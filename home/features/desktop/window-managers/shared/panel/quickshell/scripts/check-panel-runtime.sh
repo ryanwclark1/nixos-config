@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
+config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 instance_id=""
 repo_shell_mode=0

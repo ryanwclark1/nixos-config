@@ -342,19 +342,6 @@ SharedWidgets.CardBase {
         return Math.round(value) + " KiB";
     }
 
-    function formatBytes(bytes) {
-        var value = Number(bytes);
-        if (!isFinite(value) || value < 0)
-            return "Unavailable";
-        if (value >= 1024 * 1024 * 1024)
-            return (value / (1024 * 1024 * 1024)).toFixed(1) + " GiB";
-        if (value >= 1024 * 1024)
-            return (value / (1024 * 1024)).toFixed(1) + " MiB";
-        if (value >= 1024)
-            return (value / 1024).toFixed(1) + " KiB";
-        return Math.round(value) + " B";
-    }
-
     function fallbackText(value) {
         return String(value || "").trim() === "" ? "Unavailable" : String(value);
     }
@@ -1127,21 +1114,21 @@ SharedWidgets.CardBase {
                                 SharedWidgets.Chip {
                                     icon: "󰈀"
                                     iconColor: Colors.primary
-                                    text: "READ " + root.formatBytes(root.detailData.readBytes)
+                                    text: "READ " + MU.formatBytes(root.detailData.readBytes)
                                     textColor: Colors.primary
                                 }
 
                                 SharedWidgets.Chip {
                                     icon: "󰆼"
                                     iconColor: Colors.accent
-                                    text: "WRITE " + root.formatBytes(root.detailData.writeBytes)
+                                    text: "WRITE " + MU.formatBytes(root.detailData.writeBytes)
                                     textColor: Colors.accent
                                 }
 
                                 SharedWidgets.Chip {
                                     icon: "󰛐"
                                     iconColor: Colors.warning
-                                    text: "CANCEL " + root.formatBytes(root.detailData.cancelledWriteBytes)
+                                    text: "CANCEL " + MU.formatBytes(root.detailData.cancelledWriteBytes)
                                     textColor: Colors.warning
                                 }
 

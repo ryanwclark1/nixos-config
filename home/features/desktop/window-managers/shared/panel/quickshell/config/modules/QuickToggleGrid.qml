@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
-import "../modules"
+import "../system/sections"
 
 GridLayout {
   id: root

@@ -957,10 +957,10 @@ EOF
   case "${log_status}" in clean) dot_class="dot-clean" ;; warning) dot_class="dot-warning" ;; error) dot_class="dot-error" ;; esac
   
   # Determine source file for "Edit" button
-  local source_file="config/shell.qml"
-  if [[ "${name}" == portrait-* || "${name}" == laptop-* || "${name}" == wide-* ]]; then source_file="config/menu/SettingsHub.qml";
-  elif [[ "${name}" == drun-* || "${name}" == files-* || "${name}" == web-* ]]; then source_file="config/launcher/Launcher.qml";
-  elif [[ "${name}" == networkMenu-* || "${name}" == audioMenu-* ]]; then source_file="config/menu/NetworkMenu.qml"; fi
+  local source_file="src/shell.qml"
+  if [[ "${name}" == portrait-* || "${name}" == laptop-* || "${name}" == wide-* ]]; then source_file="src/menu/SettingsHub.qml";
+  elif [[ "${name}" == drun-* || "${name}" == files-* || "${name}" == web-* ]]; then source_file="src/launcher/Launcher.qml";
+  elif [[ "${name}" == networkMenu-* || "${name}" == audioMenu-* ]]; then source_file="src/menu/NetworkMenu.qml"; fi
 
   cat <<EOF
         </div>

@@ -46,6 +46,6 @@ Compositor-specific behavior notes and capability expectations are documented in
 ## Naming and Placement
 
 - Top-level UI surfaces should be orchestrated in `shell.qml`.
-- Reusable leaf widgets belong in `config/widgets/`.
-- Shared state and integration logic belongs in `config/services/`.
-- New popup/menu surfaces belong in `config/menu/` and should use shared surface IDs.
+- Reusable leaf widgets belong in `src/widgets/`.
+- Shared state and integration logic belongs in `src/services/`.
+- New popup/menu surfaces belong in `src/menu/` and should use shared surface IDs.

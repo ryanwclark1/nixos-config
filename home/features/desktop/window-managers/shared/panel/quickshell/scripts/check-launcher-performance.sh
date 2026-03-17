@@ -2,10 +2,10 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-launcher_qml="${script_dir}/../config/launcher/Launcher.qml"
-config_qml="${script_dir}/../config/services/Config.qml"
-config_persistence_js="${script_dir}/../config/services/config/ConfigPersistence.js"
-system_tab_qml="${script_dir}/../config/menu/settings/tabs/ShellCoreSectionTab.qml"
+launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
+config_qml="${script_dir}/../src/services/Config.qml"
+config_persistence_js="${script_dir}/../src/services/config/ConfigPersistence.js"
+system_tab_qml="${script_dir}/../src/menu/settings/tabs/ShellCoreSectionTab.qml"
 
 violations=()
 

@@ -3,7 +3,7 @@ set -euo pipefail
 
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
+config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 expected_config="$(realpath "${config_root}/shell.qml" 2>/dev/null || printf '%s' "${config_root}/shell.qml")"
 instance_id=""
 instance_pid=""

@@ -5,7 +5,7 @@ This document tracks intentional behavior differences between Hyprland and Niri 
 
 ## Core Rules
 
-- Route compositor-specific behavior through `config/services/CompositorAdapter.qml`.
+- Route compositor-specific behavior through `src/services/CompositorAdapter.qml`.
 - Avoid direct `hyprctl` usage in UI files outside the guard allowlist.
 - Hide unsupported UI actions instead of presenting controls that fail at runtime.
 

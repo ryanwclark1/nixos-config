@@ -122,8 +122,15 @@ let
   '';
 
   healthCheckScript = pkgs.writeShellScriptBin "qs-health-check" ''
-    export QS_REPO_ROOT=${lib.escapeShellArg repoRoot}
+    export QS_REPO_ROOT="''${QS_REPO_ROOT:-${lib.escapeShellArg repoRoot}}"
     export QS_HEALTH_RULES_FILE=${lib.escapeShellArg healthRules}
+    export QS_COMPOSITOR_GUARD_SCRIPT="${compositorGuardScript}/bin/qs-compositor-guard-check"
+    export QS_COMPOSITOR_FIXTURE_SCRIPT="${compositorFixtureScript}/bin/qs-compositor-fixture-check"
+    export QS_COMPOSITOR_VERIFY_SCRIPT="${compositorVerifyScript}/bin/qs-compositor-verify"
+    export QS_COMPOSITOR_SMOKE_SCRIPT="${compositorSmokeScript}/bin/qs-compositor-smoke-check"
+    export QS_HEALTH_SAFE_FIX_SCRIPT="${healthSafeFixScript}/bin/qs-health-safe-fix"
+    export QS_CONFIG_DIR="${config.home.homeDirectory}/.config/quickshell"
+    export QS_FIXTURES_DIR="${config.home.homeDirectory}/.config/quickshell/fixtures"
     PATH="${pkgs.quickshell}/bin:${pkgs.jq}/bin:${pkgs.ripgrep}/bin:${pkgs.git}/bin:${pkgs.perl}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.procps}/bin:${pkgs.systemd}/bin:${pkgs.bash}/bin:$PATH"
     ${builtins.readFile ./scripts/health-check.sh}
   '';
@@ -159,7 +166,7 @@ let
     export WAYLAND_DISPLAY="''${wayland_display}"
     export QT_QPA_PLATFORM=wayland
 
-    exec ${pkgs.quickshell}/bin/quickshell -p "''${HOME}/.config/quickshell/shell.qml"
+    exec ${pkgs.quickshell}/bin/quickshell -p "${config.home.homeDirectory}/.config/quickshell/shell.qml"
   '';
 
   pluginDoctorScript = pkgs.writeShellScriptBin "qs-plugin-doctor" ''
@@ -350,7 +357,12 @@ EOF
 
     home.file.".config/quickshell" = {
       force = true;
-      source = ./config;
+      source = ./src;
+      recursive = true;
+    };
+
+    home.file.".config/quickshell/fixtures" = {
+      source = ./fixtures;
       recursive = true;
     };
 

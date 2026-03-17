@@ -1,0 +1,12 @@
+DateTimeBarWidget 1.0 DateTimeBarWidget.qml
+UpdatesBarWidget 1.0 UpdatesBarWidget.qml
+CavaBarWidget 1.0 CavaBarWidget.qml
+IdleInhibitorBarWidget 1.0 IdleInhibitorBarWidget.qml
+WeatherBarWidget 1.0 WeatherBarWidget.qml
+VpnBarWidget 1.0 VpnBarWidget.qml
+BluetoothBarWidget 1.0 BluetoothBarWidget.qml
+MusicBarWidget 1.0 MusicBarWidget.qml
+PrivacyBarWidget 1.0 PrivacyBarWidget.qml
+RecordingBarWidget 1.0 RecordingBarWidget.qml
+PrinterBarWidget 1.0 PrinterBarWidget.qml
+NotificationsBarWidget 1.0 NotificationsBarWidget.qml

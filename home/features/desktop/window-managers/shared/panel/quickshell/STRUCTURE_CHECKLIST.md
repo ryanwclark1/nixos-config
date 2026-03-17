@@ -52,9 +52,9 @@ Use this checklist before merging panel architecture changes.
 - [ ] `scripts/check-plugin-diagnostics-contracts.sh` passes for plugin diagnostics payload/schema contract guardrails.
 - [ ] `scripts/sync-plugin-diagnostics-schema.sh --check` passes and `--write` is used when runtime catalog enum sets change.
 - [ ] `scripts/check-plugin-diagnostics-schema.sh` passes for local JSON Schema validation of diagnostics payload contracts.
-- [ ] `config/plugins/runtime-catalog.json` is updated when plugin lifecycle states or runtime error codes change.
-- [ ] `config/plugins/diagnostics.schema.json` is updated when diagnostics payload contracts change.
-- [ ] `PluginRuntimeCatalog` remains in sync with `config/plugins/runtime-catalog.json` consumers (plugin settings UI and guards).
+- [ ] `src/plugins/runtime-catalog.json` is updated when plugin lifecycle states or runtime error codes change.
+- [ ] `src/plugins/diagnostics.schema.json` is updated when diagnostics payload contracts change.
+- [ ] `PluginRuntimeCatalog` remains in sync with `src/plugins/runtime-catalog.json` consumers (plugin settings UI and guards).
 - [ ] `scripts/plugin-verify.sh` passes as the unified plugin verification gate.
 - [ ] `scripts/plugin-verify.sh --quiet` remains the compact unified plugin verification gate.
 - [ ] `scripts/plugin-verify.sh` reuses `scripts/plugin-local.sh all-gates`, rather than duplicating the assembled verification phases.

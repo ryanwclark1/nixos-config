@@ -2,10 +2,10 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-plugin_service="${script_dir}/../config/services/PluginService.qml"
-plugin_runtime="${script_dir}/../config/services/PluginRuntime.qml"
+plugin_service="${script_dir}/../src/services/PluginService.qml"
+plugin_runtime="${script_dir}/../src/services/PluginRuntime.qml"
 docker_daemon="${script_dir}/../examples/plugins/docker-manager/Daemon.qml"
-runtime_catalog="${script_dir}/../config/plugins/runtime-catalog.json"
+runtime_catalog="${script_dir}/../src/plugins/runtime-catalog.json"
 
 pass_count=0
 fail_count=0

@@ -6,8 +6,8 @@ reference_dir="${script_dir}/../examples/plugins/reference-local-toolkit"
 recovery_fixture="${reference_dir}/expected-recovery-scenarios.json"
 launcher_provider="${reference_dir}/LauncherProvider.qml"
 settings_view="${reference_dir}/Settings.qml"
-plugin_runtime="${script_dir}/../config/services/PluginRuntime.qml"
-runtime_catalog="${script_dir}/../config/plugins/runtime-catalog.json"
+plugin_runtime="${script_dir}/../src/services/PluginRuntime.qml"
+runtime_catalog="${script_dir}/../src/plugins/runtime-catalog.json"
 
 pass_count=0
 fail_count=0

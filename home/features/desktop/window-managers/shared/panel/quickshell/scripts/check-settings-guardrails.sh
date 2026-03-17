@@ -3,7 +3,7 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 quickshell_root="$(CDPATH= cd -- "${script_dir}/.." >/dev/null && pwd)"
-config_root="${quickshell_root}/config"
+config_root="${quickshell_root}/src"
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then

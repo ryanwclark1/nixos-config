@@ -12,7 +12,7 @@ SharedWidgets.CardBase {
 
   SharedWidgets.Ref { service: SystemStatus }
 
-  SharedWidgets.CommandPoll {
+  CommandPoll {
     id: vramPoll
     interval: 5000
     running: root.visible

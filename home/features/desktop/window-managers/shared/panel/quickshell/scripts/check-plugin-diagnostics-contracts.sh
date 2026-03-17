@@ -4,8 +4,8 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 fixtures_dir="${script_dir}/../fixtures/plugins"
 doctor_script="${script_dir}/plugin-doctor.sh"
-plugins_tab="${script_dir}/../config/menu/settings/tabs/PluginsTab.qml"
-contracts_schema="${script_dir}/../config/plugins/diagnostics.schema.json"
+plugins_tab="${script_dir}/../src/menu/settings/tabs/PluginsTab.qml"
+contracts_schema="${script_dir}/../src/plugins/diagnostics.schema.json"
 
 pass_count=0
 fail_count=0

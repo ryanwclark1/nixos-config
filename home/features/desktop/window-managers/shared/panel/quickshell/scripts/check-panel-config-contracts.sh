@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-services_dir="${script_dir}/../config/services"
+services_dir="${script_dir}/../src/services"
 services_url="file://${services_dir}"
 
 pass_count=0

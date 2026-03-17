@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-launcher_qml="${script_dir}/../config/launcher/Launcher.qml"
+launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
 
 violations=()
 

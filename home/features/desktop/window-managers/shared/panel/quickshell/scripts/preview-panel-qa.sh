@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
+config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 instance_id=""
 repo_shell_mode=0
 repo_shell_pid=""

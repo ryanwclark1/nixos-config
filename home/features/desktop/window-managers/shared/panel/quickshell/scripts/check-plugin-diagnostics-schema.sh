@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 fixtures_dir="${script_dir}/../fixtures/plugins"
 doctor_script="${script_dir}/plugin-doctor.sh"
-schema_file="${script_dir}/../config/plugins/diagnostics.schema.json"
+schema_file="${script_dir}/../src/plugins/diagnostics.schema.json"
 schema_validator="${script_dir}/validate-json-schema.js"
 
 pass_count=0

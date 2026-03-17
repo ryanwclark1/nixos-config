@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import "../modules"
+import "../system/sections"
 import "../services"
 import "../widgets" as SharedWidgets
 

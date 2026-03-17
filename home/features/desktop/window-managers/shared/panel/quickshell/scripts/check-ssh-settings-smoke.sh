@@ -84,8 +84,8 @@ cat > "${tmp_qml}" <<'QML'
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import "./config/services"
-import "./config/menu/settings/tabs"
+import "./src/services"
+import "./src/menu/settings/tabs"
 
 Scope {
   id: root

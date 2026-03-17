@@ -21,8 +21,8 @@ printf '{"themes":[]}\n' > "${tmp_home}/.config/quickshell/themes.json"
 cat > "${tmp_qml}" <<'QML'
 import Quickshell
 import QtQuick
-import "./config/services"
-import "./config/bar" as Bar
+import "./src/services"
+import "./src/bar" as Bar
 
 Scope {
   id: root

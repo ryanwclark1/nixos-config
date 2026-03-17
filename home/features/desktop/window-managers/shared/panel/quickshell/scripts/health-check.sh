@@ -4,6 +4,11 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 repo_root="${QS_REPO_ROOT:-$(CDPATH= cd -- "${script_dir}/.." >/dev/null 2>&1 && pwd -P)}"
 rules_file="${QS_HEALTH_RULES_FILE:-${script_dir}/health-rules.json}"
+compositor_guard_script="${QS_COMPOSITOR_GUARD_SCRIPT:-${script_dir}/check-compositor-guards.sh}"
+compositor_fixture_script="${QS_COMPOSITOR_FIXTURE_SCRIPT:-${script_dir}/check-compositor-fixtures.sh}"
+compositor_verify_script="${QS_COMPOSITOR_VERIFY_SCRIPT:-${script_dir}/compositor-verify.sh}"
+compositor_smoke_script="${QS_COMPOSITOR_SMOKE_SCRIPT:-${script_dir}/compositor-smoke.sh}"
+health_safe_fix_script="${QS_HEALTH_SAFE_FIX_SCRIPT:-${script_dir}/health-safe-fix.sh}"
 state_root="${QS_HEALTH_STATE_ROOT:-${XDG_STATE_HOME:-${HOME}/.local/state}/quickshell}"
 incident_root="${state_root}/incidents"
 index_file="${incident_root}/index.json"
@@ -311,7 +316,7 @@ apply_safe_fix_if_allowed() {
 
   safe_fix_attempted=1
   patch_file="${dir}/applied-fix.patch"
-  if "${script_dir}/health-safe-fix.sh" "${safe_fix_id}" > "${dir}/safe-fix.log" 2>&1; then
+  if "${health_safe_fix_script}" "${safe_fix_id}" > "${dir}/safe-fix.log" 2>&1; then
     git -C "${repo_root}" diff -- \
       home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-guards.sh \
       home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-fixtures.sh \
@@ -373,14 +378,17 @@ main() {
   notifications_probe_log="$(mktemp)"
   trap 'rm -f "${guard_log}" "${fixture_log}" "${journal_log}" "${safe_fix_probe_log}" "${static_failure_log}" "${settings_probe_log}" "${controls_probe_log}" "${notifications_probe_log}"' EXIT
 
-  {
-    printf 'Checking repo-owned quickshell scripts for legacy script_dir pattern...\n'
-    rg -n -F 'script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"' \
-      "${script_dir}/check-compositor-guards.sh" \
-      "${script_dir}/check-compositor-fixtures.sh" \
-      "${script_dir}/compositor-verify.sh" \
-      "${script_dir}/compositor-smoke.sh" || true
-  } > "${safe_fix_probe_log}"
+  local repo_scripts_dir="${repo_root}/home/features/desktop/window-managers/shared/panel/quickshell/scripts"
+  if [[ -d "${repo_scripts_dir}" ]]; then
+    {
+      printf 'Checking repo-owned quickshell scripts for legacy script_dir pattern...\n'
+      rg -n -F 'script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"' \
+        "${repo_scripts_dir}/check-compositor-guards.sh" \
+        "${repo_scripts_dir}/check-compositor-fixtures.sh" \
+        "${repo_scripts_dir}/compositor-verify.sh" \
+        "${repo_scripts_dir}/compositor-smoke.sh" || true
+    } > "${safe_fix_probe_log}"
+  fi
 
   if rg -q '^[^:]+:' "${safe_fix_probe_log}"; then
     signature="legacy-script-dir-resolution"
@@ -389,10 +397,10 @@ main() {
     apply_safe_fix_if_allowed "${signature}" "${dir}" "${safe_fix_id}"
   fi
 
-  if ! bash "${script_dir}/check-compositor-guards.sh" > "${guard_log}" 2>&1; then
+  if ! bash "${compositor_guard_script}" > "${guard_log}" 2>&1; then
     cat "${guard_log}" > "${static_failure_log}"
   fi
-  if ! bash "${script_dir}/check-compositor-fixtures.sh" > "${fixture_log}" 2>&1; then
+  if ! bash "${compositor_fixture_script}" > "${fixture_log}" 2>&1; then
     cat "${fixture_log}" >> "${static_failure_log}"
   fi
   if [[ -s "${static_failure_log}" ]]; then

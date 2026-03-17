@@ -6,7 +6,7 @@ Related docs:
 
 - settings-specific workflow: `SETTINGS_RESPONSIVE_RUNBOOK.md`
 - settings responsive history and findings: `SETTINGS_RESPONSIVE_CLOSEOUT.md`
-- plugin-specific local workflow: `config/plugins/README.md`
+- plugin-specific local workflow: `src/plugins/README.md`
 
 ## Canonical Commands
 

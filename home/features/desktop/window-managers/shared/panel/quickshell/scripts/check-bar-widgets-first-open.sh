@@ -117,7 +117,7 @@ start_repo_shell() {
   fi
 
   populate_repo_shell_env
-  env "${repo_shell_env[@]}" quickshell -p "${script_dir}/../config/shell.qml" >/tmp/quickshell-repo-bar-widgets-first-open.log 2>&1 &
+  env "${repo_shell_env[@]}" quickshell -p "${script_dir}/../src/shell.qml" >/tmp/quickshell-repo-bar-widgets-first-open.log 2>&1 &
   repo_shell_pid="$!"
 
   deadline=$((SECONDS + 20))

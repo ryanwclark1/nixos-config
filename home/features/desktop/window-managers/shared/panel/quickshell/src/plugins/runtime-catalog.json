@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://local/quickshell/plugins/runtime-catalog.json",
+  "title": "Shared Panel Plugin Runtime Catalog",
+  "states": {
+    "discovered": {
+      "label": "Discovered",
+      "description": "Plugin manifest found during scan.",
+      "severity": "info"
+    },
+    "validated": {
+      "label": "Validated",
+      "description": "Plugin manifest passed validation checks.",
+      "severity": "info"
+    },
+    "enabled": {
+      "label": "Enabled",
+      "description": "Plugin is enabled and eligible for runtime activation.",
+      "severity": "info"
+    },
+    "active": {
+      "label": "Active",
+      "description": "Plugin runtime component is active and healthy.",
+      "severity": "ok"
+    },
+    "degraded": {
+      "label": "Degraded",
+      "description": "Plugin is running with a recoverable runtime fault.",
+      "severity": "warn"
+    },
+    "failed": {
+      "label": "Failed",
+      "description": "Plugin failed validation or runtime startup/operation.",
+      "severity": "error"
+    },
+    "disabled": {
+      "label": "Disabled",
+      "description": "Plugin is installed but disabled by configuration.",
+      "severity": "muted"
+    }
+  },
+  "errors": {
+    "E_MANIFEST_VALIDATION": {
+      "label": "Manifest Validation Failed",
+      "description": "Plugin manifest does not satisfy required schema or value constraints.",
+      "severity": "error"
+    },
+    "E_DUPLICATE_PLUGIN_ID": {
+      "label": "Duplicate Plugin ID",
+      "description": "More than one plugin declares the same id; ids must be unique.",
+      "severity": "error"
+    },
+    "E_SCAN_LINE_PARSE": {
+      "label": "Scan Output Parse Error",
+      "description": "Plugin scan output contained malformed JSON and could not be parsed.",
+      "severity": "error"
+    },
+    "E_LAUNCHER_COMPONENT_LOAD": {
+      "label": "Launcher Component Load Failed",
+      "description": "Launcher provider QML component could not be loaded.",
+      "severity": "error"
+    },
+    "E_LAUNCHER_INSTANCE_CREATE": {
+      "label": "Launcher Instance Creation Failed",
+      "description": "Launcher provider component loaded but instance creation failed.",
+      "severity": "error"
+    },
+    "E_LAUNCHER_QUERY": {
+      "label": "Launcher Query Failed",
+      "description": "Launcher provider threw an error while producing query results.",
+      "severity": "warn"
+    },
+    "E_LAUNCHER_EXECUTE": {
+      "label": "Launcher Execute Failed",
+      "description": "Launcher provider failed while executing a selected item.",
+      "severity": "warn"
+    },
+    "E_LAUNCHER_ACTION": {
+      "label": "Launcher Action Failed",
+      "description": "Launcher fallback action callback threw an error.",
+      "severity": "warn"
+    },
+    "E_DAEMON_COMPONENT_LOAD": {
+      "label": "Daemon Component Load Failed",
+      "description": "Daemon plugin QML component could not be loaded.",
+      "severity": "error"
+    },
+    "E_DAEMON_INSTANCE_CREATE": {
+      "label": "Daemon Instance Creation Failed",
+      "description": "Daemon component loaded but instance creation failed.",
+      "severity": "error"
+    },
+    "E_DAEMON_START": {
+      "label": "Daemon Start Failed",
+      "description": "Daemon instance was created but failed during start().",
+      "severity": "error"
+    },
+    "E_DOCKER_RUNTIME_UNAVAILABLE": {
+      "label": "Docker Runtime Unavailable",
+      "description": "Docker Manager could not reach the configured container runtime or inspect its containers.",
+      "severity": "warn"
+    },
+    "E_DOCKER_SNAPSHOT_PARSE": {
+      "label": "Docker Snapshot Parse Failed",
+      "description": "Docker Manager received runtime output that could not be parsed into a container snapshot.",
+      "severity": "warn"
+    },
+    "E_DOCKER_ACTION_FAILED": {
+      "label": "Docker Action Failed",
+      "description": "Docker Manager failed while executing a container or compose action.",
+      "severity": "warn"
+    }
+  }
+}

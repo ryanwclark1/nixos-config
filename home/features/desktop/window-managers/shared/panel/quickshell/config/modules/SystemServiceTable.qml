@@ -131,19 +131,6 @@ SharedWidgets.CardBase {
         return Colors.textDisabled;
     }
 
-    function formatBytes(bytes) {
-        var value = Number(bytes);
-        if (!isFinite(value) || value < 0)
-            return "Unavailable";
-        if (value >= 1024 * 1024 * 1024)
-            return (value / (1024 * 1024 * 1024)).toFixed(1) + " GiB";
-        if (value >= 1024 * 1024)
-            return (value / (1024 * 1024)).toFixed(1) + " MiB";
-        if (value >= 1024)
-            return (value / 1024).toFixed(1) + " KiB";
-        return Math.round(value) + " B";
-    }
-
     function fallbackText(value) {
         return String(value || "").trim() === "" ? "Unavailable" : String(value);
     }
@@ -799,7 +786,7 @@ SharedWidgets.CardBase {
                                 SharedWidgets.Chip {
                                     icon: "󰍛"
                                     iconColor: Colors.accent
-                                    text: "MEM " + root.formatBytes(root.detailData.memoryCurrent)
+                                    text: "MEM " + MU.formatBytes(root.detailData.memoryCurrent)
                                     textColor: Colors.accent
                                 }
 

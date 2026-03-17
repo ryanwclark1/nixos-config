@@ -1,0 +1,1181 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import Quickshell
+import Quickshell.Wayland
+import Quickshell.Io
+import "../../services"
+import "services/AiProviders.js" as Providers
+import "services/AiMarkdown.js" as Markdown
+import "../../widgets" as SharedWidgets
+import "../../menu/settings"
+import "components"
+
+PanelWindow {
+    id: root
+
+    readonly property var edgeMargins: Config.reservedEdgesForScreen(screen, "")
+
+    anchors {
+        top: true
+        right: true
+        bottom: true
+    }
+    margins.top: edgeMargins.top
+    margins.right: edgeMargins.right
+    margins.bottom: edgeMargins.bottom
+
+    implicitWidth: panelWidth
+    color: "transparent"
+    mask: Region {
+        item: slidePanel
+    }
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+    WlrLayershell.namespace: "quickshell"
+
+    // --- State ---
+    property bool showContent: false
+    property int panelWidth: 420
+    readonly property int panelMinWidth: 320
+    readonly property int panelMaxWidth: 600
+    property bool includeWindowContext: false
+    property bool includeVisualContext: false
+    property bool includeSelectionContext: false
+
+    property var attachedFiles: []
+    property string _pendingMsgText: ""
+    property int _fileReadIndex: 0
+
+    signal closeRequested
+
+    onIncludeWindowContextChanged: {
+        if (includeWindowContext)
+            AiService.refreshActiveWindowTitle();
+    }
+
+    // Panel visibility: stay mapped during slide-out animation
+    visible: showContent || slidePanel.x < panelWidth
+
+    onShowContentChanged: {
+        if (showContent) {
+            inputField.forceActiveFocus();
+        } else {
+            if (inputField.activeFocus)
+                inputField.focus = false;
+            providerDropdown.visible = false;
+        }
+    }
+
+    // --- Drag-resize state ---
+    property real _dragStartX: 0
+    property real _dragStartWidth: 0
+
+    // Markdown rendering helpers
+    readonly property var _mdColors: ({
+            text: Colors.text,
+            textSecondary: Colors.textSecondary,
+            primary: Colors.primary,
+            bgWidget: Colors.bgWidget,
+            fontMono: Colors.fontMono,
+            codeBg: Colors.withAlpha(Colors.text, 0.06)
+        })
+
+    function _renderMarkdown(text) {
+        return Markdown.toHtml(text, _mdColors);
+    }
+
+    function _renderBlocks(text) {
+        return Markdown.toBlocks(text, _mdColors);
+    }
+
+    // =========================================================
+    //  Keyboard shortcuts
+    // =========================================================
+    Shortcut {
+        sequence: "Escape"
+        enabled: root.showContent
+        onActivated: root.closeRequested()
+    }
+
+    Shortcut {
+        sequence: "Ctrl+N"
+        enabled: root.showContent
+        onActivated: AiService.newConversation()
+    }
+
+    // =========================================================
+    //  Main panel rectangle — slides in from right
+    // =========================================================
+    Rectangle {
+        id: slidePanel
+        width: root.panelWidth
+        height: parent.height
+        color: Colors.popupSurface
+        border.color: Colors.border
+        border.width: 1
+        radius: Colors.radiusLarge
+
+        // Inner highlight
+        SharedWidgets.InnerHighlight {
+            highlightOpacity: 0.15
+        }
+
+        x: root.showContent ? 0 : root.panelWidth + 10
+        opacity: root.showContent ? 1.0 : 0.0
+
+        Behavior on x {
+            NumberAnimation {
+                id: slideAnim
+                duration: 320
+                easing.type: Easing.OutBack
+                easing.overshoot: 0.6
+            }
+        }
+        Behavior on opacity {
+            NumberAnimation {
+                id: fadeAnim
+                duration: 260
+            }
+        }
+        layer.enabled: slideAnim.running || fadeAnim.running
+
+        Keys.onEscapePressed: root.closeRequested()
+
+        DropArea {
+            anchors.fill: parent
+            keys: ["file"]
+            onDropped: drop => {
+                if (drop.hasUrls) {
+                    for (var i = 0; i < drop.urls.length; i++) {
+                        var url = drop.urls[i].toString();
+                        var path = url.replace("file://", "");
+                        var name = path.split("/").pop();
+                        root.attachedFiles = root.attachedFiles.concat([
+                            {
+                                type: "file",
+                                name: name,
+                                path: path,
+                                content: ""
+                            }
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // ----------------------------------------------------------
+        //  Left-edge drag handle for resizing
+        // ----------------------------------------------------------
+        Rectangle {
+            id: dragHandle
+            width: 6
+            height: parent.height * 0.15
+            radius: 3
+            color: dragArea.containsMouse ? Colors.primary : Colors.border
+            anchors.left: parent.left
+            anchors.leftMargin: -3
+            anchors.verticalCenter: parent.verticalCenter
+            opacity: dragArea.containsMouse || dragArea.pressed ? 1.0 : 0.4
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Colors.durationFast
+                }
+            }
+            Behavior on color {
+                ColorAnimation {
+                    duration: Colors.durationFast
+                }
+            }
+
+            MouseArea {
+                id: dragArea
+                anchors.fill: parent
+                anchors.margins: -6
+                hoverEnabled: true
+                cursorShape: Qt.SizeHorCursor
+                onPressed: mouse => {
+                    root._dragStartX = mapToGlobal(mouse.x, mouse.y).x;
+                    root._dragStartWidth = root.panelWidth;
+                }
+                onPositionChanged: mouse => {
+                    if (!pressed)
+                        return;
+                    var globalX = mapToGlobal(mouse.x, mouse.y).x;
+                    var delta = root._dragStartX - globalX;
+                    var newW = Math.max(root.panelMinWidth, Math.min(root.panelMaxWidth, root._dragStartWidth + delta));
+                    root.panelWidth = Math.round(newW);
+                }
+            }
+        }
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: Colors.paddingLarge
+            spacing: Colors.spacingM
+
+            // ---- Header ----
+            RowLayout {
+                Layout.fillWidth: true
+
+                Text {
+                    text: "󰚩  AI Chat"
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeXL
+                    font.weight: Font.DemiBold
+                    font.letterSpacing: Colors.letterSpacingTight
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                // Provider/model picker
+                Rectangle {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.rightMargin: Colors.spacingXS
+                    Layout.maximumWidth: 140
+                    width: providerPickerText.implicitWidth + Colors.spacingL
+                    height: 24
+                    radius: Colors.radiusXXS
+                    color: providerPickerMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
+                    border.color: providerPickerMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
+                    border.width: 1
+
+                    Text {
+                        id: providerPickerText
+                        anchors.centerIn: parent
+                        text: Providers.providerIcon(AiService.activeProvider) + " " + AiService.activeModel
+                        color: providerPickerMouse.containsMouse ? Colors.primary : Colors.textDisabled
+                        font.pixelSize: Colors.fontSizeXS
+                        font.family: Colors.fontMono
+                        elide: Text.ElideRight
+                        width: Math.min(implicitWidth, 130)
+                    }
+
+                    MouseArea {
+                        id: providerPickerMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: providerDropdown.visible = !providerDropdown.visible
+                    }
+                }
+
+                // Copy All
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusXS
+                    color: "transparent"
+                    visible: AiService.activeMessages.length > 0
+                    Text {
+                        anchors.centerIn: parent
+                        text: "󰆏"
+                        color: Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeLarge
+                    }
+                    SharedWidgets.StateLayer {
+                        id: copyAllStateLayer
+                        hovered: copyAllHover.containsMouse
+                        pressed: copyAllHover.pressed
+                    }
+                    MouseArea {
+                        id: copyAllHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => {
+                            copyAllStateLayer.burst(mouse.x, mouse.y);
+                            var fullText = "";
+                            var msgs = AiService.activeMessages;
+                            for (var i = 0; i < msgs.length; i++) {
+                                fullText += (msgs[i].role === "user" ? "### User\n" : "### Assistant\n") + msgs[i].content + "\n\n";
+                            }
+                            Quickshell.execDetached(["sh", "-c", "printf '%s' " + root._shellEscape(fullText) + " | wl-copy"]);
+                            ToastService.showNotice("Copied", "Full conversation copied to clipboard");
+                        }
+                    }
+                    SharedWidgets.BarTooltip {
+                        text: "Copy full conversation"
+                        hovered: copyAllHover.containsMouse
+                        anchorItem: parent
+                    }
+                }
+
+                // Clear conversation
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusXS
+                    color: "transparent"
+                    visible: AiService.activeMessages.length > 0
+                    Text {
+                        anchors.centerIn: parent
+                        text: "󰃢"
+                        color: Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeLarge
+                    }
+                    SharedWidgets.StateLayer {
+                        id: clearChatStateLayer
+                        hovered: clearChatHover.containsMouse
+                        pressed: clearChatHover.pressed
+                    }
+                    MouseArea {
+                        id: clearChatHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => {
+                            clearChatStateLayer.burst(mouse.x, mouse.y);
+                            AiService.clearConversation(AiService.activeConversationId);
+                        }
+                    }
+                    SharedWidgets.BarTooltip {
+                        text: "Clear current chat"
+                        hovered: clearChatHover.containsMouse
+                        anchorItem: parent
+                    }
+                }
+
+                // New conversation
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusXS
+                    color: newChatHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
+                    border.color: newChatHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "󰐕"
+                        color: newChatHover.containsMouse ? Colors.primary : Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeLarge
+                    }
+                    SharedWidgets.StateLayer {
+                        id: newChatStateLayer
+                        hovered: newChatHover.containsMouse
+                        pressed: newChatHover.pressed
+                    }
+                    MouseArea {
+                        id: newChatHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => {
+                            newChatStateLayer.burst(mouse.x, mouse.y);
+                            AiService.newConversation();
+                        }
+                    }
+                    SharedWidgets.BarTooltip {
+                        text: "New Conversation (Ctrl+N)"
+                        hovered: newChatHover.containsMouse
+                        anchorItem: parent
+                    }
+                }
+
+                // Close button
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusMedium
+                    color: "transparent"
+                    Text {
+                        anchors.centerIn: parent
+                        text: "󰅖"
+                        color: Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeLarge
+                    }
+                    SharedWidgets.StateLayer {
+                        id: closeStateLayer
+                        hovered: closeHover.containsMouse
+                        pressed: closeHover.pressed
+                    }
+                    MouseArea {
+                        id: closeHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => {
+                            closeStateLayer.burst(mouse.x, mouse.y);
+                            root.closeRequested();
+                        }
+                    }
+                }
+            }
+
+            // ---- Conversation tabs ----
+            AiConversationTabs {
+                Layout.fillWidth: true
+            }
+
+            // ---- Command Confirmation ----
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: cmdCol.implicitHeight + 24
+                radius: Colors.radiusMedium
+                color: Colors.withAlpha(Colors.accent, 0.12)
+                border.color: Colors.accent
+                border.width: 1
+                visible: AiService.pendingCommand !== null
+                clip: true
+
+                opacity: visible ? 1.0 : 0.0
+                scale: visible ? 1.0 : 0.95
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 350
+                        easing.type: Easing.OutBack
+                    }
+                }
+
+                ColumnLayout {
+                    id: cmdCol
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingM
+                    spacing: Colors.spacingS
+
+                    RowLayout {
+                        spacing: Colors.spacingS
+                        Text {
+                            text: "󰒓"
+                            color: Colors.accent
+                            font.pixelSize: Colors.fontSizeXL
+                            font.family: Colors.fontMono
+                        }
+                        Text {
+                            text: "Suggested System Action"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.Bold
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: cmdLabel.implicitHeight + 16
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.background, 0.4)
+                        Text {
+                            id: cmdLabel
+                            anchors.centerIn: parent
+                            text: AiService.pendingCommand ? AiService.pendingCommand.label : ""
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeMedium
+                            font.weight: Font.Bold
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.alignment: Qt.AlignRight
+                        spacing: Colors.spacingM
+
+                        SettingsActionButton {
+                            label: "Cancel"
+                            iconName: "󰅖"
+                            compact: true
+                            onClicked: AiService.cancelPendingCommand()
+                        }
+
+                        SettingsActionButton {
+                            label: "Execute"
+                            iconName: "󰐊"
+                            compact: true
+                            onClicked: AiService.executePendingCommand()
+                        }
+                    }
+                }
+            }
+
+            // ---- Script Confirmation ----
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: scriptCol.implicitHeight + 24
+                radius: Colors.radiusMedium
+                color: Colors.withAlpha(Colors.success, 0.12)
+                border.color: Colors.success
+                border.width: 1
+                visible: AiService.pendingScript !== null
+                clip: true
+
+                opacity: visible ? 1.0 : 0.0
+                scale: visible ? 1.0 : 0.95
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 350
+                        easing.type: Easing.OutBack
+                    }
+                }
+
+                ColumnLayout {
+                    id: scriptCol
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingM
+                    spacing: Colors.spacingS
+
+                    RowLayout {
+                        spacing: Colors.spacingS
+                        Text {
+                            text: "󰆍"
+                            color: Colors.success
+                            font.pixelSize: Colors.fontSizeXL
+                            font.family: Colors.fontMono
+                        }
+                        Text {
+                            text: "Install Shell Script"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.Bold
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: 32
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.background, 0.4)
+                        Text {
+                            anchors.centerIn: parent
+                            text: "filename: " + (AiService.pendingScript ? AiService.pendingScript.name : "")
+                            color: Colors.success
+                            font.pixelSize: 11
+                            font.weight: Font.Bold
+                            font.family: Colors.fontMono
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: Math.min(200, scriptPreview.implicitHeight + 16)
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.background, 0.6)
+                        border.color: Colors.withAlpha(Colors.success, 0.2)
+                        border.width: 1
+                        clip: true
+
+                        Flickable {
+                            anchors.fill: parent
+                            anchors.margins: 8
+                            contentHeight: scriptPreview.implicitHeight
+                            contentWidth: width
+                            flickableDirection: Flickable.VerticalFlick
+                            Text {
+                                id: scriptPreview
+                                width: parent.width
+                                text: AiService.pendingScript ? AiService.pendingScript.content : ""
+                                color: Colors.textSecondary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeXS
+                                wrapMode: Text.WrapAnywhere
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.alignment: Qt.AlignRight
+                        spacing: Colors.spacingM
+
+                        SettingsActionButton {
+                            label: "Discard"
+                            iconName: "󰅖"
+                            compact: true
+                            onClicked: AiService.cancelPendingScript()
+                        }
+
+                        SettingsActionButton {
+                            label: "Install to ~/.local/bin"
+                            iconName: "󰄬"
+                            compact: true
+                            onClicked: AiService.installPendingScript()
+                        }
+                    }
+                }
+            }
+
+            // ---- Message list ----
+            AiMessageList {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                renderBlocksFn: root._renderBlocks
+                renderMarkdownFn: root._renderMarkdown
+                shellEscapeFn: root._shellEscape
+            }
+
+            // ---- Input area ----
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: inputLayout.implicitHeight + Colors.spacingM * 2
+                color: Colors.cardSurface
+                border.color: inputField.activeFocus ? Colors.primary : Colors.border
+                border.width: inputField.activeFocus ? 1.5 : 1
+                radius: Colors.radiusMedium
+                Behavior on border.color {
+                    ColorAnimation {
+                        duration: Colors.durationFast
+                    }
+                }
+
+                ColumnLayout {
+                    id: inputLayout
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingM
+                    spacing: Colors.spacingXS
+
+                    TextEdit {
+                        id: inputField
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: 24
+                        Layout.maximumHeight: 120
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeMedium
+                        wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
+                        selectByMouse: true
+                        selectedTextColor: Colors.background
+                        selectionColor: Colors.primary
+                        text: AiService.currentInputText
+                        onTextChanged: AiService.currentInputText = text
+
+                        // Placeholder
+                        Text {
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "Type a message..."
+                            color: Colors.textDisabled
+                            font.pixelSize: Colors.fontSizeMedium
+                            visible: inputField.text.length === 0 && !inputField.activeFocus
+                        }
+
+                        onActiveFocusChanged: if (activeFocus)
+                            providerDropdown.visible = false
+
+                        Keys.onPressed: event => {
+                            if (event.key === Qt.Key_Return && !(event.modifiers & Qt.ShiftModifier)) {
+                                event.accepted = true;
+                                root._sendCurrentMessage();
+                            }
+                        }
+                    }
+
+                    // Attached files flow
+                    Flow {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingS
+                        visible: root.attachedFiles.length > 0
+
+                        Repeater {
+                            model: root.attachedFiles
+                            delegate: Rectangle {
+                                width: fileText.width + removeButton.width + Colors.spacingM
+                                height: 24
+                                color: Colors.withAlpha(Colors.primary, 0.15)
+                                radius: Colors.radiusSmall
+                                border.color: Colors.withAlpha(Colors.primary, 0.3)
+                                border.width: 1
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: Colors.spacingS
+                                    anchors.rightMargin: Colors.spacingXS
+                                    spacing: Colors.spacingXS
+
+                                    Text {
+                                        id: fileText
+                                        text: modelData.name
+                                        color: Colors.text
+                                        font.pixelSize: Colors.fontSizeSmall
+                                        elide: Text.ElideRight
+                                        Layout.maximumWidth: 150
+                                    }
+
+                                    SharedWidgets.IconButton {
+                                        id: removeButton
+                                        icon: "window-close-symbolic"
+                                        size: 16
+                                        iconSize: 10
+                                        color: "transparent"
+                                        onClicked: {
+                                            root.attachedFiles = root.attachedFiles.filter((_, i) => i !== index);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingS
+
+                        // Window context toggle
+                        Rectangle {
+                            id: windowContextToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
+                            color: root.includeWindowContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            border.color: root.includeWindowContext ? Colors.primary : Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰖲"
+                                color: root.includeWindowContext ? Colors.primary : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: winCtxHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.includeWindowContext = !root.includeWindowContext
+                            }
+
+                            SharedWidgets.BarTooltip {
+                                text: "Attach Active Window Title"
+                                hovered: winCtxHover.containsMouse
+                                anchorItem: windowContextToggle
+                            }
+                        }
+
+                        // Visual context toggle
+                        Rectangle {
+                            id: visualContextToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
+                            color: root.includeVisualContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            border.color: root.includeVisualContext ? Colors.primary : Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰄀"
+                                color: root.includeVisualContext ? Colors.primary : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: visualCtxHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (ScreenshotService.lastRegionPath === "") {
+                                        ScreenshotService.captureRegion();
+                                    } else {
+                                        root.includeVisualContext = !root.includeVisualContext;
+                                    }
+                                }
+                                onDoubleClicked: ScreenshotService.captureRegion()
+                            }
+
+                            SharedWidgets.BarTooltip {
+                                text: "Attach Latest Screen Crop (Double-click to capture new)"
+                                hovered: visualCtxHover.containsMouse
+                                anchorItem: visualContextToggle
+                            }
+
+                            Connections {
+                                target: ScreenshotService
+                                function onRegionCaptured(path) {
+                                    root.includeVisualContext = true;
+                                    // Only OCR if the model doesn't support vision directly
+                                    if (!Providers.supportsVision(AiService.activeProvider, AiService.activeModel)) {
+                                        AiService.performOcr(path);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Selection context toggle
+                        Rectangle {
+                            id: selectionContextToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
+                            color: root.includeSelectionContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            border.color: root.includeSelectionContext ? Colors.primary : Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰒅"
+                                color: root.includeSelectionContext ? Colors.primary : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: selCtxHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.includeSelectionContext = !root.includeSelectionContext
+                            }
+
+                            SharedWidgets.BarTooltip {
+                                text: "Attach Current Selection (Middle-click/Primary)"
+                                hovered: selCtxHover.containsMouse
+                                anchorItem: selectionContextToggle
+                            }
+                        }
+
+                        // OCR from screen
+                        Rectangle {
+                            id: ocrToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
+                            color: AiService.isOcrBusy ? Colors.withAlpha(Colors.warning, 0.18) : "transparent"
+                            border.color: AiService.isOcrBusy ? Colors.warning : Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰚦"
+                                color: AiService.isOcrBusy ? Colors.warning : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: ocrHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: ScreenshotService.captureRegion()
+                            }
+
+                            SharedWidgets.BarTooltip {
+                                text: "Extract Text from Screen (OCR)"
+                                hovered: ocrHover.containsMouse
+                                anchorItem: ocrToggle
+                            }
+
+                            Connections {
+                                target: AiService
+                                function onLastOcrTextChanged() {
+                                    if (AiService.lastOcrText.length > 0) {
+                                        var prefix = inputField.text.length > 0 ? "\n\n" : "";
+                                        inputField.insert(inputField.cursorPosition, prefix + "```\n" + AiService.lastOcrText + "\n```\n");
+                                        ToastService.showNotice("OCR Complete", "Text inserted from screen");
+                                    }
+                                }
+                            }
+                        }
+
+                        // System context toggle
+                        Rectangle {
+                            id: systemContextToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
+                            color: Config.aiSystemContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            border.color: Config.aiSystemContext ? Colors.primary : Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰒍"
+                                color: Config.aiSystemContext ? Colors.primary : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: sysCtxHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Config.aiSystemContext = !Config.aiSystemContext
+                            }
+
+                            SharedWidgets.BarTooltip {
+                                text: "Attach System Stats (CPU/RAM)"
+                                hovered: sysCtxHover.containsMouse
+                                anchorItem: systemContextToggle
+                            }
+                        }
+
+                        // Token / message info
+                        Text {
+                            text: {
+                                var parts = [AiService.activeMessages.length + " msg"];
+                                if (AiService.lastTotalTokens > 0) {
+                                    parts.push(AiService.lastTotalTokens + " tok");
+                                }
+                                return parts.join(" · ");
+                            }
+                            color: Colors.textDisabled
+                            font.pixelSize: Colors.fontSizeXS
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        // Send / Cancel button
+                        Rectangle {
+                            width: 32
+                            height: 28
+                            radius: Colors.radiusXS
+                            color: AiService.isStreaming ? Colors.withAlpha(Colors.error, 0.18) : (inputField.text.trim().length > 0 ? Colors.withAlpha(Colors.primary, 0.18) : "transparent")
+                            border.color: AiService.isStreaming ? Colors.error : Colors.primary
+                            border.width: AiService.isStreaming || inputField.text.trim().length > 0 ? 1 : 0
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: AiService.isStreaming ? "󰅖" : "󰒊"
+                                color: AiService.isStreaming ? Colors.error : Colors.primary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeLarge
+                            }
+                            SharedWidgets.StateLayer {
+                                id: sendStateLayer
+                                hovered: sendHover.containsMouse
+                                pressed: sendHover.pressed
+                            }
+                            MouseArea {
+                                id: sendHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: mouse => {
+                                    sendStateLayer.burst(mouse.x, mouse.y);
+                                    if (AiService.isStreaming) {
+                                        AiService.cancelStream();
+                                    } else {
+                                        root._sendCurrentMessage();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ---- Footer ----
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                Text {
+                    text: Providers.providerLabel(AiService.activeProvider)
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                }
+
+                Text {
+                    text: "·"
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                }
+
+                Text {
+                    text: AiService.activeModel
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: AiService.conversations.length + " chat" + (AiService.conversations.length !== 1 ? "s" : "")
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                }
+            }
+        }
+
+        // ── Provider/model dropdown ────────────────────
+        AiProviderDropdown {
+            id: providerDropdown
+            anchors.right: parent.right
+            anchors.rightMargin: Colors.paddingLarge
+            y: 60
+        }
+
+        // ── Slash command hints popup ─────────────────
+        Rectangle {
+            id: slashHints
+            visible: inputField.text.indexOf("/") === 0 && inputField.text.indexOf(" ") === -1 && inputField.activeFocus && !AiService.isStreaming
+            width: parent.width - Colors.paddingLarge * 2
+            height: slashHintsCol.implicitHeight + Colors.spacingS * 2
+            x: Colors.paddingLarge
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 120 + Colors.paddingLarge
+            color: Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
+            radius: Colors.radiusMedium
+            z: 10
+
+            Column {
+                id: slashHintsCol
+                anchors.fill: parent
+                anchors.margins: Colors.spacingS
+                spacing: Colors.spacingXXS
+
+                Repeater {
+                    model: ScriptModel {
+                        values: {
+                            var typed = inputField.text.toLowerCase();
+                            var cmds = AiService.slashCommands;
+                            var filtered = [];
+                            for (var i = 0; i < cmds.length; i++) {
+                                if (typed.length <= 1 || cmds[i].cmd.indexOf(typed) === 0)
+                                    filtered.push(cmds[i]);
+                            }
+                            return filtered;
+                        }
+                    }
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        required property int index
+                        width: slashHintsCol.width - Colors.spacingS * 2
+                        height: 28
+                        radius: Colors.radiusXXS
+                        color: slashItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: Colors.spacingS
+                            anchors.rightMargin: Colors.spacingS
+                            spacing: Colors.spacingS
+
+                            Text {
+                                text: modelData.cmd
+                                color: Colors.primary
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.family: Colors.fontMono
+                                font.weight: Font.DemiBold
+                            }
+                            Text {
+                                text: modelData.desc
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeSmall
+                                elide: Text.ElideRight
+                                Layout.fillWidth: true
+                            }
+                        }
+
+                        MouseArea {
+                            id: slashItemMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                inputField.text = modelData.cmd + " ";
+                                inputField.cursorPosition = inputField.text.length;
+                                inputField.forceActiveFocus();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ── Helpers ──────────────────────────────────
+    Process {
+        id: fileReadProc
+        command: ["cat", root.attachedFiles[root._fileReadIndex] ? root.attachedFiles[root._fileReadIndex].path : ""]
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                var files = root.attachedFiles.slice();
+                files[root._fileReadIndex].content = stdout.readAll();
+                root.attachedFiles = files;
+            }
+            root._fileReadIndex++;
+            root._readNextAttachedFile();
+        }
+    }
+
+    function _readNextAttachedFile() {
+        if (root._fileReadIndex < root.attachedFiles.length) {
+            fileReadProc.running = true;
+        } else {
+            // Finished reading all files, now handle selection if needed
+            if (root.includeSelectionContext) {
+                AiService.fetchSelection();
+                // We wait for AiService.onLastSelectionTextChanged via Connections
+            } else {
+                root._finishAndSendMessage();
+            }
+        }
+    }
+
+    function _finishAndSendMessage() {
+        var contextString = "";
+        for (var i = 0; i < root.attachedFiles.length; i++) {
+            contextString += "\n\nFile: " + root.attachedFiles[i].name + "\nContent:\n" + root.attachedFiles[i].content;
+        }
+        
+        if (root.includeSelectionContext && AiService.lastSelectionText) {
+            contextString += "\n\nCurrent Selection:\n```\n" + AiService.lastSelectionText + "\n```";
+        }
+
+        var text = root._pendingMsgText + contextString;
+        var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
+        var visualCtx = root.includeVisualContext ? ScreenshotService.lastRegionPath : "";
+        AiService.sendMessage(text, winCtx, visualCtx);
+        
+        // Reset state
+        root.attachedFiles = [];
+        root._pendingMsgText = "";
+        root.includeWindowContext = false;
+        root.includeVisualContext = false;
+        root.includeSelectionContext = false;
+    }
+
+    Connections {
+        target: AiService
+        function onLastSelectionTextChanged() {
+            if (root.includeSelectionContext && root._pendingMsgText !== "") {
+                root._finishAndSendMessage();
+            }
+        }
+    }
+
+    function _sendCurrentMessage() {
+        var text = inputField.text.trim();
+        if (text.length === 0 && root.attachedFiles.length === 0 && !root.includeSelectionContext)
+            return;
+        if (AiService.isStreaming)
+            return;
+        
+        inputField.text = "";
+        root._pendingMsgText = text;
+
+        if (root.attachedFiles.length > 0) {
+            root._fileReadIndex = 0;
+            root._readNextAttachedFile();
+        } else if (root.includeSelectionContext) {
+            AiService.fetchSelection();
+            // Wait for signal
+        } else {
+            root._finishAndSendMessage();
+        }
+    }
+
+    function _shellEscape(str) {
+        return "'" + str.replace(/'/g, "'\\''") + "'";
+    }
+}

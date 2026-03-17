@@ -1,0 +1,37 @@
+{
+  "QML_IMPORTS": {
+    "import \"../services/config/AiProviders.js\" as Providers": "import \"services/AiProviders.js\" as Providers",
+    "import \"../services/config/AiMarkdown.js\" as Markdown": "import \"services/AiMarkdown.js\" as Markdown",
+    "import \"../modules\"": "import \"../system/sections\"",
+    "import \"../../services/config/AiProviders.js\" as Providers": "import \"../services/AiProviders.js\" as Providers"
+  },
+  "QMLDIR_PATHS": {
+    "AiChat.qml": "../features/ai/AiChat.qml",
+    "Calendar.qml": "../features/system/sections/Calendar.qml",
+    "CircularGauge.qml": "../features/system/sections/CircularGauge.qml",
+    "DevOpsSection.qml": "../features/system/sections/DevOpsSection.qml",
+    "DiskWidget.qml": "../features/system/sections/DiskWidget.qml",
+    "GPUWidget.qml": "../features/system/sections/GPUWidget.qml",
+    "MediaWidget.qml": "../features/system/sections/MediaWidget.qml",
+    "NetworkGraphs.qml": "../features/system/sections/NetworkGraphs.qml",
+    "PowerActionsRow.qml": "../features/system/sections/PowerActionsRow.qml",
+    "ProcessWidget.qml": "../features/system/sections/ProcessWidget.qml",
+    "QuickLinkCard.qml": "../features/system/sections/QuickLinkCard.qml",
+    "QuickToggle.qml": "../features/system/sections/QuickToggle.qml",
+    "QuickToggleGrid.qml": "../features/system/sections/QuickToggleGrid.qml",
+    "ScratchpadWidget.qml": "../features/system/sections/ScratchpadWidget.qml",
+    "ServiceUnitWidget.qml": "../features/system/sections/ServiceUnitWidget.qml",
+    "SystemCpuCores.qml": "../features/system/sections/SystemCpuCores.qml",
+    "SystemGraphs.qml": "../features/system/sections/SystemGraphs.qml",
+    "SystemIoHistory.qml": "../features/system/sections/SystemIoHistory.qml",
+    "SystemMonitor.qml": "../features/system/sections/SystemMonitor.qml",
+    "SystemMonitorSummary.qml": "../features/system/sections/SystemMonitorSummary.qml",
+    "SystemProcessTable.qml": "../features/system/sections/SystemProcessTable.qml",
+    "SystemServiceTable.qml": "../features/system/sections/SystemServiceTable.qml",
+    "UpdateWidget.qml": "../features/system/sections/UpdateWidget.qml",
+    "UserWidget.qml": "../features/system/sections/UserWidget.qml",
+    "WeatherWidget.qml": "../features/system/sections/WeatherWidget.qml",
+    "LockPanel.qml": "../features/lock/LockPanel.qml",
+    "Osd.qml": "../features/osd/Osd.qml"
+  }
+}

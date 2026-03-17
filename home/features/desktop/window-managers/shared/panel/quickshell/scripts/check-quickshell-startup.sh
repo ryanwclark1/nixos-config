@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-config_root="$(CDPATH= cd -- "${script_dir}/../config" && pwd -P)"
+config_root="$(CDPATH= cd -- "${script_dir}/../src" && pwd -P)"
 
 pass_count=0
 fail_count=0

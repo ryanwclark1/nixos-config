@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 local_runner="${script_dir}/plugin-local.sh"
 verify_runner="${script_dir}/quickshell-verify.sh"
-shell_config="${script_dir}/../config/shell.qml"
+shell_config="${script_dir}/../src/shell.qml"
 
 pass_count=0
 fail_count=0
@@ -111,7 +111,7 @@ else
 fi
 
 if run_capture "$tmp_files_out" "$tmp_files_err" "$local_runner" quickshell-files; then
-  if assert_patterns "$tmp_files_out" '^shell_config=.*/config/shell\.qml$' 'guard_panel_runtime=.*/scripts/vm/run-panel-vm-qa\.sh --vm hyprland$' 'guard_panel_runtime_host_opt_out=.*/check-panel-runtime\.sh --repo-shell$' 'capture_validator=.*/check-panel-capture-artifacts\.sh$'; then
+  if assert_patterns "$tmp_files_out" '^shell_config=.*/src/shell\.qml$' 'guard_panel_runtime=.*/scripts/vm/run-panel-vm-qa\.sh --vm hyprland$' 'guard_panel_runtime_host_opt_out=.*/check-panel-runtime\.sh --repo-shell$' 'capture_validator=.*/check-panel-capture-artifacts\.sh$'; then
     pass "plugin-local quickshell-files prints the canonical Quickshell runtime file and guard paths"
   else
     fail "plugin-local quickshell-files output drifted from the expected Quickshell file summary"

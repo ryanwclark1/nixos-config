@@ -30,13 +30,13 @@ For implementation planning beyond this runbook, see `NEXT_STEPS.md`.
   - `scripts/capture-launcher-matrix.sh`
 
 Live launcher scripts auto-select a QuickShell instance in this order:
-1. launched from this repo’s `config/shell.qml` and exposing both `drunCategoryState` and `escapeActionState`
-2. launched from this repo’s `config/shell.qml`
+1. launched from this repo’s `src/shell.qml` and exposing both `drunCategoryState` and `escapeActionState`
+2. launched from this repo’s `src/shell.qml`
 3. exposing `drunCategoryState`
 4. exposing `escapeActionState`
 5. any launcher-capable instance
 
-`--repo-shell` is now the preferred validation path when you need to test the repo checkout directly. It launches this tree’s `config/shell.qml`, keeps the probe bound to that PID, and avoids stale installed-session QML.
+`--repo-shell` is now the preferred validation path when you need to test the repo checkout directly. It launches this tree’s `src/shell.qml`, keeps the probe bound to that PID, and avoids stale installed-session QML.
 
 ## Current Verified Baseline
 

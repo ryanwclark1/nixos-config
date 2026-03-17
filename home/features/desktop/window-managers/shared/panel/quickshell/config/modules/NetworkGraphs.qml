@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
 import "../services"
+import "ModuleUtils.js" as MU
 
 Rectangle {
   id: root
@@ -58,8 +59,8 @@ Rectangle {
           var diffRx = Math.max(0, rx - root.lastRx);
           var diffTx = Math.max(0, tx - root.lastTx);
 
-          root.currentDown = formatSpeed(diffRx);
-          root.currentUp = formatSpeed(diffTx);
+          root.currentDown = MU.formatRate(diffRx);
+          root.currentUp = MU.formatRate(diffTx);
 
           // Adaptive scaling: grow instantly, decay slowly
           if (diffRx > root.maxDown) root.maxDown = diffRx;
@@ -102,12 +103,6 @@ Rectangle {
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.stroke();
-  }
-
-  function formatSpeed(bytes) {
-    if (bytes < 1024) return bytes + " B/s";
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB/s";
-    return (bytes / 1048576).toFixed(1) + " MB/s";
   }
 
   function updateStats() {

@@ -5,9 +5,9 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 docker_dir="${script_dir}/../examples/plugins/docker-manager"
 active_fixture="${docker_dir}/expected-diagnostics-active.json"
 degraded_fixture="${docker_dir}/expected-diagnostics-degraded.json"
-schema_file="${script_dir}/../config/plugins/diagnostics.schema.json"
+schema_file="${script_dir}/../src/plugins/diagnostics.schema.json"
 schema_validator="${script_dir}/validate-json-schema.js"
-plugins_tab="${script_dir}/../config/menu/settings/tabs/PluginsTab.qml"
+plugins_tab="${script_dir}/../src/menu/settings/tabs/PluginsTab.qml"
 
 pass_count=0
 fail_count=0

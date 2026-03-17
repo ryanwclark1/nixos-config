@@ -19,7 +19,7 @@ SharedWidgets.CardBase {
     SharedWidgets.Ref { service: NetworkService }
     SharedWidgets.Ref { service: SystemIoTelemetryService }
 
-    SharedWidgets.CommandPoll {
+    CommandPoll {
         id: hostPoll
         interval: 5000
         running: root.visible

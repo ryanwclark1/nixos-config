@@ -9,7 +9,7 @@ SharedWidgets.CardBase {
 
   property var drives: []
 
-  SharedWidgets.CommandPoll {
+  CommandPoll {
     id: diskPoll
     interval: 30000
     running: root.visible

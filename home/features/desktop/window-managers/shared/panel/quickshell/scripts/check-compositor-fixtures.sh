@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
-fixtures_dir="${script_dir}/../fixtures"
+fixtures_dir="${QS_FIXTURES_DIR:-${script_dir}/../fixtures}"
 
 extract_active_jq='(if type == "array" then . else (.workspaces // []) end)[] | select(.is_active == true or .active == true or .is_focused == true or .focused == true) | (.name // .idx // .id // .index // empty)'
 

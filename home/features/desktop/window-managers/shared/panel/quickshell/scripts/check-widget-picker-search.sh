@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
-config_dir="${script_dir}/../config"
+config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 source "${script_dir}/harness-warnings.sh"
 
 tmp_home="$(mktemp -d)"

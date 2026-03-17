@@ -1,0 +1,7 @@
+AiConversationTabs 1.0 AiConversationTabs.qml
+AiMessageList 1.0 AiMessageList.qml
+AiTextBlock 1.0 AiTextBlock.qml
+AiCodeBlock 1.0 AiCodeBlock.qml
+AiStreamTextBlock 1.0 AiStreamTextBlock.qml
+AiThinkingBlock 1.0 AiThinkingBlock.qml
+AiProviderDropdown 1.0 AiProviderDropdown.qml

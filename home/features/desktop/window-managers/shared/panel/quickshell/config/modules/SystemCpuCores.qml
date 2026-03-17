@@ -61,7 +61,7 @@ SharedWidgets.CardBase {
         coreUsages = nextCoreUsages;
     }
 
-    SharedWidgets.CommandPoll {
+    CommandPoll {
         id: statPoll
         interval: 1500
         running: root.visible

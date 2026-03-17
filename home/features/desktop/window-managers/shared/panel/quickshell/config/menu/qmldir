@@ -1,4 +1,4 @@
-AiChat 1.0 AiChat.qml
+AiChat 1.0 ../features/ai/AiChat.qml
 AudioMenu 1.0 AudioMenu.qml
 BasePopupMenu 1.0 BasePopupMenu.qml
 BatteryMenu 1.0 BatteryMenu.qml
@@ -9,6 +9,8 @@ ColorPicker 1.0 ColorPicker.qml
 ControlCenter 1.0 ControlCenter.qml
 DateTimeMenu 1.0 DateTimeMenu.qml
 DisplayConfig 1.0 DisplayConfig.qml
+DisplayConfigCanvas 1.0 DisplayConfigCanvas.qml
+DisplayConfigCountdown 1.0 DisplayConfigCountdown.qml
 FileBrowser 1.0 FileBrowser.qml
 MusicMenu 1.0 MusicMenu.qml
 NetworkMenu 1.0 NetworkMenu.qml

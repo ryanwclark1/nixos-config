@@ -4,8 +4,9 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
-import "../modules"
+import "../system/sections"
 import "../services"
+import "osd"
 
 Scope {
   id: root
@@ -347,54 +348,11 @@ Scope {
           Loader {
             active: root.isCriticalAlert
             anchors.fill: parent
-            sourceComponent: ColumnLayout {
-              anchors.fill: parent
-              anchors.margins: Colors.spacingL
-              spacing: Colors.spacingM
-
-              Item {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 76
-                Layout.preferredHeight: 76
-
-                Rectangle {
-                  anchors.centerIn: parent
-                  width: 76
-                  height: 76
-                  radius: width / 2
-                  color: Colors.withAlpha(root.osdColor, 0.14)
-                  border.color: root.osdColor
-                  border.width: 2
-                }
-
-                Text {
-                  anchors.centerIn: parent
-                  text: root.osdIcon
-                  color: root.osdColor
-                  font.pixelSize: 30
-                  font.family: Colors.fontMono
-                }
-              }
-
-              Text {
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.NoWrap
-                text: root.osdLabel
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeXL
-                font.weight: Font.Black
-                font.family: Colors.fontMono
-              }
-
-              Text {
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-                text: "Check system load and temperature"
-                color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
-                font.weight: Font.Medium
-                elide: Text.ElideRight
+            sourceComponent: Component {
+              OsdCriticalAlert {
+                osdIcon: root.osdIcon
+                osdColor: root.osdColor
+                osdLabel: root.osdLabel
               }
             }
           }
@@ -403,162 +361,40 @@ Scope {
           Loader {
             active: !root.isCriticalAlert && Config.osdStyle === "circular"
             anchors.fill: parent
-            sourceComponent: ColumnLayout {
-              anchors.fill: parent
-              anchors.margins: 18
-              spacing: Colors.paddingSmall
-
-              CircularGauge {
-                Layout.alignment: Qt.AlignHCenter
-                width: 78
-                height: 78
-                thickness: 6
-                value: Math.min(root.currentValue / root.maxValue, 1.0)
-                color: root.osdColor
-                icon: root.osdIcon
-              }
-
-              Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: root.osdLabel
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeXL
-                font.weight: Font.Black
-                font.family: Colors.fontMono
-              }
-
-              Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: root.osdType === "kbdbrightness" ? "KBD BRIGHTNESS" : root.osdType.toUpperCase()
-                color: root.osdColor
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingExtraWide
+            sourceComponent: Component {
+              OsdCircularGauge {
+                currentValue: root.currentValue
+                maxValue: root.maxValue
+                osdColor: root.osdColor
+                osdIcon: root.osdIcon
+                osdLabel: root.osdLabel
+                osdType: root.osdType
               }
             }
           }
 
           // Pill style (horizontal progress bar)
           Loader {
+            id: pillLoader
             active: !root.isCriticalAlert && Config.osdStyle === "pill"
             anchors.fill: parent
-            sourceComponent: RowLayout {
-              anchors.fill: parent
-              anchors.leftMargin: Colors.spacingL
-              anchors.rightMargin: Colors.spacingL
-              spacing: Colors.spacingM
-
-              Text {
-                id: pillIconText
-                text: root.osdIcon
-                color: root.osdColor
-                font.pixelSize: Colors.fontSizeXL
-                font.family: Colors.fontMono
-                scale: 1.0
-
-                SequentialAnimation {
-                  id: pillIconPulse
-                  NumberAnimation { target: pillIconText; property: "scale"; to: 1.22; duration: 80; easing.type: Easing.OutQuad }
-                  NumberAnimation { target: pillIconText; property: "scale"; to: 1.0; duration: Colors.durationFast; easing.type: Easing.OutElastic }
-                }
-
-                Connections {
-                  target: root
-                  function onOsdShown() { pillIconPulse.restart(); }
-                }
-              }
-
-              // Progress track (draggable for volume/brightness)
-              Item {
-                id: osdTrack
-                Layout.fillWidth: true
-                Layout.preferredHeight: osdTrackMouse.pressed ? 12 : 6
-                Behavior on Layout.preferredHeight { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutCubic } }
-
-                Rectangle {
-                  anchors.fill: parent
-                  radius: parent.height / 2
-                  color: Colors.withAlpha(root.osdColor, 0.2)
-                }
-
-                // Tick marks at 25%, 50%, 75%
-                Repeater {
-                  model: root.isLockKey ? [] : [0.25, 0.50, 0.75]
-                  Rectangle {
-                    x: osdTrack.width * modelData - 1
-                    y: -1; width: 2; height: osdTrack.height + 2
-                    radius: 1
-                    color: Colors.withAlpha(Colors.text, 0.2)
-                    visible: (root.currentValue / root.maxValue) < modelData
-                  }
-                }
-
-                Rectangle {
-                  width: {
-                    if (root.isLockKey) return root.currentValue * parent.width;
-                    return parent.width * Math.min(1.0, root.currentValue / root.maxValue);
-                  }
-                  height: parent.height
-                  radius: parent.height / 2
-                  color: root.osdColor
-
-                  Behavior on width { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutCubic } }
-                }
-
-                // Overdrive marker at 100% when max > 1.0
-                Rectangle {
-                  visible: root.maxValue > 1.0 && !root.isLockKey
-                  x: parent.width * (1.0 / root.maxValue)
-                  y: -2
-                  width: 2
-                  height: parent.height + 4
-                  radius: 1
-                  color: Colors.withAlpha(Colors.text, 0.4)
-                }
-
-                // Drag interaction for volume/brightness adjustment
-                MouseArea {
-                  id: osdTrackMouse
-                  anchors.fill: parent
-                  anchors.topMargin: -12
-                  anchors.bottomMargin: -12
-                  enabled: !root.isLockKey
-                  hoverEnabled: true
-                  cursorShape: root.isLockKey ? Qt.ArrowCursor : Qt.PointingHandCursor
-
-                  function applyValue(mouseX) {
-                    var ratio = Math.max(0, Math.min(1.0, mouseX / osdTrack.width));
-                    var value = ratio * root.maxValue;
-                    if (root.osdType === "volume") {
-                      var pct = Math.round(value * 100);
-                      Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", pct + "%"]);
-                    } else if (root.osdType === "mic") {
-                      var pct = Math.round(value * 100);
-                      Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SOURCE@", pct + "%"]);
-                    } else if (root.osdType === "brightness") {
-                      var pct = Math.round(value * 100);
-                      Quickshell.execDetached(["brightnessctl", "set", pct + "%"]);
-                    } else if (root.osdType === "kbdbrightness") {
-                      BrightnessService.setKbdBrightness(value);
-                    }
-                    hideTimer.restart();
-                  }
-
-                  onPressed: (mouse) => applyValue(mouse.x)
-                  onPositionChanged: (mouse) => { if (pressed) applyValue(mouse.x); }
-                }
-              }
-
-              Text {
-                text: root.osdLabel
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
-                font.weight: Font.Bold
-                font.family: Colors.fontMono
-                Layout.minimumWidth: 70
-                horizontalAlignment: Text.AlignRight
+            sourceComponent: Component {
+              OsdPill {
+                currentValue: root.currentValue
+                maxValue: root.maxValue
+                osdColor: root.osdColor
+                osdIcon: root.osdIcon
+                osdLabel: root.osdLabel
+                osdType: root.osdType
+                isLockKey: root.isLockKey
               }
             }
+          }
+
+          Connections {
+            target: root
+            enabled: pillLoader.item !== null
+            function onOsdShown() { if (pillLoader.item) pillLoader.item.triggerPulse(); }
           }
         }
       }

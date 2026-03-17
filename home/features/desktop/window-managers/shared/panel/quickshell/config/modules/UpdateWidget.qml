@@ -35,7 +35,7 @@ SharedWidgets.CardBase {
     return seconds.toFixed(1) + "s";
   }
 
-  SharedWidgets.CommandPoll {
+  CommandPoll {
     id: cachePoll
     interval: 3600000
     running: true

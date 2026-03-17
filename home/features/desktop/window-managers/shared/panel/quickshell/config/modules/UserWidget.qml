@@ -29,7 +29,7 @@ Rectangle {
     }
   }
 
-  SharedWidgets.CommandPoll {
+  CommandPoll {
     id: uptimePoll
     interval: 60000
     running: root.visible

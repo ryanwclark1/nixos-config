@@ -15,16 +15,9 @@ SharedWidgets.CardBase {
         service: SystemIoTelemetryService
     }
 
-    function arrayMax(values) {
-        var maxValue = 0;
-        for (var i = 0; i < values.length; ++i)
-            maxValue = Math.max(maxValue, Number(values[i] || 0));
-        return maxValue;
-    }
-
     function normalizedHistory(values) {
         var raw = values || [];
-        var maxValue = Math.max(1, arrayMax(raw));
+        var maxValue = Math.max(1, MU.arrayMax(raw));
         var normalized = [];
         for (var i = 0; i < raw.length; ++i)
             normalized.push(Number(raw[i] || 0) / maxValue);
@@ -219,7 +212,7 @@ SharedWidgets.CardBase {
                         Layout.fillWidth: true
                         Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
                         Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(root.arrayMax(SystemIoTelemetryService.networkHistoryDown)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netDownCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+                        Text { text: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.networkHistoryDown)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netDownCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
                     Canvas {
@@ -267,7 +260,7 @@ SharedWidgets.CardBase {
                         Layout.fillWidth: true
                         Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
                         Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(root.arrayMax(SystemIoTelemetryService.networkHistoryUp)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netUpCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+                        Text { text: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.networkHistoryUp)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netUpCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
                     Canvas {
@@ -315,7 +308,7 @@ SharedWidgets.CardBase {
                         Layout.fillWidth: true
                         Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
                         Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(root.arrayMax(SystemIoTelemetryService.diskHistoryRead)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskReadCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+                        Text { text: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.diskHistoryRead)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskReadCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
                     Canvas {
@@ -363,7 +356,7 @@ SharedWidgets.CardBase {
                         Layout.fillWidth: true
                         Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
                         Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(root.arrayMax(SystemIoTelemetryService.diskHistoryWrite)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskWriteCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+                        Text { text: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.diskHistoryWrite)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskWriteCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
                     Canvas {

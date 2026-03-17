@@ -3,11 +3,11 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
-config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
-launcher_qml="${script_dir}/../config/launcher/Launcher.qml"
-launcher_search_field_qml="${script_dir}/../config/launcher/LauncherSearchField.qml"
-launcher_settings_qml="${script_dir}/../config/menu/settings/tabs/ShellCoreSectionTab.qml"
-expected_config="$(realpath "${script_dir}/../config/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../config/shell.qml")"
+config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
+launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
+launcher_search_field_qml="${script_dir}/../src/launcher/LauncherSearchField.qml"
+launcher_settings_qml="${script_dir}/../src/menu/settings/tabs/ShellCoreSectionTab.qml"
+expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
 apps_helper="${script_dir}/apps.sh"
 
 source "${script_dir}/runtime-warning-filter.sh"

@@ -4,7 +4,7 @@ set -euo pipefail
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 runtime_pid_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid"
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-config_root="$(CDPATH= cd -- "${script_dir}/../config" >/dev/null && pwd)"
+config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 
 source "${script_dir}/runtime-warning-filter.sh"
 

@@ -39,16 +39,16 @@ require_pattern() {
   fi
 }
 
-bar_registry="${repo_root}/config/services/BarWidgetRegistry.qml"
-panel_qml="${repo_root}/config/bar/Panel.qml"
-surface_service_qml="${repo_root}/config/services/SurfaceService.qml"
-shell_qml="${repo_root}/config/shell.qml"
-shell_bar_layer_qml="${repo_root}/config/shell/ShellBarLayer.qml"
-menu_qmldir="${repo_root}/config/menu/qmldir"
-widget_qmldir="${repo_root}/config/widgets/qmldir"
-network_service_qml="${repo_root}/config/services/NetworkService.qml"
-vpn_menu_qml="${repo_root}/config/menu/VpnMenu.qml"
-network_menu_qml="${repo_root}/config/menu/NetworkMenu.qml"
+bar_registry="${repo_root}/src/services/BarWidgetRegistry.qml"
+panel_qml="${repo_root}/src/bar/Panel.qml"
+surface_service_qml="${repo_root}/src/services/SurfaceService.qml"
+shell_qml="${repo_root}/src/shell.qml"
+shell_bar_layer_qml="${repo_root}/src/shell/ShellBarLayer.qml"
+menu_qmldir="${repo_root}/src/menu/qmldir"
+widget_qmldir="${repo_root}/src/widgets/qmldir"
+network_service_qml="${repo_root}/src/services/NetworkService.qml"
+vpn_menu_qml="${repo_root}/src/menu/VpnMenu.qml"
+network_menu_qml="${repo_root}/src/menu/NetworkMenu.qml"
 
 require_literal "$bar_registry" 'widgetType: "vpn"' "VPN widget is registered in BarWidgetRegistry"
 require_literal "$bar_registry" 'key: "labelMode"' "VPN widget exposes labelMode setting"

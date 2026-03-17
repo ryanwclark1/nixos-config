@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-config_dir="${script_dir}/../config"
+config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 root_qml="${config_dir}/shell.qml"
 declare -i pass_count=0
 declare -i fail_count=0
