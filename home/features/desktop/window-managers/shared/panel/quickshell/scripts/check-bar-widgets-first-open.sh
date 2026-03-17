@@ -8,14 +8,19 @@ flake_target=".#administrator@woody"
 output_dir="${TMPDIR:-/tmp}/bar-widgets-first-open"
 skip_switch=0
 instance_id=""
+repo_shell_mode=0
+repo_shell_pid=""
+repo_shell_service_was_active=0
+repo_shell_env=()
 
 usage() {
   cat <<'EOF'
-Usage: check-bar-widgets-first-open.sh [--skip-switch] [--output-dir PATH] [--flake TARGET] [--id INSTANCE_ID]
+Usage: check-bar-widgets-first-open.sh [--skip-switch] [--repo-shell] [--output-dir PATH] [--flake TARGET] [--id INSTANCE_ID]
 
 Deploy the current Home Manager configuration, restart quickshell.service, capture the
 Bar Widgets tab in the broken first-open path and the known-good re-entry path, then
 OCR both screenshots and fail if first-open is still missing widget controls.
+Use --repo-shell to run against a repo-shell instance without deploying Home Manager.
 EOF
 }
 
@@ -23,6 +28,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --skip-switch)
       skip_switch=1
+      shift
+      ;;
+    --repo-shell)
+      repo_shell_mode=1
       shift
       ;;
     --output-dir)
@@ -54,6 +63,75 @@ require_cmd() {
     printf 'Missing required command: %s\n' "$1" >&2
     exit 2
   fi
+}
+
+cleanup_repo_shell() {
+  if [[ -n "${repo_shell_pid}" ]]; then
+    kill "${repo_shell_pid}" >/dev/null 2>&1 || true
+    wait "${repo_shell_pid}" >/dev/null 2>&1 || true
+  fi
+  if (( repo_shell_service_was_active == 1 )); then
+    systemctl --user start quickshell.service >/dev/null 2>&1 || true
+  fi
+}
+
+populate_repo_shell_env() {
+  local line=""
+  local key=""
+  local value=""
+
+  repo_shell_env=()
+  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
+    value="${!key:-}"
+    if [[ -n "${value}" ]]; then
+      repo_shell_env+=("${key}=${value}")
+    fi
+  done
+
+  if (( ${#repo_shell_env[@]} > 0 )); then
+    return 0
+  fi
+
+  while IFS= read -r line; do
+    [[ "${line}" == *=* ]] || continue
+    key="${line%%=*}"
+    value="${line#*=}"
+    case "${key}" in
+      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION)
+        [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
+        ;;
+    esac
+  done < <(systemctl --user show-environment 2>/dev/null || true)
+}
+
+start_repo_shell() {
+  local runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid"
+  local runtime_dir=""
+  local deadline
+
+  if systemctl --user is-active --quiet quickshell.service; then
+    repo_shell_service_was_active=1
+    systemctl --user stop quickshell.service >/dev/null 2>&1 || true
+    sleep 1
+  fi
+
+  populate_repo_shell_env
+  env "${repo_shell_env[@]}" quickshell -p "${script_dir}/../config/shell.qml" >/tmp/quickshell-repo-bar-widgets-first-open.log 2>&1 &
+  repo_shell_pid="$!"
+
+  deadline=$((SECONDS + 20))
+  while (( SECONDS < deadline )); do
+    runtime_dir="$(readlink -f "${runtime_root}/${repo_shell_pid}" 2>/dev/null || true)"
+    if [[ -n "${runtime_dir}" && -S "${runtime_dir}/ipc.sock" ]]; then
+      instance_id="$(basename "${runtime_dir}")"
+      printf '[INFO] Repo shell instance ready: pid %s id %s\n' "${repo_shell_pid}" "${instance_id}"
+      return 0
+    fi
+    sleep 0.5
+  done
+
+  printf 'Repo shell did not become IPC-ready in time. See /tmp/quickshell-repo-bar-widgets-first-open.log\n' >&2
+  exit 1
 }
 
 discover_instance() {
@@ -193,12 +271,15 @@ print(score)
 PY
 }
 
-require_cmd home-manager
 require_cmd quickshell
 require_cmd systemctl
 require_cmd tesseract
 require_cmd compare
 require_cmd ps
+
+if (( repo_shell_mode == 0 )); then
+  require_cmd home-manager
+fi
 
 mkdir -p "${output_dir}"
 first_open_png="${output_dir}/bar-widgets-first-open.png"
@@ -206,19 +287,26 @@ reenter_png="${output_dir}/bar-widgets-reenter.png"
 first_open_txt="${output_dir}/bar-widgets-first-open.txt"
 reenter_txt="${output_dir}/bar-widgets-reenter.txt"
 
-if (( skip_switch == 0 )); then
+if (( repo_shell_mode == 1 )); then
+  trap cleanup_repo_shell EXIT
+  load_quickshell_env
+  start_repo_shell
+elif (( skip_switch == 0 )); then
   printf '[INFO] Running Home Manager switch: home-manager switch --flake %s --show-trace --verbose\n' "${flake_target}"
   (
     cd "${repo_root}"
     home-manager switch --flake "${flake_target}" --show-trace --verbose
   )
+  printf '[INFO] Restarting quickshell.service\n'
+  systemctl --user restart quickshell.service
+  systemctl --user is-active --quiet quickshell.service
+  load_quickshell_env
+else
+  printf '[INFO] Restarting quickshell.service\n'
+  systemctl --user restart quickshell.service
+  systemctl --user is-active --quiet quickshell.service
+  load_quickshell_env
 fi
-
-printf '[INFO] Restarting quickshell.service\n'
-systemctl --user restart quickshell.service
-systemctl --user is-active --quiet quickshell.service
-
-load_quickshell_env
 
 if [[ -z "${instance_id}" ]]; then
   instance_id="$(discover_instance)" || {

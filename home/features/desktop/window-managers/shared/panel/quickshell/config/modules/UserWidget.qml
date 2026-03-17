@@ -7,7 +7,7 @@ import "../widgets" as SharedWidgets
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: 80
+  Layout.preferredHeight: userContent.implicitHeight + Colors.paddingMedium * 2
   color: Colors.withAlpha(Colors.surface, 0.4)
   radius: Colors.radiusMedium
   border.color: Colors.border
@@ -40,20 +40,22 @@ Rectangle {
   }
 
   RowLayout {
+    id: userContent
     anchors.fill: parent
     anchors.margins: Colors.paddingMedium
     spacing: Colors.paddingMedium
 
     // User Avatar placeholder
     Rectangle {
-      width: 50; height: 50
+      width: 42; height: 42
       radius: Colors.radiusPill
       color: Colors.primary
+      Layout.alignment: Qt.AlignTop
       Text {
         anchors.centerIn: parent
         text: root.username.charAt(0).toUpperCase()
         color: Colors.text
-        font.pixelSize: Colors.fontSizeHuge
+        font.pixelSize: Colors.fontSizeXL
         font.weight: Font.Bold
       }
     }
@@ -67,14 +69,16 @@ Rectangle {
         font.pixelSize: Colors.fontSizeLarge
         font.weight: Font.Bold
         Layout.fillWidth: true
-        elide: Text.ElideRight
+        wrapMode: Text.Wrap
+        maximumLineCount: 2
       }
       Text {
         text: "System Uptime: " + root.uptime
         color: Colors.textSecondary
         font.pixelSize: Colors.fontSizeXS
         Layout.fillWidth: true
-        elide: Text.ElideRight
+        wrapMode: Text.Wrap
+        maximumLineCount: 2
       }
     }
   }

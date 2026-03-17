@@ -16,6 +16,9 @@ SharedWidgets.CardBase {
     property Flickable viewportFlickable: null
     property Item selectedRowItem: null
     property var collapsedPids: ({})
+    property int lastSelectedIndex: 0
+    property int lastSelectedParentPid: 0
+    property int _clockTick: 0
 
     readonly property string trimmedSearch: String(searchQuery || "").trim().toLowerCase()
     readonly property var visibleProcesses: computeVisibleProcesses()
@@ -309,8 +312,16 @@ SharedWidgets.CardBase {
             selectedPid = 0;
             return;
         }
-        if (!findProcessByPid(selectedPid))
-            selectedPid = visibleProcesses[0].pid || 0;
+        if (findProcessByPid(selectedPid))
+            return;
+
+        if (lastSelectedParentPid > 0 && findProcessByPid(lastSelectedParentPid)) {
+            selectedPid = lastSelectedParentPid;
+            return;
+        }
+
+        var fallbackIndex = Math.max(0, Math.min(visibleProcesses.length - 1, lastSelectedIndex));
+        selectedPid = visibleProcesses[fallbackIndex].pid || visibleProcesses[0].pid || 0;
     }
 
     function headerLabel(label, field) {
@@ -352,19 +363,60 @@ SharedWidgets.CardBase {
             return Colors.success;
         if (status === "loading")
             return Colors.warning;
+        if (status === "permission-limited")
+            return Colors.warning;
         if (status === "terminated" || status === "error")
             return Colors.error;
         return Colors.textDisabled;
     }
 
+    function actionStatusColor(status) {
+        if (status === "success")
+            return Colors.success;
+        if (status === "pending")
+            return Colors.warning;
+        if (status === "error")
+            return Colors.error;
+        return Colors.textDisabled;
+    }
+
+    function formatAge(timestampMs) {
+        _clockTick;
+        var value = Number(timestampMs || 0);
+        if (value <= 0)
+            return "waiting";
+        var seconds = Math.max(0, Math.round((Date.now() - value) / 1000));
+        if (seconds < 1)
+            return "now";
+        if (seconds < 60)
+            return String(seconds) + "s ago";
+        var minutes = Math.floor(seconds / 60);
+        var remainder = seconds % 60;
+        return String(minutes) + "m " + String(remainder) + "s ago";
+    }
+
     onVisibleProcessesChanged: syncSelection()
     onSelectedPidChanged: {
+        for (var i = 0; i < visibleProcesses.length; ++i) {
+            if ((visibleProcesses[i].pid || 0) === selectedPid) {
+                lastSelectedIndex = i;
+                lastSelectedParentPid = parseInt(visibleProcesses[i].parentPid, 10) || 0;
+                break;
+            }
+        }
         Qt.callLater(ensureSelectedVisible);
         ProcessService.setDetailPid(selectedPid);
     }
     Component.onCompleted: {
         syncSelection();
         ProcessService.setDetailPid(selectedPid);
+    }
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.visible
+        onTriggered: root._clockTick = root._clockTick + 1
     }
 
     FocusScope {
@@ -789,7 +841,7 @@ SharedWidgets.CardBase {
 
             Rectangle {
                 Layout.fillWidth: true
-                visible: !!root.selectedProcess
+                visible: true
                 radius: Colors.radiusSmall
                 color: Colors.bgWidget
                 border.color: Colors.border
@@ -804,6 +856,7 @@ SharedWidgets.CardBase {
 
                     RowLayout {
                         Layout.fillWidth: true
+                        visible: !!root.selectedProcess
 
                         ColumnLayout {
                             Layout.fillWidth: true
@@ -839,8 +892,16 @@ SharedWidgets.CardBase {
                         }
                     }
 
+                    SharedWidgets.EmptyState {
+                        Layout.fillWidth: true
+                        visible: !root.selectedProcess
+                        icon: "󰍉"
+                        message: root.visibleProcesses.length === 0 ? "No process selected. Adjust filters or wait for the next snapshot." : "Select a process to inspect live detail."
+                    }
+
                     Flow {
                         Layout.fillWidth: true
+                        visible: !!root.selectedProcess
                         width: parent.width
                         spacing: Colors.spacingS
 
@@ -910,6 +971,7 @@ SharedWidgets.CardBase {
 
                     Flow {
                         Layout.fillWidth: true
+                        visible: !!root.selectedProcess
                         width: parent.width
                         spacing: Colors.spacingS
 
@@ -1004,6 +1066,7 @@ SharedWidgets.CardBase {
 
                     Rectangle {
                         Layout.fillWidth: true
+                        visible: !!root.selectedProcess
                         radius: Colors.radiusSmall
                         color: Colors.cardSurface
                         border.color: Colors.withAlpha(root.detailStatusColor(ProcessService.detailStatus), 0.4)
@@ -1037,6 +1100,13 @@ SharedWidgets.CardBase {
                                     text: ProcessService.detailStatus.toUpperCase()
                                     textColor: root.detailStatusColor(ProcessService.detailStatus)
                                 }
+
+                                SharedWidgets.Chip {
+                                    icon: ProcessService.detailDegraded ? "󰀦" : "󰥔"
+                                    iconColor: ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary
+                                    text: "Updated " + root.formatAge(ProcessService.detailLastUpdatedMs)
+                                    textColor: ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary
+                                }
                             }
 
                             Text {
@@ -1044,6 +1114,15 @@ SharedWidgets.CardBase {
                                 visible: ProcessService.detailMessage !== ""
                                 text: ProcessService.detailMessage
                                 color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                visible: ProcessService.lastActionPid === root.selectedPid && ProcessService.lastActionMessage !== ""
+                                text: ProcessService.lastActionMessage + "  •  " + root.formatAge(ProcessService.lastActionAt)
+                                color: root.actionStatusColor(ProcessService.lastActionState)
                                 font.pixelSize: Colors.fontSizeXS
                                 wrapMode: Text.WordWrap
                             }
@@ -1079,6 +1158,13 @@ SharedWidgets.CardBase {
                                     iconColor: Colors.warning
                                     text: "CANCEL " + root.formatBytes(root.detailData.cancelledWriteBytes)
                                     textColor: Colors.warning
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: ProcessService.detailPermissionLimited ? "󰌾" : "󰄬"
+                                    iconColor: ProcessService.detailPermissionLimited ? Colors.warning : Colors.success
+                                    text: ProcessService.detailPermissionLimited ? "Permission limited" : "Live detail healthy"
+                                    textColor: ProcessService.detailPermissionLimited ? Colors.warning : Colors.success
                                 }
                             }
 
@@ -1222,6 +1308,7 @@ SharedWidgets.CardBase {
 
                     Rectangle {
                         Layout.fillWidth: true
+                        visible: !!root.selectedProcess
                         color: Colors.cardSurface
                         radius: Colors.radiusSmall
                         border.color: Colors.withAlpha(Colors.border, 0.65)

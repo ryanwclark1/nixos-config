@@ -52,6 +52,7 @@ SectionLabel 1.0 SectionLabel.qml
 SliderTrack 1.0 SliderTrack.qml
 SshWidget 1.0 SshWidget.qml
 SshWidgetData 1.0 SshWidgetData.qml
+SshWidgetSettings 1.0 SshWidgetSettings.qml
 StateLayer 1.0 StateLayer.qml
 StatusChip 1.0 StatusChip.qml
 SurfaceGradient 1.0 SurfaceGradient.qml

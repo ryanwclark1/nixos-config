@@ -20,7 +20,7 @@ host_pubkey_file=""
 
 usage() {
   cat <<'EOF'
-Usage: run-hyprland-panel-qa.sh [--output-dir DIR] [--mode panel|settings|surfaces|launcher]
+Usage: run-hyprland-panel-qa.sh [--output-dir DIR] [--mode panel|settings|surfaces|launcher|settings-qa|gate]
                                 [--ssh-port PORT] [--reset-disk] [--keep-vm-running]
                                 [--vm-output-dir DIR] [-- <extra capture args>]
 
@@ -33,6 +33,8 @@ Modes:
   settings   Run capture-panel-matrix.sh --repo-shell --skip-surfaces
   surfaces   Run capture-panel-matrix.sh --repo-shell --skip-settings
   launcher   Run capture-launcher-matrix.sh after launching the repo shell in the VM
+  settings-qa Run check-settings-qa.sh --repo-shell and copy its artifacts/logs
+  gate       Run runtime gate + settings QA and copy logs/artifacts
 EOF
 }
 
@@ -247,6 +249,63 @@ run_remote_capture() {
     surfaces)
       remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-settings --output-dir '${vm_output_dir}'"
       ;;
+    settings-qa)
+      "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+set -euo pipefail
+
+mkdir -p "${VM_OUTPUT_DIR}"
+log_path="${VM_OUTPUT_DIR}/settings-qa.log"
+artifact_dir="${VM_OUTPUT_DIR}/bar-widgets-first-open"
+
+set -o pipefail
+bash "${REMOTE_PANEL_ROOT}/scripts/check-settings-qa.sh" --repo-shell --output-dir "${artifact_dir}" 2>&1 | tee "${log_path}"
+EOF
+      return 0
+      ;;
+    gate)
+      "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+set -uo pipefail
+
+mkdir -p "${VM_OUTPUT_DIR}"
+runtime_log="${VM_OUTPUT_DIR}/runtime.log"
+settings_log="${VM_OUTPUT_DIR}/settings-qa.log"
+artifact_dir="${VM_OUTPUT_DIR}/bar-widgets-first-open"
+runtime_status=0
+settings_status=0
+
+set -o pipefail
+if bash "${REMOTE_PANEL_ROOT}/scripts/check-panel-runtime.sh" --repo-shell --skip-multibar --skip-launcher 2>&1 | tee "${runtime_log}"; then
+  runtime_status=0
+else
+  runtime_status=$?
+fi
+
+if (( runtime_status == 0 )); then
+  if bash "${REMOTE_PANEL_ROOT}/scripts/check-settings-qa.sh" --repo-shell --skip-switch --output-dir "${artifact_dir}" 2>&1 | tee "${settings_log}"; then
+    settings_status=0
+  else
+    settings_status=$?
+  fi
+else
+  printf '[SKIP] settings qa skipped because runtime gate failed\n' | tee "${settings_log}"
+  settings_status=99
+fi
+
+cat > "${VM_OUTPUT_DIR}/gate-status.env" <<STATUS
+runtime_exit=${runtime_status}
+settings_exit=${settings_status}
+STATUS
+
+if (( runtime_status != 0 )); then
+  exit "${runtime_status}"
+fi
+if (( settings_status != 0 && settings_status != 99 )); then
+  exit "${settings_status}"
+fi
+exit 0
+EOF
+      return 0
+      ;;
     launcher)
       "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
 set -euo pipefail
@@ -321,18 +380,17 @@ if (( ready == 0 )); then
 fi
 
 for capture in \
-  "drun home '' ${VM_OUTPUT_DIR}/drun-home.png" \
-  "drun query firefox ${VM_OUTPUT_DIR}/drun-query.png" \
-  "drun category Utility ${VM_OUTPUT_DIR}/drun-category.png" \
-  "files empty __launcher_empty_probe__ ${VM_OUTPUT_DIR}/files-empty.png" \
-  "system home '' ${VM_OUTPUT_DIR}/system-home.png"
+  "drun|home||${VM_OUTPUT_DIR}/drun-home.png" \
+  "drun|query|firefox|${VM_OUTPUT_DIR}/drun-query.png" \
+  "drun|category|Utility|${VM_OUTPUT_DIR}/drun-category.png" \
+  "files|empty|__launcher_empty_probe__|${VM_OUTPUT_DIR}/files-empty.png" \
+  "system|home||${VM_OUTPUT_DIR}/system-home.png"
 do
-  # shellcheck disable=SC2086
-  set -- ${capture}
-  mode="$1"
-  state="$2"
-  query="$3"
-  output="$4"
+  IFS='|' read -r mode state query output <<<"${capture}"
+  [[ -n "${mode}" && -n "${state}" && -n "${output}" ]] || {
+    echo "[ERROR] Invalid launcher capture definition: ${capture}" >&2
+    exit 1
+  }
   args=(
     --pid "${repo_shell_pid}"
     --mode "${mode}"
@@ -342,7 +400,7 @@ do
     --delay 1.2
     --output "${output}"
   )
-  if [[ -n "${query}" && "${query}" != "''" ]]; then
+  if [[ -n "${query}" ]]; then
     if [[ "${state}" == "category" ]]; then
       args+=(--category "${query}")
     else
@@ -380,6 +438,63 @@ copy_artifacts_home() {
   "${scp_base[@]}" -r "administrator@127.0.0.1:${vm_output_dir}/." "${output_dir}/"
 }
 
+write_summary() {
+  local remote_exit="$1"
+  local overall_status="pass"
+  local runtime_status="n/a"
+  local settings_status="n/a"
+  local runtime_exit_value=""
+  local settings_exit_value=""
+
+  if [[ -f "${output_dir}/gate-status.env" ]]; then
+    # shellcheck disable=SC1090
+    source "${output_dir}/gate-status.env"
+    runtime_exit_value="${runtime_exit:-}"
+    settings_exit_value="${settings_exit:-}"
+    case "${runtime_exit_value}" in
+      0) runtime_status="pass" ;;
+      *) runtime_status="fail" ;;
+    esac
+    case "${settings_exit_value}" in
+      0) settings_status="pass" ;;
+      99) settings_status="skip" ;;
+      *) settings_status="fail" ;;
+    esac
+  elif [[ "${capture_mode}" == "settings-qa" ]]; then
+    settings_status=$([[ "${remote_exit}" -eq 0 ]] && printf 'pass' || printf 'fail')
+  fi
+
+  if [[ "${remote_exit}" -ne 0 ]]; then
+    overall_status="fail"
+  fi
+
+  cat > "${output_dir}/summary.json" <<EOF
+{
+  "vm": "hyprland",
+  "mode": "${capture_mode}",
+  "status": "${overall_status}",
+  "remoteExit": ${remote_exit},
+  "runtimeStatus": "${runtime_status}",
+  "settingsStatus": "${settings_status}",
+  "sshPort": "${ssh_port}",
+  "artifactDir": "${output_dir}",
+  "launcherLog": "${output_dir}/launcher.log"
+}
+EOF
+
+  cat > "${output_dir}/summary.md" <<EOF
+# Hyprland VM QA Summary
+
+- mode: \`${capture_mode}\`
+- status: \`${overall_status}\`
+- remote exit: \`${remote_exit}\`
+- runtime: \`${runtime_status}\`
+- settings: \`${settings_status}\`
+- artifacts: \`${output_dir}\`
+- launcher log: \`${output_dir}/launcher.log\`
+EOF
+}
+
 echo "[INFO] Launching Hyprland test VM on SSH port ${ssh_port}"
 : > "${launcher_log}"
 launcher_args=(--ssh-port "${ssh_port}")
@@ -398,10 +513,20 @@ wait_for_hyprland
 run_id="$(date +%Y%m%d-%H%M%S)-$$"
 remote_repo="/tmp/nixos-config-${run_id}"
 sync_repo "${remote_repo}"
+remote_exit=0
+set +e
 run_remote_capture "${remote_repo}"
-copy_artifacts_home
+remote_exit=$?
+set -e
+copy_artifacts_home || true
+cp "${launcher_log}" "${output_dir}/launcher.log"
+write_summary "${remote_exit}"
 
 echo "[INFO] Host review artifacts saved to ${output_dir}"
 if (( keep_vm_running == 1 )); then
   echo "[INFO] VM left running on SSH port ${ssh_port}"
+fi
+
+if (( remote_exit != 0 )); then
+  exit "${remote_exit}"
 fi

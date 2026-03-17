@@ -11,12 +11,25 @@ SharedWidgets.CardBase {
     property string scopeMode: "both"
     property int maxRows: 16
     property int selectedIndex: -1
+    property string selectedScope: ""
+    property string selectedUnitName: ""
     property Flickable viewportFlickable: null
     property Item selectedRowItem: null
+    property int lastSelectedIndex: -1
+    property int _clockTick: 0
 
     readonly property string trimmedSearch: String(searchQuery || "").trim().toLowerCase()
     readonly property var visibleUnits: computeVisibleUnits()
-    readonly property var selectedUnit: (selectedIndex >= 0 && selectedIndex < visibleUnits.length) ? visibleUnits[selectedIndex] : null
+    readonly property var selectedUnit: {
+        if (selectedScope !== "" && selectedUnitName !== "") {
+            for (var i = 0; i < visibleUnits.length; ++i) {
+                var candidate = visibleUnits[i];
+                if (String(candidate.scope || "") === selectedScope && String(candidate.name || "") === selectedUnitName)
+                    return candidate;
+            }
+        }
+        return (selectedIndex >= 0 && selectedIndex < visibleUnits.length) ? visibleUnits[selectedIndex] : null;
+    }
     readonly property var detailData: root.selectedUnit
         && ServiceUnitService.detailScope === root.selectedUnit.scope
         && ServiceUnitService.detailUnitName === root.selectedUnit.name
@@ -100,9 +113,36 @@ SharedWidgets.CardBase {
             return Colors.success;
         if (status === "loading")
             return Colors.warning;
+        if (status === "permission-limited")
+            return Colors.warning;
         if (status === "error" || status === "missing")
             return Colors.error;
         return Colors.textDisabled;
+    }
+
+    function actionStatusColor(status) {
+        if (status === "success")
+            return Colors.success;
+        if (status === "pending")
+            return Colors.warning;
+        if (status === "error")
+            return Colors.error;
+        return Colors.textDisabled;
+    }
+
+    function formatAge(timestampMs) {
+        _clockTick;
+        var value = Number(timestampMs || 0);
+        if (value <= 0)
+            return "waiting";
+        var seconds = Math.max(0, Math.round((Date.now() - value) / 1000));
+        if (seconds < 1)
+            return "now";
+        if (seconds < 60)
+            return String(seconds) + "s ago";
+        var minutes = Math.floor(seconds / 60);
+        var remainder = seconds % 60;
+        return String(minutes) + "m " + String(remainder) + "s ago";
     }
 
     function formatBytes(bytes) {
@@ -184,14 +224,40 @@ SharedWidgets.CardBase {
     function syncSelection() {
         if (visibleUnits.length === 0) {
             selectedIndex = -1;
+            selectedScope = "";
+            selectedUnitName = "";
             return;
         }
-        if (selectedIndex < 0 || selectedIndex >= visibleUnits.length)
-            selectedIndex = 0;
+        for (var i = 0; i < visibleUnits.length; ++i) {
+            var candidate = visibleUnits[i];
+            if (String(candidate.scope || "") === selectedScope && String(candidate.name || "") === selectedUnitName) {
+                selectedIndex = i;
+                return;
+            }
+        }
+        if (selectedUnit)
+            return;
+        if (lastSelectedIndex >= 0 && lastSelectedIndex < visibleUnits.length) {
+            selectedIndex = lastSelectedIndex;
+            selectedScope = String(visibleUnits[lastSelectedIndex].scope || "");
+            selectedUnitName = String(visibleUnits[lastSelectedIndex].name || "");
+            return;
+        }
+        selectedIndex = 0;
+        selectedScope = String(visibleUnits[0].scope || "");
+        selectedUnitName = String(visibleUnits[0].name || "");
     }
 
     onVisibleUnitsChanged: syncSelection()
     onSelectedIndexChanged: {
+        if (selectedIndex >= 0 && selectedIndex < visibleUnits.length) {
+            lastSelectedIndex = selectedIndex;
+            selectedScope = String(visibleUnits[selectedIndex].scope || "");
+            selectedUnitName = String(visibleUnits[selectedIndex].name || "");
+        } else {
+            selectedScope = "";
+            selectedUnitName = "";
+        }
         Qt.callLater(ensureSelectedVisible);
         if (root.selectedUnit)
             ServiceUnitService.setDetailUnit(root.selectedUnit.scope, root.selectedUnit.name);
@@ -202,6 +268,13 @@ SharedWidgets.CardBase {
         syncSelection();
         if (root.selectedUnit)
             ServiceUnitService.setDetailUnit(root.selectedUnit.scope, root.selectedUnit.name);
+    }
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.visible
+        onTriggered: root._clockTick = root._clockTick + 1
     }
 
     FocusScope {
@@ -503,7 +576,7 @@ SharedWidgets.CardBase {
 
             Rectangle {
                 Layout.fillWidth: true
-                visible: !!root.selectedUnit
+                visible: true
                 radius: Colors.radiusSmall
                 color: Colors.bgWidget
                 border.color: Colors.border
@@ -518,6 +591,7 @@ SharedWidgets.CardBase {
 
                     RowLayout {
                         Layout.fillWidth: true
+                        visible: !!root.selectedUnit
 
                         ColumnLayout {
                             Layout.fillWidth: true
@@ -547,8 +621,16 @@ SharedWidgets.CardBase {
                         }
                     }
 
+                    SharedWidgets.EmptyState {
+                        Layout.fillWidth: true
+                        visible: !root.selectedUnit
+                        icon: "󰒓"
+                        message: root.visibleUnits.length === 0 ? "No service selected. Adjust filters or wait for service discovery." : "Select a service to inspect live unit detail."
+                    }
+
                     Flow {
                         Layout.fillWidth: true
+                        visible: !!root.selectedUnit
                         width: parent.width
                         spacing: Colors.spacingS
 
@@ -569,6 +651,7 @@ SharedWidgets.CardBase {
 
                     Flow {
                         Layout.fillWidth: true
+                        visible: !!root.selectedUnit
                         width: parent.width
                         spacing: Colors.spacingS
 
@@ -645,6 +728,7 @@ SharedWidgets.CardBase {
 
                     Rectangle {
                         Layout.fillWidth: true
+                        visible: !!root.selectedUnit
                         radius: Colors.radiusSmall
                         color: Colors.cardSurface
                         border.color: Colors.withAlpha(root.detailStatusColor(ServiceUnitService.detailStatus), 0.4)
@@ -678,6 +762,13 @@ SharedWidgets.CardBase {
                                     text: ServiceUnitService.detailStatus.toUpperCase()
                                     textColor: root.detailStatusColor(ServiceUnitService.detailStatus)
                                 }
+
+                                SharedWidgets.Chip {
+                                    icon: ServiceUnitService.detailDegraded ? "󰀦" : "󰥔"
+                                    iconColor: ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary
+                                    text: "Updated " + root.formatAge(ServiceUnitService.detailLastUpdatedMs)
+                                    textColor: ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary
+                                }
                             }
 
                             Text {
@@ -685,6 +776,18 @@ SharedWidgets.CardBase {
                                 visible: ServiceUnitService.detailMessage !== ""
                                 text: ServiceUnitService.detailMessage
                                 color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                visible: root.selectedUnit
+                                    && ServiceUnitService.lastActionScope === root.selectedUnit.scope
+                                    && ServiceUnitService.lastActionUnitName === root.selectedUnit.name
+                                    && ServiceUnitService.lastActionMessage !== ""
+                                text: ServiceUnitService.lastActionMessage + "  •  " + root.formatAge(ServiceUnitService.lastActionAt)
+                                color: root.actionStatusColor(ServiceUnitService.lastActionState)
                                 font.pixelSize: Colors.fontSizeXS
                                 wrapMode: Text.WordWrap
                             }
@@ -720,6 +823,13 @@ SharedWidgets.CardBase {
                                     iconColor: Colors.warning
                                     text: "TASKS " + (root.detailData.tasksCurrent !== undefined && root.detailData.tasksCurrent !== null ? String(root.detailData.tasksCurrent) : "Unavailable")
                                     textColor: Colors.warning
+                                }
+
+                                SharedWidgets.Chip {
+                                    icon: ServiceUnitService.detailPermissionLimited ? "󰌾" : "󰄬"
+                                    iconColor: ServiceUnitService.detailPermissionLimited ? Colors.warning : Colors.success
+                                    text: ServiceUnitService.detailPermissionLimited ? "Permission limited" : "Live unit healthy"
+                                    textColor: ServiceUnitService.detailPermissionLimited ? Colors.warning : Colors.success
                                 }
                             }
 

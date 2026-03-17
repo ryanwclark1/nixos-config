@@ -70,7 +70,19 @@ PanelWindow {
     if (CompositorAdapter.supportsHyprctlSettings) refreshHyprlandSettings();
   }
 
+  function clearInteractiveFocus() {
+    var item = settingsRoot.activeFocusItem;
+    var depth = 0;
+    while (item && depth < 24) {
+      if (item.focus !== undefined)
+        item.focus = false;
+      item = item.parent;
+      depth++;
+    }
+  }
+
   function close() {
+    clearInteractiveFocus();
     isOpen = false;
   }
 
@@ -223,8 +235,11 @@ PanelWindow {
     onVisibleChanged: {
       if (visible)
         forceActiveFocus()
-      else if (activeFocus)
+      else {
+        settingsRoot.clearInteractiveFocus();
+        if (activeFocus)
         focus = false
+      }
     }
     Keys.onEscapePressed: settingsRoot.isOpen = false
 

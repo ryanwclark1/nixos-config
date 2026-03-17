@@ -28,7 +28,16 @@ QtObject {
     property string detailMessage: ""
     property var unitDetail: ({})
     readonly property bool detailBusy: detailPoll.busy
+    property double detailLastUpdatedMs: 0
+    property bool detailPermissionLimited: false
+    property bool detailDegraded: false
+    property var lastGoodUnitDetail: ({})
     property var pendingActions: ({})
+    property string lastActionScope: ""
+    property string lastActionUnitName: ""
+    property string lastActionState: "idle"
+    property string lastActionMessage: ""
+    property double lastActionAt: 0
 
     function _dockerCommand() {
         return ["sh", "-c", "if ! command -v docker >/dev/null 2>&1; then printf '__STATUS__\\tmissing\\tdocker is not installed\\n'; exit 0; fi; " + "if ! output=$(docker ps -a --format '{{.ID}}\\t{{.Names}}\\t{{.Status}}\\t{{.Image}}\\t{{.State}}' 2>/dev/null); then " + "printf '__STATUS__\\terror\\tUnable to query docker containers\\n'; exit 0; fi; " + "printf '__STATUS__\\tready\\t\\n'; " + "printf '%s\\n' \"$output\""];
@@ -178,6 +187,10 @@ QtObject {
         detailStatus = "idle";
         detailMessage = "";
         unitDetail = ({});
+        detailLastUpdatedMs = 0;
+        detailPermissionLimited = false;
+        detailDegraded = false;
+        lastGoodUnitDetail = ({});
     }
 
     function _detailCommand(scope, unitName) {
@@ -188,13 +201,22 @@ QtObject {
         return ["sh", "-c", "scope=\"$1\"; unit=\"$2\"; prefix=\"$3\"; journalPrefix=\"$4\"; " +
                               "if [ -z \"$unit\" ]; then printf '__STATUS__\\tidle\\tNo service selected\\n'; exit 0; fi; " +
                               "if ! command -v systemctl >/dev/null 2>&1; then printf '__STATUS__\\tmissing\\tsystemctl is not installed\\n'; exit 0; fi; " +
-                              "if ! showOutput=$($prefix show \"$unit\" -p Description -p ActiveState -p SubState -p MainPID -p ExecMainStatus -p FragmentPath -p ActiveEnterTimestamp -p TasksCurrent -p MemoryCurrent 2>/dev/null); then " +
-                              "  printf '__STATUS__\\terror\\tUnable to query unit detail\\n'; exit 0; " +
+                              "status='ready'; message=''; permissionLimited=0; degraded=0; " +
+                              "showOutput=$($prefix show \"$unit\" -p Description -p ActiveState -p SubState -p MainPID -p ExecMainStatus -p FragmentPath -p ActiveEnterTimestamp -p TasksCurrent -p MemoryCurrent 2>&1); showStatus=$?; " +
+                              "if [ \"$showStatus\" -ne 0 ]; then " +
+                              "  case \"$showOutput\" in " +
+                              "    *'not found'*|*'could not be found'*) printf '__STATUS__\\tmissing\\tUnit not found\\n'; printf 'scope\\t%s\\nname\\t%s\\n' \"$scope\" \"$unit\"; exit 0 ;; " +
+                              "    *) printf '__STATUS__\\terror\\tUnable to query unit detail\\n'; printf 'scope\\t%s\\nname\\t%s\\n' \"$scope\" \"$unit\"; exit 0 ;; " +
+                              "  esac; " +
                               "fi; " +
-                              "logOutput=$($journalPrefix\"$unit\" -n 20 --no-pager -o short-iso 2>/dev/null || true); " +
-                              "printf '__STATUS__\\tready\\t\\n'; " +
+                              "logOutput=$($journalPrefix\"$unit\" -n 20 --no-pager -o short-iso 2>/dev/null); logStatus=$?; " +
+                              "if [ \"$logStatus\" -ne 0 ]; then permissionLimited=1; degraded=1; message='Recent logs unavailable'; fi; " +
+                              "if [ \"$permissionLimited\" -eq 1 ]; then status='permission-limited'; fi; " +
+                              "printf '__STATUS__\\t%s\\t%s\\n' \"$status\" \"$message\"; " +
                               "printf 'scope\\t%s\\n' \"$scope\"; " +
                               "printf 'name\\t%s\\n' \"$unit\"; " +
+                              "printf 'permissionLimited\\t%s\\n' \"$permissionLimited\"; " +
+                              "printf 'degraded\\t%s\\n' \"$degraded\"; " +
                               "printf '%s\\n' \"$showOutput\" | awk -F= 'BEGIN{OFS=\"\\t\"} {key=$1; sub(/^[^=]*=/, \"\", $0); print key, $0}'; " +
                               "printf '%s\\n' \"$logOutput\" | while IFS= read -r line; do [ -n \"$line\" ] && printf 'log\\t%s\\n' \"$line\"; done;", "sh", safeScope, safeUnit, prefix, journalPrefix];
     }
@@ -230,6 +252,9 @@ QtObject {
             name: detailUnitName,
             scope: detailScope
         };
+        detailLastUpdatedMs = 0;
+        detailPermissionLimited = false;
+        detailDegraded = false;
         detailPoll.triggerPoll();
     }
 
@@ -266,13 +291,21 @@ QtObject {
             name: detailUnitName,
             status: status,
             message: message,
-            recentLogs: []
+            recentLogs: [],
+            permissionLimited: false,
+            degraded: false
         };
 
         function parseOptionalInt(value) {
             if (value === undefined || value === null || String(value) === "")
                 return null;
             return parseInt(value, 10);
+        }
+
+        function parseOptionalBool(value) {
+            if (value === undefined || value === null || String(value) === "")
+                return false;
+            return String(value) === "1" || String(value).toLowerCase() === "true";
         }
 
         for (var i = 0; i < lines.length; ++i) {
@@ -286,6 +319,10 @@ QtObject {
             var value = parts.slice(1).join("\t");
             if (key === "log") {
                 result.recentLogs.push(value);
+                continue;
+            }
+            if (key === "permissionLimited" || key === "degraded") {
+                result[key] = parseOptionalBool(value);
                 continue;
             }
             if (key === "MainPID" || key === "ExecMainStatus" || key === "TasksCurrent" || key === "MemoryCurrent")
@@ -323,6 +360,11 @@ QtObject {
             return false;
         }
 
+        lastActionScope = String(scope || "user");
+        lastActionUnitName = String(unitName);
+        lastActionState = "pending";
+        lastActionMessage = String(actionName || "action").toUpperCase() + " running...";
+        lastActionAt = Date.now();
         var command = ["systemctl"];
         if (scope !== "system")
             command.push("--user");
@@ -351,6 +393,11 @@ QtObject {
             return false;
         }
 
+        lastActionScope = String(scope || "user");
+        lastActionUnitName = String(unitName);
+        lastActionState = "pending";
+        lastActionMessage = "COPY running...";
+        lastActionAt = Date.now();
         _actionScope = String(scope || "user");
         _actionUnitName = String(unitName);
         _actionTitle = "Copied";
@@ -461,9 +508,29 @@ QtObject {
             var snapshot = detailPoll.value || {};
             if (String(snapshot.scope || "") !== root.detailScope || String(snapshot.name || "") !== root.detailUnitName)
                 return;
-            root.detailStatus = String(snapshot.status || "ready");
-            root.detailMessage = String(snapshot.message || "");
-            root.unitDetail = root._mergeDetailSnapshot(snapshot);
+            var nextStatus = String(snapshot.status || "ready");
+            var nextMessage = String(snapshot.message || "");
+            var hasCached = String(root.lastGoodUnitDetail.scope || "") === root.detailScope
+                && String(root.lastGoodUnitDetail.name || "") === root.detailUnitName;
+            var nextDetail = root._mergeDetailSnapshot(snapshot);
+
+            root.detailLastUpdatedMs = Date.now();
+            root.detailPermissionLimited = !!snapshot.permissionLimited || nextStatus === "permission-limited";
+            root.detailDegraded = !!snapshot.degraded || nextStatus === "error" || nextStatus === "permission-limited";
+
+            if (nextStatus === "error" && hasCached) {
+                root.detailStatus = "error";
+                root.detailMessage = nextMessage !== "" ? nextMessage + " Showing last successful detail." : "Detail refresh failed. Showing last successful detail.";
+                root.unitDetail = root.lastGoodUnitDetail;
+                root.detailDegraded = true;
+                return;
+            }
+
+            root.detailStatus = nextStatus;
+            root.detailMessage = nextMessage;
+            root.unitDetail = nextDetail;
+            if (nextStatus === "ready" || nextStatus === "permission-limited")
+                root.lastGoodUnitDetail = nextDetail;
         }
     }
 
@@ -480,6 +547,11 @@ QtObject {
         }
         onExited: (exitCode, exitStatus) => {
             root._setPending(root._actionScope, root._actionUnitName, "");
+            root.lastActionScope = root._actionScope;
+            root.lastActionUnitName = root._actionUnitName;
+            root.lastActionState = exitCode === 0 ? "success" : "error";
+            root.lastActionMessage = exitCode === 0 ? root._actionSuccessMessage : root._actionFailureMessage;
+            root.lastActionAt = Date.now();
             if (exitCode === 0)
                 ToastService.showSuccess(root._actionTitle, root._actionSuccessMessage);
             else

@@ -63,6 +63,7 @@ PanelWindow {
         ProcessService.refresh();
         ServiceUnitService.refresh();
         NetworkService.refreshData();
+        SystemIoTelemetryService.refreshMetadata();
     }
 
     function focusKeyboardSection(index) {
@@ -254,6 +255,39 @@ PanelWindow {
                     textColor: SystemStatus.isCritical ? Colors.error : Colors.success
                 }
 
+                SharedWidgets.Chip {
+                    icon: ProcessService.detailDegraded ? "󰀦" : "󰍉"
+                    iconColor: ProcessService.detailStatus === "error" || ProcessService.detailStatus === "terminated"
+                        ? Colors.error
+                        : (ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                    text: "PROC " + String(ProcessService.detailStatus || "idle").toUpperCase()
+                    textColor: ProcessService.detailStatus === "error" || ProcessService.detailStatus === "terminated"
+                        ? Colors.error
+                        : (ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                }
+
+                SharedWidgets.Chip {
+                    icon: ServiceUnitService.detailDegraded ? "󰀦" : "󰒓"
+                    iconColor: ServiceUnitService.detailStatus === "error" || ServiceUnitService.detailStatus === "missing"
+                        ? Colors.error
+                        : (ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                    text: "UNIT " + String(ServiceUnitService.detailStatus || "idle").toUpperCase()
+                    textColor: ServiceUnitService.detailStatus === "error" || ServiceUnitService.detailStatus === "missing"
+                        ? Colors.error
+                        : (ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                }
+
+                SharedWidgets.Chip {
+                    icon: SystemIoTelemetryService.telemetryStatus === "degraded" ? "󰀦" : "󰋊"
+                    iconColor: SystemIoTelemetryService.telemetryStatus === "degraded"
+                        ? Colors.warning
+                        : (SystemIoTelemetryService.telemetryStatus === "missing" ? Colors.error : Colors.textSecondary)
+                    text: "I/O " + String(SystemIoTelemetryService.telemetryStatus || "loading").toUpperCase()
+                    textColor: SystemIoTelemetryService.telemetryStatus === "degraded"
+                        ? Colors.warning
+                        : (SystemIoTelemetryService.telemetryStatus === "missing" ? Colors.error : Colors.textSecondary)
+                }
+
                 SharedWidgets.FilterChip {
                     label: "Processes"
                     icon: "󰆍"
@@ -373,8 +407,8 @@ PanelWindow {
             Text {
                 Layout.fillWidth: true
                 text: root.keyboardSectionIndex === 0
-                    ? "Tab switches sections. Process keys: arrows/j/k move, selection updates live detail, left/right or h/l collapse tree, r refresh, x term, Delete kill, Space suspend, +/- renice, d details, c/y copy, Enter inspect."
-                    : "Tab switches sections. Service keys: arrows/j/k move, selection updates live unit detail, r restart, s start/stop, Enter or l opens logs."
+                    ? "Tab switches sections. Process keys: arrows/j/k move, selection persists across refresh, left/right or h/l collapse tree, r refresh, x term, Delete kill, Space suspend, +/- renice, d details, c/y copy, Enter inspect. Status chips show degraded or stale detail."
+                    : "Tab switches sections. Service keys: arrows/j/k move, selection persists across refresh, r restart, s start/stop, Enter or l opens logs. Status chips show degraded or stale unit detail."
                 color: Colors.textDisabled
                 font.pixelSize: Colors.fontSizeXS
                 wrapMode: Text.WordWrap

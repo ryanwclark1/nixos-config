@@ -59,6 +59,29 @@ make niri-vm-panel-qa
 bash scripts/vm/run-niri-panel-qa.sh --mode settings --output-dir /tmp/panel-qa-niri-settings
 ```
 
+For the unified focused regression gate across both compositor VMs:
+
+```bash
+make panel-vm-qa
+bash scripts/vm/run-panel-vm-qa.sh --vm both --reset-disk
+```
+
+This runs the repo-shell panel runtime gate plus settings QA for each selected
+VM, stores artifacts under
+`${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/panel-vm-qa/`, and writes
+aggregate `summary.json` / `summary.md` files.
+
+For host-side Hyprland settings QA run inside the VM:
+
+```bash
+make hyprland-vm-settings-qa
+bash scripts/vm/run-hyprland-panel-qa.sh --mode settings-qa --output-dir /tmp/panel-qa-hyprland-settings-qa
+```
+
+This runs `check-settings-qa.sh --repo-shell` inside the guest and copies the
+settings QA log plus first-open bar-widgets artifacts back to the host output
+directory.
+
 ## SSH debugging
 
 Run with SSH forwarding:

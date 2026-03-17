@@ -6,7 +6,7 @@ import "../services"
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: 120
+  Layout.preferredHeight: networkContent.implicitHeight + Colors.paddingMedium * 2
   color: Colors.bgWidget
   radius: Colors.radiusMedium
   border.color: netCardHover.hovered ? Colors.primary : Colors.border
@@ -114,54 +114,113 @@ Rectangle {
     if (!netProc.running) netProc.running = true;
   }
 
-  RowLayout {
+  ColumnLayout {
+    id: networkContent
     anchors.fill: parent
     anchors.margins: Colors.paddingMedium
-    spacing: Colors.spacingLG
+    spacing: Colors.spacingM
 
-    ColumnLayout {
+    GridLayout {
+      id: graphGrid
       Layout.fillWidth: true
-      RowLayout {
-        Text { 
-          text: "DOWNLOAD"
+      columns: width >= 420 ? 2 : 1
+      columnSpacing: Colors.spacingLG
+      rowSpacing: Colors.spacingM
+
+      ColumnLayout {
+        id: downloadGraph
+        readonly property real valueWidth: Math.max(72, (graphGrid.width / Math.max(1, graphGrid.columns)) * 0.42)
+        Layout.fillWidth: true
+        spacing: Colors.spacingXS
+
+        RowLayout {
+          Layout.fillWidth: true
+          Text {
+            text: "DOWNLOAD"
+            color: Colors.textDisabled
+            font.pixelSize: Colors.fontSizeXS
+            font.weight: Font.Bold
+            font.capitalization: Font.AllUppercase
+            Layout.fillWidth: true
+            elide: Text.ElideRight
+          }
+          Text {
+            text: root.currentDown
+            color: Colors.primary
+            font.pixelSize: Colors.fontSizeXS
+            font.weight: Font.Bold
+            font.family: Colors.fontMono
+            Layout.maximumWidth: downloadGraph.valueWidth
+            horizontalAlignment: Text.AlignRight
+            elide: Text.ElideLeft
+          }
+        }
+
+        Text {
+          Layout.fillWidth: true
+          text: root.activeInterface.toUpperCase()
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Bold
-          font.capitalization: Font.AllUppercase
+          elide: Text.ElideRight
         }
-        Item { Layout.fillWidth: true }
-        Text { text: root.activeInterface.toUpperCase(); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-        Text { text: "•"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; visible: root.activeInterface !== "" }
-        Text { text: root.currentDown; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-      }
-      Canvas {
-        id: downCanvas; Layout.fillWidth: true; Layout.fillHeight: true
-        renderTarget: Canvas.FramebufferObject
-        renderStrategy: Canvas.Threaded
-        onPaint: root.paintGraph(downCanvas, root.downHistory, Colors.primary)
-      }
-    }
 
-    ColumnLayout {
-      Layout.fillWidth: true
-      RowLayout {
-        Text { 
-          text: "UPLOAD"
+        Canvas {
+          id: downCanvas
+          Layout.fillWidth: true
+          Layout.preferredHeight: 52
+          renderTarget: Canvas.FramebufferObject
+          renderStrategy: Canvas.Threaded
+          onPaint: root.paintGraph(downCanvas, root.downHistory, Colors.primary)
+        }
+      }
+
+      ColumnLayout {
+        id: uploadGraph
+        readonly property real valueWidth: Math.max(72, (graphGrid.width / Math.max(1, graphGrid.columns)) * 0.42)
+        Layout.fillWidth: true
+        spacing: Colors.spacingXS
+
+        RowLayout {
+          Layout.fillWidth: true
+          Text {
+            text: "UPLOAD"
+            color: Colors.textDisabled
+            font.pixelSize: Colors.fontSizeXS
+            font.weight: Font.Bold
+            font.capitalization: Font.AllUppercase
+            Layout.fillWidth: true
+            elide: Text.ElideRight
+          }
+          Text {
+            text: root.currentUp
+            color: Colors.accent
+            font.pixelSize: Colors.fontSizeXS
+            font.weight: Font.Bold
+            font.family: Colors.fontMono
+            Layout.maximumWidth: uploadGraph.valueWidth
+            horizontalAlignment: Text.AlignRight
+            elide: Text.ElideLeft
+          }
+        }
+
+        Text {
+          Layout.fillWidth: true
+          text: root.activeInterface.toUpperCase()
           color: Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Bold
-          font.capitalization: Font.AllUppercase
+          elide: Text.ElideRight
         }
-        Item { Layout.fillWidth: true }
-        Text { text: root.activeInterface.toUpperCase(); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-        Text { text: "•"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; visible: root.activeInterface !== "" }
-        Text { text: root.currentUp; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-      }
-      Canvas {
-        id: upCanvas; Layout.fillWidth: true; Layout.fillHeight: true
-        renderTarget: Canvas.FramebufferObject
-        renderStrategy: Canvas.Threaded
-        onPaint: root.paintGraph(upCanvas, root.upHistory, Colors.accent)
+
+        Canvas {
+          id: upCanvas
+          Layout.fillWidth: true
+          Layout.preferredHeight: 52
+          renderTarget: Canvas.FramebufferObject
+          renderStrategy: Canvas.Threaded
+          onPaint: root.paintGraph(upCanvas, root.upHistory, Colors.accent)
+        }
       }
     }
   }

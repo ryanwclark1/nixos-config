@@ -681,6 +681,9 @@ main() {
     fi
   fi
 
+  local start_time
+  start_time="$(date +'%Y-%m-%d %H:%M:%S')"
+
   grim_capture "${temp_full}"
 
   if [[ "${crop_mode}" == "surface" ]] && { [[ "${surface_kind}" == "popup" ]] || [[ -z "${crop_box}" ]] || [[ "${crop_w:-0}" -ge $((monitor_w - 16)) ]] || [[ "${crop_h:-0}" -ge $((monitor_h - 16)) ]]; }; then
@@ -723,6 +726,9 @@ main() {
 
   magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
+
+  # Dump correlated logs
+  journalctl --user --since "${start_time}" > "${output_path%.png}.log" 2>/dev/null || true
 
   printf '[INFO] Saved surface review artifact for %s (%s) -> %s\n' "${surface_id}" "${crop_mode}" "${output_path}"
 }

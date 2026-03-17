@@ -97,6 +97,14 @@ install_host_pubkey
 
 echo "[INFO] SSH is ready; validating session"
 
+if ! "${ssh_base[@]}" '
+  pgrep -fa "niri --session" >/dev/null 2>&1 ||
+  systemctl --user start niri.service >/dev/null 2>&1
+' ; then
+  echo "[ERROR] Failed to start niri.service inside the VM" >&2
+  exit 1
+fi
+
 for ((i = 1; i <= 30; i++)); do
   if "${ssh_base[@]}" '
     pgrep -fa "niri --session" >/dev/null &&

@@ -45,6 +45,7 @@ surface_ids=(
   "dateTimeMenu"
   "notifCenter"
   "controlCenter"
+  "systemMonitor"
 )
 
 usage() {

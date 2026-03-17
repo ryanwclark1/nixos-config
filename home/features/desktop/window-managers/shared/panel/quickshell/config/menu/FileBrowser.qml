@@ -65,16 +65,24 @@ PanelWindow {
   }
 
   function close() {
-    if (saveField.activeFocus)
-      saveField.focus = false;
-    if (mainBox.activeFocus)
-      mainBox.focus = false;
+    clearInteractiveFocus();
     isOpen = false;
     _fileEntries = [];
   }
 
   function toggle() {
     isOpen ? close() : open(currentPath, fileFilters, mode);
+  }
+
+  function clearInteractiveFocus() {
+    var item = root.activeFocusItem;
+    var depth = 0;
+    while (item && depth < 24) {
+      if (item.focus !== undefined)
+        item.focus = false;
+      item = item.parent;
+      depth++;
+    }
   }
 
   IpcHandler {
@@ -317,13 +325,15 @@ PanelWindow {
               saveField.forceActiveFocus();
           });
         } else {
-          forceActiveFocus();
+          Qt.callLater(function() {
+            if (root.isOpen && root.mode !== "save")
+              focusSink.forceActiveFocus();
+          });
         }
       } else {
-        if (saveField.activeFocus)
-          saveField.focus = false;
+        root.clearInteractiveFocus();
         if (activeFocus)
-        focus = false;
+          focus = false;
       }
     }
     Keys.onEscapePressed: root.close()
@@ -336,6 +346,13 @@ PanelWindow {
 
     // Block click-through
     MouseArea { anchors.fill: parent }
+
+    Item {
+      id: focusSink
+      width: 0
+      height: 0
+      focus: false
+    }
 
     SharedWidgets.ElevationShadow { elevation: 20; shadowRadius: mainBox.radius }
 

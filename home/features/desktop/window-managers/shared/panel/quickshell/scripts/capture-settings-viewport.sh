@@ -410,11 +410,27 @@ main() {
     crop_y=$((monitor_y + reserved_top + (usable_h - crop_h) / 2))
   fi
 
+  local start_time
+  start_time="$(date +'%Y-%m-%d %H:%M:%S')"
+
   grim_capture "${temp_full}"
   magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
 
-  printf '[INFO] Saved settings review artifact for %s at %sx%s -> %s\n' "${tab_id}" "${crop_w}" "${crop_h}" "${output_path}"
+  # Dump correlated logs
+  local log_file="${output_path%.png}.log"
+  journalctl --user --since "${start_time}" > "${log_file}" 2>/dev/null || true
+
+  # Scan for health status
+  local status="clean"
+  if grep -qiE "error|critical|failed|exception" "${log_file}"; then
+    status="error"
+  elif grep -qiE "warn|alert" "${log_file}"; then
+    status="warning"
+  fi
+  printf '%s' "${status}" > "${log_file}.status"
+
+  printf '[INFO] Saved settings review artifact for %s at %sx%s (logs: %s) -> %s\n' "${tab_id}" "${crop_w}" "${crop_h}" "${status}" "${output_path}"
 }
 
 main "$@"

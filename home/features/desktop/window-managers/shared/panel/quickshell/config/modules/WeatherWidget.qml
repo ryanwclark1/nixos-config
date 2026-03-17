@@ -6,7 +6,7 @@ import "../widgets" as SharedWidgets
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: 80
+  Layout.preferredHeight: weatherContent.implicitHeight + Colors.paddingMedium * 2
   color: Colors.withAlpha(Colors.surface, 0.4)
   radius: Colors.radiusMedium
   border.color: Colors.border
@@ -20,6 +20,7 @@ Rectangle {
   SharedWidgets.InnerHighlight { }
 
   RowLayout {
+    id: weatherContent
     anchors.fill: parent
     anchors.margins: Colors.paddingMedium
     spacing: Colors.paddingMedium
@@ -32,6 +33,7 @@ Rectangle {
     }
 
     ColumnLayout {
+      Layout.fillWidth: true
       spacing: Colors.spacingXXS
       Text {
         text: WeatherService.temp
@@ -43,8 +45,9 @@ Rectangle {
         text: (WeatherService.condition || "Unknown") + " in " + (WeatherService.location || "Local")
         color: Colors.textDisabled
         font.pixelSize: Colors.fontSizeSmall
-        elide: Text.ElideRight
         Layout.fillWidth: true
+        wrapMode: Text.Wrap
+        maximumLineCount: 2
       }
     }
   }

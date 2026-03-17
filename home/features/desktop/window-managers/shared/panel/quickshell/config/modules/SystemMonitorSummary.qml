@@ -12,6 +12,7 @@ SharedWidgets.CardBase {
     property string uptimeText: "--"
     property string loadAverage: "--"
     property string swapUsage: "--"
+    property int _clockTick: 0
 
     SharedWidgets.Ref { service: SystemStatus }
     SharedWidgets.Ref { service: NetworkService }
@@ -26,6 +27,21 @@ SharedWidgets.CardBase {
         if (value < 1073741824)
             return (value / 1048576).toFixed(1) + " MB/s";
         return (value / 1073741824).toFixed(2) + " GB/s";
+    }
+
+    function formatAge(timestampMs) {
+        _clockTick;
+        var value = Number(timestampMs || 0);
+        if (value <= 0)
+            return "waiting";
+        var seconds = Math.max(0, Math.round((Date.now() - value) / 1000));
+        if (seconds < 1)
+            return "now";
+        if (seconds < 60)
+            return String(seconds) + "s ago";
+        var minutes = Math.floor(seconds / 60);
+        var remainder = seconds % 60;
+        return String(minutes) + "m " + String(remainder) + "s ago";
     }
 
     SharedWidgets.CommandPoll {
@@ -54,6 +70,13 @@ SharedWidgets.CardBase {
             root.loadAverage = String(next.loadAverage || "--");
             root.swapUsage = String(next.swapUsage || "--");
         }
+    }
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.visible
+        onTriggered: root._clockTick = root._clockTick + 1
     }
 
     ColumnLayout {
@@ -89,6 +112,13 @@ SharedWidgets.CardBase {
                 iconColor: SystemStatus.isCritical ? Colors.error : Colors.success
                 text: SystemStatus.isCritical ? "Attention" : "Healthy"
                 textColor: SystemStatus.isCritical ? Colors.error : Colors.success
+            }
+
+            SharedWidgets.Chip {
+                icon: SystemIoTelemetryService.telemetryStatus === "degraded" ? "󰀦" : "󰄬"
+                iconColor: SystemIoTelemetryService.telemetryStatus === "degraded" ? Colors.warning : Colors.textSecondary
+                text: "I/O " + SystemIoTelemetryService.telemetryStatus.toUpperCase()
+                textColor: SystemIoTelemetryService.telemetryStatus === "degraded" ? Colors.warning : Colors.textSecondary
             }
         }
 
@@ -261,6 +291,18 @@ SharedWidgets.CardBase {
                 Layout.fillWidth: true
                 label: "Disk Peak"
                 value: root.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
+            }
+
+            SharedWidgets.InfoRow {
+                Layout.fillWidth: true
+                label: "Net Age"
+                value: root.formatAge(SystemIoTelemetryService.networkLastSampleMs)
+            }
+
+            SharedWidgets.InfoRow {
+                Layout.fillWidth: true
+                label: "Disk Age"
+                value: root.formatAge(SystemIoTelemetryService.diskLastSampleMs)
             }
         }
     }

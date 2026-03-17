@@ -32,6 +32,13 @@ QtObject {
     property bool diskHotspot: false
     property string telemetryStatus: "loading"
     property string telemetryMessage: ""
+    property double networkLastSampleMs: 0
+    property double diskLastSampleMs: 0
+    property double metadataLastRefreshMs: 0
+    property bool networkDegraded: false
+    property bool diskDegraded: false
+
+    property var _interfaceTotals: ({})
 
     property real _lastRx: -1
     property real _lastTx: -1
@@ -57,6 +64,10 @@ QtObject {
         peakDiskWrite = 0;
         networkHotspot = false;
         diskHotspot = false;
+        networkLastSampleMs = 0;
+        diskLastSampleMs = 0;
+        networkDegraded = false;
+        diskDegraded = false;
         _lastRx = -1;
         _lastTx = -1;
         _lastReadSectors = -1;
@@ -102,6 +113,46 @@ QtObject {
         metadataPoll.triggerPoll();
     }
 
+    function _fallbackInterface(defaultIface, nextInterfaces) {
+        var preferred = String(defaultIface || "");
+        if (preferred !== "" && nextInterfaces.indexOf(preferred) !== -1)
+            return preferred;
+
+        var busiest = "";
+        var busiestValue = -1;
+        for (var i = 0; i < nextInterfaces.length; ++i) {
+            var iface = String(nextInterfaces[i] || "");
+            var bytes = Number((_interfaceTotals || {})[iface] || 0);
+            if (bytes > busiestValue) {
+                busiest = iface;
+                busiestValue = bytes;
+            }
+        }
+        return busiest;
+    }
+
+    function _updateTelemetryState() {
+        if (selectedInterface === "" && selectedDiskDevice === "") {
+            telemetryStatus = "missing";
+            telemetryMessage = "No network or disk telemetry source was discovered.";
+            return;
+        }
+
+        if (networkDegraded || diskDegraded) {
+            telemetryStatus = "degraded";
+            var issues = [];
+            if (networkDegraded && selectedInterface !== "")
+                issues.push("network telemetry stale");
+            if (diskDegraded && selectedDiskDevice !== "")
+                issues.push("disk telemetry stale");
+            telemetryMessage = issues.join("; ");
+            return;
+        }
+
+        telemetryStatus = "ready";
+        telemetryMessage = "";
+    }
+
     function _metadataCommand() {
         return [
             "sh",
@@ -111,7 +162,12 @@ QtObject {
             + "rootBase=$(printf '%s' \"$rootSrc\" | sed 's/[0-9]\\+$//' | sed 's/p$//'); "
             + "printf 'DEFAULT_IFACE=%s\\n' \"$defaultIface\"; "
             + "printf 'DEFAULT_DISK=%s\\n' \"$rootBase\"; "
-            + "for iface in $(ls /sys/class/net 2>/dev/null | grep -v '^lo$'); do printf 'IFACE=%s\\n' \"$iface\"; done; "
+            + "for iface in $(ls /sys/class/net 2>/dev/null | grep -v '^lo$'); do "
+            + "  rx=$(cat \"/sys/class/net/$iface/statistics/rx_bytes\" 2>/dev/null || echo 0); "
+            + "  tx=$(cat \"/sys/class/net/$iface/statistics/tx_bytes\" 2>/dev/null || echo 0); "
+            + "  total=$((rx + tx)); "
+            + "  printf 'IFACE=%s\\t%s\\n' \"$iface\" \"$total\"; "
+            + "done; "
             + "awk 'BEGIN{seen[\"\"]=1} $3 ~ /^(sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+|md[0-9]+)$/ { if (!seen[$3]++) print \"DISK=\" $3 }' /proc/diskstats 2>/dev/null"
         ];
     }
@@ -145,6 +201,7 @@ QtObject {
         var data = {};
         var ifaces = [];
         var disks = [];
+        var interfaceTotals = {};
         for (var i = 0; i < lines.length; ++i) {
             var line = String(lines[i] || "");
             var idx = line.indexOf("=");
@@ -152,8 +209,14 @@ QtObject {
                 continue;
             var key = line.substring(0, idx);
             var value = line.substring(idx + 1);
-            if (key === "IFACE")
-                ifaces.push(value);
+            if (key === "IFACE") {
+                var parts = value.split("\t");
+                var iface = String(parts[0] || "");
+                if (iface !== "") {
+                    ifaces.push(iface);
+                    interfaceTotals[iface] = Number(parts[1] || 0);
+                }
+            }
             else if (key === "DISK")
                 disks.push(value);
             else
@@ -161,6 +224,7 @@ QtObject {
         }
         data.interfaces = ifaces;
         data.disks = disks;
+        data.interfaceTotals = interfaceTotals;
         return data;
     }
 
@@ -170,10 +234,12 @@ QtObject {
 
         interfaces = nextInterfaces;
         diskDevices = nextDisks;
+        _interfaceTotals = snapshot.interfaceTotals || {};
+        metadataLastRefreshMs = Date.now();
 
         var nextInterface = selectedInterface;
         if (nextInterfaces.indexOf(nextInterface) === -1)
-            nextInterface = String(snapshot.DEFAULT_IFACE || nextInterfaces[0] || "");
+            nextInterface = _fallbackInterface(snapshot.DEFAULT_IFACE, nextInterfaces);
 
         var nextDisk = selectedDiskDevice;
         if (nextDisks.indexOf(nextDisk) === -1) {
@@ -185,11 +251,9 @@ QtObject {
         selectedInterface = nextInterface;
         selectedDiskDevice = nextDisk;
 
-        telemetryStatus = (selectedInterface !== "" || selectedDiskDevice !== "") ? "ready" : "missing";
-        telemetryMessage = telemetryStatus === "missing" ? "No network or disk telemetry source was discovered." : "";
-
         if (changed)
             resetHistories();
+        _updateTelemetryState();
     }
 
     property SharedWidgets.CommandPoll metadataPoll: SharedWidgets.CommandPoll {
@@ -219,6 +283,7 @@ QtObject {
             var tx = Number(snapshot.TX || 0);
             var readSectors = Number(snapshot.READ_SEC || 0);
             var writeSectors = Number(snapshot.WRITE_SEC || 0);
+            var now = Date.now();
 
             if (root._lastRx >= 0) {
                 root.currentNetworkDown = Math.max(0, rx - root._lastRx);
@@ -229,6 +294,10 @@ QtObject {
                 root.peakNetworkUp = root.arrayMax(root.networkHistoryUp);
                 root.networkHotspot = (root.peakNetworkDown > 0 && root.currentNetworkDown >= root.peakNetworkDown * 0.8)
                     || (root.peakNetworkUp > 0 && root.currentNetworkUp >= root.peakNetworkUp * 0.8);
+            }
+            if (root.selectedInterface !== "") {
+                root.networkLastSampleMs = now;
+                root.networkDegraded = false;
             }
 
             if (root._lastReadSectors >= 0) {
@@ -241,11 +310,31 @@ QtObject {
                 root.diskHotspot = (root.peakDiskRead > 0 && root.currentDiskRead >= root.peakDiskRead * 0.8)
                     || (root.peakDiskWrite > 0 && root.currentDiskWrite >= root.peakDiskWrite * 0.8);
             }
+            if (root.selectedDiskDevice !== "") {
+                root.diskLastSampleMs = now;
+                root.diskDegraded = false;
+            }
 
             root._lastRx = rx;
             root._lastTx = tx;
             root._lastReadSectors = readSectors;
             root._lastWriteSectors = writeSectors;
+            root._updateTelemetryState();
+        }
+    }
+
+    property Timer staleTimer: Timer {
+        interval: Math.max(1500, root.sampleIntervalMs * 2)
+        repeat: true
+        running: root.subscriberCount > 0
+        triggeredOnStart: true
+        onTriggered: {
+            var now = Date.now();
+            if (root.selectedInterface !== "" && root.networkLastSampleMs > 0 && now - root.networkLastSampleMs > Math.max(3000, root.sampleIntervalMs * 3))
+                root.networkDegraded = true;
+            if (root.selectedDiskDevice !== "" && root.diskLastSampleMs > 0 && now - root.diskLastSampleMs > Math.max(3000, root.sampleIntervalMs * 3))
+                root.diskDegraded = true;
+            root._updateTelemetryState();
         }
     }
 }

@@ -8,6 +8,7 @@ SharedWidgets.CardBase {
 
     Layout.fillWidth: true
     Layout.preferredHeight: ioColumn.implicitHeight + root.pad * 2
+    property int _clockTick: 0
 
     SharedWidgets.Ref {
         service: SystemIoTelemetryService
@@ -38,6 +39,21 @@ SharedWidgets.CardBase {
         for (var i = 0; i < raw.length; ++i)
             normalized.push(Number(raw[i] || 0) / maxValue);
         return normalized;
+    }
+
+    function formatAge(timestampMs) {
+        _clockTick;
+        var value = Number(timestampMs || 0);
+        if (value <= 0)
+            return "waiting";
+        var seconds = Math.max(0, Math.round((Date.now() - value) / 1000));
+        if (seconds < 1)
+            return "now";
+        if (seconds < 60)
+            return String(seconds) + "s ago";
+        var minutes = Math.floor(seconds / 60);
+        var remainder = seconds % 60;
+        return String(minutes) + "m " + String(remainder) + "s ago";
     }
 
     function paintGraph(canvas, values, strokeColor) {
@@ -79,6 +95,13 @@ SharedWidgets.CardBase {
             SystemIoTelemetryService.refreshMetadata();
     }
 
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.visible
+        onTriggered: root._clockTick = root._clockTick + 1
+    }
+
     ColumnLayout {
         id: ioColumn
         Layout.fillWidth: true
@@ -99,12 +122,25 @@ SharedWidgets.CardBase {
             Item {
                 Layout.fillWidth: true
             }
+        }
+
+        Flow {
+            Layout.fillWidth: true
+            width: parent.width
+            spacing: Colors.spacingS
 
             SharedWidgets.Chip {
                 icon: SystemIoTelemetryService.networkHotspot ? "󰀦" : "󰄬"
                 iconColor: SystemIoTelemetryService.networkHotspot || SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.success
                 text: SystemIoTelemetryService.telemetryStatus.toUpperCase()
                 textColor: SystemIoTelemetryService.networkHotspot || SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.success
+            }
+
+            SharedWidgets.Chip {
+                icon: "󰥔"
+                iconColor: Colors.textSecondary
+                text: "Meta " + root.formatAge(SystemIoTelemetryService.metadataLastRefreshMs)
+                textColor: Colors.textSecondary
             }
         }
 
@@ -121,6 +157,22 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             width: parent.width
             spacing: Colors.spacingS
+
+            SharedWidgets.Chip {
+                visible: SystemIoTelemetryService.selectedInterface !== ""
+                icon: SystemIoTelemetryService.networkDegraded ? "󰀦" : "󰈀"
+                iconColor: SystemIoTelemetryService.networkDegraded ? Colors.warning : Colors.primary
+                text: String(SystemIoTelemetryService.selectedInterface || "").toUpperCase() + "  " + root.formatAge(SystemIoTelemetryService.networkLastSampleMs)
+                textColor: SystemIoTelemetryService.networkDegraded ? Colors.warning : Colors.primary
+            }
+
+            SharedWidgets.Chip {
+                visible: SystemIoTelemetryService.selectedDiskDevice !== ""
+                icon: SystemIoTelemetryService.diskDegraded ? "󰀦" : "󰋊"
+                iconColor: SystemIoTelemetryService.diskDegraded ? Colors.warning : Colors.secondary
+                text: String(SystemIoTelemetryService.selectedDiskDevice || "").toUpperCase() + "  " + root.formatAge(SystemIoTelemetryService.diskLastSampleMs)
+                textColor: SystemIoTelemetryService.diskDegraded ? Colors.warning : Colors.secondary
+            }
 
             Repeater {
                 model: SystemIoTelemetryService.interfaces || []
@@ -152,12 +204,15 @@ SharedWidgets.CardBase {
         }
 
         GridLayout {
+            id: metricsGrid
             Layout.fillWidth: true
-            columns: 2
+            columns: width >= 420 ? 2 : 1
             columnSpacing: Colors.spacingM
             rowSpacing: Colors.spacingM
 
             Rectangle {
+                id: netDownCard
+                readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
                 color: Colors.withAlpha(Colors.surface, 0.45)
@@ -173,16 +228,23 @@ SharedWidgets.CardBase {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Text { text: "NET DOWN"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+                        Text { text: "NET DOWN"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
                         Item { Layout.fillWidth: true }
-                        Text { text: root.formatRate(SystemIoTelemetryService.currentNetworkDown); color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono }
+                        Text { text: root.formatRate(SystemIoTelemetryService.currentNetworkDown); color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: netDownCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
-                    Text {
-                        text: "Peak " + root.formatRate(SystemIoTelemetryService.peakNetworkDown)
-                        color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                        Item { Layout.fillWidth: true }
+                        Text { text: root.formatRate(SystemIoTelemetryService.peakNetworkDown); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netDownCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                        Item { Layout.fillWidth: true }
+                        Text { text: root.formatRate(root.arrayMax(SystemIoTelemetryService.networkHistoryDown)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netDownCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
                     Canvas {
@@ -197,6 +259,8 @@ SharedWidgets.CardBase {
             }
 
             Rectangle {
+                id: netUpCard
+                readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
                 color: Colors.withAlpha(Colors.surface, 0.45)
@@ -212,16 +276,23 @@ SharedWidgets.CardBase {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Text { text: "NET UP"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+                        Text { text: "NET UP"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
                         Item { Layout.fillWidth: true }
-                        Text { text: root.formatRate(SystemIoTelemetryService.currentNetworkUp); color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono }
+                        Text { text: root.formatRate(SystemIoTelemetryService.currentNetworkUp); color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: netUpCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
-                    Text {
-                        text: "Peak " + root.formatRate(SystemIoTelemetryService.peakNetworkUp)
-                        color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                        Item { Layout.fillWidth: true }
+                        Text { text: root.formatRate(SystemIoTelemetryService.peakNetworkUp); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netUpCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                        Item { Layout.fillWidth: true }
+                        Text { text: root.formatRate(root.arrayMax(SystemIoTelemetryService.networkHistoryUp)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netUpCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
                     Canvas {
@@ -236,6 +307,8 @@ SharedWidgets.CardBase {
             }
 
             Rectangle {
+                id: diskReadCard
+                readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
                 color: Colors.withAlpha(Colors.surface, 0.45)
@@ -251,16 +324,23 @@ SharedWidgets.CardBase {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Text { text: "DISK READ"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+                        Text { text: "DISK READ"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
                         Item { Layout.fillWidth: true }
-                        Text { text: root.formatRate(SystemIoTelemetryService.currentDiskRead); color: Colors.secondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono }
+                        Text { text: root.formatRate(SystemIoTelemetryService.currentDiskRead); color: Colors.secondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: diskReadCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
-                    Text {
-                        text: "Peak " + root.formatRate(SystemIoTelemetryService.peakDiskRead)
-                        color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                        Item { Layout.fillWidth: true }
+                        Text { text: root.formatRate(SystemIoTelemetryService.peakDiskRead); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskReadCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                        Item { Layout.fillWidth: true }
+                        Text { text: root.formatRate(root.arrayMax(SystemIoTelemetryService.diskHistoryRead)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskReadCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
                     Canvas {
@@ -275,6 +355,8 @@ SharedWidgets.CardBase {
             }
 
             Rectangle {
+                id: diskWriteCard
+                readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
                 color: Colors.withAlpha(Colors.surface, 0.45)
@@ -290,16 +372,23 @@ SharedWidgets.CardBase {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Text { text: "DISK WRITE"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+                        Text { text: "DISK WRITE"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
                         Item { Layout.fillWidth: true }
-                        Text { text: root.formatRate(SystemIoTelemetryService.currentDiskWrite); color: Colors.warning; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono }
+                        Text { text: root.formatRate(SystemIoTelemetryService.currentDiskWrite); color: Colors.warning; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: diskWriteCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
-                    Text {
-                        text: "Peak " + root.formatRate(SystemIoTelemetryService.peakDiskWrite)
-                        color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                        Item { Layout.fillWidth: true }
+                        Text { text: root.formatRate(SystemIoTelemetryService.peakDiskWrite); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskWriteCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                        Item { Layout.fillWidth: true }
+                        Text { text: root.formatRate(root.arrayMax(SystemIoTelemetryService.diskHistoryWrite)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskWriteCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
                     }
 
                     Canvas {

@@ -215,6 +215,7 @@
                 services.displayManager.autoLogin.enable = lib.mkForce false;
                 services.displayManager.autoLogin.user = lib.mkForce null;
                 services.displayManager.defaultSession = lib.mkForce "niri";
+                services.xserver.displayManager.lightdm.enable = lib.mkForce false;
                 services.getty.autologinUser = lib.mkForce "administrator";
                 services.syncthing.enable = lib.mkForce false;
                 services.blueman.enable = lib.mkForce false;

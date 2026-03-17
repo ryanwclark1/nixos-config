@@ -94,6 +94,8 @@ render_gallery_css() {
       overflow: hidden;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
 
     .card:hover {
@@ -103,7 +105,14 @@ render_gallery_css() {
       box-shadow: 0 12px 24px rgba(0,0,0,0.3);
     }
 
-    .card .img-container { position: relative; background: #000; aspect-ratio: 16/10; overflow: hidden; cursor: zoom-in; }
+    .card .img-container { 
+      position: relative; 
+      background: #000; 
+      aspect-ratio: 16/10; 
+      overflow: hidden; 
+      cursor: zoom-in;
+      user-select: none;
+    }
     .card img {
       display: block;
       width: 100%;
@@ -120,15 +129,69 @@ render_gallery_css() {
     .card.viewing-baseline .baseline-img { opacity: 1; pointer-events: auto; }
     .card.viewing-baseline .current-img { opacity: 0; }
 
-    .card .meta { padding: 12px; }
+    /* Swipe Slider */
+    .swipe-container {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: none;
+      pointer-events: auto;
+    }
+    .card.comparing-swipe .swipe-container { display: block; }
+    .card.comparing-swipe .current-img { position: relative; z-index: 1; }
+    .card.comparing-swipe .baseline-img { 
+      opacity: 1; 
+      z-index: 2; 
+      width: 100%; 
+      clip-path: inset(0 0 0 50%); 
+      pointer-events: none;
+    }
+    .swipe-handle {
+      position: absolute;
+      top: 0; bottom: 0; left: 50%;
+      width: 4px;
+      background: var(--accent);
+      z-index: 10;
+      transform: translateX(-50%);
+      cursor: col-resize;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    .swipe-handle::after {
+      content: '↔';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--accent);
+      color: #000;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
 
-    .card .name { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .card .meta { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+
+    .card .name { font-weight: 600; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     
+    .card .notes-area {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 11px;
+      padding: 6px;
+      resize: vertical;
+      min-height: 40px;
+      outline: none;
+    }
+    .card .notes-area:focus { border-color: var(--accent); }
+
     .card .actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 12px;
+      margin-top: auto;
     }
 
     .btn {
@@ -190,10 +253,40 @@ render_gallery_css() {
       justify-content: center;
       backdrop-filter: blur(10px);
     }
-    #lightbox img { max-width: 90%; max-height: 90%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+    #lightbox .lb-container { position: relative; max-width: 90%; max-height: 90%; display: flex; align-items: center; justify-content: center; }
+    #lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
     .lightbox-close { position: absolute; top: 20px; right: 30px; font-size: 40px; cursor: pointer; color: var(--muted); }
     .lightbox-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none; }
     .lightbox-nav button { pointer-events: auto; background: rgba(255,255,255,0.1); border: none; color: white; padding: 20px; cursor: pointer; border-radius: 50%; font-size: 24px; }
+
+    /* Modal (Logs) */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 3000;
+      display: none;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-content {
+      background: var(--panel);
+      width: 80%; max-height: 80%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
+    .log-pre {
+      font-family: var(--font-mono, monospace);
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      color: #cbd5e1;
+      margin: 0;
+    }
 
     /* Checklist Sidebar */
     #checklistSidebar {
@@ -319,6 +412,27 @@ render_gallery_css() {
       color: var(--muted);
     }
 
+    .summary-section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+    .summary-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 12px;
+      font-size: 13px;
+      min-height: 100px;
+      outline: none;
+      margin-top: 12px;
+    }
+    .summary-textarea:focus { border-color: var(--accent); }
+
     [hidden] { display: none !important; }
   </style>
 EOF
@@ -329,6 +443,7 @@ render_gallery_js() {
   <script>
     let currentLightboxIdx = -1;
     let lightboxImages = [];
+    let isDraggingSwipe = false;
 
     function filterCards() {
       const query = document.getElementById('filterInput').value.toLowerCase();
@@ -356,7 +471,6 @@ render_gallery_js() {
         const currentImg = card.querySelector('.current-img');
         const baselineImg = card.querySelector('.baseline-img');
         
-        // Check for blank screen / capture failure
         const isFailure = await checkCaptureFailure(currentImg.src);
         if (isFailure) {
           card.classList.add('capture-failure');
@@ -389,7 +503,6 @@ render_gallery_js() {
           for (let i = 0; i < data.length; i += 4) {
             if (data[i] < 10 && data[i+1] < 10 && data[i+2] < 10) blackPixels++;
           }
-          // If > 98% pixels are black, it's likely a capture failure
           resolve((blackPixels / totalPixels) > 0.98);
         };
         img.src = src;
@@ -460,13 +573,13 @@ render_gallery_js() {
 
     function cycleCompare(btn) {
       const card = btn.closest('.card');
-      const states = ['none', 'baseline', 'diff'];
+      const states = ['none', 'baseline', 'diff', 'swipe'];
       let currentIdx = states.indexOf(card.getAttribute('data-compare-state') || 'none');
       let nextIdx = (currentIdx + 1) % states.length;
       let nextState = states[nextIdx];
       
       card.setAttribute('data-compare-state', nextState);
-      card.classList.remove('viewing-baseline', 'comparing-diff');
+      card.classList.remove('viewing-baseline', 'comparing-diff', 'comparing-swipe');
       
       if (nextState === 'baseline') {
         card.classList.add('viewing-baseline');
@@ -476,10 +589,63 @@ render_gallery_js() {
         card.classList.add('comparing-diff');
         btn.innerText = 'Viewing Diff';
         btn.classList.add('accent');
+      } else if (nextState === 'swipe') {
+        card.classList.add('comparing-swipe');
+        btn.innerText = 'Viewing Swipe';
+        btn.classList.add('accent');
       } else {
         btn.innerText = 'Compare Baseline';
         btn.classList.remove('accent');
       }
+    }
+
+    function handleSwipeMove(e) {
+      const container = e.currentTarget;
+      const card = container.closest('.card');
+      const baselineImg = card.querySelector('.baseline-img');
+      const handle = container.querySelector('.swipe-handle');
+      
+      const rect = container.getBoundingClientRect();
+      const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+      const percent = (x / rect.width) * 100;
+      
+      baselineImg.style.clipPath = `inset(0 0 0 ${percent}%)`;
+      handle.style.left = `${percent}%`;
+    }
+
+    async function viewLogs(logPath) {
+      const modal = document.getElementById('logModal');
+      const body = modal.querySelector('.log-pre');
+      body.innerText = 'Loading logs...';
+      modal.style.display = 'flex';
+      
+      try {
+        const resp = await fetch(logPath);
+        if (!resp.ok) throw new Error('Failed to load log file');
+        body.innerText = await resp.text();
+      } catch (err) {
+        body.innerText = 'Error: ' + err.message;
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function saveNote(el) {
+      const card = el.closest('.card');
+      const states = JSON.parse(localStorage.getItem('quickshell-qa-notes') || '{}');
+      const pageId = document.title + location.pathname;
+      if (!states[pageId]) states[pageId] = {};
+      states[pageId][card.getAttribute('data-name')] = el.value;
+      localStorage.setItem('quickshell-qa-notes', JSON.stringify(states));
+    }
+
+    function saveGeneralSummary(el) {
+      const states = JSON.parse(localStorage.getItem('quickshell-qa-summaries') || '{}');
+      const pageId = document.title + location.pathname;
+      states[pageId] = el.value;
+      localStorage.setItem('quickshell-qa-summaries', JSON.stringify(states));
     }
 
     function toggleChecklist() {
@@ -513,22 +679,28 @@ render_gallery_js() {
       if (text) text.innerText = `${reviewed} / ${cards.length} reviewed (${percent}%)`;
     }
 
-    function loadReviewed() {
-      const states = JSON.parse(localStorage.getItem('quickshell-qa-reviewed') || '{}');
+    function loadSessionData() {
       const pageId = document.title + location.pathname;
-      const pageStates = states[pageId] || {};
+      const reviewedStates = JSON.parse(localStorage.getItem('quickshell-qa-reviewed') || '{}')[pageId] || {};
+      const notesStates = JSON.parse(localStorage.getItem('quickshell-qa-notes') || '{}')[pageId] || {};
+      const generalSummary = JSON.parse(localStorage.getItem('quickshell-qa-summaries') || '{}')[pageId] || '';
       
       document.querySelectorAll('.card').forEach(card => {
         const name = card.getAttribute('data-name');
-        if (pageStates[name]) {
+        if (reviewedStates[name]) {
           card.classList.add('reviewed');
           const btn = card.querySelector('button[onclick="toggleReviewed(this)"]');
-          if (btn) {
-            btn.classList.add('active');
-            btn.innerText = 'Unmark';
-          }
+          if (btn) { btn.classList.add('active'); btn.innerText = 'Unmark'; }
+        }
+        if (notesStates[name]) {
+          const area = card.querySelector('.notes-area');
+          if (area) area.value = notesStates[name];
         }
       });
+
+      const summaryArea = document.querySelector('.summary-textarea');
+      if (summaryArea) summaryArea.value = generalSummary;
+
       updateProgress();
     }
 
@@ -560,15 +732,28 @@ render_gallery_js() {
       const diffs = document.querySelectorAll('.card.has-diff').length;
       const checklist = document.querySelectorAll('.checklist-content input');
       const checked = Array.from(checklist).filter(c => c.checked).length;
+      const summary = document.querySelector('.summary-textarea')?.value || '';
       
       let md = `# QA Pass Report: ${document.title}\n\n`;
-      md += `**Visual Matrix:** ${reviewed}/${cards.length} reviewed\n`;
-      if (diffs > 0) md += `**Regressions:** ${diffs} detected ⚠️\n`;
-      if (failures > 0) md += `**Capture Failures:** ${failures} detected ❌\n`;
-      md += `**Checklist:** ${checked}/${checklist.length} tasks completed\n\n`;
+      if (summary) md += `## Summary\n${summary}\n\n`;
       
+      md += `## Status\n`;
+      md += `- **Visual Matrix:** ${reviewed}/${cards.length} reviewed\n`;
+      if (diffs > 0) md += `- **Regressions:** ${diffs} detected ⚠️\n`;
+      if (failures > 0) md += `- **Capture Failures:** ${failures} detected ❌\n`;
+      md += `- **Checklist:** ${checked}/${checklist.length} tasks completed\n\n`;
+      
+      const noteEntries = Array.from(cards).filter(c => c.querySelector('.notes-area')?.value.trim() !== '');
+      if (noteEntries.length > 0) {
+        md += `## Review Notes\n`;
+        noteEntries.forEach(c => {
+          md += `- **${c.getAttribute('data-name')}**: ${c.querySelector('.notes-area').value}\n`;
+        });
+        md += `\n`;
+      }
+
       if (checked < checklist.length) {
-        md += `### Pending Tasks\n`;
+        md += `## Pending Tasks\n`;
         checklist.forEach(c => {
           if (!c.checked) md += `- [ ] ${c.nextElementSibling.innerText}\n`;
         });
@@ -592,17 +777,20 @@ render_gallery_js() {
         if (e.key === 'ArrowLeft') navigateLightbox(-1);
         if (e.key === 'ArrowRight') navigateLightbox(1);
       } else {
-        if (e.key === 'f' && e.target.tagName !== 'INPUT') {
+        if (e.key === 'f' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
           e.preventDefault();
           document.getElementById('filterInput')?.focus();
         }
-        if (e.key === 'c' && e.target.tagName !== 'INPUT') toggleChecklist();
+        if (e.key === 'c' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') toggleChecklist();
+        if (e.key === 'Escape') {
+          closeModal('logModal');
+        }
       }
     });
 
     window.addEventListener('DOMContentLoaded', () => {
       loadChecklist();
-      loadReviewed();
+      loadSessionData();
       updateLightboxImages();
       validateAndDetect();
     });
@@ -641,7 +829,21 @@ EOF
     <button onclick="navigateLightbox(-1)">&lsaquo;</button>
     <button onclick="navigateLightbox(1)">&rsaquo;</button>
   </div>
-  <img src="" alt="Lightbox">
+  <div class="lb-container">
+    <img src="" alt="Lightbox">
+  </div>
+</div>
+
+<div id="logModal" class="modal" onclick="if(event.target === this) closeModal('logModal')">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="margin:0; font-size:1rem;">System Logs</h3>
+      <button class="btn" onclick="closeModal('logModal')">Close</button>
+    </div>
+    <div class="modal-body">
+      <pre class="log-pre"></pre>
+    </div>
+  </div>
 </div>
 
 <header>
@@ -684,7 +886,11 @@ EOF
         image_name="$(basename "${image_path}")"
         local baseline_path=""
         [[ -f "${baseline_dir}/${image_name}" ]] && baseline_path="baselines/${image_name}"
-        render_card "${rel_image_path}" "${image_name}" "${baseline_path}" ""
+        
+        local log_path=""
+        [[ -f "${output_dir}/${rel_image_path%.png}.log" ]] && log_path="${rel_image_path%.png}.log"
+        
+        render_card "${rel_image_path}" "${image_name}" "${baseline_path}" "" "${log_path}"
       done < <(find "${output_dir}" -maxdepth 1 -type f -name '*.png' | sort)
       printf '  </div>\n'
     else
@@ -698,7 +904,11 @@ EOF
           image_name="$(basename "${image_path}")"
           local baseline_path=""
           [[ -f "${baseline_dir}/${rel_image_path}" ]] && baseline_path="baselines/${rel_image_path}"
-          render_card "${rel_image_path}" "${image_name}" "${baseline_path}" ""
+          
+          local log_path=""
+          [[ -f "${output_dir}/${rel_image_path%.png}.log" ]] && log_path="${rel_image_path%.png}.log"
+          
+          render_card "${rel_image_path}" "${image_name}" "${baseline_path}" "" "${log_path}"
         done < <(find "${output_dir}/${s}" -maxdepth 1 -type f -name '*.png' | sort)
         printf '    </div></div>\n'
       done
@@ -790,6 +1000,10 @@ EOF
   </div>
 </header>
 <main>
+  <div class="summary-section">
+    <h3 style="margin:0; font-size:1rem; color:var(--accent);">Overall Session Summary</h3>
+    <textarea class="summary-textarea" placeholder="Type general observations about this QA pass here..." oninput="saveGeneralSummary(this)"></textarea>
+  </div>
 EOF
     if [[ "${health_status}" != "healthy" && "${health_status}" != "unknown" ]]; then
       printf '  <div class="health-section"><h3 style="margin:0 0 12px; font-size:1rem; color:var(--error);">Active Health Incidents</h3><div class="incident-list">\n'
@@ -811,7 +1025,7 @@ EOF
 }
 
 render_card() {
-  local rel_path="$1" name="$2" baseline_path="$3" repro_cmd="${4:-}"
+  local rel_path="$1" name="$2" baseline_path="$3" repro_cmd="${4:-}" log_path="${5:-}"
   cat <<EOF
       <div class="card" data-name="${name}">
         <div class="badge diff-badge">⚠️ DIFF DETECTED</div>
@@ -822,12 +1036,16 @@ EOF
   if [[ -n "${baseline_path}" ]]; then
     cat <<EOF
           <img src="${baseline_path}" class="baseline-img" alt="Baseline">
+          <div class="swipe-container" onmousemove="handleSwipeMove(event)" onmousedown="event.stopPropagation()">
+            <div class="swipe-handle"></div>
+          </div>
 EOF
   fi
   cat <<EOF
         </div>
         <div class="meta">
           <div class="name">${name}</div>
+          <textarea class="notes-area" placeholder="Add observations..." oninput="saveNote(this)"></textarea>
           <div class="actions">
             <div style="display: flex; gap: 4px;">
               <button class="btn" onclick="copyText('${rel_path}', this)">Copy Path</button>
@@ -835,6 +1053,11 @@ EOF
   if [[ -n "${repro_cmd}" ]]; then
     cat <<EOF
               <button class="btn" onclick="copyText('\`${repro_cmd}\`', this)">Repro</button>
+EOF
+  fi
+  if [[ -n "${log_path}" ]]; then
+    cat <<EOF
+              <button class="btn" onclick="viewLogs('${log_path}')">View Logs</button>
 EOF
   fi
   cat <<EOF

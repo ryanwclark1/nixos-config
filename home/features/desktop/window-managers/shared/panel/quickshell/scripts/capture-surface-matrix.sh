@@ -15,6 +15,7 @@ surfaces=(
   "dateTimeMenu"
   "notifCenter"
   "controlCenter"
+  "systemMonitor"
 )
 
 usage() {

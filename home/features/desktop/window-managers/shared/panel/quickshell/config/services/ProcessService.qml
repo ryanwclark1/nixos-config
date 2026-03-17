@@ -19,8 +19,16 @@ QtObject {
     property string detailMessage: ""
     property var processDetail: ({})
     readonly property bool detailBusy: detailPoll.busy
+    property double detailLastUpdatedMs: 0
+    property bool detailPermissionLimited: false
+    property bool detailDegraded: false
+    property var lastGoodProcessDetail: ({})
     property double lastRefreshAt: 0
     property var pendingActions: ({})
+    property int lastActionPid: 0
+    property string lastActionState: "idle"
+    property string lastActionMessage: ""
+    property double lastActionAt: 0
 
     property int _actionPid: 0
     property string _actionKey: ""
@@ -36,11 +44,11 @@ QtObject {
         return ["sh", "-c", "pid=\"$1\"; proc=\"/proc/$pid\"; " +
                               "if [ -z \"$pid\" ] || [ \"$pid\" -le 0 ] 2>/dev/null; then printf '__STATUS__\\tidle\\tNo process selected\\n'; printf 'pid\\t0\\n'; exit 0; fi; " +
                               "if [ ! -d \"$proc\" ]; then printf '__STATUS__\\tterminated\\tProcess exited\\n'; printf 'pid\\t%s\\n' \"$pid\"; exit 0; fi; " +
-                              "status='ready'; message=''; " +
+                              "status='ready'; message=''; permissionLimited=0; degraded=0; " +
                               "cwd=$(readlink \"$proc/cwd\" 2>/dev/null || true); " +
-                              "if [ -z \"$cwd\" ]; then message='cwd unavailable'; fi; " +
+                              "if [ -z \"$cwd\" ]; then message='cwd unavailable'; permissionLimited=1; degraded=1; fi; " +
                               "exe=$(readlink \"$proc/exe\" 2>/dev/null || true); " +
-                              "if [ -z \"$exe\" ]; then if [ -n \"$message\" ]; then message=\"$message; exe unavailable\"; else message='exe unavailable'; fi; fi; " +
+                              "if [ -z \"$exe\" ]; then permissionLimited=1; degraded=1; if [ -n \"$message\" ]; then message=\"$message; exe unavailable\"; else message='exe unavailable'; fi; fi; " +
                               "fdCount=$(find \"$proc/fd\" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l | tr -d ' '); " +
                               "readBytes=''; writeBytes=''; cancelledWriteBytes=''; " +
                               "if [ -r \"$proc/io\" ]; then " +
@@ -48,10 +56,15 @@ QtObject {
                               "  writeBytes=$(awk '/^write_bytes:/ {print $2}' \"$proc/io\" 2>/dev/null); " +
                               "  cancelledWriteBytes=$(awk '/^cancelled_write_bytes:/ {print $2}' \"$proc/io\" 2>/dev/null); " +
                               "else " +
+                              "  permissionLimited=1; degraded=1; " +
                               "  if [ -n \"$message\" ]; then message=\"$message; io unavailable\"; else message='io unavailable'; fi; " +
                               "fi; " +
+                              "if [ ! -r \"$proc/status\" ]; then permissionLimited=1; degraded=1; fi; " +
+                              "if [ \"$permissionLimited\" -eq 1 ]; then status='permission-limited'; fi; " +
                               "printf '__STATUS__\\t%s\\t%s\\n' \"$status\" \"$message\"; " +
                               "printf 'pid\\t%s\\n' \"$pid\"; " +
+                              "printf 'permissionLimited\\t%s\\n' \"$permissionLimited\"; " +
+                              "printf 'degraded\\t%s\\n' \"$degraded\"; " +
                               "printf 'cwd\\t%s\\n' \"$cwd\"; " +
                               "printf 'exe\\t%s\\n' \"$exe\"; " +
                               "printf 'fdCount\\t%s\\n' \"$fdCount\"; " +
@@ -117,6 +130,10 @@ QtObject {
         detailStatus = "idle";
         detailMessage = "";
         processDetail = ({});
+        detailLastUpdatedMs = 0;
+        detailPermissionLimited = false;
+        detailDegraded = false;
+        lastGoodProcessDetail = ({});
     }
 
     function _mergeDetailSnapshot(snapshot, pid) {
@@ -152,10 +169,17 @@ QtObject {
             _clearDetail();
             return;
         }
+        if (detailPid === safePid && detailStatus !== "idle") {
+            refreshDetail();
+            return;
+        }
         detailPid = safePid;
         detailStatus = "loading";
         detailMessage = "Loading process detail...";
         processDetail = { pid: safePid };
+        detailLastUpdatedMs = 0;
+        detailPermissionLimited = false;
+        detailDegraded = false;
         detailPoll.triggerPoll();
     }
 
@@ -203,13 +227,21 @@ QtObject {
             pid: detailPid,
             status: status,
             message: message,
-            openFilePreview: []
+            openFilePreview: [],
+            permissionLimited: false,
+            degraded: false
         };
 
         function parseOptionalInt(value) {
             if (value === undefined || value === null || String(value) === "")
                 return null;
             return parseInt(value, 10);
+        }
+
+        function parseOptionalBool(value) {
+            if (value === undefined || value === null || String(value) === "")
+                return false;
+            return String(value) === "1" || String(value).toLowerCase() === "true";
         }
 
         for (var i = 0; i < lines.length; ++i) {
@@ -230,6 +262,8 @@ QtObject {
             var value = parts.slice(1).join("\t");
             if (key === "pid")
                 result.pid = parseInt(value, 10) || 0;
+            else if (key === "permissionLimited" || key === "degraded")
+                result[key] = parseOptionalBool(value);
             else if (key === "fdCount" || key === "readBytes" || key === "writeBytes" || key === "cancelledWriteBytes" || key === "threads" || key === "vmRssKb" || key === "voluntaryCtxtSwitches" || key === "nonvoluntaryCtxtSwitches")
                 result[key] = parseOptionalInt(value);
             else
@@ -283,6 +317,10 @@ QtObject {
             return false;
         }
 
+        lastActionPid = safePid;
+        lastActionState = "pending";
+        lastActionMessage = String(actionName || "action").toUpperCase() + " running...";
+        lastActionAt = Date.now();
         _actionPid = safePid;
         _actionKey = String(safePid);
         _actionTitle = String(title || "Process action");
@@ -306,6 +344,10 @@ QtObject {
             return false;
         }
 
+        lastActionPid = safePid;
+        lastActionState = "pending";
+        lastActionMessage = "COPY running...";
+        lastActionAt = Date.now();
         _actionPid = safePid;
         _actionKey = String(safePid);
         _actionTitle = "Copied";
@@ -383,6 +425,9 @@ QtObject {
             if (root.detailPid > 0 && !root.processByPid(root.detailPid) && root.detailStatus !== "loading") {
                 root.detailStatus = "terminated";
                 root.detailMessage = "Process exited.";
+                root.detailLastUpdatedMs = Date.now();
+                root.detailPermissionLimited = false;
+                root.detailDegraded = false;
                 root.processDetail = {
                     pid: root.detailPid
                 };
@@ -404,9 +449,28 @@ QtObject {
             if (snapshotPid <= 0 || snapshotPid !== root.detailPid)
                 return;
 
-            root.detailStatus = String(snapshot.status || "ready");
-            root.detailMessage = String(snapshot.message || "");
-            root.processDetail = root._mergeDetailSnapshot(snapshot, snapshotPid);
+            var nextStatus = String(snapshot.status || "ready");
+            var nextMessage = String(snapshot.message || "");
+            var hasCached = parseInt(root.lastGoodProcessDetail.pid, 10) === snapshotPid;
+            var nextDetail = root._mergeDetailSnapshot(snapshot, snapshotPid);
+
+            root.detailLastUpdatedMs = Date.now();
+            root.detailPermissionLimited = !!snapshot.permissionLimited || nextStatus === "permission-limited";
+            root.detailDegraded = !!snapshot.degraded || nextStatus === "error" || nextStatus === "permission-limited";
+
+            if (nextStatus === "error" && hasCached) {
+                root.detailStatus = "error";
+                root.detailMessage = nextMessage !== "" ? nextMessage + " Showing last successful detail." : "Detail refresh failed. Showing last successful detail.";
+                root.processDetail = root.lastGoodProcessDetail;
+                root.detailDegraded = true;
+                return;
+            }
+
+            root.detailStatus = nextStatus;
+            root.detailMessage = nextMessage;
+            root.processDetail = nextDetail;
+            if (nextStatus === "ready" || nextStatus === "permission-limited")
+                root.lastGoodProcessDetail = nextDetail;
         }
     }
 
@@ -424,6 +488,10 @@ QtObject {
         onExited: (exitCode, exitStatus) => {
             var pid = root._actionPid;
             root._setPending(pid, "");
+            root.lastActionPid = pid;
+            root.lastActionState = exitCode === 0 ? "success" : "error";
+            root.lastActionMessage = exitCode === 0 ? root._actionSuccessMessage : root._actionFailureMessage;
+            root.lastActionAt = Date.now();
             if (exitCode === 0)
                 ToastService.showSuccess(root._actionTitle, root._actionSuccessMessage);
             else

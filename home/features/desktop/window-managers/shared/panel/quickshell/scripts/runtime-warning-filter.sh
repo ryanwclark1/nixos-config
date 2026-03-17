@@ -6,14 +6,12 @@ runtime_warning_ignore_patterns() {
   cat <<'EOF'
 qt\.qpa\.wayland\.textinput
 qt\.svg: .*Could not resolve property
+Could not register notification server
+Registration will be attempted again
 EOF
 
   case "${profile}" in
     surfaces|targeted-surfaces)
-      cat <<'EOF'
-Could not register notification server
-Registration will be attempted again
-EOF
       ;;
   esac
 }
