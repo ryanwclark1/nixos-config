@@ -10,7 +10,7 @@ Rectangle {
 
   Layout.fillWidth: true
   height: 4
-  color: Colors.withAlpha(Colors.surface, 0.5)
+  color: Colors.cardSurface
   radius: root.safeRadius
   border.color: Colors.withAlpha("#000000", 0.1)
   border.width: 1

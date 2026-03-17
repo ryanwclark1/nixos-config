@@ -44,10 +44,11 @@ function flush_entry(    cleaned_exec, cleaned_categories, cleaned_keywords) {
 
   if (count > 0)
     printf(",\n")
-  printf("{\"name\":\"%s\",\"exec\":\"%s\",\"icon\":\"%s\",\"category\":\"%s\",\"keywords\":\"%s\",\"terminal\":%s}",
+  printf("{\"name\":\"%s\",\"exec\":\"%s\",\"icon\":\"%s\",\"desktopId\":\"%s\",\"category\":\"%s\",\"keywords\":\"%s\",\"terminal\":%s}",
          json_escape(name),
          json_escape(cleaned_exec),
          json_escape(icon_name),
+         json_escape(desktop_id),
          json_escape(cleaned_categories),
          json_escape(cleaned_keywords),
          bool_string(terminal))
@@ -60,6 +61,7 @@ function reset_entry() {
   name = ""
   exec = ""
   icon_name = ""
+  desktop_id = ""
   categories = ""
   keywords = ""
   no_display = ""
@@ -77,6 +79,9 @@ FNR == 1 {
   if (NR > 1)
     flush_entry()
   reset_entry()
+  desktop_id = FILENAME
+  sub(/^.*\//, "", desktop_id)
+  sub(/\.desktop$/, "", desktop_id)
 }
 
 /^\[Desktop Entry\]$/ {

@@ -490,7 +490,7 @@ PanelWindow {
         Rectangle {
           Layout.preferredWidth: 180
           Layout.fillHeight: true
-          color: Colors.withAlpha(Colors.surface, 0.5)
+          color: Colors.cardSurface
 
           // right border
           Rectangle {
@@ -601,7 +601,7 @@ PanelWindow {
           Rectangle {
             Layout.fillWidth: true
             height: 38
-            color: Colors.withAlpha(Colors.surface, 0.3)
+            color: Colors.cardSurface
 
             Rectangle {
               anchors.bottom: parent.bottom
@@ -745,7 +745,7 @@ PanelWindow {
           Rectangle {
             Layout.fillWidth: true
             height: 32
-            color: Colors.withAlpha(Colors.surface, 0.2)
+            color: Colors.cardSurface
             visible: !root._viewGrid
 
             Rectangle {
@@ -1152,7 +1152,7 @@ PanelWindow {
                       var isSel = (root.selectedFile === modelData.path);
                       if (isSel) return Colors.withAlpha(Colors.primary, 0.22);
                       if (listItemHover.containsMouse) return Colors.withAlpha(Colors.text, 0.06);
-                      return index % 2 === 0 ? "transparent" : Colors.withAlpha(Colors.surface, 0.3);
+                      return index % 2 === 0 ? "transparent" : Colors.cardSurface;
                     }
                     Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
@@ -1281,7 +1281,7 @@ PanelWindow {
           Rectangle {
             Layout.fillWidth: true
             height: root.mode === "save" ? 96 : 52
-            color: Colors.withAlpha(Colors.surface, 0.4)
+            color: Colors.cardSurface
 
             // top border
             Rectangle {
@@ -1303,7 +1303,7 @@ PanelWindow {
                 height: 32
                 radius: Colors.radiusSmall
                 visible: root.mode === "save"
-                color: Colors.withAlpha(Colors.surface, 0.7)
+                color: Colors.cardSurface
                 border.color: saveField.activeFocus ? Colors.primary : Colors.border
                 border.width: 1
                 Behavior on border.color { ColorAnimation { duration: Colors.durationSnap } }
@@ -1358,7 +1358,7 @@ PanelWindow {
                   Layout.minimumWidth: 0
                   height: 30
                   radius: Colors.radiusSmall
-                  color: Colors.withAlpha(Colors.surface, 0.5)
+                  color: Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   clip: true
@@ -1388,7 +1388,7 @@ PanelWindow {
                   width: filterText.implicitWidth + 28
                   radius: Colors.radiusSmall
                   color: filterHover.containsMouse
-                    ? Colors.withAlpha(Colors.text, 0.1) : Colors.withAlpha(Colors.surface, 0.6)
+                    ? Colors.withAlpha(Colors.text, 0.1) : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
@@ -1434,7 +1434,7 @@ PanelWindow {
                   width: Math.max(Layout.minimumWidth, cancelText.implicitWidth + 24)
                   radius: Colors.radiusSmall
                   color: cancelHover.containsMouse
-                    ? Colors.withAlpha(Colors.text, 0.1) : Colors.withAlpha(Colors.surface, 0.6)
+                    ? Colors.withAlpha(Colors.text, 0.1) : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
@@ -1470,7 +1470,7 @@ PanelWindow {
 
                   color: canConfirm
                     ? (actionHover.containsMouse ? Colors.primary : Colors.withAlpha(Colors.primary, 0.75))
-                    : Colors.withAlpha(Colors.surface, 0.6)
+                    : Colors.cardSurface
                   border.color: canConfirm ? Colors.primary : Colors.border
                   border.width: 1
                   Behavior on color { ColorAnimation { duration: Colors.durationSnap } }

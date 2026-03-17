@@ -619,7 +619,7 @@ SharedWidgets.CardBase {
             Rectangle {
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
-                color: Colors.withAlpha(Colors.surface, 0.55)
+                color: Colors.cardSurface
                 border.color: keyboardFocused ? Colors.primary : Colors.border
                 border.width: 1
                 implicitHeight: tableColumn.implicitHeight + Colors.spacingS * 2
@@ -1204,7 +1204,7 @@ SharedWidgets.CardBase {
 
                             Rectangle {
                                 Layout.fillWidth: true
-                                color: Colors.withAlpha(Colors.surface, 0.5)
+                                color: Colors.cardSurface
                                 radius: Colors.radiusSmall
                                 border.color: Colors.withAlpha(Colors.border, 0.6)
                                 border.width: 1
@@ -1236,7 +1236,7 @@ SharedWidgets.CardBase {
 
                             Rectangle {
                                 Layout.fillWidth: true
-                                color: Colors.withAlpha(Colors.surface, 0.5)
+                                color: Colors.cardSurface
                                 radius: Colors.radiusSmall
                                 border.color: Colors.withAlpha(Colors.border, 0.6)
                                 border.width: 1
@@ -1269,7 +1269,7 @@ SharedWidgets.CardBase {
                             Rectangle {
                                 Layout.fillWidth: true
                                 visible: !!root.detailData.openFilePreview && root.detailData.openFilePreview.length > 0
-                                color: Colors.withAlpha(Colors.surface, 0.5)
+                                color: Colors.cardSurface
                                 radius: Colors.radiusSmall
                                 border.color: Colors.withAlpha(Colors.border, 0.6)
                                 border.width: 1

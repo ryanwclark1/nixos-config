@@ -22,7 +22,7 @@ Rectangle {
   readonly property var compactEntries: buildCompactEntries()
 
   Layout.fillHeight: true
-  color: Colors.withAlpha(Colors.surface, 0.25)
+  color: Colors.cardSurface
 
   Rectangle {
     anchors.right: parent.right

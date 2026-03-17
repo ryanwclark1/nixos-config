@@ -11,7 +11,7 @@ Rectangle {
   Layout.fillWidth: true
   Layout.preferredHeight: contentCol.implicitHeight + 24
   visible: Config.controlCenterShowMediaWidget && activePlayers.length > 0
-  color: Colors.withAlpha(Colors.surface, 0.4)
+  color: Colors.cardSurface
   radius: Colors.radiusMedium
   border.color: cardHover.hovered ? Colors.primary : Colors.border
   clip: true
@@ -171,7 +171,7 @@ Rectangle {
               Rectangle {
                 anchors.fill: parent
                 radius: height / 2
-                color: playBtn.containsMouse ? Colors.primary : Colors.withAlpha(Colors.surface, 0.6)
+                color: playBtn.containsMouse ? Colors.primary : Colors.cardSurface
                 border.color: playBtn.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
                 Behavior on color { ColorAnimation { duration: Colors.durationFast } }

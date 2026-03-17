@@ -12,13 +12,15 @@ QtObject {
     property int barHeight: 38
     property bool barFloating: true
     property int barMargin: 12
-    property real barOpacity: 0.85
+    property real barOpacity: 1.0
     property var barConfigs: []
     property string selectedBarId: ""
 
     // --- GLASS ---
     property bool blurEnabled: true
-    property real glassOpacity: 0.65
+    property real glassOpacity: 1.0
+    property real popupOpacity: 1.0
+    property real cardOpacity: 1.0
     property real settingsBackdropOpacity: 0.92
     property real settingsSurfaceOpacity: 1.0
 
@@ -262,7 +264,11 @@ QtObject {
             "org.gnome.nautilus": ["system-file-manager", "folder", "inode-directory"],
             "nautilus": ["system-file-manager", "folder", "inode-directory"],
             "com.mitchellh.ghostty": ["com.mitchellh.ghostty"],
-            "ghostty": ["com.mitchellh.ghostty"]
+            "ghostty": ["com.mitchellh.ghostty"],
+            "firefox": ["firefox", "org.mozilla.firefox", "mozilla-firefox"],
+            "nvim": ["nvim", "neovim"],
+            "neovim": ["neovim", "nvim"],
+            "mpv": ["mpv", "mpv-symbolic"]
         })
 
     function normalizedIconNames(name) {

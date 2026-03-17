@@ -323,7 +323,7 @@ ColumnLayout {
                     Layout.fillWidth: true
                     implicitHeight: skippedColumn.implicitHeight + Colors.spacingS * 2
                     radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.surface, 0.35)
+                    color: Colors.cardSurface
                     border.color: Colors.border
                     border.width: 1
 
@@ -452,7 +452,7 @@ ColumnLayout {
                     Layout.fillWidth: true
                     implicitHeight: hostColumn.implicitHeight + Colors.spacingM * 2
                     radius: Colors.radiusSmall
-                    color: editingThisHost ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35)
+                    color: editingThisHost ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
                     border.color: editingThisHost ? Colors.primary : Colors.border
                     border.width: 1
 

@@ -60,7 +60,7 @@ Item {
                 Layout.fillWidth: true
                 implicitHeight: root.compactMode ? compactPreview.implicitHeight + Colors.spacingM * 2 : 84
                 radius: Colors.radiusMedium
-                color: Colors.withAlpha(Colors.surface, 0.78)
+                color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
 

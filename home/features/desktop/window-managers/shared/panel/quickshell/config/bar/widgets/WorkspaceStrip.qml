@@ -168,7 +168,7 @@ Flow {
     id: addWsBtn
     width: root.pillMinWidth; height: root.pillHeight
     radius: Colors.radiusXXS
-    color: addWsHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.25)
+    color: addWsHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
     border.color: addWsHover.containsMouse ? Colors.primary : Colors.border
     border.width: 1
     visible: root.showAddButton && (Config.workspaceShowEmpty || root.state.workspaces.length < 10)
@@ -189,7 +189,7 @@ Flow {
       anchors.fill: parent
       keys: ["window", "overview-window"]
       onEntered: addWsBtn.color = Colors.withAlpha(Colors.accent, 0.2)
-      onExited: addWsBtn.color = Colors.withAlpha(Colors.surface, 0.25)
+      onExited: addWsBtn.color = Colors.cardSurface
       onDropped: (drop) => {
         if (drop.source && (drop.source.windowAddress || drop.source.windowId)) {
           var addr = drop.source.windowAddress || drop.source.windowId;

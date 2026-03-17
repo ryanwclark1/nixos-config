@@ -1061,7 +1061,7 @@ Item {
 
                                         Rectangle {
                                             radius: Colors.radiusSmall
-                                            color: String(modelData.section || "") === root.addSection ? Colors.withAlpha(Colors.primary, 0.16) : Colors.withAlpha(Colors.surface, 0.55)
+                                            color: String(modelData.section || "") === root.addSection ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface
                                             border.color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.border
                                             border.width: 1
                                             implicitWidth: sectionBadgeLabel.implicitWidth + Colors.spacingM

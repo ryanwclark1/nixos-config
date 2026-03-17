@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 config_dir="${script_dir}/../config"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
+launcher_home_qml="${config_dir}/launcher/LauncherHome.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 system_tab_qml="${config_dir}/menu/settings/tabs/ShellCoreSectionTab.qml"
@@ -44,6 +45,7 @@ require_literal "$apps_script" '/^Keywords=/ && keywords == "" {' "apps script k
 require_literal "$apps_script" 'gsub(/;/, " ", cleaned_categories)' "apps script category shaping"
 require_literal "$apps_script" 'gsub(/;/, " ", cleaned_keywords)' "apps script keyword shaping"
 require_literal "$apps_script" '/^Hidden=/ && hidden == "" {' "apps script hidden flag extraction"
+require_literal "$apps_script" '\"desktopId\":\"%s\"' "apps script desktop id output"
 
 # Launcher behavior and UI guards
 require_literal "$launcher_qml" 'readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled' "launcher category filters enabled binding"
@@ -59,11 +61,16 @@ require_literal "$launcher_qml" 'readonly property string launcherControlHintTex
 require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)' "launcher category keyboard handler branch"
 require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab' "launcher category ctrl+tab keyboard handler branch"
 require_literal "$launcher_qml" 'var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";' "launcher category clear hint"
-require_literal "$launcher_qml" 'var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "")) ? "Esc: reset/close" : "Esc: close";' "launcher category escape hint"
+require_literal "$launcher_qml" 'var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded))) ? "Esc: reset/close" : "Esc: close";' "launcher category escape hint"
 require_literal "$launcher_qml" 'return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • " + escapeHint;' "launcher category keyboard hint"
 require_literal "$launcher_qml" 'function jumpDrunCategoryBoundary(toEnd) {' "launcher category boundary helper"
 require_literal "$launcher_qml" 'else if (event.key === Qt.Key_0 || event.key === Qt.Key_Backspace) {' "launcher category clear branch"
 require_literal "$launcher_qml" 'launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "launcher category chip visibility guard"
+require_literal "$launcher_home_qml" 'readonly property bool categorySummaryExpanded: root.launcher.drunCategorySectionExpanded || root.launcher.drunCategoryFilter !== ""' "launcher home category summary expansion binding"
+require_literal "$launcher_home_qml" 'text: root.launcher.drunCategoryFilter === "" ? "All Apps" : root.launcher.drunCategoryFilterLabel' "launcher home summary pill label"
+require_literal "$launcher_home_qml" 'visible: root.showCategoryChips' "launcher home compact chip visibility"
+require_literal "$launcher_home_qml" 'label: String(modelData.label || "All")' "launcher home compact chip label"
+require_literal "$launcher_home_qml" 'SharedWidgets.AppIcon {' "launcher home shared app icon usage"
 
 if (( ${#violations[@]} > 0 )); then
   printf '%s\n' "Launcher category filters check failed:" >&2

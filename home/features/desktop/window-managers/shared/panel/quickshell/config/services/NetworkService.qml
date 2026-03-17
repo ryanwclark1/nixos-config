@@ -84,8 +84,9 @@ QtObject {
     readonly property int vpnProfileCount: (vpnProfiles || []).length
     readonly property bool vpnHasSavedProfiles: vpnProfileCount > 0
     readonly property bool vpnHasAnyOverlay: vpnPrimaryStatus === "connected" || vpnOtherCount > 0
-    readonly property bool tailscaleInstalled: vpnPrimaryStatus !== "unavailable"
-    readonly property bool tailscaleConnected: vpnPrimaryStatus === "connected"
+    readonly property bool tailscaleInstalled: DependencyService.isAvailable("tailscale")
+    readonly property bool tailscaleConnected: tailscaleStatus === "Connected"
+    readonly property bool nmcliInstalled: DependencyService.isAvailable("nmcli")
 
     // ── Refresh state ────────────────────────────────
     property bool isRefreshing: false
@@ -325,12 +326,14 @@ QtObject {
     }
 
     function refreshStatus() {
+        if (!nmcliInstalled) return;
         if (!_getPrimaryDetails.running) _getPrimaryDetails.running = true;
         if (!_getActiveConnections.running) _getActiveConnections.running = true;
-        if (!_getTailscale.running) _getTailscale.running = true;
+        if (tailscaleInstalled && !_getTailscale.running) _getTailscale.running = true;
     }
 
     function refreshInventory() {
+        if (!nmcliInstalled) return;
         if (!_getRadioState.running) _getRadioState.running = true;
         if (!_getWifi.running) _getWifi.running = true;
         if (!_getVPNs.running) _getVPNs.running = true;

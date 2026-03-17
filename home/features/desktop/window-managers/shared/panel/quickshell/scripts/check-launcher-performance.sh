@@ -63,7 +63,7 @@ require_literal "$launcher_qml" 'readonly property string drunCategoryFilterLabe
 require_literal "$launcher_qml" 'readonly property string launcherControlHintText: {' "launcher control hint text property"
 require_literal "$launcher_qml" 'var resultHint = hasResults ? "↑/↓/Ctrl+P/N/PgUp/PgDn/Home/End: results • " : "";' "launcher control result hint text"
 require_literal "$launcher_qml" 'var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";' "launcher control clear hint text"
-require_literal "$launcher_qml" 'var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "")) ? "Esc: reset/close" : "Esc: close";' "launcher control escape hint text"
+require_literal "$launcher_qml" 'var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded))) ? "Esc: reset/close" : "Esc: close";' "launcher control escape hint text"
 require_literal "$launcher_qml" 'return resultHint + clearHint + "Enter: run • " + escapeHint;' "default keyboard hint text with dynamic escape action"
 require_literal "$launcher_qml" 'return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • " + escapeHint;' "drun category keyboard hint text with dynamic escape action"
 require_literal "$launcher_qml" 'function filesBackendStatusObject() {' "files backend status payload helper"

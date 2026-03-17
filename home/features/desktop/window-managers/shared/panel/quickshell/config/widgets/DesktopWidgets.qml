@@ -285,7 +285,7 @@ Item {
                         implicitWidth: closePickerLabel.implicitWidth + Colors.spacingM * 2
                         implicitHeight: 32
                         radius: Colors.radiusMedium
-                        color: Colors.withAlpha(Colors.surface, 0.4)
+                        color: Colors.cardSurface
                         border.color: Colors.border
                         border.width: 1
 
@@ -332,7 +332,7 @@ Item {
                                 width: parent.width
                                 height: desktopWidgetInfo.implicitHeight + Colors.spacingM * 2
                                 radius: Colors.radiusSmall
-                                color: desktopWidgetAddArea.containsMouse ? Colors.highlight : Colors.withAlpha(Colors.surface, 0.4)
+                                color: desktopWidgetAddArea.containsMouse ? Colors.highlight : Colors.cardSurface
                                 border.color: desktopWidgetAddArea.containsMouse ? Colors.primary : Colors.border
                                 border.width: 1
 
@@ -403,7 +403,7 @@ Item {
             width: 120
             height: 60
             radius: Colors.radiusSmall
-            color: Colors.withAlpha(Colors.surface, 0.5)
+            color: Colors.cardSurface
             border.color: Colors.border
             Text {
                 anchors.centerIn: parent

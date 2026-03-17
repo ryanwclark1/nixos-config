@@ -18,12 +18,11 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Colors.spacingL : 0)
     radius: Colors.radiusMedium
-    color: Colors.withAlpha(Colors.surface, 0.35)
+    color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
     clip: true
 
-    gradient: SharedWidgets.SurfaceGradient {}
 
     // Inner highlight
     SharedWidgets.InnerHighlight { }

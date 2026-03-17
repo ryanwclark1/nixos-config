@@ -10,20 +10,11 @@ ColumnLayout {
     spacing: Colors.spacingM
 
     readonly property bool showCategoryFilters: root.launcher.showLauncherHome && root.launcher.drunCategoryFiltersEnabled && root.launcher.mode === "drun" && root.launcher.drunCategoryOptions.length > 1
+    readonly property bool categorySummaryExpanded: root.launcher.drunCategorySectionExpanded || root.launcher.drunCategoryFilter !== ""
+    readonly property bool showCategoryChips: root.showCategoryFilters && root.categorySummaryExpanded
     readonly property bool showRecentItems: root.launcher.showLauncherHome && root.launcher.recentItems.length > 0
     readonly property bool showSuggestions: root.launcher.showLauncherHome && root.launcher.mode === "drun" && root.launcher.suggestionItems.length > 0
     readonly property bool useSplitColumns: width >= 720 && root.showRecentItems && root.showSuggestions
-
-    function resolvedIconSource(iconValue) {
-        return Config.resolveIconSource(String(iconValue || ""));
-    }
-
-    function iconFallback(iconValue, fallbackValue) {
-        var icon = String(iconValue || "");
-        if (icon === "")
-            return fallbackValue;
-        return resolvedIconSource(icon) === "" ? icon : fallbackValue;
-    }
 
     function primaryText(item) {
         if (!item)
@@ -52,45 +43,96 @@ ColumnLayout {
         return "";
     }
 
-    // Section 1: Category filters
+    function itemKey(item) {
+        return root.launcher.homeItemKey(item);
+    }
+
+    function isSelected(item) {
+        var key = itemKey(item);
+        return key !== "" && key === root.launcher.selectedHomeItemKey;
+    }
+
     Rectangle {
         Layout.fillWidth: true
         visible: root.showCategoryFilters
-        clip: true
-        color: Colors.bgWidget
-        radius: Colors.radiusMedium
-        border.color: Colors.border
-        border.width: 1
-        implicitHeight: categoryFiltersSection.implicitHeight + (Colors.spacingM * 2)
+        color: "transparent"
+        implicitHeight: categoryColumn.implicitHeight
 
-        SharedWidgets.InnerHighlight {}
-
-        SharedWidgets.CollapsibleSection {
-            id: categoryFiltersSection
+        ColumnLayout {
+            id: categoryColumn
             anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            title: "CATEGORIES • " + root.launcher.drunCategoryFilterLabel
-            expanded: root.launcher.drunCategorySectionExpanded
-            onExpandedChanged: root.launcher.drunCategorySectionExpanded = expanded
+            spacing: Colors.spacingS
 
-            Text {
-                text: root.launcher.drunCategoryFilterSummary
-                color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                Rectangle {
+                    Layout.alignment: Qt.AlignVCenter
+                    radius: Colors.radiusPill
+                    color: categorySummaryMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.14) : Colors.withAlpha(Colors.surface, 0.72)
+                    border.color: root.launcher.drunCategoryFilter !== "" ? Colors.withAlpha(Colors.primary, 0.55) : Colors.border
+                    border.width: 1
+                    implicitHeight: 30
+                    implicitWidth: categorySummaryRow.implicitWidth + 18
+
+                    RowLayout {
+                        id: categorySummaryRow
+                        anchors.centerIn: parent
+                        spacing: Colors.spacingXS
+
+                        Text {
+                            text: root.launcher.drunCategoryFilter === "" ? "󰍉" : "󰌌"
+                            color: root.launcher.drunCategoryFilter === "" ? Colors.textSecondary : Colors.primary
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeSmall
+                        }
+
+                        Text {
+                            text: root.launcher.drunCategoryFilter === "" ? "All Apps" : root.launcher.drunCategoryFilterLabel
+                            color: root.launcher.drunCategoryFilter === "" ? Colors.text : Colors.primary
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: root.launcher.drunCategoryFilter === "" ? Font.Medium : Font.DemiBold
+                        }
+
+                        Text {
+                            text: root.categorySummaryExpanded ? "󰅀" : "󰅂"
+                            color: Colors.textDisabled
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeXS
+                        }
+                    }
+
+                    MouseArea {
+                        id: categorySummaryMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.launcher.drunCategorySectionExpanded = !root.launcher.drunCategorySectionExpanded
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter
+                    text: root.launcher.drunCategoryFilterSummary
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    elide: Text.ElideRight
+                }
             }
 
             Flow {
-                id: categoryFilterFlow
-                width: parent.width
-                spacing: Colors.spacingS
+                Layout.fillWidth: true
+                visible: root.showCategoryChips
+                spacing: Colors.spacingXS
 
                 Repeater {
                     model: root.launcher.drunCategoryOptions
                     delegate: SharedWidgets.FilterChip {
                         required property var modelData
 
-                        icon: modelData.hotkey === "0" ? "󰍉" : "󰌌"
-                        label: String(modelData.label || "All") + " (" + String(modelData.count || 0) + ")" + (String(modelData.hotkey || "") !== "" ? (" [" + String(modelData.hotkey || "") + "]") : "")
+                        label: String(modelData.label || "All")
                         selected: String(modelData.key || "") === root.launcher.drunCategoryFilter
 
                         onClicked: root.launcher.setDrunCategoryFilter(String(modelData.key || ""))
@@ -106,7 +148,6 @@ ColumnLayout {
         rowSpacing: Colors.spacingM
         columnSpacing: Colors.spacingM
 
-        // Section 2: Recent items
         Rectangle {
             Layout.fillWidth: true
             visible: root.showRecentItems
@@ -122,6 +163,7 @@ ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: Colors.spacingM
                 spacing: Colors.spacingS
+
                 SharedWidgets.SectionLabel {
                     label: "RECENT"
                 }
@@ -130,15 +172,17 @@ ColumnLayout {
                     model: root.launcher.recentItems
                     delegate: Rectangle {
                         Layout.fillWidth: true
-                        implicitHeight: 40
+                        implicitHeight: 42
                         clip: true
                         radius: Colors.radiusSmall
                         readonly property bool hovered: recentHover.containsMouse
-                        color: hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
-                        border.color: hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent"
-                        border.width: hovered ? 1 : 0
-                        scale: hovered ? 1.01 : 1.0
-                        layer.enabled: hovered
+                        readonly property bool selected: root.isSelected(modelData)
+                        color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent")
+                        border.color: selected ? Colors.withAlpha(Colors.primary, 0.52) : (hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent")
+                        border.width: selected || hovered ? 1 : 0
+                        scale: selected ? 1.01 : (hovered ? 1.008 : 1.0)
+                        layer.enabled: selected || hovered
+
                         Behavior on color {
                             ColorAnimation { duration: Colors.durationFast }
                         }
@@ -156,53 +200,48 @@ ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: Colors.spacingS
                             spacing: Colors.paddingSmall
+
                             Rectangle {
                                 implicitWidth: 28
                                 implicitHeight: 28
                                 radius: Colors.radiusXS
-                                color: hovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.surface
-                                border.color: hovered ? Colors.withAlpha(Colors.primary, 0.24) : "transparent"
-                                border.width: hovered ? 1 : 0
+                                color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.surface)
+                                border.color: selected ? Colors.withAlpha(Colors.primary, 0.32) : "transparent"
+                                border.width: selected ? 1 : 0
                                 Layout.alignment: Qt.AlignVCenter
 
-                                Image {
-                                    id: recentIconImage
-                                    anchors.fill: parent
-                                    anchors.margins: Colors.spacingXS
-                                    source: root.resolvedIconSource(modelData ? modelData.icon : "")
-                                    sourceSize: Qt.size(56, 56)
-                                    asynchronous: true
-                                    fillMode: Image.PreserveAspectFit
-                                    visible: source !== "" && status === Image.Ready
-                                }
-
-                                Text {
+                                SharedWidgets.AppIcon {
                                     anchors.centerIn: parent
-                                    text: root.iconFallback(modelData ? modelData.icon : "", "󰀻")
-                                    color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeMedium
-                                    visible: !recentIconImage.visible
+                                    iconName: modelData ? String(modelData.icon || "") : ""
+                                    desktopId: modelData ? String(modelData.desktopId || "") : ""
+                                    appId: modelData ? String(modelData.appId || "") : ""
+                                    execName: modelData ? String(modelData.exec || "") : ""
+                                    appName: root.primaryText(modelData)
+                                    iconSize: 18
+                                    fallbackIcon: "󰀻"
                                 }
                             }
+
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 Layout.minimumWidth: 0
                                 Layout.alignment: Qt.AlignVCenter
                                 spacing: 0
+
                                 Text {
                                     text: root.primaryText(modelData)
-                                    color: Colors.text
+                                    color: selected ? Colors.primary : Colors.text
                                     font.pixelSize: Colors.fontSizeSmall
-                                    font.weight: Font.DemiBold
+                                    font.weight: selected ? Font.Bold : Font.DemiBold
                                     elide: Text.ElideRight
                                     wrapMode: Text.NoWrap
                                     maximumLineCount: 1
                                     Layout.fillWidth: true
                                 }
+
                                 Text {
                                     text: root.secondaryText(modelData)
-                                    color: Colors.textSecondary
+                                    color: selected ? Colors.withAlpha(Colors.primary, 0.84) : Colors.textSecondary
                                     font.pixelSize: Colors.fontSizeXS
                                     elide: Text.ElideRight
                                     wrapMode: Text.NoWrap
@@ -218,6 +257,7 @@ ColumnLayout {
                             hovered: recentHover.containsMouse
                             pressed: recentHover.pressed
                         }
+
                         MouseArea {
                             id: recentHover
                             anchors.fill: parent
@@ -233,7 +273,6 @@ ColumnLayout {
             }
         }
 
-        // Section 4: Suggestions
         Rectangle {
             Layout.fillWidth: true
             visible: root.showSuggestions
@@ -249,6 +288,7 @@ ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: Colors.spacingM
                 spacing: Colors.spacingS
+
                 SharedWidgets.SectionLabel {
                     label: "SUGGESTED"
                 }
@@ -261,11 +301,13 @@ ColumnLayout {
                         clip: true
                         radius: Colors.radiusSmall
                         readonly property bool hovered: suggestionHover.containsMouse
-                        color: hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent"
-                        border.color: hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent"
-                        border.width: hovered ? 1 : 0
-                        scale: hovered ? 1.01 : 1.0
-                        layer.enabled: hovered
+                        readonly property bool selected: root.isSelected(modelData)
+                        color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.withAlpha(Colors.primary, 0.08) : "transparent")
+                        border.color: selected ? Colors.withAlpha(Colors.primary, 0.52) : (hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent")
+                        border.width: selected || hovered ? 1 : 0
+                        scale: selected ? 1.01 : (hovered ? 1.008 : 1.0)
+                        layer.enabled: selected || hovered
+
                         Behavior on color {
                             ColorAnimation { duration: Colors.durationFast }
                         }
@@ -283,53 +325,48 @@ ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: Colors.spacingS
                             spacing: Colors.paddingSmall
+
                             Rectangle {
                                 implicitWidth: 28
                                 implicitHeight: 28
                                 radius: Colors.radiusXS
-                                color: hovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.surface
-                                border.color: hovered ? Colors.withAlpha(Colors.primary, 0.24) : "transparent"
-                                border.width: hovered ? 1 : 0
+                                color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.surface)
+                                border.color: selected ? Colors.withAlpha(Colors.primary, 0.32) : "transparent"
+                                border.width: selected ? 1 : 0
                                 Layout.alignment: Qt.AlignVCenter
 
-                                Image {
-                                    id: suggestionIconImage
-                                    anchors.fill: parent
-                                    anchors.margins: Colors.spacingXS
-                                    source: root.resolvedIconSource(modelData ? modelData.icon : "")
-                                    sourceSize: Qt.size(56, 56)
-                                    asynchronous: true
-                                    fillMode: Image.PreserveAspectFit
-                                    visible: source !== "" && status === Image.Ready
-                                }
-
-                                Text {
+                                SharedWidgets.AppIcon {
                                     anchors.centerIn: parent
-                                    text: root.iconFallback(modelData ? modelData.icon : "", "󰀻")
-                                    color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeMedium
-                                    visible: !suggestionIconImage.visible
+                                    iconName: modelData ? String(modelData.icon || "") : ""
+                                    desktopId: modelData ? String(modelData.desktopId || "") : ""
+                                    appId: modelData ? String(modelData.appId || "") : ""
+                                    execName: modelData ? String(modelData.exec || "") : ""
+                                    appName: root.primaryText(modelData)
+                                    iconSize: 18
+                                    fallbackIcon: "󰀻"
                                 }
                             }
+
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 Layout.minimumWidth: 0
                                 Layout.alignment: Qt.AlignVCenter
                                 spacing: 0
+
                                 Text {
                                     text: root.primaryText(modelData)
-                                    color: Colors.text
+                                    color: selected ? Colors.primary : Colors.text
                                     font.pixelSize: Colors.fontSizeSmall
-                                    font.weight: Font.DemiBold
+                                    font.weight: selected ? Font.Bold : Font.DemiBold
                                     elide: Text.ElideRight
                                     wrapMode: Text.NoWrap
                                     maximumLineCount: 1
                                     Layout.fillWidth: true
                                 }
+
                                 Text {
                                     text: root.secondaryText(modelData) || "Frequently used"
-                                    color: Colors.textSecondary
+                                    color: selected ? Colors.withAlpha(Colors.primary, 0.84) : Colors.textSecondary
                                     font.pixelSize: Colors.fontSizeXS
                                     elide: Text.ElideRight
                                     wrapMode: Text.NoWrap
@@ -337,18 +374,20 @@ ColumnLayout {
                                     Layout.fillWidth: true
                                 }
                             }
+
                             Rectangle {
                                 radius: height / 2
-                                color: Colors.surface
-                                border.color: Colors.border
+                                color: selected ? Colors.withAlpha(Colors.primary, 0.14) : Colors.surface
+                                border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
                                 border.width: 1
                                 implicitWidth: suggestionBadge.implicitWidth + 16
                                 implicitHeight: 22
+
                                 Text {
                                     id: suggestionBadge
                                     anchors.centerIn: parent
                                     text: (modelData._usage || 0) + "x"
-                                    color: Colors.textSecondary
+                                    color: selected ? Colors.primary : Colors.textSecondary
                                     font.pixelSize: Colors.fontSizeXS
                                     font.weight: Font.Medium
                                 }
@@ -360,6 +399,7 @@ ColumnLayout {
                             hovered: suggestionHover.containsMouse
                             pressed: suggestionHover.pressed
                         }
+
                         MouseArea {
                             id: suggestionHover
                             anchors.fill: parent

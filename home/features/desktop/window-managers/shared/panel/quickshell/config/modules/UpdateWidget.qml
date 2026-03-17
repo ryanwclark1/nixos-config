@@ -145,7 +145,7 @@ SharedWidgets.CardBase {
 
       Rectangle {
         width: 80; height: 32; radius: Colors.radiusXXS
-        color: root.isChecking ? Colors.withAlpha(Colors.surface, 0.4) : Colors.withAlpha(Colors.primary, 0.18)
+        color: root.isChecking ? Colors.cardSurface : Colors.withAlpha(Colors.primary, 0.18)
         border.color: root.isChecking ? Colors.border : Colors.primary
         border.width: 1
         Behavior on color { ColorAnimation { duration: Colors.durationFast } }

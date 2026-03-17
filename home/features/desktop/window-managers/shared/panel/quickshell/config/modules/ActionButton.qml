@@ -13,7 +13,7 @@ Rectangle {
   radius: Colors.radiusXXS
   height: 22
   width: Math.max(32, textLabel.implicitWidth + 16)
-  color: btnMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.15) : Colors.withAlpha(Colors.surface, 0.6)
+  color: btnMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.15) : Colors.cardSurface
   border.color: btnMouse.containsMouse ? Colors.primary : Colors.border
   border.width: 1
   opacity: enabled ? 1.0 : 0.4

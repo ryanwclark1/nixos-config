@@ -31,7 +31,7 @@ ColumnLayout {
   Rectangle {
     Layout.fillWidth: true
     radius: Colors.radiusMedium
-    color: Colors.withAlpha(Colors.surface, 0.4)
+    color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
     implicitHeight: controlCol.implicitHeight + 2 * Colors.spacingM
@@ -112,7 +112,7 @@ ColumnLayout {
       radius: Colors.radiusMedium
       property bool isDefault: modelData.id === root.defaultDeviceId
       property bool isHovered: deviceHover.containsMouse
-      color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35))
+      color: isDefault ? Colors.withAlpha(Colors.primary, 0.16) : (isHovered ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface)
       border.color: isDefault ? Colors.primary : Colors.border
       border.width: 1
       Behavior on color { ColorAnimation { duration: Colors.durationFast } }

@@ -18,7 +18,7 @@ Item {
     anchors.fill: parent
     anchors.margins: -Colors.spacingL
     radius: Colors.radiusLarge
-    color: Colors.withAlpha(Colors.surface, 0.25)
+    color: Colors.cardSurface
     border.color: Colors.withAlpha(Colors.border, 0.5)
     border.width: 1
 

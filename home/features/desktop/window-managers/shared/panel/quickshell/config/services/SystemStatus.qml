@@ -17,12 +17,12 @@ QtObject {
   property bool isHealthChecking: false
   property date lastHealthCheckTime: new Date(0)
 
-  readonly property string healthCheckScript: "qs-health-check"
-  readonly property string pluginDoctorScript: "qs-plugin-doctor"
+  readonly property string healthCheckScript: "./scripts/health-check.sh"
+  readonly property string pluginDoctorScript: "./scripts/plugin-doctor.sh"
   readonly property string incidentRoot: Quickshell.env("HOME") + "/.local/state/quickshell/incidents"
 
   property Process _healthProc: Process {
-    command: ["qs-health-check"]
+    command: [root.healthCheckScript]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -40,7 +40,7 @@ QtObject {
   }
 
   property Process _pluginProc: Process {
-    command: ["qs-plugin-doctor", "--json"]
+    command: [root.pluginDoctorScript, "--json"]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -57,7 +57,7 @@ QtObject {
   }
 
   function applySafeFixes() {
-    var fixProc = Qt.createQmlObject('import Quickshell.Io; Process { command: ["qs-health-check", "--apply-safe-fixes"] }', root);
+    var fixProc = Qt.createQmlObject('import Quickshell.Io; Process { command: ["./scripts/health-check.sh", "--apply-safe-fixes"] }', root);
     fixProc.onExited.connect(function() {
       root.refreshHealth();
       fixProc.destroy();
@@ -70,14 +70,14 @@ QtObject {
   }
 
   property Process _incidentCollector: Process {
-    command: ["sh", "-c", "find '" + root.incidentRoot + "' -name 'incident.json' -exec cat {} + | jq -s ."]
+    command: ["sh", "-c", "mkdir -p '" + root.incidentRoot + "'; find '" + root.incidentRoot + "' -name 'incident.json' -exec cat {} + | jq -s ."]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
         try { 
           var nextIncidents = JSON.parse(this.text || "[]");
           // Check for genuinely new signatures to avoid notification spam
-          var currentSigs = root.activeIncidents.map(i => i.signature);
+          var currentSigs = root.activeIncidents.map(function(i) { return i.signature; });
           for (var i = 0; i < nextIncidents.length; i++) {
             if (currentSigs.indexOf(nextIncidents[i].signature) === -1) {
               root.newIncident(nextIncidents[i]);
@@ -93,10 +93,11 @@ QtObject {
 
   property Timer _healthTimer: Timer {
     interval: 300000 // 5 minutes
-    running: false // disabled until health scripts are Nix-wrapped
+    running: root.subscriberCount > 0
     repeat: true
     onTriggered: root.refreshHealth()
   }
+
 
   readonly property real cpuTempNum: parseFloat(cpuTemp) || 0
   readonly property real gpuTempNum: parseFloat(gpuTemp) || 0

@@ -220,13 +220,12 @@ PanelWindow {
     anchors.left: parent.left
     anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(settingsRoot.gutterY, (settingsRoot.usableHeight - height) / 2)
     anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(settingsRoot.gutterX, (settingsRoot.usableWidth - width) / 2)
-    color: Colors.withAlpha(Colors.surface, Config.settingsSurfaceOpacity)
+    color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge
     clip: true
 
-    gradient: SharedWidgets.SurfaceGradient {}
 
     // Inner highlight
     SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }

@@ -205,12 +205,52 @@ discover_instance() {
 call_ipc() {
   local target="$1"
   local action="$2"
+  local attempt
   shift 2
-  if [[ -n "${instance_pid}" ]]; then
-    run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "${action}" "$@"
-  else
-    run_ipc quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
+
+  for attempt in 1 2 3; do
+    if [[ -n "${instance_pid}" ]]; then
+      if run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "${action}" "$@"; then
+        return 0
+      fi
+    else
+      if run_ipc quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"; then
+        return 0
+      fi
+    fi
+    if ! refresh_instance_binding; then
+      sleep 0.2
+      continue
+    fi
+    sleep 0.2
+  done
+
+  return 1
+}
+
+refresh_instance_binding() {
+  instance_dir=""
+  log_file=""
+
+  if resolve_instance_paths; then
+    if [[ -f "${log_file}" ]]; then
+      start_bytes="$(wc -c < "${log_file}")"
+    else
+      start_bytes=0
+    fi
+    return 0
   fi
+
+  if discover_instance && resolve_instance_paths; then
+    if [[ -f "${log_file}" ]]; then
+      start_bytes="$(wc -c < "${log_file}")"
+    else
+      start_bytes=0
+    fi
+    return 0
+  fi
+
+  return 1
 }
 
 while [[ $# -gt 0 ]]; do

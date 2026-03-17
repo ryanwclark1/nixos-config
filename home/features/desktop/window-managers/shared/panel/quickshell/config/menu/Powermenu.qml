@@ -219,7 +219,6 @@ PanelWindow {
               border.width: actionItem.isFocused ? 3 : 1
               Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
-              gradient: SharedWidgets.SurfaceGradient {}
 
               SharedWidgets.InnerHighlight { highlightOpacity: actionItem.isFocused ? 0.25 : 0.12 }
             }
@@ -274,7 +273,7 @@ PanelWindow {
       Rectangle {
         Layout.alignment: Qt.AlignHCenter
         width: 300; height: 40; radius: Colors.radiusLarge
-        color: Colors.withAlpha(Colors.surface, 0.3)
+        color: Colors.cardSurface
         visible: root.timerActive
         border.color: Colors.border
         border.width: 1

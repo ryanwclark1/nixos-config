@@ -444,7 +444,7 @@ PanelWindow {
         Rectangle {
           visible: root.isSearching
           width: 140; height: 28; radius: Colors.radiusMedium
-          color: Colors.withAlpha(Colors.surface, 0.6)
+          color: Colors.cardSurface
           border.color: searchInput.activeFocus ? Colors.primary : Colors.border
           border.width: 1
           
@@ -717,7 +717,7 @@ PanelWindow {
       Rectangle {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        color: Colors.withAlpha(Colors.surface, 0.35)
+        color: Colors.cardSurface
         border.color: notepadText.activeFocus ? Colors.primary : Colors.border
         border.width: notepadText.activeFocus ? 1.5 : 1
         radius: Colors.radiusMedium

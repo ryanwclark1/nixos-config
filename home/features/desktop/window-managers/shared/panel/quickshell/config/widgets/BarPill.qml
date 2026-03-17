@@ -75,6 +75,19 @@ MouseArea {
 
   property bool shimmerEnabled: true
 
+  // --- Active Glow ---
+  Rectangle {
+    anchors.fill: parent
+    anchors.margins: -3
+    radius: bg.radius + 3
+    color: "transparent"
+    border.color: root.isActive ? Colors.withAlpha(root.activeBorderColor, 0.35) : "transparent"
+    border.width: 2
+    opacity: root.isActive ? 1.0 : 0.0
+    visible: opacity > 0
+    Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
+  }
+
   Rectangle {
     id: bg
     anchors.fill: parent
@@ -88,15 +101,25 @@ MouseArea {
     Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
     Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
+    gradient: SurfaceGradient {}
+
+    InnerHighlight {
+      anchors.fill: parent
+      hovered: root.containsMouse
+      hoveredOpacity: 0.15
+      highlightOpacity: 0.08
+      visible: !root.isActive
+    }
+
     // Double border effect for depth
     Rectangle {
       anchors.fill: parent
       anchors.margins: 1
       radius: parent.radius - 1
       color: "transparent"
-      border.color: Colors.borderLight
+      border.color: root.isActive ? Colors.withAlpha("#fff", 0.15) : Colors.borderLight
       border.width: 1
-      opacity: root.isActive ? 0.4 : (root.containsMouse ? 0.25 : 0.1)
+      opacity: root.isActive ? 0.6 : (root.containsMouse ? 0.25 : 0.1)
       Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
     }
 

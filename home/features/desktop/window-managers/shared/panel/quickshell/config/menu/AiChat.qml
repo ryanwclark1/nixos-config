@@ -109,12 +109,10 @@ PanelWindow {
         id: slidePanel
         width: root.panelWidth
         height: parent.height
-        color: Colors.withAlpha(Colors.surface, 0.96)
+        color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
         radius: Colors.radiusLarge
-
-        gradient: SharedWidgets.SurfaceGradient {}
 
         // Inner highlight
         SharedWidgets.InnerHighlight {
@@ -728,7 +726,7 @@ PanelWindow {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: Colors.withAlpha(Colors.surface, 0.35)
+                color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
                 radius: Colors.radiusMedium
@@ -1087,7 +1085,7 @@ PanelWindow {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: inputLayout.implicitHeight + Colors.spacingM * 2
-                color: Colors.withAlpha(Colors.surface, 0.35)
+                color: Colors.cardSurface
                 border.color: inputField.activeFocus ? Colors.primary : Colors.border
                 border.width: inputField.activeFocus ? 1.5 : 1
                 radius: Colors.radiusMedium

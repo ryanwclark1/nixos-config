@@ -63,7 +63,7 @@ require_literal "$launcher_qml" 'return "Tab: Next Result";' "legend results map
 require_literal "$launcher_qml" 'return hasResults ? "Tab: Next Result" : "Tab: Next Mode";' "legend contextual branch"
 require_literal "$launcher_qml" 'readonly property string legendTertiaryAction: {' "legend tertiary action property"
 require_literal "$launcher_qml" 'if (showingConfirm)' "legend tertiary confirm branch"
-require_literal "$launcher_qml" 'if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== ""))' "legend tertiary reset branch"
+require_literal "$launcher_qml" 'if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded)))' "legend tertiary reset branch"
 require_literal "$launcher_qml" 'return "Esc: Reset";' "legend tertiary reset mapping"
 require_literal "$launcher_qml" 'return "Shift+Tab: Next Mode";' "legend tertiary default mapping"
 

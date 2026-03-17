@@ -151,7 +151,7 @@ fi
 if run_capture "$tmp_all_out" "$tmp_all_err" env PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 "$local_runner" quickshell-all --quiet; then
   if assert_patterns "$tmp_all_out" \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \
-    'SSH widget settings smoke loaded the custom editor' \
+    'SSH widget settings smoke .*custom editor' \
     'hidden bar widgets collapse to zero layout footprint' \
     'Running targeted runtime warning regressions' \
     'Panel runtime verification completed' \

@@ -127,6 +127,40 @@ let
     ${builtins.readFile ./scripts/health-check.sh}
   '';
 
+  quickshellLaunchScript = pkgs.writeShellScriptBin "quickshell-launch" ''
+    set -euo pipefail
+
+    runtime_dir="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+    wayland_display="''${WAYLAND_DISPLAY:-}"
+
+    have_wayland_socket() {
+      local socket_name="$1"
+      [[ -n "''${socket_name}" && -S "''${runtime_dir}/''${socket_name}" ]]
+    }
+
+    if ! have_wayland_socket "''${wayland_display}"; then
+      wayland_display=""
+      for _ in $(seq 1 150); do
+        for candidate in "''${runtime_dir}"/wayland-*; do
+          [[ -S "''${candidate}" ]] || continue
+          wayland_display="$(basename "''${candidate}")"
+          break 2
+        done
+        sleep 0.2
+      done
+    fi
+
+    if ! have_wayland_socket "''${wayland_display}"; then
+      printf 'quickshell-launch: no Wayland socket found in %s\n' "''${runtime_dir}" >&2
+      exit 1
+    fi
+
+    export WAYLAND_DISPLAY="''${wayland_display}"
+    export QT_QPA_PLATFORM=wayland
+
+    exec ${pkgs.quickshell}/bin/quickshell -p "''${HOME}/.config/quickshell/shell.qml"
+  '';
+
   pluginDoctorScript = pkgs.writeShellScriptBin "qs-plugin-doctor" ''
     export QS_REPO_ROOT=${lib.escapeShellArg repoRoot}
     PATH="${pkgs.quickshell}/bin:${pkgs.jq}/bin:${pkgs.ripgrep}/bin:${pkgs.findutils}/bin:${pkgs.coreutils}/bin:${pkgs.bash}/bin:$PATH"
@@ -379,7 +413,7 @@ EOF
 
           exit 0
         ''}";
-        ExecStart = "${pkgs.quickshell}/bin/quickshell -p %h/.config/quickshell/shell.qml";
+        ExecStart = "${quickshellLaunchScript}/bin/quickshell-launch";
         Environment = [
           "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin"
           "QT_QPA_PLATFORMTHEME=adwaita"

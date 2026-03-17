@@ -177,7 +177,7 @@ Rectangle {
             Layout.fillWidth: true
             visible: root.expanded
             radius: Colors.radiusSmall
-            color: Colors.withAlpha(Colors.surface, 0.55)
+            color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
             implicitHeight: Math.min(optionsList.contentHeight, root.maxMenuHeight) + Colors.spacingXS * 2

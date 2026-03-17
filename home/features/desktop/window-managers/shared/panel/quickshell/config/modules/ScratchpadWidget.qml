@@ -57,7 +57,7 @@ SharedWidgets.CardBase {
         delegate: Rectangle {
           id: itemRect
           Layout.fillWidth: true
-          color: scratchHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35)
+          color: scratchHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.cardSurface
           border.color: Colors.border
           border.width: 1
           radius: Colors.radiusXXS

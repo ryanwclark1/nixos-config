@@ -67,12 +67,11 @@ BasePopupMenu {
       Rectangle {
         Layout.fillWidth: true
         radius: Colors.radiusMedium
-        color: Colors.withAlpha(Colors.surface, 0.4)
+        color: Colors.cardSurface
         border.color: Colors.border
         border.width: 1
         implicitHeight: appCol.implicitHeight + 2 * Colors.spacingM
 
-        gradient: SharedWidgets.SurfaceGradient {}
 
         // Inner highlight
         SharedWidgets.InnerHighlight { }

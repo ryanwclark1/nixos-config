@@ -44,7 +44,7 @@ Rectangle {
                     Layout.fillWidth: true
                     height: 36
                     radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.surface, 0.3)
+                    color: Colors.cardSurface
                     
                     RowLayout {
                         anchors.fill: parent; anchors.margins: Colors.spacingS

@@ -49,11 +49,10 @@ BasePopupMenu {
         Layout.fillWidth: true
         implicitHeight: atAGlanceColumn.implicitHeight + Colors.paddingSmall * 2
         radius: Colors.radiusMedium
-        color: Colors.withAlpha(Colors.surface, 0.4)
+        color: Colors.cardSurface
         border.color: Colors.border
         border.width: 1
 
-        gradient: SharedWidgets.SurfaceGradient {}
 
         // Inner highlight
         SharedWidgets.InnerHighlight { }

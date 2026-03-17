@@ -215,7 +215,7 @@ SharedWidgets.CardBase {
                 readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
-                color: Colors.withAlpha(Colors.surface, 0.45)
+                color: Colors.cardSurface
                 border.color: Colors.primary
                 border.width: SystemIoTelemetryService.networkHotspot ? 2 : 1
                 implicitHeight: netDownColumn.implicitHeight + Colors.spacingS * 2
@@ -263,7 +263,7 @@ SharedWidgets.CardBase {
                 readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
-                color: Colors.withAlpha(Colors.surface, 0.45)
+                color: Colors.cardSurface
                 border.color: Colors.accent
                 border.width: SystemIoTelemetryService.networkHotspot ? 2 : 1
                 implicitHeight: netUpColumn.implicitHeight + Colors.spacingS * 2
@@ -311,7 +311,7 @@ SharedWidgets.CardBase {
                 readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
-                color: Colors.withAlpha(Colors.surface, 0.45)
+                color: Colors.cardSurface
                 border.color: Colors.secondary
                 border.width: SystemIoTelemetryService.diskHotspot ? 2 : 1
                 implicitHeight: diskReadColumn.implicitHeight + Colors.spacingS * 2
@@ -359,7 +359,7 @@ SharedWidgets.CardBase {
                 readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
                 Layout.fillWidth: true
                 radius: Colors.radiusSmall
-                color: Colors.withAlpha(Colors.surface, 0.45)
+                color: Colors.cardSurface
                 border.color: Colors.warning
                 border.width: SystemIoTelemetryService.diskHotspot ? 2 : 1
                 implicitHeight: diskWriteColumn.implicitHeight + Colors.spacingS * 2

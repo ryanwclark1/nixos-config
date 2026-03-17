@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import "../services"
 import "../widgets" as SharedWidgets
+import "LauncherSearch.js" as Search
+import "LauncherModeData.js" as ModeData
 
 Rectangle {
     id: root
@@ -49,11 +51,7 @@ Rectangle {
     }
 
     function highlightMatch(text, query) {
-        if (!query)
-            return text;
-        var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        var regex = new RegExp("(" + escaped + ")", "gi");
-        return text.replace(regex, "<b>$1</b>");
+        return Search.highlightMatch(text, query, ModeData.stripModePrefix);
     }
 
     function itemActionLabel(it) {
@@ -75,6 +73,11 @@ Rectangle {
             return "";
         if (it.providerName)
             return it.providerName;
+        if (root.mode === "files") {
+            var extension = String(it.extension || "");
+            if (extension !== "")
+                return extension.toUpperCase();
+        }
         if (root.mode === "web")
             return it.category || "";
         return "";
@@ -93,6 +96,11 @@ Rectangle {
 
         if (description !== "" && description !== primary)
             return description;
+        if (root.mode === "files") {
+            var displayPath = String(it.displayPath || "");
+            if (displayPath !== "")
+                return displayPath;
+        }
         if (fullPath !== "" && fullPath !== primary)
             return fullPath;
         if (windowAppId !== "" && windowAppId !== primary)
@@ -184,6 +192,9 @@ Rectangle {
             SharedWidgets.AppIcon {
                 anchors.centerIn: parent
                 iconName: root.itemIconName(modelData)
+                desktopId: modelData ? String(modelData.desktopId || "") : ""
+                appId: modelData ? String(modelData.appId || modelData.class || "") : ""
+                execName: modelData ? String(modelData.exec || "") : ""
                 appName: modelData ? String(modelData.name || modelData.title || "") : ""
                 iconMap: root.mode === "window" ? root.iconMap : null
                 iconSize: root.compactMode ? 18 : 20
@@ -243,7 +254,7 @@ Rectangle {
                     font.pixelSize: Colors.fontSizeXS
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
-                    width: Math.min(implicitWidth, root.compactMode ? 84 : 120)
+                    width: Math.min(implicitWidth, root.mode === "files" ? (root.compactMode ? 110 : 160) : (root.compactMode ? 84 : 120))
                 }
             }
 

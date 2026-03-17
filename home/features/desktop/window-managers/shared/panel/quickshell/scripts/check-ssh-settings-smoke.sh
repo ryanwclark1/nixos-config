@@ -141,7 +141,32 @@ Scope {
           scan(tab, scanResults);
           var barWidgetsTab = scanResults.barWidgetsTab;
           var sshSettings = scanResults.sshSettingsNode;
+          var invalidSaveError = "";
+          var invalidSaveHostCount = -1;
+          var cancelState = null;
           if (sshSettings) {
+            sshSettings.formLabel = "";
+            sshSettings.formHost = "";
+            sshSettings.formPort = "not-a-port";
+            sshSettings.saveHost();
+            invalidSaveError = String(sshSettings.formError || "");
+            var invalidWidget = Config.widgetInstance("bar-primary", "left", "ssh-left-1");
+            var invalidHosts = invalidWidget && invalidWidget.settings && Array.isArray(invalidWidget.settings.manualHosts)
+              ? invalidWidget.settings.manualHosts
+              : [];
+            invalidSaveHostCount = invalidHosts.length;
+
+            sshSettings.editHostAt(0);
+            sshSettings.formLabel = "Prod Draft";
+            sshSettings.formPort = "2200";
+            sshSettings.resetForm();
+            cancelState = {
+              editingHostId: String(sshSettings.editingHostId || ""),
+              formLabel: String(sshSettings.formLabel || ""),
+              formPort: String(sshSettings.formPort || ""),
+              formError: String(sshSettings.formError || "")
+            };
+
             sshSettings.formLabel = "Staging";
             sshSettings.formHost = "staging.internal";
             sshSettings.formUser = "deploy";
@@ -163,6 +188,9 @@ Scope {
             sshSettingsNodes: scanResults.sshSettingsNodes,
             manualSearchNodes: scanResults.manualSearchNodes,
             sshBoundNodes: scanResults.sshBoundNodes,
+            invalidSaveError: invalidSaveError,
+            invalidSaveHostCount: invalidSaveHostCount,
+            cancelState: cancelState,
             manualHostCount: manualHosts.length,
             savedHost: manualHosts.length > 1 ? {
               label: String(manualHosts[1].label || ""),
@@ -238,6 +266,23 @@ if results.get("settingsInstanceId") != "ssh-left-1":
 
 if results.get("sshSettingsNodes", 0) < 1 or results.get("manualSearchNodes", 0) < 1:
     print("[FAIL] SSH settings pane did not instantiate its custom editor.", file=sys.stderr)
+    sys.exit(1)
+
+if results.get("invalidSaveError") != "Label and host are required.":
+    print("[FAIL] SSH settings smoke did not surface the expected validation error.", file=sys.stderr)
+    sys.exit(1)
+
+if results.get("invalidSaveHostCount") != 1:
+    print("[FAIL] SSH settings smoke mutated manual hosts on invalid save.", file=sys.stderr)
+    sys.exit(1)
+
+cancel_state = results.get("cancelState") or {}
+if cancel_state.get("editingHostId") != "" or cancel_state.get("formLabel") != "" or cancel_state.get("formError") != "":
+    print("[FAIL] SSH settings smoke did not clear draft state on cancel/reset.", file=sys.stderr)
+    sys.exit(1)
+
+if cancel_state.get("formPort") != "22":
+    print("[FAIL] SSH settings smoke did not restore the default port on cancel/reset.", file=sys.stderr)
     sys.exit(1)
 
 saved = results.get("savedHost") or {}

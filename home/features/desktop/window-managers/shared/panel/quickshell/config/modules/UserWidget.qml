@@ -8,12 +8,11 @@ Rectangle {
   id: root
   Layout.fillWidth: true
   Layout.preferredHeight: userContent.implicitHeight + Colors.paddingMedium * 2
-  color: Colors.withAlpha(Colors.surface, 0.4)
+  color: Colors.cardSurface
   radius: Colors.radiusMedium
   border.color: Colors.border
   clip: true
 
-  gradient: SharedWidgets.SurfaceGradient {}
 
   // Inner highlight
   SharedWidgets.InnerHighlight { }

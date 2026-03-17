@@ -92,7 +92,7 @@ Item {
   Rectangle {
     id: bg
     anchors.fill: parent
-    color: Colors.withAlpha(Colors.surface, 0.85)
+    color: Colors.cardSurface
     border.color: root.borderColor
     border.width: 1
     radius: Colors.radiusMedium

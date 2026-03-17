@@ -41,8 +41,8 @@ QtObject {
     readonly property color bg: background
 
     // --- GRADIENTS & DEPTH ---
-    readonly property color surfaceGradientStart: withAlpha(surface, 0.1)
-    readonly property color surfaceGradientEnd: withAlpha(surface, 0.02)
+    readonly property color surfaceGradientStart: solid(surface)
+    readonly property color surfaceGradientEnd: solid(surface)
     readonly property color borderLight: withAlpha(text, 0.12)
     readonly property color borderDark: withAlpha("#000000", 0.25)
     readonly property color glassBorder: withAlpha(text, 0.1)
@@ -54,8 +54,8 @@ QtObject {
     readonly property int shadowSizeHigh: 16
 
     // --- POPUP SURFACES (shared across all menus) ---
-    readonly property color popupSurface: withAlpha(surface, 0.96)
-    readonly property color cardSurface: withAlpha(surface, 0.96)
+    readonly property color popupSurface: withAlpha(surface, Config.popupOpacity)
+    readonly property color cardSurface: withAlpha(surface, Config.cardOpacity)
     readonly property color chipSurface: withAlpha(surface, 0.92)
     readonly property color modalSurface: solid(surface)
     readonly property color modalSidebarSurface: _isLight ? Qt.darker(modalSurface, 1.04) : Qt.darker(modalSurface, 1.12)

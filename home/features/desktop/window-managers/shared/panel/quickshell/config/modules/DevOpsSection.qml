@@ -72,7 +72,7 @@ ColumnLayout {
             Layout.fillWidth: true
             height: 54
             radius: Colors.radiusMedium
-            color: Colors.withAlpha(Colors.surface, 0.3)
+            color: Colors.cardSurface
             border.color: ServiceUnitService.dockerStatus === "ready" ? Colors.border : Colors.warning
             border.width: 1
             RowLayout {
@@ -107,7 +107,7 @@ ColumnLayout {
             Layout.fillWidth: true
             height: 54
             radius: Colors.radiusMedium
-            color: Colors.withAlpha(Colors.surface, 0.3)
+            color: Colors.cardSurface
             border.color: ServiceUnitService.sshStatus === "ready" ? Colors.border : Colors.warning
             border.width: 1
             RowLayout {
@@ -150,7 +150,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Colors.radiusSmall
-                color: Colors.withAlpha(Colors.surface, 0.2)
+                color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
                 RowLayout {
@@ -205,7 +205,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Colors.radiusSmall
-                color: Colors.withAlpha(Colors.surface, 0.2)
+                color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
                 RowLayout {

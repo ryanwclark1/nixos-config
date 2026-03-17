@@ -69,7 +69,7 @@ Scope {
           id: content
           anchors.fill: parent
           radius: Colors.radiusLarge
-          color: Colors.withAlpha(Colors.surface, 0.85)
+          color: Colors.cardSurface
           border.color: Colors.border
           border.width: 1
 

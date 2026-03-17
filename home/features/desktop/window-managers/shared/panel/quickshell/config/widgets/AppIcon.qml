@@ -5,7 +5,11 @@ Item {
   id: root
 
   property string iconName: ""
+  property string desktopId: ""
+  property string appId: ""
+  property string execName: ""
   property string appName: ""
+  property var iconCandidates: []
   property int iconSize: 32
   property var iconMap: null
   property string fallbackIcon: "󰀻"
@@ -13,26 +17,83 @@ Item {
   width: iconSize
   height: iconSize
 
-  readonly property string _resolvedSource: {
-    var name = iconName;
-    if (!name) return "";
+  function candidateList() {
+    var values = [];
 
-    // Already an absolute path or file URI — use directly
-    if (name.startsWith("/") || name.startsWith("file://"))
-      return name.startsWith("file://") ? name : "file://" + name;
-
-    // If iconMap provided, try alias lookup then direct lookup
-    if (iconMap) {
-      var lower = name.toLowerCase();
-      var aliases = Config.iconAliases[lower] || [];
-      for (var i = 0; i < aliases.length; ++i) {
-        if (iconMap[aliases[i]]) return "file://" + iconMap[aliases[i]];
-      }
-      if (iconMap[lower]) return "file://" + iconMap[lower];
+    function appendUnique(value) {
+      var next = String(value || "").trim();
+      if (next === "" || values.indexOf(next) !== -1)
+        return;
+      values.push(next);
     }
 
-    // Fall back to Config.resolveIconSource (aliases + Quickshell.iconPath)
-    return Config.resolveIconSource(name);
+    function execBasename(value) {
+      var raw = String(value || "").trim();
+      if (raw === "")
+        return "";
+      var head = raw.split(/\s+/)[0] || "";
+      if (head === "")
+        return "";
+      var slash = head.lastIndexOf("/");
+      return slash >= 0 ? head.substring(slash + 1) : head;
+    }
+
+    appendUnique(root.iconName);
+    appendUnique(root.desktopId);
+    appendUnique(root.appId);
+    appendUnique(execBasename(root.execName));
+    appendUnique(root.appName);
+
+    var extra = Array.isArray(root.iconCandidates) ? root.iconCandidates : [];
+    for (var i = 0; i < extra.length; ++i)
+      appendUnique(extra[i]);
+
+    return values;
+  }
+
+  function resolveCandidate(name) {
+    var candidate = String(name || "");
+    if (candidate === "")
+      return "";
+
+    if (candidate.startsWith("/") || candidate.startsWith("file://"))
+      return candidate.startsWith("file://") ? candidate : "file://" + candidate;
+
+    if (iconMap) {
+      var lower = candidate.toLowerCase();
+      var aliases = Config.iconAliases[lower] || [];
+      for (var i = 0; i < aliases.length; ++i) {
+        if (iconMap[aliases[i]])
+          return "file://" + iconMap[aliases[i]];
+      }
+      if (iconMap[lower])
+        return "file://" + iconMap[lower];
+    }
+
+    return Config.resolveIconSource(candidate);
+  }
+
+  function isGlyphIcon(name) {
+    var value = String(name || "");
+    if (value === "" || value.length > 3)
+      return false;
+    return !/[A-Za-z0-9/_\-.]/.test(value);
+  }
+
+  readonly property string _resolvedSource: {
+    var candidates = candidateList();
+    for (var i = 0; i < candidates.length; ++i) {
+      var resolved = resolveCandidate(candidates[i]);
+      if (resolved !== "")
+        return resolved;
+    }
+    return "";
+  }
+
+  readonly property string _fallbackText: {
+    if (root._resolvedSource === "" && isGlyphIcon(root.iconName))
+      return root.iconName;
+    return root.fallbackIcon;
   }
 
   Image {
@@ -47,7 +108,7 @@ Item {
 
   Text {
     anchors.centerIn: parent
-    text: root.fallbackIcon
+    text: root._fallbackText
     color: Colors.text
     font.family: Colors.fontMono
     font.pixelSize: root.iconSize * 0.6

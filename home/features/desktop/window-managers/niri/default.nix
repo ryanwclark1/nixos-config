@@ -131,15 +131,21 @@
 
           "Mod+Shift+E".action.quit = { };
 
-          # Applications (matching your Hyprland setup)
-          "Mod+T".action.spawn = "kitty";
-          "Mod+Return".action.spawn = "kitty";
-          "Mod+D".action.spawn = "rofi -show drun";
-          "Mod+Space".action.spawn = "rofi -show drun";
+          # Applications and quick launchers aligned with the Hyprland setup.
+          "Mod+Return".action.spawn = "ghostty";
+          "Mod+Space".action.spawn = "qs-rofi -show drun";
+          "Mod+X".action.spawn = "rofi -show drun";
+          "Mod+Z".action.spawn = "qs-rofi -show drun";
+          "Mod+R".action.spawn = "qs-rofi -show run";
           "Mod+E".action.spawn = "code";
           "Mod+B".action.spawn = "google-chrome";
           "Mod+N".action.spawn = "nautilus";
+          "Mod+Alt+Space".action.spawn = "nautilus";
           "Mod+Alt+L".action.spawn = "hyprlock";
+          "Mod+Ctrl+E".action.spawn = "qs-rofi -show emoji";
+          "Mod+Ctrl+C".action.spawn = "qs-rofi -show calc";
+          "Mod+Shift+T".action.spawn = "voxtype toggle";
+          "Mod+F1".action.spawn = "qs-rofi -show keybinds";
 
           # Screenshot (using shared Wayland script)
           "Print".action.spawn = "~/.local/bin/scripts/wayland/screenshot.sh area";
@@ -152,6 +158,7 @@
 
           # Clipboard history
           "Mod+V".action.spawn = "cliphist list | rofi -dmenu | cliphist decode | wl-copy";
+          "Mod+Shift+V".action.spawn = "cliphist list | rofi -dmenu -theme ~/.config/rofi/style/cliphist.rasi | cliphist decode | wl-copy";
 
           # Web search
           "Mod+Shift+W".action.spawn = "~/.config/desktop/window-managers/shared/scripts/rofi/rofi-web-search.sh";

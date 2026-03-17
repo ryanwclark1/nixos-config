@@ -40,6 +40,11 @@ function ensureItemRankCache(item) {
     item._titleLower = item.title ? String(item.title).toLowerCase() : "";
     item._execLower = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
     item._bodyLower = [item.body, item.description, item.fullPath].filter(Boolean).join(" ").toLowerCase();
+    item._relativePathLower = item.relativePath ? String(item.relativePath).toLowerCase() : "";
+    item._parentPathLower = item.parentPath ? String(item.parentPath).toLowerCase() : "";
+    item._displayPathLower = item.displayPath ? String(item.displayPath).toLowerCase() : "";
+    item._extensionLower = item.extension ? String(item.extension).toLowerCase() : "";
+    item._pathDepth = Number(item.pathDepth || 0);
     var category = item.category ? String(item.category).toLowerCase() : "";
     var keywords = item.keywords ? String(item.keywords).toLowerCase() : "";
     var tokens = [];

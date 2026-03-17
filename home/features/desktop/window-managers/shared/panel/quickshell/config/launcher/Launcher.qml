@@ -168,6 +168,11 @@ PanelWindow {
     readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
+    readonly property string selectedHomeItemKey: {
+        if (!showLauncherHome || selectedIndex < 0 || selectedIndex >= filteredItems.length)
+            return "";
+        return homeItemKey(filteredItems[selectedIndex]);
+    }
     readonly property string drunCategoryFilterLabel: {
         for (var i = 0; i < drunCategoryOptions.length; ++i) {
             var option = drunCategoryOptions[i];
@@ -258,8 +263,12 @@ PanelWindow {
             ]
         })
     readonly property string emptyStateTitle: {
-        if (mode === "files")
-            return "Type at least " + Config.launcherFileMinQueryLength + " characters to search files";
+        var clean = stripModePrefix(searchText).trim();
+        if (mode === "files") {
+            if (clean.length < Config.launcherFileMinQueryLength)
+                return "Start typing to search Home";
+            return "No files match '" + clean + "'";
+        }
         if (mode === "ai")
             return "Describe what you want and press Enter";
         if (mode === "clip")
@@ -269,8 +278,12 @@ PanelWindow {
         return "No results";
     }
     readonly property string emptyStateSubtitle: {
-        if (mode === "files")
-            return "Search runs inside your home directory";
+        var clean = stripModePrefix(searchText).trim();
+        if (mode === "files") {
+            if (clean.length < Config.launcherFileMinQueryLength)
+                return "Filename-first search across your home directory. Prefix with / to jump here from any mode.";
+            return "Try a shorter filename fragment or browse Home directly.";
+        }
         if (mode === "ai")
             return "The response will be copied to your clipboard";
         if (mode === "clip")
@@ -304,7 +317,7 @@ PanelWindow {
         var webSecondary = secondaryWebProvider();
         var webSecondaryName = webSecondary ? webSecondary.name : "Google";
         if (mode === "files")
-            return "Open Folder";
+            return fileQueryLooksLikePath(clean) ? "Open Folder" : (searchText !== "" ? "Clear Query" : "");
         if (mode === "web")
             return clean !== "" ? "Search " + webSecondaryName : "Open " + webSecondaryName;
         if (mode === "system")
@@ -349,7 +362,7 @@ PanelWindow {
         var webSecondary = secondaryWebProvider();
         var webSecondaryName = webSecondary ? webSecondary.name : "Google";
         if (mode === "files")
-            return clean !== "" ? "Open folder target derived from query path." : "Open your home directory.";
+            return fileQueryLooksLikePath(clean) ? "Open the folder implied by the current path-like query." : (searchText !== "" ? "Clear the current query text." : "");
         if (mode === "web")
             return clean !== "" ? "Search " + webSecondaryName + " using the current query." : "Open " + webSecondaryName + " homepage.";
         if (mode === "system")
@@ -389,7 +402,7 @@ PanelWindow {
     readonly property string launcherControlHintText: {
         var resultHint = hasResults ? "↑/↓/Ctrl+P/N/PgUp/PgDn/Home/End: results • " : "";
         var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";
-        var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "")) ? "Esc: reset/close" : "Esc: close";
+        var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded))) ? "Esc: reset/close" : "Esc: close";
         if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryOptions.length > 1)
             return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • " + escapeHint;
         return resultHint + clearHint + "Enter: run • " + escapeHint;
@@ -423,7 +436,7 @@ PanelWindow {
     readonly property string legendTertiaryAction: {
         if (showingConfirm)
             return "Esc: Cancel";
-        if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== ""))
+        if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded)))
             return "Esc: Reset";
         return "Shift+Tab: Next Mode";
     }
@@ -1175,7 +1188,8 @@ PanelWindow {
             return;
         fileIndexBuilding = true;
         fileIndexReady = false;
-        beginModeLoad("files", "Building file index");
+        if (mode === "files" && fileIndexItems.length === 0)
+            beginModeLoad("files", "Building file index");
         var script = "cd " + shellQuote(homeDir) + " && fd --hidden --exclude .git --exclude .cache --exclude node_modules --exclude .local/share/Trash --exclude .local/share/Steam --exclude .cargo --exclude .npm --exclude .mozilla . 2>/dev/null";
         fileIndexProc._startedAt = Date.now();
         fileIndexProc.command = ["bash", "-lc", script];
@@ -1191,7 +1205,7 @@ PanelWindow {
         recordFilesBackendLoad("fd", tookMs);
         if (mode === "files" && stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength)
             loadFiles();
-        else
+        else if (mode === "files" && modeLoadState === "loading")
             completeModeLoad("files", true, "");
     }
 
@@ -1342,13 +1356,26 @@ PanelWindow {
         return String(modeInfo(mode).label || "Results");
     }
 
+    function homeItemKey(item) {
+        if (!item)
+            return "";
+        var keys = [item._homeKey, item.exec, item.address, item.appId, item.desktopId, item.fullPath, item.name, item.title];
+        for (var i = 0; i < keys.length; ++i) {
+            var value = String(keys[i] || "").trim();
+            if (value !== "")
+                return value;
+        }
+        return "";
+    }
+
     function decorateResultSections(items) {
         var source = Array.isArray(items) ? items : [];
         for (var i = 0; i < source.length; ++i) {
             var entry = source[i];
             if (!entry)
                 continue;
-            entry.sectionLabel = resultSectionLabel(entry);
+            if (String(entry.sectionLabel || "") === "")
+                entry.sectionLabel = resultSectionLabel(entry);
         }
         return source;
     }
@@ -1438,6 +1465,7 @@ PanelWindow {
         if (drunCategoryFilter === next)
             return false;
         drunCategoryFilter = next;
+        drunCategorySectionExpanded = next !== "";
         scheduleSearchRefresh(true);
         return true;
     }
@@ -1710,9 +1738,10 @@ PanelWindow {
                 loadNixos();
             else if (mode === "wallpapers")
                 loadWallpapers();
-            else if (mode === "files")
+            else if (mode === "files") {
+                prewarmFileIndex();
                 loadFiles();
-            else if (mode === "bookmarks")
+            } else if (mode === "bookmarks")
                 loadBookmarks();
             else if (mode === "settings")
                 loadSettings();
@@ -2030,25 +2059,52 @@ PanelWindow {
         var lines = raw ? raw.split("\n") : [];
         var items = new Array(lines.length);
         var count = 0;
+        var homePrefix = homeDir.endsWith("/") ? homeDir : (homeDir + "/");
         for (var i = 0; i < lines.length; ++i) {
             var path = String(lines[i] || "");
             if (path === "")
                 continue;
             var fullPath = path.charCodeAt(0) === 47 ? path : (homeDir + "/" + path);
-            var slash = fullPath.lastIndexOf("/");
-            var name = slash >= 0 ? fullPath.substring(slash + 1) : fullPath;
+            var relativePath = fullPath.indexOf(homePrefix) === 0 ? fullPath.substring(homePrefix.length) : fullPath;
+            var slash = relativePath.lastIndexOf("/");
+            var name = slash >= 0 ? relativePath.substring(slash + 1) : relativePath;
             if (name === "")
                 name = path;
+            var parentPath = slash >= 0 ? relativePath.substring(0, slash) : "";
+            var displayPath = parentPath !== "" ? ("~/" + parentPath) : "~";
+            var extension = "";
+            var extIndex = name.lastIndexOf(".");
+            if (extIndex > 0 && extIndex < (name.length - 1))
+                extension = name.substring(extIndex + 1);
+            var pathDepth = parentPath === "" ? 0 : parentPath.split("/").length;
             items[count] = {
                 name: name,
                 title: fullPath,
-                fullPath: fullPath
+                fullPath: fullPath,
+                relativePath: relativePath,
+                parentPath: parentPath,
+                displayPath: displayPath,
+                extension: extension,
+                pathDepth: pathDepth
             };
             count += 1;
         }
         if (count < items.length)
             items.length = count;
         return items;
+    }
+
+    function fileQueryLooksLikePath(clean) {
+        var normalized = String(clean || "").trim();
+        return normalized.startsWith("/") || normalized.startsWith("~") || normalized.indexOf("/") !== -1;
+    }
+
+    function prewarmFileIndex() {
+        resolveFileSearchBackend(function (backend) {
+            if (backend !== "fd" || !fileIndexStale())
+                return;
+            buildFileIndex(Quickshell.env("HOME") || "/");
+        });
     }
 
     function resolveFileSearchBackend(callback) {
@@ -2202,6 +2258,8 @@ PanelWindow {
             action = "resetQuery";
         else if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "")
             action = "resetCategory";
+        else if (drunCategoryFiltersEnabled && mode === "drun" && drunCategorySectionExpanded)
+            action = "collapseCategorySummary";
 
         return ({
                 action: action,
@@ -2332,38 +2390,39 @@ PanelWindow {
             }
 
             if (backend === "fd") {
-                if (fileIndexStale()) {
-                    if (!fileIndexBuilding)
-                        buildFileIndex(homeDir);
-                    runCommand(["fd", "--base-directory", homeDir, "--max-results", String(maxResults), searchQuery], function (raw) {
-                        if (!isRequestCurrent("files", token))
-                            return;
-                        var tookMs = Date.now() - startedAt;
-                        recordFilesBackendLoad("fd", tookMs);
-                        var items = buildFileItemsFromRaw(raw, homeDir);
-                        allItems = items;
-                        setFileQueryCached(cacheKey, items);
-                        filterItems();
-                        completeModeLoad("files", true, fileIndexBuilding ? "Indexing in background" : "");
-                        recordLoadMetric("files", tookMs, false, true);
-                    });
-                    return;
-                }
+                if (fileIndexStale() && !fileIndexBuilding)
+                    buildFileIndex(homeDir);
 
                 var cachedItems = getFileQueryCached(cacheKey);
-                allItems = fileIndexItems;
-                if (cachedItems) {
-                    filteredItems = decorateResultSections(cachedItems.slice(0, Config.launcherMaxResults));
-                    selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
-                    completeModeLoad("files", true, "");
-                    recordLoadMetric("files", 0, true, true);
+                if (fileIndexItems.length > 0) {
+                    allItems = fileIndexItems;
+                    if (cachedItems) {
+                        filteredItems = decorateResultSections(cachedItems.slice(0, Config.launcherMaxResults));
+                        selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
+                        completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
+                        recordLoadMetric("files", 0, true, true);
+                        return;
+                    }
+
+                    filterItems();
+                    setFileQueryCached(cacheKey, filteredItems.slice());
+                    completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
+                    recordLoadMetric("files", Date.now() - startedAt, false, true);
                     return;
                 }
 
-                filterItems();
-                setFileQueryCached(cacheKey, filteredItems.slice());
-                completeModeLoad("files", true, "");
-                recordLoadMetric("files", Date.now() - startedAt, false, true);
+                runCommand(["fd", "--base-directory", homeDir, "--max-results", String(maxResults), searchQuery], function (raw) {
+                    if (!isRequestCurrent("files", token))
+                        return;
+                    var tookMs = Date.now() - startedAt;
+                    recordFilesBackendLoad("fd", tookMs);
+                    var items = buildFileItemsFromRaw(raw, homeDir);
+                    allItems = items;
+                    setFileQueryCached(cacheKey, items);
+                    filterItems();
+                    completeModeLoad("files", true, fileIndexBuilding ? "Indexing in background" : "");
+                    recordLoadMetric("files", tookMs, false, true);
+                });
                 return;
             }
 
@@ -2711,6 +2770,8 @@ PanelWindow {
     function rankItem(item, clean, cleanLower) {
         if (clean === "")
             return 1;
+        if (mode === "files")
+            return rankFileItem(item, cleanLower);
         ensureItemRankCache(item);
         var categoryScore = mode === "drun" ? (fuzzyMatchLower(item._categoryKeywordsLower, cleanLower) * Config.launcherScoreCategoryWeight) : 0;
         var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * Config.launcherScoreNameWeight, fuzzyMatchLower(item._titleLower, cleanLower) * Config.launcherScoreTitleWeight, fuzzyMatchLower(item._execLower, cleanLower) * Config.launcherScoreExecWeight, fuzzyMatchLower(item._bodyLower, cleanLower) * Config.launcherScoreBodyWeight, categoryScore);
@@ -2720,6 +2781,26 @@ PanelWindow {
             var decayScore = UsageTrackerService.getUsageScore(item.exec) * 1.5;
             bestScore += Math.max(rawFreq, decayScore);
         }
+        return bestScore;
+    }
+
+    function rankFileItem(item, cleanLower) {
+        ensureItemRankCache(item);
+        var exactName = item._nameLower === cleanLower;
+        var namePrefix = cleanLower !== "" && item._nameLower.startsWith(cleanLower);
+        var relPrefix = cleanLower !== "" && item._relativePathLower.startsWith(cleanLower);
+        var parentPrefix = cleanLower !== "" && item._parentPathLower.startsWith(cleanLower);
+        var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * 2.2, fuzzyMatchLower(item._relativePathLower, cleanLower) * 1.2, fuzzyMatchLower(item._parentPathLower, cleanLower) * 0.75, fuzzyMatchLower(item._titleLower, cleanLower) * 0.65, fuzzyMatchLower(item._extensionLower, cleanLower) * 0.35);
+        if (exactName)
+            bestScore += 220;
+        else if (namePrefix)
+            bestScore += 160;
+        else if (relPrefix)
+            bestScore += 90;
+        else if (parentPrefix)
+            bestScore += 30;
+        bestScore -= Math.min(20, item._pathDepth * 2);
+        bestScore -= Math.min(16, Math.floor(item._relativePathLower.length / 24));
         return bestScore;
     }
 
@@ -2783,7 +2864,41 @@ PanelWindow {
         var cleanLower = clean.toLowerCase();
 
         if (clean === "" && mode !== "files" && mode !== "ai") {
-            filteredItems = decorateResultSections(allItems);
+            if (showLauncherHome && mode === "drun") {
+                var homeItems = [];
+                var homeSeen = ({});
+
+                function appendHomeSection(sourceItems, sectionLabel) {
+                    var source = Array.isArray(sourceItems) ? sourceItems : [];
+                    for (var homeIndex = 0; homeIndex < source.length; ++homeIndex) {
+                        var sourceItem = source[homeIndex];
+                        var homeKey = homeItemKey(sourceItem);
+                        if (homeKey === "" || homeSeen[homeKey])
+                            continue;
+                        var homeEntry = Object.assign({}, sourceItem);
+                        homeEntry._homeSection = sectionLabel.toLowerCase();
+                        homeEntry._homeKey = homeKey;
+                        homeEntry.sectionLabel = sectionLabel;
+                        homeItems.push(homeEntry);
+                        homeSeen[homeKey] = true;
+                    }
+                }
+
+                appendHomeSection(recentItems, "Recent");
+                appendHomeSection(suggestionItems, "Suggested");
+
+                var remainingItems = [];
+                for (var baseIndex = 0; baseIndex < allItems.length; ++baseIndex) {
+                    var baseItem = allItems[baseIndex];
+                    if (homeSeen[homeItemKey(baseItem)])
+                        continue;
+                    remainingItems.push(baseItem);
+                }
+
+                filteredItems = homeItems.concat(decorateResultSections(remainingItems));
+            } else {
+                filteredItems = decorateResultSections(allItems);
+            }
         } else {
             var scoredItems = [];
             for (var i = 0; i < allItems.length; i++) {
@@ -2818,8 +2933,12 @@ PanelWindow {
                 scoredItems.sort(function (a, b) {
                     if (b._score !== a._score)
                         return b._score - a._score;
-                    var aPath = a.fullPath || a.title || "";
-                    var bPath = b.fullPath || b.title || "";
+                    var aDepth = Number(a.pathDepth || 0);
+                    var bDepth = Number(b.pathDepth || 0);
+                    if (aDepth !== bDepth)
+                        return aDepth - bDepth;
+                    var aPath = a.relativePath || a.fullPath || a.title || "";
+                    var bPath = b.relativePath || b.fullPath || b.title || "";
                     return aPath.localeCompare(bPath);
                 });
             } else if (mode === "ai") {
@@ -2958,6 +3077,10 @@ PanelWindow {
     function executeEmptySecondary() {
         var clean = stripModePrefix(searchText).trim();
         if (mode === "files") {
+            if (!fileQueryLooksLikePath(clean)) {
+                clearSearchQuery();
+                return;
+            }
             var target = Quickshell.env("HOME") || "/";
             if (clean.startsWith("~")) {
                 target = (Quickshell.env("HOME") || "/") + clean.substring(1);
@@ -3016,6 +3139,10 @@ PanelWindow {
         }
         if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "") {
             return setDrunCategoryFilter("");
+        }
+        if (drunCategoryFiltersEnabled && mode === "drun" && drunCategorySectionExpanded) {
+            drunCategorySectionExpanded = false;
+            return true;
         }
         close();
         return true;

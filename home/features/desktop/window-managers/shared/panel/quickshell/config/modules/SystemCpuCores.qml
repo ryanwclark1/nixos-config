@@ -117,7 +117,7 @@ SharedWidgets.CardBase {
                     readonly property real valueWidth: Math.max(34, (coreGrid.width / Math.max(1, coreGrid.columns)) * 0.34)
                     Layout.fillWidth: true
                     radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.surface, 0.45)
+                    color: Colors.cardSurface
                     border.color: Colors.withAlpha(Colors.border, 0.75)
                     border.width: 1
                     implicitHeight: coreInner.implicitHeight + Colors.spacingS * 2

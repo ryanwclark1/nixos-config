@@ -11,17 +11,18 @@ QtObject {
   property var values: _emptyArray()
   property bool isIdle: true
   readonly property int barsCount: 32
+  readonly property bool available: DependencyService.isAvailable("cava")
 
   // ── Subscriber pattern ─────────────────────────
   property int subscriberCount: 0
   onSubscriberCountChanged: _onSubscribersChanged()
 
-  property bool _shouldRun: subscriberCount > 0
+  property bool _shouldRun: subscriberCount > 0 && available
 
   function _onSubscribersChanged() {
     if (_shouldRun && !_cavaProc.running) {
       _startCava();
-    } else if (!_shouldRun && _cavaProc.running) {
+    } else if ((!_shouldRun || !available) && _cavaProc.running) {
       _cavaProc.running = false;
     }
   }
@@ -98,6 +99,7 @@ QtObject {
   }
 
   function _startCava() {
+    if (!available) return;
     _crashCount = 0;
     _cavaProc.running = true;
   }

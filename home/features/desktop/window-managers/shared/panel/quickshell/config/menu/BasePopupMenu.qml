@@ -71,14 +71,12 @@ PopupWindow {
   Rectangle {
     id: surface
     anchors.fill: parent
-    color: Colors.withAlpha(Colors.surface, 0.98)
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge
     clip: true
     focus: true
-
-    gradient: SharedWidgets.SurfaceGradient {}
 
     // Inner subtle highlight border
     SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }

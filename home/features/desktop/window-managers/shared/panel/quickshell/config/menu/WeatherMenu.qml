@@ -36,11 +36,9 @@ BasePopupMenu {
       Layout.fillWidth: true
       implicitHeight: root.compactMode ? 182 : 132
       radius: Colors.radiusMedium
-      color: Colors.withAlpha(Colors.surface, 0.4)
+      color: Colors.cardSurface
       border.color: Colors.border
       border.width: 1
-
-      gradient: SharedWidgets.SurfaceGradient {}
 
       // Inner highlight
       SharedWidgets.InnerHighlight { }
@@ -118,11 +116,9 @@ BasePopupMenu {
       Layout.fillWidth: true
       implicitHeight: detailsGrid.implicitHeight + Colors.spacingM * 2
       radius: Colors.radiusMedium
-      color: Colors.withAlpha(Colors.surface, 0.4)
+      color: Colors.cardSurface
       border.color: Colors.border
       border.width: 1
-
-      gradient: SharedWidgets.SurfaceGradient {}
 
       // Inner highlight
       SharedWidgets.InnerHighlight { }
@@ -197,7 +193,7 @@ BasePopupMenu {
             width: 62
             height: 72
             radius: Colors.radiusMedium
-            color: Colors.withAlpha(Colors.surface, 0.35)
+            color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
 
@@ -255,7 +251,7 @@ BasePopupMenu {
         Layout.fillWidth: true
         implicitHeight: root.compactMode ? 78 : 60
         radius: Colors.radiusMedium
-        color: forecastHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.withAlpha(Colors.surface, 0.3)
+        color: forecastHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.08) : Colors.cardSurface
         border.color: forecastHover.containsMouse ? Colors.primary : Colors.border
         border.width: 1
 

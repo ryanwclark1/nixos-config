@@ -69,7 +69,7 @@ BasePopupMenu {
       Layout.fillWidth: true
       Layout.preferredHeight: 60
       radius: Colors.radiusMedium
-      color: Colors.withAlpha(Colors.surface, 0.3)
+      color: Colors.cardSurface
       border.color: Colors.border
       border.width: 1
       clip: true
@@ -112,12 +112,10 @@ BasePopupMenu {
         Rectangle {
           Layout.fillWidth: true
           radius: Colors.radiusMedium
-          color: Colors.withAlpha(Colors.surface, 0.4)
+          color: Colors.cardSurface
           border.color: NetworkService.activePrimaryName === "Offline" ? Colors.border : Colors.primary
           border.width: 1
           implicitHeight: root.compactMode ? 126 : 96
-
-          gradient: SharedWidgets.SurfaceGradient {}
 
           // Inner highlight
           SharedWidgets.InnerHighlight { }
@@ -559,7 +557,7 @@ BasePopupMenu {
                 radius: Colors.radiusMedium
                 color: networkMouse.containsMouse
                   ? Colors.withAlpha(Colors.primary, 0.12)
-                  : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.withAlpha(Colors.surface, 0.3))
+                  : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface)
                 border.color: modelData.active ? Colors.primary : Colors.border
                 border.width: 1
 
