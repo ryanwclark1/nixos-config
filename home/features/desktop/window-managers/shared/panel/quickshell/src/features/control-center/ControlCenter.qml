@@ -2,10 +2,9 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import "."
 import "../system/sections"
-import "../services"
-import "../widgets" as SharedWidgets
+import "../../services"
+import "../../widgets" as SharedWidgets
 
 PanelWindow {
     id: root

@@ -124,17 +124,17 @@ write_tab_harnesses() {
   local bar_tab_qml="${harness_dir}/bar-tab-harness.qml"
   local bar_widgets_qml="${harness_dir}/bar-widgets-harness.qml"
 
-  mkdir -p "${harness_dir}/menu"
+  mkdir -p "${harness_dir}/features/settings"
   ln -s "${config_dir}/services" "${harness_dir}/services"
   ln -s "${config_dir}/widgets" "${harness_dir}/widgets"
-  ln -s "${config_dir}/menu/settings" "${harness_dir}/menu/settings"
+  ln -s "${config_dir}/features/settings/components" "${harness_dir}/features/settings/components"
 
   cat > "${bar_tab_qml}" <<QML
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
 import "./services"
-import "./menu/settings/tabs"
+import "./features/settings/components/tabs"
 
 PanelWindow {
   visible: true
@@ -161,7 +161,7 @@ import Quickshell
 import QtQuick
 import QtQuick.Layouts
 import "./services"
-import "./menu/settings/tabs"
+import "./features/settings/components/tabs"
 
 PanelWindow {
   visible: true

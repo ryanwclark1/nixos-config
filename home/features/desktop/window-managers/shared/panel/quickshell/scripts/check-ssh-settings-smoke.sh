@@ -85,7 +85,7 @@ import Quickshell
 import QtQuick
 import QtQuick.Layouts
 import "./src/services"
-import "./src/menu/settings/tabs"
+import "./src/features/settings/components/tabs"
 
 Scope {
   id: root

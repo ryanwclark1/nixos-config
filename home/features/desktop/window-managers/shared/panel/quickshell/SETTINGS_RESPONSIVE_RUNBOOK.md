@@ -44,7 +44,7 @@ Reference:
   - prefer `--repo-shell` on the panel-level wrappers instead of guessing an instance id
   - this temporarily stops the managed service, launches the repo checkout as the live shell, runs QA, then attempts to restore the service
 - Static parse validation for touched QML:
-  - `qmlformat -n src/menu/SettingsHub.qml src/menu/settings/*.qml src/menu/settings/tabs/*.qml`
+  - `qmlformat -n src/features/settings/SettingsHub.qml src/features/settings/components/*.qml src/features/settings/components/tabs/*.qml`
 
 Command roles:
 

@@ -7,7 +7,7 @@ launcher_qml="${config_dir}/launcher/Launcher.qml"
 launcher_home_qml="${config_dir}/launcher/LauncherHome.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
-system_tab_qml="${config_dir}/menu/settings/tabs/ShellCoreSectionTab.qml"
+system_tab_qml="${config_dir}/features/settings/components/tabs/ShellCoreSectionTab.qml"
 apps_script="${script_dir}/apps.sh"
 
 violations=()

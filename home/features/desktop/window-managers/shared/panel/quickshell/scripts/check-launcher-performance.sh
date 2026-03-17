@@ -5,7 +5,7 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
 config_qml="${script_dir}/../src/services/Config.qml"
 config_persistence_js="${script_dir}/../src/services/config/ConfigPersistence.js"
-system_tab_qml="${script_dir}/../src/menu/settings/tabs/ShellCoreSectionTab.qml"
+system_tab_qml="${script_dir}/../src/features/settings/components/tabs/ShellCoreSectionTab.qml"
 
 violations=()
 

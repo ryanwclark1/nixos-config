@@ -15,12 +15,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
-mkdir -p "${tmp_home}/.local/state/quickshell" "${tmp_home}/.config/quickshell" "${tmp_runtime}/quickshell" "${tmp_dir}/menu"
+mkdir -p "${tmp_home}/.local/state/quickshell" "${tmp_home}/.config/quickshell" "${tmp_runtime}/quickshell" "${tmp_dir}/features/settings"
 chmod 700 "${tmp_runtime}"
 printf '{"themes":[]}\n' > "${tmp_home}/.config/quickshell/themes.json"
 ln -s "${config_dir}/services" "${tmp_dir}/services"
 ln -s "${config_dir}/widgets" "${tmp_dir}/widgets"
-ln -s "${config_dir}/menu/settings" "${tmp_dir}/menu/settings"
+ln -s "${config_dir}/features/settings/components" "${tmp_dir}/features/settings/components"
 
 cat > "${tmp_home}/.local/state/quickshell/config.json" <<'JSON'
 {
@@ -59,7 +59,7 @@ import QtQuick
 import QtQuick.Layouts
 import "./services"
 import "./widgets"
-import "./menu/settings/tabs"
+import "./features/settings/components/tabs"
 
 Item {
   width: 960

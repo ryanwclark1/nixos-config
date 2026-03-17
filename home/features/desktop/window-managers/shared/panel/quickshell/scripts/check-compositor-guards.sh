@@ -25,7 +25,7 @@ allow_direct_compositor_checks=(
   "${config_dir}/bar/widgets/WindowTitle.qml"
   "${config_dir}/bar/widgets/Workspaces.qml"
   "${config_dir}/launcher/AltTabSwitcher.qml"
-  "${config_dir}/menu/settings/tabs/HotkeysTab.qml"
+  "${config_dir}/features/settings/components/tabs/HotkeysTab.qml"
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/NightLightService.qml"
   "${config_dir}/services/NiriBinds.qml"

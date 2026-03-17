@@ -6,7 +6,7 @@ config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
-launcher_settings_qml="${config_dir}/menu/settings/tabs/ShellCoreSectionTab.qml"
+launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellCoreSectionTab.qml"
 
 violations=()
 

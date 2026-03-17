@@ -6,7 +6,7 @@ runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
 launcher_search_field_qml="${script_dir}/../src/launcher/LauncherSearchField.qml"
-launcher_settings_qml="${script_dir}/../src/menu/settings/tabs/ShellCoreSectionTab.qml"
+launcher_settings_qml="${script_dir}/../src/features/settings/components/tabs/ShellCoreSectionTab.qml"
 expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
 apps_helper="${script_dir}/apps.sh"
 

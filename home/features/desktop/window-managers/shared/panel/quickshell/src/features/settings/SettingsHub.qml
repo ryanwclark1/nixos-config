@@ -3,9 +3,9 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import "../services"
-import "../widgets" as SharedWidgets
-import "settings"
+import "../../services"
+import "../../widgets" as SharedWidgets
+import "components"
 
 PanelWindow {
   id: settingsRoot

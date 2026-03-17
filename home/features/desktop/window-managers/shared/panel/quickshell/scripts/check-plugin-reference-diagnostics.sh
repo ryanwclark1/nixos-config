@@ -7,7 +7,7 @@ active_fixture="${reference_dir}/expected-diagnostics-active.json"
 degraded_fixture="${reference_dir}/expected-diagnostics-degraded.json"
 schema_file="${script_dir}/../src/plugins/diagnostics.schema.json"
 schema_validator="${script_dir}/validate-json-schema.js"
-plugins_tab="${script_dir}/../src/menu/settings/tabs/PluginsTab.qml"
+plugins_tab="${script_dir}/../src/features/settings/components/tabs/PluginsTab.qml"
 
 pass_count=0
 fail_count=0

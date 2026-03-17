@@ -52,6 +52,10 @@ QtObject {
     readonly property int shadowSizeMedium: 8
     readonly property int shadowSizeHigh: 16
 
+    // --- OVERLAYS ---
+    readonly property color overlayScrim: Qt.rgba(0, 0, 0, 0.45)
+    readonly property color overlayHeavy: Qt.rgba(0, 0, 0, 0.55)
+
     // --- POPUP SURFACES (shared across all menus) ---
     property real _popupOpacity: 0.96
     property real _cardOpacity: 0.96

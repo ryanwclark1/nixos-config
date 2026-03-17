@@ -623,7 +623,7 @@ Item {
                 width: Math.min(previewContainer.width - Colors.spacingM * 2, previewName.implicitWidth + 16)
                 height: 22
                 radius: Colors.radiusPill
-                color: Qt.rgba(0, 0, 0, 0.55)
+                color: Colors.overlayHeavy
 
                 Text {
                     id: previewName
@@ -1227,7 +1227,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         visible: root.solidPickerOpen
-        color: Qt.rgba(0, 0, 0, 0.45)
+        color: Colors.overlayScrim
         z: 2000
 
         MouseArea {
