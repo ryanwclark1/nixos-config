@@ -19,12 +19,15 @@ Compositor-specific behavior notes and capability expectations are documented in
 - `Notifications`: popup notifications + manager.
 - `System/Decorative Layers`: lock, toast overlay, corners, borders.
 - `Services`: shared state, persistence, and integration logic.
+- `Shared UI`: reusable UI primitives, controls, and feedback helpers.
 
 ## Dependency Rules
 
-- `shell.qml` owns closable surface orchestration and screen routing.
-- Reusable UI in `widgets/` must not directly orchestrate other surfaces.
-- `menu/`, `bar/`, `launcher/`, `notifications/`, `widgets/` may depend on `services/`.
+- `src/shell.qml` and `src/app/ShellRoot.qml` own closable surface orchestration and screen routing.
+- Feature roots in `src/features/` own their surfaces, local components, and registries.
+- Reusable UI lives in `src/shared/` and must not directly orchestrate other surfaces.
+- `src/widgets/qmldir` is a compatibility facade only; new runtime ownership does not belong there.
+- `menu/`, `bar/`, `launcher/`, `notifications/`, `shared/`, and `shell/` may depend on `services/`.
 - `services/` must not depend on higher-level UI modules.
 - Persistent settings shape is owned by `services/Config.qml`.
 
@@ -38,14 +41,16 @@ Compositor-specific behavior notes and capability expectations are documented in
 
 ## Invariants
 
-- Only one closable surface is active at a time (`activeSurfaceId` in `shell.qml`).
+- Only one closable surface is active at a time (`activeSurfaceId` in `src/app/ShellRoot.qml`).
 - Existing IPC compatibility methods remain available while routing through generic surface APIs.
-- Popup menus are positioned through shared anchor helpers in `shell.qml`.
+- Popup menus are positioned through shared anchor helpers in `src/app/ShellRoot.qml`.
 - Desktop widgets are stored per monitor in `Config.desktopWidgetsMonitorWidgets`.
 
 ## Naming and Placement
 
-- Top-level UI surfaces should be orchestrated in `shell.qml`.
-- Reusable leaf widgets belong in `src/widgets/`.
+- Top-level UI surfaces should be orchestrated in `src/app/ShellRoot.qml`.
+- Feature-owned surfaces and components belong in `src/features/<feature>/`.
+- Reusable leaf widgets and generic controls belong in `src/shared/`.
+- Shell-only decoration surfaces belong in `src/shell/`.
 - Shared state and integration logic belongs in `src/services/`.
-- New popup/menu surfaces belong in `src/menu/` and should use shared surface IDs.
+- `src/menu/` and `src/widgets/` exist for backward-compatible module resolution and should stay thin.

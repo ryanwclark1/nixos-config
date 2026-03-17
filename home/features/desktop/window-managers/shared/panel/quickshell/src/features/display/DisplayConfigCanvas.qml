@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import "../services"
-import "../widgets" as SharedWidgets
+import "../../services"
 
 Item {
   id: root

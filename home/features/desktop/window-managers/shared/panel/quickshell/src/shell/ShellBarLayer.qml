@@ -2,9 +2,17 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../bar"
-import "../menu"
+import "../features/audio"
+import "../features/clipboard"
+import "../features/media"
+import "../features/network"
+import "../features/power"
+import "../features/screenshot"
+import "../features/ssh"
+import "../features/status"
+import "../features/system/surfaces"
+import "../features/time"
 import "../services"
-import "../widgets"
 
 Item {
     id: root

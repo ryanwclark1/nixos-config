@@ -2,9 +2,12 @@
 
 Use this checklist before merging panel architecture changes.
 
-- [ ] New closable surfaces are registered through `shell.qml` surface APIs (`toggleSurface/openSurface/closeAllSurfaces`), not ad-hoc booleans.
-- [ ] Popup menu placement uses shared anchor helpers in `shell.qml`.
+- [ ] New closable surfaces are registered through `src/app/ShellRoot.qml` surface APIs (`toggleSurface/openSurface/closeAllSurfaces`), not ad-hoc booleans.
+- [ ] Popup menu placement uses shared anchor helpers in `src/app/ShellRoot.qml`.
 - [ ] Shared state changes live in `services/` (especially `Config.qml`) and are not duplicated across UI modules.
+- [ ] New reusable controls land in `src/shared/`, not `src/widgets/`.
+- [ ] New shell-only decoration surfaces land in `src/shell/`, not `src/widgets/`.
+- [ ] `src/widgets/qmldir` remains a compatibility shim and does not regain real runtime ownership.
 - [ ] Compositor-specific behavior routes through `services/CompositorAdapter.qml` capabilities, not ad-hoc WM checks.
 - [ ] `scripts/check-compositor-guards.sh` passes for QML compositor guardrails.
 - [ ] `scripts/check-compositor-fixtures.sh` passes for known Niri payload shapes (array and object forms).

@@ -3,16 +3,21 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../bar"
+import "../features/ai"
+import "../features/color-picker"
+import "../features/control-center"
+import "../features/display"
 import "../features/lock"
 import "../launcher"
-import "../menu"
 import "../features/media"
 import "../features/osd"
-import "../system/sections"
+import "../features/power"
+import "../features/system/surfaces"
+import "../features/settings"
+import "../features/workspace"
 import "../notifications"
 import "../services"
 import "../shell"
-import "../widgets"
 
 Scope {
     id: root
