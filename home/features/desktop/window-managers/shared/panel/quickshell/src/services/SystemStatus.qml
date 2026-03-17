@@ -212,7 +212,7 @@ QtObject {
     BrightnessService.setKbdBrightness(value);
   }
 
-  property int pollIntervalMs: 2000
+  property int pollIntervalMs: 5000
 
   // Subscriber-based polling: only runs when at least one consumer is active.
   // Use Ref { service: SystemStatus } for automatic lifecycle management.

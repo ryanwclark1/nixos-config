@@ -5,7 +5,7 @@ QtObject {
     id: root
 
     property int subscriberCount: 0
-    property int sampleIntervalMs: 1000
+    property int sampleIntervalMs: 2000
     property int historyLength: 180
 
     property var interfaces: []

@@ -9,11 +9,6 @@ let
   repoRoot = builtins.toString ../../../../../../..;
   healthRules = pkgs.writeText "qs-health-rules.json" (builtins.readFile ./scripts/health-rules.json);
 
-  appsScript = pkgs.writeShellScriptBin "qs-apps" ''
-    PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:$PATH"
-    ${builtins.readFile ./scripts/apps.sh}
-  '';
-
   qsRofiScript = pkgs.writeShellScriptBin "qs-rofi" ''
     PATH="${pkgs.quickshell}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:$PATH"
     ${builtins.readFile ./scripts/qs-rofi.sh}
@@ -27,11 +22,6 @@ let
   emojiScript = pkgs.writeShellScriptBin "qs-emoji" ''
     PATH="${pkgs.coreutils}/bin:$PATH"
     ${builtins.readFile ./scripts/emojis.sh}
-  '';
-
-  clipScript = pkgs.writeShellScriptBin "qs-clip" ''
-    PATH="${pkgs.cliphist}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:$PATH"
-    ${builtins.readFile ./scripts/cliphist.sh}
   '';
 
   wallpaperScript = pkgs.writeShellScriptBin "qs-wallpapers" ''
@@ -272,11 +262,9 @@ let
       python3 # Needed for various scripts (Niri binds parser, etc.)
 
       # Quickshell utility scripts
-      appsScript
       qsRofiScript
       runScript
       emojiScript
-      clipScript
       wallpaperScript
       keybindsScript
       aiScript
@@ -377,15 +365,6 @@ EOF
       '';
     };
 
-    home.file.".local/bin/qs-apps" = {
-      force = true;
-      executable = true;
-      text = ''
-        #!/usr/bin/env bash
-        exec bash ${./scripts/apps.sh} "$@"
-      '';
-    };
-
     home.file.".local/share/applications/org.quickshell.desktop".text = ''
       [Desktop Entry]
       Name=Quickshell
@@ -429,7 +408,7 @@ EOF
         ''}";
         ExecStart = "${quickshellLaunchScript}/bin/quickshell-launch";
         Environment = [
-          "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin:${pkgs.python3}/bin"
+          "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin:${pkgs.python3}/bin"
           "QS_NIRI_PARSER=${./scripts/parse-niri-binds.py}"
           "QT_QPA_PLATFORMTHEME=adwaita"
           "QT_STYLE_OVERRIDE=adwaita-dark"
@@ -468,7 +447,7 @@ EOF
 
       Timer = {
         OnBootSec = "2min";
-        OnUnitActiveSec = "5min";
+        OnUnitActiveSec = "15min";
         RandomizedDelaySec = "45sec";
         Persistent = true;
       };

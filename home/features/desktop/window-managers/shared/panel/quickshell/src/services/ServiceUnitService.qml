@@ -7,7 +7,7 @@ QtObject {
     id: root
 
     property int subscriberCount: 0
-    property int pollIntervalMs: 5000
+    property int pollIntervalMs: 10000
     property var userUnits: []
     property var systemUnits: []
     property var dockerContainers: []

@@ -24,12 +24,12 @@ Rectangle {
   border.color: Colors.primaryRing
   border.width: 1
 
-  readonly property int _gitPollMs: 3000
+  readonly property int _gitPollMs: 20000
 
   CommandPoll {
     id: gitPoll
     interval: root._gitPollMs
-    running: root.visible
+    running: looksLikeTerminal || looksLikePath
     command: ["sh", "-c",
       "path=$(echo \"$1\" | grep -o '/[^ ]*' | head -1); " +
       "[ -z \"$path\" ] && path=$HOME; " +

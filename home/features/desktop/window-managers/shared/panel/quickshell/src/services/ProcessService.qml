@@ -7,12 +7,12 @@ QtObject {
     id: root
 
     property int subscriberCount: 0
-    property int pollIntervalMs: 3000
+    property int pollIntervalMs: 5000
     property int snapshotLimit: 60
     property string sortBy: "cpu"
     property var processes: []
     property bool busy: processPoll.busy
-    property int detailPollIntervalMs: 2000
+    property int detailPollIntervalMs: 10000
     property int detailPid: 0
     property string detailStatus: "idle"
     property string detailMessage: ""

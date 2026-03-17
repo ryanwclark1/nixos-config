@@ -61,7 +61,7 @@ in
     Unit = { Description = "Run Wallpapers Sync every 6 hours"; };
     Timer = {
       OnBootSec = "5m";
-      OnUnitActiveSec = "1h";
+      OnUnitActiveSec = "24h";
       Persistent = true;
     };
     Install = { WantedBy = [ "timers.target" ]; };
