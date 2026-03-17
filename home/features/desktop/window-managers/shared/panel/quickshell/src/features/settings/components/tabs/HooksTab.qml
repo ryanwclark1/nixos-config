@@ -136,14 +136,6 @@ Item {
         }
     }
 
-    // Import BarTooltip for template button tooltip
-    component BarTooltip: Text {
-        property var anchorItem: null
-        property bool hovered: false
-        property string text: ""
-        visible: false // Simplified: tooltip handled by hover state above
-    }
-
     function _groupedCategories() {
         var catalog = HookService.hookCatalog;
         var groups = {};

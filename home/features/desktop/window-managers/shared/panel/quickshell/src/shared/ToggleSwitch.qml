@@ -24,7 +24,7 @@ Item {
     radius: height / 2
     color: root.checked
       ? Colors.primary
-      : Colors.withAlpha(Colors.text, 0.12)
+      : Colors.borderLight
     border.color: root.checked ? "transparent" : Colors.border
     border.width: root.checked ? 0 : 1
 

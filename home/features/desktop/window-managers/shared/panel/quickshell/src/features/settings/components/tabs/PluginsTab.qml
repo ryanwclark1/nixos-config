@@ -420,7 +420,7 @@ Item {
                     implicitWidth: disabledCount.implicitWidth + 12
                     height: 20
                     radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.text, 0.12)
+                    color: Colors.borderLight
                     Text {
                         id: disabledCount
                         anchors.centerIn: parent
