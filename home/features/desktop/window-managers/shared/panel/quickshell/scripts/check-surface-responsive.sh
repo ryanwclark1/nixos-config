@@ -90,6 +90,7 @@ populate_repo_shell_env() {
   local value=""
 
   repo_shell_env=()
+  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
   for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
     value="${!key:-}"
     if [[ -n "${value}" ]]; then
@@ -458,7 +459,13 @@ main() {
     if call_ipc Shell closeAllSurfaces >/dev/null; then
       pass "Shell.closeAllSurfaces after ${surface_id}"
     else
-      fail "Shell.closeAllSurfaces after ${surface_id}"
+      sleep 0.4
+      refresh_instance_binding >/dev/null 2>&1 || true
+      if call_ipc Shell closeAllSurfaces >/dev/null; then
+        pass "Shell.closeAllSurfaces after ${surface_id} (after instance refresh)"
+      else
+        fail "Shell.closeAllSurfaces after ${surface_id}"
+      fi
     fi
     sleep 0.1
   done

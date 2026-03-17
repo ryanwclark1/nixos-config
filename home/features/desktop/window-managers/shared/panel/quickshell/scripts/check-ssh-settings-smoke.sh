@@ -21,7 +21,7 @@ printf '{"themes":[]}\n' > "${tmp_home}/.config/quickshell/themes.json"
 cat > "${tmp_home}/.local/state/quickshell/config.json" <<'JSON'
 {
   "bars": {
-    "selectedBarId": "bar-primary",
+    "selectedBarId": "bar-secondary",
     "configs": [
       {
         "id": "bar-primary",
@@ -54,6 +54,26 @@ cat > "${tmp_home}/.local/state/quickshell/config.json" <<'JSON'
           "center": [],
           "right": []
         }
+      },
+      {
+        "id": "bar-secondary",
+        "name": "Secondary",
+        "enabled": true,
+        "position": "bottom",
+        "sectionWidgets": {
+          "left": [
+            {
+              "instanceId": "cpu-left-1",
+              "widgetType": "cpuStatus",
+              "enabled": true,
+              "settings": {
+                "displayMode": "compact"
+              }
+            }
+          ],
+          "center": [],
+          "right": []
+        }
       }
     ]
   }
@@ -79,9 +99,18 @@ Scope {
       results.manualSearchNodes += 1;
     if (node.widgetInstance !== undefined && node.widgetInstance && String(node.widgetInstance.widgetType || "") === "ssh")
       results.sshBoundNodes += 1;
+    if (node.widgetSettingsOpen !== undefined)
+      results.barWidgetsTab = node;
+    if (node.formPort !== undefined && !results.sshSettingsNode)
+      results.sshSettingsNode = node;
     var children = node.children || [];
     for (var i = 0; i < children.length; ++i)
       scan(children[i], results);
+  }
+
+  QtObject {
+    id: fakeSettingsRoot
+    property var pendingBarWidgetTarget: null
   }
 
   BarWidgetsTab {
@@ -91,24 +120,63 @@ Scope {
     tabId: "bar-widgets"
     compactMode: true
     tightSpacing: false
+    settingsRoot: fakeSettingsRoot
   }
 
   Component.onCompleted: {
     Config.load();
-    tab.openWidgetSettings("left", "ssh-left-1");
+    fakeSettingsRoot.pendingBarWidgetTarget = Config.findBarWidgetInstance("ssh-left-1");
     Qt.callLater(function() {
-      var results = {
-        editingWidgetType: tab.editingWidget ? String(tab.editingWidget.widgetType || "") : "",
-        editingSchemaLength: tab.editingWidgetSchema ? tab.editingWidgetSchema.length : -1,
-        widgetSettingsOpen: tab.widgetSettingsOpen,
-        settingsInstanceId: tab.settingsInstanceId,
-        sshSettingsNodes: 0,
-        manualSearchNodes: 0,
-        sshBoundNodes: 0
-      };
-      scan(tab, results);
-      console.log("RESULT:" + JSON.stringify(results));
-      Qt.quit();
+      tab.applyPendingBarWidgetTarget();
+      Qt.callLater(function() {
+        tab.applyPendingBarWidgetTarget();
+        Qt.callLater(function() {
+          var scanResults = {
+            sshSettingsNodes: 0,
+            manualSearchNodes: 0,
+            sshBoundNodes: 0,
+            barWidgetsTab: null,
+            sshSettingsNode: null
+          };
+          scan(tab, scanResults);
+          var barWidgetsTab = scanResults.barWidgetsTab;
+          var sshSettings = scanResults.sshSettingsNode;
+          if (sshSettings) {
+            sshSettings.formLabel = "Staging";
+            sshSettings.formHost = "staging.internal";
+            sshSettings.formUser = "deploy";
+            sshSettings.formPort = "2222";
+            sshSettings.formTags = "qa, edge";
+            sshSettings.formGroup = "qa";
+            sshSettings.saveHost();
+          }
+          var widget = Config.widgetInstance("bar-primary", "left", "ssh-left-1");
+          var manualHosts = widget && widget.settings && Array.isArray(widget.settings.manualHosts)
+            ? widget.settings.manualHosts
+            : [];
+          var results = {
+            selectedBarId: String(Config.selectedBarId || ""),
+            editingWidgetType: barWidgetsTab && barWidgetsTab.editingWidget ? String(barWidgetsTab.editingWidget.widgetType || "") : "",
+            editingSchemaLength: barWidgetsTab && barWidgetsTab.editingWidgetSchema ? barWidgetsTab.editingWidgetSchema.length : -1,
+            widgetSettingsOpen: barWidgetsTab ? barWidgetsTab.widgetSettingsOpen : false,
+            settingsInstanceId: barWidgetsTab ? barWidgetsTab.settingsInstanceId : "",
+            sshSettingsNodes: scanResults.sshSettingsNodes,
+            manualSearchNodes: scanResults.manualSearchNodes,
+            sshBoundNodes: scanResults.sshBoundNodes,
+            manualHostCount: manualHosts.length,
+            savedHost: manualHosts.length > 1 ? {
+              label: String(manualHosts[1].label || ""),
+              host: String(manualHosts[1].host || ""),
+              user: String(manualHosts[1].user || ""),
+              port: Number(manualHosts[1].port || 0),
+              group: String(manualHosts[1].group || ""),
+              tags: Array.isArray(manualHosts[1].tags) ? manualHosts[1].tags : []
+            } : null
+          };
+          console.log("RESULT:" + JSON.stringify(results));
+          Qt.quit();
+        });
+      });
     });
   }
 }
@@ -156,6 +224,10 @@ if results.get("editingWidgetType") != "ssh":
     print("[FAIL] SSH settings smoke did not target the SSH widget.", file=sys.stderr)
     sys.exit(1)
 
+if results.get("selectedBarId") != "bar-primary":
+    print("[FAIL] SSH settings smoke did not switch to the target bar.", file=sys.stderr)
+    sys.exit(1)
+
 if results.get("widgetSettingsOpen") is not True:
     print("[FAIL] SSH widget settings modal did not open.", file=sys.stderr)
     sys.exit(1)
@@ -167,6 +239,19 @@ if results.get("settingsInstanceId") != "ssh-left-1":
 if results.get("sshSettingsNodes", 0) < 1 or results.get("manualSearchNodes", 0) < 1:
     print("[FAIL] SSH settings pane did not instantiate its custom editor.", file=sys.stderr)
     sys.exit(1)
+
+saved = results.get("savedHost") or {}
+if results.get("manualHostCount") != 2:
+    print("[FAIL] SSH settings smoke did not persist the new manual host.", file=sys.stderr)
+    sys.exit(1)
+
+if saved.get("label") != "Staging" or saved.get("host") != "staging.internal" or saved.get("user") != "deploy":
+    print("[FAIL] SSH settings smoke saved the wrong host fields.", file=sys.stderr)
+    sys.exit(1)
+
+if saved.get("port") != 2222 or saved.get("group") != "qa" or saved.get("tags") != ["qa", "edge"]:
+    print("[FAIL] SSH settings smoke did not normalize saved SSH host metadata as expected.", file=sys.stderr)
+    sys.exit(1)
 PY
 
-printf '[PASS] SSH widget settings smoke loaded the custom editor.\n'
+printf '[PASS] SSH widget settings smoke deep-linked and saved through the custom editor.\n'

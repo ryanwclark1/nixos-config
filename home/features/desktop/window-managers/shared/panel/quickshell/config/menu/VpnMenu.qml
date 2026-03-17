@@ -68,20 +68,22 @@ BasePopupMenu {
         columnSpacing: Colors.spacingM
 
         Rectangle {
+            id: mainStatusCard
             Layout.fillWidth: true
             radius: Colors.radiusLarge
-            color: Colors.withAlpha(Colors.surface, 0.38)
+            color: Colors.withAlpha(Colors.surface, 0.96)
             border.color: Colors.withAlpha(root.statusColor(NetworkService.vpnPrimaryStatus), 0.45)
             border.width: 1
-            implicitHeight: root.compactMode ? 136 : 118
+            implicitHeight: mainStatusLayout.implicitHeight + (Colors.spacingM * 2)
 
             gradient: SharedWidgets.SurfaceGradient {}
             SharedWidgets.InnerHighlight {}
 
             ColumnLayout {
+                id: mainStatusLayout
                 anchors.fill: parent
                 anchors.margins: Colors.spacingM
-                spacing: Colors.spacingS
+                spacing: Colors.spacingM
 
                 RowLayout {
                     Layout.fillWidth: true

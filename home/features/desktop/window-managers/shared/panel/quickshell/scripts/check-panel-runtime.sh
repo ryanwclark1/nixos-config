@@ -137,8 +137,23 @@ discover_reachable_instance() {
 
 refresh_instance_args() {
   local refreshed_id=""
+  local resolved=""
 
-  if (( repo_shell_mode == 1 )) || [[ -z "${instance_id}" ]]; then
+  if (( repo_shell_mode == 1 )); then
+    if [[ -n "${repo_shell_pid}" ]] && run_ipc quickshell ipc --pid "${repo_shell_pid}" show >/dev/null; then
+      resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
+      if [[ -n "${resolved}" ]]; then
+        refreshed_id="$(basename "${resolved}")"
+        if [[ -z "${instance_id}" || "${refreshed_id}" != "${instance_id}" ]]; then
+          printf '[INFO] Refreshing repo-shell instance id %s -> %s\n' "${instance_id:-<unset>}" "${refreshed_id}"
+          instance_id="${refreshed_id}"
+        fi
+      fi
+    fi
+    return 0
+  fi
+
+  if [[ -z "${instance_id}" ]]; then
     return 0
   fi
 
@@ -176,6 +191,7 @@ populate_repo_shell_env() {
   local value=""
 
   repo_shell_env=()
+  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
   for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
     value="${!key:-}"
     if [[ -n "${value}" ]]; then
@@ -257,15 +273,26 @@ main() {
   run_step "Running hidden bar widget collapse checks" "${script_dir}/check-bar-widget-collapse.sh"
 
   if (( run_settings == 1 )); then
+    refresh_instance_args
+    args=()
+    if [[ -n "${instance_id}" ]]; then
+      args+=(--id "${instance_id}")
+    fi
     run_step "Running settings responsive smoke" "${script_dir}/check-settings-responsive.sh" "${args[@]}"
     refresh_instance_args
     args=()
     if [[ -n "${instance_id}" ]]; then
       args+=(--id "${instance_id}")
     fi
+    run_step "Running SSH widget settings smoke" "${script_dir}/check-ssh-settings-smoke.sh"
   fi
 
   if (( run_surfaces == 1 )); then
+    refresh_instance_args
+    args=()
+    if [[ -n "${instance_id}" ]]; then
+      args+=(--id "${instance_id}")
+    fi
     run_step "Running live surface responsive smoke" "${script_dir}/check-surface-responsive.sh" "${args[@]}"
     refresh_instance_args
     args=()

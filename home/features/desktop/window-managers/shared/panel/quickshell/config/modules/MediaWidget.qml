@@ -47,14 +47,17 @@ Rectangle {
       id: mprisRepeater
       model: root.activePlayers
 
-      delegate: RowLayout {
+      delegate: GridLayout {
         Layout.fillWidth: true
-        spacing: Colors.paddingMedium
+        columns: root.width >= 380 ? 2 : 1
+        columnSpacing: Colors.paddingMedium
+        rowSpacing: Colors.spacingS
 
         // Album Art
         ClippingWrapperRectangle {
-          Layout.preferredWidth: 70
-          Layout.preferredHeight: 70
+          Layout.preferredWidth: root.width >= 380 ? 70 : 56
+          Layout.preferredHeight: root.width >= 380 ? 70 : 56
+          Layout.alignment: root.width >= 380 ? Qt.AlignTop : Qt.AlignHCenter
           radius: Colors.radiusXS
           color: Colors.surface
 
@@ -91,7 +94,8 @@ Rectangle {
             font.pixelSize: Colors.fontSizeMedium
             font.weight: Font.Bold
             Layout.fillWidth: true
-            elide: Text.ElideRight
+            wrapMode: Text.Wrap
+            maximumLineCount: 2
           }
 
           Text {
@@ -99,7 +103,8 @@ Rectangle {
             color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
             Layout.fillWidth: true
-            elide: Text.ElideRight
+            wrapMode: Text.Wrap
+            maximumLineCount: 2
           }
 
           // Progress Bar
@@ -137,7 +142,7 @@ Rectangle {
 
           // Playback Controls
           RowLayout {
-            spacing: Colors.spacingLG
+            spacing: root.width >= 380 ? Colors.spacingLG : Colors.spacingM
             Layout.alignment: Qt.AlignHCenter
             
             // Previous

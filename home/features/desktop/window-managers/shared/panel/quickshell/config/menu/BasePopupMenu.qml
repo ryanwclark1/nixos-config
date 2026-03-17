@@ -71,7 +71,7 @@ PopupWindow {
   Rectangle {
     id: surface
     anchors.fill: parent
-    color: Colors.withAlpha(Colors.surface, 0.94)
+    color: Colors.withAlpha(Colors.surface, 0.98)
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge

@@ -40,7 +40,18 @@ QtObject {
     property double lastActionAt: 0
 
     function _dockerCommand() {
-        return ["sh", "-c", "if ! command -v docker >/dev/null 2>&1; then printf '__STATUS__\\tmissing\\tdocker is not installed\\n'; exit 0; fi; " + "if ! output=$(docker ps -a --format '{{.ID}}\\t{{.Names}}\\t{{.Status}}\\t{{.Image}}\\t{{.State}}' 2>/dev/null); then " + "printf '__STATUS__\\terror\\tUnable to query docker containers\\n'; exit 0; fi; " + "printf '__STATUS__\\tready\\t\\n'; " + "printf '%s\\n' \"$output\""];
+        return ["sh", "-c", "if command -v docker >/dev/null 2>&1; then " +
+                              "  runtime='docker'; " +
+                              "elif command -v podman >/dev/null 2>&1; then " +
+                              "  runtime='podman'; " +
+                              "else " +
+                              "  printf '__STATUS__\\tmissing\\tDocker or Podman not found\\n'; exit 0; " +
+                              "fi; " +
+                              "if ! output=$($runtime ps -a --format '{{.ID}}\\t{{.Names}}\\t{{.Status}}\\t{{.Image}}\\t{{.State}}' 2>/dev/null); then " +
+                              "  printf '__STATUS__\\terror\\tUnable to query %s containers\\n' \"$runtime\"; exit 0; " +
+                              "fi; " +
+                              "printf '__STATUS__\\tready\\t\\n'; " +
+                              "printf '%s\\n' \"$output\""];
     }
 
     function _parseDockerSnapshot(out) {
@@ -58,7 +69,9 @@ QtObject {
         }
         var containers = [];
         for (var i = 0; i < lines.length; i++) {
-            var parts = lines[i].split("\t");
+            var line = String(lines[i] || "").trim();
+            if (line === "") continue;
+            var parts = line.split("\t");
             if (parts.length < 5) continue;
             containers.push({
                 id: parts[0], name: parts[1], status: parts[2], image: parts[3], state: parts[4]
@@ -73,7 +86,7 @@ QtObject {
         _actionTitle = "Container " + action;
         _actionSuccessMessage = "Container " + containerId + " " + action + " successful.";
         _actionFailureMessage = "Failed to " + action + " container " + containerId;
-        _actionCommand = ["docker", action, containerId];
+        _actionCommand = ["sh", "-c", "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" " + action + " " + containerId + "; else exit 1; fi"];
         _setPending(_actionScope, _actionUnitName, action);
         actionProc.command = _actionCommand;
         actionProc.running = true;
@@ -157,20 +170,45 @@ QtObject {
     property string sshMessage: ""
     property int sshActiveCount: sshSessions.length
 
+    function _sshCommand() {
+        return ["sh", "-c", "if ! command -v who >/dev/null 2>&1; then printf '__STATUS__\\tmissing\\twho command not found\\n'; exit 0; fi; " +
+                              "output=$(who | grep 'pts/' | awk '{print $1 \"@\" $5}' | sed 's/[()]//g' 2>/dev/null); " +
+                              "printf '__STATUS__\\tready\\t\\n'; printf '%s\\n' \"$output\""];
+    }
+
+    function _parseSshSnapshot(out) {
+        var text = String(out || "").trim();
+        if (text === "") return { status: "ready", message: "", sessions: [] };
+        var lines = text.split("\n");
+        var first = String(lines[0] || "");
+        var status = "ready";
+        var message = "";
+        if (first.indexOf("__STATUS__\t") === 0) {
+            var meta = first.split("\t");
+            status = String(meta[1] || "ready");
+            message = String(meta[2] || "");
+            lines.shift();
+        }
+        var sessions = [];
+        for (var i = 0; i < lines.length; i++) {
+            var s = String(lines[i] || "").trim();
+            if (s !== "") sessions.push(s);
+        }
+        return { status: status, message: message, sessions: sessions };
+    }
+
     property SharedWidgets.CommandPoll sshPoll: SharedWidgets.CommandPoll {
         id: sshPoll
         interval: 10000
         running: root.subscriberCount > 0
-        command: ["sh", "-c", "who | grep 'pts/' | awk '{print $1 \"@\" $5}' | sed 's/[()]//g'"]
-        parse: function(out) {
-            var lines = String(out || "").trim().split("\n");
-            var result = [];
-            for (var i = 0; i < lines.length; i++) {
-                if (lines[i].trim()) result.push(lines[i].trim());
-            }
-            return result;
+        command: root._sshCommand()
+        parse: function(out) { return root._parseSshSnapshot(out); }
+        onUpdated: {
+            var snapshot = sshPoll.value || {};
+            root.sshStatus = snapshot.status || "ready";
+            root.sshMessage = snapshot.message || "";
+            root.sshSessions = snapshot.sessions || [];
         }
-        onUpdated: root.sshSessions = sshPoll.value || []
     }
 
     function refresh() {
@@ -440,7 +478,7 @@ QtObject {
 
     function getLogStreamCommand(scope, id) {
         if (scope === "docker") {
-            return ["docker", "logs", "-f", "--tail", "100", id];
+            return ["sh", "-c", "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then exec \"$runtime\" logs -f --tail 100 " + id + "; else exit 1; fi"];
         }
         var prefix = scope === "system" ? ["journalctl", "-u"] : ["journalctl", "--user", "-u"];
         return prefix.concat([id, "-f", "-n", "100"]);
@@ -451,7 +489,8 @@ QtObject {
             return false;
 
         var prefix = scope === "system" ? "journalctl -u " : "journalctl --user -u ";
-        Quickshell.execDetached(["kitty", "-e", "bash", "-lc", prefix + String(unitName) + " -n 120 --no-pager; echo; read -n 1 -s -r -p \"Press any key to close\""]);
+        var cmd = prefix + String(unitName) + " -n 120 --no-pager; echo; read -n 1 -s -r -p \"Press any key to close\"";
+        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
         return true;
     }
 
@@ -460,9 +499,11 @@ QtObject {
             return false;
 
         var prefix = scope === "system" ? "systemctl status " : "systemctl --user status ";
-        Quickshell.execDetached(["kitty", "-e", "bash", "-lc", prefix + String(unitName) + " --no-pager; echo; read -n 1 -s -r -p \"Press any key to close\""]);
+        var cmd = prefix + String(unitName) + " --no-pager; echo; read -n 1 -s -r -p \"Press any key to close\"";
+        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
         return true;
     }
+
 
     property SharedWidgets.CommandPoll userPoll: SharedWidgets.CommandPoll {
         id: userPoll

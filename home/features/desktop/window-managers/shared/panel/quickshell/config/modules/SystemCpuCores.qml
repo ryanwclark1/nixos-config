@@ -102,8 +102,9 @@ SharedWidgets.CardBase {
         }
 
         GridLayout {
+            id: coreGrid
             Layout.fillWidth: true
-            columns: coreUsages.length >= 12 ? 4 : 3
+            columns: width >= 420 ? (coreUsages.length >= 12 ? 4 : 3) : (width >= 280 ? 2 : 1)
             columnSpacing: Colors.spacingM
             rowSpacing: Colors.spacingS
 
@@ -112,6 +113,8 @@ SharedWidgets.CardBase {
 
                 delegate: Rectangle {
                     required property var modelData
+                    id: coreCell
+                    readonly property real valueWidth: Math.max(34, (coreGrid.width / Math.max(1, coreGrid.columns)) * 0.34)
                     Layout.fillWidth: true
                     radius: Colors.radiusSmall
                     color: Colors.withAlpha(Colors.surface, 0.45)
@@ -144,6 +147,9 @@ SharedWidgets.CardBase {
                                 color: modelData.usage >= 0.8 ? Colors.error : (modelData.usage >= 0.5 ? Colors.warning : Colors.primary)
                                 font.pixelSize: Colors.fontSizeXS
                                 font.family: Colors.fontMono
+                                Layout.maximumWidth: coreCell.valueWidth
+                                horizontalAlignment: Text.AlignRight
+                                elide: Text.ElideLeft
                             }
                         }
 

@@ -6,17 +6,25 @@ known_quickshell_harness_warning_pattern() {
 EOF
 }
 
+strip_ansi_escape_sequences() {
+  local input="${1-}"
+  printf '%s\n' "${input}" | sed -E $'s/\x1B\\[[0-9;]*[[:alpha:]]//g'
+}
+
 filter_known_quickshell_harness_warnings() {
   local output="${1-}"
-  printf '%s\n' "${output}" | grep -Ev "$(known_quickshell_harness_warning_pattern)"
+  strip_ansi_escape_sequences "${output}" | grep -Ev "$(known_quickshell_harness_warning_pattern)"
 }
 
 fail_on_quickshell_harness_warnings() {
   local harness_name="${1:?missing harness name}"
   local output="${2-}"
   local filtered_output="${3-}"
+  local normalized_output=""
 
-  if grep -q 'TypeError:' <<<"${output}"; then
+  normalized_output="$(strip_ansi_escape_sequences "${output}")"
+
+  if grep -q 'TypeError:' <<<"${normalized_output}"; then
     printf '[FAIL] %s emitted QML TypeError warnings.\n' "${harness_name}" >&2
     exit 1
   fi

@@ -22,26 +22,22 @@ PanelWindow {
   property int reservedRight: edgeMargins.right
   property int reservedBottom: edgeMargins.bottom
   property int reservedLeft: edgeMargins.left
-  anchors {
-    top: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "top"
-    right: surfaceEdge === "right"
-    bottom: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "bottom"
-    left: surfaceEdge === "left" || surfaceEdge === "top" || surfaceEdge === "bottom"
-  }
-  margins.top: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "top" ? reservedTop : 0
-  margins.right: surfaceEdge === "right" ? reservedRight : 0
-  margins.bottom: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "bottom" ? reservedBottom : 0
-  margins.left: surfaceEdge === "left" ? reservedLeft : ((surfaceEdge === "top" || surfaceEdge === "bottom") ? panelX : 0)
 
-  implicitWidth: panelWidth
-  implicitHeight: surfaceEdge === "top" || surfaceEdge === "bottom" ? panelHeight : 0
-  color: "transparent"
-  mask: Region {
-    item: sidebarContent
+  anchors {
+    top: true
+    right: true
+    bottom: true
   }
-  WlrLayershell.layer: WlrLayer.Top
-  WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
-  WlrLayershell.namespace: "quickshell"
+
+  margins.top: reservedTop + Colors.spacingS
+  margins.right: reservedRight + Colors.spacingS
+  margins.bottom: reservedBottom + Colors.spacingS
+
+  implicitWidth: panelWidth + 20
+  color: "transparent"
+
+  WlrLayershell.layer: WlrLayer.Overlay
+  WlrLayershell.namespace: "quickshell-notifications"
 
   property var manager: null
   property bool showContent: false
@@ -56,7 +52,6 @@ PanelWindow {
       && height <= maxLayerTextureSize;
   }
 
-  // Ensure focus is grabbed when shown
   onShowContentChanged: {
     if (showContent) {
       Qt.callLater(function() {
@@ -71,33 +66,43 @@ PanelWindow {
     }
   }
 
+  SharedWidgets.ElevationShadow {
+    anchors.fill: sidebarContent
+    visible: sidebarContent.visible && sidebarContent.opacity > 0.5
+  }
+
   Rectangle {
     id: sidebarContent
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
     width: root.panelWidth
-    height: root.surfaceEdge === "top" || root.surfaceEdge === "bottom" ? root.panelHeight : parent.height
+
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
     radius: Colors.radiusLarge
     focus: true
 
-    x: {
-      if (root.surfaceEdge === "right") return root.showContent ? 0 : root.panelWidth + 10;
-      if (root.surfaceEdge === "left") return root.showContent ? 0 : -root.panelWidth - 10;
-      return 0;
+    transform: Translate {
+      x: root.showContent ? 0 : root.panelWidth + 40
+      Behavior on x {
+        NumberAnimation {
+          id: ncSlideAnim
+          duration: Colors.durationSlow
+          easing.type: Easing.OutQuint
+        }
+      }
     }
-    y: {
-      if (root.surfaceEdge === "top") return root.showContent ? 0 : -height - 10;
-      if (root.surfaceEdge === "bottom") return root.showContent ? 0 : height + 10;
-      return 0;
-    }
+
     opacity: root.showContent ? 1.0 : 0.0
     visible: opacity > 0
-
-    Behavior on x { NumberAnimation { id: ncSlideAnim; duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
-    Behavior on y { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
     Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: Colors.durationNormal } }
     layer.enabled: (ncSlideAnim.running || ncFadeAnim.running) && root.allowLayer(width, height)
+
+    SharedWidgets.InnerHighlight { highlightOpacity: 0.12 }
+    SharedWidgets.SurfaceGradient {}
+
     Keys.onEscapePressed: root.closeRequested()
 
     ColumnLayout {
@@ -107,6 +112,7 @@ PanelWindow {
 
       RowLayout {
         Layout.fillWidth: true
+        spacing: Colors.spacingM
         Text {
           text: "Notifications"
           color: Colors.text
@@ -118,54 +124,31 @@ PanelWindow {
         Item { Layout.fillWidth: true }
 
         // DND Toggle
-        MouseArea {
-          width: 80; height: 28
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          Rectangle {
-            anchors.fill: parent
-            color: parent.containsMouse
-              ? (root.manager && root.manager.dndEnabled ? Qt.darker(Colors.error, 1.1) : Colors.highlightLight)
-              : (root.manager && root.manager.dndEnabled ? Colors.error : Colors.highlight)
-            radius: Colors.radiusXXS
-            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-            Text {
-              anchors.centerIn: parent
-              text: root.manager && root.manager.dndEnabled ? "󰂛 DND" : "󰂚 DND"
-              color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium; font.family: Colors.fontMono
-            }
-          }
+        SharedWidgets.IconButton {
+          size: 32
+          icon: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
+          iconColor: root.manager && root.manager.dndEnabled ? Colors.error : Colors.textSecondary
           onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
         }
 
         // Clear all
-        Rectangle {
-          width: 70; height: 28; radius: Colors.radiusXXS
-          color: Colors.highlight
-
-          SharedWidgets.StateLayer {
-            id: clearAllStateLayer
-            hovered: clearAllHover.containsMouse
-            pressed: clearAllHover.pressed
-          }
-
-          Text { anchors.centerIn: parent; text: "Clear All"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
-
-          MouseArea {
-            id: clearAllHover
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => {
-              clearAllStateLayer.burst(mouse.x, mouse.y);
-              if (root.manager) { for (var i = root.manager.notifications.count - 1; i >= 0; i--) { var n = root.manager.notifications.get(i); if (n) n.dismiss(); } }
+        SharedWidgets.IconButton {
+          size: 32
+          icon: "󰎟"
+          iconColor: Colors.textDisabled
+          onClicked: {
+            if (root.manager) {
+              for (var i = root.manager.notifications.count - 1; i >= 0; i--) {
+                var n = root.manager.notifications.get(i);
+                if (n) n.dismiss();
+              }
             }
           }
         }
 
         // Close button
         SharedWidgets.IconButton {
-          size: 28; radius: Colors.radiusXXS
+          size: 32
           icon: "󰅖"
           onClicked: root.closeRequested()
         }
@@ -179,22 +162,38 @@ PanelWindow {
 
       // Search Bar
       Rectangle {
-        Layout.fillWidth: true; height: 40; color: Colors.highlightLight; radius: Colors.radiusXS
-        border.color: searchInput.activeFocus ? Colors.primary : "transparent"; border.width: 1
+        Layout.fillWidth: true
+        height: 44
+        color: Colors.cardSurface
+        radius: Colors.radiusMedium
+        border.color: searchInput.activeFocus ? Colors.primary : Colors.border
+        border.width: 1
+
         RowLayout {
-          anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
-          Text { text: ""; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
+          anchors.fill: parent
+          anchors.margins: Colors.spacingM
+          spacing: Colors.spacingS
+          Text {
+            text: "󰍉"
+            color: Colors.textDisabled
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeLarge
+          }
           TextInput {
-            id: searchInput; Layout.fillWidth: true; verticalAlignment: Text.AlignVCenter
-            color: Colors.text; font.pixelSize: Colors.fontSizeMedium
+            id: searchInput
+            Layout.fillWidth: true
+            verticalAlignment: Text.AlignVCenter
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeMedium
             onVisibleChanged: if (!visible && activeFocus) focus = false
             Keys.onEscapePressed: root.closeRequested()
             onTextChanged: root.searchQuery = text
           }
           Text {
             Layout.alignment: Qt.AlignVCenter
-            Layout.leftMargin: 35
-            text: "Search notifications..."; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeMedium
+            text: "Search..."
+            color: Colors.textDisabled
+            font.pixelSize: Colors.fontSizeMedium
             visible: !searchInput.text && !searchInput.activeFocus
           }
         }
@@ -300,7 +299,7 @@ PanelWindow {
           visible: !notification.dismissed && matchesSearch && !isCollapsed
           width: notifList.width
           height: visible ? colItem.implicitHeight + 24 + (isReplying ? 50 : 0) : 0
-          color: Colors.surface
+          color: Colors.cardSurface
           opacity: isCollapsed ? 0 : 1
           radius: Colors.radiusCard
           border.color: ListView.isCurrentItem && notifList.activeFocus ? Colors.primary : Colors.border
@@ -497,7 +496,7 @@ PanelWindow {
           cacheBuffer: 120
           spacing: Colors.spacingS
           delegate: Rectangle {
-            width: ListView.view.width; height: 60; color: Colors.withAlpha(Colors.surface, 0.25); radius: Colors.radiusSmall; opacity: 0.8
+            width: ListView.view.width; height: 60; color: Colors.withAlpha(Colors.surface, 0.92); radius: Colors.radiusSmall; opacity: 0.8
             border.color: Colors.border; border.width: 1
             
             // Inner highlight

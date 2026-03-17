@@ -111,6 +111,7 @@ populate_repo_shell_env() {
   local value=""
 
   repo_shell_env=()
+  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
   for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
     value="${!key:-}"
     if [[ -n "${value}" ]]; then

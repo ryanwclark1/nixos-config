@@ -22,6 +22,8 @@ temp_layers_before=""
 temp_layers_after=""
 restore_workspace=""
 capture_workspace=""
+min_surface_crop_width="200"
+min_surface_crop_height="200"
 
 usage() {
   cat <<'EOF'
@@ -132,9 +134,9 @@ hypr() {
 grim_capture() {
   if [[ -n "${hyprland_instance}" ]]; then
     env HYPRLAND_INSTANCE_SIGNATURE="${hyprland_instance}" WAYLAND_DISPLAY="${hyprland_wayland_socket}" \
-      grim -t png "$@"
+      timeout 15s grim -t png "$@"
   else
-    grim -t png "$@"
+    timeout 15s grim -t png "$@"
   fi
 }
 
@@ -583,6 +585,11 @@ main() {
     exit 2
   fi
 
+  if ! [[ "${min_surface_crop_width}" =~ ^[0-9]+$ ]] || ! [[ "${min_surface_crop_height}" =~ ^[0-9]+$ ]]; then
+    printf 'Minimum surface crop dimensions must be integers.\n' >&2
+    exit 2
+  fi
+
   case "${crop_mode}" in
     surface|monitor|usable) ;;
     *)
@@ -692,6 +699,16 @@ main() {
       local diff_crop_x diff_crop_y diff_crop_w diff_crop_h
       local current_area diff_area
       read -r diff_crop_x diff_crop_y diff_crop_w diff_crop_h <<< "${diff_crop_box}"
+      if (( diff_crop_w < min_surface_crop_width || diff_crop_h < min_surface_crop_height )); then
+        log_info "ignoring screenshot diff crop below minimum size: ${diff_crop_x},${diff_crop_y} ${diff_crop_w}x${diff_crop_h}"
+        diff_crop_box=""
+      fi
+    fi
+
+    if [[ -n "${diff_crop_box}" ]]; then
+      local diff_crop_x diff_crop_y diff_crop_w diff_crop_h
+      local current_area diff_area
+      read -r diff_crop_x diff_crop_y diff_crop_w diff_crop_h <<< "${diff_crop_box}"
       current_area=$(( (${crop_w:-0}) * (${crop_h:-0}) ))
       diff_area=$(( diff_crop_w * diff_crop_h ))
       if [[ -z "${crop_box}" || "${surface_kind}" != "popup" || "${current_area}" -eq 0 || "${diff_area}" -lt $(( current_area * 75 / 100 )) ]]; then
@@ -731,12 +748,17 @@ main() {
   local log_file="${output_path%.png}.log"
   journalctl --user --since "${start_time}" > "${log_file}" 2>/dev/null || true
 
-  # Scan for health status
+  # Scan for health status (focus on quickshell, ignore system noise)
   local status="clean"
-  if grep -qiE "error|critical|failed|exception" "${log_file}"; then
-    status="error"
-  elif grep -qiE "warn|alert" "${log_file}"; then
-    status="warning"
+  local filtered_logs
+  filtered_logs="$(grep -i "quickshell" "${log_file}" | grep -viE "ignore|blueman|swww" || true)"
+
+  if [[ -n "${filtered_logs}" ]]; then
+    if echo "${filtered_logs}" | grep -qiE "error|critical|failed|exception"; then
+      status="error"
+    elif echo "${filtered_logs}" | grep -qiE "warn|alert"; then
+      status="warning"
+    fi
   fi
   printf '%s' "${status}" > "${log_file}.status"
 

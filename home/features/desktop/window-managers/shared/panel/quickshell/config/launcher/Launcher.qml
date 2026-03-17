@@ -2608,13 +2608,13 @@ PanelWindow {
                 category: "Utilities",
                 name: "System Monitor (terminal btop)",
                 icon: "󱓞",
-                action: () => Quickshell.execDetached(["kitty", "-e", "btop"])
+                action: () => Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc 'btop'; fi; done"])
             },
             {
                 category: "Utilities",
                 name: "Audio Settings",
                 icon: "󰕾",
-                action: () => Quickshell.execDetached(["kitty", "-e", "wiremix"])
+                action: () => Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc 'wiremix'; fi; done"])
             }
         ]);
         allItems = items;
@@ -2629,19 +2629,19 @@ PanelWindow {
                 category: "System",
                 name: "Rebuild Switch (flake)",
                 icon: "󰒓",
-                action: () => Quickshell.execDetached(["kitty", "-e", "sudo", "nixos-rebuild", "switch", "--flake", ".#"])
+                action: () => Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc 'sudo nixos-rebuild switch --flake .#'; fi; done"])
             },
             {
                 category: "System",
                 name: "Update Flake Locks",
                 icon: "󰚰",
-                action: () => Quickshell.execDetached(["kitty", "-e", "nix", "flake", "update"])
+                action: () => Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc 'nix flake update'; fi; done"])
             },
             {
                 category: "System",
                 name: "Collect Garbage",
                 icon: "󰃢",
-                action: () => Quickshell.execDetached(["kitty", "-e", "sudo", "nix-env", "--delete-generations", "old"])
+                action: () => Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc 'sudo nix-env --delete-generations old'; fi; done"])
             }
         ];
 
@@ -2880,7 +2880,8 @@ PanelWindow {
         if (!execString || String(execString).trim() === "")
             return;
         if (runInTerminal) {
-            Quickshell.execDetached(["kitty", "-e", "bash", "-lc", String(execString)]);
+            var cmd = String(execString).replace(/'/g, "'\\''");
+            Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd + "'; fi; done"]);
             return;
         }
         Quickshell.execDetached(["bash", "-lc", String(execString)]);
@@ -2987,7 +2988,7 @@ PanelWindow {
             if (clean !== "") {
                 launchExecString(clean, true);
             } else {
-                Quickshell.execDetached(["kitty"]);
+                Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t; fi; done"]);
             }
             close();
             return;
@@ -3404,7 +3405,7 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, 0.5)
+        color: Colors.withAlpha(Colors.background, 0.92)
         opacity: launcherOpacity
         Behavior on opacity {
             NumberAnimation {
@@ -3426,7 +3427,8 @@ PanelWindow {
         anchors.left: parent.left
         anchors.topMargin: launcherRoot.edgeMargins.top + launcherRoot.diagnosticViewportOffsetY + Math.max(20, (launcherRoot.usableHeight - height) / 2)
         anchors.leftMargin: launcherRoot.edgeMargins.left + launcherRoot.diagnosticViewportOffsetX + Math.max(20, (launcherRoot.usableWidth - width) / 2)
-        color: Qt.rgba(0.1, 0.105, 0.12, 0.96)
+        
+        color: Colors.bgGlass
         radius: Colors.radiusLarge
         border.color: Colors.withAlpha(Colors.primary, 0.26)
         border.width: 1
@@ -3436,12 +3438,15 @@ PanelWindow {
         }
         clip: true
 
+        SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
+        SharedWidgets.SurfaceGradient {}
+
         Rectangle {
             anchors.fill: parent
             anchors.margins: 1
             radius: Math.max(0, hudBox.radius - 1)
-            color: Qt.rgba(0.16, 0.15, 0.17, 0.9)
-            border.color: Colors.withAlpha(Colors.border, 0.8)
+            color: Colors.withAlpha(Colors.surface, 0.96)
+            border.color: Colors.withAlpha(Colors.border, 0.1)
             border.width: 1
         }
 
@@ -3452,7 +3457,7 @@ PanelWindow {
             anchors.right: parent.right
             height: launcherRoot.tightMode ? 34 : 42
             radius: hudBox.radius
-            color: Qt.rgba(0.13, 0.14, 0.16, 0.98)
+            color: Colors.withAlpha(Colors.surface, 0.98)
             border.color: Colors.withAlpha(Colors.primary, 0.18)
             border.width: 1
 

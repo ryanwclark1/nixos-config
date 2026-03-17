@@ -19,27 +19,22 @@ PanelWindow {
     property int reservedRight: edgeMargins.right
     property int reservedBottom: edgeMargins.bottom
     property int reservedLeft: edgeMargins.left
-    anchors {
-        top: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "top"
-        right: surfaceEdge === "right"
-        bottom: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "bottom"
-        left: surfaceEdge === "left" || surfaceEdge === "top" || surfaceEdge === "bottom"
-    }
-    margins.top: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "top" ? reservedTop : 0
-    margins.right: surfaceEdge === "right" ? reservedRight : 0
-    margins.bottom: surfaceEdge === "right" || surfaceEdge === "left" || surfaceEdge === "bottom" ? reservedBottom : 0
-    margins.left: surfaceEdge === "left" ? reservedLeft : ((surfaceEdge === "top" || surfaceEdge === "bottom") ? panelX : 0)
 
-    implicitWidth: panelWidth
-    implicitHeight: surfaceEdge === "top" || surfaceEdge === "bottom" ? panelHeight : 0
-    color: "transparent"
-    mask: Region {
-        item: sidebarContent
+    anchors {
+        top: true
+        right: true
+        bottom: true
     }
-    WlrLayershell.layer: WlrLayer.Top
-    // Command center has no text inputs; keep keyboard with focused app (e.g. Ghostty).
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-    WlrLayershell.namespace: "quickshell"
+
+    margins.top: reservedTop + Colors.spacingS
+    margins.right: reservedRight + Colors.spacingS
+    margins.bottom: reservedBottom + Colors.spacingS
+
+    implicitWidth: panelWidth + 20 // Extra room for shadow/animation
+    color: "transparent"
+
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.namespace: "quickshell-control-center"
 
     property var manager: null
     property bool showContent: false
@@ -53,15 +48,15 @@ PanelWindow {
     }
 
     function entranceScale(index) {
-        return showContent ? 1.0 : 0.96
+        return showContent ? 1.0 : 0.97
     }
 
     function entranceY(index) {
-        return showContent ? 0 : 8
+        return showContent ? 0 : 12
     }
 
     function entranceDuration(index) {
-        return Colors.durationNormal + (index * 20)
+        return Colors.durationSlow
     }
 
     function entranceDelay(index) {
@@ -83,78 +78,55 @@ PanelWindow {
 
     visible: showContent || ccSlideAnim.running || ccFadeAnim.running
 
-    SharedWidgets.Ref {
-        service: AudioService
-    }
-    Loader {
-        active: root.showContent
-        sourceComponent: SharedWidgets.Ref {
-            service: SystemStatus
-        }
-    }
-    Loader {
-        active: root.showContent
-        sourceComponent: SharedWidgets.Ref {
-            service: RecordingService
-        }
-    }
-    Loader {
-        active: root.showContent
-        sourceComponent: SharedWidgets.Ref {
-            service: BrightnessService
-        }
-    }
-    Loader {
-        active: root.showContent
-        sourceComponent: SharedWidgets.Ref {
-            service: ServiceUnitService
-        }
+    // --- Services ---
+    SharedWidgets.Ref { service: AudioService }
+    SharedWidgets.Ref { service: SystemStatus; active: root.showContent }
+    SharedWidgets.Ref { service: RecordingService; active: root.showContent }
+    SharedWidgets.Ref { service: BrightnessService; active: root.showContent }
+    SharedWidgets.Ref { service: ServiceUnitService; active: root.showContent }
+
+    // Use a shadow widget if available or just the rectangle's properties
+    SharedWidgets.ElevationShadow {
+        anchors.fill: sidebarContent
+        visible: sidebarContent.visible && sidebarContent.opacity > 0.5
     }
 
     Rectangle {
         id: sidebarContent
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
         width: root.panelWidth
-        height: root.surfaceEdge === "top" || root.surfaceEdge === "bottom" ? root.panelHeight : parent.height
+
         color: Colors.bgGlass
         border.color: Colors.border
         border.width: 1
         radius: Colors.radiusLarge
-        x: {
-            if (root.surfaceEdge === "right")
-                return root.showContent ? 0 : root.panelWidth + 10;
-            if (root.surfaceEdge === "left")
-                return root.showContent ? 0 : -root.panelWidth - 10;
-            return 0;
+        clip: true
+
+        // Slide animation from right
+        transform: Translate {
+            x: root.showContent ? 0 : root.panelWidth + 40
+            Behavior on x {
+                NumberAnimation {
+                    id: ccSlideAnim
+                    duration: Colors.durationSlow
+                    easing.type: Easing.OutQuint
+                }
+            }
         }
-        y: {
-            if (root.surfaceEdge === "top")
-                return root.showContent ? 0 : -height - 10;
-            if (root.surfaceEdge === "bottom")
-                return root.showContent ? 0 : height + 10;
-            return 0;
-        }
+
         opacity: root.showContent ? 1.0 : 0.0
         visible: opacity > 0
-        Behavior on x {
-            NumberAnimation {
-                id: ccSlideAnim
-                duration: Colors.durationSlow
-                easing.type: Easing.OutCubic
-            }
-        }
-        Behavior on y {
-            NumberAnimation {
-                duration: Colors.durationSlow
-                easing.type: Easing.OutCubic
-            }
-        }
         Behavior on opacity {
             NumberAnimation {
                 id: ccFadeAnim
                 duration: Colors.durationNormal
             }
         }
-        layer.enabled: (ccSlideAnim.running || ccFadeAnim.running) && root.allowLayer(width, height)
+
+        SharedWidgets.InnerHighlight { highlightOpacity: 0.12 }
+        SharedWidgets.SurfaceGradient {}
 
         Keys.onEscapePressed: root.closeRequested()
 

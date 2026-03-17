@@ -11,10 +11,10 @@ QtObject {
 
     readonly property string pluginId: pluginManifest && pluginManifest.id ? String(pluginManifest.id) : "docker.manager"
     readonly property var defaults: ({
-            dockerBinary: "docker",
+            dockerBinary: "auto",
             debounceDelay: 300,
             fallbackRefreshInterval: 30000,
-            terminalCommand: "kitty -e bash -lc",
+            terminalCommand: "auto",
             shellPath: "/bin/sh",
             showPorts: true,
             autoScrollOnExpand: true,
@@ -175,15 +175,15 @@ QtObject {
     }
 
     function _refreshCommand() {
-        var runtime = _shellQuote(dockerBinary);
+        var runtime = dockerBinary === "auto" ? "" : _shellQuote(dockerBinary);
         return ["sh", "-lc",
-            "runtime=" + runtime + "; "
-            + "if ! command -v \"$runtime\" >/dev/null 2>&1; then "
+            (runtime !== "" ? "runtime=" + runtime + "; " : "if command -v docker >/dev/null 2>&1; then runtime='docker'; elif command -v podman >/dev/null 2>&1; then runtime='podman'; else runtime=''; fi; ")
+            + "if [ -z \"$runtime\" ]; then "
             + "printf '{\"available\":false,\"message\":\"Runtime binary not found\"}\\n'; "
             + "exit 0; "
             + "fi; "
             + "if ! \"$runtime\" info >/dev/null 2>&1; then "
-            + "printf '{\"available\":false,\"message\":\"Unable to reach container runtime\"}\\n'; "
+            + "printf '{\"available\":false,\"message\":\"Unable to reach %s container runtime\"}\\n' \"$runtime\"; "
             + "exit 0; "
             + "fi; "
             + "ids=$(\"$runtime\" container ls -aq 2>/dev/null | tr '\\n' ' '); "
@@ -200,7 +200,9 @@ QtObject {
     }
 
     function _eventCommand() {
-        return [dockerBinary, "events", "--format", "json", "--filter", "type=container"];
+        if (dockerBinary !== "auto")
+            return [dockerBinary, "events", "--format", "json", "--filter", "type=container"];
+        return ["sh", "-c", "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then exec \"$runtime\" events --format json --filter type=container; else exit 1; fi"];
     }
 
     function scheduleRefresh(delayMs) {
@@ -308,7 +310,7 @@ QtObject {
 
     function _applySnapshot(payload) {
         var available = payload && payload.available === true;
-        runtimeName = _runtimeNameForBinary(dockerBinary);
+        runtimeName = _runtimeNameForBinary(dockerBinary === "auto" ? "docker" : dockerBinary);
         if (!available) {
             runtimeAvailable = false;
             statusMessage = payload && payload.message ? String(payload.message) : "Runtime unavailable.";
@@ -435,17 +437,12 @@ QtObject {
         var identifier = String(containerId || "").trim();
         if (identifier === "")
             return false;
-        var verbs = ({
-                start: [dockerBinary, "start", identifier],
-                stop: [dockerBinary, "stop", identifier],
-                restart: [dockerBinary, "restart", identifier],
-                pause: [dockerBinary, "pause", identifier],
-                unpause: [dockerBinary, "unpause", identifier]
-            });
-        if (!verbs[action])
-            return false;
+            
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        var cmd = ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" " + action + " " + _shellQuote(identifier) + "; else exit 1; fi"];
+        
         return _runAction(
-            verbs[action],
+            cmd,
             _capitalize(action) + " requested for " + identifier + ".",
             "Failed to " + action + " " + identifier + "."
         );
@@ -460,8 +457,8 @@ QtObject {
         }
 
         var composeArgs = _composeFileArgs(configFiles);
-        var runtime = _shellQuote(dockerBinary);
-        var shellCommand = "cd " + _shellQuote(workingDir) + " && " + runtime + " compose "
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        var shellCommand = "cd " + _shellQuote(workingDir) + " && runtime=" + runtime + "; \"$runtime\" compose "
             + (composeArgs !== "" ? composeArgs + " " : "");
 
         if (action === "logs") {
@@ -490,7 +487,14 @@ QtObject {
         var command = String(innerCommand || "").trim();
         if (command === "")
             return false;
-        Quickshell.execDetached(["sh", "-lc", terminalCommand + " " + _shellQuote(command)]);
+            
+        var termCmd = terminalCommand;
+        if (termCmd === "auto") {
+            termCmd = "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc " + _shellQuote(command) + "; fi; done";
+            Quickshell.execDetached(["sh", "-c", termCmd]);
+        } else {
+             Quickshell.execDetached(["sh", "-lc", termCmd + " " + _shellQuote(command)]);
+        }
         return true;
     }
 
@@ -498,20 +502,22 @@ QtObject {
         var identifier = String(containerId || "").trim();
         if (identifier === "")
             return false;
-        return _openInTerminal(_shellQuote(dockerBinary) + " logs -f " + _shellQuote(identifier));
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _openInTerminal("runtime=" + runtime + "; \"$runtime\" logs -f " + _shellQuote(identifier));
     }
 
     function openShell(containerId) {
         var identifier = String(containerId || "").trim();
         if (identifier === "")
             return false;
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
         return _openInTerminal(
-            _shellQuote(dockerBinary) + " exec -it " + _shellQuote(identifier) + " " + _shellQuote(shellPath)
+            "runtime=" + runtime + "; \"$runtime\" exec -it " + _shellQuote(identifier) + " " + _shellQuote(shellPath)
         );
     }
 
     onDockerBinaryChanged: {
-        runtimeName = _runtimeNameForBinary(dockerBinary);
+        runtimeName = _runtimeNameForBinary(dockerBinary === "auto" ? "docker" : dockerBinary);
         if (active)
             reloadFromSettings();
     }

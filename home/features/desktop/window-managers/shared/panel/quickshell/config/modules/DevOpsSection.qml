@@ -73,7 +73,7 @@ ColumnLayout {
             height: 54
             radius: Colors.radiusMedium
             color: Colors.withAlpha(Colors.surface, 0.3)
-            border.color: Colors.border
+            border.color: ServiceUnitService.dockerStatus === "ready" ? Colors.border : Colors.warning
             border.width: 1
             RowLayout {
                 anchors.fill: parent
@@ -84,11 +84,20 @@ ColumnLayout {
                     font.pixelSize: Colors.fontSizeXL
                     font.family: Colors.fontMono
                 }
-                Text {
-                    text: ServiceUnitService.dockerContainers.length + " Docker"
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.Bold
+                Column {
+                    Layout.fillWidth: true
+                    Text {
+                        text: ServiceUnitService.dockerContainers.length + " Docker"
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.Bold
+                    }
+                    Text {
+                        visible: ServiceUnitService.dockerStatus !== "ready"
+                        text: ServiceUnitService.dockerStatus === "missing" ? "Missing" : "Error"
+                        color: Colors.warning
+                        font.pixelSize: 10
+                    }
                 }
             }
         }
@@ -99,7 +108,7 @@ ColumnLayout {
             height: 54
             radius: Colors.radiusMedium
             color: Colors.withAlpha(Colors.surface, 0.3)
-            border.color: Colors.border
+            border.color: ServiceUnitService.sshStatus === "ready" ? Colors.border : Colors.warning
             border.width: 1
             RowLayout {
                 anchors.fill: parent
@@ -110,11 +119,20 @@ ColumnLayout {
                     font.pixelSize: Colors.fontSizeXL
                     font.family: Colors.fontMono
                 }
-                Text {
-                    text: ServiceUnitService.sshActiveCount + " SSH"
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.Bold
+                Column {
+                    Layout.fillWidth: true
+                    Text {
+                        text: ServiceUnitService.sshActiveCount + " SSH"
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.Bold
+                    }
+                    Text {
+                        visible: ServiceUnitService.sshStatus !== "ready"
+                        text: ServiceUnitService.sshStatus === "missing" ? "Missing" : "Error"
+                        color: Colors.warning
+                        font.pixelSize: 10
+                    }
                 }
             }
         }
@@ -160,7 +178,10 @@ ColumnLayout {
                             size: 28
                             iconSize: 14
                             iconColor: Colors.textDisabled
-                            onClicked: Quickshell.execDetached(["ghostty", "-e", "docker", "exec", "-it", modelData.id, "sh"])
+                            onClicked: {
+                                var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec -it " + modelData.id + " sh; else exit 1; fi";
+                                Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
+                            }
                         }
                         SharedWidgets.IconButton {
                             icon: "󰋚"
@@ -212,13 +233,15 @@ ColumnLayout {
                         iconColor: Colors.textDisabled
                         onClicked: {
                             var host = modelData.split("@")[1] || modelData;
-                            Quickshell.execDetached(["ghostty", "-e", "ssh", host]);
+                            var cmd = "ssh " + host;
+                            Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
                         }
                     }
                 }
             }
         }
     }
+
 
     // Live Log Overlay
     SharedWidgets.LiveLogOverlay {

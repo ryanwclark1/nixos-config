@@ -270,9 +270,42 @@ discover_instances() {
     | sort -nr | awk '{print $2}'
 }
 
+discover_service_instance() {
+  local service_pid runtime_link candidate
+  service_pid="$(systemctl --user show quickshell.service --property MainPID --value 2>/dev/null || true)"
+  if [[ -z "${service_pid}" || "${service_pid}" == "0" ]]; then
+    return 1
+  fi
+
+  runtime_link="${runtime_base}/by-pid/${service_pid}"
+  candidate="$(readlink -f "${runtime_link}" 2>/dev/null || true)"
+  if [[ -z "${candidate}" ]]; then
+    return 1
+  fi
+  candidate="$(basename "${candidate}")"
+  if [[ -z "${candidate}" ]]; then
+    return 1
+  fi
+  if ! quickshell ipc --id "${candidate}" show >/dev/null 2>&1; then
+    return 1
+  fi
+  printf '%s\n' "${candidate}"
+  return 0
+}
+
 discover_reachable_instance() {
   local candidate
   local show_output
+
+  candidate="$(discover_service_instance || true)"
+  if [[ -n "${candidate}" ]]; then
+    show_output="$(quickshell ipc --id "${candidate}" show 2>/dev/null || true)"
+    if [[ -n "${show_output}" ]] && printf '%s' "${show_output}" | rg -q "target Launcher"; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  fi
+
   while IFS= read -r candidate; do
     [[ -n "${candidate}" ]] || continue
     show_output="$(quickshell ipc --id "${candidate}" show 2>/dev/null || true)"

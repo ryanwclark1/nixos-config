@@ -14,9 +14,10 @@ make niri-vm-smoke
 
 The `niriTestVm` profile is configured for test access:
 
-- SDDM autologin is enabled for `administrator`
-- default session is `niri.desktop`
-- tty autologin is disabled (SDDM session is the intended entrypoint)
+- SDDM is disabled
+- LightDM is disabled
+- tty autologin is enabled for `administrator`
+- the test wrapper starts `niri.service` inside the user session when visual/runtime QA needs it
 - fallback login password is `niri`
 - OpenSSH is enabled, with password auth enabled for debugging
 - VM host SSH keys live under `/etc/ssh` so Home Manager can manage `~/.ssh`
@@ -28,11 +29,13 @@ The `niriTestVm` profile is configured for test access:
 
 The wrapper uses a persistent qcow2 disk by default:
 
-- default path: `${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/niri-test-vm/niriTestVm.qcow2`
+- default path: `${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/niri-test-vm/niriTestVm-<ssh-port>.qcow2`
 - default VM disk size: `32G` (from `niriTestVm` profile)
 - override: `NIRI_VM_DISK_IMAGE=/path/to/disk.qcow2`
 - one-time override: `--disk /path/to/disk.qcow2`
 - reset disk: `make niri-vm-reset` or `--reset-disk`
+
+Per-port disks are now the default so multiple agent runs do not contend for one qcow2 image.
 
 If credentials look wrong, you are usually reusing an old qcow2 state. Reset it:
 
@@ -107,7 +110,7 @@ so follow-up `ssh` to the running VM should not prompt for a password.
 ## Useful launch variants
 
 ```bash
-# default launch already uses a virtio GL GPU and gtk display for Niri testing
+# default launch uses a headless virtio GPU so compositor QA does not open a host QEMU window
 make niri-vm
 
 # pass args directly to run-*-vm

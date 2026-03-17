@@ -491,19 +491,29 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: root.noBackground ? "transparent" : Colors.bgGlass
-        opacity: root.noBackground ? 0 : computedOpacity
-        radius: floatingBar ? Colors.radiusMedium : 0
+        radius: root.floatingBar ? Colors.radiusMedium : 0
         clip: true
 
-        gradient: (floatingBar && !root.noBackground) ? barGradient : null
+        gradient: (root.floatingBar && !root.noBackground) ? barGradient : null
 
-        border.color: (floatingBar && !root.noBackground) ? Colors.border : "transparent"
-        border.width: (floatingBar && !root.noBackground) ? 1 : 0
+        border.color: (root.floatingBar && !root.noBackground) ? Colors.border : "transparent"
+        border.width: (root.floatingBar && !root.noBackground) ? 1 : 0
+
+        // If not floating, add a subtle border on the edge
+        Rectangle {
+            visible: !root.floatingBar && !root.noBackground
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: root.position === "top" ? parent.bottom : undefined
+            anchors.top: root.position === "bottom" ? parent.top : undefined
+            height: 1
+            color: Colors.border
+        }
 
         // Inner subtle highlight border
         SharedWidgets.InnerHighlight {
-            highlightOpacity: 0.15
-            visible: floatingBar && !root.noBackground
+            highlightOpacity: 0.12
+            visible: !root.noBackground
         }
     }
 

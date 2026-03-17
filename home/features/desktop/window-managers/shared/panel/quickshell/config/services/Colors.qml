@@ -55,7 +55,7 @@ QtObject {
 
     // --- POPUP SURFACES (shared across all menus) ---
     readonly property color popupSurface: withAlpha(surface, 0.96)
-    readonly property color cardSurface: withAlpha(surface, 0.82)
+    readonly property color cardSurface: withAlpha(surface, 0.96)
     readonly property color chipSurface: withAlpha(surface, 0.92)
     readonly property color modalSurface: solid(surface)
     readonly property color modalSidebarSurface: _isLight ? Qt.darker(modalSurface, 1.04) : Qt.darker(modalSurface, 1.12)

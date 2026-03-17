@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
-repo_root="${QS_REPO_ROOT:-$(CDPATH= cd -- "${script_dir}/../../../../../../.." >/dev/null 2>&1 && pwd -P)}"
+repo_root="${QS_REPO_ROOT:-$(CDPATH= cd -- "${script_dir}/.." >/dev/null 2>&1 && pwd -P)}"
 rules_file="${QS_HEALTH_RULES_FILE:-${script_dir}/health-rules.json}"
 state_root="${QS_HEALTH_STATE_ROOT:-${XDG_STATE_HOME:-${HOME}/.local/state}/quickshell}"
 incident_root="${state_root}/incidents"

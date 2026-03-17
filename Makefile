@@ -233,7 +233,7 @@ update-package-status:
 	@./scripts/update-packages.sh status
 
 
-.PHONY: quickshell-guard quickshell-fixtures quickshell-smoke quickshell-checks
+.PHONY: quickshell-guard quickshell-fixtures quickshell-smoke quickshell-checks quickshell-checks-host
 
 quickshell-guard:
 	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-guards.sh
@@ -246,7 +246,10 @@ quickshell-smoke:
 	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-smoke.sh
 
 quickshell-checks:
-	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-verify.sh
+	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/quickshell-verify.sh
+
+quickshell-checks-host:
+	PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/quickshell-verify.sh
 
 niri-vm-build:
 	bash ./scripts/vm/launch-niri-test-vm.sh --build-only

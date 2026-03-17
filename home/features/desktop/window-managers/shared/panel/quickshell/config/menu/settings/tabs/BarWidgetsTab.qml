@@ -27,6 +27,7 @@ Item {
     property var editingWidgetSchema: []
     readonly property int overlayInset: root.tightSpacing ? 20 : 40
     readonly property bool dragReorderEnabled: true
+    readonly property var availablePickerWidgets: availableWidgetsForPicker()
 
     readonly property var selectedBar: {
         var bars = Config.barConfigs || [];
@@ -1029,7 +1030,7 @@ Item {
                         spacing: Colors.spacingS
 
                         Repeater {
-                            model: root.availableWidgetsForPicker()
+                            model: root.availablePickerWidgets
                             delegate: SettingsListRow {
                                 required property var modelData
                                 minimumHeight: root.compactMode ? 88 : 64
@@ -1104,7 +1105,7 @@ Item {
 
                         Text {
                             width: parent.width
-                            visible: root.availableWidgetsForPicker().length === 0
+                            visible: root.availablePickerWidgets.length === 0
                             text: "No widgets match \"" + root.widgetSearchQuery + "\"."
                             color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeSmall

@@ -304,12 +304,46 @@ cleanup_repo_shell() {
   fi
 }
 
+ensure_repo_shell_ready() {
+  if (( repo_shell_mode == 0 )); then
+    return 0
+  fi
+
+  if [[ -n "${instance_id}" ]] && run_ipc quickshell ipc --id "${instance_id}" call SettingsHub close >/dev/null 2>&1; then
+    return 0
+  fi
+
+  cleanup_repo_shell
+  repo_shell_pid=""
+  instance_id=""
+  start_repo_shell
+}
+
+run_with_repo_shell_retry() {
+  local label="$1"
+  shift
+
+  ensure_repo_shell_ready
+  if "$@"; then
+    return 0
+  fi
+
+  if (( repo_shell_mode == 0 )); then
+    return 1
+  fi
+
+  printf '[INFO] %s failed with the current repo-shell instance; restarting repo shell and retrying once.\n' "${label}"
+  ensure_repo_shell_ready
+  "$@"
+}
+
 populate_repo_shell_env() {
   local line=""
   local key=""
   local value=""
 
   repo_shell_env=()
+  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
   for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
     value="${!key:-}"
     if [[ -n "${value}" ]]; then
@@ -398,12 +432,13 @@ main() {
     local launcher_preset=""
     for launcher_preset in portrait laptop wide; do
       printf '[INFO] Capturing launcher matrix (%s)...\n' "${launcher_preset}"
-      bash "${script_dir}/capture-launcher-matrix.sh" \
-        --id "${instance_id}" \
-        --preset "${launcher_preset}" \
-        --delay "${surface_delay}" \
-        --workspace "${workspace_target}" \
-        --output-dir "${output_dir}/launcher-${launcher_preset}"
+      run_with_repo_shell_retry "launcher matrix (${launcher_preset})" \
+        bash "${script_dir}/capture-launcher-matrix.sh" \
+          --id "${instance_id}" \
+          --preset "${launcher_preset}" \
+          --delay "${surface_delay}" \
+          --workspace "${workspace_target}" \
+          --output-dir "${output_dir}/launcher-${launcher_preset}"
     done
   fi
 
@@ -414,33 +449,36 @@ main() {
     fi
 
     printf '[INFO] Capturing settings matrix (%s)...\n' "${settings_preset}"
-    bash "${script_dir}/capture-settings-matrix.sh" \
-      --id "${instance_id}" \
-      --preset "${settings_preset}" \
-      --delay "${settings_delay}" \
-      --workspace "${workspace_target}" \
-      --output-dir "${output_dir}/settings-${settings_preset}"
-
-    if [[ -n "${deep_scroll_y}" ]]; then
-      printf '[INFO] Capturing settings matrix (%s, scroll %s)...\n' "${settings_preset}" "${deep_scroll_y}"
+    run_with_repo_shell_retry "settings matrix (${settings_preset})" \
       bash "${script_dir}/capture-settings-matrix.sh" \
         --id "${instance_id}" \
         --preset "${settings_preset}" \
         --delay "${settings_delay}" \
-        --scroll-y "${deep_scroll_y}" \
         --workspace "${workspace_target}" \
-        --output-dir "${output_dir}/settings-${settings_preset}-deep"
+        --output-dir "${output_dir}/settings-${settings_preset}"
+
+    if [[ -n "${deep_scroll_y}" ]]; then
+      printf '[INFO] Capturing settings matrix (%s, scroll %s)...\n' "${settings_preset}" "${deep_scroll_y}"
+      run_with_repo_shell_retry "settings matrix (${settings_preset}, scroll ${deep_scroll_y})" \
+        bash "${script_dir}/capture-settings-matrix.sh" \
+          --id "${instance_id}" \
+          --preset "${settings_preset}" \
+          --delay "${settings_delay}" \
+          --scroll-y "${deep_scroll_y}" \
+          --workspace "${workspace_target}" \
+          --output-dir "${output_dir}/settings-${settings_preset}-deep"
     fi
   fi
 
   if (( run_surfaces == 1 )); then
     printf '[INFO] Capturing surface matrix (%s)...\n' "${surface_crop}"
-    bash "${script_dir}/capture-surface-matrix.sh" \
-      --id "${instance_id}" \
-      --crop "${surface_crop}" \
-      --delay "${surface_delay}" \
-      --workspace "${workspace_target}" \
-      --output-dir "${output_dir}/surfaces-${surface_crop}"
+    run_with_repo_shell_retry "surface matrix (${surface_crop})" \
+      bash "${script_dir}/capture-surface-matrix.sh" \
+        --id "${instance_id}" \
+        --crop "${surface_crop}" \
+        --delay "${surface_delay}" \
+        --workspace "${workspace_target}" \
+        --output-dir "${output_dir}/surfaces-${surface_crop}"
   fi
 
   write_gallery "${output_dir}"

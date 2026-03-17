@@ -75,8 +75,9 @@ If the managed `quickshell.service` is stale, broken, or intentionally stopped:
 
 1. Runs headless-safe panel config contract checks.
 2. Runs settings responsive smoke against the live shell.
-3. Runs popup/panel surface smoke against the live shell.
-4. Runs the synthetic multibar shell matrix and bar-management harnesses.
+3. Runs the SSH widget settings smoke against the live shell.
+4. Runs popup/panel surface smoke against the live shell.
+5. Runs the synthetic multibar shell matrix and bar-management harnesses.
 
 This is the required runtime gate after panel changes.
 `--repo-shell` makes this gate self-contained by launching the repo checkout as the live shell first.
@@ -101,6 +102,14 @@ This is the fastest no-session gate for stat-widget and config-migration changes
 4. Runs the bar-widget reorder regression harness.
 
 Use this when a change is concentrated in settings behavior, bar-widget management, or widget picker flows and you want tighter coverage than the broad runtime gate.
+
+`scripts/check-ssh-settings-smoke.sh`
+
+1. Boots a minimal bar config with a real SSH widget instance.
+2. Opens the `Bar Widgets` modal directly on that SSH widget.
+3. Verifies the custom `SshWidgetSettings` editor mounts instead of falling back to schema-only fields.
+
+Use this when a change touches SSH widget settings, SSH deep-linking from `SshMenu`, or the SSH-specific editor integration in `BarWidgetsTab`.
 
 `qs-panel-preview`
 

@@ -6,7 +6,7 @@ import "../widgets" as SharedWidgets
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: 140
+  Layout.preferredHeight: graphsContent.implicitHeight + Colors.paddingMedium * 2
   color: Colors.highlightLight
   radius: Colors.radiusMedium
   border.color: sysCardHover.hovered ? Colors.primary : Colors.border
@@ -65,52 +65,55 @@ Rectangle {
     }
   }
 
-  RowLayout {
+  ColumnLayout {
+    id: graphsContent
     anchors.fill: parent
     anchors.margins: Colors.paddingMedium
-    spacing: Colors.spacingLG
+    spacing: Colors.spacingM
 
-    // CPU Graph
-    ColumnLayout {
+    GridLayout {
+      id: graphsGrid
       Layout.fillWidth: true
-      Layout.fillHeight: true
-      spacing: 5
-      RowLayout {
-        Layout.preferredHeight: 14
-        Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide }
-        Item { Layout.fillWidth: true }
-        Text { text: Math.round(root.cpuHistory[root.cpuHistory.length-1] * 100) + "%"; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-      }
-      Canvas {
-        id: cpuCanvas
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        antialiasing: true
-        renderTarget: Canvas.FramebufferObject
-        renderStrategy: Canvas.Threaded
-        onPaint: root.paintGraph(cpuCanvas, root.cpuHistory, Colors.primary)
-      }
-    }
+      columns: width >= 420 ? 2 : 1
+      columnSpacing: Colors.spacingLG
+      rowSpacing: Colors.spacingM
 
-    // Memory Graph
-    ColumnLayout {
-      Layout.fillWidth: true
-      Layout.fillHeight: true
-      spacing: 5
-      RowLayout {
-        Layout.preferredHeight: 14
-        Text { text: "MEM"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide }
-        Item { Layout.fillWidth: true }
-        Text { text: Math.round(root.memHistory[root.memHistory.length-1] * 100) + "%"; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
-      }
-      Canvas {
-        id: memCanvas
+      ColumnLayout {
         Layout.fillWidth: true
-        Layout.fillHeight: true
-        antialiasing: true
-        renderTarget: Canvas.FramebufferObject
-        renderStrategy: Canvas.Threaded
-        onPaint: root.paintGraph(memCanvas, root.memHistory, Colors.accent)
+        spacing: 5
+        RowLayout {
+          Layout.fillWidth: true
+          Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide; Layout.fillWidth: true; elide: Text.ElideRight }
+          Text { text: Math.round(root.cpuHistory[root.cpuHistory.length-1] * 100) + "%"; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+        }
+        Canvas {
+          id: cpuCanvas
+          Layout.fillWidth: true
+          Layout.preferredHeight: 78
+          antialiasing: true
+          renderTarget: Canvas.FramebufferObject
+          renderStrategy: Canvas.Threaded
+          onPaint: root.paintGraph(cpuCanvas, root.cpuHistory, Colors.primary)
+        }
+      }
+
+      ColumnLayout {
+        Layout.fillWidth: true
+        spacing: 5
+        RowLayout {
+          Layout.fillWidth: true
+          Text { text: "MEM"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide; Layout.fillWidth: true; elide: Text.ElideRight }
+          Text { text: Math.round(root.memHistory[root.memHistory.length-1] * 100) + "%"; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+        }
+        Canvas {
+          id: memCanvas
+          Layout.fillWidth: true
+          Layout.preferredHeight: 78
+          antialiasing: true
+          renderTarget: Canvas.FramebufferObject
+          renderStrategy: Canvas.Threaded
+          onPaint: root.paintGraph(memCanvas, root.memHistory, Colors.accent)
+        }
       }
     }
   }

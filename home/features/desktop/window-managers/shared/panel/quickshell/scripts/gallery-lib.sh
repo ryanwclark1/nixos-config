@@ -27,6 +27,11 @@ render_gallery_css() {
       font: 14px/1.5 'Inter', system-ui, -apple-system, sans-serif;
     }
 
+    /* Accessibility Filters */
+    body.filter-grayscale { filter: grayscale(100%); }
+    body.filter-protanopia { filter: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feColorMatrix type="matrix" values="0.567,0.433,0,0,0 0.558,0.442,0,0,0 0,0.242,0.758,0,0 0,0,0,1,0"/></filter></svg>#f'); }
+    body.filter-deuteranopia { filter: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feColorMatrix type="matrix" values="0.625,0.375,0,0,0 0.7,0.3,0,0,0 0,0.3,0.7,0,0 0,0,0,1,0"/></filter></svg>#f'); }
+
     header {
       position: sticky;
       top: 0;
@@ -52,7 +57,7 @@ render_gallery_css() {
       align-items: center;
     }
 
-    #filterInput, #jumpTo {
+    #filterInput, #jumpTo, .select-input {
       background: var(--panel);
       border: 1px solid var(--border);
       color: var(--text);
@@ -472,36 +477,31 @@ render_gallery_js() {
       const query = document.getElementById('filterInput').value.toLowerCase();
       const showOnlyDiff = document.getElementById('diffFilter')?.classList.contains('active');
       const sortScore = document.getElementById('scoreSort')?.classList.contains('active');
-      
       const cards = Array.from(document.querySelectorAll('.card'));
       
       cards.forEach(card => {
         const name = card.getAttribute('data-name').toLowerCase();
         const score = parseFloat(card.getAttribute('data-diff-score') || 0);
-        
         let visible = name.includes(query);
         
-        // Apply threshold logic
-        if (score >= sensitivityThreshold) {
-          card.classList.add('has-diff');
-        } else {
-          card.classList.remove('has-diff');
-        }
+        if (score >= sensitivityThreshold) card.classList.add('has-diff');
+        else card.classList.remove('has-diff');
 
         if (showOnlyDiff && !card.classList.contains('has-diff')) visible = false;
-        
         card.hidden = !visible;
       });
 
       if (sortScore) {
         const grid = document.querySelector('.grid');
-        const sorted = cards.sort((a, b) => {
-          return parseFloat(b.getAttribute('data-diff-score') || 0) - parseFloat(a.getAttribute('data-diff-score') || 0);
-        });
+        const sorted = cards.sort((a, b) => parseFloat(b.getAttribute('data-diff-score') || 0) - parseFloat(a.getAttribute('data-diff-score') || 0));
         sorted.forEach(c => grid.appendChild(c));
       }
-
       updateLightboxImages();
+    }
+
+    function applyA11y(filter) {
+      document.body.className = document.body.className.replace(/filter-\w+/g, '');
+      if (filter) document.body.classList.add('filter-' + filter);
     }
 
     function handleThresholdChange(el) {
@@ -543,9 +543,7 @@ render_gallery_js() {
           ctx.drawImage(img, 0, 0);
           const data = ctx.getImageData(0, 0, img.width, img.height).data;
           let blackPixels = 0;
-          for (let i = 0; i < data.length; i += 4) {
-            if (data[i] < 10 && data[i+1] < 10 && data[i+2] < 10) blackPixels++;
-          }
+          for (let i = 0; i < data.length; i += 4) { if (data[i] < 10 && data[i+1] < 10 && data[i+2] < 10) blackPixels++; }
           resolve((blackPixels / (data.length / 4)) > 0.98);
         };
         img.src = src;
@@ -557,10 +555,7 @@ render_gallery_js() {
       const originalText = btn.innerText;
       btn.innerText = 'Copied!';
       btn.classList.add('active');
-      setTimeout(() => {
-        btn.innerText = originalText;
-        btn.classList.remove('active');
-      }, 1500);
+      setTimeout(() => { btn.innerText = originalText; btn.classList.remove('active'); }, 1500);
     }
 
     function toggleReviewed(btn) {
@@ -574,7 +569,6 @@ render_gallery_js() {
       if (!states[pageId]) states[pageId] = {};
       states[pageId][card.getAttribute('data-name')] = card.classList.contains('reviewed');
       localStorage.setItem('quickshell-qa-reviewed', JSON.stringify(states));
-      
       updateProgress();
     }
 
@@ -584,26 +578,12 @@ render_gallery_js() {
       let currentIdx = states.indexOf(card.getAttribute('data-compare-state') || 'none');
       let nextIdx = (currentIdx + 1) % states.length;
       let nextState = states[nextIdx];
-      
       card.setAttribute('data-compare-state', nextState);
       card.classList.remove('viewing-baseline', 'comparing-diff', 'comparing-swipe');
-      
-      if (nextState === 'baseline') {
-        card.classList.add('viewing-baseline');
-        btn.innerText = 'Viewing Baseline';
-        btn.classList.add('accent');
-      } else if (nextState === 'diff') {
-        card.classList.add('comparing-diff');
-        btn.innerText = 'Viewing Diff';
-        btn.classList.add('accent');
-      } else if (nextState === 'swipe') {
-        card.classList.add('comparing-swipe');
-        btn.innerText = 'Viewing Swipe';
-        btn.classList.add('accent');
-      } else {
-        btn.innerText = 'Compare Baseline';
-        btn.classList.remove('accent');
-      }
+      if (nextState === 'baseline') { card.classList.add('viewing-baseline'); btn.innerText = 'Viewing Baseline'; btn.classList.add('accent'); }
+      else if (nextState === 'diff') { card.classList.add('comparing-diff'); btn.innerText = 'Viewing Diff'; btn.classList.add('accent'); }
+      else if (nextState === 'swipe') { card.classList.add('comparing-swipe'); btn.innerText = 'Viewing Swipe'; btn.classList.add('accent'); }
+      else { btn.innerText = 'Compare'; btn.classList.remove('accent'); }
     }
 
     function handleSwipeMove(e) {
@@ -627,14 +607,10 @@ render_gallery_js() {
         const resp = await fetch(logPath);
         if (!resp.ok) throw new Error('Failed to load log file');
         body.innerText = await resp.text();
-      } catch (err) {
-        body.innerText = 'Error: ' + err.message;
-      }
+      } catch (err) { body.innerText = 'Error: ' + err.message; }
     }
 
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
-    }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     function saveNote(el) {
       const card = el.closest('.card');
@@ -652,23 +628,17 @@ render_gallery_js() {
       localStorage.setItem('quickshell-qa-summaries', JSON.stringify(states));
     }
 
-    function toggleChecklist() {
-      document.getElementById('checklistSidebar').classList.toggle('open');
-    }
+    function toggleChecklist() { document.getElementById('checklistSidebar').classList.toggle('open'); }
 
     function saveChecklist() {
       const states = {};
-      document.querySelectorAll('.checklist-content input').forEach((cb, i) => {
-        states[i] = cb.checked;
-      });
+      document.querySelectorAll('.checklist-content input').forEach((cb, i) => { states[i] = cb.checked; });
       localStorage.setItem('quickshell-qa-checklist', JSON.stringify(states));
     }
 
     function loadChecklist() {
       const states = JSON.parse(localStorage.getItem('quickshell-qa-checklist') || '{}');
-      document.querySelectorAll('.checklist-content input').forEach((cb, i) => {
-        if (states[i]) cb.checked = true;
-      });
+      document.querySelectorAll('.checklist-content input').forEach((cb, i) => { if (states[i]) cb.checked = true; });
     }
 
     function updateProgress() {
@@ -687,7 +657,6 @@ render_gallery_js() {
       const reviewedStates = JSON.parse(localStorage.getItem('quickshell-qa-reviewed') || '{}')[pageId] || {};
       const notesStates = JSON.parse(localStorage.getItem('quickshell-qa-notes') || '{}')[pageId] || {};
       const generalSummary = JSON.parse(localStorage.getItem('quickshell-qa-summaries') || '{}')[pageId] || '';
-      
       document.querySelectorAll('.card').forEach(card => {
         const name = card.getAttribute('data-name');
         if (reviewedStates[name]) {
@@ -695,19 +664,14 @@ render_gallery_js() {
           const btn = card.querySelector('button[onclick="toggleReviewed(this)"]');
           if (btn) { btn.classList.add('active'); btn.innerText = 'Unmark'; }
         }
-        if (notesStates[name]) {
-          const area = card.querySelector('.notes-area');
-          if (area) area.value = notesStates[name];
-        }
+        if (notesStates[name]) { const area = card.querySelector('.notes-area'); if (area) area.value = notesStates[name]; }
       });
       const summaryArea = document.querySelector('.summary-textarea');
       if (summaryArea) summaryArea.value = generalSummary;
       updateProgress();
     }
 
-    function updateLightboxImages() {
-      lightboxImages = Array.from(document.querySelectorAll('.card:not([hidden]) .current-img')).map(img => img.src);
-    }
+    function updateLightboxImages() { lightboxImages = Array.from(document.querySelectorAll('.card:not([hidden]) .current-img')).map(img => img.src); }
 
     function openLightbox(src) {
       updateLightboxImages();
@@ -717,9 +681,7 @@ render_gallery_js() {
       lb.style.display = 'flex';
     }
 
-    function closeLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
-    }
+    function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
 
     function navigateLightbox(dir) {
       currentLightboxIdx = (currentLightboxIdx + dir + lightboxImages.length) % lightboxImages.length;
@@ -727,29 +689,24 @@ render_gallery_js() {
     }
 
     function exportReport() {
-      const cards = Array.from(document.querySelectorAll('.card')).sort((a, b) => {
-        return parseFloat(b.getAttribute('data-diff-score') || 0) - parseFloat(a.getAttribute('data-diff-score') || 0);
-      });
+      const cards = Array.from(document.querySelectorAll('.card')).sort((a, b) => parseFloat(b.getAttribute('data-diff-score') || 0) - parseFloat(a.getAttribute('data-diff-score') || 0));
       const reviewed = document.querySelectorAll('.card.reviewed').length;
       const failures = document.querySelectorAll('.card.capture-failure').length;
       const diffs = document.querySelectorAll('.card.has-diff').length;
       const checklist = document.querySelectorAll('.checklist-content input');
       const checked = Array.from(checklist).filter(c => c.checked).length;
       const summary = document.querySelector('.summary-textarea')?.value || '';
-      
       let md = `# QA Pass Report: ${document.title}\n\n`;
       if (summary) md += `## Summary\n${summary}\n\n`;
       md += `## Status\n- **Visual Matrix:** ${reviewed}/${cards.length} reviewed\n`;
       if (diffs > 0) md += `- **Regressions:** ${diffs} detected (threshold ${sensitivityThreshold}%) ⚠️\n`;
       if (failures > 0) md += `- **Capture Failures:** ${failures} detected ❌\n`;
       md += `- **Checklist:** ${checked}/${checklist.length} tasks completed\n\n`;
-      
       const noteEntries = cards.filter(c => {
         const area = c.querySelector('.notes-area');
         const score = parseFloat(c.getAttribute('data-diff-score') || 0);
         return (area && area.value.trim() !== '') || score >= sensitivityThreshold;
       });
-
       if (noteEntries.length > 0) {
         md += `## Issues & Observations (Impact Threshold: ${sensitivityThreshold}%)\n`;
         noteEntries.forEach(c => {
@@ -760,12 +717,10 @@ render_gallery_js() {
         });
         md += `\n`;
       }
-
       if (checked < checklist.length) {
         md += `## Pending Tasks\n`;
         checklist.forEach(c => { if (!c.checked) md += `- [ ] ${c.nextElementSibling.innerText}\n`; });
       }
-
       navigator.clipboard.writeText(md);
       alert('PR Report copied to clipboard!');
     }
@@ -773,7 +728,7 @@ render_gallery_js() {
     function runChecklistCommand(cmd, btn) {
       navigator.clipboard.writeText(cmd);
       const originalText = btn.innerText;
-      btn.innerText = 'Copied to run!';
+      btn.innerText = 'Copied!';
       setTimeout(() => btn.innerText = originalText, 1500);
     }
 
@@ -784,18 +739,13 @@ render_gallery_js() {
         if (e.key === 'ArrowLeft') navigateLightbox(-1);
         if (e.key === 'ArrowRight') navigateLightbox(1);
       } else {
-        if (e.key === 'f' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-          e.preventDefault();
-          document.getElementById('filterInput')?.focus();
-        }
+        if (e.key === 'f' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); document.getElementById('filterInput')?.focus(); }
         if (e.key === 'c' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') toggleChecklist();
         if (e.key === 'Escape') closeModal('logModal');
       }
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-      loadChecklist(); loadSessionData(); updateLightboxImages(); validateAndDetect();
-    });
+    window.addEventListener('DOMContentLoaded', () => { loadChecklist(); loadSessionData(); updateLightboxImages(); validateAndDetect(); });
   </script>
 EOF
 }
@@ -807,8 +757,6 @@ write_gallery_v2() {
   local gallery_path="${output_dir}/index.html"
   local sections=()
   local baseline_dir="${output_dir}/baselines"
-
-  # Discover sections
   mapfile -t sections < <(find "${output_dir}" -mindepth 1 -maxdepth 1 -type d -not -name "baselines" -not -name "responsive" -printf '%f\n' | sort)
 
   {
@@ -824,48 +772,28 @@ EOF
     cat <<EOF
 </head>
 <body>
-
 <div id="lightbox" onclick="if(event.target === this) closeLightbox()">
   <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-  <div class="lightbox-nav">
-    <button onclick="navigateLightbox(-1)">&lsaquo;</button>
-    <button onclick="navigateLightbox(1)">&rsaquo;</button>
-  </div>
-  <div class="lb-container">
-    <img src="" alt="Lightbox">
-  </div>
+  <div class="lightbox-nav"><button onclick="navigateLightbox(-1)">&lsaquo;</button><button onclick="navigateLightbox(1)">&rsaquo;</button></div>
+  <div class="lb-container"><img src="" alt="Lightbox"></div>
 </div>
-
 <div id="logModal" class="modal" onclick="if(event.target === this) closeModal('logModal')">
   <div class="modal-content">
-    <div class="modal-header">
-      <h3 style="margin:0; font-size:1rem;">System Logs</h3>
-      <button class="btn" onclick="closeModal('logModal')">Close</button>
-    </div>
-    <div class="modal-body">
-      <pre class="log-pre"></pre>
-    </div>
+    <div class="modal-header"><h3 style="margin:0; font-size:1rem;">System Logs</h3><button class="btn" onclick="closeModal('logModal')">Close</button></div>
+    <div class="modal-body"><pre class="log-pre"></pre></div>
   </div>
 </div>
-
 <header>
-  <div class="title-area">
-    <h1>${title}</h1>
-    <p>Generated by <code>${script_name}</code></p>
-  </div>
-  
-  <div class="progress-container">
-    <span class="progress-text">0 / 0 reviewed (0%)</span>
-    <div class="progress-bar"><div class="progress-fill"></div></div>
-    <button class="btn" onclick="exportReport()">Export PR Report</button>
-  </div>
-
+  <div class="title-area"><h1>${title}</h1><p>Generated by <code>${script_name}</code></p></div>
+  <div class="progress-container"><span class="progress-text">0 / 0 reviewed (0%)</span><div class="progress-bar"><div class="progress-fill"></div></div><button class="btn" onclick="exportReport()">Export PR Report</button></div>
   <div class="controls">
-    <div class="slider-container">
-      <span>Noise Filter:</span>
-      <input type="range" min="0" max="2" step="0.01" value="0.05" oninput="handleThresholdChange(this)">
-      <b id="thresholdValue">0.05%</b>
-    </div>
+    <select class="select-input" onchange="applyA11y(this.value)">
+      <option value="">Vision Audit: Default</option>
+      <option value="grayscale">Grayscale</option>
+      <option value="protanopia">Protanopia (Red-Blind)</option>
+      <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+    </select>
+    <div class="slider-container"><span>Filter:</span><input type="range" min="0" max="2" step="0.01" value="0.05" oninput="handleThresholdChange(this)"><b id="thresholdValue">0.05%</b></div>
     <button id="scoreSort" class="btn" onclick="toggleSort(this)">Sort by Change</button>
     <button id="diffFilter" class="btn" onclick="toggleDiffFilter(this)">Filter by Diff</button>
     <input type="text" id="filterInput" placeholder="Filter by filename..." oninput="filterCards()">
@@ -875,40 +803,29 @@ EOF
     <select id="jumpTo" onchange="const el = document.getElementById(this.value); if(el) el.scrollIntoView({behavior:'smooth'})">
       <option value="">Jump to section...</option>
 EOF
-      for s in "${sections[@]}"; do
-        printf '      <option value="sec-%s">%s</option>\n' "${s}" "${s}"
-      done
+      for s in "${sections[@]}"; do printf '      <option value="sec-%s">%s</option>\n' "${s}" "${s}"; done
       printf '    </select>\n'
     fi
     cat <<EOF
   </div>
 </header>
-
 <main>
 EOF
-
     if (( ${#sections[@]} == 0 )); then
       printf '  <div class="grid">\n'
       while IFS= read -r image_path; do
         rel_image_path="${image_path#${output_dir}/}"
         image_name="$(basename "${image_path}")"
-        local baseline_path=""
-        local diff_score="0"
-        
+        local baseline_path="" diff_score="0"
         if [[ -f "${baseline_dir}/${image_name}" ]]; then
           baseline_path="baselines/${image_name}"
-          if command -v magick >/dev/null 2>&1; then
-            diff_score=$(magick compare -metric MAE "${image_path}" "${baseline_dir}/${image_name}" null: 2>&1 | awk -F '[()]' '{print $2}' | tr -d '%' || echo "0")
-          fi
+          if command -v magick >/dev/null 2>&1; then diff_score=$(magick compare -metric MAE "${image_path}" "${baseline_dir}/${image_name}" null: 2>&1 | awk -F '[()]' '{print $2}' | tr -d '%' || echo "0"); fi
         fi
-        
-        local log_path=""
-        local log_status="none"
+        local log_path="" log_status="none"
         if [[ -f "${output_dir}/${rel_image_path%.png}.log" ]]; then
           log_path="${rel_image_path%.png}.log"
           [[ -f "${output_dir}/${log_path}.status" ]] && log_status="$(cat "${output_dir}/${log_path}.status")"
         fi
-        
         render_card "${rel_image_path}" "${image_name}" "${baseline_path}" "" "${log_path}" "${log_status}" "${diff_score}"
       done < <(find "${output_dir}" -maxdepth 1 -type f -name '*.png' | sort)
       printf '  </div>\n'
@@ -916,28 +833,20 @@ EOF
       for s in "${sections[@]}"; do
         local image_count=$(find "${output_dir}/${s}" -maxdepth 1 -type f -name '*.png' | wc -l)
         printf '  <div class="section" id="sec-%s">\n' "${s}"
-        printf '    <div class="section-header"><h2>%s</h2><span class="count">(%s items)</span></div>\n' "${s}" "${image_count}"
-        printf '    <div class="grid">\n'
+        printf '    <div class="section-header"><h2>%s</h2><span class="count">(%s items)</span></div><div class="grid">\n' "${s}" "${image_count}"
         while IFS= read -r image_path; do
           rel_image_path="${image_path#${output_dir}/}"
           image_name="$(basename "${image_path}")"
-          local baseline_path=""
-          local diff_score="0"
-          
+          local baseline_path="" diff_score="0"
           if [[ -f "${baseline_dir}/${rel_image_path}" ]]; then
             baseline_path="baselines/${rel_image_path}"
-            if command -v magick >/dev/null 2>&1; then
-              diff_score=$(magick compare -metric MAE "${image_path}" "${baseline_dir}/${rel_image_path}" null: 2>&1 | awk -F '[()]' '{print $2}' | tr -d '%' || echo "0")
-            fi
+            if command -v magick >/dev/null 2>&1; then diff_score=$(magick compare -metric MAE "${image_path}" "${baseline_dir}/${rel_image_path}" null: 2>&1 | awk -F '[()]' '{print $2}' | tr -d '%' || echo "0"); fi
           fi
-          
-          local log_path=""
-          local log_status="none"
+          local log_path="" log_status="none"
           if [[ -f "${output_dir}/${rel_image_path%.png}.log" ]]; then
             log_path="${rel_image_path%.png}.log"
             [[ -f "${output_dir}/${log_path}.status" ]] && log_status="$(cat "${output_dir}/${log_path}.status")"
           fi
-          
           render_card "${rel_image_path}" "${image_name}" "${baseline_path}" "" "${log_path}" "${log_status}" "${diff_score}"
         done < <(find "${output_dir}/${s}" -maxdepth 1 -type f -name '*.png' | sort)
         printf '    </div></div>\n'
@@ -957,15 +866,10 @@ write_master_index() {
   local gallery_path="${output_dir}/index.html"
   shift 4
   local links=("$@")
-
   local health_status=$(echo "${health_json}" | jq -r '.status // "unknown"')
   local health_class="health-error"
   local health_icon="❌"
-  case "${health_status}" in
-    healthy) health_class="health-healthy"; health_icon="✓" ;;
-    safe_fix_pending|manual_review_required) health_class="health-warning"; health_icon="⚠️" ;;
-  esac
-
+  case "${health_status}" in healthy) health_class="health-healthy"; health_icon="✓" ;; safe_fix_pending|manual_review_required) health_class="health-warning"; health_icon="⚠️" ;; esac
   local git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
   local git_hash=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
@@ -991,55 +895,32 @@ EOF
 </head>
 <body>
 <div id="checklistSidebar">
-  <div class="checklist-header">
-    <h2 style="margin:0; font-size:1.1rem;">Manual Checklist</h2>
-    <button class="btn" onclick="toggleChecklist()">Close</button>
-  </div>
+  <div class="checklist-header"><h2 style="margin:0; font-size:1.1rem;">Manual Checklist</h2><button class="btn" onclick="toggleChecklist()">Close</button></div>
   <div class="checklist-content">
 EOF
+    local in_commands=0
     echo "${checklist_md}" | while IFS= read -r line; do
-      if [[ "${line}" =~ ^##\ Recommended\ Interactive\ Commands ]]; then
-        in_commands=1
-        continue
-      fi
-      if [[ "${line}" =~ ^##\ (.*) ]]; then
-        printf '    <div class="checklist-category">%s</div>\n' "${BASH_REMATCH[1]}"
-        in_commands=0
-      elif [[ "${line}" =~ ^-\ (.*) ]]; then
-        printf '    <label class="checklist-item"><input type="checkbox" onchange="saveChecklist()"><span>%s</span></label>\n' "${BASH_REMATCH[1]}"
+      if [[ "${line}" =~ ^##\ Recommended\ Interactive\ Commands ]]; then in_commands=1; continue; fi
+      if [[ "${line}" =~ ^##\ (.*) ]]; then printf '    <div class="checklist-category">%s</div>\n' "${BASH_REMATCH[1]}"; in_commands=0;
+      elif [[ "${line}" =~ ^-\ (.*) ]]; then printf '    <label class="checklist-item"><input type="checkbox" onchange="saveChecklist()"><span>%s</span></label>\n' "${BASH_REMATCH[1]}";
       elif [[ "${in_commands}" == 1 && "${line}" =~ ^\`(quickshell\ ipc\ call\ .*)\` ]]; then
         local cmd="${BASH_REMATCH[1]}"
-        printf '    <div class="checklist-item"><span style="font-family:monospace; font-size:11px; color:var(--muted);">%s</span> <button class="run-btn" onclick="runChecklistCommand('\''%s'\'', this)">Copy & Run</button></div>\n' "${cmd}" "${cmd}"
+        printf '    <div class="checklist-item"><span style="font-family:monospace; font-size:11px; color:var(--muted);">%s</span> <button class="run-btn" onclick="runChecklistCommand('\''%s'\'', this)">Copy</button></div>\n' "${cmd}" "${cmd}"
       fi
     done
     cat <<EOF
   </div>
 </div>
 <header>
-  <div class="title-area">
-    <h1>${title}</h1>
-    <p style="display:flex; gap:8px; align-items:center;">
-      <span class="meta-tag"> ${git_branch} (${git_hash})</span>
-      &bull; 
-      <span class="health-badge ${health_class}">${health_icon} System ${health_status}</span>
-    </p>
-  </div>
-  <div class="progress-container">
-    <button class="btn" onclick="exportReport()">Export PR Report</button>
-    <button class="toggle-checklist-btn" onclick="toggleChecklist()">📋 View Checklist</button>
-  </div>
+  <div class="title-area"><h1>${title}</h1><p style="display:flex; gap:8px; align-items:center;"><span class="meta-tag"> ${git_branch} (${git_hash})</span> &bull; <span class="health-badge ${health_class}">${health_icon} System ${health_status}</span></p></div>
+  <div class="progress-container"><button class="btn" onclick="exportReport()">Export PR Report</button><button class="toggle-checklist-btn" onclick="toggleChecklist()">📋 View Checklist</button></div>
 </header>
 <main>
-  <div class="summary-section">
-    <h3 style="margin:0; font-size:1rem; color:var(--accent);">Overall Session Summary</h3>
-    <textarea class="summary-textarea" placeholder="Type general observations about this QA pass here..." oninput="saveGeneralSummary(this)"></textarea>
-  </div>
+  <div class="summary-section"><h3 style="margin:0; font-size:1rem; color:var(--accent);">Overall Session Summary</h3><textarea class="summary-textarea" placeholder="Type general observations about this QA pass here..." oninput="saveGeneralSummary(this)"></textarea></div>
 EOF
     if [[ "${health_status}" != "healthy" && "${health_status}" != "unknown" ]]; then
       printf '  <div class="health-section"><h3 style="margin:0 0 12px; font-size:1rem; color:var(--error);">Active Health Incidents</h3><div class="incident-list">\n'
-      echo "${health_json}" | jq -r '.active_signatures[]' | while IFS= read -r sig; do
-        printf '      <div class="incident-item"><div><span class="incident-signature">%s</span></div></div>\n' "${sig}"
-      done
+      echo "${health_json}" | jq -r '.active_signatures[]' | while IFS= read -r sig; do printf '      <div class="incident-item"><div><span class="incident-signature">%s</span></div></div>\n' "${sig}"; done
       printf '    </div></div>\n'
     fi
     printf '  <div class="dashboard-grid">\n'
@@ -1069,22 +950,24 @@ EOF
   if [[ -n "${baseline_path}" ]]; then
     cat <<EOF
           <img src="${baseline_path}" class="baseline-img" alt="Baseline">
-          <div class="swipe-container" onmousemove="handleSwipeMove(event)" onmousedown="event.stopPropagation()">
-            <div class="swipe-handle"></div>
-          </div>
+          <div class="swipe-container" onmousemove="handleSwipeMove(event)" onmousedown="event.stopPropagation()"><div class="swipe-handle"></div></div>
 EOF
   fi
   local dot_class=""
   case "${log_status}" in clean) dot_class="dot-clean" ;; warning) dot_class="dot-warning" ;; error) dot_class="dot-error" ;; esac
+  
+  # Determine source file for "Edit" button
+  local source_file="config/shell.qml"
+  if [[ "${name}" == portrait-* || "${name}" == laptop-* || "${name}" == wide-* ]]; then source_file="config/menu/SettingsHub.qml";
+  elif [[ "${name}" == drun-* || "${name}" == files-* || "${name}" == web-* ]]; then source_file="config/launcher/Launcher.qml";
+  elif [[ "${name}" == networkMenu-* || "${name}" == audioMenu-* ]]; then source_file="config/menu/NetworkMenu.qml"; fi
+
   cat <<EOF
         </div>
         <div class="meta">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div class="name">${name}</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;"><div class="name">${name}</div>
 EOF
-  if (( $(echo "${diff_score} > 0" | bc -l) )); then
-    printf '            <div class="meta-tag" style="background:rgba(250,204,21,0.1); color:var(--warning);">Δ %s%%</div>\n' "$(printf '%.2f' "${diff_score}")"
-  fi
+  if [[ "${diff_score}" != "0" && "${diff_score}" != "0.00" ]]; then printf '            <div class="meta-tag" style="background:rgba(250,204,21,0.1); color:var(--warning);">Δ %s%%</div>\n' "$(printf '%.2f' "${diff_score}")"; fi
   cat <<EOF
           </div>
           <textarea class="notes-area" placeholder="Add observations..." oninput="saveNote(this)"></textarea>
@@ -1092,25 +975,14 @@ EOF
             <div style="display: flex; gap: 4px;">
               <button class="btn" onclick="copyText('${rel_path}', this)">Path</button>
 EOF
-  if [[ -n "${repro_cmd}" ]]; then
-    cat <<EOF
-              <button class="btn" onclick="copyText('\`${repro_cmd}\`', this)">Repro</button>
-EOF
-  fi
-  if [[ -n "${log_path}" ]]; then
-    cat <<EOF
-              <button class="btn" onclick="viewLogs('${log_path}')"><span class="dot ${dot_class}"></span> Logs</button>
-EOF
-  fi
+  if [[ -n "${repro_cmd}" ]]; then printf '              <button class="btn" onclick="copyText('\''%s'\'', this)">Repro</button>\n' "${repro_cmd}"; fi
+  if [[ -n "${log_path}" ]]; then printf '              <button class="btn" onclick="viewLogs('\''%s'\'')"><span class="dot %s"></span> Logs</button>\n' "${log_path}" "${dot_class}"; fi
   cat <<EOF
+              <button class="btn" onclick="window.location.href='vscode://file/$(pwd)/${source_file}'">Edit</button>
             </div>
             <div style="display: flex; gap: 4px;">
 EOF
-  if [[ -n "${baseline_path}" ]]; then
-    cat <<EOF
-              <button class="btn" onclick="cycleCompare(this)">Compare</button>
-EOF
-  fi
+  if [[ -n "${baseline_path}" ]]; then printf '              <button class="btn" onclick="cycleCompare(this)">Compare</button>\n'; fi
   cat <<EOF
               <button class="btn" onclick="toggleReviewed(this)">Mark Reviewed</button>
             </div>

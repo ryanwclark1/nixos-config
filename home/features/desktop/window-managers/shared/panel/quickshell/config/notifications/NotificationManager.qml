@@ -7,22 +7,32 @@ Item {
   id: root
   
   property bool dndEnabled: false
-  readonly property alias server: server
-  readonly property alias notifications: server.trackedNotifications
+  readonly property bool notificationServerEnabled: (Quickshell.env("QS_DISABLE_NOTIFICATION_SERVER") || "") !== "1"
+  readonly property var server: notificationServerLoader.item
+  readonly property var notifications: server ? server.trackedNotifications : null
   
   // Persistence State
   property var archivedNotifications: []
   property string statePath: Quickshell.statePath("notifications.json")
 
-  NotificationServer {
-    id: server
-    actionsSupported: true
-    bodySupported: true
-    imageSupported: true
-    
-    onNotification: function(notif) {
-      notif.tracked = true;
-      saveNotifications(); 
+  Loader {
+    id: notificationServerLoader
+    active: root.notificationServerEnabled
+    sourceComponent: notificationServerComponent
+  }
+
+  Component {
+    id: notificationServerComponent
+
+    NotificationServer {
+      actionsSupported: true
+      bodySupported: true
+      imageSupported: true
+
+      onNotification: function(notif) {
+        notif.tracked = true;
+        root.saveNotifications();
+      }
     }
   }
 
@@ -30,6 +40,9 @@ Item {
 
   function saveNotifications() {
     var data = [];
+    if (!server) {
+      return;
+    }
     // Combine current tracked + archive (avoiding duplicates)
     for (var i = 0; i < server.trackedNotifications.count; i++) {
       var n = server.trackedNotifications.get(i);

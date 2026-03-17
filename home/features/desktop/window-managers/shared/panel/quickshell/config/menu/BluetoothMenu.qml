@@ -68,6 +68,28 @@ BasePopupMenu {
     return "󰂯";
   }
 
+  function shellQuote(text) {
+    return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
+  }
+
+  function pairDevice(address) {
+    if (!address) return;
+
+    root.stopScan();
+    var quotedAddress = shellQuote(address);
+    Quickshell.execDetached(["sh", "-c",
+      "bluetoothctl pair " + quotedAddress
+      + " && bluetoothctl trust " + quotedAddress
+      + " && bluetoothctl connect " + quotedAddress + " || true"
+    ]);
+  }
+
+  function connectDevice(device) {
+    if (!device) return;
+    root.stopScan();
+    device.connect();
+  }
+
   function startScan() {
     if (!hasAdapter || !effectiveBtEnabled) return;
     Bluetooth.defaultAdapter.discovering = true;
@@ -333,7 +355,7 @@ BasePopupMenu {
               chipColor: Colors.textSecondary
               interactive: true
               visible: !root.compactMode
-              onClicked: modelData.connect()
+              onClicked: root.connectDevice(modelData)
             }
 
             SharedWidgets.IconButton {
@@ -422,9 +444,7 @@ BasePopupMenu {
               chipColor: Colors.textSecondary
               interactive: true
               visible: !root.compactMode
-              onClicked: Quickshell.execDetached(["sh", "-c",
-                "bluetoothctl trust '" + modelData.address + "' && bluetoothctl pair '" + modelData.address + "'"
-              ])
+              onClicked: root.pairDevice(modelData.address)
             }
           }
 

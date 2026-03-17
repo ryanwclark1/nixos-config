@@ -144,9 +144,9 @@ niri_msg() {
 grim_capture() {
   if [[ -n "${hyprland_instance}" ]]; then
     env HYPRLAND_INSTANCE_SIGNATURE="${hyprland_instance}" WAYLAND_DISPLAY="${hyprland_wayland_socket}" \
-      grim -t png "$@"
+      timeout 15s grim -t png "$@"
   else
-    grim -t png "$@"
+    timeout 15s grim -t png "$@"
   fi
 }
 
@@ -488,12 +488,17 @@ main() {
   local log_file="${output_path%.png}.log"
   journalctl --user --since "${start_time}" > "${log_file}" 2>/dev/null || true
 
-  # Scan for health status
+  # Scan for health status (focus on quickshell, ignore system noise)
   local status="clean"
-  if grep -qiE "error|critical|failed|exception" "${log_file}"; then
-    status="error"
-  elif grep -qiE "warn|alert" "${log_file}"; then
-    status="warning"
+  local filtered_logs
+  filtered_logs="$(grep -i "quickshell" "${log_file}" | grep -viE "ignore|blueman|swww" || true)"
+
+  if [[ -n "${filtered_logs}" ]]; then
+    if echo "${filtered_logs}" | grep -qiE "error|critical|failed|exception"; then
+      status="error"
+    elif echo "${filtered_logs}" | grep -qiE "warn|alert"; then
+      status="warning"
+    fi
   fi
   printf '%s' "${status}" > "${log_file}.status"
 

@@ -7,7 +7,7 @@ import "../widgets" as SharedWidgets
 SharedWidgets.CardBase {
   id: root
   readonly property var allToplevels: CompositorAdapter.toplevels
-  Layout.preferredHeight: root.scratchpadWindows.length > 0 ? col.implicitHeight + 30 : 0
+  Layout.preferredHeight: root.scratchpadWindows.length > 0 ? col.implicitHeight + root.pad * 2 : 0
   visible: CompositorAdapter.supportsScratchpad && root.scratchpadWindows.length > 0
 
   readonly property var scratchpadWindows: {
@@ -56,19 +56,28 @@ SharedWidgets.CardBase {
 
         delegate: Rectangle {
           id: itemRect
-          Layout.fillWidth: true; height: 35
+          Layout.fillWidth: true
           color: scratchHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.12) : Colors.withAlpha(Colors.surface, 0.35)
           border.color: Colors.border
           border.width: 1
           radius: Colors.radiusXXS
+          implicitHeight: scratchRow.implicitHeight + Colors.paddingSmall * 2
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
           SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: scratchHover.containsMouse }
 
           RowLayout {
+            id: scratchRow
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
-            Text { text: "󱂬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-            Text { text: modelData.title || modelData.class || "Unknown Window"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; Layout.fillWidth: true; elide: Text.ElideRight }
+            Text { text: "󱂬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium; Layout.alignment: Qt.AlignTop }
+            Text {
+              text: modelData.title || modelData.class || "Unknown Window"
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeSmall
+              Layout.fillWidth: true
+              wrapMode: Text.Wrap
+              maximumLineCount: 2
+            }
             Text { text: "󰁔"; color: Colors.textDisabled; font.family: Colors.fontMono }
           }
 

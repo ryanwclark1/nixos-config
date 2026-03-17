@@ -1204,7 +1204,7 @@ PanelWindow {
     Rectangle {
       anchors.fill: parent
       visible: displayRoot.countdownActive
-      color: Colors.withAlpha(Colors.background, 0.82)
+      color: Colors.withAlpha(Colors.background, 0.94)
       radius: Colors.radiusLarge
 
       opacity: displayRoot.countdownActive ? 1.0 : 0.0

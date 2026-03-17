@@ -111,7 +111,7 @@ else
 fi
 
 if run_capture "$tmp_files_out" "$tmp_files_err" "$local_runner" quickshell-files; then
-  if assert_patterns "$tmp_files_out" '^shell_config=.*/config/shell\.qml$' 'guard_panel_runtime=.*/check-panel-runtime\.sh$' 'capture_validator=.*/check-panel-capture-artifacts\.sh$'; then
+  if assert_patterns "$tmp_files_out" '^shell_config=.*/config/shell\.qml$' 'guard_panel_runtime=.*/scripts/vm/run-panel-vm-qa\.sh --vm hyprland$' 'guard_panel_runtime_host_opt_out=.*/check-panel-runtime\.sh --repo-shell$' 'capture_validator=.*/check-panel-capture-artifacts\.sh$'; then
     pass "plugin-local quickshell-files prints the canonical Quickshell runtime file and guard paths"
   else
     fail "plugin-local quickshell-files output drifted from the expected Quickshell file summary"
@@ -123,7 +123,7 @@ else
 fi
 
 if run_capture "$tmp_flow_out" "$tmp_flow_err" "$local_runner" quickshell-flow; then
-  if assert_patterns "$tmp_flow_out" '^Quickshell Manual Flow$' 'scripts/capture-panel-matrix\.sh --repo-shell' 'scripts/check-panel-capture-artifacts\.sh --dir DIR' 'scripts/plugin-local\.sh quickshell-all'; then
+  if assert_patterns "$tmp_flow_out" '^Quickshell Manual Flow$' 'scripts/vm/run-panel-vm-qa\.sh --vm hyprland' 'scripts/vm/run-hyprland-panel-qa\.sh --mode panel' 'PLUGIN_LOCAL_QUICKSHELL_USE_VM=0' 'scripts/plugin-local\.sh quickshell-all'; then
     pass "plugin-local quickshell-flow documents the expected Quickshell runtime validation sequence"
   else
     fail "plugin-local quickshell-flow output drifted from the expected Quickshell manual flow"
@@ -137,7 +137,7 @@ fi
 if run_capture "$tmp_guards_out" "$tmp_guards_err" "$local_runner" quickshell-guards; then
   if assert_patterns "$tmp_guards_out" \
     'check-quickshell-startup\.sh' \
-    'check-panel-runtime\.sh --repo-shell'; then
+    'scripts/vm/run-panel-vm-qa\.sh --vm hyprland'; then
     pass "plugin-local quickshell-guards prints the assembled Quickshell guard sequence"
   else
     fail "plugin-local quickshell-guards output drifted from the expected Quickshell guard sequence"
@@ -148,9 +148,10 @@ else
   show_excerpt "$tmp_guards_err" 160
 fi
 
-if run_capture "$tmp_all_out" "$tmp_all_err" "$local_runner" quickshell-all --quiet; then
+if run_capture "$tmp_all_out" "$tmp_all_err" env PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 "$local_runner" quickshell-all --quiet; then
   if assert_patterns "$tmp_all_out" \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \
+    'SSH widget settings smoke loaded the custom editor' \
     'hidden bar widgets collapse to zero layout footprint' \
     'Running targeted runtime warning regressions' \
     'Panel runtime verification completed' \
@@ -166,7 +167,7 @@ else
   show_excerpt "$tmp_all_err" 200
 fi
 
-if run_capture "$tmp_live_out" "$tmp_live_err" "$local_runner" live-gates --quiet; then
+if run_capture "$tmp_live_out" "$tmp_live_err" env PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 "$local_runner" live-gates --quiet; then
   if assert_patterns "$tmp_live_out" \
     'Plugin runtime guard summary:' \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \

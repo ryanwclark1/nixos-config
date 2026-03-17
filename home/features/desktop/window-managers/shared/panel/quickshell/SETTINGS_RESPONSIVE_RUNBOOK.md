@@ -85,18 +85,21 @@ The smoke script:
 
 This is a runtime guardrail, not a replacement for visual QA.
 If the installed shell does not reflect the repo checkout yet, use `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar` instead.
+For SSH-specific settings/editor changes, pair it with `scripts/check-ssh-settings-smoke.sh` so the custom SSH widget editor path is exercised directly rather than only through tab-open coverage.
 
 Unlike the headless multibar smoke in the panel QA flow, this live-session check uses only `PASS`, `WARN`, and `FAIL` outcomes. It does not emit `[SKIP]` results.
 
 Current verified repo-shell baseline:
 
 - `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar`
-- summary: `12 pass, 0 warn, 0 fail`
+- summary: `13 pass, 0 warn, 0 fail`
 - covered tabs: `wallpaper`, `bar-widgets`, `bars`, `system`, `plugins`, `theme`, `hotkeys`, `time-weather`
+- extra focused check: SSH widget settings modal opens on the target instance and mounts the custom editor
 - recent runtime fixes that made this clean again:
   - deferred `SettingsHub` tab-open persistence now guards initialization,
   - `CommandPoll` no longer emits startup `triggerPoll` type errors,
-  - missing shared support widgets/imports uncovered during repo-shell verification were restored.
+  - missing shared support widgets/imports uncovered during repo-shell verification were restored,
+  - the SSH widget settings editor is now restored and covered by a dedicated smoke harness.
 
 ## What The Preview Script Covers
 

@@ -12,7 +12,6 @@ repo_shell_mode=0
 repo_shell_pid=""
 repo_shell_service_was_active=0
 repo_shell_env=()
-python_cmd=""
 
 usage() {
   cat <<'EOF'
@@ -66,17 +65,6 @@ require_cmd() {
   fi
 }
 
-resolve_python() {
-  if command -v python >/dev/null 2>&1; then
-    python_cmd="python"
-  elif command -v python3 >/dev/null 2>&1; then
-    python_cmd="python3"
-  else
-    printf 'Missing required command: python or python3\n' >&2
-    exit 2
-  fi
-}
-
 cleanup_repo_shell() {
   if [[ -n "${repo_shell_pid}" ]]; then
     kill "${repo_shell_pid}" >/dev/null 2>&1 || true
@@ -93,6 +81,7 @@ populate_repo_shell_env() {
   local value=""
 
   repo_shell_env=()
+  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
   for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
     value="${!key:-}"
     if [[ -n "${value}" ]]; then
@@ -266,38 +255,41 @@ capture_until_visible() {
 
 population_score() {
   local text="$1"
-  "${python_cmd}" - "$text" <<'PY'
-import re
-import sys
+  local score=0
+  local visible_hits=0
+  local pattern=""
+  local patterns=(
+    'Bar[[:space:]]+Widgets'
+    'Manage the widget composition'
+    '(Main|Mlan)[[:space:]]+Bar'
+    'Active[[:space:]]+Bar'
+    'Current widgets'
+    'Rem(aove|ove)'
+    'Sett(irgs|ings)'
+    'App[[:space:]]+Launcher'
+    'Workspace[[:space:]]+Switcher'
+    'Left[[:space:]]+Section'
+    'Window[[:space:]]+Title'
+    'Active[[:space:]]+Ap(p|o)[[:space:]]+Context'
+    'Running Apps'
+  )
 
-text = sys.argv[1]
-score = 0
+  for pattern in "${patterns[@]}"; do
+    if printf '%s\n' "${text}" | grep -Eqi "${pattern}"; then
+      score=$((score + 1))
+    fi
+  done
 
-stable_patterns = [
-    r'Bar\s+Widgets',
-    r'Manage the widget composition',
-    r'(Main|Mlan)\s+Bar',
-    r'Active\s+Bar',
-    r'Current widgets',
-    r'Rem(?:ove|aove)',
-    r'Sett(?:ings|irgs)',
-    r'App\s+Launcher',
-    r'Workspace\s+Switcher',
-    r'Left\s+Section',
-    r'Window\s+Title',
-    r'Active\s+Ap(?:p|o)\s+Context',
-    r'Running Apps',
-]
+  visible_hits="$(printf '%s\n' "${text}" | grep -Eio 'Visible' | wc -l | tr -d '[:space:]')"
+  if [[ -z "${visible_hits}" ]]; then
+    visible_hits=0
+  fi
+  if (( visible_hits > 6 )); then
+    visible_hits=6
+  fi
+  score=$((score + visible_hits))
 
-for pattern in stable_patterns:
-    if re.search(pattern, text, flags=re.I):
-        score += 1
-
-visible_hits = len(re.findall(r'Visible', text, flags=re.I))
-score += min(visible_hits, 6)
-
-print(score)
-PY
+  printf '%s\n' "${score}"
 }
 
 require_cmd quickshell
@@ -305,7 +297,6 @@ require_cmd systemctl
 require_cmd tesseract
 require_cmd compare
 require_cmd ps
-resolve_python
 
 if (( repo_shell_mode == 0 )); then
   require_cmd home-manager

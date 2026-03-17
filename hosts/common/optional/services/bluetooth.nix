@@ -16,7 +16,6 @@
     powerOnBoot = true;
     settings = {
       General = {
-        Enable = "Source,Sink,Media,Socket";
         Class = "0x200414";
       };
     };

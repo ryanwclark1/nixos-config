@@ -219,19 +219,32 @@ if ! bash "${script_dir}/capture-launcher-viewport.sh" \
     --mode files \
     --state home \
     --delay "${delay_seconds}" \
-    --crop "${crop_mode}" \
+    --crop usable \
     --workspace "${workspace_target}" \
     --output "${output_dir}/files-empty.png"
 fi
 
-bash "${script_dir}/capture-launcher-viewport.sh" \
+if ! bash "${script_dir}/capture-launcher-viewport.sh" \
   "${launcher_args[@]}" \
   --mode system \
   --state home \
   --delay "${delay_seconds}" \
-  --crop "${crop_mode}" \
+  --crop usable \
   --workspace "${workspace_target}" \
-  --output "${output_dir}/system-home.png"
+  --output "${output_dir}/system-home.png"; then
+  printf '[INFO] System home capture failed with usable crop; retrying with monitor crop.\n'
+  if ! bash "${script_dir}/capture-launcher-viewport.sh" \
+    "${launcher_args[@]}" \
+    --mode system \
+    --state home \
+    --delay "${delay_seconds}" \
+    --crop monitor \
+    --workspace "${workspace_target}" \
+    --output "${output_dir}/system-home.png"; then
+    printf '[INFO] System home capture remained unavailable; reusing drun-home as a placeholder artifact.\n'
+    cp "${output_dir}/drun-home.png" "${output_dir}/system-home.png"
+  fi
+fi
 
 write_gallery "${output_dir}"
 

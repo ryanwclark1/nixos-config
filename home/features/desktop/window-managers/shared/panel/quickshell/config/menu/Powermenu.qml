@@ -139,7 +139,7 @@ PanelWindow {
       Rectangle {
         anchors.fill: parent
         color: Colors.background
-        opacity: root.isVisible ? 0.75 : 0.0
+        opacity: root.isVisible ? 0.92 : 0.0
         Behavior on opacity { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
       }
     }
@@ -148,22 +148,22 @@ PanelWindow {
     ColumnLayout {
       id: contentCol
       anchors.centerIn: parent
-      spacing: 48
-      scale: root.isVisible ? 1.0 : 0.94
-      Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: 500; easing.type: Easing.OutBack } }
+      spacing: 64
+      scale: root.isVisible ? 1.0 : 0.92
+      Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: 500; easing.type: Easing.OutBack; easing.overshoot: 1.05 } }
       opacity: root.isVisible ? 1.0 : 0.0
       Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } }
       layer.enabled: pmScaleAnim.running || pmFadeAnim.running
 
       ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
-        spacing: Colors.spacingXS
+        spacing: Colors.spacingS
         Text {
-          text: "Power Menu"
+          text: "System Session"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeHuge
+          font.pixelSize: 42
           font.weight: Font.Bold
-          font.letterSpacing: Colors.letterSpacingTight
+          font.letterSpacing: -1
           Layout.alignment: Qt.AlignHCenter
         }
 
@@ -172,22 +172,21 @@ PanelWindow {
           visible: root.uptimeText !== ""
           text: "system uptime: " + root.uptimeText
           color: Colors.primary
-          opacity: 0.8
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Colors.fontSizeMedium
           font.weight: Font.Medium
           Layout.alignment: Qt.AlignHCenter
         }
       }
 
       RowLayout {
-        spacing: Colors.spacingXL
+        spacing: 32
 
         Repeater {
           model: root.actions
 
           delegate: Item {
             id: actionItem
-            width: 140; height: 140
+            width: 160; height: 160
 
             property bool isPending: root.timerActive && root.pendingAction === modelData.id
             property bool isFocused: root.currentIndex === index
@@ -201,29 +200,28 @@ PanelWindow {
               default: return Colors.textSecondary;
               }
             }
-            property color activeColor: modelData.danger ? Colors.error : Colors.primary
 
             // Staggered entry
             opacity: root.isVisible ? 1.0 : 0.0
-            scale: root.isVisible ? 1.0 : 0.8
-            transform: Translate { y: root.isVisible ? 0 : 20 }
-            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: index * 40 } NumberAnimation { duration: 400; easing.type: Easing.OutCubic } } }
-            Behavior on scale { SequentialAnimation { PauseAnimation { duration: index * 40 } NumberAnimation { duration: 500; easing.type: Easing.OutBack } } }
-            Behavior on transform { SequentialAnimation { PauseAnimation { duration: index * 40 } NumberAnimation { duration: 450; easing.type: Easing.OutCubic } } }
+            scale: root.isVisible ? 1.0 : 0.7
+            transform: Translate { y: root.isVisible ? 0 : 30 }
+            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: 400; easing.type: Easing.OutCubic } } }
+            Behavior on scale { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: 550; easing.type: Easing.OutBack } } }
+            Behavior on transform { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: 500; easing.type: Easing.OutCubic } } }
 
             // Layer 1: Base
             Rectangle {
               id: baseLayer
               anchors.fill: parent
               radius: Colors.radiusLarge
-              color: Colors.withAlpha(Colors.surface, 0.4)
+              color: Colors.cardSurface
               border.color: actionItem.isFocused ? actionItem.actionColor : Colors.border
-              border.width: actionItem.isFocused ? 2 : 1
+              border.width: actionItem.isFocused ? 3 : 1
               Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
               gradient: SharedWidgets.SurfaceGradient {}
 
-              SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: actionItem.isFocused }
+              SharedWidgets.InnerHighlight { highlightOpacity: actionItem.isFocused ? 0.25 : 0.12 }
             }
 
             // Layer 2: Pending indicator (circular progress-like)

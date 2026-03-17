@@ -2,6 +2,8 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+repo_root="$(cd "${script_dir}/../../../../../../../../" && pwd -P)"
+vm_script_dir="${repo_root}/scripts/vm"
 
 mode="${1:-quick}"
 reference_dir_name="reference-local-toolkit"
@@ -13,6 +15,8 @@ reference_recovery_fixture="${reference_source_dir}/expected-recovery-scenarios.
 reference_diag_active_fixture="${reference_source_dir}/expected-diagnostics-active.json"
 reference_diag_degraded_fixture="${reference_source_dir}/expected-diagnostics-degraded.json"
 shell_config="${script_dir}/../config/shell.qml"
+quickshell_vm_default="${PLUGIN_LOCAL_QUICKSHELL_VM_DEFAULT:-hyprland}"
+quickshell_use_vm="${PLUGIN_LOCAL_QUICKSHELL_USE_VM:-1}"
 docker_plugin_dir_name="docker-manager"
 docker_plugin_id="docker.manager"
 docker_source_dir="$(cd "${script_dir}/../examples/plugins/${docker_plugin_dir_name}" 2>/dev/null && pwd || true)"
@@ -52,10 +56,17 @@ docker_guard_label() {
 }
 
 quickshell_guard_commands() {
-  cat <<EOF
+  if [[ "${quickshell_use_vm}" == "1" ]]; then
+    cat <<EOF
+${script_dir}/check-quickshell-startup.sh
+${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
+EOF
+  else
+    cat <<EOF
 ${script_dir}/check-quickshell-startup.sh
 ${script_dir}/check-panel-runtime.sh --repo-shell
 EOF
+  fi
 }
 
 quickshell_guard_label() {
@@ -63,6 +74,9 @@ quickshell_guard_label() {
   case "$guard_cmd" in
     *"check-quickshell-startup.sh")
       printf '%s' 'quickshell startup smoke'
+      ;;
+    *"run-panel-vm-qa.sh"*)
+      printf '%s' "quickshell VM-backed runtime/settings gate (${quickshell_vm_default})"
       ;;
     *"check-panel-runtime.sh --repo-shell")
       printf '%s' 'quickshell repo-shell runtime aggregate (settings, surfaces, and multibar when supported)'
@@ -741,12 +755,14 @@ Quickshell Manual Flow
    - home-manager switch --flake /home/administrator/nixos-config#administrator@woody
 2. Run the focused Quickshell runtime checks:
    - scripts/check-quickshell-startup.sh
-   - scripts/check-panel-runtime.sh --repo-shell
+   - ${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
 3. Capture review artifacts for high-risk UI changes:
-   - scripts/capture-panel-matrix.sh --repo-shell
+   - ${vm_script_dir}/run-${quickshell_vm_default}-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-${quickshell_vm_default}
    - artifact validation runs automatically; use scripts/check-panel-capture-artifacts.sh --dir DIR to re-check a saved bundle
 4. Run the assembled Quickshell workflow:
    - scripts/plugin-local.sh quickshell-all
+5. Opt back into direct host repo-shell only when needed:
+   - PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 scripts/plugin-local.sh quickshell-all
 EOF
     ;;
   quickshell-status)
@@ -771,14 +787,16 @@ EOF
       shell_health="$(health_label 0 "quickshell shell config")"
       health_failures=$((health_failures + 1))
     fi
-    if [[ -x "${script_dir}/check-quickshell-startup.sh" && -x "${script_dir}/check-settings-responsive.sh" && -x "${script_dir}/check-surface-responsive.sh" && -x "${script_dir}/check-runtime-warning-regressions.sh" && -x "${script_dir}/check-panel-runtime.sh" && -x "${script_dir}/check-panel-capture-artifacts.sh" ]]; then
+    if [[ -x "${script_dir}/check-quickshell-startup.sh" && -x "${script_dir}/check-settings-responsive.sh" && -x "${script_dir}/check-ssh-settings-smoke.sh" && -x "${script_dir}/check-surface-responsive.sh" && -x "${script_dir}/check-runtime-warning-regressions.sh" && -x "${script_dir}/check-panel-runtime.sh" && -x "${script_dir}/check-panel-capture-artifacts.sh" ]]; then
       guard_health="$(health_label 1 "quickshell runtime guard scripts")"
     else
       guard_health="$(health_label 0 "quickshell runtime guard scripts")"
       health_failures=$((health_failures + 1))
     fi
     if command -v systemctl >/dev/null 2>&1; then
-      if systemctl --user is-active --quiet quickshell.service; then
+      if [[ "${quickshell_use_vm}" == "1" ]]; then
+        service_health="$(health_label 1 "vm-backed repo-shell runtime path enabled (${quickshell_vm_default})")"
+      elif systemctl --user is-active --quiet quickshell.service; then
         service_health="$(health_label 1 "quickshell.service active")"
       else
         service_health="$(health_label 1 "repo-shell runtime path available")"
@@ -805,12 +823,13 @@ Local commands:
   status:  scripts/plugin-local.sh quickshell-status --check
   guards:  scripts/plugin-local.sh quickshell-guards
   all:     scripts/plugin-local.sh quickshell-all
-  capture: scripts/capture-panel-matrix.sh --repo-shell
+  capture: ${vm_script_dir}/run-${quickshell_vm_default}-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-${quickshell_vm_default}
 
 Runtime files:
   startup:  ${script_dir}/check-quickshell-startup.sh
-  panel:    ${script_dir}/check-panel-runtime.sh --repo-shell
+  panel:    ${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
   capture:  ${script_dir}/check-panel-capture-artifacts.sh
+  host opt-out: PLUGIN_LOCAL_QUICKSHELL_USE_VM=0
 EOF
     else
       printf '[INFO] Quickshell status: %s | %s | %s\n' \
@@ -834,7 +853,8 @@ guard_startup=${script_dir}/check-quickshell-startup.sh
 guard_settings=${script_dir}/check-settings-responsive.sh
 guard_surfaces=${script_dir}/check-surface-responsive.sh
 guard_warning_regressions=${script_dir}/check-runtime-warning-regressions.sh
-guard_panel_runtime=${script_dir}/check-panel-runtime.sh
+guard_panel_runtime=${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
+guard_panel_runtime_host_opt_out=${script_dir}/check-panel-runtime.sh --repo-shell
 capture_validator=${script_dir}/check-panel-capture-artifacts.sh
 service_name=quickshell.service
 EOF

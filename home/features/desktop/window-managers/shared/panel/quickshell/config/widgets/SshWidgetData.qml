@@ -516,10 +516,11 @@ QtObject {
         var terminalCommand = host.source === "imported"
             ? "exec ssh " + _shellQuote(String(host.alias || ""))
             : _buildManualCommand(host);
-        Quickshell.execDetached(["ghostty", "-e", "bash", "-lc", terminalCommand]);
+        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + terminalCommand.replace(/'/g, "'\\''") + "'; fi; done"]);
         _rememberHost(host);
         return true;
     }
+
 
     function copyHostCommand(host) {
         if (!host)

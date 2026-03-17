@@ -76,6 +76,7 @@ populate_repo_shell_env() {
   local line key value
   repo_shell_env=()
   repo_shell_env+=("PATH=${script_dir}:${PATH}")
+  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
   for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
     value="${!key:-}"
     [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
@@ -127,8 +128,22 @@ start_repo_shell() {
 discover_reachable_instance() {
   local candidate show_output log_file launch_line
   local fallback_candidate="" drun_candidate="" escape_candidate="" config_candidate="" preferred_candidate=""
+  local service_pid service_runtime service_candidate
   if [[ ! -d "${runtime_root}" ]]; then
     return 1
+  fi
+
+  service_pid="$(systemctl --user show quickshell.service --property MainPID --value 2>/dev/null || true)"
+  if [[ -n "${service_pid}" && "${service_pid}" != "0" ]]; then
+    service_runtime="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${service_pid}" 2>/dev/null || true)"
+    service_candidate="$(basename "${service_runtime}")"
+    if [[ -n "${service_candidate}" ]]; then
+      show_output="$(quickshell ipc --id "${service_candidate}" show 2>/dev/null || true)"
+      if [[ -n "${show_output}" ]] && printf '%s' "${show_output}" | rg -q "target Launcher"; then
+        printf '%s\n' "${service_candidate}"
+        return 0
+      fi
+    fi
   fi
 
   while IFS= read -r candidate; do
