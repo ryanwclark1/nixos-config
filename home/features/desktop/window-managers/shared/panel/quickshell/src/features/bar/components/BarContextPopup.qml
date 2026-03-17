@@ -50,10 +50,10 @@ PopupWindow {
 
         if (pos === "left" || pos === "right") {
             // Side bars: popup beside the bar, vertically centered on trigger
-            var anchorY = ty + th / 2 - root.height / 2;
+            var anchorY = ty + th / 2 - root.implicitHeight / 2;
             if (anchorWin && anchorWin.screen) {
                 var screenH = anchorWin.screen.height;
-                if (anchorY + root.height > screenH - 8) anchorY = screenH - root.height - 8;
+                if (anchorY + root.implicitHeight > screenH - 8) anchorY = screenH - root.implicitHeight - 8;
                 if (anchorY < 8) anchorY = 8;
             }
             root.anchor.rect.y = anchorY;
@@ -73,7 +73,7 @@ PopupWindow {
             root.anchor.rect.x = anchorX;
 
             if (pos === "bottom")
-                root.anchor.rect.y = ty - root.height - gap;
+                root.anchor.rect.y = ty - root.implicitHeight - gap;
             else
                 root.anchor.rect.y = ty + th + gap;
         }

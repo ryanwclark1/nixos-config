@@ -48,7 +48,7 @@ RowLayout {
         Rectangle {
             radius: Colors.radiusPill
             color: Colors.withAlpha(Colors.textSecondary, 0.08)
-            border.color: Colors.withAlpha(Colors.primary, 0.14)
+            border.color: Colors.primaryAccent
             border.width: 1
             implicitHeight: root.compact ? 22 : 24
             implicitWidth: secondaryText.implicitWidth + (root.compact ? 12 : 14)

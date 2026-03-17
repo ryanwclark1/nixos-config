@@ -36,19 +36,13 @@ QtObject {
     // ── Internal state ───────────────────────────
     property bool _detected: false
 
+    // ── Named constants ────────────────────────────
+    readonly property int _wakeSettleMs: 3000
+    readonly property int _ddcDebounceMs: 300
+    readonly property int _pollIntervalMs: 2000
+
     // ── Detection on startup + wake ──────────────
     Component.onCompleted: _detectMonitors()
-
-    property Connections _suspendConn: Connections {
-        target: SuspendManager
-        function onWakingUp() {
-            // DDC devices may have changed after wake
-            root._detected = false;
-            root._detectTimer.restart();
-        }
-    }
-
-    readonly property int _wakeSettleMs: 3000
 
     property Timer _detectTimer: Timer {
         interval: root._wakeSettleMs   // wait for hardware to settle after wake
@@ -144,7 +138,7 @@ QtObject {
 
     // ── Set brightness ───────────────────────────
     property Timer _ddcDebounce: Timer {
-        interval: 300
+        interval: root._ddcDebounceMs
         property string _pendingBus: ""
         property int _pendingValue: 0
         onTriggered: {
@@ -257,7 +251,7 @@ QtObject {
     }
 
     property Timer _pollTimer: Timer {
-        interval: 2000
+        interval: root._pollIntervalMs
         running: root.subscriberCount > 0 && root._detected
         repeat: true
         onTriggered: {

@@ -324,7 +324,7 @@ Item {
                             implicitWidth: actionPillText.implicitWidth + 12
                             height: 18
                             radius: height / 2
-                            color: Colors.withAlpha(Colors.primary, 0.14)
+                            color: Colors.primaryAccent
 
                             Text {
                                 id: actionPillText

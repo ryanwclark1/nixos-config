@@ -556,7 +556,7 @@ Item {
                             visible: webProviderRow.dropBeforeActive
                             height: 10
                             radius: Colors.radiusXXS
-                            color: Colors.withAlpha(Colors.primary, 0.22)
+                            color: Colors.primaryMarked
                             border.color: Colors.primary
                             border.width: 1
                         }
@@ -689,7 +689,7 @@ Item {
                     height: 12
                     radius: Colors.radiusXXS
                     visible: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
-                    color: Colors.withAlpha(Colors.primary, 0.22)
+                    color: Colors.primaryMarked
                     border.color: Colors.primary
                     border.width: 1
                 }
@@ -854,7 +854,7 @@ Item {
                             visible: modeRow.dropBeforeActive
                             height: 10
                             radius: Colors.radiusXXS
-                            color: Colors.withAlpha(Colors.primary, 0.22)
+                            color: Colors.primaryMarked
                             border.color: Colors.primary
                             border.width: 1
                         }
@@ -975,7 +975,7 @@ Item {
                     height: 12
                     radius: Colors.radiusXXS
                     visible: root.dragModeKey !== "" && root.dragModeTargetIndex === root.orderedEnabledModes().length
-                    color: Colors.withAlpha(Colors.primary, 0.22)
+                    color: Colors.primaryMarked
                     border.color: Colors.primary
                     border.width: 1
                 }

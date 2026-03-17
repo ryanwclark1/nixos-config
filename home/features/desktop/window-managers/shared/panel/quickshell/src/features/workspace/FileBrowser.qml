@@ -396,7 +396,7 @@ PanelWindow {
           Rectangle {
             width: 30; height: 30; radius: Colors.radiusSmall
             color: root._viewGrid
-              ? Colors.withAlpha(Colors.primary, 0.25)
+              ? Colors.highlight
               : "transparent"
             Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
@@ -426,7 +426,7 @@ PanelWindow {
           Rectangle {
             width: 30; height: 30; radius: Colors.radiusSmall
             color: !root._viewGrid
-              ? Colors.withAlpha(Colors.primary, 0.25)
+              ? Colors.highlight
               : "transparent"
             Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
 
@@ -529,7 +529,7 @@ PanelWindow {
                 radius: Colors.radiusSmall
                 color: {
                   var isActive = root.currentPath === modelData.path;
-                  if (isActive) return Colors.withAlpha(Colors.primary, 0.22);
+                  if (isActive) return Colors.primaryMarked;
                   if (locHover.containsMouse) return Colors.withAlpha(Colors.text, 0.07);
                   return "transparent";
                 }
@@ -1150,7 +1150,7 @@ PanelWindow {
 
                     color: {
                       var isSel = (root.selectedFile === modelData.path);
-                      if (isSel) return Colors.withAlpha(Colors.primary, 0.22);
+                      if (isSel) return Colors.primaryMarked;
                       if (listItemHover.containsMouse) return Colors.withAlpha(Colors.text, 0.06);
                       return index % 2 === 0 ? "transparent" : Colors.cardSurface;
                     }

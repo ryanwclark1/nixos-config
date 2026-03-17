@@ -194,7 +194,7 @@ Item {
     function severityBgColor(severity) {
         var base = severityColor(severity);
         if (String(severity || "") === "muted")
-            return Qt.rgba(Colors.text.r, Colors.text.g, Colors.text.b, 0.08);
+            return Colors.withAlpha(Colors.text, 0.08);
         return Qt.rgba(base.r, base.g, base.b, 0.16);
     }
 
@@ -375,7 +375,7 @@ Item {
                     implicitWidth: activeCount.implicitWidth + 12
                     height: 20
                     radius: Colors.radiusSmall
-                    color: Qt.rgba(Colors.success.r, Colors.success.g, Colors.success.b, 0.16)
+                    color: Colors.withAlpha(Colors.success, 0.16)
                     Text {
                         id: activeCount
                         anchors.centerIn: parent
@@ -390,7 +390,7 @@ Item {
                     implicitWidth: degradedCount.implicitWidth + 12
                     height: 20
                     radius: Colors.radiusSmall
-                    color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.16)
+                    color: Colors.withAlpha(Colors.warning, 0.16)
                     Text {
                         id: degradedCount
                         anchors.centerIn: parent
@@ -405,7 +405,7 @@ Item {
                     implicitWidth: failedCount.implicitWidth + 12
                     height: 20
                     radius: Colors.radiusSmall
-                    color: Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.16)
+                    color: Colors.withAlpha(Colors.error, 0.16)
                     Text {
                         id: failedCount
                         anchors.centerIn: parent
@@ -420,7 +420,7 @@ Item {
                     implicitWidth: disabledCount.implicitWidth + 12
                     height: 20
                     radius: Colors.radiusSmall
-                    color: Qt.rgba(Colors.text.r, Colors.text.g, Colors.text.b, 0.12)
+                    color: Colors.withAlpha(Colors.text, 0.12)
                     Text {
                         id: disabledCount
                         anchors.centerIn: parent

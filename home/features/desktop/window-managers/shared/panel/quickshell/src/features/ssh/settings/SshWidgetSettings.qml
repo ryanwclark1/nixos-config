@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import "."
+import "." as SshSettings
 import ".."
 import "../../../services"
 import "../../../features/settings/components"
@@ -183,7 +183,7 @@ ColumnLayout {
         wrapMode: Text.WordWrap
     }
 
-    SshSettingsOverview {
+    SshSettings.SshSettingsOverview {
         Layout.fillWidth: true
         sshData: sshData
         onResetStateRequested: sshData.resetStateOnly()
@@ -193,12 +193,12 @@ ColumnLayout {
         }
     }
 
-    SshImportDiagnostics {
+    SshSettings.SshImportDiagnostics {
         Layout.fillWidth: true
         sshData: sshData
     }
 
-    SshHostList {
+    SshSettings.SshHostList {
         Layout.fillWidth: true
         sshData: sshData
         filteredManualHosts: root.filteredManualHosts
@@ -211,7 +211,7 @@ ColumnLayout {
         onSearchChanged: (query) => root.manualSearchQuery = query
     }
 
-    SshHostEditor {
+    SshSettings.SshHostEditor {
         Layout.fillWidth: true
         formLabel: root.formLabel
         formHost: root.formHost

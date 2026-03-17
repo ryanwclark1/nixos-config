@@ -226,7 +226,7 @@ BasePopupMenu {
                     radius: Colors.radiusMedium
                     color: NetworkService.vpnPrimaryStatus === "connected"
                         ? Colors.withAlpha(Colors.error, 0.14)
-                        : Colors.withAlpha(Colors.primary, 0.16)
+                        : Colors.primaryStrong
                     border.color: NetworkService.vpnPrimaryStatus === "connected" ? Colors.error : Colors.primary
                     border.width: 1
 
@@ -396,7 +396,7 @@ BasePopupMenu {
                             radius: Colors.radiusPill
                             color: actionPending
                                 ? Colors.withAlpha(Colors.textSecondary, 0.12)
-                                : Colors.withAlpha(Colors.primary, 0.14)
+                                : Colors.primaryAccent
                             border.color: actionPending ? Colors.border : Colors.primary
                             border.width: 1
                             implicitHeight: 24

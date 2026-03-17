@@ -48,6 +48,10 @@ QtObject {
     signal workspacesUpdated()
     signal windowsUpdated()
 
+    // ── Named constants ─────────────────────────────
+    readonly property int _outputsDebounceMs: 200
+    readonly property int _windowsBatchMs: 50
+
     // ── Batching for window updates ─────────────────
     property bool _windowsDirty: false
     property var _pendingWindows: []
@@ -101,7 +105,7 @@ QtObject {
     }
 
     property Timer _fetchOutputsDebounce: Timer {
-        interval: 200
+        interval: root._outputsDebounceMs
         onTriggered: {
             if (root.available)
                 root._fetchOutputsProc.running = true
@@ -109,7 +113,7 @@ QtObject {
     }
 
     property Timer _windowsUpdateTimer: Timer {
-        interval: 50
+        interval: root._windowsBatchMs
         repeat: false
         onTriggered: {
             if (root._windowsDirty) {

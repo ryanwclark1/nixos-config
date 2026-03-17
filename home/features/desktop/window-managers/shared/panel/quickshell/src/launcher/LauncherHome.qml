@@ -72,7 +72,7 @@ ColumnLayout {
                 Rectangle {
                     Layout.alignment: Qt.AlignVCenter
                     radius: Colors.radiusPill
-                    color: categorySummaryMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.14) : Colors.withAlpha(Colors.surface, 0.72)
+                    color: categorySummaryMouse.containsMouse ? Colors.primaryAccent : Colors.withAlpha(Colors.surface, 0.72)
                     border.color: root.launcher.drunCategoryFilter !== "" ? Colors.withAlpha(Colors.primary, 0.55) : Colors.border
                     border.width: 1
                     implicitHeight: 30
@@ -195,7 +195,7 @@ ColumnLayout {
                             readonly property bool hovered: recentHover.containsMouse
                             readonly property bool selected: root.isSelected(modelData)
                             
-                            color: selected ? Colors.withAlpha(Colors.primary, 0.15) : (hovered ? Colors.primaryFaint : Colors.withAlpha(Colors.surface, 0.3))
+                            color: selected ? Colors.highlightLight : (hovered ? Colors.primaryFaint : Colors.withAlpha(Colors.surface, 0.3))
                             border.color: selected ? Colors.primary : (hovered ? Colors.primaryRing : "transparent")
                             border.width: 1
 
@@ -277,7 +277,7 @@ ColumnLayout {
                         radius: Colors.radiusSmall
                         readonly property bool hovered: suggestionHover.containsMouse
                         readonly property bool selected: root.isSelected(modelData)
-                        color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.primaryFaint : "transparent")
+                        color: selected ? Colors.primaryAccent : (hovered ? Colors.primaryFaint : "transparent")
                         border.color: selected ? Colors.withAlpha(Colors.primary, 0.52) : (hovered ? Colors.withAlpha(Colors.primary, 0.28) : "transparent")
                         border.width: selected || hovered ? 1 : 0
                         scale: selected ? 1.01 : (hovered ? 1.008 : 1.0)
@@ -305,7 +305,7 @@ ColumnLayout {
                                 implicitWidth: 28
                                 implicitHeight: 28
                                 radius: Colors.radiusXS
-                                color: selected ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.primarySubtle : Colors.surface)
+                                color: selected ? Colors.primaryAccent : (hovered ? Colors.primarySubtle : Colors.surface)
                                 border.color: selected ? Colors.withAlpha(Colors.primary, 0.32) : "transparent"
                                 border.width: selected ? 1 : 0
                                 Layout.alignment: Qt.AlignVCenter
@@ -352,7 +352,7 @@ ColumnLayout {
 
                             Rectangle {
                                 radius: height / 2
-                                color: selected ? Colors.withAlpha(Colors.primary, 0.14) : Colors.surface
+                                color: selected ? Colors.primaryAccent : Colors.surface
                                 border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
                                 border.width: 1
                                 implicitWidth: suggestionBadge.implicitWidth + 16

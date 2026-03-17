@@ -79,7 +79,7 @@ BasePopupMenu {
 
       Rectangle {
         anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
-        width: 3; color: Colors.withAlpha(Colors.primary, 0.25)
+        width: 3; color: Colors.highlight
       }
 
       Column {
@@ -163,7 +163,7 @@ BasePopupMenu {
                 height: 30
                 radius: height / 2
                 color: NetworkService.activePrimaryName === "Offline"
-                  ? Colors.withAlpha(Colors.primary, 0.16)
+                  ? Colors.primaryStrong
                   : Colors.withAlpha(Colors.error, 0.16)
                 border.color: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
                 border.width: 1
@@ -227,7 +227,7 @@ BasePopupMenu {
                 implicitHeight: 30
                 radius: height / 2
                 color: NetworkService.activePrimaryName === "Offline"
-                  ? Colors.withAlpha(Colors.primary, 0.16)
+                  ? Colors.primaryStrong
                   : Colors.withAlpha(Colors.error, 0.16)
                 border.color: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
                 border.width: 1
@@ -399,7 +399,7 @@ BasePopupMenu {
                 width: 86
                 height: 28
                 radius: Colors.radiusMedium
-                color: Colors.withAlpha(Colors.primary, 0.14)
+                color: Colors.primaryAccent
                 border.color: Colors.primary
                 border.width: 1
 
@@ -558,7 +558,7 @@ BasePopupMenu {
                 radius: Colors.radiusMedium
                 color: networkMouse.containsMouse
                   ? Colors.primarySubtle
-                  : (modelData.active ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface)
+                  : (modelData.active ? Colors.primaryStrong : Colors.cardSurface)
                 border.color: modelData.active ? Colors.primary : Colors.border
                 border.width: 1
 

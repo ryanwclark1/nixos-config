@@ -541,8 +541,10 @@ QtObject {
         _barMgr.applyLegacyBarSetting(key, value);
     }
 
+    readonly property int _saveDebounceMs: 500
+
     property Timer saveTimer: Timer {
-        interval: 500
+        interval: root._saveDebounceMs
         onTriggered: root.save()
     }
 

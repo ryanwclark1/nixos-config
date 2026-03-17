@@ -10,7 +10,7 @@ Rectangle {
 
     radius: Colors.radiusLarge
     color: Qt.rgba(0.18, 0.18, 0.21, 0.96)
-    border.color: Colors.withAlpha(Colors.primary, 0.16)
+    border.color: Colors.primaryStrong
     border.width: 1
 
     // Depth highlight
@@ -87,7 +87,7 @@ Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: root.launcher.sidebarCompact ? 40 : 44
                         radius: Colors.radiusMedium
-                        color: root.launcher.mode === modelData ? Colors.withAlpha(Colors.primary, 0.14) : Colors.withAlpha(Colors.surface, 0.12)
+                        color: root.launcher.mode === modelData ? Colors.primaryAccent : Colors.withAlpha(Colors.surface, 0.12)
                         Behavior on color {
                             ColorAnimation {
                                 duration: Colors.durationFast
@@ -148,7 +148,7 @@ Rectangle {
             implicitHeight: controlsLayout.implicitHeight + (Colors.spacingM * 2)
             radius: Colors.radiusMedium
             color: Colors.withAlpha(Colors.surface, 0.2)
-            border.color: Colors.withAlpha(Colors.primary, 0.14)
+            border.color: Colors.primaryAccent
             border.width: 1
             visible: Config.launcherShowModeHints && !root.launcher.sidebarCompact
 

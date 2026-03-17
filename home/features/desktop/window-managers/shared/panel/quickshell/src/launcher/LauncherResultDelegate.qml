@@ -167,7 +167,7 @@ Rectangle {
             width: root.compactMode ? 30 : 34
             height: root.compactMode ? 30 : 34
             radius: Colors.radiusXS
-            color: highlighted ? Colors.withAlpha(Colors.primary, 0.14) : (hovered ? Colors.primaryFaint : Colors.surface)
+            color: highlighted ? Colors.primaryAccent : (hovered ? Colors.primaryFaint : Colors.surface)
             border.color: highlighted ? Colors.primaryRing : "transparent"
             border.width: highlighted ? 1 : 0
             scale: highlighted ? 1.04 : 1.0
@@ -241,7 +241,7 @@ Rectangle {
                 property string provider: root.itemProviderLabel(modelData)
                 visible: provider !== ""
                 radius: Colors.radiusPill
-                color: highlighted ? Colors.withAlpha(Colors.primary, 0.22) : Colors.highlight
+                color: highlighted ? Colors.primaryMarked : Colors.highlight
                 border.color: Colors.withAlpha(Colors.primary, 0.45)
                 border.width: 1
                 implicitHeight: 22

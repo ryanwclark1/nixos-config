@@ -9,6 +9,9 @@ import "."
 QtObject {
   id: root
 
+  // ── Named constants ────────────────────────────
+  readonly property int _hyprctlPollMs: 1500
+
   readonly property string desktopEnv: (Quickshell.env("XDG_CURRENT_DESKTOP") || "").toLowerCase()
   readonly property string sessionDesktop: (Quickshell.env("DESKTOP_SESSION") || "").toLowerCase()
   readonly property bool hasHyprSig: (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") || "") !== ""
@@ -147,7 +150,7 @@ QtObject {
   }
 
   property Timer hyprctlActiveWindowTimer: Timer {
-    interval: 1500
+    interval: root._hyprctlPollMs
     repeat: true
     running: root.isHyprland && root.hasHyprSig && root.hasWaylandDisplay
     triggeredOnStart: true

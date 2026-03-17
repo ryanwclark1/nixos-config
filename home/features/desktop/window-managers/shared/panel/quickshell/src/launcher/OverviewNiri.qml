@@ -372,7 +372,7 @@ Scope {
                                                                 width: windowCol.width
                                                                 height: 56
                                                                 radius: Colors.radiusSmall
-                                                                color: modelData.is_focused ? Colors.withAlpha(Colors.primary, 0.15) : (cardMouse.containsMouse ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.25))
+                                                                color: modelData.is_focused ? Colors.highlightLight : (cardMouse.containsMouse ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.25))
                                                                 border.color: modelData.is_focused ? Colors.primary : (cardMouse.containsMouse ? Colors.border : "transparent")
                                                                 border.width: 1
 

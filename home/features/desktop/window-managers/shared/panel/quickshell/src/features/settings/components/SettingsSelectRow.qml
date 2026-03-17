@@ -201,7 +201,7 @@ Rectangle {
                     height: 34
                     radius: Colors.radiusXS
                     color: selected
-                        ? Colors.withAlpha(Colors.primary, 0.14)
+                        ? Colors.primaryAccent
                         : optionMouse.containsMouse
                             ? Colors.highlightLight
                             : "transparent"

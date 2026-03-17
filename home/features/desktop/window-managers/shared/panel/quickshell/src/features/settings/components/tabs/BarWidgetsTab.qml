@@ -474,7 +474,7 @@ Item {
                                 visible: root.dragReorderEnabled && widgetRow.dropBeforeActive
                                 height: 10
                                 radius: Colors.radiusXXS
-                                color: Colors.withAlpha(Colors.primary, 0.22)
+                                color: Colors.primaryMarked
                                 border.color: Colors.primary
                                 border.width: 1
                                 z: 3
@@ -685,7 +685,7 @@ Item {
                         height: 12
                         radius: Colors.radiusXXS
                         visible: root.sectionWidgets(sectionKey).length > 0 && root.dragReorderEnabled && root.dragSourceIndex >= 0 && root.dragTargetSection === sectionKey && root.dragTargetIndex === root.sectionWidgets(sectionKey).length
-                        color: Colors.withAlpha(Colors.primary, 0.22)
+                        color: Colors.primaryMarked
                         border.color: Colors.primary
                         border.width: 1
                     }
@@ -834,7 +834,7 @@ Item {
 
                                         Rectangle {
                                             radius: Colors.radiusSmall
-                                            color: String(modelData.section || "") === root.addSection ? Colors.withAlpha(Colors.primary, 0.16) : Colors.cardSurface
+                                            color: String(modelData.section || "") === root.addSection ? Colors.primaryStrong : Colors.cardSurface
                                             border.color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.border
                                             border.width: 1
                                             implicitWidth: sectionBadgeLabel.implicitWidth + Colors.spacingM

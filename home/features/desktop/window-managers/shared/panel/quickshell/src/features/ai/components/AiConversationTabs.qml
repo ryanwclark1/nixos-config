@@ -66,7 +66,7 @@ RowLayout {
                         Rectangle {
                             anchors.fill: parent
                             radius: Colors.radiusSmall
-                            color: isActive ? Colors.withAlpha(Colors.primary, 0.15) : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.05) : "transparent")
+                            color: isActive ? Colors.highlightLight : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.05) : "transparent")
                             border.color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.25) : Colors.border)
                             border.width: isActive ? 1.5 : 1
 

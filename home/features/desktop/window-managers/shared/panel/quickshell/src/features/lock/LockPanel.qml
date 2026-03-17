@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.UPower
 import "../../services"
-import "../system/sections"
 import "."
 import "../../shared"
 

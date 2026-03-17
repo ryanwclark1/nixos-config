@@ -11,13 +11,17 @@ QtObject {
     property bool isSuspending: false
     property bool wakeReady: true
 
+    // ── Named constants ──────────────────────────
+    readonly property int _wakeReadyDelayMs: 3000
+    readonly property int _restartDelayMs: 3000
+
     // ── Signals ──────────────────────────────────
     signal preparingForSleep()
     signal wakingUp()
 
     // ── Wake-ready delay (3s post-wake) ──────────
     property Timer _wakeReadyTimer: Timer {
-        interval: 3000
+        interval: root._wakeReadyDelayMs
         onTriggered: {
             root.wakeReady = true;
         }
@@ -51,7 +55,7 @@ QtObject {
     }
 
     property Timer _restartTimer: Timer {
-        interval: 3000
+        interval: root._restartDelayMs
         onTriggered: {
             if (!root._monitor.running)
                 root._monitor.running = true;

@@ -682,7 +682,7 @@ PanelWindow {
                             delegate: Rectangle {
                                 width: fileText.width + removeButton.width + Colors.spacingM
                                 height: 24
-                                color: Colors.withAlpha(Colors.primary, 0.15)
+                                color: Colors.highlightLight
                                 radius: Colors.radiusSmall
                                 border.color: Colors.primaryRing
                                 border.width: 1

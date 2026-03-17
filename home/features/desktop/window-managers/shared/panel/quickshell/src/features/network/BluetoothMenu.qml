@@ -204,7 +204,7 @@ BasePopupMenu {
           implicitWidth: turnOnLabel.implicitWidth + 24
           implicitHeight: 32
           radius: Colors.radiusPill
-          color: Colors.withAlpha(Colors.primary, 0.16)
+          color: Colors.primaryStrong
 
           Text {
             id: turnOnLabel

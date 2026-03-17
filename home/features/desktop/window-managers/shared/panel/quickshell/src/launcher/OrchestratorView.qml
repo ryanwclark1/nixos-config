@@ -104,7 +104,7 @@ ColumnLayout {
                                 Layout.fillWidth: true
                                 height: 140
                                 radius: Colors.radiusMedium
-                                color: modelData.is_focused ? Colors.withAlpha(Colors.primary, 0.15) : Colors.withAlpha(Colors.surface, 0.3)
+                                color: modelData.is_focused ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.3)
                                 border.color: modelData.is_focused ? Colors.primary : Colors.border
                                 border.width: 1
 

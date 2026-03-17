@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
-import "."
 import "../services"
+import "../widgets" as SharedWidgets
 
 // ScrollableContent — reusable scrollable wrapper for popup menus.
 //
@@ -37,6 +37,6 @@ Item {
     }
   }
 
-  Scrollbar { flickable: flick }
-  OverscrollGlow { flickable: flick }
+  SharedWidgets.Scrollbar { flickable: flick }
+  SharedWidgets.OverscrollGlow { flickable: flick }
 }

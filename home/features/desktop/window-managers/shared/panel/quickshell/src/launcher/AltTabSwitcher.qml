@@ -188,7 +188,7 @@ Scope {
                                         width: 120
                                         height: 100
                                         radius: Colors.radiusCard
-                                        color: isSelected ? Colors.withAlpha(Colors.primary, 0.15) : Colors.withAlpha(Colors.surface, 0.45)
+                                        color: isSelected ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.45)
                                         border.color: isSelected ? Colors.primary : Colors.border
                                         border.width: isSelected ? 2 : 1
                                         scale: isSelected ? 1.15 : 1.0

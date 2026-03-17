@@ -147,7 +147,7 @@ Rectangle {
                             width: Math.min(parent.width * 0.85, userMsgContent.implicitWidth + Colors.spacingL * 2)
                             height: visible ? userMsgContent.implicitHeight + Colors.spacingM * 2 : 0
                             radius: Colors.radiusMedium
-                            color: Colors.withAlpha(Colors.primary, 0.15)
+                            color: Colors.highlightLight
                             border.color: Colors.primaryRing
                             border.width: 1
                             anchors.right: parent.right

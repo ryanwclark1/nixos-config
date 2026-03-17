@@ -20,7 +20,7 @@ Rectangle {
   implicitWidth: visible ? gitRow.implicitWidth + Colors.spacingM : 0
   implicitHeight: 22
   radius: height / 2
-  color: Colors.withAlpha(Colors.primary, 0.15)
+  color: Colors.highlightLight
   border.color: Colors.primaryRing
   border.width: 1
 

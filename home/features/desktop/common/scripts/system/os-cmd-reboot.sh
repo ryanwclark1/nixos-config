@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-os-state clear re*-required || true
+omarchy-state clear re*-required || true
 
 # Schedule the reboot to happen after closing windows (detached from terminal)
 nohup bash -c "sleep 2 && systemctl reboot --no-wall" >/dev/null 2>&1 &

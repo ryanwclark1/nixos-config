@@ -3570,7 +3570,7 @@ PanelWindow {
 
                 Rectangle {
                     radius: Colors.radiusPill
-                    color: Colors.withAlpha(Colors.primary, 0.16)
+                    color: Colors.primaryStrong
                     border.color: Colors.withAlpha(Colors.primary, 0.35)
                     border.width: 1
                     implicitHeight: launcherRoot.tightMode ? 22 : 24
@@ -3929,7 +3929,7 @@ PanelWindow {
                                     Rectangle {
                                         radius: Colors.radiusPill
                                         color: Colors.primarySubtle
-                                        border.color: Colors.withAlpha(Colors.primary, 0.22)
+                                        border.color: Colors.primaryMarked
                                         border.width: 1
                                         implicitHeight: launcherRoot.compactMode ? 18 : 20
                                         implicitWidth: sectionHeaderLabel.implicitWidth + (launcherRoot.compactMode ? 12 : 14)

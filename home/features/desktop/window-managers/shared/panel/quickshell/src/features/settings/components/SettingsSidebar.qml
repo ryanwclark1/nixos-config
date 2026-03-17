@@ -467,7 +467,7 @@ Rectangle {
       Layout.fillWidth: true
       implicitHeight: saveButtonRow.implicitHeight + Colors.spacingS * 2
       radius: root.compactMode ? Colors.radiusMedium : Colors.radiusPill
-      color: Colors.withAlpha(Colors.primary, 0.14)
+      color: Colors.primaryAccent
       border.color: Colors.primary
       border.width: 1
 
