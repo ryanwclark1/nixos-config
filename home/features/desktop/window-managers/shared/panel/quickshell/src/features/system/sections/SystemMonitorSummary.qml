@@ -19,9 +19,11 @@ SharedWidgets.CardBase {
     SharedWidgets.Ref { service: NetworkService }
     SharedWidgets.Ref { service: SystemIoTelemetryService }
 
+    readonly property int _hostInfoPollMs: 5000
+
     CommandPoll {
         id: hostPoll
-        interval: 5000
+        interval: root._hostInfoPollMs
         running: root.visible
         command: [
             "sh",

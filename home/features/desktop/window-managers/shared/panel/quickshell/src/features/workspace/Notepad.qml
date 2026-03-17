@@ -218,9 +218,11 @@ PanelWindow {
     }
   }
 
+  readonly property int _saveDebounceMs: 500
+
   // Debounced save timer
   property Timer saveTimer: Timer {
-    interval: 500
+    interval: root._saveDebounceMs
     onTriggered: root.saveState()
   }
 

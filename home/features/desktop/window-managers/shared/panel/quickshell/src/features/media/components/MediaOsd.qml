@@ -139,7 +139,7 @@ Scope {
               Text {
                 text: MediaService.trackTitle || "No Media"
                 color: Colors.text
-                font.pointSize: 12
+                font.pixelSize: Colors.fontSizeSmall
                 font.bold: true
                 elide: Text.ElideRight
                 Layout.fillWidth: true
@@ -148,7 +148,7 @@ Scope {
               Text {
                 text: MediaService.trackArtist || "Unknown Artist"
                 color: Colors.textSecondary
-                font.pointSize: 10
+                font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight
                 Layout.fillWidth: true
               }

@@ -141,7 +141,7 @@ Scope {
               Layout.alignment: Qt.AlignHCenter
               text: root.workspaceName
               color: Colors.text
-              font.pointSize: 24
+              font.pixelSize: Colors.fontSizeDisplay
               font.bold: true
             }
           }

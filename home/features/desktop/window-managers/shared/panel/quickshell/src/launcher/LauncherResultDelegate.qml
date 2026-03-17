@@ -22,32 +22,30 @@ Rectangle {
     signal entered
 
     width: parent ? parent.width : 0
-    height: tightMode ? 48 : (compactMode ? 52 : 58)
+    height: tightMode ? 48 : (compactMode ? 54 : 64)
 
     readonly property bool highlighted: index === selectedIndex
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
 
-    color: highlighted ? Colors.primarySubtle : (hovered ? Colors.withAlpha(Colors.primary, 0.05) : "transparent")
-    radius: Colors.radiusSmall
-    border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.58) : (hovered ? Colors.primaryMid : "transparent")
-    border.width: highlighted || hovered ? 1 : 0
-    scale: highlighted ? 1.012 : (hovered ? 1.004 : 1.0)
+    color: highlighted ? Colors.highlight : (hovered ? Colors.withAlpha(Colors.white, 0.04) : "transparent")
+    radius: Colors.radiusMedium
+    border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
+    border.width: 1
+    scale: highlighted ? 1.01 : 1.0
 
-    Behavior on color {
-        ColorAnimation {
-            duration: Colors.durationFast
-        }
-    }
-    Behavior on border.color {
-        ColorAnimation {
-            duration: Colors.durationFast
-        }
-    }
-    Behavior on scale {
-        NumberAnimation {
-            duration: Colors.durationFast
-            easing.type: Easing.OutCubic
-        }
+    Behavior on color { ColorAnimation { duration: 150 } }
+    Behavior on border.color { ColorAnimation { duration: 150 } }
+    Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+    // Glow Effect
+    Rectangle {
+        anchors.fill: parent
+        radius: root.radius
+        z: -1
+        color: Colors.primary
+        opacity: highlighted ? 0.08 : 0
+        visible: highlighted
+        Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
     function highlightMatch(text, query) {
@@ -136,24 +134,16 @@ Rectangle {
     // Indicator bar
     Rectangle {
         anchors.left: parent.left
-        anchors.leftMargin: root.compactMode ? 4 : 6
+        anchors.leftMargin: 0
         anchors.verticalCenter: parent.verticalCenter
-        width: 3
-        height: highlighted ? Math.max(22, parent.height - (root.compactMode ? 18 : 16)) : (hovered ? 18 : 0)
-        radius: width / 2
+        width: highlighted ? 4 : 0
+        height: highlighted ? parent.height * 0.5 : 0
+        radius: Colors.radiusPill
         color: Colors.primary
-        opacity: highlighted ? 0.95 : (hovered ? 0.4 : 0.0)
-        Behavior on height {
-            NumberAnimation {
-                duration: Colors.durationFast
-                easing.type: Easing.OutCubic
-            }
-        }
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Colors.durationSnap
-            }
-        }
+        opacity: highlighted ? 1.0 : 0.0
+        Behavior on height { NumberAnimation { duration: 250; easing.type: Easing.OutBack } }
+        Behavior on width { NumberAnimation { duration: 200 } }
+        Behavior on opacity { NumberAnimation { duration: 150 } }
     }
 
     RowLayout {

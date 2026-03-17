@@ -61,9 +61,11 @@ SharedWidgets.CardBase {
         coreUsages = nextCoreUsages;
     }
 
+    readonly property int _corePollMs: 1500
+
     CommandPoll {
         id: statPoll
-        interval: 1500
+        interval: root._corePollMs
         running: root.visible
         command: ["sh", "-c", "grep '^cpu[0-9][0-9]* ' /proc/stat 2>/dev/null"]
         parse: function(out) {

@@ -327,6 +327,11 @@ function applyData(config, data) {
             config.aiMaxMessages = data.ai.maxMessages;
     }
 
+    if (data.state) {
+        if (data.state.activeSurfaceId !== undefined)
+            config.activeSurfaceId = data.state.activeSurfaceId;
+    }
+
     if (data.theme) {
         if (data.theme.name !== undefined)
             config.themeName = data.theme.name;

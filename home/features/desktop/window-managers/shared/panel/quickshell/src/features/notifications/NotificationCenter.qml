@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import "../system/sections"
 import "../../services"

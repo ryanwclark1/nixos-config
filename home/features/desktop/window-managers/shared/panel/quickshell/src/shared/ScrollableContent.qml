@@ -58,9 +58,11 @@ Item {
       NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic }
     }
 
+    readonly property int _scrollbarHideMs: 1200
+
     Timer {
       id: hideTimer
-      interval: 1200
+      interval: _scrollbarHideMs
       repeat: false
       onTriggered: if (!thumbDrag.drag.active && !thumbDrag.containsMouse) scrollbar.visibleState = false
     }

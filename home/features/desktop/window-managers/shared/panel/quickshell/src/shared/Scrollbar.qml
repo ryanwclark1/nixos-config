@@ -45,9 +45,11 @@ Item {
   // ── Show/hide state ───────────────────────────────────────────────────────
   property bool _visible: false
 
+  readonly property int _scrollbarHideMs: 1200
+
   Timer {
     id: hideTimer
-    interval: 1200
+    interval: root._scrollbarHideMs
     repeat: false
     onTriggered: if (!thumbDrag.drag.active && !thumbDrag.containsMouse) root._visible = false
   }

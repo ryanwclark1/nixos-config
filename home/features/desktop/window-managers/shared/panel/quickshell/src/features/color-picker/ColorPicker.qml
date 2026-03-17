@@ -515,9 +515,11 @@ PanelWindow {
             font.pixelSize: Colors.fontSizeLarge
           }
 
+          readonly property int _copyFeedbackMs: 1500
+
           Timer {
             id: clipCopied
-            interval: 1500
+            interval: _copyFeedbackMs
           }
 
           SharedWidgets.StateLayer {

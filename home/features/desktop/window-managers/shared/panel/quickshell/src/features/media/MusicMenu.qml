@@ -17,12 +17,7 @@ BasePopupMenu {
 
   SharedWidgets.Ref { service: MediaService }
 
-  // Immersive Background Glow
-  Item {
-    Layout.fillWidth: true
-    Layout.fillHeight: true
-    z: -1
-
+  backgroundContent: [
     Rectangle {
       anchors.fill: parent
       radius: Colors.radiusLarge
@@ -47,7 +42,7 @@ BasePopupMenu {
         }
       }
     }
-  }
+  ]
 
   readonly property var activePlayers: {
     MediaService.currentPlayer; // force re-eval on player change
@@ -70,9 +65,11 @@ BasePopupMenu {
     }
   }
 
+  readonly property int _fallbackArtClearMs: 3000
+
   Timer {
     id: fallbackClearTimer
-    interval: 3000
+    interval: root._fallbackArtClearMs
     onTriggered: root._fallbackArtUrl = ""
   }
 

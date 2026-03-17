@@ -60,9 +60,11 @@ Rectangle {
             }
         }
 
+        readonly property int _cursorBlinkMs: 530
+
         Timer {
             id: cursorBlink
-            interval: 530
+            interval: _cursorBlinkMs
             repeat: true
             running: AiService.isStreaming
             property bool cursorVisible: true

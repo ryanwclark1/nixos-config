@@ -239,6 +239,9 @@ QtObject {
     property int aiMaxConversations: 20
     property int aiMaxMessages: 100                // per conversation
 
+    // --- STATE RECOVERY ---
+    property string activeSurfaceId: ""
+
     // --- PLUGINS ---
     property var disabledPlugins: []
     property var pluginLauncherTriggers: ({})

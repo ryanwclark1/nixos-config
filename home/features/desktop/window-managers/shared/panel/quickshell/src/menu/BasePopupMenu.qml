@@ -14,6 +14,7 @@ PopupWindow {
 
   // ── Optional customization ────────────────────
   property alias headerExtras: headerExtrasSlot.children
+  property alias backgroundContent: backgroundSlot.data
   default property alias content: contentSlot.data
   property string subtitle: ""
   property color surfaceTint: "transparent"
@@ -80,6 +81,12 @@ PopupWindow {
 
     // Inner subtle highlight border
     SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
+
+    Item {
+      id: backgroundSlot
+      anchors.fill: parent
+      z: -1
+    }
 
     Keys.onEscapePressed: root.closeRequested()
 
