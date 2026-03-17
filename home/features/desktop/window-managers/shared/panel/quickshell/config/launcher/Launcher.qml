@@ -3964,6 +3964,7 @@ PanelWindow {
                 LauncherHome {
                     Layout.fillWidth: true
                     launcher: launcherRoot
+                    showHomeSections: false
                     visible: launcherRoot.showLauncherHome && launcherRoot.mode !== "orchestrator" && !launcherRoot.isModeLoading
                 }
 
@@ -3987,15 +3988,27 @@ PanelWindow {
                             currentIndex: launcherRoot.selectedIndex
                             enabled: !launcherRoot.showingConfirm
                             topMargin: launcherRoot.compactMode ? Colors.spacingXXS : Colors.spacingXS
+                            
+                            header: LauncherHome {
+                                width: resultsList.width
+                                launcher: launcherRoot
+                                showCategoryFiltersSection: false
+                                visible: launcherRoot.showLauncherHome && launcherRoot.mode !== "orchestrator" && !launcherRoot.isModeLoading
+                                height: visible ? implicitHeight : 0
+                                Layout.bottomMargin: visible ? Colors.spacingM : 0
+                            }
+                            
                             section.property: "sectionLabel"
                             section.delegate: Item {
                                 width: resultsList.width
-                                height: launcherRoot.compactMode ? 26 : 30
-
+                                height: (launcherRoot.showLauncherHome && (section === "Recent" || section === "Suggested")) ? 0 : (launcherRoot.compactMode ? 26 : 30)
+                                visible: height > 0
+                                
                                 RowLayout {
                                     anchors.fill: parent
                                     anchors.topMargin: launcherRoot.compactMode ? Colors.spacingXXS : Colors.spacingXS
                                     spacing: launcherRoot.compactMode ? Colors.spacingXS : Colors.spacingS
+                                    visible: parent.visible
 
                                     Rectangle {
                                         radius: Colors.radiusPill
@@ -4037,6 +4050,9 @@ PanelWindow {
                                 onClicked: launcherRoot.executeSelection()
                                 onEntered: if (!launcherRoot.ignoreMouseHover)
                                     launcherRoot.selectedIndex = index
+                                    
+                                visible: !modelData._homeSection || !launcherRoot.showLauncherHome
+                                height: visible ? (launcherRoot.tightMode ? 48 : (launcherRoot.compactMode ? 52 : 58)) : 0
                             }
                         }
 

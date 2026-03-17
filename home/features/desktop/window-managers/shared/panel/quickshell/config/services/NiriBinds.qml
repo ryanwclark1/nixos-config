@@ -16,7 +16,11 @@ QtObject {
     property string configPath: ""
     property string errorMessage: ""
 
-    readonly property string parserScript: Qt.resolvedUrl("../../scripts/parse-niri-binds.py").toString().replace("file://", "")
+    readonly property string parserScript: {
+        const envPath = Quickshell.env("QS_NIRI_PARSER");
+        if (envPath) return envPath;
+        return Qt.resolvedUrl("../../scripts/parse-niri-binds.py").toString().replace("file://", "");
+    }
 
     function reload() {
         bindParser.running = true

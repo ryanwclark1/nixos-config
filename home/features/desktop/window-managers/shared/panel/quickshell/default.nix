@@ -76,7 +76,7 @@ let
   '';
 
   screenshotScript = pkgs.writeShellScriptBin "qs-screenshot" ''
-    PATH="${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.wl-clipboard}/bin:${pkgs.coreutils}/bin:${pkgs.jq}/bin:$PATH"
+    PATH="${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.wl-clipboard}/bin:${pkgs.coreutils}/bin:${pkgs.jq}/bin:${pkgs.hyprpicker}/bin:${pkgs.hyprland}/bin:$PATH"
     ${builtins.readFile ./scripts/screenshot.sh}
   '';
 
@@ -418,9 +418,12 @@ EOF
         ExecStart = "${quickshellLaunchScript}/bin/quickshell-launch";
         Environment = [
           "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin:${pkgs.python3}/bin"
+          "QS_NIRI_PARSER=${./scripts/parse-niri-binds.py}"
           "QT_QPA_PLATFORMTHEME=adwaita"
           "QT_STYLE_OVERRIDE=adwaita-dark"
         ];
+
+
         Restart = "on-failure";
         RestartSec = 2;
       };

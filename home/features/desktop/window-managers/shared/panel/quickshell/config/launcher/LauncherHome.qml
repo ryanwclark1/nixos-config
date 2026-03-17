@@ -7,9 +7,11 @@ ColumnLayout {
     id: root
 
     required property var launcher
+    property bool showCategoryFiltersSection: true
+    property bool showHomeSections: true
     spacing: Colors.spacingM
 
-    readonly property bool showCategoryFilters: root.launcher.showLauncherHome && root.launcher.drunCategoryFiltersEnabled && root.launcher.mode === "drun" && root.launcher.drunCategoryOptions.length > 1
+    readonly property bool showCategoryFilters: root.showCategoryFiltersSection && root.launcher.showLauncherHome && root.launcher.drunCategoryFiltersEnabled && root.launcher.mode === "drun" && root.launcher.drunCategoryOptions.length > 1
     readonly property bool categorySummaryExpanded: root.launcher.drunCategorySectionExpanded || root.launcher.drunCategoryFilter !== ""
     readonly property bool showCategoryChips: root.showCategoryFilters && root.categorySummaryExpanded
     readonly property bool showRecentItems: root.launcher.showLauncherHome && root.launcher.recentItems.length > 0
@@ -144,6 +146,7 @@ ColumnLayout {
 
     GridLayout {
         Layout.fillWidth: true
+        visible: root.showHomeSections
         columns: root.useSplitColumns ? 2 : 1
         rowSpacing: Colors.spacingM
         columnSpacing: Colors.spacingM
