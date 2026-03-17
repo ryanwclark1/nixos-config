@@ -49,11 +49,6 @@ PanelWindow {
 
     signal closeRequested
 
-    onIncludeWindowContextChanged: {
-        if (includeWindowContext)
-            AiService.refreshActiveWindowTitle();
-    }
-
     // Panel visibility: stay mapped during slide-out animation
     visible: showContent || slidePanel.x < panelWidth
 
@@ -127,7 +122,7 @@ PanelWindow {
         Behavior on x {
             NumberAnimation {
                 id: slideAnim
-                duration: 320
+                duration: Colors.durationPanelOpen
                 easing.type: Easing.OutBack
                 easing.overshoot: 0.6
             }
@@ -135,7 +130,7 @@ PanelWindow {
         Behavior on opacity {
             NumberAnimation {
                 id: fadeAnim
-                duration: 260
+                duration: Colors.durationPanelClose
             }
         }
         layer.enabled: slideAnim.running || fadeAnim.running
@@ -171,7 +166,7 @@ PanelWindow {
             id: dragHandle
             width: 6
             height: parent.height * 0.15
-            radius: 3
+            radius: Colors.radiusXS
             color: dragArea.containsMouse ? Colors.primary : Colors.border
             anchors.left: parent.left
             anchors.leftMargin: -3
@@ -555,7 +550,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             text: "filename: " + (AiService.pendingScript ? AiService.pendingScript.name : "")
                             color: Colors.success
-                            font.pixelSize: 11
+                            font.pixelSize: Colors.fontSizeXS
                             font.weight: Font.Bold
                             font.family: Colors.fontMono
                         }

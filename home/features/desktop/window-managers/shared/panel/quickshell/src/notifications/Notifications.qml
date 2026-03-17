@@ -191,8 +191,8 @@ PanelWindow {
         SequentialAnimation on border.color {
           running: notifDelegate.isUrgent
           loops: Animation.Infinite
-          ColorAnimation { from: Colors.error; to: Qt.lighter(Colors.error, 1.4); duration: 800 }
-          ColorAnimation { from: Qt.lighter(Colors.error, 1.4); to: Colors.error; duration: 800 }
+          ColorAnimation { from: Colors.error; to: Qt.lighter(Colors.error, 1.4); duration: Colors.durationLong }
+          ColorAnimation { from: Qt.lighter(Colors.error, 1.4); to: Colors.error; duration: Colors.durationLong }
         }
 
         Column {

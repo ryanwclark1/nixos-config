@@ -106,6 +106,7 @@ BasePopupMenu {
             Image {
                 anchors.fill: parent
                 source: ScreenshotService.lastScreenshotPath ? ("file://" + ScreenshotService.lastScreenshotPath) : ""
+                sourceSize: Qt.size(400, 300)
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
             }

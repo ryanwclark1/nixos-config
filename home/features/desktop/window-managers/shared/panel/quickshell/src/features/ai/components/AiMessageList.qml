@@ -263,7 +263,7 @@ Rectangle {
                             font.family: Colors.fontMono
                             font.pixelSize: Colors.fontSizeLarge
                             OpacityAnimator on opacity {
-                                from: 0.3; to: 1.0; duration: 800
+                                from: 0.3; to: 1.0; duration: Colors.durationLong
                                 running: AiService.isStreaming && AiService.streamingContent.length === 0
                                 loops: Animation.Infinite
                             }

@@ -29,8 +29,11 @@ Item {
   implicitWidth: pill.width
   implicitHeight: pill.height
 
-  SharedWidgets.Ref { service: SystemStatus }
-  SharedWidgets.Ref { service: ProcessService }
+  Item {
+    id: services
+    SharedWidgets.Ref { service: SystemStatus }
+    SharedWidgets.Ref { service: ProcessService }
+  }
 
   SharedWidgets.BarPill {
     id: pill

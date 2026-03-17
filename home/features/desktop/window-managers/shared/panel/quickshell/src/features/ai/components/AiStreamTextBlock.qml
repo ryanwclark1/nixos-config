@@ -35,7 +35,7 @@ Rectangle {
     Rectangle {
         width: 2
         height: 16
-        radius: 1
+        radius: Colors.radiusXXXS
         color: Colors.primary
         anchors.bottom: parent.bottom
         anchors.right: parent.right

@@ -434,16 +434,18 @@ QtObject {
     // ═══════════════════════════════════════════════════
     //  Timers
     // ═══════════════════════════════════════════════════
+    readonly property int _statusPollMs: 5000
+    readonly property int _inventoryPollMs: 12000
 
     property Timer _statusTimer: Timer {
-        interval: 5000
+        interval: root._statusPollMs
         running: root.subscriberCount > 0
         repeat: true
         onTriggered: root.refreshStatus()
     }
 
     property Timer _inventoryTimer: Timer {
-        interval: 12000
+        interval: root._inventoryPollMs
         running: root.subscriberCount > 0
         repeat: true
         onTriggered: root.refreshInventory()

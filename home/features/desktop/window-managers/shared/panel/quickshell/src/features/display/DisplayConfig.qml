@@ -931,7 +931,7 @@ PanelWindow {
               NumberAnimation on rotation {
                 running: displayRoot.applyInProgress
                 from: 0; to: 360
-                duration: 800
+                duration: Colors.durationLong
                 loops: Animation.Infinite
               }
             }

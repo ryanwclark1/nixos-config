@@ -45,9 +45,10 @@ QtObject {
   // ── Crash recovery ─────────────────────────────
   property int _crashCount: 0
   readonly property int _maxCrashes: 5
+  readonly property int _restartDelayMs: 2000
 
   property Timer _restartTimer: Timer {
-    interval: 2000
+    interval: root._restartDelayMs
     onTriggered: {
       if (root._shouldRun && root._crashCount < root._maxCrashes) {
         root._startCava();

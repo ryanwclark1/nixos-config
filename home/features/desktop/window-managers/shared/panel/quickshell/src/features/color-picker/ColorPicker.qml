@@ -443,7 +443,7 @@ PanelWindow {
         Rectangle {
           width: 44
           height: 44
-          radius: 22
+          radius: Colors.radiusXL
           color: root.currentColor
           border.color: Colors.border
           border.width: 1
@@ -574,7 +574,7 @@ PanelWindow {
             Rectangle {
               Layout.fillWidth: true
               height: 6
-              radius: 3
+              radius: Colors.radiusXS
               color: Colors.surface
 
               Rectangle {

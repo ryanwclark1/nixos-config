@@ -126,7 +126,7 @@ ColumnLayout {
                                         Text {
                                             text: modelData.windows + " windows"
                                             color: Colors.textDisabled
-                                            font.pixelSize: 9
+                                            font.pixelSize: Colors.fontSizeXXS
                                         }
                                     }
 
@@ -227,7 +227,7 @@ ColumnLayout {
                             anchors.margins: Colors.spacingM
                             text: AiService.isStreaming ? AiService.streamingContent : (AiService.activeMessages.length > 0 ? AiService.activeMessages[AiService.activeMessages.length - 1].content : "Listening for commands...")
                             color: Colors.textSecondary
-                            font.pixelSize: 11
+                            font.pixelSize: Colors.fontSizeXS
                             wrapMode: Text.Wrap
                             elide: Text.ElideRight
                         }

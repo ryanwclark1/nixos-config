@@ -33,9 +33,9 @@ ColumnLayout {
 
     SequentialAnimation {
         id: shakeAnim
-        PropertyAnimation { target: root; property: "shakeOffset"; to: 10; duration: 50 }
-        PropertyAnimation { target: root; property: "shakeOffset"; to: -10; duration: 50 }
-        PropertyAnimation { target: root; property: "shakeOffset"; to: 0; duration: 50 }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: 10; duration: Colors.durationShake }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: -10; duration: Colors.durationShake }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: 0; duration: Colors.durationShake }
     }
 
     // Password input

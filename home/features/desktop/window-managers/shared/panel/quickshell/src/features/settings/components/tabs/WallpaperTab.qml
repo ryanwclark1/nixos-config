@@ -927,13 +927,13 @@ Item {
                     width: parent.width
                     height: 6
                     color: Colors.surface
-                    radius: 3
+                    radius: Colors.radiusXS
 
                     Rectangle {
                         width: parent.width * (Config.wallpaperCycleInterval / 60)
                         height: parent.height
                         color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
-                        radius: 3
+                        radius: Colors.radiusXS
                         Behavior on width {
                             NumberAnimation {
                                 duration: Colors.durationSnap

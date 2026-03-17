@@ -155,6 +155,7 @@ Scope {
                                 anchors.fill: parent
                                 color: Colors.withAlpha(Colors.bg, 0.6)
                                 opacity: root.isVisible ? 1.0 : 0.0
+                                layer.enabled: opacity > 0 && opacity < 1
                                 Behavior on opacity {
                                     NumberAnimation {
                                         duration: Colors.durationFast

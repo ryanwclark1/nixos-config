@@ -1,5 +1,4 @@
 import QtQuick
-import "."
 import "../../../services"
 import "../../../widgets"
 
@@ -154,9 +153,9 @@ MouseArea {
 
       SequentialAnimation {
         id: shimmerFade
-        NumberAnimation { target: shimmer; property: "opacity"; to: 1.0; duration: 80 }
+        NumberAnimation { target: shimmer; property: "opacity"; to: 1.0; duration: Colors.durationFlash }
         PauseAnimation { duration: 440 }
-        NumberAnimation { target: shimmer; property: "opacity"; to: 0.0; duration: 80 }
+        NumberAnimation { target: shimmer; property: "opacity"; to: 0.0; duration: Colors.durationFlash }
       }
     }
 

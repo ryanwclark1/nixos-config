@@ -97,7 +97,7 @@ Item {
                 Text {
                     text: MediaService.trackTitle
                     color: Colors.text
-                    font.pixelSize: 9
+                    font.pixelSize: Colors.fontSizeXXS
                     font.weight: Font.Bold
                     elide: Text.ElideRight
                     Layout.maximumWidth: 120

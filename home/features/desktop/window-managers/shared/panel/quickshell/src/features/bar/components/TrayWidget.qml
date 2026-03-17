@@ -35,6 +35,7 @@ Flow {
         width: Math.min(root.iconSize, root.itemSize)
         height: Math.min(root.iconSize, root.itemSize)
         source: Config.resolveIconSource(modelData.icon || "")
+        sourceSize: Qt.size(root.iconSize * 2, root.iconSize * 2)
         asynchronous: true
 
         // Fallback icon if none found

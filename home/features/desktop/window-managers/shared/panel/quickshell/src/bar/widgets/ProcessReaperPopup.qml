@@ -31,7 +31,7 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             Text { text: "RESOURCE REAPER"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingWide; Layout.fillWidth: true }
-            Text { text: ProcessService.sortBy.toUpperCase(); color: Colors.primary; font.pixelSize: 9; font.weight: Font.Bold }
+            Text { text: ProcessService.sortBy.toUpperCase(); color: Colors.primary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
         }
 
         ColumnLayout {
@@ -52,8 +52,8 @@ Rectangle {
                         
                         ColumnLayout {
                             spacing: -2; Layout.fillWidth: true
-                            Text { text: modelData.name; color: Colors.text; font.pixelSize: 11; font.weight: Font.Bold; elide: Text.ElideRight; Layout.fillWidth: true }
-                            Text { text: "PID " + modelData.pid; color: Colors.textDisabled; font.pixelSize: 9 }
+                            Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; elide: Text.ElideRight; Layout.fillWidth: true }
+                            Text { text: "PID " + modelData.pid; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS }
                         }
                         
                         Text { 

@@ -33,7 +33,7 @@ Rectangle {
 
   SequentialAnimation {
     id: pulseAnim
-    NumberAnimation { target: pulse; property: "opacity"; from: 0.0; to: 1.0; duration: 70 }
+    NumberAnimation { target: pulse; property: "opacity"; from: 0.0; to: 1.0; duration: Colors.durationFlash }
     NumberAnimation { target: pulse; property: "scale"; from: 0.6; to: 1.25; duration: Colors.durationFast; easing.type: Easing.OutCubic }
     NumberAnimation { target: pulse; property: "opacity"; from: 1.0; to: 0.0; duration: Colors.durationFast }
     ScriptAction { script: { pulse.scale = 0.6 } }

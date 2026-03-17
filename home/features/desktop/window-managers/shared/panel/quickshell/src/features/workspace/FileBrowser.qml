@@ -341,7 +341,7 @@ PanelWindow {
     opacity: root.isOpen ? 1.0 : 0.0
     scale:   root.isOpen ? 1.0 : 0.95
     Behavior on opacity { NumberAnimation { id: fbFadeAnim;  duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
-    Behavior on scale   { NumberAnimation { id: fbScaleAnim; duration: 260; easing.type: Easing.OutBack  } }
+    Behavior on scale   { NumberAnimation { id: fbScaleAnim; duration: Colors.durationPanelClose; easing.type: Easing.OutBack  } }
     layer.enabled: fbFadeAnim.running || fbScaleAnim.running
 
     // Block click-through

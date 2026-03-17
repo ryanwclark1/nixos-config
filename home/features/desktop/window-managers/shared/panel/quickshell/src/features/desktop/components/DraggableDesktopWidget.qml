@@ -75,7 +75,7 @@ Item {
     anchors.rightMargin: -8
     anchors.bottomMargin: -8
     width: 16; height: 16
-    radius: 3
+    radius: Colors.radiusXS
     color: Colors.primary
     opacity: scaleArea.containsMouse ? 1.0 : 0.6
 

@@ -372,13 +372,13 @@ PanelWindow {
     Behavior on x {
       NumberAnimation {
         id: npSlideAnim
-        duration: 320
+        duration: Colors.durationPanelOpen
         easing.type: Easing.OutBack
         easing.overshoot: 0.6
       }
     }
     Behavior on opacity {
-      NumberAnimation { id: npFadeAnim; duration: 260 }
+      NumberAnimation { id: npFadeAnim; duration: Colors.durationPanelClose }
     }
     layer.enabled: npSlideAnim.running || npFadeAnim.running
 
@@ -391,7 +391,7 @@ PanelWindow {
       id: dragHandle
       width: 6
       height: parent.height * 0.15
-      radius: 3
+      radius: Colors.radiusXS
       color: dragArea.containsMouse ? Colors.primary : Colors.border
       anchors.left: parent.left
       anchors.leftMargin: -3

@@ -68,7 +68,7 @@ Rectangle {
                     width: parent.width
                     color: Colors.textSecondary
                     font.family: Colors.fontMono
-                    font.pixelSize: 11
+                    font.pixelSize: Colors.fontSizeXS
                     wrapMode: Text.WrapAnywhere
                     text: ""
                     

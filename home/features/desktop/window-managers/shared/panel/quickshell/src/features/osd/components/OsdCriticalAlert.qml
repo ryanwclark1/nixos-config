@@ -32,7 +32,7 @@ ColumnLayout {
       anchors.centerIn: parent
       text: root.osdIcon
       color: root.osdColor
-      font.pixelSize: 30
+      font.pixelSize: Colors.fontSizeDisplay
       font.family: Colors.fontMono
     }
   }

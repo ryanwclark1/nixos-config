@@ -39,7 +39,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignHCenter
                 width: 64
                 height: 64
-                radius: 32
+                radius: Colors.radiusPill
                 color: Colors.withAlpha(Colors.primary, 0.1)
                 border.color: Colors.withAlpha(Colors.primary, 0.2)
                 border.width: 1
@@ -85,7 +85,7 @@ Rectangle {
                 implicitHeight: 38
                 implicitWidth: emptyPrimaryText.implicitWidth + 32
                 scale: primaryHover.containsMouse ? 1.02 : 1.0
-                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
                 Text {
                     id: emptyPrimaryText
@@ -114,7 +114,7 @@ Rectangle {
                 implicitHeight: 38
                 implicitWidth: emptySecondaryText.implicitWidth + 32
                 scale: secondaryHover.containsMouse ? 1.02 : 1.0
-                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
                 Text {
                     id: emptySecondaryText

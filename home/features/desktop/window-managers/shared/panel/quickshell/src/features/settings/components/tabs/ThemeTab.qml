@@ -159,7 +159,7 @@ Item {
                                     Rectangle {
                                         Layout.fillWidth: true
                                         height: 24
-                                        radius: 12
+                                        radius: Colors.radiusMedium
                                         color: root._effectivePreviewTheme ? Colors.withAlpha(root._effectivePreviewTheme.palette.base01, 0.8) : Colors.surface
 
                                         RowLayout {
@@ -170,7 +170,7 @@ Item {
                                             Rectangle {
                                                 width: 12
                                                 height: 12
-                                                radius: 6
+                                                radius: Colors.radiusPill
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base0D : Colors.primary
                                             }
 
@@ -181,7 +181,7 @@ Item {
                                             Text {
                                                 text: "12:00"
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
-                                                font.pixelSize: 10
+                                                font.pixelSize: Colors.fontSizeXS
                                                 font.bold: true
                                             }
                                         }
@@ -190,7 +190,7 @@ Item {
                                     Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        radius: 8
+                                        radius: Colors.radiusSmall
                                         color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base01 : Colors.surface
                                         border.color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base0D : Colors.primary
                                         border.width: 1
@@ -203,7 +203,7 @@ Item {
                                             Rectangle {
                                                 width: 60
                                                 height: 4
-                                                radius: 2
+                                                radius: Colors.radiusXXS
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
                                                 opacity: 0.6
                                             }
@@ -211,7 +211,7 @@ Item {
                                             Rectangle {
                                                 width: 100
                                                 height: 4
-                                                radius: 2
+                                                radius: Colors.radiusXXS
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
                                                 opacity: 0.3
                                             }
@@ -279,7 +279,7 @@ Item {
                                         Rectangle {
                                             width: 36
                                             height: 36
-                                            radius: 18
+                                            radius: Colors.radiusPill
                                             color: modelData.c
                                             border.color: Colors.withAlpha(Colors.text, 0.1)
                                             border.width: 1

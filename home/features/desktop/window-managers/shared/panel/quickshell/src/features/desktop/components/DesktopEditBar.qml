@@ -17,7 +17,7 @@ Rectangle {
     anchors.bottomMargin: edgeMargins.bottom + 20
     width: editRow.implicitWidth + 40
     height: 48
-    radius: 24
+    radius: Colors.radiusXL
     color: Colors.bgGlass
     border.color: Colors.primary
     border.width: 2

@@ -117,6 +117,10 @@ QtObject {
     readonly property int durationSlow: 350
     readonly property int durationEmphasis: 400
     readonly property int durationPulse: 600
+    readonly property int durationShake: 50        // Lock screen auth shake micro-steps
+    readonly property int durationPanelClose: 260  // Sidebar panel fade/scale out
+    readonly property int durationPanelOpen: 320   // Sidebar panel scale in (OutBack)
+    readonly property int durationLong: 800        // Extended pulse/countdown animations
 
     // --- LETTER-SPACING TOKENS ---
     readonly property real letterSpacingTight: -0.5

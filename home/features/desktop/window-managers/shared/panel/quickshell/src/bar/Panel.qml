@@ -1,7 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Bluetooth
-import "."
 import "widgets"
 import "./widgets" as Widgets
 import "../features/system/sections"
@@ -1234,7 +1232,7 @@ Item {
             implicitHeight: root.vertical ? separatorThickness : separatorLength
             width: implicitWidth
             height: implicitHeight
-            radius: 1
+            radius: Colors.radiusXXXS
             color: Colors.border
             opacity: {
                 var settings = root.widgetSettings(widgetInstance);

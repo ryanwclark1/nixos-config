@@ -178,6 +178,7 @@ QtObject {
 
     // ── Persistence ─────────────────────────────
     readonly property string savePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/ai-chat.json"
+    readonly property int _saveDebounceMs: 500
     property bool _loading: false
 
     property FileView _chatFile: FileView {
@@ -198,7 +199,7 @@ QtObject {
     }
 
     property Timer _saveTimer: Timer {
-        interval: 500
+        interval: root._saveDebounceMs
         onTriggered: root._saveData()
     }
 
@@ -500,34 +501,42 @@ QtObject {
         _scheduleSave();
     }
 
-    function _fuzzyMatchModel(query) {
+    function _fuzzyMatch(items, query, accessor, allowContains) {
         var q = query.toLowerCase();
-        // Exact match
-        for (var i = 0; i < availableModels.length; i++) {
-            if (availableModels[i].toLowerCase() === q) return availableModels[i];
+        var i;
+        for (i = 0; i < items.length; i++) {
+            if (String(accessor(items[i]) || "").toLowerCase() === q)
+                return items[i];
         }
-        // Prefix match
-        for (var j = 0; j < availableModels.length; j++) {
-            if (availableModels[j].toLowerCase().indexOf(q) === 0) return availableModels[j];
+        for (i = 0; i < items.length; i++) {
+            if (String(accessor(items[i]) || "").toLowerCase().indexOf(q) === 0)
+                return items[i];
         }
-        // Contains match
-        for (var k = 0; k < availableModels.length; k++) {
-            if (availableModels[k].toLowerCase().indexOf(q) !== -1) return availableModels[k];
+        if (allowContains) {
+            for (i = 0; i < items.length; i++) {
+                if (String(accessor(items[i]) || "").toLowerCase().indexOf(q) !== -1)
+                    return items[i];
+            }
         }
         return null;
     }
 
+    function _fuzzyMatchModel(query) {
+        return _fuzzyMatch(availableModels, query, function(model) {
+            return model;
+        }, true);
+    }
+
     function _fuzzyMatchProvider(query) {
-        var q = query.toLowerCase();
         var all = Providers.allProviders();
-        for (var i = 0; i < all.length; i++) {
-            if (all[i] === q || Providers.providerLabel(all[i]).toLowerCase() === q) return all[i];
-        }
-        // Prefix match
-        for (var j = 0; j < all.length; j++) {
-            if (all[j].indexOf(q) === 0 || Providers.providerLabel(all[j]).toLowerCase().indexOf(q) === 0) return all[j];
-        }
-        return null;
+        var providerKey = _fuzzyMatch(all, query, function(provider) {
+            return provider;
+        }, false);
+        if (providerKey)
+            return providerKey;
+        return _fuzzyMatch(all, query, function(provider) {
+            return Providers.providerLabel(provider);
+        }, false);
     }
 
     function sendMessage(text, contextWindow, visualContext) {
@@ -743,10 +752,6 @@ QtObject {
 
     // ── Context Helpers ─────────────────────────
     readonly property string contextWindowTitle: CompositorAdapter.activeWindowTitle || ""
-    function refreshActiveWindowTitle() {
-        // Kept for API compatibility with existing callers.
-        return;
-    }
 
     property string lastSelectionText: ""
     property bool isSelectionBusy: false

@@ -134,7 +134,7 @@ Flow {
             width: Math.max(2, (modelData.w / screenW) * parent.width)
             height: Math.max(2, (modelData.h / screenH) * parent.height)
             
-            radius: 1
+            radius: Colors.radiusXXXS
             color: wsPill.isActive ? Colors.background : (modelData.active ? Colors.primary : Colors.textSecondary)
             opacity: modelData.active ? 0.8 : 0.4
             border.color: wsPill.isActive ? Colors.background : Colors.border

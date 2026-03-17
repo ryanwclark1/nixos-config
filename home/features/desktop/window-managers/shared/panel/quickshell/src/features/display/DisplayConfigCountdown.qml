@@ -61,7 +61,7 @@ Rectangle {
         anchors.centerIn: parent
         text: root.seconds.toString()
         color: root.seconds <= 5 ? Colors.error : Colors.text
-        font.pixelSize: 36
+        font.pixelSize: Colors.fontSizeIcon
         font.weight: Font.Bold
         Behavior on color { ColorAnimation { duration: Colors.durationSlow } }
       }

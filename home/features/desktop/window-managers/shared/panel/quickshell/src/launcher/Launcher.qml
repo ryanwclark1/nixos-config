@@ -3411,6 +3411,7 @@ PanelWindow {
         anchors.fill: parent
         color: Colors.withAlpha(Colors.background, 0.92)
         opacity: launcherOpacity
+        layer.enabled: opacity > 0 && opacity < 1
         Behavior on opacity {
             NumberAnimation {
                 duration: Colors.durationNormal
@@ -3440,6 +3441,7 @@ PanelWindow {
         transform: Translate {
             y: launcherRoot.yOffset
         }
+        layer.enabled: scaleValue !== 1.0 || launcherRoot.yOffset !== 0
         clip: true
 
         SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
@@ -3890,7 +3892,7 @@ PanelWindow {
                                         Layout.fillWidth: true
                                         Layout.alignment: Qt.AlignVCenter
                                         implicitHeight: 1
-                                        radius: 1
+                                        radius: Colors.radiusXXXS
                                         color: Colors.withAlpha(Colors.border, 0.9)
                                     }
                                 }

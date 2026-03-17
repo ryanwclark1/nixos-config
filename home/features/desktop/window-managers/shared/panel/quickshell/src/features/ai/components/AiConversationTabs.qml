@@ -87,7 +87,7 @@ RowLayout {
                             anchors.bottomMargin: 1.5
                             width: isActive ? parent.width - 20 : 0
                             height: 2
-                            radius: 1
+                            radius: Colors.radiusXXXS
                             color: Colors.primary
                             opacity: isActive ? 1 : 0
                             visible: width > 0
@@ -110,7 +110,7 @@ RowLayout {
                             Rectangle {
                                 width: 6
                                 height: 6
-                                radius: 3
+                                radius: Colors.radiusXS
                                 color: Colors.primary
                                 visible: isActive && AiService.isStreaming
                                 Layout.alignment: Qt.AlignVCenter

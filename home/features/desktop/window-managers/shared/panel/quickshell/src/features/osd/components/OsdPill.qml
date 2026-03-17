@@ -33,7 +33,7 @@ RowLayout {
 
     SequentialAnimation {
       id: pillIconPulse
-      NumberAnimation { target: pillIconText; property: "scale"; to: 1.22; duration: 80; easing.type: Easing.OutQuad }
+      NumberAnimation { target: pillIconText; property: "scale"; to: 1.22; duration: Colors.durationFlash; easing.type: Easing.OutQuad }
       NumberAnimation { target: pillIconText; property: "scale"; to: 1.0; duration: Colors.durationFast; easing.type: Easing.OutElastic }
     }
   }
@@ -57,7 +57,7 @@ RowLayout {
       Rectangle {
         x: osdTrack.width * modelData - 1
         y: -1; width: 2; height: osdTrack.height + 2
-        radius: 1
+        radius: Colors.radiusXXXS
         color: Colors.withAlpha(Colors.text, 0.2)
         visible: (root.currentValue / root.maxValue) < modelData
       }
@@ -82,7 +82,7 @@ RowLayout {
       y: -2
       width: 2
       height: parent.height + 4
-      radius: 1
+      radius: Colors.radiusXXXS
       color: Colors.withAlpha(Colors.text, 0.4)
     }
 
