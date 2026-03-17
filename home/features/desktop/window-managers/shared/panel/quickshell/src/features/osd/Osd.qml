@@ -5,8 +5,8 @@ import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import "../system/sections"
+import "."
 import "../../services"
-import "../../widgets/osd"
 
 Scope {
   id: root

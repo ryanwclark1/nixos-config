@@ -4,7 +4,7 @@ import Quickshell
 import Quickshell.Services.UPower
 import "../../services"
 import "../system/sections"
-import "../../widgets/lock"
+import "."
 
 Item {
   id: root

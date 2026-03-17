@@ -1,3 +1,7 @@
 LockPanel 1.0 LockPanel.qml
+LockAuthArea 1.0 components/LockAuthArea.qml
+LockClock 1.0 components/LockClock.qml
 LockContext 1.0 components/LockContext.qml
+LockMediaCard 1.0 components/LockMediaCard.qml
+LockSessionBar 1.0 components/LockSessionBar.qml
 NativeLock 1.0 components/NativeLock.qml
