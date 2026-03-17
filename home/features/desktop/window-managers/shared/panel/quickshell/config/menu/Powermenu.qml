@@ -32,7 +32,6 @@ PanelWindow {
 
   // ── Countdown state ────────────────────────────
   property string pendingAction: ""
-  property var pendingCmd: null
   property bool timerActive: false
   property int timeRemaining: 0
 
@@ -61,28 +60,29 @@ PanelWindow {
     }
   }
 
-  function startTimer(key, cmd) {
+  function startTimer(actionId) {
+    var key = String(actionId || "");
+    if (!key)
+      return;
     if (timerActive && pendingAction === key) {
-      executeAction(cmd);
+      executeAction(key);
       return;
     }
     pendingAction = key;
-    pendingCmd = cmd;
     timeRemaining = Config.powermenuCountdown;
     timerActive = true;
   }
 
   function cancelTimer() {
     pendingAction = "";
-    pendingCmd = null;
     timerActive = false;
     timeRemaining = 0;
   }
 
-  function executeAction(cmd) {
+  function executeAction(actionId) {
     cancelTimer();
     root.isVisible = false;
-    Quickshell.execDetached(cmd);
+    SystemActionRegistry.execute(actionId);
   }
 
   Timer {
@@ -92,10 +92,8 @@ PanelWindow {
     repeat: true
     onTriggered: {
       root.timeRemaining -= 100;
-      if (root.timeRemaining <= 0) {
-        var cmd = root.pendingCmd;
-        root.executeAction(cmd);
-      }
+      if (root.timeRemaining <= 0)
+        root.executeAction(root.pendingAction);
     }
   }
 
@@ -122,7 +120,7 @@ PanelWindow {
       } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
         if (root.currentIndex >= 0 && root.currentIndex < root.actions.length) {
           var action = root.actions[root.currentIndex];
-          root.startTimer(action.key, action.cmd);
+          root.startTimer(action.id);
         }
         event.accepted = true;
       }
@@ -263,7 +261,7 @@ PanelWindow {
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-              onClicked: root.startTimer(modelData.id, modelData.cmd)
+              onClicked: root.startTimer(modelData.id)
               onEntered: root.currentIndex = index
             }
           }

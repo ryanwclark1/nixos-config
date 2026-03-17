@@ -324,17 +324,17 @@ PanelWindow {
             // ---- Conversation tabs ----
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingSM
+                spacing: Colors.spacingS
 
                 Item {
                     Layout.fillWidth: true
-                    height: 32
+                    height: 38
                     clip: true
 
                     Flickable {
                         id: tabFlickable
                         anchors.fill: parent
-                        contentWidth: tabRow.implicitWidth
+                        contentWidth: tabRow.implicitWidth + 32
                         contentHeight: height
                         flickableDirection: Flickable.HorizontalFlick
                         boundsBehavior: Flickable.StopAtBounds
@@ -342,8 +342,11 @@ PanelWindow {
 
                         Row {
                             id: tabRow
-                            spacing: Colors.spacingXS
+                            spacing: Colors.spacingS
                             height: parent.height
+                            leftPadding: Colors.spacingS
+                            rightPadding: Colors.spacingS
+                            topPadding: 3
 
                             Repeater {
                                 model: AiService.conversations
@@ -355,8 +358,8 @@ PanelWindow {
                                     property bool isActive: modelData.id === AiService.activeConversationId
                                     property bool isEditing: false
 
-                                    width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + 36, 140)
-                                    height: 28
+                                    width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + (isActive ? 44 : 38), 160)
+                                    height: 32
 
                                     Behavior on width {
                                         NumberAnimation {
@@ -365,17 +368,26 @@ PanelWindow {
                                         }
                                     }
 
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        radius: Colors.radiusXXS
-                                        color: isActive ? Colors.withAlpha(Colors.primary, 0.18) : Colors.bgWidget
-                                        border.color: isActive ? Colors.primary : Colors.border
-                                        border.width: isActive ? 1.5 : 1
-                                        Behavior on color {
-                                            ColorAnimation {
-                                                duration: Colors.durationFast
+                                    // Auto-scroll when active
+                                    onIsActiveChanged: {
+                                        if (isActive) {
+                                            if (x < tabFlickable.contentX) {
+                                                tabFlickable.contentX = x - 16;
+                                            } else if (x + width > tabFlickable.contentX + tabFlickable.width) {
+                                                tabFlickable.contentX = x + width - tabFlickable.width + 16;
                                             }
                                         }
+                                    }
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        radius: Colors.radiusSmall
+                                        color: isActive ? Colors.withAlpha(Colors.primary, 0.15) : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.05) : "transparent")
+                                        border.color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.25) : Colors.border)
+                                        border.width: isActive ? 1.5 : 1
+                                        
+                                        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                                        Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
 
                                         SharedWidgets.StateLayer {
                                             id: tabStateLayer
@@ -384,19 +396,62 @@ PanelWindow {
                                         }
                                     }
 
-                                    Text {
-                                        id: tabLabelText
-                                        anchors.left: parent.left
+                                    // Active indicator line
+                                    Rectangle {
+                                        anchors.bottom: parent.bottom
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        anchors.bottomMargin: 1.5
+                                        width: isActive ? parent.width - 20 : 0
+                                        height: 2
+                                        radius: 1
+                                        color: Colors.primary
+                                        opacity: isActive ? 1 : 0
+                                        visible: width > 0
+                                        
+                                        Behavior on width {
+                                            NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
+                                        }
+                                        Behavior on opacity {
+                                            NumberAnimation { duration: Colors.durationFast }
+                                        }
+                                    }
+
+                                    RowLayout {
+                                        anchors.fill: parent
                                         anchors.leftMargin: Colors.spacingS
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.right: deleteTabBtn.left
-                                        anchors.rightMargin: Colors.spacingXS
-                                        text: modelData.title
-                                        color: isActive ? Colors.primary : Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeSmall
-                                        font.weight: isActive ? Font.DemiBold : Font.Normal
-                                        elide: Text.ElideRight
-                                        visible: !tabDelegate.isEditing
+                                        anchors.rightMargin: 6
+                                        spacing: Colors.spacingXS
+
+                                        // Streaming dot
+                                        Rectangle {
+                                            width: 6
+                                            height: 6
+                                            radius: 3
+                                            color: Colors.primary
+                                            visible: isActive && AiService.isStreaming
+                                            Layout.alignment: Qt.AlignVCenter
+                                            
+                                            OpacityAnimator on opacity {
+                                                from: 0.3
+                                                to: 1.0
+                                                duration: 600
+                                                running: isActive && AiService.isStreaming
+                                                loops: Animation.Infinite
+                                            }
+                                        }
+
+                                        Text {
+                                            id: tabLabelText
+                                            Layout.fillWidth: true
+                                            text: modelData.title
+                                            color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.text : Colors.textSecondary)
+                                            font.pixelSize: Colors.fontSizeSmall
+                                            font.weight: isActive ? Font.DemiBold : Font.Normal
+                                            elide: Text.ElideRight
+                                            visible: !tabDelegate.isEditing
+                                            horizontalAlignment: Text.AlignLeft
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
                                     }
 
                                     TextInput {
@@ -428,11 +483,11 @@ PanelWindow {
 
                                     Rectangle {
                                         id: deleteTabBtn
-                                        width: 14
-                                        height: 14
+                                        width: 16
+                                        height: 16
                                         radius: width / 2
                                         anchors.right: parent.right
-                                        anchors.rightMargin: 5
+                                        anchors.rightMargin: 6
                                         anchors.verticalCenter: parent.verticalCenter
                                         color: "transparent"
                                         opacity: (tabMouse.containsMouse || tabDelegate.isActive) && AiService.conversations.length > 1 ? 1 : 0
@@ -455,7 +510,7 @@ PanelWindow {
                                             text: "󰅖"
                                             color: deleteTabMouse.containsMouse ? "white" : Colors.textDisabled
                                             font.family: Colors.fontMono
-                                            font.pixelSize: Colors.fontSizeXS
+                                            font.pixelSize: 10
                                         }
                                         MouseArea {
                                             id: deleteTabMouse
@@ -487,6 +542,12 @@ PanelWindow {
                                         }
                                         onDoubleClicked: tabDelegate.isEditing = true
                                     }
+
+                                    SharedWidgets.BarTooltip {
+                                        text: modelData.title
+                                        hovered: tabMouse.containsMouse && tabLabelText.truncated
+                                        anchorItem: tabDelegate
+                                    }
                                 }
                             }
                         }
@@ -495,18 +556,20 @@ PanelWindow {
 
                 // "+" add conversation button
                 Rectangle {
-                    width: 28
-                    height: 28
-                    radius: Colors.radiusXS
-                    color: Colors.bgWidget
-                    border.color: Colors.border
+                    width: 32
+                    height: 32
+                    radius: Colors.radiusSmall
+                    color: addConvMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : Colors.bgWidget
+                    border.color: addConvMouse.containsMouse ? Colors.primary : Colors.border
                     border.width: 1
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.rightMargin: Colors.spacingXS
 
                     Text {
                         anchors.centerIn: parent
                         text: "+"
-                        color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeLarge
+                        color: addConvMouse.containsMouse ? Colors.primary : Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeXL
                         font.weight: Font.Light
                     }
                     SharedWidgets.StateLayer {

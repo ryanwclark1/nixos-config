@@ -40,7 +40,8 @@ let
   '';
 
   keybindsScript = pkgs.writeShellScriptBin "qs-keybinds" ''
-    PATH="${pkgs.jq}/bin:${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:$PATH"
+    PATH="${pkgs.jq}/bin:${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:${pkgs.python3}/bin:$PATH"
+    export PARSER_SCRIPT="${./scripts/parse-niri-binds.py}"
     ${builtins.readFile ./scripts/keybinds.sh}
   '';
 
@@ -261,6 +262,7 @@ let
       qt6.qtimageformats
       qt6.qtmultimedia
       qt6.qt5compat
+      python3 # Needed for various scripts (Niri binds parser, etc.)
 
       # Quickshell utility scripts
       appsScript
@@ -415,7 +417,7 @@ EOF
         ''}";
         ExecStart = "${quickshellLaunchScript}/bin/quickshell-launch";
         Environment = [
-          "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin"
+          "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin:${pkgs.python3}/bin"
           "QT_QPA_PLATFORMTHEME=adwaita"
           "QT_STYLE_OVERRIDE=adwaita-dark"
         ];

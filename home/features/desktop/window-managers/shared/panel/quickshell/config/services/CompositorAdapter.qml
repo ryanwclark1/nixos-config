@@ -333,10 +333,16 @@ QtObject {
     return ["os-lock-screen"];
   }
 
-  function logoutCommand() {
-    if (isHyprland) return ["hyprctl", "dispatch", "exit"];
-    if (isNiri) { NiriService.quit(); return ["sh", "-c", "true"]; }
-    return ["os-power", "logout"];
+  function logout() {
+    if (isHyprland) {
+      Quickshell.execDetached(["hyprctl", "dispatch", "exit"]);
+      return true;
+    }
+    if (isNiri)
+      return NiriService.quit();
+
+    Quickshell.execDetached(["os-power", "logout"]);
+    return true;
   }
 
   function focusWorkspace(id) {

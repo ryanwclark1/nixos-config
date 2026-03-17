@@ -89,15 +89,15 @@ Scope {
         model: Quickshell.screens
 
         delegate: Component {
+            Timer {
+                id: _hideTimer
+                interval: Colors.durationFast
+                running: false
+            }
+
             LazyLoader {
                 active: root.isVisible || _hideTimer.running
                 required property ShellScreen modelData
-
-                Timer {
-                    id: _hideTimer
-                    interval: Colors.durationFast
-                    running: false
-                }
 
                 Connections {
                     target: root

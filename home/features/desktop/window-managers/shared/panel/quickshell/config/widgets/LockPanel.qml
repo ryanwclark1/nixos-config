@@ -41,19 +41,19 @@ Item {
     countdownTimer.stop();
   }
 
-  function executeAction(action) {
-    countdownTimer.stop();
-    switch (action) {
+    function executeAction(action) {
+        countdownTimer.stop();
+        switch (action) {
       case "logout":
-        Quickshell.execDetached(SystemActionRegistry.commandFor(action)); break;
+        SystemActionRegistry.execute(action); break;
       case "suspend":
         Quickshell.execDetached(["systemctl", "suspend"]); break;
       case "hibernate":
         Quickshell.execDetached(["systemctl", "hibernate"]); break;
       case "reboot":
-        Quickshell.execDetached(SystemActionRegistry.commandFor(action)); break;
+        SystemActionRegistry.execute(action); break;
       case "shutdown":
-        Quickshell.execDetached(SystemActionRegistry.commandFor(action)); break;
+        SystemActionRegistry.execute(action); break;
     }
     cancelTimer();
   }

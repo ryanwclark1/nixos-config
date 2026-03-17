@@ -9,6 +9,7 @@ allow_hyprctl=(
   "${config_dir}/bar/widgets/Workspaces.qml"
   "${config_dir}/launcher/Overview.qml"
   "${config_dir}/services/CompositorAdapter.qml"
+  "${config_dir}/services/DependencyService.qml"
   "${config_dir}/services/NightLightService.qml"
   "${config_dir}/services/PowerService.qml"
 )

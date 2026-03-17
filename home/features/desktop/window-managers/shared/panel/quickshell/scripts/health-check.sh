@@ -376,10 +376,10 @@ main() {
   {
     printf 'Checking repo-owned quickshell scripts for legacy script_dir pattern...\n'
     rg -n -F 'script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"' \
-      "${repo_root}/home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-guards.sh" \
-      "${repo_root}/home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-fixtures.sh" \
-      "${repo_root}/home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-verify.sh" \
-      "${repo_root}/home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-smoke.sh" || true
+      "${script_dir}/check-compositor-guards.sh" \
+      "${script_dir}/check-compositor-fixtures.sh" \
+      "${script_dir}/compositor-verify.sh" \
+      "${script_dir}/compositor-smoke.sh" || true
   } > "${safe_fix_probe_log}"
 
   if rg -q '^[^:]+:' "${safe_fix_probe_log}"; then

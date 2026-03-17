@@ -70,12 +70,12 @@ RowLayout {
         cursorShape: Qt.PointingHandCursor
         onClicked: mouse => {
           powerStateLayer.burst(mouse.x, mouse.y);
-          if (!modelData.danger) {
-            Quickshell.execDetached(modelData.cmd);
+          if (!modelData.requiresConfirmation) {
+            SystemActionRegistry.execute(modelData.id);
             return;
           }
           if (awaitingConfirm) {
-            Quickshell.execDetached(modelData.cmd);
+            SystemActionRegistry.execute(modelData.id);
             root.pendingPowerIndex = -1;
             powerConfirmTimer.stop();
           } else {

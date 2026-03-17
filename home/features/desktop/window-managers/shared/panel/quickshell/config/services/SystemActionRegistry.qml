@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import Quickshell
 import "."
 
 QtObject {
@@ -15,6 +16,7 @@ QtObject {
                 icon: "󰐥",
                 subtitle: "Power off the system",
                 danger: true,
+                requiresConfirmation: true,
                 cmd: ["systemctl", "poweroff"]
             },
             reboot: {
@@ -26,6 +28,7 @@ QtObject {
                 icon: "󰑐",
                 subtitle: "Restart the system",
                 danger: true,
+                requiresConfirmation: true,
                 cmd: ["systemctl", "reboot"]
             },
             lock: {
@@ -37,6 +40,7 @@ QtObject {
                 icon: "󰌾",
                 subtitle: "Lock the current session",
                 danger: false,
+                requiresConfirmation: false,
                 cmd: CompositorAdapter.lockCommand()
             },
             logout: {
@@ -48,7 +52,7 @@ QtObject {
                 icon: "󰍃",
                 subtitle: "End the current session",
                 danger: false,
-                cmd: CompositorAdapter.logoutCommand()
+                requiresConfirmation: true
             },
             audioControls: {
                 id: "audioControls",
@@ -59,6 +63,7 @@ QtObject {
                 icon: "󰕾",
                 subtitle: "Devices, volume, and mute",
                 danger: false,
+                requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleAudioMenu",
                 clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleAudioMenu"]
@@ -72,6 +77,7 @@ QtObject {
                 icon: "󰖩",
                 subtitle: "Wi-Fi and connectivity",
                 danger: false,
+                requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleNetworkMenu",
                 clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]
@@ -85,6 +91,7 @@ QtObject {
                 icon: "󰖂",
                 subtitle: "Tailscale and active VPN sessions",
                 danger: false,
+                requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleVpnMenu",
                 clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleVpnMenu"]
@@ -98,6 +105,7 @@ QtObject {
                 icon: "󰒓",
                 subtitle: "Quick system controls",
                 danger: false,
+                requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleControls",
                 clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleControls"]
@@ -129,5 +137,31 @@ QtObject {
     function commandFor(actionId) {
         var action = root.actionById(actionId);
         return action && action.cmd ? action.cmd : [];
+    }
+
+    function requiresConfirmation(actionId) {
+        var action = root.actionById(actionId);
+        return !!(action && action.requiresConfirmation);
+    }
+
+    function execute(actionId) {
+        var action = root.actionById(actionId);
+        if (!action)
+            return false;
+
+        if (String(action.id || "") === "logout")
+            return CompositorAdapter.logout();
+
+        if (action.clickCommand && action.clickCommand.length > 0) {
+            Quickshell.execDetached(action.clickCommand);
+            return true;
+        }
+
+        if (action.cmd && action.cmd.length > 0) {
+            Quickshell.execDetached(action.cmd);
+            return true;
+        }
+
+        return false;
     }
 }

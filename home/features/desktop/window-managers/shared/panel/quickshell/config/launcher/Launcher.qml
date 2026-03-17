@@ -1814,17 +1814,17 @@ PanelWindow {
         };
     }
 
-    function makeConfirmedSystemAction(title, command) {
+    function makeConfirmedSystemAction(title, actionId) {
         return function () {
             askConfirm(title, function () {
-                Quickshell.execDetached(command);
+                SystemActionRegistry.execute(actionId);
             });
         };
     }
 
-    function makeDetachedSystemAction(command) {
+    function makeDetachedSystemAction(actionId) {
         return function () {
-            Quickshell.execDetached(command);
+            SystemActionRegistry.execute(actionId);
         };
     }
 
@@ -2603,10 +2603,10 @@ PanelWindow {
             if (action.ipcTarget && action.ipcAction) {
                 item.ipcTarget = action.ipcTarget;
                 item.ipcAction = action.ipcAction;
-            } else if (action.danger) {
-                item.action = makeConfirmedSystemAction(action.title, action.cmd);
+            } else if (action.requiresConfirmation) {
+                item.action = makeConfirmedSystemAction(action.title, action.id);
             } else {
-                item.action = makeDetachedSystemAction(action.cmd);
+                item.action = makeDetachedSystemAction(action.id);
             }
             items.push(item);
         }
@@ -2892,6 +2892,10 @@ PanelWindow {
                     var baseItem = allItems[baseIndex];
                     if (homeSeen[homeItemKey(baseItem)])
                         continue;
+                    
+                    if (drunCategoryFilter !== "" && !itemMatchesDrunCategory(baseItem, drunCategoryFilter))
+                        continue;
+                        
                     remainingItems.push(baseItem);
                 }
 

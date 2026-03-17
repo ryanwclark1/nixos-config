@@ -24,17 +24,9 @@ emit_error() {
   echo "ERROR|$1"
 }
 
-require_tool() {
-  local tool="$1"
-  if ! command -v "$tool" >/dev/null 2>&1; then
-    emit_error "missing dependency: ${tool}"
-    exit 1
-  fi
-}
-
 ensure_output_dir() {
   if ! mkdir -p "$SCREENSHOTS_DIR" 2>/dev/null; then
-    emit_error "unable to create screenshots directory"
+    emit_error "unable to create screenshots directory: $SCREENSHOTS_DIR"
     exit 1
   fi
 }
@@ -45,32 +37,77 @@ copy_to_clipboard() {
   fi
 }
 
+# Freeze screen for region selection if hyprpicker is available
+freezescreen() {
+  if command -v hyprpicker >/dev/null 2>&1; then
+    hyprpicker -rz &
+    HYPRPICKER_PID=$!
+    sleep 0.2
+  fi
+}
+
+unfreezescreen() {
+  if [[ -n "${HYPRPICKER_PID:-}" ]]; then
+    kill "$HYPRPICKER_PID" 2>/dev/null || true
+  fi
+  pkill hyprpicker 2>/dev/null || true
+}
+
 capture_region() {
-  require_tool "slurp"
+  if ! command -v slurp >/dev/null 2>&1; then
+    emit_error "missing dependency: slurp"
+    exit 1
+  fi
+  
+  # Try to get window rectangles if on Hyprland for better slurp experience
+  local rects=""
+  if command -v hyprctl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    rects=$(hyprctl clients -j | jq -r '.[] | select(.workspace.id != -1) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' 2>/dev/null || echo "")
+  fi
+
+  freezescreen
+  
   local geometry
-  geometry="$(slurp 2>/dev/null)" || geometry=""
+  if [[ -n "$rects" ]]; then
+    geometry=$(echo "$rects" | slurp 2>/dev/null) || geometry=""
+  else
+    geometry=$(slurp 2>/dev/null) || geometry=""
+  fi
+  
+  unfreezescreen
+
   if [[ -z "$geometry" ]]; then
     echo "ERROR|cancelled"
     exit 0
   fi
-  grim -g "$geometry" "$FILEPATH"
+  
+  if ! grim -g "$geometry" "$FILEPATH" 2>/dev/null; then
+    emit_error "grim failed to capture region"
+    exit 1
+  fi
 }
 
 capture_screen() {
   if [[ -n "$MONITOR" ]]; then
-    grim -o "$MONITOR" "$FILEPATH"
+    if ! grim -o "$MONITOR" "$FILEPATH" 2>/dev/null; then
+        # Fallback if monitor name is invalid
+        grim "$FILEPATH" 2>/dev/null || { emit_error "grim failed to capture screen"; exit 1; }
+    fi
   else
-    grim "$FILEPATH"
+    grim "$FILEPATH" 2>/dev/null || { emit_error "grim failed to capture screen"; exit 1; }
   fi
 }
 
 capture_fullscreen() {
-  grim "$FILEPATH"
+  grim "$FILEPATH" 2>/dev/null || { emit_error "grim failed to capture fullscreen"; exit 1; }
 }
 
-require_tool "date"
-require_tool "mkdir"
-require_tool "grim"
+# Main execution
+if ! command -v grim >/dev/null 2>&1; then
+  emit_error "missing dependency: grim"
+  exit 1
+fi
+
 ensure_output_dir
 
 case "$MODE" in
@@ -93,6 +130,6 @@ if [[ -f "$FILEPATH" ]]; then
   copy_to_clipboard
   echo "OK|${FILEPATH}"
 else
-  emit_error "capture failed"
+  emit_error "capture failed: file not created"
   exit 1
 fi

@@ -261,11 +261,83 @@ def parse_niri_config(config_path: Path) -> dict:
 
 def main():
     config_path = get_niri_config_path()
-    if len(sys.argv) > 1:
-        config_path = Path(sys.argv[1])
+    flatten = "--flatten" in sys.argv
+    
+    # Remove --flatten from args if present to avoid confusing it with config path
+    args = [arg for arg in sys.argv[1:] if arg != "--flatten"]
+    if args:
+        config_path = Path(args[0])
 
-    result = parse_niri_config(config_path)
-    print(json.dumps(result))
+    if not config_path.exists():
+        if flatten:
+            print("[]")
+        else:
+            print(json.dumps({'error': f'Config not found: {config_path}', 'children': []}))
+        return
+
+    content = config_path.read_text()
+    binds_content = find_binds_block(content)
+    if not binds_content:
+        if flatten:
+            print("[]")
+        else:
+            print(json.dumps({'error': 'No binds block found', 'children': []}))
+        return
+
+    binds = parse_binds_from_block(binds_content)
+
+    if flatten:
+        flattened = []
+        for kb in binds:
+            # Clean up mods for display
+            display_mods = [m.upper() for m in kb['mods']]
+            name = " + ".join(display_mods + [kb['key']])
+            
+            # Try to split action into disp and args
+            action = kb['action']
+            disp = ""
+            args = ""
+            if action:
+                parts = action.split(None, 1)
+                disp = parts[0]
+                args = parts[1] if len(parts) > 1 else ""
+            
+            flattened.append({
+                'name': name,
+                'desc': kb['comment'],
+                'disp': disp,
+                'args': args
+            })
+        print(json.dumps(flattened))
+    else:
+        by_category = {}
+
+        for kb in binds:
+            category = categorize_bind(kb)
+            if category not in by_category:
+                by_category[category] = []
+            by_category[category].append({
+                'mods': kb['mods'],
+                'key': kb['key'],
+                'comment': kb['comment']
+            })
+
+        category_order = [
+            'System', 'Shell', 'Window Switcher', 'Screenshots',
+            'Applications', 'Window Management', 'Focus', 'Move Windows',
+            'Workspaces', 'Media', 'Brightness', 'Other'
+        ]
+
+        children = []
+        for cat in category_order:
+            if cat in by_category and by_category[cat]:
+                children.append({
+                    'name': cat,
+                    'children': [{'keybinds': by_category[cat]}]
+                })
+
+        result = {'children': children, 'configPath': str(config_path)}
+        print(json.dumps(result))
 
 
 if __name__ == '__main__':

@@ -1,6 +1,26 @@
-# keybinds.sh - Parse Hyprland keybindings into JSON
+# keybinds.sh - Parse compositor keybindings into JSON
 
-if [[ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && ! grep -qi "hyprland" <<<"${XDG_CURRENT_DESKTOP:-}${DESKTOP_SESSION:-}"; then
+is_hyprland() {
+    [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] || grep -qi "hyprland" <<<"${XDG_CURRENT_DESKTOP:-}${DESKTOP_SESSION:-}"
+}
+
+is_niri() {
+    [[ -n "${NIRI_SOCKET:-}" ]] || grep -qi "niri" <<<"${XDG_CURRENT_DESKTOP:-}${DESKTOP_SESSION:-}"
+}
+
+if is_niri; then
+    # Use the python parser for Niri if available
+    if [[ -n "${PARSER_SCRIPT:-}" && -f "${PARSER_SCRIPT}" ]]; then
+        python3 "${PARSER_SCRIPT}" --flatten
+        exit 0
+    elif [[ -f "$(dirname "$0")/parse-niri-binds.py" ]]; then
+        # Fallback to local script path if PARSER_SCRIPT not set (e.g. running from source)
+        python3 "$(dirname "$0")/parse-niri-binds.py" --flatten
+        exit 0
+    fi
+fi
+
+if ! is_hyprland; then
     echo "[]"
     exit 0
 fi
