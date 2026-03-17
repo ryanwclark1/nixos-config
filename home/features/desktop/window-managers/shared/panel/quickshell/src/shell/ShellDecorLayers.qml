@@ -1,7 +1,10 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import "../widgets"
+import "."
+import "../features/desktop"
+import "../features/dock"
+import "../shared"
 
 Item {
     id: root
