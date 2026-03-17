@@ -156,15 +156,18 @@ Scope {
         property bool dockHovered: false
         property bool peekHovered: false
 
+        readonly property int _dockShowDelayMs: 100
+        readonly property int _dockHideDelayMs: 500
+
         Timer {
           id: showTimer
-          interval: 100
+          interval: screenDelegate._dockShowDelayMs
           onTriggered: screenDelegate.hidden = false
         }
 
         Timer {
           id: hideTimer
-          interval: 500
+          interval: screenDelegate._dockHideDelayMs
           onTriggered: {
             if (!screenDelegate.dockHovered && !screenDelegate.peekHovered)
               screenDelegate.hidden = true;

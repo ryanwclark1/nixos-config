@@ -17,9 +17,11 @@ Item {
     implicitWidth: visible ? updatesPill.width : 0
     implicitHeight: visible ? updatesPill.height : 0
 
+    readonly property int _cacheReadIntervalMs: 600000  // 10 min
+
     CommandPoll {
         id: updatePoll
-        interval: 600000
+        interval: root._cacheReadIntervalMs
         running: true
         command: ["sh", "-c", "nix=$(cat \"${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates/nixos\" 2>/dev/null || echo 0); " + "flat=$(cat \"${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates/flatpak\" 2>/dev/null || echo 0); " + "total=$(( (nix > 0 ? nix : 0) + (flat > 0 ? flat : 0) )); " + "echo $total"]
         parse: function (out) {

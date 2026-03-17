@@ -318,17 +318,18 @@ PanelWindow {
 
 
   // ── 30-second confirmation countdown ─────────────────────────────
+  readonly property int _revertCountdownSec: 30
   property bool countdownActive: false
-  property int  countdownSeconds: 30
+  property int  countdownSeconds: _revertCountdownSec
 
   function _startCountdown() {
-    countdownSeconds = 30;
+    countdownSeconds = _revertCountdownSec;
     countdownActive  = true;
   }
 
   function _cancelCountdown() {
     countdownActive = false;
-    countdownSeconds = 30;
+    countdownSeconds = _revertCountdownSec;
   }
 
   function _confirmChanges() {

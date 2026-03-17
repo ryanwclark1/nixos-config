@@ -13,9 +13,12 @@ Scope {
   property bool initialized: false
   property string _lastWorkspaceName: ""
 
+  readonly property int _displayMs: 1500
+  readonly property int _hyprlandPollMs: 400
+
   Timer {
     id: hideTimer
-    interval: 1500
+    interval: root._displayMs
     onTriggered: root.shouldShowOsd = false
   }
 
@@ -36,7 +39,7 @@ Scope {
 
   Timer {
     id: pollTimer
-    interval: 400
+    interval: root._hyprlandPollMs
     running: CompositorAdapter.supportsWorkspaceOsd
     repeat: true
     triggeredOnStart: true

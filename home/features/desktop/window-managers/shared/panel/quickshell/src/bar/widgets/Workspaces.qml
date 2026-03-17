@@ -236,7 +236,7 @@ Rectangle {
 
   Timer {
     id: activeWorkspacePollTimer
-    interval: 120
+    interval: root._activeWorkspacePollMs
     running: CompositorAdapter.isHyprland
     repeat: true
     triggeredOnStart: true
