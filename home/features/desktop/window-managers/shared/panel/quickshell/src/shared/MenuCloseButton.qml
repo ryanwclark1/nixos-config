@@ -1,6 +1,6 @@
 import QtQuick
+import "."
 import "../services"
-import "../widgets"
 
 IconButton {
   icon: "󰅖"

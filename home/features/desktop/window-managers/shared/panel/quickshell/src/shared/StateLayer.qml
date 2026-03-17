@@ -1,4 +1,5 @@
 import QtQuick
+import "."
 import "../services"
 
 // Transparent overlay providing consistent hover/press/disabled visual states.

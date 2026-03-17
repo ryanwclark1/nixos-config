@@ -1,4 +1,14 @@
 ActionCard 1.0 ActionCard.qml
+ClickRipple 1.0 ClickRipple.qml
 ContextMenu 1.0 ContextMenu.qml
+EmptyState 1.0 EmptyState.qml
+IconButton 1.0 IconButton.qml
+InnerHighlight 1.0 InnerHighlight.qml
 MenuCloseButton 1.0 MenuCloseButton.qml
 Ref 1.0 Ref.qml
+SearchBar 1.0 SearchBar.qml
+SectionLabel 1.0 SectionLabel.qml
+SliderTrack 1.0 SliderTrack.qml
+StateLayer 1.0 StateLayer.qml
+StatusChip 1.0 StatusChip.qml
+SurfaceGradient 1.0 SurfaceGradient.qml
