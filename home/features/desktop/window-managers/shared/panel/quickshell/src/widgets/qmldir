@@ -37,12 +37,12 @@ MenuCloseButton 1.0 MenuCloseButton.qml
 MiniProgressBar 1.0 MiniProgressBar.qml
 MuteButton 1.0 ../features/audio/components/MuteButton.qml
 NativeLock 1.0 ../features/lock/components/NativeLock.qml
-NetworkBadge 1.0 NetworkBadge.qml
+NetworkBadge 1.0 ../features/network/components/NetworkBadge.qml
 NetworkWidget 1.0 ../features/network/components/NetworkWidget.qml
 VpnWidget 1.0 ../features/network/components/VpnWidget.qml
 Osd 1.0 ../features/osd/Osd.qml
 OverscrollGlow 1.0 OverscrollGlow.qml
-PrivacySourceRow 1.0 PrivacySourceRow.qml
+PrivacySourceRow 1.0 ../features/status/PrivacySourceRow.qml
 PulseButton 1.0 PulseButton.qml
 Ref 1.0 Ref.qml
 ScreenBorder 1.0 ScreenBorder.qml
