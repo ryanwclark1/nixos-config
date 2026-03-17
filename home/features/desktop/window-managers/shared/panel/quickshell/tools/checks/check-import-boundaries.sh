@@ -35,6 +35,8 @@ allowed_feature_imports = {
     '../../../../widgets',
     '../../../../services/ShellUtils.js',
     '../../menu/settings',
+    '../../../menu/settings',
+    '../../../services/ShellUtils.js',
     '../../widgets/lock',
     '../../widgets/osd',
     '../../menu',
