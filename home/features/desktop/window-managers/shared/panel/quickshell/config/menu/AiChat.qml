@@ -260,16 +260,97 @@ PanelWindow {
                     }
                 }
 
-                // New conversation
+                // Copy All
                 Rectangle {
                     width: 28
                     height: 28
                     radius: Colors.radiusXS
                     color: "transparent"
+                    visible: AiService.activeMessages.length > 0
+                    Text {
+                        anchors.centerIn: parent
+                        text: "󰆏"
+                        color: Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeLarge
+                    }
+                    SharedWidgets.StateLayer {
+                        id: copyAllStateLayer
+                        hovered: copyAllHover.containsMouse
+                        pressed: copyAllHover.pressed
+                    }
+                    MouseArea {
+                        id: copyAllHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => {
+                            copyAllStateLayer.burst(mouse.x, mouse.y);
+                            var fullText = "";
+                            var msgs = AiService.activeMessages;
+                            for (var i = 0; i < msgs.length; i++) {
+                                fullText += (msgs[i].role === "user" ? "### User\n" : "### Assistant\n") + msgs[i].content + "\n\n";
+                            }
+                            Quickshell.execDetached(["sh", "-c", "printf '%s' " + root._shellEscape(fullText) + " | wl-copy"]);
+                            ToastService.showNotice("Copied", "Full conversation copied to clipboard");
+                        }
+                    }
+                    SharedWidgets.BarTooltip {
+                        text: "Copy full conversation"
+                        hovered: copyAllHover.containsMouse
+                        anchorItem: parent
+                    }
+                }
+
+                // Clear conversation
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusXS
+                    color: "transparent"
+                    visible: AiService.activeMessages.length > 0
+                    Text {
+                        anchors.centerIn: parent
+                        text: "󰃢"
+                        color: Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeLarge
+                    }
+                    SharedWidgets.StateLayer {
+                        id: clearChatStateLayer
+                        hovered: clearChatHover.containsMouse
+                        pressed: clearChatHover.pressed
+                    }
+                    MouseArea {
+                        id: clearChatHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => {
+                            clearChatStateLayer.burst(mouse.x, mouse.y);
+                            AiService.clearConversation(AiService.activeConversationId);
+                        }
+                    }
+                    SharedWidgets.BarTooltip {
+                        text: "Clear current chat"
+                        hovered: clearChatHover.containsMouse
+                        anchorItem: parent
+                    }
+                }
+
+                // New conversation
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: Colors.radiusXS
+                    color: newChatHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
+                    border.color: newChatHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
+                    border.width: 1
+
                     Text {
                         anchors.centerIn: parent
                         text: "󰐕"
-                        color: Colors.textSecondary
+                        color: newChatHover.containsMouse ? Colors.primary : Colors.textSecondary
                         font.family: Colors.fontMono
                         font.pixelSize: Colors.fontSizeLarge
                     }
@@ -287,6 +368,11 @@ PanelWindow {
                             newChatStateLayer.burst(mouse.x, mouse.y);
                             AiService.newConversation();
                         }
+                    }
+                    SharedWidgets.BarTooltip {
+                        text: "New Conversation (Ctrl+N)"
+                        hovered: newChatHover.containsMouse
+                        anchorItem: parent
                     }
                 }
 
@@ -1328,6 +1414,49 @@ PanelWindow {
                             }
                         }
 
+                        // OCR from screen
+                        Rectangle {
+                            id: ocrToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
+                            color: AiService.isOcrBusy ? Colors.withAlpha(Colors.warning, 0.18) : "transparent"
+                            border.color: AiService.isOcrBusy ? Colors.warning : Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰚦"
+                                color: AiService.isOcrBusy ? Colors.warning : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: ocrHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: ScreenshotService.captureRegion()
+                            }
+
+                            SharedWidgets.BarTooltip {
+                                text: "Extract Text from Screen (OCR)"
+                                hovered: ocrHover.containsMouse
+                                anchorItem: ocrToggle
+                            }
+
+                            Connections {
+                                target: AiService
+                                function onLastOcrTextChanged() {
+                                    if (AiService.lastOcrText.length > 0) {
+                                        var prefix = inputField.text.length > 0 ? "\n\n" : "";
+                                        inputField.insert(inputField.cursorPosition, prefix + "```\n" + AiService.lastOcrText + "\n```\n");
+                                        ToastService.showNotice("OCR Complete", "Text inserted from screen");
+                                    }
+                                }
+                            }
+                        }
+
                         // System context toggle
                         Rectangle {
                             id: systemContextToggle
@@ -1765,8 +1894,8 @@ PanelWindow {
                 anchors.bottom: parent.bottom
                 anchors.margins: Colors.spacingS
                 anchors.topMargin: Colors.spacingXS
-                text: blockData ? blockData.content : ""
-                textFormat: TextEdit.PlainText
+                text: (blockData && blockData.highlightedHtml) ? blockData.highlightedHtml : (blockData ? blockData.content : "")
+                textFormat: (blockData && blockData.highlightedHtml) ? TextEdit.RichText : TextEdit.PlainText
                 color: Colors.text
                 font.pixelSize: Colors.fontSizeSmall
                 font.family: Colors.fontMono

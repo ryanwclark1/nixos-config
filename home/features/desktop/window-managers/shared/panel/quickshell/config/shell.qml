@@ -21,16 +21,6 @@ Scope {
     // Canonical UI state: only one closable surface is active at a time.
     property alias activeSurfaceId: surfaceService.activeSurfaceId
     property alias activeSurfaceContext: surfaceService.activeSurfaceContext
-    readonly property var surfaceRegistry: surfaceService.surfaceRegistry
-    readonly property var knownSurfaces: surfaceService.knownSurfaces
-    readonly property var legacyPanelToSurface: surfaceService.legacyPanelToSurface
-    property alias closingSurfaceId: surfaceService.closingSurfaceId
-    property alias closingSurfaceContext: surfaceService.closingSurfaceContext
-    property alias closingMenuScreen: surfaceService.closingMenuScreen
-    property alias pendingSurfaceId: surfaceService.pendingSurfaceId
-    property alias pendingSurfaceContext: surfaceService.pendingSurfaceContext
-    property alias menuScreen: surfaceService.menuScreen
-    readonly property var activeScreen: surfaceService.activeScreen
 
     // ── Named timing constants ─────────────────
     // Time to wait for LazyLoader to create FileBrowser before calling open().
@@ -68,17 +58,8 @@ Scope {
     function currentSurfaceScreen() {
         return surfaceService.currentSurfaceScreen();
     }
-    function normalizeSurfaceId(surfaceId) {
-        return surfaceService.normalizeSurfaceId(surfaceId);
-    }
     function isSurfaceOpen(surfaceId) {
         return surfaceService.isSurfaceOpen(surfaceId);
-    }
-    function surfaceMeta(surfaceId) {
-        return surfaceService.surfaceMeta(surfaceId);
-    }
-    function surfaceKind(surfaceId) {
-        return surfaceService.surfaceKind(surfaceId);
     }
     function barOwnsSurface(context, screenRef, barId) {
         return surfaceService.barOwnsSurface(context, screenRef, barId);
@@ -88,24 +69,6 @@ Scope {
     }
     function isSurfacePresentedOnBar(surfaceId, screenRef, barId) {
         return surfaceService.isSurfacePresentedOnBar(surfaceId, screenRef, barId);
-    }
-    function clearClosingSurface() {
-        surfaceService.clearClosingSurface();
-    }
-    function clearPendingSurface() {
-        surfaceService.clearPendingSurface();
-    }
-    function defaultSurfaceContext(surfaceId, preferredScreen) {
-        return surfaceService.defaultSurfaceContext(surfaceId, preferredScreen);
-    }
-    function resolveSurfaceContext(surfaceId, context) {
-        return surfaceService.resolveSurfaceContext(surfaceId, context);
-    }
-    function commitSurfaceOpen(surfaceId, surfaceContext) {
-        surfaceService.commitSurfaceOpen(surfaceId, surfaceContext);
-    }
-    function beginPopupSwitch(surfaceId, surfaceContext) {
-        surfaceService.beginPopupSwitch(surfaceId, surfaceContext);
     }
     function openSurface(surfaceId, context) {
         return surfaceService.openSurface(surfaceId, context);
@@ -120,11 +83,6 @@ Scope {
         return surfaceService.toggleSurface(surfaceId, context);
     }
 
-    // Backward-compatibility helper for older callers.
-    function togglePanel(panel) {
-        return toggleSurface(panel);
-    }
-
     function popupAnchorX(context, popupWidth, screenWidth) {
         return surfaceService.popupAnchorX(context, popupWidth, screenWidth);
     }
@@ -136,79 +94,6 @@ Scope {
     }
     function surfacePanelLayout(context, preferredWidth) {
         return surfaceService.surfacePanelLayout(context, preferredWidth);
-    }
-
-    function toggleNotifications() {
-        toggleSurface("notifCenter");
-    }
-    function toggleControls() {
-        toggleSurface("controlCenter");
-    }
-    function toggleNetworkMenu() {
-        toggleSurface("networkMenu");
-    }
-    function toggleVpnMenu() {
-        toggleSurface("vpnMenu");
-    }
-    function toggleAudioMenu() {
-        toggleSurface("audioMenu");
-    }
-    function toggleClipboardMenu() {
-        toggleSurface("clipboardMenu");
-    }
-    function toggleRecordingMenu() {
-        toggleSurface("recordingMenu");
-    }
-    function toggleMusicMenu() {
-        toggleSurface("musicMenu");
-    }
-    function toggleBatteryMenu() {
-        toggleSurface("batteryMenu");
-    }
-    function toggleWeatherMenu() {
-        toggleSurface("weatherMenu");
-    }
-    function toggleSshMenu() {
-        toggleSurface("sshMenu");
-    }
-    function toggleDateTimeMenu() {
-        toggleSurface("dateTimeMenu");
-    }
-    function toggleSystemStatsMenu() {
-        toggleSurface("systemStatsMenu");
-    }
-    function toggleSystemMonitor() {
-        toggleSurface("systemMonitor");
-    }
-    function toggleBluetoothMenu() {
-        toggleSurface("bluetoothMenu");
-    }
-    function togglePrinterMenu() {
-        toggleSurface("printerMenu");
-    }
-    function togglePrivacyMenu() {
-        toggleSurface("privacyMenu");
-    }
-    function toggleNotepad() {
-        toggleSurface("notepad");
-    }
-    function toggleColorPicker() {
-        toggleSurface("colorPicker");
-    }
-    function toggleDisplayConfig() {
-        toggleSurface("displayConfig");
-    }
-    function toggleFileBrowser() {
-        toggleSurface("fileBrowser");
-    }
-    function toggleScreenshotMenu() {
-        toggleSurface("screenshotMenu");
-    }
-    function toggleCavaPopup() {
-        toggleSurface("cavaPopup");
-    }
-    function toggleAiChat() {
-        toggleSurface("aiChat");
     }
 
     IpcHandler {
@@ -235,84 +120,6 @@ Scope {
             if (altTabSwitcher.item && altTabSwitcher.item.show)
                 altTabSwitcher.item.show();
         }
-
-        // Per-surface toggle methods — kept for backward compatibility with
-        // existing keybindings and scripts (e.g. `quickshell ipc call Shell toggleAudioMenu`).
-        function toggleNotifications() {
-            root.toggleSurface("notifCenter");
-        }
-        function toggleControls() {
-            root.toggleSurface("controlCenter");
-        }
-        function toggleNetworkMenu() {
-            root.toggleSurface("networkMenu");
-        }
-        function toggleVpnMenu() {
-            root.toggleSurface("vpnMenu");
-        }
-        function toggleAudioMenu() {
-            root.toggleSurface("audioMenu");
-        }
-        function toggleBluetoothMenu() {
-            root.toggleSurface("bluetoothMenu");
-        }
-        function togglePrinterMenu() {
-            root.toggleSurface("printerMenu");
-        }
-        function togglePrivacyMenu() {
-            root.toggleSurface("privacyMenu");
-        }
-        function toggleClipboardMenu() {
-            root.toggleSurface("clipboardMenu");
-        }
-        function toggleRecordingMenu() {
-            root.toggleSurface("recordingMenu");
-        }
-        function toggleMusicMenu() {
-            root.toggleSurface("musicMenu");
-        }
-        function toggleBatteryMenu() {
-            root.toggleSurface("batteryMenu");
-        }
-        function toggleWeatherMenu() {
-            root.toggleSurface("weatherMenu");
-        }
-        function toggleSshMenu() {
-            root.toggleSurface("sshMenu");
-        }
-        function toggleDateTimeMenu() {
-            root.toggleSurface("dateTimeMenu");
-        }
-        function toggleSystemStatsMenu() {
-            root.toggleSurface("systemStatsMenu");
-        }
-        function toggleSystemMonitor() {
-            root.toggleSurface("systemMonitor");
-        }
-        function toggleNotepad() {
-            root.toggleSurface("notepad");
-        }
-        function toggleColorPicker() {
-            root.toggleSurface("colorPicker");
-        }
-        function toggleDisplayConfig() {
-            root.toggleSurface("displayConfig");
-        }
-        function toggleFileBrowser() {
-            root.toggleSurface("fileBrowser");
-        }
-        function togglePowermenu() {
-            root.toggleSurface("powerMenu");
-        }
-        function toggleScreenshotMenu() {
-            root.toggleSurface("screenshotMenu");
-        }
-        function toggleCavaPopup() {
-            root.toggleSurface("cavaPopup");
-        }
-        function toggleAiChat() {
-            root.toggleSurface("aiChat");
-        }
     }
 
     // Global shortcuts (outside Variants to avoid duplicate registration)
@@ -323,12 +130,12 @@ Scope {
 
     Shortcut {
         sequence: "Meta+C"
-        onActivated: root.toggleControls()
+        onActivated: root.toggleSurface("controlCenter")
     }
 
     Shortcut {
         sequence: "Meta+N"
-        onActivated: root.toggleNotifications()
+        onActivated: root.toggleSurface("notifCenter")
     }
 
     // Ensure ThemeService and HookService initialize early

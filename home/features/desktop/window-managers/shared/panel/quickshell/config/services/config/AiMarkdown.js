@@ -128,10 +128,12 @@ function _parseMarkdownBlocks(markdown, colors) {
             if (inCodeBlock) {
                 // Close code block
                 flushText();
+                var content = codeBlockContent.join("\n");
                 blocks.push({
                     type: "code",
-                    content: codeBlockContent.join("\n"),
-                    lang: codeBlockLang
+                    content: content,
+                    lang: codeBlockLang,
+                    highlightedHtml: _highlightCode(content, codeBlockLang, colors)
                 });
                 codeBlockContent = [];
                 inCodeBlock = false;
@@ -154,10 +156,12 @@ function _parseMarkdownBlocks(markdown, colors) {
     // Close any open code block
     if (inCodeBlock) {
         flushText();
+        var content = codeBlockContent.join("\n");
         blocks.push({
             type: "code",
-            content: codeBlockContent.join("\n"),
-            lang: codeBlockLang
+            content: content,
+            lang: codeBlockLang,
+            highlightedHtml: _highlightCode(content, codeBlockLang, colors)
         });
     } else {
         flushText();
@@ -245,6 +249,9 @@ function _inlineFormat(text, colors) {
 
 function _applyInlineFormatting(escapedText, colors) {
     var primaryColor = (colors && colors.primary) || "#7aa2f7";
+    var secondaryColor = (colors && colors.secondary) || "#bb9af7";
+    var accentColor = (colors && colors.accent) || "#e0af68";
+    var successColor = (colors && colors.success) || "#9ece6a";
     var fontMono = (colors && colors.fontMono) || "monospace";
     var codeBg = (colors && colors.codeBg) || "rgba(255,255,255,0.06)";
 
@@ -259,14 +266,58 @@ function _applyInlineFormatting(escapedText, colors) {
     result = result.replace(/_(.+?)_/g, '<i>$1</i>');
 
     // Inline code: `text`
-    result = result.replace(/`([^`]+)`/g,
-        '<span style="background-color: ' + codeBg +
-        '; padding: 1px 4px; border-radius: 3px; font-family: ' +
-        fontMono + '; font-size: 12px;">$1</span>');
+    result = result.replace(/`([^`]+)`/g, function(match, p1) {
+        // Simple highlighting for inline code too
+        var highlighted = p1;
+        if (p1.match(/^[0-9.]+$/)) {
+            highlighted = '<span style="color: ' + accentColor + ';">' + p1 + '</span>';
+        } else if (p1.match(/^".*"$/) || p1.match(/^'.*'$/)) {
+            highlighted = '<span style="color: ' + successColor + ';">' + p1 + '</span>';
+        }
+        
+        return '<span style="background-color: ' + codeBg +
+            '; padding: 1px 4px; border-radius: 3px; font-family: ' +
+            fontMono + '; font-size: 12px;">' + highlighted + '</span>';
+    });
 
     // Links: [text](url) — rendered as colored text (no clickable links in TextEdit)
     result = result.replace(/\[([^\]]+)\]\([^)]+\)/g,
         '<span style="color: ' + primaryColor + ';">$1</span>');
+
+    return result;
+}
+
+function _highlightCode(code, lang, colors) {
+    var primaryColor = (colors && colors.primary) || "#7aa2f7";
+    var secondaryColor = (colors && colors.secondary) || "#bb9af7";
+    var accentColor = (colors && colors.accent) || "#e0af68";
+    var successColor = (colors && colors.success) || "#9ece6a";
+    var commentColor = (colors && colors.textDisabled) || "#565f89";
+
+    var escaped = _escapeHtml(code);
+    
+    // Very basic regex-based syntax highlighting
+    var result = escaped;
+
+    // Strings
+    result = result.replace(/(&quot;[\s\S]*?&quot;)/g, '<span style="color: ' + successColor + ';">$1</span>');
+    result = result.replace(/(&apos;[\s\S]*?&apos;)/g, '<span style="color: ' + successColor + ';">$1</span>');
+
+    // Comments (single line)
+    result = result.replace(/(\/\/.*$)/gm, '<span style="color: ' + commentColor + ';">$1</span>');
+    result = result.replace(/(#.*$)/gm, '<span style="color: ' + commentColor + ';">$1</span>');
+
+    // Keywords
+    var keywords = /\b(function|return|var|let|const|if|else|for|while|switch|case|break|continue|import|export|from|class|extends|new|try|catch|finally|async|await|type|interface|readonly|property|id|anchors|Layout|Component)\b/g;
+    result = result.replace(keywords, '<span style="color: ' + secondaryColor + ';">$1</span>');
+
+    // Values (true, false, null, undefined)
+    var values = /\b(true|false|null|undefined)\b/g;
+    result = result.replace(values, '<span style="color: ' + primaryColor + ';">$1</span>');
+
+    // Numbers
+    var numbers = /\b(\d+(\.\d+)?)\b/g;
+    result = result.replace(numbers, '<span style="color: ' + accentColor + ';">$1</span>');
 
     return result;
 }
