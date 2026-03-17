@@ -3,8 +3,9 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Mpris
 import Quickshell.Widgets
-import "../services"
-import "../widgets" as SharedWidgets
+import "../../menu"
+import "../../services"
+import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root

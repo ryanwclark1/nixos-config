@@ -1,1 +1,2 @@
 ControlCenter 1.0 ControlCenter.qml
+ControlCenterRegistry 1.0 registry/ControlCenterRegistry.qml

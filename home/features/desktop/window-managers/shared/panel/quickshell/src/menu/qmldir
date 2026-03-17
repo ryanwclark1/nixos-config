@@ -4,7 +4,7 @@ BasePopupMenu 1.0 BasePopupMenu.qml
 BatteryMenu 1.0 ../features/power/BatteryMenu.qml
 BluetoothMenu 1.0 ../features/network/BluetoothMenu.qml
 CavaPopup 1.0 ../features/media/CavaPopup.qml
-ClipboardMenu 1.0 ClipboardMenu.qml
+ClipboardMenu 1.0 ../features/clipboard/ClipboardMenu.qml
 ColorPicker 1.0 ../features/color-picker/ColorPicker.qml
 ControlCenter 1.0 ../features/control-center/ControlCenter.qml
 DateTimeMenu 1.0 ../features/time/DateTimeMenu.qml
@@ -17,11 +17,11 @@ NetworkMenu 1.0 ../features/network/NetworkMenu.qml
 VpnMenu 1.0 ../features/network/VpnMenu.qml
 Notepad 1.0 ../features/workspace/Notepad.qml
 NotificationCenter 1.0 ../notifications/NotificationCenter.qml
-Powermenu 1.0 Powermenu.qml
+Powermenu 1.0 ../features/power/Powermenu.qml
 PrinterMenu 1.0 ../features/status/PrinterMenu.qml
 PrivacyMenu 1.0 ../features/status/PrivacyMenu.qml
 RecordingMenu 1.0 ../features/status/RecordingMenu.qml
-ScreenshotMenu 1.0 ScreenshotMenu.qml
+ScreenshotMenu 1.0 ../features/screenshot/ScreenshotMenu.qml
 SettingsHub 1.0 ../features/settings/SettingsHub.qml
 SshMenu 1.0 ../features/ssh/SshMenu.qml
 SystemStatsMenu 1.0 ../features/system/surfaces/SystemStatsMenu.qml

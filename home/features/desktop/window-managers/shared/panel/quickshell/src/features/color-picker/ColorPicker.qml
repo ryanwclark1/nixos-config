@@ -3,9 +3,9 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import "../services"
-import "../services/ColorUtils.js" as ColorUtils
-import "../widgets" as SharedWidgets
+import "../../services"
+import "../../services/ColorUtils.js" as ColorUtils
+import "../../widgets" as SharedWidgets
 
 PanelWindow {
   id: root
