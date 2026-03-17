@@ -1388,7 +1388,7 @@ PanelWindow {
                   width: filterText.implicitWidth + 28
                   radius: Colors.radiusSmall
                   color: filterHover.containsMouse
-                    ? Colors.textThin : Colors.cardSurface
+                    ? Colors.textWash : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
@@ -1434,7 +1434,7 @@ PanelWindow {
                   width: Math.max(Layout.minimumWidth, cancelText.implicitWidth + 24)
                   radius: Colors.radiusSmall
                   color: cancelHover.containsMouse
-                    ? Colors.textThin : Colors.cardSurface
+                    ? Colors.textWash : Colors.cardSurface
                   border.color: Colors.border
                   border.width: 1
                   Behavior on color { ColorAnimation { duration: Colors.durationSnap } }

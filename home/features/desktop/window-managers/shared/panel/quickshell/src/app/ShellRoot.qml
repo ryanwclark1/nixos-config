@@ -115,6 +115,9 @@ Scope {
         function openSurface(surfaceId: string) {
             root.openSurface(surfaceId);
         }
+        function isSurfaceOpen(surfaceId: string): bool {
+            return root.isSurfaceOpen(surfaceId);
+        }
         function closeAllSurfaces() {
             root.closeAllSurfaces();
         }

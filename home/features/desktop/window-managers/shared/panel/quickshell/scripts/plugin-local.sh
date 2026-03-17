@@ -759,9 +759,8 @@ Quickshell Manual Flow
 1. Ensure the current Home Manager generation is active:
    - home-manager switch --flake /home/administrator/nixos-config#administrator@woody
 2. Run the focused Quickshell runtime checks:
-   - scripts/check-quickshell-startup.sh
-   - scripts/check-clipboard-contracts.sh
-   - ${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
+   - scripts/quickshell-structure-verify.sh
+   - scripts/quickshell-structure-verify.sh --vm
 3. Capture review artifacts for high-risk UI changes:
    - ${vm_script_dir}/run-${quickshell_vm_default}-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-${quickshell_vm_default}
    - artifact validation runs automatically; use scripts/check-panel-capture-artifacts.sh --dir DIR to re-check a saved bundle
@@ -828,10 +827,13 @@ Local commands:
   flow:    scripts/plugin-local.sh quickshell-flow
   status:  scripts/plugin-local.sh quickshell-status --check
   guards:  scripts/plugin-local.sh quickshell-guards
+  fast:    ${structure_verify_script}
+  vm:      ${structure_verify_script} --vm
   all:     scripts/plugin-local.sh quickshell-all
   capture: ${vm_script_dir}/run-${quickshell_vm_default}-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-${quickshell_vm_default}
 
 Runtime files:
+  fast:     ${structure_verify_script}
   startup:  ${script_dir}/check-quickshell-startup.sh
   panel:    ${vm_script_dir}/run-panel-vm-qa.sh --vm ${quickshell_vm_default}
   capture:  ${script_dir}/check-panel-capture-artifacts.sh

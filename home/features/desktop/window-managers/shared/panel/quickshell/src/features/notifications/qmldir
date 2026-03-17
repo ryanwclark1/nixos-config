@@ -1,3 +1,4 @@
 NotificationCenter 1.0 NotificationCenter.qml
 NotificationManager 1.0 NotificationManager.qml
 Notifications 1.0 Notifications.qml
+NotificationDelegate 1.0 NotificationDelegate.qml

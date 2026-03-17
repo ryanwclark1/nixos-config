@@ -127,6 +127,8 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
   - Optional custom path: `scripts/plugin-doctor.sh /path/to/plugins`
 - Quickshell runtime gates:
   - `scripts/check-quickshell-local.sh`
+  - `scripts/quickshell-structure-verify.sh`
+  - `scripts/quickshell-structure-verify.sh --vm`
   - `scripts/plugin-local.sh quickshell-status`
   - `scripts/plugin-local.sh quickshell-status --check --quiet`
   - `scripts/plugin-local.sh quickshell-flow`
@@ -169,7 +171,9 @@ Use `manifest.schema.json` as the reference contract for plugin manifests.
 - Run `scripts/plugin-local.sh quickshell-status --check --quiet` when you want that preflight as a compact one-line status.
 - Run `scripts/plugin-local.sh quickshell-files` when you need only the canonical Quickshell shell and runtime guard paths.
 - Run `scripts/plugin-local.sh quickshell-guards` when you need the runnable Quickshell runtime guard commands in order.
-- Run `scripts/plugin-local.sh quickshell-all` when you want the assembled Quickshell runtime workflow in one command; it runs startup smoke plus `check-panel-runtime.sh --repo-shell`, including multibar when the environment supports a `PanelWindow` backend.
+- Run `scripts/quickshell-structure-verify.sh` when you want the fast host-side Quickshell verification path: structural checks, startup smoke, the transient repo-shell journal warning gate, and lightweight launcher smoke.
+- Run `scripts/quickshell-structure-verify.sh --vm` when you want the exhaustive VM-backed Quickshell runtime/settings path without occupying the host session.
+- Run `scripts/plugin-local.sh quickshell-all` when you want the assembled Quickshell runtime workflow in one command; by default it reuses the fast local preflight and then hands off the comprehensive runtime/settings phase to the VM-backed QA wrapper.
 - Run `scripts/plugin-local.sh live-gates` when you want the shared plugin/runtime guards and the Quickshell repo-shell runtime workflow in one command.
 - Run `scripts/plugin-local.sh live-gates --quiet` when you want that combined repo-shell gate without wrapper headings.
 - Run `scripts/quickshell-verify.sh` when you want the Quickshell-first top-level verifier without going through `plugin-local.sh`.

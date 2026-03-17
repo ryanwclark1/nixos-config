@@ -6,10 +6,15 @@ import "../../../services"
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: 280
-  color: Colors.bgWidget
-  radius: Colors.radiusCard
+  Layout.preferredHeight: 300
+  color: Colors.cardSurface
+  radius: Colors.radiusLarge
   border.color: Colors.border
+  clip: true
+
+  // Inner highlight
+  SharedWidgets.InnerHighlight { highlightOpacity: 0.1 }
+  SharedWidgets.SurfaceGradient {}
 
   SystemClock {
     id: calendarClock

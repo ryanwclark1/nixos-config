@@ -440,7 +440,7 @@ Item {
                                                                 height: 14
                                                                 radius: width / 2
                                                                 color: modelData
-                                                                border.color: Colors.withAlpha(Colors.text, 0.15)
+                                                                border.color: Colors.border
                                                                 border.width: 1
                                                             }
                                                         }

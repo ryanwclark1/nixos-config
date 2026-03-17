@@ -2,9 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
-import Quickshell.Services.Mpris
 import Quickshell.Wayland
-import Quickshell.Widgets
 import "../system/sections"
 import "../../services"
 import "../../widgets" as SharedWidgets
@@ -131,14 +129,7 @@ PanelWindow {
           size: 32
           icon: "󰎟"
           iconColor: Colors.textDisabled
-          onClicked: {
-            if (root.manager) {
-              for (var i = root.manager.notifications.count - 1; i >= 0; i--) {
-                var n = root.manager.notifications.get(i);
-                if (n) n.dismiss();
-              }
-            }
-          }
+          onClicked: if (root.manager) root.manager.dismissAll()
         }
 
         // Close button
@@ -202,263 +193,139 @@ PanelWindow {
           id: notifList
           anchors.fill: parent
           spacing: Colors.spacingM; clip: true; focus: true
-          highlightFollowsCurrentItem: true; keyNavigationEnabled: true
-          Keys.onEscapePressed: root.closeRequested()
           model: root.manager ? root.manager.notifications : null
 
-        property var collapsedGroups: ({})
+          property var collapsedGroups: ({})
 
-        add: Transition {
-          NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic }
-          NumberAnimation { property: "scale"; from: 0.9; to: 1.0; duration: Colors.durationEmphasis; easing.type: Easing.OutBack }
-        }
+          add: Transition {
+            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: Colors.durationPanelOpen; easing.type: Easing.OutCubic }
+            NumberAnimation { property: "scale"; from: 0.95; to: 1.0; duration: Colors.durationPanelOpen; easing.type: Easing.OutBack }
+          }
 
-        remove: Transition {
-          NumberAnimation { property: "opacity"; to: 0; duration: Colors.durationSlow }
-          NumberAnimation { property: "scale"; to: 0.9; duration: Colors.durationSlow }
-        }
+          remove: Transition {
+            NumberAnimation { property: "opacity"; to: 0; duration: Colors.durationNormal }
+          }
 
-        displaced: Transition {
-          NumberAnimation { properties: "x,y"; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
-        }
+          displaced: Transition {
+            NumberAnimation { properties: "y"; duration: Colors.durationPanelOpen; easing.type: Easing.OutCubic }
+          }
 
-        function toggleGroup(name) {
-          var groups = JSON.parse(JSON.stringify(collapsedGroups));
-          groups[name] = !groups[name];
-          collapsedGroups = groups;
-        }
-
-        section.property: "appName"
-        section.criteria: ViewSection.FullString
-        section.delegate: Rectangle {
-          width: notifList.width; height: 35; color: "transparent"
-          property bool isCollapsed: notifList.collapsedGroups[section] || false
-
-          RowLayout {
-            anchors.fill: parent; spacing: Colors.paddingSmall
-
-            MouseArea {
-              width: 20; height: 20
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-              Text {
-                anchors.centerIn: parent; text: isCollapsed ? "󰅂" : "󰅀"; color: Colors.primary
-                font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
-              }
-              onClicked: notifList.toggleGroup(section)
-            }
-
+          // Empty state
+          ColumnLayout {
+            anchors.centerIn: parent
+            visible: (notifList.count === 0 && root.searchQuery === "") || (root.searchQuery !== "" && notifList.visibleCount === 0)
+            spacing: Colors.spacingM
+            opacity: 0.6
             Text {
-              text: section || "System"
-              color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold
-              font.capitalization: Font.AllUppercase; font.letterSpacing: Colors.letterSpacingWide
+              Layout.alignment: Qt.AlignHCenter
+              text: root.searchQuery === "" ? "󰂚" : "󰍉"
+              color: Colors.textDisabled
+              font.pixelSize: 64
+              font.family: Colors.fontMono
             }
-
-            Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.5 }
-
-            // App Count Badge
-            Rectangle {
-              width: 20; height: 16; radius: Colors.radiusSmall; color: Colors.highlight
-              readonly property int sectionCount: {
-                var count = 0;
-                var notifs = root.manager ? root.manager.notifications : null;
-                if (!notifs) return 0;
-                for (var i = 0; i < notifs.count; i++) {
-                  var n = notifs.get(i);
-                  if (n && n.appName === section) count++;
-                }
-                return count;
-              }
-              Text { anchors.centerIn: parent; text: parent.sectionCount; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+            Text {
+              Layout.alignment: Qt.AlignHCenter
+              text: root.searchQuery === "" ? "No new notifications" : "No matches found"
+              color: Colors.textDisabled
+              font.pixelSize: Colors.fontSizeLarge
+              font.weight: Font.Medium
             }
+          }
 
-            SharedWidgets.IconButton {
-              size: 24; radius: Colors.radiusCard
-              icon: "󰅖"; iconColor: Colors.textDisabled
-              onClicked: {
-                if (!root.manager) return;
-                for (var i = root.manager.notifications.count - 1; i >= 0; i--) {
-                  var n = root.manager.notifications.get(i);
-                  if (n && n.appName === section) n.dismiss();
-                }
+          readonly property int visibleCount: {
+            var count = 0;
+            if (!root.manager || !root.manager.notifications) return 0;
+            for (var i = 0; i < root.manager.notifications.count; i++) {
+              var n = root.manager.notifications.get(i);
+              if (!n || n.dismissed) continue;
+              var q = root.searchQuery.toLowerCase();
+              if (q === "" || (n.appName && n.appName.toLowerCase().includes(q)) || (n.summary && n.summary.toLowerCase().includes(q)) || (n.body && n.body.toLowerCase().includes(q))) {
+                count++;
               }
             }
-          }
-        }
-
-        delegate: Rectangle {
-          id: notifItem
-          property var notification: modelData
-          property bool isCollapsed: notifList.collapsedGroups[modelData.appName] || false
-
-          visible: !notification.dismissed && matchesSearch && !isCollapsed
-          width: notifList.width
-          height: visible ? colItem.implicitHeight + 24 + (isReplying ? 50 : 0) : 0
-          color: Colors.cardSurface
-          opacity: isCollapsed ? 0 : 1
-          radius: Colors.radiusCard
-          border.color: ListView.isCurrentItem && notifList.activeFocus ? Colors.primary : Colors.border
-          border.width: 1
-          clip: true
-
-          // Search filtering logic
-          property bool matchesSearch: {
-             if (root.searchQuery === "") return true;
-             var q = root.searchQuery.toLowerCase();
-             return (modelData.appName && modelData.appName.toLowerCase().includes(q)) ||
-                    (modelData.summary && modelData.summary.toLowerCase().includes(q)) ||
-                    (modelData.body && modelData.body.toLowerCase().includes(q));
+            return count;
           }
 
-          property bool isReplying: false
-          onIsReplyingChanged: {
-            if (isReplying) replyInput.forceActiveFocus();
-            else if (replyInput.activeFocus) replyInput.focus = false;
+          function toggleGroup(name) {
+            var groups = JSON.parse(JSON.stringify(collapsedGroups));
+            groups[name] = !groups[name];
+            collapsedGroups = groups;
           }
 
-          // MPRIS Integration
-          property var mprisPlayer: {
-            if (!modelData.appName) return null;
-            var app = modelData.appName.toLowerCase();
-            for (var i = 0; i < Mpris.players.length; i++) {
-              var p = Mpris.players[i];
-              if ((p.identity || "").toLowerCase().includes(app) || p.desktopEntry === app) return p;
-            }
-            return null;
-          }
-
-          Column {
-            id: colItem
-            width: parent.width - 24; anchors.top: parent.top; anchors.topMargin: Colors.spacingM; anchors.horizontalCenter: parent.horizontalCenter; spacing: Colors.paddingSmall
+          section.property: "appName"
+          section.criteria: ViewSection.FullString
+          section.delegate: Item {
+            width: notifList.width
+            height: 44
+            property bool isCollapsed: notifList.collapsedGroups[section] || false
 
             RowLayout {
-              width: parent.width; spacing: Colors.spacingM
-              Image {
-                Layout.preferredWidth: 32; Layout.preferredHeight: 32
-                source: Config.resolveIconSource(modelData.appIcon || "")
-                sourceSize: Qt.size(64, 64)
-                asynchronous: true
-                visible: modelData.appIcon !== ""
-                Rectangle { anchors.fill: parent; color: "transparent"; visible: parent.status !== Image.Ready; Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.text; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono } }
-              }
+              anchors.fill: parent
+              anchors.leftMargin: Colors.spacingS
+              spacing: Colors.spacingM
 
-              ColumnLayout {
-                Layout.fillWidth: true; spacing: Colors.spacingXXS
-                RowLayout {
-                  Layout.fillWidth: true
-                  Text {
-                    text: modelData.summary; color: Colors.text; font.pixelSize: Colors.fontSizeLarge; font.weight: Font.Bold
-                    Layout.fillWidth: true; elide: Text.ElideRight
-                  }
-                  Text {
-                    text: modelData.time ? Qt.formatDateTime(modelData.time, "HH:mm") : ""
-                    color: Colors.textDisabled; font.pixelSize: Colors.fontSizeSmall
-                  }
-                }
+              MouseArea {
+                Layout.preferredWidth: 24; Layout.preferredHeight: 24
+                hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                 Text {
-                  text: modelData.body; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium
-                  Layout.fillWidth: true; wrapMode: Text.Wrap; visible: modelData.body !== ""
+                  anchors.centerIn: parent; text: isCollapsed ? "󰅂" : "󰅀"; color: Colors.primary
+                  font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
                 }
-              }
-            }
-
-            // Media Controls (if applicable)
-            Rectangle {
-              width: parent.width; height: 40; radius: Colors.radiusXS; color: Colors.highlightLight; visible: mprisPlayer !== null
-              RowLayout {
-                anchors.fill: parent; anchors.margins: Colors.spacingS; spacing: Colors.paddingMedium
-                Item { Layout.fillWidth: true }
-                SharedWidgets.IconButton {
-                  size: 24; icon: "󰒮"; iconColor: Colors.text
-                  onClicked: { if (mprisPlayer) mprisPlayer.previous(); }
-                }
-                SharedWidgets.IconButton {
-                  size: 32; color: Colors.primary
-                  icon: mprisPlayer && mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
-                  iconColor: Colors.background
-                  onClicked: { if (mprisPlayer) mprisPlayer.playPause(); }
-                }
-                SharedWidgets.IconButton {
-                  size: 24; icon: "󰒭"; iconColor: Colors.text
-                  onClicked: { if (mprisPlayer) mprisPlayer.next(); }
-                }
-                Item { Layout.fillWidth: true }
-              }
-            }
-
-            // Large Image Preview
-            ClippingWrapperRectangle {
-              width: parent.width; height: 150; visible: modelData.image !== ""; radius: Colors.radiusXS; color: "transparent"; border.color: Colors.border; border.width: 1
-              Image { source: modelData.image || ""; sourceSize: Qt.size(600, 300); asynchronous: true; fillMode: Image.PreserveAspectCrop }
-            }
-
-            // Inline Reply Area
-            Rectangle {
-              width: parent.width; height: 36; radius: Colors.radiusXXS; color: Colors.highlightLight; visible: isReplying
-              TextInput {
-                id: replyInput; anchors.fill: parent; anchors.margins: Colors.spacingS
-                verticalAlignment: Text.AlignVCenter
-                color: Colors.text; font.pixelSize: Colors.fontSizeMedium
-                onVisibleChanged: if (!visible && activeFocus) focus = false
-                Keys.onReturnPressed: {
-                  notifItem.notification.invoke(text);
-                  notifItem.isReplying = false;
-                  notifItem.notification.dismiss();
-                }
-                Keys.onEscapePressed: notifItem.isReplying = false
-              }
-            }
-
-            // Actions
-            RowLayout {
-              width: parent.width; spacing: Colors.spacingS; visible: !isReplying
-
-              // Dynamic Actions from Notification
-              Repeater {
-                model: notifItem.notification ? notifItem.notification.actions : null
-                delegate: Rectangle {
-                  id: actionRect
-                  Layout.fillWidth: true; height: 28; color: Colors.highlightLight; radius: Colors.radiusXXS
-                  Text { anchors.centerIn: parent; text: modelData && modelData.label ? modelData.label : ""; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium }
-                  SharedWidgets.StateLayer {
-                    id: actionStateLayer
-                    hovered: actionMa.containsMouse
-                    pressed: actionMa.pressed
-                  }
-                  MouseArea {
-                    id: actionMa
-                    anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                    onClicked: (mouse) => {
-                      actionStateLayer.burst(mouse.x, mouse.y);
-                      var label = modelData && modelData.label ? modelData.label.toLowerCase() : "";
-                      if (label.includes("reply")) notifItem.isReplying = true;
-                      else if (modelData) { modelData.invoke(); notifItem.notification.dismiss(); }
-                    }
-                  }
-                }
+                onClicked: notifList.toggleGroup(section)
               }
 
-              // Dismiss Action
+              Text {
+                text: section || "System"
+                color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Black
+                font.capitalization: Font.AllUppercase; font.letterSpacing: Colors.letterSpacingWide
+              }
+
+              Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.4 }
+
               Rectangle {
-                Layout.preferredWidth: 32; height: 28; color: Colors.highlightLight; radius: Colors.radiusXXS
-                Text { anchors.centerIn: parent; text: "󰅖"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
-                SharedWidgets.StateLayer {
-                  id: dismissStateLayer
-                  hovered: dismissMa.containsMouse
-                  pressed: dismissMa.pressed
-                }
-                MouseArea {
-                  id: dismissMa
-                  anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                  onClicked: (mouse) => {
-                    dismissStateLayer.burst(mouse.x, mouse.y);
-                    notifItem.notification.dismiss();
+                width: 24; height: 18; radius: Colors.radiusSmall; color: Colors.highlight
+                readonly property int sectionCount: {
+                  var count = 0;
+                  var notifs = root.manager ? root.manager.notifications : null;
+                  if (!notifs) return 0;
+                  for (var i = 0; i < notifs.count; i++) {
+                    var n = notifs.get(i);
+                    if (n && n.appName === section) count++;
                   }
+                  return count;
                 }
+                Text { anchors.centerIn: parent; text: parent.sectionCount; color: Colors.primary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+              }
+
+              SharedWidgets.IconButton {
+                size: 28; icon: "󰅖"; iconColor: Colors.textDisabled
+                stateColor: Colors.error
+                onClicked: if (root.manager) root.manager.dismissAll(section)
               }
             }
           }
-        }
+
+          delegate: NotificationDelegate {
+            id: ncDelegate
+            notification: modelData
+            property bool isGroupCollapsed: notifList.collapsedGroups[modelData.appName] || false
+            visible: !notification.dismissed && matchesSearch && !isGroupCollapsed
+            height: visible ? implicitHeight : 0
+            opacity: isGroupCollapsed ? 0 : 1
+            width: notifList.width
+
+            property bool matchesSearch: {
+               if (root.searchQuery === "") return true;
+               var q = root.searchQuery.toLowerCase();
+               return (modelData.appName && modelData.appName.toLowerCase().includes(q)) ||
+                      (modelData.summary && modelData.summary.toLowerCase().includes(q)) ||
+                      (modelData.body && modelData.body.toLowerCase().includes(q));
+            }
+
+            onDismissRequested: notification.dismiss()
+            onActionInvoked: action => { action.invoke(); notification.dismiss(); }
+            onReplySent: text => { notification.invoke(text); notification.dismiss(); }
+          }
 
           SharedWidgets.Scrollbar { flickable: notifList }
           SharedWidgets.OverscrollGlow { flickable: notifList }
@@ -466,46 +333,53 @@ PanelWindow {
       }
 
       // Archive Section
-      Column {
-        width: parent.width; spacing: Colors.spacingS
-        visible: root.manager && root.manager.archivedNotifications.length > 0
+      ColumnLayout {
+        Layout.fillWidth: true
+        spacing: Colors.spacingS
+        visible: root.manager && root.manager.archivedNotifications.length > 0 && root.searchQuery === ""
 
         RowLayout {
-          width: parent.width
-          Text { text: "ARCHIVE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+          Layout.fillWidth: true
+          Text {
+            text: "RECENTLY DISMISSED"
+            color: Colors.textDisabled
+            font.pixelSize: Colors.fontSizeXXS
+            font.weight: Font.Black
+            font.letterSpacing: Colors.letterSpacingWide
+          }
           Item { Layout.fillWidth: true }
-          MouseArea {
-            width: 40; height: 20
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            Text { anchors.centerIn: parent; text: "Clear"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS }
+          SharedWidgets.Button {
+            text: "Clear Archive"
+            fontSize: Colors.fontSizeXXS
+            Layout.preferredHeight: 22
             onClicked: if (root.manager) root.manager.clearArchive()
           }
         }
 
         ListView {
-          width: parent.width
-          height: Math.min(contentHeight, 300)
+          Layout.fillWidth: true
+          height: Math.min(contentHeight, 240)
           clip: true
           model: root.manager ? root.manager.archivedNotifications : null
-          cacheBuffer: 120
           spacing: Colors.spacingS
           delegate: Rectangle {
-            width: ListView.view.width; height: 60; color: Colors.withAlpha(Colors.surface, 0.92); radius: Colors.radiusSmall; opacity: 0.8
+            width: ListView.view.width; height: 54; color: Colors.cardSurface; radius: Colors.radiusMedium; opacity: 0.7
             border.color: Colors.border; border.width: 1
-            
-            // Inner highlight
-            SharedWidgets.InnerHighlight { }
 
-            Row {
-              anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
-              Rectangle { width: 32; height: 32; color: "transparent"
-                Text { anchors.centerIn: parent; text: "󰂚"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeHuge; font.family: Colors.fontMono }
+            SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
+
+            RowLayout {
+              anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingMedium
+              SharedWidgets.AppIcon {
+                iconName: modelData.appIcon || ""
+                appName: modelData.appName || ""
+                iconSize: 24
+                fallbackIcon: "󰂚"
               }
-              Column {
-                width: parent.width - 50; spacing: Colors.spacingXXS
-                Text { text: modelData.summary; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Bold; elide: Text.ElideRight; width: parent.width }
-                Text { text: modelData.body; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; elide: Text.ElideRight; width: parent.width }
+              ColumnLayout {
+                Layout.fillWidth: true; spacing: 0
+                Text { text: modelData.summary; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; elide: Text.ElideRight; Layout.fillWidth: true }
+                Text { text: modelData.body; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; elide: Text.ElideRight; Layout.fillWidth: true; visible: modelData.body !== "" }
               }
             }
           }

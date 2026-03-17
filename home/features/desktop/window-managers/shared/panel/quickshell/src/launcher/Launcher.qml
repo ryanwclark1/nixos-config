@@ -3516,7 +3516,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: 1
             radius: Math.max(0, hudBox.radius - 1)
-            color: Colors.popupSurface
+            color: Colors.cardSurface
             border.color: Colors.withAlpha(Colors.border, 0.1)
             border.width: 1
         }

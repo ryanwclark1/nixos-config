@@ -9,7 +9,7 @@ Rectangle {
     required property var launcher
 
     radius: Colors.radiusLarge
-    color: Qt.rgba(0.18, 0.18, 0.21, 0.96)
+    color: Colors.popupSurface
     border.color: Colors.primaryStrong
     border.width: 1
 

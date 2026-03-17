@@ -61,8 +61,8 @@ QtObject {
     readonly property color borderLight: withAlpha(text, 0.12)
     readonly property color borderDark: withAlpha("#000000", 0.25)
     readonly property color glassBorder: withAlpha(text, 0.1)
-    readonly property color borderMedium: withAlpha(border, 0.4)     // Subtle separator / divider
-    readonly property color borderFocus: withAlpha(border, 0.6)      // Focused input / strong border
+    readonly property color borderMedium: withAlpha(text, 0.4)       // Subtle separator / divider
+    readonly property color borderFocus: withAlpha(text, 0.6)        // Focused input / strong border
 
     // --- STATUS COLOR ALIASES ---
     readonly property color errorLight: withAlpha(error, 0.15)       // Error indicator bg

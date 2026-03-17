@@ -7,6 +7,7 @@ BarContextPopup 1.0 ../features/bar/components/BarContextPopup.qml
 BarPill 1.0 ../features/bar/components/BarPill.qml
 BarTooltip 1.0 ../features/bar/components/BarTooltip.qml
 BatteryWidget 1.0 ../features/power/components/BatteryWidget.qml
+Button 1.0 ../shared/Button.qml
 CardBase 1.0 ../shared/CardBase.qml
 Chip 1.0 ../shared/Chip.qml
 ClickRipple 1.0 ../shared/ClickRipple.qml

@@ -8,7 +8,7 @@ Rectangle {
   Layout.fillWidth: true
   Layout.preferredHeight: weatherContent.implicitHeight + Colors.paddingMedium * 2
   color: Colors.cardSurface
-  radius: Colors.radiusMedium
+  radius: Colors.radiusLarge
   border.color: Colors.border
   clip: true
 

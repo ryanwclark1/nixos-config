@@ -75,6 +75,16 @@ Item {
   function loadNotifications() {
     if (!readArchive.running) readArchive.running = true;
   }
+
+  function dismissAll(appName) {
+    if (!server || !server.trackedNotifications) return;
+    for (var i = server.trackedNotifications.count - 1; i >= 0; i--) {
+      var n = server.trackedNotifications.get(i);
+      if (n && (!appName || n.appName === appName)) {
+        n.dismiss();
+      }
+    }
+  }
   
   function clearArchive() {
      archivedNotifications = [];

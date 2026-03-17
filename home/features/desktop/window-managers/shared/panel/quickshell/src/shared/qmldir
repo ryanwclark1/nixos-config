@@ -1,5 +1,6 @@
 ActionCard 1.0 ActionCard.qml
 AppIcon 1.0 AppIcon.qml
+Button 1.0 Button.qml
 CardBase 1.0 CardBase.qml
 Chip 1.0 Chip.qml
 ClickRipple 1.0 ClickRipple.qml

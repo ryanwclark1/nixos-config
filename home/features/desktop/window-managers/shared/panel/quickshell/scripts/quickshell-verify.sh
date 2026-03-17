@@ -8,10 +8,11 @@ usage() {
 Usage: quickshell-verify.sh [--quiet]
 
 Run the Quickshell-first verification workflow.
-By default the visual/runtime phase uses the VM-backed panel QA wrappers.
+By default this runs the shared plugin/runtime guards first, then the VM-backed
+Quickshell runtime/settings path.
   1. shared plugin/runtime guards
   2. VM-backed Quickshell runtime/settings checks
-  3. host repo-shell opt-out via PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 when needed
+  3. fast host verification is available separately via scripts/quickshell-structure-verify.sh
 
 This is a thin wrapper over:
   scripts/plugin-local.sh live-gates

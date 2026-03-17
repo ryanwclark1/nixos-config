@@ -143,6 +143,13 @@ call_ipc() {
   run_ipc quickshell ipc --pid "${unit_pid}" call "${target}" "${action}" "$@"
 }
 
+surface_is_open() {
+  local surface_id="$1"
+  local state=""
+  state="$(call_ipc Shell isSurfaceOpen "${surface_id}" 2>/dev/null || true)"
+  [[ "${state}" == "true" ]]
+}
+
 start_transient_unit() {
   local run_args=()
   local env_entry=""
@@ -207,14 +214,23 @@ exercise_surfaces() {
   for surface_id in notifCenter controlCenter audioMenu dateTimeMenu clipboardMenu; do
     if call_ipc Shell openSurface "${surface_id}" >/dev/null; then
       pass "Shell.openSurface ${surface_id}"
+    elif surface_is_open "${surface_id}"; then
+      pass "Shell.openSurface ${surface_id} (already open)"
     else
-      fail "Shell.openSurface ${surface_id}"
+      sleep 0.2
+      if call_ipc Shell openSurface "${surface_id}" >/dev/null || surface_is_open "${surface_id}"; then
+        pass "Shell.openSurface ${surface_id} (retry)"
+      else
+        fail "Shell.openSurface ${surface_id}"
+      fi
     fi
     sleep 0.2
-    if call_ipc Shell closeAllSurfaces >/dev/null; then
-      pass "Shell.closeAllSurfaces after ${surface_id}"
+    if call_ipc Shell closeSurface "${surface_id}" >/dev/null; then
+      pass "Shell.closeSurface ${surface_id}"
+    elif ! surface_is_open "${surface_id}"; then
+      pass "Shell.closeSurface ${surface_id} (already closed)"
     else
-      warn "Shell.closeAllSurfaces after ${surface_id}"
+      warn "Shell.closeSurface ${surface_id}"
     fi
     sleep 0.1
   done
