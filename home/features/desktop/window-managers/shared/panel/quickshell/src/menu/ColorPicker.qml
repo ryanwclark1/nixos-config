@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import "../services"
+import "../services/ColorUtils.js" as ColorUtils
 import "../widgets" as SharedWidgets
 
 PanelWindow {
@@ -93,29 +94,13 @@ PanelWindow {
   function applyHex(hex) {
     var clean = hex.replace(/^#/, "");
     if (clean.length !== 6) return;
-    var r = parseInt(clean.substring(0, 2), 16) / 255;
-    var g = parseInt(clean.substring(2, 4), 16) / 255;
-    var b = parseInt(clean.substring(4, 6), 16) / 255;
-    var hsv = rgbToHsv(r, g, b);
-    root.hue        = hsv[0];
-    root.saturation = hsv[1];
-    root.value      = hsv[2];
-  }
-
-  // RGB → HSV conversion (returns [h, s, v] each 0-1)
-  function rgbToHsv(r, g, b) {
-    var max = Math.max(r, g, b);
-    var min = Math.min(r, g, b);
-    var delta = max - min;
-    var h = 0, s = 0, v = max;
-    if (delta > 0.0001) {
-      s = delta / max;
-      if (max === r)      h = ((g - b) / delta) / 6;
-      else if (max === g) h = (2 + (b - r) / delta) / 6;
-      else                h = (4 + (r - g) / delta) / 6;
-      if (h < 0) h += 1;
-    }
-    return [h, s, v];
+    var r = parseInt(clean.substring(0, 2), 16);
+    var g = parseInt(clean.substring(2, 4), 16);
+    var b = parseInt(clean.substring(4, 6), 16);
+    var hsv = ColorUtils.rgbToHsv(r, g, b);
+    root.hue        = hsv.h / 360;
+    root.saturation = hsv.s;
+    root.value      = hsv.v;
   }
 
   // Clipboard copy helper
@@ -612,10 +597,10 @@ PanelWindow {
                   var r = modelData.label === "R" ? newVal : Math.round(root.currentColor.r * 255);
                   var g = modelData.label === "G" ? newVal : Math.round(root.currentColor.g * 255);
                   var b = modelData.label === "B" ? newVal : Math.round(root.currentColor.b * 255);
-                  var hsv = root.rgbToHsv(r / 255, g / 255, b / 255);
-                  root.hue        = hsv[0];
-                  root.saturation = hsv[1];
-                  root.value      = hsv[2];
+                  var hsv = ColorUtils.rgbToHsv(r, g, b);
+                  root.hue        = hsv.h / 360;
+                  root.saturation = hsv.s;
+                  root.value      = hsv.v;
                 }
 
                 onPressed:         (e) => updateChannel(e.x)
