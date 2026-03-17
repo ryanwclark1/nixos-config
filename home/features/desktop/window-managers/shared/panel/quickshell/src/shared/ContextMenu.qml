@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../widgets"
 
 // Right-click context menu with keyboard navigation, separators, and icons.
 //

@@ -1,4 +1,4 @@
-ActionCard 1.0 ActionCard.qml
+ActionCard 1.0 ../shared/ActionCard.qml
 AppIcon 1.0 AppIcon.qml
 AppVolumeEntry 1.0 ../features/audio/components/AppVolumeEntry.qml
 AudioDeviceSection 1.0 ../features/audio/components/AudioDeviceSection.qml
@@ -11,7 +11,7 @@ CardBase 1.0 CardBase.qml
 Chip 1.0 Chip.qml
 ClickRipple 1.0 ClickRipple.qml
 CollapsibleSection 1.0 CollapsibleSection.qml
-ContextMenu 1.0 ContextMenu.qml
+ContextMenu 1.0 ../shared/ContextMenu.qml
 Corners 1.0 Corners.qml
 DesktopClock 1.0 ../features/desktop/components/DesktopClock.qml
 DesktopSystemStat 1.0 ../features/desktop/components/DesktopSystemStat.qml
@@ -33,7 +33,7 @@ LockContext 1.0 ../features/lock/components/LockContext.qml
 LockPanel 1.0 ../features/lock/LockPanel.qml
 MediaBar 1.0 ../features/media/components/MediaBar.qml
 MediaOsd 1.0 ../features/media/components/MediaOsd.qml
-MenuCloseButton 1.0 MenuCloseButton.qml
+MenuCloseButton 1.0 ../shared/MenuCloseButton.qml
 MiniProgressBar 1.0 MiniProgressBar.qml
 MuteButton 1.0 ../features/audio/components/MuteButton.qml
 NativeLock 1.0 ../features/lock/components/NativeLock.qml
@@ -44,7 +44,7 @@ Osd 1.0 ../features/osd/Osd.qml
 OverscrollGlow 1.0 OverscrollGlow.qml
 PrivacySourceRow 1.0 ../features/status/PrivacySourceRow.qml
 PulseButton 1.0 PulseButton.qml
-Ref 1.0 Ref.qml
+Ref 1.0 ../shared/Ref.qml
 ScreenBorder 1.0 ScreenBorder.qml
 ScrollableContent 1.0 ScrollableContent.qml
 Scrollbar 1.0 Scrollbar.qml
