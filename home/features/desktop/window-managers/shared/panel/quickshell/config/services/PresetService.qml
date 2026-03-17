@@ -91,19 +91,4 @@ QtObject {
         _refreshDelay.restart();
     }
 
-    // ── Export / Import ──────────────────────────
-    function exportPreset(name, destPath) {
-        if (!name || !destPath) return;
-        var safeName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
-        Quickshell.execDetached(["cp", _presetsDir + "/" + safeName + ".json", destPath]);
-    }
-
-    function importPreset(srcPath) {
-        if (!srcPath) return;
-        Quickshell.execDetached(["sh", "-c",
-            "mkdir -p '" + _presetsDir + "'; "
-            + "cp '" + srcPath + "' '" + _presetsDir + "/' 2>/dev/null"
-        ]);
-        _refreshDelay.restart();
-    }
 }

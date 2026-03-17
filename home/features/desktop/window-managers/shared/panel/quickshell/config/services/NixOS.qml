@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-Item {
+QtObject {
     id: root
 
     property var generations: []
@@ -13,11 +13,10 @@ Item {
     function refresh() {
         if (busy) return;
         busy = true;
-        genProc.running = true;
+        _genProc.running = true;
     }
 
-    Process {
-        id: genProc
+    property Process _genProc: Process {
         command: ["sh", "-c", "nixos-rebuild list-generations"]
         stdout: StdioCollector {
             onStreamFinished: {

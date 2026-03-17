@@ -2,7 +2,6 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "."
 
 QtObject {
     id: colors
@@ -54,8 +53,8 @@ QtObject {
     readonly property int shadowSizeHigh: 16
 
     // --- POPUP SURFACES (shared across all menus) ---
-    readonly property color popupSurface: withAlpha(surface, Config.popupOpacity)
-    readonly property color cardSurface: withAlpha(surface, Config.cardOpacity)
+    readonly property color popupSurface: withAlpha(surface, 0.96)
+    readonly property color cardSurface: withAlpha(surface, 0.96)
     readonly property color chipSurface: withAlpha(surface, 0.92)
     readonly property color modalSurface: solid(surface)
     readonly property color modalSidebarSurface: _isLight ? Qt.darker(modalSurface, 1.04) : Qt.darker(modalSurface, 1.12)

@@ -57,7 +57,6 @@ require_pattern "$panel_qml" 'if \(widgetType === "vpn"\)\s+return vpnComponent;
 require_literal "$panel_qml" 'root.requestSurface("vpnMenu", this)' "VPN widget opens the vpnMenu surface"
 require_literal "$surface_service_qml" 'vpnMenu: {' "SurfaceService registers vpnMenu"
 require_literal "$shell_qml" 'readonly property bool vpnMenuVisible: root.isSurfaceOpen("vpnMenu")' "shell.qml exposes vpnMenu visibility"
-require_literal "$shell_qml" 'function toggleVpnMenu() {' "shell.qml exposes toggleVpnMenu helper"
 require_literal "$shell_bar_layer_qml" 'VpnMenu {' "ShellBarLayer instantiates VpnMenu"
 require_literal "$menu_qmldir" 'VpnMenu 1.0 VpnMenu.qml' "menu qmldir exports VpnMenu"
 require_literal "$widget_qmldir" 'VpnWidget 1.0 VpnWidget.qml' "widgets qmldir exports VpnWidget"

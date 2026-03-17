@@ -134,7 +134,7 @@ QtObject {
         var renameRegex = /\[RENAME_WORKSPACE:\s*([^|\]]+)\s*\|\s*([^\]]+)\]/g;
         var renameMatch;
         while ((renameMatch = renameRegex.exec(content)) !== null) {
-            WorkspaceIdentityService.renameWorkspace(renameMatch[1].trim(), renameMatch[2].trim());
+            WorkspaceIdentityService.setWorkspaceName(renameMatch[1].trim(), renameMatch[2].trim());
         }
     }
 
@@ -625,8 +625,15 @@ QtObject {
         var model = activeModel;
 
         // Stage pending stream command — launched when temp file write completes
-        _pendingStreamCommand = ["qs-ai-stream", provider, model, endpoint, apiKey, tmpFile,
-                                 Config.aiMaxTokens.toString(), Config.aiTemperature.toString()];
+        var cmd = ["qs-ai-stream", provider, model, endpoint, apiKey, tmpFile,
+                   Config.aiMaxTokens.toString(), Config.aiTemperature.toString()];
+        
+        // Add visual context (image path) if supported and provided
+        if (visualContext && Providers.supportsVision(provider, model)) {
+            cmd.push(visualContext);
+        }
+
+        _pendingStreamCommand = cmd;
         isStreaming = true;
         _writeTempFile(tmpFile, JSON.stringify(msgs));
     }
@@ -743,6 +750,28 @@ QtObject {
     function refreshActiveWindowTitle() {
         // Kept for API compatibility with existing callers.
         return;
+    }
+
+    property string lastSelectionText: ""
+    property bool isSelectionBusy: false
+    
+    function fetchSelection() {
+        if (isSelectionBusy) return;
+        isSelectionBusy = true;
+        lastSelectionText = "";
+        selectionProc.command = ["wl-paste", "-p"];
+        selectionProc.running = true;
+    }
+
+    property Process _selectionProc: Process {
+        id: selectionProc
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.lastSelectionText = this.text.trim();
+                root.isSelectionBusy = false;
+            }
+        }
     }
 
     // ── OCR Helpers ─────────────────────────────

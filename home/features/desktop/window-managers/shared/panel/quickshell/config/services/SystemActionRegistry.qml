@@ -134,16 +134,6 @@ QtObject {
         return result;
     }
 
-    function commandFor(actionId) {
-        var action = root.actionById(actionId);
-        return action && action.cmd ? action.cmd : [];
-    }
-
-    function requiresConfirmation(actionId) {
-        var action = root.actionById(actionId);
-        return !!(action && action.requiresConfirmation);
-    }
-
     function execute(actionId) {
         var action = root.actionById(actionId);
         if (!action)

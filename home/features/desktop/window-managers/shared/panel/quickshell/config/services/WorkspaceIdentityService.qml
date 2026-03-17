@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-Item {
+QtObject {
     id: root
 
     // id (string) → { name: string, project: string, lastActive: number }
@@ -33,20 +33,15 @@ Item {
         return data ? (data.name || "") : "";
     }
 
-    function renameWorkspace(id, name) {
-        setWorkspaceName(id, name);
-    }
-
     // ── Persistence ──────────────────────────────
     function saveState() {
         if (_loading) return;
         var content = JSON.stringify(workspaceData);
-        saveProc.command = ["sh", "-c", "mkdir -p $(dirname '" + savePath + "') && cat > '" + savePath + "'"];
-        saveProc.running = true;
+        _saveProc.command = ["sh", "-c", "mkdir -p $(dirname '" + savePath + "') && cat > '" + savePath + "'"];
+        _saveProc.running = true;
     }
 
-    Process {
-        id: saveProc
+    property Process _saveProc: Process {
         stdinEnabled: true
         onStarted: {
             write(JSON.stringify(root.workspaceData));
@@ -56,11 +51,10 @@ Item {
 
     function loadState() {
         _loading = true;
-        loadProc.running = true;
+        _loadProc.running = true;
     }
 
-    Process {
-        id: loadProc
+    property Process _loadProc: Process {
         command: ["cat", root.savePath]
         stdout: StdioCollector {
             onStreamFinished: {

@@ -34,11 +34,6 @@ QtObject {
         return frequency * decay;
     }
 
-    function getUsageCount(appId) {
-        var entry = _data[appId];
-        return entry ? (entry.count || 0) : 0;
-    }
-
     // ── Internal ─────────────────────────────────
     property var _data: ({})
     readonly property string _filePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/usage.json"

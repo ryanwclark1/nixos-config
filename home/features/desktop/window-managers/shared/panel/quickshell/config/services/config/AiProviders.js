@@ -79,3 +79,24 @@ function envKeyName(provider) {
         default:          return "";
     }
 }
+
+function supportsVision(provider, model) {
+    if (provider === "anthropic") {
+        // Most Claude 3 models support vision
+        return model.indexOf("claude-3") !== -1;
+    }
+    if (provider === "openai") {
+        // GPT-4o and O1 support vision
+        return model.indexOf("gpt-4o") !== -1 || model.indexOf("o1") !== -1;
+    }
+    if (provider === "gemini") {
+        // All recent Gemini models support vision
+        return true;
+    }
+    if (provider === "ollama") {
+        // Some common Ollama vision models
+        var m = model.toLowerCase();
+        return m.indexOf("llava") !== -1 || m.indexOf("moondream") !== -1 || m.indexOf("bakllava") !== -1;
+    }
+    return false;
+}

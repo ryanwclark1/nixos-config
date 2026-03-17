@@ -101,9 +101,6 @@ SharedWidgets.CardBase {
         ToastService.showError("Update check failed", root.statusDetail);
       }
     }
-    stdout: StdioCollector {
-      onStreamFinished: {}
-    }
     stderr: StdioCollector {
       onStreamFinished: {
         root.lastError = (this.text || "").trim();

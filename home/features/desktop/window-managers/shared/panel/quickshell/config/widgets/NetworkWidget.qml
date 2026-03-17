@@ -80,64 +80,27 @@ Row {
             anchors.verticalCenter: parent.verticalCenter
         }
 
-        Rectangle {
-            visible: secondaryLabel.text.length > 0
-            radius: Colors.radiusXS
-            color: Colors.highlightLight
-            border.color: Colors.border
-            border.width: 1
-            implicitHeight: 18
-            implicitWidth: secondaryLabel.implicitWidth + 10
-            anchors.verticalCenter: parent.verticalCenter
-
-            Text {
-                id: secondaryLabel
-                anchors.centerIn: parent
-                text: root.secondaryText
-                color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Medium
-            }
+        NetworkBadge {
+            visible: text.length > 0
+            text: root.secondaryText
+            badgeColor: Colors.highlightLight
+            borderColor: Colors.border
+            textColor: Colors.textSecondary
+            fontWeight: Font.Medium
         }
 
-        Rectangle {
+        NetworkBadge {
             visible: root.hasVpn
-            radius: Colors.radiusXS
-            color: Colors.withAlpha(Colors.accent, 0.14)
-            border.color: Colors.withAlpha(Colors.accent, 0.35)
-            border.width: 1
-            implicitHeight: 18
-            implicitWidth: vpnLabel.implicitWidth + 10
-            anchors.verticalCenter: parent.verticalCenter
-
-            Text {
-                id: vpnLabel
-                anchors.centerIn: parent
-                text: NetworkService.vpnOtherCount > 1 ? NetworkService.vpnOtherCount + " VPN" : "VPN"
-                color: Colors.accent
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.DemiBold
-            }
+            text: NetworkService.vpnOtherCount > 1 ? NetworkService.vpnOtherCount + " VPN" : "VPN"
+            badgeColor: Colors.accent
+            textColor: Colors.accent
         }
 
-        Rectangle {
+        NetworkBadge {
             visible: root.tailscaleActive
-            radius: Colors.radiusXS
-            color: Colors.withAlpha(Colors.primary, 0.14)
-            border.color: Colors.withAlpha(Colors.primary, 0.35)
-            border.width: 1
-            implicitHeight: 18
-            implicitWidth: tsLabel.implicitWidth + 10
-            anchors.verticalCenter: parent.verticalCenter
-
-            Text {
-                id: tsLabel
-                anchors.centerIn: parent
-                text: "TS"
-                color: Colors.primary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.DemiBold
-            }
+            text: "TS"
+            badgeColor: Colors.primary
+            textColor: Colors.primary
         }
     }
 }

@@ -1,5 +1,5 @@
 # ai-stream.sh — Streaming curl wrapper for AI providers
-# Usage: qs-ai-stream <provider> <model> <endpoint> <api-key> <messages-file> [max-tokens] [temperature]
+# Usage: qs-ai-stream <provider> <model> <endpoint> <api-key> <messages-file> [max-tokens] [temperature] [image-path]
 # Output protocol: CONTENT:<text>, ERROR:<message>, USAGE:<json>, DONE
 
 set -euo pipefail
@@ -11,6 +11,13 @@ API_KEY="${4:-}"
 MESSAGES_FILE="${5:-}"
 MAX_TOKENS="${6:-4096}"
 TEMPERATURE="${7:-0.7}"
+IMAGE_PATH="${8:-}"
+
+# Base64 image data if provided
+IMAGE_B64=""
+if [[ -n "$IMAGE_PATH" && -f "$IMAGE_PATH" ]]; then
+    IMAGE_B64=$(base64 -w0 "$IMAGE_PATH")
+fi
 
 cleanup() {
     rm -f "$MESSAGES_FILE" 2>/dev/null || true
@@ -36,6 +43,15 @@ case "$PROVIDER" in
     ollama)
         ENDPOINT="${ENDPOINT:-http://localhost:11434}"
         URL="${ENDPOINT}/api/chat"
+
+        if [[ -n "$IMAGE_B64" ]]; then
+            # Add images array to the last user message
+            MESSAGES=$(echo "$MESSAGES" | jq --arg b64 "$IMAGE_B64" '
+                # Find the index of the last user message
+                (map(.role == "user") | to_entries | last | .key) as $last_idx |
+                .[$last_idx].images = [$b64]
+            ')
+        fi
 
         BODY=$(jq -n \
             --arg model "$MODEL" \
@@ -80,9 +96,35 @@ case "$PROVIDER" in
         ENDPOINT="${ENDPOINT:-https://api.anthropic.com}"
         URL="${ENDPOINT}/v1/messages"
 
-        # Extract system messages and non-system messages
+        # Convert simple message list to Anthropic format (with image in last user message)
+        if [[ -n "$IMAGE_B64" ]]; then
+            CHAT_MSGS=$(echo "$MESSAGES" | jq --arg b64 "$IMAGE_B64" '
+                # Filter out system messages
+                [.[] | select(.role != "system")] |
+                # Find the index of the last user message in the filtered list
+                (map(.role == "user") | to_entries | last | .key) as $last_idx |
+                # For each message, convert content to array of parts
+                map(
+                    if .role == "user" and (.[ "content" ] != null) and (to_entries | any(.key == "role" and .value == "user")) then
+                        # If this is the last user message, add the image block
+                        if (index(.) == $last_idx) then
+                            .content = [
+                                {type: "text", text: .content},
+                                {type: "image", source: {type: "base64", media_type: "image/png", data: $b64}}
+                            ]
+                        else
+                            .content = [{type: "text", text: .content}]
+                        end
+                    else
+                        .content = [{type: "text", text: .content}]
+                    end
+                )
+            ')
+        else
+            CHAT_MSGS=$(echo "$MESSAGES" | jq '[.[] | select(.role != "system")]')
+        fi
+
         SYSTEM_MSG=$(echo "$MESSAGES" | jq -r '[.[] | select(.role == "system")] | map(.content) | join("\n")' 2>/dev/null)
-        CHAT_MSGS=$(echo "$MESSAGES" | jq '[.[] | select(.role != "system")]' 2>/dev/null)
 
         BODY=$(jq -n \
             --arg model "$MODEL" \
@@ -144,6 +186,16 @@ case "$PROVIDER" in
         fi
         URL="${ENDPOINT}/v1/chat/completions"
 
+        if [[ -n "$IMAGE_B64" ]]; then
+            MESSAGES=$(echo "$MESSAGES" | jq --arg b64 "$IMAGE_B64" '
+                (map(.role == "user") | to_entries | last | .key) as $last_idx |
+                .[$last_idx].content = [
+                    {type: "text", text: .[$last_idx].content},
+                    {type: "image_url", image_url: {url: ("data:image/png;base64," + $b64)}}
+                ]
+            ')
+        fi
+
         BODY=$(jq -n \
             --arg model "$MODEL" \
             --argjson messages "$MESSAGES" \
@@ -188,6 +240,13 @@ case "$PROVIDER" in
         # Convert messages to Gemini format
         SYSTEM_MSG=$(echo "$MESSAGES" | jq -r '[.[] | select(.role == "system")] | map(.content) | join("\n")' 2>/dev/null)
         GEMINI_CONTENTS=$(echo "$MESSAGES" | jq '[.[] | select(.role != "system") | {role: (if .role == "assistant" then "model" else .role end), parts: [{text: .content}]}]' 2>/dev/null)
+
+        if [[ -n "$IMAGE_B64" ]]; then
+            GEMINI_CONTENTS=$(echo "$GEMINI_CONTENTS" | jq --arg b64 "$IMAGE_B64" '
+                (length - 1) as $last_idx |
+                .[$last_idx].parts += [{inline_data: {mime_type: "image/png", data: $b64}}]
+            ')
+        fi
 
         BODY=$(jq -n \
             --argjson contents "$GEMINI_CONTENTS" \

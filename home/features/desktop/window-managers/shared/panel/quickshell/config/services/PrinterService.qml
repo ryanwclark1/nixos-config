@@ -30,7 +30,7 @@ QtObject {
   // ── Polling ───────────────────────────────────────────────────────────────
   // Combines `lpstat -p -d` (printer list + default) and `lpstat -o | wc -l`
   // (active job count) in a single shell invocation to minimise process spawns.
-  property SharedWidgets.CommandPoll printerPoll: SharedWidgets.CommandPoll {
+  property var printerPoll: SharedWidgets.CommandPoll {
     interval: 10000
     running: root.subscriberCount > 0
 

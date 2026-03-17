@@ -256,7 +256,7 @@ QtObject {
         _updateTelemetryState();
     }
 
-    property SharedWidgets.CommandPoll metadataPoll: SharedWidgets.CommandPoll {
+    property var metadataPoll: SharedWidgets.CommandPoll {
         id: metadataPoll
         interval: 10000
         running: root.subscriberCount > 0
@@ -269,7 +269,7 @@ QtObject {
         }
     }
 
-    property SharedWidgets.CommandPoll samplePoll: SharedWidgets.CommandPoll {
+    property var samplePoll: SharedWidgets.CommandPoll {
         id: samplePoll
         interval: Math.max(1000, root.sampleIntervalMs)
         running: root.subscriberCount > 0 && (root.selectedInterface !== "" || root.selectedDiskDevice !== "")

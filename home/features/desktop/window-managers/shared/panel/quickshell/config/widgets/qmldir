@@ -37,6 +37,7 @@ MenuCloseButton 1.0 MenuCloseButton.qml
 MiniProgressBar 1.0 MiniProgressBar.qml
 MuteButton 1.0 MuteButton.qml
 NativeLock 1.0 NativeLock.qml
+NetworkBadge 1.0 NetworkBadge.qml
 NetworkWidget 1.0 NetworkWidget.qml
 VpnWidget 1.0 VpnWidget.qml
 Osd 1.0 Osd.qml

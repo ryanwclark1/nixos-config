@@ -22,7 +22,7 @@ if ! kill -0 "${qs_pid}" 2>/dev/null; then
 fi
 
 echo "Triggering Control Center..."
-quickshell ipc --newest call Shell toggleControls || true
+quickshell ipc --newest call Shell toggleSurface controlCenter || true
 
 sleep 1
 

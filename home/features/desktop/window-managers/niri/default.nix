@@ -129,8 +129,8 @@
           "Mod+Shift+4".action.move-column-to-workspace = 4;
           "Mod+Shift+5".action.move-column-to-workspace = 5;
 
-          "Mod+Shift+E".action.spawn = "quickshell ipc call Shell togglePowermenu";
-          "Ctrl+Alt+Delete".action.spawn = "quickshell ipc call Shell togglePowermenu";
+          "Mod+Shift+E".action.spawn = "quickshell ipc call Shell toggleSurface powerMenu";
+          "Ctrl+Alt+Delete".action.spawn = "quickshell ipc call Shell toggleSurface powerMenu";
 
           # Applications and quick launchers aligned with the Hyprland setup.
           "Mod+Return".action.spawn = "ghostty";
@@ -155,7 +155,7 @@
           "Alt+Print".action.screenshot-window = { };
 
           # Power menu
-          "Mod+Escape".action.spawn = "quickshell ipc call Shell togglePowermenu";
+          "Mod+Escape".action.spawn = "quickshell ipc call Shell toggleSurface powerMenu";
 
           # Clipboard history
           "Mod+V".action.spawn = "cliphist list | rofi -dmenu | cliphist decode | wl-copy";

@@ -81,16 +81,6 @@ QtObject {
         return null;
     }
 
-    function pluginSourceForWidgetType(widgetType) {
-        var meta = metadataForWidgetType(widgetType);
-        return meta && meta.source === "plugin" ? meta.componentSource : "";
-    }
-
-    function isBuiltInType(widgetType) {
-        var meta = metadataForWidgetType(widgetType);
-        return !!(meta && meta.source === "builtin");
-    }
-
     function metadataForWidgetType(widgetType) {
         var items = widgetCatalog;
         for (var i = 0; i < items.length; i++) {
@@ -111,11 +101,6 @@ QtObject {
             componentSource: (plugin.path || "") + desktopEntry,
             settingsSource: settingsEntry ? (plugin.path || "") + settingsEntry : ""
         };
-    }
-
-    function componentSourceForWidgetType(widgetType) {
-        var meta = metadataForWidgetType(widgetType);
-        return meta && meta.componentSource ? meta.componentSource : "";
     }
 
     function getWidgetsForScreen(screenName) {

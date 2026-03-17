@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../services"
 import "../widgets" as SharedWidgets
+import "ModuleUtils.js" as MU
 
 SharedWidgets.CardBase {
     id: root
@@ -128,21 +129,6 @@ SharedWidgets.CardBase {
         if (status === "error")
             return Colors.error;
         return Colors.textDisabled;
-    }
-
-    function formatAge(timestampMs) {
-        _clockTick;
-        var value = Number(timestampMs || 0);
-        if (value <= 0)
-            return "waiting";
-        var seconds = Math.max(0, Math.round((Date.now() - value) / 1000));
-        if (seconds < 1)
-            return "now";
-        if (seconds < 60)
-            return String(seconds) + "s ago";
-        var minutes = Math.floor(seconds / 60);
-        var remainder = seconds % 60;
-        return String(minutes) + "m " + String(remainder) + "s ago";
     }
 
     function formatBytes(bytes) {
@@ -576,7 +562,6 @@ SharedWidgets.CardBase {
 
             Rectangle {
                 Layout.fillWidth: true
-                visible: true
                 radius: Colors.radiusSmall
                 color: Colors.bgWidget
                 border.color: Colors.border
@@ -766,7 +751,7 @@ SharedWidgets.CardBase {
                                 SharedWidgets.Chip {
                                     icon: ServiceUnitService.detailDegraded ? "󰀦" : "󰥔"
                                     iconColor: ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary
-                                    text: "Updated " + root.formatAge(ServiceUnitService.detailLastUpdatedMs)
+                                    text: "Updated " + MU.formatAge(ServiceUnitService.detailLastUpdatedMs, root._clockTick)
                                     textColor: ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary
                                 }
                             }
@@ -786,7 +771,7 @@ SharedWidgets.CardBase {
                                     && ServiceUnitService.lastActionScope === root.selectedUnit.scope
                                     && ServiceUnitService.lastActionUnitName === root.selectedUnit.name
                                     && ServiceUnitService.lastActionMessage !== ""
-                                text: ServiceUnitService.lastActionMessage + "  •  " + root.formatAge(ServiceUnitService.lastActionAt)
+                                text: ServiceUnitService.lastActionMessage + "  •  " + MU.formatAge(ServiceUnitService.lastActionAt, root._clockTick)
                                 color: root.actionStatusColor(ServiceUnitService.lastActionState)
                                 font.pixelSize: Colors.fontSizeXS
                                 wrapMode: Text.WordWrap

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../services"
 import "../widgets" as SharedWidgets
+import "ModuleUtils.js" as MU
 
 SharedWidgets.CardBase {
     id: root
@@ -17,32 +18,6 @@ SharedWidgets.CardBase {
     SharedWidgets.Ref { service: SystemStatus }
     SharedWidgets.Ref { service: NetworkService }
     SharedWidgets.Ref { service: SystemIoTelemetryService }
-
-    function formatRate(bytes) {
-        var value = Number(bytes || 0);
-        if (value < 1024)
-            return Math.round(value) + " B/s";
-        if (value < 1048576)
-            return (value / 1024).toFixed(1) + " KB/s";
-        if (value < 1073741824)
-            return (value / 1048576).toFixed(1) + " MB/s";
-        return (value / 1073741824).toFixed(2) + " GB/s";
-    }
-
-    function formatAge(timestampMs) {
-        _clockTick;
-        var value = Number(timestampMs || 0);
-        if (value <= 0)
-            return "waiting";
-        var seconds = Math.max(0, Math.round((Date.now() - value) / 1000));
-        if (seconds < 1)
-            return "now";
-        if (seconds < 60)
-            return String(seconds) + "s ago";
-        var minutes = Math.floor(seconds / 60);
-        var remainder = seconds % 60;
-        return String(minutes) + "m " + String(remainder) + "s ago";
-    }
 
     SharedWidgets.CommandPoll {
         id: hostPoll
@@ -159,7 +134,7 @@ SharedWidgets.CardBase {
                 visible: SystemIoTelemetryService.selectedInterface !== ""
                 icon: SystemIoTelemetryService.networkHotspot ? "󰀦" : "󰈀"
                 iconColor: SystemIoTelemetryService.networkHotspot ? Colors.warning : Colors.primary
-                text: "NET PEAK " + root.formatRate(Math.max(SystemIoTelemetryService.peakNetworkDown, SystemIoTelemetryService.peakNetworkUp))
+                text: "NET PEAK " + MU.formatRate(Math.max(SystemIoTelemetryService.peakNetworkDown, SystemIoTelemetryService.peakNetworkUp))
                 textColor: SystemIoTelemetryService.networkHotspot ? Colors.warning : Colors.primary
             }
 
@@ -167,7 +142,7 @@ SharedWidgets.CardBase {
                 visible: SystemIoTelemetryService.selectedDiskDevice !== ""
                 icon: SystemIoTelemetryService.diskHotspot ? "󰀦" : "󰋊"
                 iconColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.secondary
-                text: "DISK PEAK " + root.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
+                text: "DISK PEAK " + MU.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
                 textColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.secondary
             }
         }
@@ -284,25 +259,25 @@ SharedWidgets.CardBase {
             SharedWidgets.InfoRow {
                 Layout.fillWidth: true
                 label: "Net Peak"
-                value: root.formatRate(Math.max(SystemIoTelemetryService.peakNetworkDown, SystemIoTelemetryService.peakNetworkUp))
+                value: MU.formatRate(Math.max(SystemIoTelemetryService.peakNetworkDown, SystemIoTelemetryService.peakNetworkUp))
             }
 
             SharedWidgets.InfoRow {
                 Layout.fillWidth: true
                 label: "Disk Peak"
-                value: root.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
+                value: MU.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
             }
 
             SharedWidgets.InfoRow {
                 Layout.fillWidth: true
                 label: "Net Age"
-                value: root.formatAge(SystemIoTelemetryService.networkLastSampleMs)
+                value: MU.formatAge(SystemIoTelemetryService.networkLastSampleMs, root._clockTick)
             }
 
             SharedWidgets.InfoRow {
                 Layout.fillWidth: true
                 label: "Disk Age"
-                value: root.formatAge(SystemIoTelemetryService.diskLastSampleMs)
+                value: MU.formatAge(SystemIoTelemetryService.diskLastSampleMs, root._clockTick)
             }
         }
     }

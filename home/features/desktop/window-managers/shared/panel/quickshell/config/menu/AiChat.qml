@@ -40,6 +40,7 @@ PanelWindow {
     readonly property int panelMaxWidth: 600
     property bool includeWindowContext: false
     property bool includeVisualContext: false
+    property bool includeSelectionContext: false
 
     property var attachedFiles: []
     property string _pendingMsgText: ""
@@ -1409,8 +1410,43 @@ PanelWindow {
                                 target: ScreenshotService
                                 function onRegionCaptured(path) {
                                     root.includeVisualContext = true;
-                                    AiService.performOcr(path);
+                                    // Only OCR if the model doesn't support vision directly
+                                    if (!Providers.supportsVision(AiService.activeProvider, AiService.activeModel)) {
+                                        AiService.performOcr(path);
+                                    }
                                 }
+                            }
+                        }
+
+                        // Selection context toggle
+                        Rectangle {
+                            id: selectionContextToggle
+                            width: 24
+                            height: 24
+                            radius: Colors.radiusXXS
+                            color: root.includeSelectionContext ? Colors.withAlpha(Colors.primary, 0.18) : "transparent"
+                            border.color: root.includeSelectionContext ? Colors.primary : Colors.border
+                            border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰒅"
+                                color: root.includeSelectionContext ? Colors.primary : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeSmall
+                            }
+                            MouseArea {
+                                id: selCtxHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.includeSelectionContext = !root.includeSelectionContext
+                            }
+
+                            SharedWidgets.BarTooltip {
+                                text: "Attach Current Selection (Middle-click/Primary)"
+                                hovered: selCtxHover.containsMouse
+                                anchorItem: selectionContextToggle
                             }
                         }
 
@@ -2052,40 +2088,66 @@ PanelWindow {
         if (root._fileReadIndex < root.attachedFiles.length) {
             fileReadProc.running = true;
         } else {
-            // Finished reading all files, now send.
-            var contextString = "";
-            for (var i = 0; i < root.attachedFiles.length; i++) {
-                contextString += "\n\nFile: " + root.attachedFiles[i].name + "\nContent:\n" + root.attachedFiles[i].content;
+            // Finished reading all files, now handle selection if needed
+            if (root.includeSelectionContext) {
+                AiService.fetchSelection();
+                // We wait for AiService.onLastSelectionTextChanged via Connections
+            } else {
+                root._finishAndSendMessage();
             }
-            var text = root._pendingMsgText + contextString;
-            var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
-            var visualCtx = root.includeVisualContext ? ScreenshotService.lastRegionPath : "";
-            AiService.sendMessage(text, winCtx, visualCtx);
-            root.attachedFiles = [];
-            root._pendingMsgText = "";
-            root.includeWindowContext = false;
-            root.includeVisualContext = false;
+        }
+    }
+
+    function _finishAndSendMessage() {
+        var contextString = "";
+        for (var i = 0; i < root.attachedFiles.length; i++) {
+            contextString += "\n\nFile: " + root.attachedFiles[i].name + "\nContent:\n" + root.attachedFiles[i].content;
+        }
+        
+        if (root.includeSelectionContext && AiService.lastSelectionText) {
+            contextString += "\n\nCurrent Selection:\n```\n" + AiService.lastSelectionText + "\n```";
+        }
+
+        var text = root._pendingMsgText + contextString;
+        var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
+        var visualCtx = root.includeVisualContext ? ScreenshotService.lastRegionPath : "";
+        AiService.sendMessage(text, winCtx, visualCtx);
+        
+        // Reset state
+        root.attachedFiles = [];
+        root._pendingMsgText = "";
+        root.includeWindowContext = false;
+        root.includeVisualContext = false;
+        root.includeSelectionContext = false;
+    }
+
+    Connections {
+        target: AiService
+        function onLastSelectionTextChanged() {
+            if (root.includeSelectionContext && root._pendingMsgText !== "") {
+                root._finishAndSendMessage();
+            }
         }
     }
 
     function _sendCurrentMessage() {
         var text = inputField.text.trim();
-        if (text.length === 0 && root.attachedFiles.length === 0)
+        if (text.length === 0 && root.attachedFiles.length === 0 && !root.includeSelectionContext)
             return;
         if (AiService.isStreaming)
             return;
+        
         inputField.text = "";
+        root._pendingMsgText = text;
 
         if (root.attachedFiles.length > 0) {
-            root._pendingMsgText = text;
             root._fileReadIndex = 0;
             root._readNextAttachedFile();
+        } else if (root.includeSelectionContext) {
+            AiService.fetchSelection();
+            // Wait for signal
         } else {
-            var winCtx = root.includeWindowContext ? AiService.contextWindowTitle : "";
-            var visualCtx = root.includeVisualContext ? (ScreenshotService.lastRegionPath || "") : "";
-            AiService.sendMessage(text, winCtx, visualCtx);
-            root.includeWindowContext = false;
-            root.includeVisualContext = false;
+            root._finishAndSendMessage();
         }
     }
 

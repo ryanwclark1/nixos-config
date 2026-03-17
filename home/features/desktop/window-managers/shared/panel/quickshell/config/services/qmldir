@@ -9,9 +9,7 @@ singleton Config 1.0 Config.qml
 ConfigAutoSave 1.0 ConfigAutoSave.qml
 ConfigBarManager 1.0 ConfigBarManager.qml
 singleton ControlCenterRegistry 1.0 ControlCenterRegistry.qml
-singleton DependencyService 1.0 DependencyService.qml
 singleton DesktopWidgetRegistry 1.0 DesktopWidgetRegistry.qml
-singleton GameModeService 1.0 GameModeService.qml
 singleton HookService 1.0 HookService.qml
 singleton MediaService 1.0 MediaService.qml
 singleton NetworkService 1.0 NetworkService.qml
