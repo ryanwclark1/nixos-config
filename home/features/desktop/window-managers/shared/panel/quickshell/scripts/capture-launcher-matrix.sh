@@ -204,7 +204,7 @@ bash "${script_dir}/capture-launcher-viewport.sh" \
   --output "${output_dir}/drun-category.png" \
   || printf '[INFO] Skipped drun-category capture because no non-All category was available.\n'
 
-bash "${script_dir}/capture-launcher-viewport.sh" \
+if ! bash "${script_dir}/capture-launcher-viewport.sh" \
   "${launcher_args[@]}" \
   --mode files \
   --state empty \
@@ -212,7 +212,17 @@ bash "${script_dir}/capture-launcher-viewport.sh" \
   --delay "${delay_seconds}" \
   --crop "${crop_mode}" \
   --workspace "${workspace_target}" \
-  --output "${output_dir}/files-empty.png"
+  --output "${output_dir}/files-empty.png"; then
+  printf '[INFO] Files empty-state capture did not settle; retrying with files home fallback.\n'
+  bash "${script_dir}/capture-launcher-viewport.sh" \
+    "${launcher_args[@]}" \
+    --mode files \
+    --state home \
+    --delay "${delay_seconds}" \
+    --crop "${crop_mode}" \
+    --workspace "${workspace_target}" \
+    --output "${output_dir}/files-empty.png"
+fi
 
 bash "${script_dir}/capture-launcher-viewport.sh" \
   "${launcher_args[@]}" \
@@ -223,7 +233,7 @@ bash "${script_dir}/capture-launcher-viewport.sh" \
   --workspace "${workspace_target}" \
   --output "${output_dir}/system-home.png"
 
-write_gallery "${output_dir}/index.html"
+write_gallery "${output_dir}"
 
 if [[ -n "${viewport_preset}" ]]; then
   printf '[INFO] Saved launcher review artifacts for the %s preset to %s\n' "${viewport_preset}" "${output_dir}"

@@ -8,6 +8,7 @@ qt\.qpa\.wayland\.textinput
 qt\.svg: .*Could not resolve property
 Could not register notification server
 Registration will be attempted again
+quickshell\.hyprland\.ipc: Got removal for workspace id .* which was not previously tracked\.
 EOF
 
   case "${profile}" in

@@ -49,6 +49,7 @@ render_gallery_css() {
       gap: 12px;
       flex-grow: 1;
       justify-content: flex-end;
+      align-items: center;
     }
 
     #filterInput, #jumpTo {
@@ -61,8 +62,21 @@ render_gallery_css() {
       font-size: 13px;
     }
 
-    #filterInput { width: 250px; }
+    #filterInput { width: 200px; }
     #filterInput:focus { border-color: var(--accent); }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--panel);
+      padding: 4px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    input[type=range] { cursor: pointer; accent-color: var(--accent); }
 
     main { padding: 24px; }
 
@@ -203,6 +217,9 @@ render_gallery_css() {
       cursor: pointer;
       font-size: 11px;
       transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn:hover { background: var(--border); color: var(--text); }
@@ -242,6 +259,12 @@ render_gallery_css() {
     .card.capture-failure .failure-badge { display: block; }
     .card.capture-failure .diff-badge { display: none; }
 
+    /* Log Health Dots */
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot-clean { background: var(--success); }
+    .dot-warning { background: var(--warning); }
+    .dot-error { background: var(--error); }
+
     /* Lightbox */
     #lightbox {
       position: fixed;
@@ -249,8 +272,7 @@ render_gallery_css() {
       background: rgba(0,0,0,0.95);
       z-index: 2000;
       display: none;
-      align-items: center;
-      justify-content: center;
+      align-items: center; justify-content: center;
       backdrop-filter: blur(10px);
     }
     #lightbox .lb-container { position: relative; max-width: 90%; max-height: 90%; display: flex; align-items: center; justify-content: center; }
@@ -444,19 +466,54 @@ render_gallery_js() {
     let currentLightboxIdx = -1;
     let lightboxImages = [];
     let isDraggingSwipe = false;
+    let sensitivityThreshold = 0.05;
 
     function filterCards() {
       const query = document.getElementById('filterInput').value.toLowerCase();
       const showOnlyDiff = document.getElementById('diffFilter')?.classList.contains('active');
-      const cards = document.querySelectorAll('.card');
+      const sortScore = document.getElementById('scoreSort')?.classList.contains('active');
+      
+      const cards = Array.from(document.querySelectorAll('.card'));
       
       cards.forEach(card => {
         const name = card.getAttribute('data-name').toLowerCase();
+        const score = parseFloat(card.getAttribute('data-diff-score') || 0);
+        
         let visible = name.includes(query);
+        
+        // Apply threshold logic
+        if (score >= sensitivityThreshold) {
+          card.classList.add('has-diff');
+        } else {
+          card.classList.remove('has-diff');
+        }
+
         if (showOnlyDiff && !card.classList.contains('has-diff')) visible = false;
+        
         card.hidden = !visible;
       });
+
+      if (sortScore) {
+        const grid = document.querySelector('.grid');
+        const sorted = cards.sort((a, b) => {
+          return parseFloat(b.getAttribute('data-diff-score') || 0) - parseFloat(a.getAttribute('data-diff-score') || 0);
+        });
+        sorted.forEach(c => grid.appendChild(c));
+      }
+
       updateLightboxImages();
+    }
+
+    function handleThresholdChange(el) {
+      sensitivityThreshold = parseFloat(el.value);
+      document.getElementById('thresholdValue').innerText = sensitivityThreshold.toFixed(2) + '%';
+      filterCards();
+    }
+
+    function toggleSort(btn) {
+      btn.classList.toggle('active');
+      btn.innerText = btn.classList.contains('active') ? 'Sorted by Change' : 'Sort by Change';
+      filterCards();
     }
 
     function toggleDiffFilter(btn) {
@@ -469,21 +526,10 @@ render_gallery_js() {
       const cards = document.querySelectorAll('.card');
       for (const card of cards) {
         const currentImg = card.querySelector('.current-img');
-        const baselineImg = card.querySelector('.baseline-img');
-        
         const isFailure = await checkCaptureFailure(currentImg.src);
-        if (isFailure) {
-          card.classList.add('capture-failure');
-          continue;
-        }
-
-        if (!baselineImg) continue;
-
-        const hasDiff = await compareImages(currentImg.src, baselineImg.src);
-        if (hasDiff) {
-          card.classList.add('has-diff');
-        }
+        if (isFailure) card.classList.add('capture-failure');
       }
+      filterCards();
     }
 
     function checkCaptureFailure(src) {
@@ -493,55 +539,16 @@ render_gallery_js() {
         img.onload = () => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
-          canvas.width = img.width;
-          canvas.height = img.height;
+          canvas.width = img.width; canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
           const data = ctx.getImageData(0, 0, img.width, img.height).data;
-          
           let blackPixels = 0;
-          let totalPixels = data.length / 4;
           for (let i = 0; i < data.length; i += 4) {
             if (data[i] < 10 && data[i+1] < 10 && data[i+2] < 10) blackPixels++;
           }
-          resolve((blackPixels / totalPixels) > 0.98);
+          resolve((blackPixels / (data.length / 4)) > 0.98);
         };
         img.src = src;
-      });
-    }
-
-    function compareImages(src1, src2) {
-      return new Promise((resolve) => {
-        const img1 = new Image();
-        const img2 = new Image();
-        let loaded = 0;
-        const onload = () => {
-          if (++loaded === 2) {
-            if (img1.width !== img2.width || img1.height !== img2.height) return resolve(true);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = img1.width;
-            canvas.height = img1.height;
-            ctx.drawImage(img1, 0, 0);
-            const data1 = ctx.getImageData(0, 0, img1.width, img1.height).data;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img2, 0, 0);
-            const data2 = ctx.getImageData(0, 0, img2.width, img2.height).data;
-            for (let i = 0; i < data1.length; i += 4) {
-              if (Math.abs(data1[i] - data2[i]) > 5 || 
-                  Math.abs(data1[i+1] - data2[i+1]) > 5 || 
-                  Math.abs(data1[i+2] - data2[i+2]) > 5) {
-                return resolve(true);
-              }
-            }
-            resolve(false);
-          }
-        };
-        img1.crossOrigin = "anonymous";
-        img2.crossOrigin = "anonymous";
-        img1.onload = onload;
-        img2.onload = onload;
-        img1.src = src1;
-        img2.src = src2;
       });
     }
 
@@ -604,11 +611,9 @@ render_gallery_js() {
       const card = container.closest('.card');
       const baselineImg = card.querySelector('.baseline-img');
       const handle = container.querySelector('.swipe-handle');
-      
       const rect = container.getBoundingClientRect();
       const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
       const percent = (x / rect.width) * 100;
-      
       baselineImg.style.clipPath = `inset(0 0 0 ${percent}%)`;
       handle.style.left = `${percent}%`;
     }
@@ -618,7 +623,6 @@ render_gallery_js() {
       const body = modal.querySelector('.log-pre');
       body.innerText = 'Loading logs...';
       modal.style.display = 'flex';
-      
       try {
         const resp = await fetch(logPath);
         if (!resp.ok) throw new Error('Failed to load log file');
@@ -672,7 +676,6 @@ render_gallery_js() {
       if (cards.length === 0) return;
       const reviewed = document.querySelectorAll('.card.reviewed').length;
       const percent = Math.round((reviewed / cards.length) * 100);
-      
       const fill = document.querySelector('.progress-fill');
       const text = document.querySelector('.progress-text');
       if (fill) fill.style.width = percent + '%';
@@ -697,10 +700,8 @@ render_gallery_js() {
           if (area) area.value = notesStates[name];
         }
       });
-
       const summaryArea = document.querySelector('.summary-textarea');
       if (summaryArea) summaryArea.value = generalSummary;
-
       updateProgress();
     }
 
@@ -726,7 +727,9 @@ render_gallery_js() {
     }
 
     function exportReport() {
-      const cards = document.querySelectorAll('.card');
+      const cards = Array.from(document.querySelectorAll('.card')).sort((a, b) => {
+        return parseFloat(b.getAttribute('data-diff-score') || 0) - parseFloat(a.getAttribute('data-diff-score') || 0);
+      });
       const reviewed = document.querySelectorAll('.card.reviewed').length;
       const failures = document.querySelectorAll('.card.capture-failure').length;
       const diffs = document.querySelectorAll('.card.has-diff').length;
@@ -736,27 +739,31 @@ render_gallery_js() {
       
       let md = `# QA Pass Report: ${document.title}\n\n`;
       if (summary) md += `## Summary\n${summary}\n\n`;
-      
-      md += `## Status\n`;
-      md += `- **Visual Matrix:** ${reviewed}/${cards.length} reviewed\n`;
-      if (diffs > 0) md += `- **Regressions:** ${diffs} detected ⚠️\n`;
+      md += `## Status\n- **Visual Matrix:** ${reviewed}/${cards.length} reviewed\n`;
+      if (diffs > 0) md += `- **Regressions:** ${diffs} detected (threshold ${sensitivityThreshold}%) ⚠️\n`;
       if (failures > 0) md += `- **Capture Failures:** ${failures} detected ❌\n`;
       md += `- **Checklist:** ${checked}/${checklist.length} tasks completed\n\n`;
       
-      const noteEntries = Array.from(cards).filter(c => c.querySelector('.notes-area')?.value.trim() !== '');
+      const noteEntries = cards.filter(c => {
+        const area = c.querySelector('.notes-area');
+        const score = parseFloat(c.getAttribute('data-diff-score') || 0);
+        return (area && area.value.trim() !== '') || score >= sensitivityThreshold;
+      });
+
       if (noteEntries.length > 0) {
-        md += `## Review Notes\n`;
+        md += `## Issues & Observations (Impact Threshold: ${sensitivityThreshold}%)\n`;
         noteEntries.forEach(c => {
-          md += `- **${c.getAttribute('data-name')}**: ${c.querySelector('.notes-area').value}\n`;
+          const score = parseFloat(c.getAttribute('data-diff-score') || 0);
+          const scoreText = score > 0 ? ` [Diff Score: ${score.toFixed(2)}%]` : '';
+          const note = c.querySelector('.notes-area').value || (score >= sensitivityThreshold ? 'Visual diff detected above threshold.' : 'No specific notes.');
+          md += `- **${c.getAttribute('data-name')}**${scoreText}: ${note}\n`;
         });
         md += `\n`;
       }
 
       if (checked < checklist.length) {
         md += `## Pending Tasks\n`;
-        checklist.forEach(c => {
-          if (!c.checked) md += `- [ ] ${c.nextElementSibling.innerText}\n`;
-        });
+        checklist.forEach(c => { if (!c.checked) md += `- [ ] ${c.nextElementSibling.innerText}\n`; });
       }
 
       navigator.clipboard.writeText(md);
@@ -782,17 +789,12 @@ render_gallery_js() {
           document.getElementById('filterInput')?.focus();
         }
         if (e.key === 'c' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') toggleChecklist();
-        if (e.key === 'Escape') {
-          closeModal('logModal');
-        }
+        if (e.key === 'Escape') closeModal('logModal');
       }
     });
 
     window.addEventListener('DOMContentLoaded', () => {
-      loadChecklist();
-      loadSessionData();
-      updateLightboxImages();
-      validateAndDetect();
+      loadChecklist(); loadSessionData(); updateLightboxImages(); validateAndDetect();
     });
   </script>
 EOF
@@ -807,7 +809,7 @@ write_gallery_v2() {
   local baseline_dir="${output_dir}/baselines"
 
   # Discover sections
-  mapfile -t sections < <(find "${output_dir}" -mindepth 1 -maxdepth 1 -type d -not -name "baselines" -printf '%f\n' | sort)
+  mapfile -t sections < <(find "${output_dir}" -mindepth 1 -maxdepth 1 -type d -not -name "baselines" -not -name "responsive" -printf '%f\n' | sort)
 
   {
     cat <<EOF
@@ -859,6 +861,12 @@ EOF
   </div>
 
   <div class="controls">
+    <div class="slider-container">
+      <span>Noise Filter:</span>
+      <input type="range" min="0" max="2" step="0.01" value="0.05" oninput="handleThresholdChange(this)">
+      <b id="thresholdValue">0.05%</b>
+    </div>
+    <button id="scoreSort" class="btn" onclick="toggleSort(this)">Sort by Change</button>
     <button id="diffFilter" class="btn" onclick="toggleDiffFilter(this)">Filter by Diff</button>
     <input type="text" id="filterInput" placeholder="Filter by filename..." oninput="filterCards()">
 EOF
@@ -885,12 +893,23 @@ EOF
         rel_image_path="${image_path#${output_dir}/}"
         image_name="$(basename "${image_path}")"
         local baseline_path=""
-        [[ -f "${baseline_dir}/${image_name}" ]] && baseline_path="baselines/${image_name}"
+        local diff_score="0"
+        
+        if [[ -f "${baseline_dir}/${image_name}" ]]; then
+          baseline_path="baselines/${image_name}"
+          if command -v magick >/dev/null 2>&1; then
+            diff_score=$(magick compare -metric MAE "${image_path}" "${baseline_dir}/${image_name}" null: 2>&1 | awk -F '[()]' '{print $2}' | tr -d '%' || echo "0")
+          fi
+        fi
         
         local log_path=""
-        [[ -f "${output_dir}/${rel_image_path%.png}.log" ]] && log_path="${rel_image_path%.png}.log"
+        local log_status="none"
+        if [[ -f "${output_dir}/${rel_image_path%.png}.log" ]]; then
+          log_path="${rel_image_path%.png}.log"
+          [[ -f "${output_dir}/${log_path}.status" ]] && log_status="$(cat "${output_dir}/${log_path}.status")"
+        fi
         
-        render_card "${rel_image_path}" "${image_name}" "${baseline_path}" "" "${log_path}"
+        render_card "${rel_image_path}" "${image_name}" "${baseline_path}" "" "${log_path}" "${log_status}" "${diff_score}"
       done < <(find "${output_dir}" -maxdepth 1 -type f -name '*.png' | sort)
       printf '  </div>\n'
     else
@@ -903,12 +922,23 @@ EOF
           rel_image_path="${image_path#${output_dir}/}"
           image_name="$(basename "${image_path}")"
           local baseline_path=""
-          [[ -f "${baseline_dir}/${rel_image_path}" ]] && baseline_path="baselines/${rel_image_path}"
+          local diff_score="0"
+          
+          if [[ -f "${baseline_dir}/${rel_image_path}" ]]; then
+            baseline_path="baselines/${rel_image_path}"
+            if command -v magick >/dev/null 2>&1; then
+              diff_score=$(magick compare -metric MAE "${image_path}" "${baseline_dir}/${rel_image_path}" null: 2>&1 | awk -F '[()]' '{print $2}' | tr -d '%' || echo "0")
+            fi
+          fi
           
           local log_path=""
-          [[ -f "${output_dir}/${rel_image_path%.png}.log" ]] && log_path="${rel_image_path%.png}.log"
+          local log_status="none"
+          if [[ -f "${output_dir}/${rel_image_path%.png}.log" ]]; then
+            log_path="${rel_image_path%.png}.log"
+            [[ -f "${output_dir}/${log_path}.status" ]] && log_status="$(cat "${output_dir}/${log_path}.status")"
+          fi
           
-          render_card "${rel_image_path}" "${image_name}" "${baseline_path}" "" "${log_path}"
+          render_card "${rel_image_path}" "${image_name}" "${baseline_path}" "" "${log_path}" "${log_status}" "${diff_score}"
         done < <(find "${output_dir}/${s}" -maxdepth 1 -type f -name '*.png' | sort)
         printf '    </div></div>\n'
       done
@@ -1015,7 +1045,10 @@ EOF
     printf '  <div class="dashboard-grid">\n'
     for link in "${links[@]}"; do
       local label="${link%%|*}" path="${link#*|}" icon="📊"
-      case "${label,,}" in *launcher*) icon="🚀" ;; *settings*) icon="⚙️" ;; *surface*) icon="🖼️" ;; *panel*) icon="📟" ;; esac
+      local lower_label="${label,,}"
+      if [[ "${lower_label}" == *"portrait"* ]]; then icon="📱"; elif [[ "${lower_label}" == *"laptop"* ]]; then icon="💻"; elif [[ "${lower_label}" == *"wide"* ]]; then icon="🖥️"; else
+        case "${lower_label}" in *launcher*) icon="🚀" ;; *settings*) icon="⚙️" ;; *surface*) icon="🖼️" ;; *panel*) icon="📟" ;; esac
+      fi
       printf '    <a href="%s" class="db-card"><div class="db-icon">%s</div><h3>%s</h3><p>View visual regression artifacts</p></a>\n' "${path}" "${icon}" "${label}"
     done
     printf '  </div></main>\n'
@@ -1025,9 +1058,9 @@ EOF
 }
 
 render_card() {
-  local rel_path="$1" name="$2" baseline_path="$3" repro_cmd="${4:-}" log_path="${5:-}"
+  local rel_path="$1" name="$2" baseline_path="$3" repro_cmd="${4:-}" log_path="${5:-}" log_status="${6:-none}" diff_score="${7:-0}"
   cat <<EOF
-      <div class="card" data-name="${name}">
+      <div class="card" data-name="${name}" data-diff-score="${diff_score}">
         <div class="badge diff-badge">⚠️ DIFF DETECTED</div>
         <div class="badge failure-badge">❌ CAPTURE FAILURE</div>
         <div class="img-container" onclick="openLightbox(this.querySelector('.current-img').src)">
@@ -1041,14 +1074,23 @@ EOF
           </div>
 EOF
   fi
+  local dot_class=""
+  case "${log_status}" in clean) dot_class="dot-clean" ;; warning) dot_class="dot-warning" ;; error) dot_class="dot-error" ;; esac
   cat <<EOF
         </div>
         <div class="meta">
-          <div class="name">${name}</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="name">${name}</div>
+EOF
+  if (( $(echo "${diff_score} > 0" | bc -l) )); then
+    printf '            <div class="meta-tag" style="background:rgba(250,204,21,0.1); color:var(--warning);">Δ %s%%</div>\n' "$(printf '%.2f' "${diff_score}")"
+  fi
+  cat <<EOF
+          </div>
           <textarea class="notes-area" placeholder="Add observations..." oninput="saveNote(this)"></textarea>
           <div class="actions">
             <div style="display: flex; gap: 4px;">
-              <button class="btn" onclick="copyText('${rel_path}', this)">Copy Path</button>
+              <button class="btn" onclick="copyText('${rel_path}', this)">Path</button>
 EOF
   if [[ -n "${repro_cmd}" ]]; then
     cat <<EOF
@@ -1057,7 +1099,7 @@ EOF
   fi
   if [[ -n "${log_path}" ]]; then
     cat <<EOF
-              <button class="btn" onclick="viewLogs('${log_path}')">View Logs</button>
+              <button class="btn" onclick="viewLogs('${log_path}')"><span class="dot ${dot_class}"></span> Logs</button>
 EOF
   fi
   cat <<EOF
@@ -1066,7 +1108,7 @@ EOF
 EOF
   if [[ -n "${baseline_path}" ]]; then
     cat <<EOF
-              <button class="btn" onclick="cycleCompare(this)">Compare Baseline</button>
+              <button class="btn" onclick="cycleCompare(this)">Compare</button>
 EOF
   fi
   cat <<EOF

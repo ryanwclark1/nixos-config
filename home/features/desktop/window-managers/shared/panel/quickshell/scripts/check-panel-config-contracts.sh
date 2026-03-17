@@ -263,6 +263,65 @@ main() {
     fail "Legacy cava widgets migrate into mediaBar settings"
   fi
 
+  local vpn_profiles_output vpn_profiles_json
+  vpn_profiles_output="$(run_harness "vpn saved profile normalization" '
+    var profiles = NetworkService.buildVpnProfiles(
+      "uuid-active:Work VPN:vpn\nuuid-idle:Work VPN:vpn\nuuid-wire:Lab Tunnel:wireguard",
+      "uuid-active:Work VPN:vpn:tun0:activated\nuuid-missing:Ad Hoc:vpn:tun9:activated"
+    );
+    console.log("CONTRACT:" + JSON.stringify({
+      profiles: profiles,
+      activeCount: profiles.filter(function(profile) { return !!profile.active; }).length,
+      inactiveCount: profiles.filter(function(profile) { return !profile.active; }).length
+    }));
+    Qt.quit();
+  ')" || true
+
+  vpn_profiles_json="$(printf '%s\n' "${vpn_profiles_output}" | sed -n 's/^.*CONTRACT://p' | tail -n 1)"
+  if [[ -n "${vpn_profiles_json}" ]] \
+    && [[ "$(printf '%s' "${vpn_profiles_json}" | jq -r '.profiles | length')" == "4" ]] \
+    && [[ "$(printf '%s' "${vpn_profiles_json}" | jq -r '.activeCount')" == "2" ]] \
+    && [[ "$(printf '%s' "${vpn_profiles_json}" | jq -r '.inactiveCount')" == "2" ]] \
+    && [[ "$(printf '%s' "${vpn_profiles_json}" | jq -r '.profiles[] | select(.uuid == "uuid-active").active')" == "true" ]] \
+    && [[ "$(printf '%s' "${vpn_profiles_json}" | jq -r '.profiles[] | select(.uuid == "uuid-active").device')" == "tun0" ]] \
+    && [[ "$(printf '%s' "${vpn_profiles_json}" | jq -r '.profiles[] | select(.uuid == "uuid-idle").name')" == "Work VPN" ]] \
+    && [[ "$(printf '%s' "${vpn_profiles_json}" | jq -r '.profiles[] | select(.uuid == "uuid-wire").type')" == "wireguard" ]] \
+    && [[ "$(printf '%s' "${vpn_profiles_json}" | jq -r '.profiles[] | select(.uuid == "uuid-missing").active')" == "true" ]]; then
+    pass "VPN saved profiles merge catalog entries and active sessions by UUID"
+  else
+    fail "VPN saved profiles merge catalog entries and active sessions by UUID"
+  fi
+
+  local vpn_grouping_output vpn_grouping_json
+  vpn_grouping_output="$(run_harness "vpn saved profile grouping" '
+    NetworkService.vpnProfiles = [
+      { uuid: "uuid-1", name: "Shared", type: "vpn", device: "", state: "", active: false },
+      { uuid: "uuid-2", name: "Shared", type: "vpn", device: "tun2", state: "activated", active: true }
+    ];
+    console.log("CONTRACT:" + JSON.stringify({
+      hasSavedProfiles: NetworkService.vpnHasSavedProfiles,
+      profileCount: NetworkService.vpnProfileCount,
+      activeCount: NetworkService.vpnActiveProfiles.length,
+      inactiveCount: NetworkService.vpnInactiveProfiles.length,
+      activeUuid: NetworkService.vpnActiveProfiles[0].uuid,
+      inactiveUuid: NetworkService.vpnInactiveProfiles[0].uuid
+    }));
+    Qt.quit();
+  ')" || true
+
+  vpn_grouping_json="$(printf '%s\n' "${vpn_grouping_output}" | sed -n 's/^.*CONTRACT://p' | tail -n 1)"
+  if [[ -n "${vpn_grouping_json}" ]] \
+    && [[ "$(printf '%s' "${vpn_grouping_json}" | jq -r '.hasSavedProfiles')" == "true" ]] \
+    && [[ "$(printf '%s' "${vpn_grouping_json}" | jq -r '.profileCount')" == "2" ]] \
+    && [[ "$(printf '%s' "${vpn_grouping_json}" | jq -r '.activeCount')" == "1" ]] \
+    && [[ "$(printf '%s' "${vpn_grouping_json}" | jq -r '.inactiveCount')" == "1" ]] \
+    && [[ "$(printf '%s' "${vpn_grouping_json}" | jq -r '.activeUuid')" == "uuid-2" ]] \
+    && [[ "$(printf '%s' "${vpn_grouping_json}" | jq -r '.inactiveUuid')" == "uuid-1" ]]; then
+    pass "VPN saved profile grouping preserves duplicate names and separates active rows"
+  else
+    fail "VPN saved profile grouping preserves duplicate names and separates active rows"
+  fi
+
   if bash "${script_dir}/check-network-vpn-contracts.sh"; then
     pass "VPN hub structural contracts stay wired across registry, shell, and popup layers"
   else

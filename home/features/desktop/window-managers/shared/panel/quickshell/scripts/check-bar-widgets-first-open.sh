@@ -12,6 +12,7 @@ repo_shell_mode=0
 repo_shell_pid=""
 repo_shell_service_was_active=0
 repo_shell_env=()
+python_cmd=""
 
 usage() {
   cat <<'EOF'
@@ -61,6 +62,17 @@ done
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
     printf 'Missing required command: %s\n' "$1" >&2
+    exit 2
+  fi
+}
+
+resolve_python() {
+  if command -v python >/dev/null 2>&1; then
+    python_cmd="python"
+  elif command -v python3 >/dev/null 2>&1; then
+    python_cmd="python3"
+  else
+    printf 'Missing required command: python or python3\n' >&2
     exit 2
   fi
 }
@@ -144,6 +156,20 @@ discover_instance() {
   local fallback=()
 
   [[ -d "${runtime_root}" ]] || return 1
+
+  if (( repo_shell_mode == 1 )) && [[ -n "${repo_shell_pid}" ]]; then
+    resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
+    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+      candidate="$(basename "${resolved}")"
+      for attempt in $(seq 1 20); do
+        if quickshell ipc --id "${candidate}" call SettingsHub close >/dev/null 2>&1; then
+          printf '%s\n' "${candidate}"
+          return 0
+        fi
+        sleep 0.5
+      done
+    fi
+  fi
 
   while IFS= read -r candidate; do
     [[ -n "${candidate}" ]] || continue
@@ -240,7 +266,7 @@ capture_until_visible() {
 
 population_score() {
   local text="$1"
-  python - "$text" <<'PY'
+  "${python_cmd}" - "$text" <<'PY'
 import re
 import sys
 
@@ -248,15 +274,18 @@ text = sys.argv[1]
 score = 0
 
 stable_patterns = [
-    r'Bar Widgets',
+    r'Bar\s+Widgets',
     r'Manage the widget composition',
-    r'Main Bar',
+    r'(Main|Mlan)\s+Bar',
+    r'Active\s+Bar',
     r'Current widgets',
-    r'Remove',
-    r'Settings',
-    r'App Launcher',
-    r'Workspace Switcher',
-    r'Window Title',
+    r'Rem(?:ove|aove)',
+    r'Sett(?:ings|irgs)',
+    r'App\s+Launcher',
+    r'Workspace\s+Switcher',
+    r'Left\s+Section',
+    r'Window\s+Title',
+    r'Active\s+Ap(?:p|o)\s+Context',
     r'Running Apps',
 ]
 
@@ -276,6 +305,7 @@ require_cmd systemctl
 require_cmd tesseract
 require_cmd compare
 require_cmd ps
+resolve_python
 
 if (( repo_shell_mode == 0 )); then
   require_cmd home-manager

@@ -153,7 +153,7 @@ for surface in "${surfaces[@]}"; do
     --output "${output_dir}/${surface}-${crop_mode}.png"
 done
 
-write_gallery
+write_gallery "${output_dir}"
 
 printf '[INFO] Saved surface review artifacts for the %s matrix to %s\n' "${crop_mode}" "${output_dir}"
 printf '[INFO] Saved review gallery to %s/index.html\n' "${output_dir}"

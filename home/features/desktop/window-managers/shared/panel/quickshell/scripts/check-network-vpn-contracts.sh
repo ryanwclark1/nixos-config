@@ -46,6 +46,9 @@ shell_qml="${repo_root}/config/shell.qml"
 shell_bar_layer_qml="${repo_root}/config/shell/ShellBarLayer.qml"
 menu_qmldir="${repo_root}/config/menu/qmldir"
 widget_qmldir="${repo_root}/config/widgets/qmldir"
+network_service_qml="${repo_root}/config/services/NetworkService.qml"
+vpn_menu_qml="${repo_root}/config/menu/VpnMenu.qml"
+network_menu_qml="${repo_root}/config/menu/NetworkMenu.qml"
 
 require_literal "$bar_registry" 'widgetType: "vpn"' "VPN widget is registered in BarWidgetRegistry"
 require_literal "$bar_registry" 'key: "labelMode"' "VPN widget exposes labelMode setting"
@@ -58,6 +61,12 @@ require_literal "$shell_qml" 'function toggleVpnMenu() {' "shell.qml exposes tog
 require_literal "$shell_bar_layer_qml" 'VpnMenu {' "ShellBarLayer instantiates VpnMenu"
 require_literal "$menu_qmldir" 'VpnMenu 1.0 VpnMenu.qml' "menu qmldir exports VpnMenu"
 require_literal "$widget_qmldir" 'VpnWidget 1.0 VpnWidget.qml' "widgets qmldir exports VpnWidget"
+require_literal "$network_service_qml" 'function buildVpnProfiles(catalogText, activeText) {' "NetworkService exposes saved-profile merge helper"
+require_literal "$network_service_qml" 'function connectVpnProfile(uuidValue) {' "NetworkService exposes connectVpnProfile action"
+require_literal "$network_service_qml" 'function disconnectVpnProfile(uuidValue) {' "NetworkService exposes disconnectVpnProfile action"
+require_literal "$vpn_menu_qml" 'Active VPN Profiles' "VpnMenu shows the active profile section"
+require_literal "$vpn_menu_qml" 'Available VPN Profiles' "VpnMenu shows the available profile section"
+require_literal "$network_menu_qml" 'NetworkService.vpnHasSavedProfiles' "NetworkMenu summary appears when saved VPN profiles exist"
 
 printf '[INFO] VPN contract summary: %d pass, %d fail\n' "$pass_count" "$fail_count"
 (( fail_count == 0 ))

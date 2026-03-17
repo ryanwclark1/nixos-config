@@ -69,6 +69,7 @@ Item {
     property bool _autoHidden: false
     property bool _hovered: false
     property var _widgetDiagnosticStates: ({})
+    property bool diagnosticsReady: false
     // Expose to shell.qml for exclusiveZone control
     readonly property bool isAutoHidden: _autoHidden
     signal surfaceRequested(string surfaceId, var context)
@@ -76,6 +77,11 @@ Item {
 
     implicitHeight: vertical ? 0 : thickness
     implicitWidth: vertical ? Math.max(thickness, Math.max(leftColumn.implicitWidth, Math.max(centerColumn.implicitWidth, rightColumn.implicitWidth)) + outerPadding * 2) : 0
+
+    function resetDiagnosticWarmup() {
+        diagnosticsReady = false;
+        diagnosticWarmupTimer.restart();
+    }
 
     function sectionItems(section) {
         var items = sectionWidgets && sectionWidgets[section] ? sectionWidgets[section] : [];
@@ -111,27 +117,23 @@ Item {
         return "bar=" + barId + " widget=" + type + (instanceId !== "" ? " instance=" + instanceId : "");
     }
 
-    function itemFootprint(item) {
+    function itemLayoutFootprint(item) {
         if (!item)
             return 0;
 
         var implicitWidth = Number(item.implicitWidth);
         var implicitHeight = Number(item.implicitHeight);
-        var width = Number(item.width);
-        var height = Number(item.height);
 
         implicitWidth = isNaN(implicitWidth) ? 0 : implicitWidth;
         implicitHeight = isNaN(implicitHeight) ? 0 : implicitHeight;
-        width = isNaN(width) ? 0 : width;
-        height = isNaN(height) ? 0 : height;
 
-        return vertical ? Math.max(implicitHeight, height) : Math.max(implicitWidth, width);
+        return vertical ? implicitHeight : implicitWidth;
     }
 
     function itemOccupiesSpace(item) {
         if (!item || item.visible === false)
             return false;
-        return itemFootprint(item) > 0;
+        return itemLayoutFootprint(item) > 0;
     }
 
     function reportWidgetDiagnostic(widgetId, state, details) {
@@ -148,6 +150,17 @@ Item {
 
         _widgetDiagnosticStates[widgetId] = state;
         console.warn("[Panel] widget state warning:", widgetId, "state=" + state, details || "");
+    }
+
+    onBarConfigChanged: resetDiagnosticWarmup()
+    onSectionWidgetsChanged: resetDiagnosticWarmup()
+    Component.onCompleted: resetDiagnosticWarmup()
+
+    Timer {
+        id: diagnosticWarmupTimer
+        interval: 1200
+        repeat: false
+        onTriggered: root.diagnosticsReady = true
     }
 
     function requestSurface(surfaceId, item, extraContext) {
@@ -595,11 +608,13 @@ Item {
     Component {
         id: widgetLoaderDelegate
         Item {
+            id: diagnosticWrapper
             required property var modelData
             property var widgetInstance: modelData
             property string deferredDiagnosticState: ""
             property string deferredDiagnosticDetail: ""
             readonly property bool occupiesSpace: root.itemOccupiesSpace(widgetLoader.item)
+            readonly property bool diagnosticsReady: root.diagnosticsReady
             readonly property bool widgetEnabled: !!widgetInstance && widgetInstance.enabled !== false
             readonly property string widgetId: root.widgetDiagnosticId(widgetInstance)
             readonly property string diagnosticState: {
@@ -629,6 +644,12 @@ Item {
                 else if (diagnosticState === "zero-footprint")
                     detail = "widget is enabled but reports zero layout footprint";
                 if (diagnosticState === "zero-footprint") {
+                    if (!root.diagnosticsReady) {
+                        diagnosticGraceTimer.stop();
+                        deferredDiagnosticState = "";
+                        deferredDiagnosticDetail = "";
+                        return;
+                    }
                     deferredDiagnosticState = diagnosticState;
                     deferredDiagnosticDetail = detail;
                     diagnosticGraceTimer.restart();
@@ -640,8 +661,9 @@ Item {
                 root.reportWidgetDiagnostic(widgetId, diagnosticState, detail);
             }
 
-            onDiagnosticStateChanged: refreshDiagnosticState()
-            Component.onCompleted: refreshDiagnosticState()
+            onDiagnosticStateChanged: diagnosticWrapper.refreshDiagnosticState()
+            onDiagnosticsReadyChanged: diagnosticWrapper.refreshDiagnosticState()
+            Component.onCompleted: diagnosticWrapper.refreshDiagnosticState()
 
             Timer {
                 id: diagnosticGraceTimer
@@ -659,11 +681,11 @@ Item {
                 anchors.centerIn: parent
                 active: !!parent.widgetInstance && parent.widgetInstance.enabled !== false
                 sourceComponent: root.componentForWidget(parent.widgetInstance ? parent.widgetInstance.widgetType : "")
-                onStatusChanged: parent.refreshDiagnosticState()
+                onStatusChanged: diagnosticWrapper.refreshDiagnosticState()
                 onLoaded: {
                     if (item && item.widgetInstance !== undefined)
                         item.widgetInstance = parent.widgetInstance;
-                    parent.refreshDiagnosticState();
+                    diagnosticWrapper.refreshDiagnosticState();
                 }
             }
         }

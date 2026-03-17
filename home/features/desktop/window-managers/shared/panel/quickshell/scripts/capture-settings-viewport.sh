@@ -7,6 +7,7 @@ width=900
 height=700
 tab_id="wallpaper"
 instance_id=""
+compositor=""
 hyprland_instance=""
 hyprland_wayland_socket=""
 output_path=""
@@ -116,6 +117,17 @@ run_ipc() {
   return "${status}"
 }
 
+detect_compositor() {
+  if [[ -n "${NIRI_SOCKET:-}" ]] && command -v niri >/dev/null 2>&1 && niri msg -j workspaces >/dev/null 2>&1; then
+    compositor="niri"
+    return 0
+  fi
+
+  require_cmd hyprctl
+  resolve_hyprland_instance
+  compositor="hyprland"
+}
+
 hypr() {
   if [[ -n "${hyprland_instance}" ]]; then
     env HYPRLAND_INSTANCE_SIGNATURE="${hyprland_instance}" WAYLAND_DISPLAY="${hyprland_wayland_socket}" \
@@ -123,6 +135,10 @@ hypr() {
   else
     hyprctl "$@"
   fi
+}
+
+niri_msg() {
+  niri msg -j "$@"
 }
 
 grim_capture() {
@@ -219,11 +235,58 @@ discover_reachable_instance() {
   return 1
 }
 
+active_workspace_token() {
+  if [[ "${compositor}" == "niri" ]]; then
+    niri_msg workspaces | jq -r '
+      (if type == "array" then . else (.workspaces // []) end)[]
+      | select(.is_active == true or .active == true or .is_focused == true or .focused == true)
+      | (.idx // .id // .index // .name // empty)
+    ' | head -n1
+    return 0
+  fi
+
+  hypr activeworkspace -j | jq -r '.name // (.id | tostring)'
+}
+
+list_workspace_tokens() {
+  if [[ "${compositor}" == "niri" ]]; then
+    niri_msg workspaces | jq -r '
+      (if type == "array" then . else (.workspaces // []) end)[]
+      | (.idx // .id // .index // .name // empty)
+    '
+    return 0
+  fi
+
+  hypr workspaces -j | jq -r '.[] | (.name // (.id | tostring) // empty)'
+}
+
+focus_workspace() {
+  local target="$1"
+
+  if [[ "${compositor}" == "niri" ]]; then
+    niri msg action focus-workspace "${target}" >/dev/null
+    return 0
+  fi
+
+  hypr dispatch workspace "${target}" >/dev/null
+}
+
+focused_output_json() {
+  if [[ "${compositor}" == "niri" ]]; then
+    niri_msg outputs | jq '
+      (if type == "array" then . else (.outputs // []) end)
+      | (map(select(.is_focused == true or .focused == true or .active == true or .is_active == true))[0] // .[0])
+    '
+    return 0
+  fi
+
+  hypr monitors -j | jq 'map(select(.focused == true))[0]'
+}
+
 pick_capture_workspace() {
-  local used
+  local candidate
   for candidate in $(seq 9001 9099); do
-    used="$(hypr workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
-    if [[ "${used}" == "0" ]]; then
+    if ! list_workspace_tokens | grep -Fxq "${candidate}"; then
       printf '%s\n' "${candidate}"
       return 0
     fi
@@ -233,14 +296,12 @@ pick_capture_workspace() {
 
 wait_for_workspace() {
   local target="$1"
-  local current_name
-  local current_id
+  local current
   local attempt
 
   for attempt in $(seq 1 "${workspace_settle_attempts}"); do
-    current_name="$(hypr activeworkspace -j | jq -r '.name // empty')"
-    current_id="$(hypr activeworkspace -j | jq -r '(.id | tostring) // empty')"
-    if [[ "${current_name}" == "${target}" || "${current_id}" == "${target}" ]]; then
+    current="$(active_workspace_token)"
+    if [[ "${current}" == "${target}" ]]; then
       return 0
     fi
     sleep "${workspace_settle_interval}"
@@ -257,7 +318,7 @@ switch_to_capture_workspace() {
     return 0
   fi
 
-  restore_workspace="$(hypr activeworkspace -j | jq -r '.name // (.id | tostring)')"
+  restore_workspace="$(active_workspace_token)"
   if [[ -z "${restore_workspace}" || "${restore_workspace}" == "null" ]]; then
     printf 'Could not resolve active workspace before capture.\n' >&2
     exit 1
@@ -270,7 +331,7 @@ switch_to_capture_workspace() {
     }
   fi
 
-  hypr dispatch workspace "${target}" >/dev/null
+  focus_workspace "${target}"
   wait_for_workspace "${target}"
 }
 
@@ -283,14 +344,13 @@ call_ipc() {
 cleanup() {
   call_ipc SettingsHub close >/dev/null 2>&1 || true
   if [[ -n "${restore_workspace}" ]]; then
-    hypr dispatch workspace "${restore_workspace}" >/dev/null 2>&1 || true
+    focus_workspace "${restore_workspace}" >/dev/null 2>&1 || true
   fi
   rm -f "${temp_full}" "${temp_crop}"
 }
 
 main() {
   require_cmd quickshell
-  require_cmd hyprctl
   require_cmd jq
   require_cmd grim
   require_cmd magick
@@ -298,7 +358,7 @@ main() {
   require_cmd sed
   require_cmd find
   require_cmd ps
-  resolve_hyprland_instance
+  detect_compositor
 
   if ! [[ "${width}" =~ ^[0-9]+$ ]] || ! [[ "${height}" =~ ^[0-9]+$ ]]; then
     printf 'Width and height must be integers.\n' >&2
@@ -360,20 +420,27 @@ main() {
   sleep "${delay_seconds}"
 
   local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right usable_w usable_h crop_x crop_y crop_w crop_h gutter_x gutter_y modal_w modal_h
-  monitor_json="$(hypr monitors -j | jq 'map(select(.focused == true))[0]')"
+  monitor_json="$(focused_output_json)"
   if [[ -z "${monitor_json}" || "${monitor_json}" == "null" ]]; then
-    printf 'Could not resolve focused monitor from hyprctl.\n' >&2
+    printf 'Could not resolve focused output from %s.\n' "${compositor}" >&2
     exit 1
   fi
 
-  monitor_x="$(printf '%s' "${monitor_json}" | jq -r '.x')"
-  monitor_y="$(printf '%s' "${monitor_json}" | jq -r '.y')"
-  monitor_w="$(printf '%s' "${monitor_json}" | jq -r '.width')"
-  monitor_h="$(printf '%s' "${monitor_json}" | jq -r '.height')"
-  reserved_top="$(printf '%s' "${monitor_json}" | jq -r '.reserved[0]')"
-  reserved_left="$(printf '%s' "${monitor_json}" | jq -r '.reserved[1]')"
-  reserved_bottom="$(printf '%s' "${monitor_json}" | jq -r '.reserved[2]')"
-  reserved_right="$(printf '%s' "${monitor_json}" | jq -r '.reserved[3]')"
+  monitor_x="$(printf '%s' "${monitor_json}" | jq -r '.logical.x // .logical_rect.x // .position.x // .x // 0')"
+  monitor_y="$(printf '%s' "${monitor_json}" | jq -r '.logical.y // .logical_rect.y // .position.y // .y // 0')"
+  monitor_w="$(printf '%s' "${monitor_json}" | jq -r '.logical.width // .logical_rect.width // .current_mode.width // .width // .physical.width // 0')"
+  monitor_h="$(printf '%s' "${monitor_json}" | jq -r '.logical.height // .logical_rect.height // .current_mode.height // .height // .physical.height // 0')"
+  if [[ "${compositor}" == "niri" ]]; then
+    reserved_top=0
+    reserved_left=0
+    reserved_bottom=0
+    reserved_right=0
+  else
+    reserved_top="$(printf '%s' "${monitor_json}" | jq -r '.reserved[0]')"
+    reserved_left="$(printf '%s' "${monitor_json}" | jq -r '.reserved[1]')"
+    reserved_bottom="$(printf '%s' "${monitor_json}" | jq -r '.reserved[2]')"
+    reserved_right="$(printf '%s' "${monitor_json}" | jq -r '.reserved[3]')"
+  fi
 
   usable_w=$((monitor_w - reserved_left - reserved_right))
   usable_h=$((monitor_h - reserved_top - reserved_bottom))

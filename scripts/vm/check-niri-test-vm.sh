@@ -3,12 +3,17 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 port="${NIRI_VM_SMOKE_SSH_PORT:-2232}"
-poll_attempts="${NIRI_VM_SMOKE_POLL_ATTEMPTS:-120}"
+boot_timeout="${NIRI_VM_SMOKE_BOOT_TIMEOUT:-300}"
 poll_delay="${NIRI_VM_SMOKE_POLL_DELAY:-2}"
+poll_attempts="${NIRI_VM_SMOKE_POLL_ATTEMPTS:-}"
 launcher="${repo_root}/scripts/vm/launch-niri-test-vm.sh"
 log_file="${NIRI_VM_SMOKE_LOG:-/tmp/niri-test-vm-smoke.log}"
 vm_password="${NIRI_VM_PASSWORD:-niri}"
 host_pubkey_file=""
+
+if [[ -z "${poll_attempts}" ]]; then
+  poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
+fi
 
 cleanup() {
   if [[ -n "${launcher_pid:-}" ]] && kill -0 "${launcher_pid}" 2>/dev/null; then

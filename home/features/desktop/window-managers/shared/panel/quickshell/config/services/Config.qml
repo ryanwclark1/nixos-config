@@ -19,8 +19,8 @@ QtObject {
     // --- GLASS ---
     property bool blurEnabled: true
     property real glassOpacity: 0.65
-    property real settingsBackdropOpacity: 0.82
-    property real settingsSurfaceOpacity: 0.985
+    property real settingsBackdropOpacity: 0.92
+    property real settingsSurfaceOpacity: 1.0
 
     // --- NOTIFICATIONS ---
     property int notifWidth: 350

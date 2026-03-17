@@ -5,7 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 flake_ref="${FLAKE_REF:-path:${repo_root}}"
 config_name="${HYPRLAND_VM_CONFIG:-hyprlandTestVm}"
 state_dir="${HYPRLAND_VM_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/hyprland-test-vm}"
-disk_image="${HYPRLAND_VM_DISK_IMAGE:-${state_dir}/${config_name}.qcow2}"
+disk_image="${HYPRLAND_VM_DISK_IMAGE:-}"
 build_only=0
 reset_disk=0
 ssh_port=""
@@ -79,13 +79,21 @@ if [[ -z "${config_name}" ]]; then
   exit 2
 fi
 
-if [[ -z "${disk_image}" ]]; then
-  echo "Disk image path cannot be empty" >&2
+if [[ -n "${ssh_port}" && ! "${ssh_port}" =~ ^[0-9]+$ ]]; then
+  echo "SSH port must be numeric, got: ${ssh_port}" >&2
   exit 2
 fi
 
-if [[ -n "${ssh_port}" && ! "${ssh_port}" =~ ^[0-9]+$ ]]; then
-  echo "SSH port must be numeric, got: ${ssh_port}" >&2
+if [[ -z "${disk_image}" ]]; then
+  if [[ -n "${ssh_port}" ]]; then
+    disk_image="${state_dir}/${config_name}-${ssh_port}.qcow2"
+  else
+    disk_image="${state_dir}/${config_name}.qcow2"
+  fi
+fi
+
+if [[ -z "${disk_image}" ]]; then
+  echo "Disk image path cannot be empty" >&2
   exit 2
 fi
 

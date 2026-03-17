@@ -728,9 +728,19 @@ main() {
   cp "${temp_crop}" "${output_path}"
 
   # Dump correlated logs
-  journalctl --user --since "${start_time}" > "${output_path%.png}.log" 2>/dev/null || true
+  local log_file="${output_path%.png}.log"
+  journalctl --user --since "${start_time}" > "${log_file}" 2>/dev/null || true
 
-  printf '[INFO] Saved surface review artifact for %s (%s) -> %s\n' "${surface_id}" "${crop_mode}" "${output_path}"
+  # Scan for health status
+  local status="clean"
+  if grep -qiE "error|critical|failed|exception" "${log_file}"; then
+    status="error"
+  elif grep -qiE "warn|alert" "${log_file}"; then
+    status="warning"
+  fi
+  printf '%s' "${status}" > "${log_file}.status"
+
+  printf '[INFO] Saved surface review artifact for %s (%s) (logs: %s) -> %s\n' "${surface_id}" "${crop_mode}" "${status}" "${output_path}"
 }
 
 main "$@"

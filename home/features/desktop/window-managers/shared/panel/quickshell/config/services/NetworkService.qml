@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "."
 
 // Centralized network state service.  Extracts all nmcli polling, Tailscale
 // status, and network detail gathering from NetworkMenu into a subscriber-based
@@ -24,8 +25,9 @@ QtObject {
     // ── Scanned networks ─────────────────────────────
     property var wifiNetworks: []
 
-    // ── Active connections ────────────────────────────
+    // ── VPN connections ──────────────────────────────
     property var vpns: []
+    property var vpnProfiles: []
     property var activeConnections: []
 
     // ── Primary connection details ───────────────────
@@ -74,14 +76,30 @@ QtObject {
             return "Ready to connect";
         return "CLI unavailable";
     }
-    readonly property var vpnOtherSessions: Array.isArray(vpns) ? vpns.slice() : []
+    readonly property var vpnOtherSessions: (vpnProfiles || []).filter(function(profile) { return !!profile.active; })
+    readonly property var vpnActiveProfiles: vpnOtherSessions
+    readonly property var vpnInactiveProfiles: (vpnProfiles || []).filter(function(profile) { return !profile.active; })
     readonly property int vpnOtherCount: vpnOtherSessions.length
+    readonly property int vpnInactiveCount: vpnInactiveProfiles.length
+    readonly property int vpnProfileCount: (vpnProfiles || []).length
+    readonly property bool vpnHasSavedProfiles: vpnProfileCount > 0
     readonly property bool vpnHasAnyOverlay: vpnPrimaryStatus === "connected" || vpnOtherCount > 0
     readonly property bool tailscaleInstalled: vpnPrimaryStatus !== "unavailable"
     readonly property bool tailscaleConnected: vpnPrimaryStatus === "connected"
 
     // ── Refresh state ────────────────────────────────
     property bool isRefreshing: false
+    property string pendingVpnProfileUuid: ""
+    property string pendingVpnAction: ""
+    property string lastVpnActionState: "idle"
+    property string lastVpnActionMessage: ""
+    property double lastVpnActionAt: 0
+
+    property string _vpnActionUuid: ""
+    property string _vpnActionTitle: ""
+    property string _vpnActionSuccessMessage: ""
+    property string _vpnActionFailureMessage: ""
+    property var _vpnActionCommand: []
 
     // ═══════════════════════════════════════════════════
     //  Helper functions
@@ -187,6 +205,115 @@ QtObject {
         return "Unavailable";
     }
 
+    function isVpnConnectionType(typeName) {
+        var type = String(typeName || "").toLowerCase();
+        return type === "vpn" || type === "wireguard" || type === "tun";
+    }
+
+    function parseVpnCatalog(text) {
+        var lines = String(text || "").trim().split("\n");
+        var entries = [];
+        for (var i = 0; i < lines.length; ++i) {
+            var line = String(lines[i] || "").trim();
+            if (line === "")
+                continue;
+            var parts = line.split(":");
+            if (parts.length < 3)
+                continue;
+            if (!isVpnConnectionType(parts[2]))
+                continue;
+            entries.push({
+                uuid: String(parts[0] || ""),
+                name: String(parts[1] || ""),
+                type: String(parts[2] || ""),
+                device: "",
+                state: "",
+                active: false
+            });
+        }
+        return entries;
+    }
+
+    function parseActiveVpnSessions(text) {
+        var lines = String(text || "").trim().split("\n");
+        var entries = [];
+        for (var i = 0; i < lines.length; ++i) {
+            var line = String(lines[i] || "").trim();
+            if (line === "")
+                continue;
+            var parts = line.split(":");
+            if (parts.length < 5)
+                continue;
+            if (!isVpnConnectionType(parts[2]))
+                continue;
+            entries.push({
+                uuid: String(parts[0] || ""),
+                name: String(parts[1] || ""),
+                type: String(parts[2] || ""),
+                device: String(parts[3] || ""),
+                state: String(parts[4] || ""),
+                active: true
+            });
+        }
+        return entries;
+    }
+
+    function sortVpnProfiles(profiles) {
+        return (profiles || []).sort(function(a, b) {
+            if (!!a.active !== !!b.active)
+                return a.active ? -1 : 1;
+            return String(a.name || "").localeCompare(String(b.name || ""));
+        });
+    }
+
+    function buildVpnProfiles(catalogText, activeText) {
+        var catalog = parseVpnCatalog(catalogText);
+        var activeEntries = parseActiveVpnSessions(activeText);
+        var activeByUuid = ({});
+        var merged = [];
+        var seen = ({});
+        var i;
+
+        for (i = 0; i < activeEntries.length; ++i) {
+            var activeEntry = activeEntries[i];
+            if (activeEntry.uuid !== "")
+                activeByUuid[activeEntry.uuid] = activeEntry;
+        }
+
+        for (i = 0; i < catalog.length; ++i) {
+            var entry = catalog[i];
+            var mergedEntry = entry.uuid !== "" && activeByUuid[entry.uuid]
+                ? Object.assign({}, entry, activeByUuid[entry.uuid], { active: true })
+                : Object.assign({}, entry);
+            merged.push(mergedEntry);
+            if (mergedEntry.uuid !== "")
+                seen[mergedEntry.uuid] = true;
+        }
+
+        for (i = 0; i < activeEntries.length; ++i) {
+            var extraActive = activeEntries[i];
+            if (extraActive.uuid !== "" && seen[extraActive.uuid])
+                continue;
+            merged.push(Object.assign({}, extraActive));
+        }
+
+        return sortVpnProfiles(merged);
+    }
+
+    function vpnProfileByUuid(uuidValue) {
+        var uuid = String(uuidValue || "");
+        var profiles = vpnProfiles || [];
+        for (var i = 0; i < profiles.length; ++i) {
+            if (String(profiles[i].uuid || "") === uuid)
+                return profiles[i];
+        }
+        return null;
+    }
+
+    function vpnProfilePendingAction(uuidValue) {
+        return pendingVpnProfileUuid === String(uuidValue || "") ? pendingVpnAction : "";
+    }
+
     // ═══════════════════════════════════════════════════
     //  Refresh orchestration
     // ═══════════════════════════════════════════════════
@@ -212,6 +339,24 @@ QtObject {
 
     function queueRefresh() {
         _actionRefresh.restart();
+    }
+
+    function _runVpnProfileAction(profile, actionName, command, title, successMessage, failureMessage) {
+        if (!profile || !profile.uuid)
+            return false;
+        if (vpnActionProc.running) {
+            ToastService.showNotice("VPN action pending", "Wait for the current VPN action to finish.");
+            return false;
+        }
+        pendingVpnProfileUuid = String(profile.uuid || "");
+        pendingVpnAction = String(actionName || "");
+        _vpnActionUuid = pendingVpnProfileUuid;
+        _vpnActionTitle = String(title || "VPN action");
+        _vpnActionSuccessMessage = String(successMessage || "VPN action completed.");
+        _vpnActionFailureMessage = String(failureMessage || "VPN action failed.");
+        _vpnActionCommand = command || [];
+        vpnActionProc.running = true;
+        return true;
     }
 
     // ── Actions ──────────────────────────────────────
@@ -244,8 +389,45 @@ QtObject {
     }
 
     function disconnectVpn(name) {
-        Quickshell.execDetached(["nmcli", "connection", "down", name]);
+        var safeName = String(name || "");
+        var activeProfiles = vpnActiveProfiles || [];
+        for (var i = 0; i < activeProfiles.length; ++i) {
+            if (String(activeProfiles[i].name || "") === safeName)
+                return disconnectVpnProfile(activeProfiles[i].uuid);
+        }
+        if (safeName === "")
+            return false;
+        Quickshell.execDetached(["nmcli", "connection", "down", safeName]);
         queueRefresh();
+        return true;
+    }
+
+    function connectVpnProfile(uuidValue) {
+        var profile = vpnProfileByUuid(uuidValue);
+        if (!profile)
+            return false;
+        return _runVpnProfileAction(
+            profile,
+            "connect",
+            ["nmcli", "connection", "up", "uuid", String(profile.uuid || "")],
+            "VPN connected",
+            String(profile.name || "VPN") + " is now connected.",
+            "Could not connect " + String(profile.name || "VPN") + "."
+        );
+    }
+
+    function disconnectVpnProfile(uuidValue) {
+        var profile = vpnProfileByUuid(uuidValue);
+        if (!profile)
+            return false;
+        return _runVpnProfileAction(
+            profile,
+            "disconnect",
+            ["nmcli", "connection", "down", "uuid", String(profile.uuid || "")],
+            "VPN disconnected",
+            String(profile.name || "VPN") + " is now disconnected.",
+            "Could not disconnect " + String(profile.name || "VPN") + "."
+        );
     }
 
     function tailscaleUp() {
@@ -282,6 +464,18 @@ QtObject {
         onTriggered: root.refreshData()
     }
 
+    property Timer _vpnActionImmediateRefresh: Timer {
+        interval: 120
+        repeat: false
+        onTriggered: root.refreshData()
+    }
+
+    property Timer _vpnActionSettleRefresh: Timer {
+        interval: 900
+        repeat: false
+        onTriggered: root.refreshData()
+    }
+
     // Initial fetch when first subscriber connects
     onSubscriberCountChanged: {
         if (subscriberCount === 1)
@@ -291,6 +485,30 @@ QtObject {
     // ═══════════════════════════════════════════════════
     //  Process definitions (all nmcli / ip / tailscale)
     // ═══════════════════════════════════════════════════
+
+    property Process vpnActionProc: Process {
+        id: vpnActionProc
+        command: root._vpnActionCommand
+        running: false
+        onExited: (exitCode, exitStatus) => {
+            var wasSuccess = exitCode === 0;
+            var actionTitle = root._vpnActionTitle;
+            var successMessage = root._vpnActionSuccessMessage;
+            var failureMessage = root._vpnActionFailureMessage;
+            root.pendingVpnProfileUuid = "";
+            root.pendingVpnAction = "";
+            root.lastVpnActionState = wasSuccess ? "success" : "error";
+            root.lastVpnActionMessage = wasSuccess ? successMessage : failureMessage;
+            root.lastVpnActionAt = Date.now();
+            if (wasSuccess)
+                ToastService.showSuccess(actionTitle, successMessage);
+            else
+                ToastService.showError(actionTitle, failureMessage);
+            root.refreshData();
+            root._vpnActionImmediateRefresh.restart();
+            root._vpnActionSettleRefresh.restart();
+        }
+    }
 
     property Process _getRadioState: Process {
         command: [
@@ -342,24 +560,24 @@ QtObject {
         command: [
             "sh",
             "-c",
-            "command -v nmcli >/dev/null 2>&1 && nmcli -t -f NAME,TYPE,DEVICE,STATE connection show --active 2>/dev/null | grep -E ':(vpn|wireguard|tun):' || true"
+            "if command -v nmcli >/dev/null 2>&1; then "
+            + "printf '__CATALOG__\\n'; "
+            + "nmcli -t -f UUID,NAME,TYPE connection show 2>/dev/null | grep -E ':(vpn|wireguard|tun)$' || true; "
+            + "printf '__ACTIVE__\\n'; "
+            + "nmcli -t -f UUID,NAME,TYPE,DEVICE,STATE connection show --active 2>/dev/null | grep -E ':(vpn|wireguard|tun):' || true; "
+            + "fi"
         ]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
-                var lines = (this.text || "").trim().split("\n");
-                var activeVpns = [];
-                for (var i = 0; i < lines.length; ++i) {
-                    if (!lines[i]) continue;
-                    var parts = lines[i].split(":");
-                    activeVpns.push({
-                        name: parts[0] || "",
-                        type: parts[1] || "",
-                        device: parts[2] || "",
-                        state: parts[3] || ""
-                    });
-                }
-                root.vpns = activeVpns;
+                var output = String(this.text || "");
+                var activeMarker = "\n__ACTIVE__\n";
+                var markerIndex = output.indexOf(activeMarker);
+                var catalogText = markerIndex >= 0 ? output.substring("__CATALOG__\n".length, markerIndex) : "";
+                var activeText = markerIndex >= 0 ? output.substring(markerIndex + activeMarker.length) : "";
+                var profiles = root.buildVpnProfiles(catalogText, activeText);
+                root.vpnProfiles = profiles;
+                root.vpns = (profiles || []).filter(function(profile) { return !!profile.active; });
             }
         }
     }

@@ -6,8 +6,8 @@ launcher="${repo_root}/scripts/vm/launch-niri-test-vm.sh"
 ssh_port="${NIRI_VM_QA_SSH_PORT:-2232}"
 vm_password="${NIRI_VM_PASSWORD:-niri}"
 boot_timeout="${NIRI_VM_QA_BOOT_TIMEOUT:-300}"
-poll_attempts="${NIRI_VM_QA_POLL_ATTEMPTS:-120}"
 poll_delay="${NIRI_VM_QA_POLL_DELAY:-2}"
+poll_attempts="${NIRI_VM_QA_POLL_ATTEMPTS:-}"
 output_dir="${NIRI_VM_QA_OUTPUT_DIR:-/tmp/panel-qa-matrix-niri-host}"
 capture_mode="panel"
 reset_disk=0
@@ -16,6 +16,10 @@ vm_output_dir=""
 launcher_log="${NIRI_VM_QA_LOG:-/tmp/niri-test-vm-qa.log}"
 extra_capture_args=()
 host_pubkey_file=""
+
+if [[ -z "${poll_attempts}" ]]; then
+  poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
+fi
 
 usage() {
   cat <<'EOF'

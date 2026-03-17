@@ -7,8 +7,8 @@ ssh_port="${HYPRLAND_VM_QA_SSH_PORT:-2242}"
 vm_password="${HYPRLAND_VM_PASSWORD:-hyprland}"
 qa_qemu_opts="${HYPRLAND_VM_QA_QEMU_OPTS:--vga none -device virtio-vga -display vnc=127.0.0.1:42}"
 boot_timeout="${HYPRLAND_VM_QA_BOOT_TIMEOUT:-300}"
-poll_attempts="${HYPRLAND_VM_QA_POLL_ATTEMPTS:-120}"
 poll_delay="${HYPRLAND_VM_QA_POLL_DELAY:-2}"
+poll_attempts="${HYPRLAND_VM_QA_POLL_ATTEMPTS:-}"
 output_dir="${HYPRLAND_VM_QA_OUTPUT_DIR:-/tmp/panel-qa-matrix-host}"
 capture_mode="panel"
 reset_disk=0
@@ -17,6 +17,10 @@ vm_output_dir=""
 launcher_log="${HYPRLAND_VM_QA_LOG:-/tmp/hyprland-test-vm-qa.log}"
 extra_capture_args=()
 host_pubkey_file=""
+
+if [[ -z "${poll_attempts}" ]]; then
+  poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
+fi
 
 usage() {
   cat <<'EOF'
@@ -189,17 +193,6 @@ install_host_pubkey() {
 
 wait_for_hyprland() {
   local i
-  if ! "${ssh_base[@]}" '
-    if pgrep -af "Hyprland" >/dev/null 2>&1; then
-      exit 0
-    fi
-    systemctl --user stop quickshell.service quickshell-health.service graphical-session.target >/dev/null 2>&1 || true
-    nohup sh -lc "exec uwsm start hyprland-uwsm.desktop >/tmp/uwsm-hyprland.log 2>&1" >/dev/null 2>&1 &
-  ' >/dev/null 2>&1; then
-    echo "[ERROR] Failed to request Hyprland startup inside the VM" >&2
-    return 1
-  fi
-
   for ((i = 1; i <= 60; i++)); do
     if "${ssh_base[@]}" '
       pgrep -af "Hyprland" >/dev/null 2>&1 &&
@@ -208,6 +201,21 @@ wait_for_hyprland() {
     ' >/dev/null 2>&1; then
       return 0
     fi
+
+    "${ssh_base[@]}" '
+      # Recover from stale user-session state where graphical-session.target is
+      # active before Hyprland has exported its Wayland environment.
+      systemctl --user reset-failed quickshell.service quickshell-health.service hyprpolkitagent.service >/dev/null 2>&1 || true
+      systemctl --user stop quickshell.service quickshell-health.service >/dev/null 2>&1 || true
+      pkill -x quickshell >/dev/null 2>&1 || true
+      if uwsm check is-active >/dev/null 2>&1; then
+        uwsm stop >/tmp/uwsm-hyprland-stop.log 2>&1 || true
+        sleep 1
+      fi
+      if ! pgrep -af "Hyprland" >/dev/null 2>&1; then
+        nohup sh -lc "exec uwsm start hyprland-uwsm.desktop >/tmp/uwsm-hyprland.log 2>&1" >/dev/null 2>&1 &
+      fi
+    ' >/dev/null 2>&1 || true
     sleep 2
   done
 
@@ -215,10 +223,18 @@ wait_for_hyprland() {
   "${ssh_base[@]}" '
     echo "--- processes ---"
     pgrep -a "Hyprland|quickshell|kitty|uwsm|sddm|lightdm" || true
+    echo "--- quickshell status ---"
+    systemctl --user status --no-pager quickshell.service 2>/dev/null || true
     echo "--- uwsm log ---"
     sed -n "1,160p" /tmp/uwsm-hyprland.log 2>/dev/null || true
+    echo "--- uwsm stop log ---"
+    sed -n "1,160p" /tmp/uwsm-hyprland-stop.log 2>/dev/null || true
     echo "--- env ---"
     systemctl --user show-environment 2>/dev/null | grep -E "HYPRLAND|WAYLAND|XDG_CURRENT_DESKTOP|DESKTOP_SESSION" || true
+    echo "--- session ---"
+    loginctl show-session "$XDG_SESSION_ID" -p Name -p Desktop -p Type 2>/dev/null || true
+    echo "--- user journal ---"
+    journalctl --user --no-pager -n 160 2>/dev/null || true
   ' >&2
   return 1
 }

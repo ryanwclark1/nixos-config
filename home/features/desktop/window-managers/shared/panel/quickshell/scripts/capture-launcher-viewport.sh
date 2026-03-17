@@ -20,8 +20,8 @@ viewport_width=""
 viewport_height=""
 workspace_settle_attempts="80"
 workspace_settle_interval="0.2"
-state_settle_attempts="18"
-state_settle_interval="0.1"
+state_settle_attempts="60"
+state_settle_interval="0.2"
 temp_full=""
 temp_crop=""
 restore_workspace=""
@@ -315,10 +315,10 @@ wait_for_launcher_state() {
   local snapshot=""
   local attempt
 
-  if [[ "${expected_query}" != "" ]]; then
-    expected_has_results="true"
-  elif [[ "${state}" == "empty" ]]; then
+  if [[ "${state}" == "empty" ]]; then
     expected_has_results="false"
+  elif [[ "${expected_query}" != "" ]]; then
+    expected_has_results="true"
   elif [[ "${state}" == "category" ]]; then
     expected_has_results="true"
   fi
@@ -574,12 +574,13 @@ main() {
   if [[ "${crop_mode}" == "hud" ]]; then
     launcher_state="$(call_ipc Launcher launcherState 2>/dev/null || true)"
     if [[ -z "${launcher_state}" ]]; then
-      printf 'Could not read launcher state for hud crop.\n' >&2
-      exit 1
+      printf '[INFO] Could not read launcher state for hud crop; falling back to usable crop.\n'
+      crop_mode="usable"
     fi
 
-    local hud_snapshot=""
-    hud_snapshot="$(printf '%s' "${launcher_state}" | node -e '
+    if [[ "${crop_mode}" == "hud" ]]; then
+      local hud_snapshot=""
+      hud_snapshot="$(printf '%s' "${launcher_state}" | node -e '
 const fs = require("node:fs");
 const raw = fs.readFileSync(0, "utf8").trim();
 if (!raw) process.exit(1);
@@ -598,27 +599,35 @@ const values = [
 if (values[2] <= 0 || values[3] <= 0) process.exit(1);
 process.stdout.write(values.join("\t"));
 ' 2>/dev/null || true)"
-    IFS=$'\t' read -r hud_x hud_y hud_w hud_h launcher_usable_w launcher_usable_h launcher_diag_x launcher_diag_y <<< "${hud_snapshot}" || true
+      if [[ -z "${hud_snapshot}" ]]; then
+        printf '[INFO] Launcher HUD geometry unavailable; falling back to usable crop.\n'
+        crop_mode="usable"
+      else
+        IFS=$'\t' read -r hud_x hud_y hud_w hud_h launcher_usable_w launcher_usable_h launcher_diag_x launcher_diag_y <<< "${hud_snapshot}" || true
 
-    if (( hud_x < 0 )); then
-      hud_x=$((reserved_left + launcher_diag_x + (launcher_usable_w - hud_w) / 2))
-      if (( hud_x < reserved_left + launcher_diag_x + 20 )); then
-        hud_x=$((reserved_left + launcher_diag_x + 20))
+        if (( hud_x < 0 )); then
+          hud_x=$((reserved_left + launcher_diag_x + (launcher_usable_w - hud_w) / 2))
+          if (( hud_x < reserved_left + launcher_diag_x + 20 )); then
+            hud_x=$((reserved_left + launcher_diag_x + 20))
+          fi
+        fi
+
+        if (( hud_y < 0 )); then
+          hud_y=$((reserved_top + launcher_diag_y + (launcher_usable_h - hud_h) / 2))
+          if (( hud_y < reserved_top + launcher_diag_y + 20 )); then
+            hud_y=$((reserved_top + launcher_diag_y + 20))
+          fi
+        fi
+
+        crop_x=$((monitor_x + hud_x))
+        crop_y=$((monitor_y + hud_y))
+        crop_w="${hud_w}"
+        crop_h="${hud_h}"
       fi
     fi
+  fi
 
-    if (( hud_y < 0 )); then
-      hud_y=$((reserved_top + launcher_diag_y + (launcher_usable_h - hud_h) / 2))
-      if (( hud_y < reserved_top + launcher_diag_y + 20 )); then
-        hud_y=$((reserved_top + launcher_diag_y + 20))
-      fi
-    fi
-
-    crop_x=$((monitor_x + hud_x))
-    crop_y=$((monitor_y + hud_y))
-    crop_w="${hud_w}"
-    crop_h="${hud_h}"
-  elif [[ "${crop_mode}" == "usable" ]]; then
+  if [[ "${crop_mode}" == "usable" ]]; then
     crop_x=$((monitor_x + reserved_left))
     crop_y=$((monitor_y + reserved_top))
     crop_w=$((monitor_w - reserved_left - reserved_right))

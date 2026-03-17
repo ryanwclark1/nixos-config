@@ -9,7 +9,7 @@ BasePopupMenu {
     popupMinWidth: 340
     popupMaxWidth: 396
     compactThreshold: 420
-    implicitHeight: compactMode ? 520 : 488
+    implicitHeight: compactMode ? 620 : 560
     title: "VPN Hub"
     subtitle: NetworkService.vpnPrimaryLabel + " • " + NetworkService.vpnStatusLabel(NetworkService.vpnPrimaryStatus)
     toggleMethod: "toggleVpnMenu"
@@ -27,6 +27,18 @@ BasePopupMenu {
     function openNetworkMenu() {
         root.closeRequested();
         Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]);
+    }
+
+    function otherVpnChipText() {
+        if (NetworkService.vpnOtherCount <= 0)
+            return "";
+        return NetworkService.vpnOtherCount === 1 ? "1 active profile" : NetworkService.vpnOtherCount + " active profiles";
+    }
+
+    function savedVpnChipText() {
+        if (!NetworkService.vpnHasSavedProfiles)
+            return "";
+        return NetworkService.vpnProfileCount === 1 ? "1 saved profile" : NetworkService.vpnProfileCount + " saved profiles";
     }
 
     SharedWidgets.Ref {
@@ -159,7 +171,26 @@ BasePopupMenu {
                         Text {
                             id: otherCountLabel
                             anchors.centerIn: parent
-                            text: NetworkService.vpnOtherCount === 1 ? "1 other VPN" : NetworkService.vpnOtherCount + " other VPNs"
+                            text: root.otherVpnChipText()
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeXS
+                            font.weight: Font.Medium
+                        }
+                    }
+
+                    Rectangle {
+                        visible: NetworkService.vpnHasSavedProfiles
+                        radius: Colors.radiusPill
+                        color: Colors.chipSurface
+                        border.color: Colors.border
+                        border.width: 1
+                        implicitHeight: 24
+                        implicitWidth: savedCountLabel.implicitWidth + 18
+
+                        Text {
+                            id: savedCountLabel
+                            anchors.centerIn: parent
+                            text: root.savedVpnChipText()
                             color: Colors.textSecondary
                             font.pixelSize: Colors.fontSizeXS
                             font.weight: Font.Medium
@@ -224,14 +255,16 @@ BasePopupMenu {
             spacing: Colors.spacingS
             visible: NetworkService.vpnOtherCount > 0
 
-            SharedWidgets.SectionLabel { label: "Other Active VPN Sessions" }
+            SharedWidgets.SectionLabel { label: "Active VPN Profiles" }
 
             Repeater {
-                model: NetworkService.vpnOtherSessions
+                model: NetworkService.vpnActiveProfiles
 
                 delegate: Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 52
+                    required property var modelData
+                    readonly property bool actionPending: NetworkService.pendingVpnProfileUuid === String(modelData.uuid || "")
+                    implicitHeight: 60
                     radius: Colors.radiusMedium
                     color: Colors.cardSurface
                     border.color: Colors.border
@@ -257,6 +290,7 @@ BasePopupMenu {
                                 text: modelData.name || "VPN"
                                 color: Colors.text
                                 font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.Medium
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
                             }
@@ -272,19 +306,113 @@ BasePopupMenu {
 
                         Rectangle {
                             radius: Colors.radiusPill
-                            color: Colors.withAlpha(Colors.accent, 0.12)
-                            border.color: Colors.withAlpha(Colors.accent, 0.28)
+                            color: actionPending
+                                ? Colors.withAlpha(Colors.textSecondary, 0.12)
+                                : Colors.withAlpha(Colors.error, 0.12)
+                            border.color: actionPending ? Colors.border : Colors.error
                             border.width: 1
                             implicitHeight: 24
-                            implicitWidth: otherStateLabel.implicitWidth + 16
+                            implicitWidth: otherStateLabel.implicitWidth + 18
 
                             Text {
                                 id: otherStateLabel
                                 anchors.centerIn: parent
-                                text: modelData.state || "active"
-                                color: Colors.accent
+                                text: actionPending ? "Disconnecting" : "Disconnect"
+                                color: actionPending ? Colors.textSecondary : Colors.error
                                 font.pixelSize: Colors.fontSizeXS
                                 font.weight: Font.DemiBold
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                enabled: !actionPending && NetworkService.pendingVpnProfileUuid === ""
+                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
+                                onClicked: NetworkService.disconnectVpnProfile(modelData.uuid)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Colors.spacingS
+            visible: NetworkService.vpnInactiveCount > 0
+
+            SharedWidgets.SectionLabel { label: "Available VPN Profiles" }
+
+            Repeater {
+                model: NetworkService.vpnInactiveProfiles
+
+                delegate: Rectangle {
+                    Layout.fillWidth: true
+                    required property var modelData
+                    readonly property bool actionPending: NetworkService.pendingVpnProfileUuid === String(modelData.uuid || "")
+                    implicitHeight: 60
+                    radius: Colors.radiusMedium
+                    color: Colors.cardSurface
+                    border.color: Colors.border
+                    border.width: 1
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: Colors.spacingM
+                        spacing: Colors.spacingS
+
+                        Text {
+                            text: "󰖂"
+                            color: Colors.textSecondary
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeLarge
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 0
+
+                            Text {
+                                text: modelData.name || "VPN"
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.Medium
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                text: modelData.type || "vpn"
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+                        }
+
+                        Rectangle {
+                            radius: Colors.radiusPill
+                            color: actionPending
+                                ? Colors.withAlpha(Colors.textSecondary, 0.12)
+                                : Colors.withAlpha(Colors.primary, 0.14)
+                            border.color: actionPending ? Colors.border : Colors.primary
+                            border.width: 1
+                            implicitHeight: 24
+                            implicitWidth: availableActionLabel.implicitWidth + 18
+
+                            Text {
+                                id: availableActionLabel
+                                anchors.centerIn: parent
+                                text: actionPending ? "Connecting" : "Connect"
+                                color: actionPending ? Colors.textSecondary : Colors.primary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.DemiBold
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                enabled: !actionPending && NetworkService.pendingVpnProfileUuid === ""
+                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
+                                onClicked: NetworkService.connectVpnProfile(modelData.uuid)
                             }
                         }
                     }
@@ -294,7 +422,7 @@ BasePopupMenu {
 
         Rectangle {
             Layout.fillWidth: true
-            visible: NetworkService.vpnOtherCount === 0
+            visible: !NetworkService.vpnHasSavedProfiles
             implicitHeight: 72
             radius: Colors.radiusMedium
             color: Colors.cardSurface
@@ -314,7 +442,7 @@ BasePopupMenu {
                 }
 
                 Text {
-                    text: "No other VPN sessions are active"
+                    text: "No saved NetworkManager VPN profiles"
                     color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeSmall
                     anchors.horizontalCenter: parent.horizontalCenter

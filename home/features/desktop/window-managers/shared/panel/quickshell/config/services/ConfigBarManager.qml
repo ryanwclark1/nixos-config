@@ -854,11 +854,15 @@ QtObject {
     var primaryBar = compatibleLegacyBar();
     if (!primaryBar) return;
 
+    var nextHeight = parseInt(primaryBar.height !== undefined ? primaryBar.height : config.barHeight, 10);
+    var nextMargin = parseInt(primaryBar.margin !== undefined ? primaryBar.margin : config.barMargin, 10);
+    var nextOpacity = Number(primaryBar.opacity !== undefined ? primaryBar.opacity : config.barOpacity);
+
     config._syncingLegacyBarSettings = true;
-    config.barHeight = primaryBar.height;
-    config.barFloating = primaryBar.floating;
-    config.barMargin = primaryBar.margin;
-    config.barOpacity = primaryBar.opacity;
+    config.barHeight = isNaN(nextHeight) ? config.barHeight : nextHeight;
+    config.barFloating = primaryBar.floating !== undefined ? !!primaryBar.floating : config.barFloating;
+    config.barMargin = isNaN(nextMargin) ? config.barMargin : nextMargin;
+    config.barOpacity = isNaN(nextOpacity) ? config.barOpacity : nextOpacity;
     config._syncingLegacyBarSettings = false;
   }
 

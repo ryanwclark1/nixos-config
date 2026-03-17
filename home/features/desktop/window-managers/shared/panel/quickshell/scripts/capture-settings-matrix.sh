@@ -188,7 +188,7 @@ for tab in "${tabs[@]}"; do
     --output "${output_dir}/${viewport_preset}-${tab}.png"
 done
 
-write_gallery
+write_gallery "${output_dir}"
 
 printf '[INFO] Saved settings review artifacts for the %s matrix to %s\n' "${viewport_preset}" "${output_dir}"
 printf '[INFO] Saved review gallery to %s/index.html\n' "${output_dir}"

@@ -201,6 +201,7 @@ populate_repo_shell_env() {
 
 start_repo_shell() {
   local deadline
+  local resolved=""
 
   if ! command -v systemctl >/dev/null 2>&1; then
     printf 'systemctl is required for --repo-shell mode.\n' >&2
@@ -221,6 +222,10 @@ start_repo_shell() {
   while (( SECONDS < deadline )); do
     if run_ipc quickshell ipc --pid "${repo_shell_pid}" show >/dev/null; then
       sleep 1
+      resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
+      if [[ -n "${resolved}" ]]; then
+        instance_id="$(basename "${resolved}")"
+      fi
       printf '[INFO] Repo shell instance ready: pid %s\n' "${repo_shell_pid}"
       return 0
     fi

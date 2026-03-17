@@ -7,19 +7,20 @@ checklist_path="${repo_root}/MANUAL_QA_CHECKLIST.md"
 
 usage() {
   cat <<EOF
-Usage: manual-qa.sh [--checklist] [--journal] [--settings] [--surfaces] [--launcher] [--artifacts] [--all]
+Usage: manual-qa.sh [--checklist] [--journal] [--settings] [--surfaces] [--launcher] [--artifacts] [--responsive] [--all]
 
 Helpers for the remaining manual Quickshell QA pass.
 
 Options:
-  --checklist  Print the manual QA checklist path and contents.
-  --journal    Print the recommended journal command.
-  --settings   Open SettingsHub.
-  --surfaces   Open the main runtime surfaces used for sanity checks.
-  --launcher   Open the launcher in its primary manual QA modes.
-  --artifacts  Generate all visual QA matrices and a dashboard index.
-  --all        Print the checklist path, journal command, run settings/surfaces/launcher helpers, and generate artifacts.
-  -h, --help   Show this help text.
+  --checklist   Print the manual QA checklist path and contents.
+  --journal     Print the recommended journal command.
+  --settings    Open SettingsHub.
+  --surfaces    Open the main runtime surfaces used for sanity checks.
+  --launcher    Open the launcher in its primary manual QA modes.
+  --artifacts   Generate all visual QA matrices and a dashboard index.
+  --responsive  When generating artifacts, capture multiple resolutions (Portrait, Laptop, Wide).
+  --all         Print the checklist path, journal command, run settings/surfaces/launcher helpers, and generate artifacts.
+  -h, --help    Show this help text.
 EOF
 }
 
@@ -51,7 +52,9 @@ open_launcher() {
 }
 
 capture_artifacts() {
-  bash "${script_dir}/capture-manual-qa-dashboard.sh"
+  local responsive_flag=""
+  [[ "${run_responsive:-0}" == "1" ]] && responsive_flag="--responsive"
+  bash "${script_dir}/capture-manual-qa-dashboard.sh" ${responsive_flag}
 }
 
 if (( $# == 0 )); then
@@ -59,6 +62,7 @@ if (( $# == 0 )); then
   exit 0
 fi
 
+run_responsive=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --checklist)
@@ -79,9 +83,11 @@ while [[ $# -gt 0 ]]; do
     --artifacts)
       capture_artifacts
       ;;
+    --responsive)
+      run_responsive=1
+      ;;
     --all)
-      printf '[INFO] Checklist: %s\n' "${checklist_path}"
-      printf '[INFO] Journal: '
+      print_checklist
       print_journal_cmd
       open_settings
       open_surfaces

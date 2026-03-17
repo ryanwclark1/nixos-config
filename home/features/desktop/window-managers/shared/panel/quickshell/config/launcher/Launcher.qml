@@ -85,6 +85,10 @@ PanelWindow {
     property var onCommandError: null
     property string commandStdoutBuffer: ""
     property string commandStderrBuffer: ""
+    property var pendingCommand: null
+    property var pendingCommandOutput: null
+    property var pendingCommandError: null
+    property bool suppressNextCommandExit: false
     property string modeLoadState: "idle"
     property string modeLoadMessage: ""
     property string modeLoadTarget: ""
@@ -591,10 +595,29 @@ PanelWindow {
             var errorCb = launcherRoot.onCommandError;
             var stdoutText = launcherRoot.commandStdoutBuffer || "";
             var stderrText = launcherRoot.commandStderrBuffer || "";
+            var suppressExit = launcherRoot.suppressNextCommandExit;
             launcherRoot.onCommandOutput = null;
             launcherRoot.onCommandError = null;
             launcherRoot.commandStdoutBuffer = "";
             launcherRoot.commandStderrBuffer = "";
+            launcherRoot.suppressNextCommandExit = false;
+
+            var nextCommand = launcherRoot.pendingCommand;
+            var nextOutput = launcherRoot.pendingCommandOutput;
+            var nextError = launcherRoot.pendingCommandError;
+            launcherRoot.pendingCommand = null;
+            launcherRoot.pendingCommandOutput = null;
+            launcherRoot.pendingCommandError = null;
+
+            if (suppressExit) {
+                if (nextCommand)
+                    launcherRoot.startCommand(nextCommand, nextOutput, nextError);
+                return;
+            }
+
+            if (nextCommand)
+                launcherRoot.startCommand(nextCommand, nextOutput, nextError);
+
             if (exitCode === 0) {
                 if (outputCb)
                     outputCb(stdoutText);
@@ -1797,15 +1820,25 @@ PanelWindow {
         close();
     }
 
-    function runCommand(command, callback, errorCallback) {
-        if (commandProc.running)
-            commandProc.running = false;
+    function startCommand(command, callback, errorCallback) {
         onCommandOutput = callback;
         onCommandError = errorCallback || null;
         commandStdoutBuffer = "";
         commandStderrBuffer = "";
         commandProc.command = command;
         commandProc.running = true;
+    }
+
+    function runCommand(command, callback, errorCallback) {
+        if (commandProc.running) {
+            pendingCommand = command;
+            pendingCommandOutput = callback;
+            pendingCommandError = errorCallback || null;
+            suppressNextCommandExit = true;
+            commandProc.running = false;
+            return;
+        }
+        startCommand(command, callback, errorCallback);
     }
 
     function loadCached(modeKey, command, parseFunc) {

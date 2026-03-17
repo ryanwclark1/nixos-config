@@ -349,7 +349,7 @@ BasePopupMenu {
         ColumnLayout {
           Layout.fillWidth: true
           spacing: Colors.spacingS
-          visible: NetworkService.tailscaleInstalled || NetworkService.vpnOtherCount > 0
+          visible: NetworkService.tailscaleInstalled || NetworkService.vpnHasSavedProfiles
 
           SharedWidgets.SectionLabel { label: "VPN Hub" }
 
@@ -386,7 +386,9 @@ BasePopupMenu {
                 }
 
                 Text {
-                  text: NetworkService.vpnPrimaryDetail + (NetworkService.vpnOtherCount > 0 ? " \u2022 " + (NetworkService.vpnOtherCount === 1 ? "1 other VPN" : NetworkService.vpnOtherCount + " other VPNs") : "")
+                  text: NetworkService.vpnPrimaryDetail
+                    + (NetworkService.vpnOtherCount > 0 ? " \u2022 " + (NetworkService.vpnOtherCount === 1 ? "1 active profile" : NetworkService.vpnOtherCount + " active profiles") : "")
+                    + (NetworkService.vpnInactiveCount > 0 ? " \u2022 " + (NetworkService.vpnInactiveCount === 1 ? "1 saved profile" : NetworkService.vpnInactiveCount + " saved profiles") : "")
                   color: Colors.textSecondary
                   font.pixelSize: Colors.fontSizeXS
                   Layout.fillWidth: true
