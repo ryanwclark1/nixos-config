@@ -243,7 +243,7 @@ RowLayout {
         width: 32
         height: 32
         radius: Colors.radiusSmall
-        color: addConvMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : Colors.bgWidget
+        color: addConvMouse.containsMouse ? Colors.primaryGhost : Colors.bgWidget
         border.color: addConvMouse.containsMouse ? Colors.primary : Colors.border
         border.width: 1
         Layout.alignment: Qt.AlignVCenter

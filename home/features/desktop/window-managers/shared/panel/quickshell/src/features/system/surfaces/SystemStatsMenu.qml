@@ -14,6 +14,7 @@ BasePopupMenu {
     title: "System"
     subtitle: compactMode ? "Actions first" : "Processes, services, and live telemetry"
     toggleMethod: "toggleSystemStatsMenu"
+    focusOnOpen: true
 
     headerExtras: SharedWidgets.IconButton {
         icon: "󰄨"

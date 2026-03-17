@@ -13,7 +13,7 @@ Rectangle {
     radius: Colors.radiusSmall
     color: root.active
         ? Colors.primaryAccent
-        : Colors.withAlpha(Colors.text, 0.06)
+        : Colors.textFaint
     border.color: root.active
         ? Colors.withAlpha(Colors.primary, 0.6)
         : Colors.border

@@ -11,7 +11,7 @@ Rectangle {
     implicitWidth: chipRow.implicitWidth + 16
     implicitHeight: 28
     radius: Colors.radiusPill
-    color: Colors.withAlpha(Colors.primary, 0.1)
+    color: Colors.primaryGhost
     border.color: Colors.border
     border.width: 1
 

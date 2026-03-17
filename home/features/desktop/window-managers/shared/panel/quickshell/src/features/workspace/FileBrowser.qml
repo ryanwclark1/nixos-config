@@ -1151,7 +1151,7 @@ PanelWindow {
                     color: {
                       var isSel = (root.selectedFile === modelData.path);
                       if (isSel) return Colors.primaryMarked;
-                      if (listItemHover.containsMouse) return Colors.withAlpha(Colors.text, 0.06);
+                      if (listItemHover.containsMouse) return Colors.textFaint;
                       return index % 2 === 0 ? "transparent" : Colors.cardSurface;
                     }
                     Behavior on color { ColorAnimation { duration: Colors.durationSnap } }

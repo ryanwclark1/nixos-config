@@ -44,6 +44,14 @@ QtObject {
     // ── Detection on startup + wake ──────────────
     Component.onCompleted: _detectMonitors()
 
+    property Connections _suspendConn: Connections {
+        target: SuspendManager
+        function onWakingUp() {
+            root._detected = false;
+            root._detectTimer.restart();
+        }
+    }
+
     property Timer _detectTimer: Timer {
         interval: root._wakeSettleMs   // wait for hardware to settle after wake
         onTriggered: root._detectMonitors()

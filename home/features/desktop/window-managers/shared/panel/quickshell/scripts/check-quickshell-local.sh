@@ -149,7 +149,7 @@ else
   show_excerpt "$tmp_guards_err" 160
 fi
 
-if run_capture "$tmp_all_out" "$tmp_all_err" env PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 "$local_runner" quickshell-all --quiet; then
+if run_capture "$tmp_all_out" "$tmp_all_err" "$local_runner" quickshell-all --quiet; then
   if assert_patterns "$tmp_all_out" \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \
     'Clipboard contract summary: 17 pass, 0 fail' \
@@ -169,7 +169,7 @@ else
   show_excerpt "$tmp_all_err" 200
 fi
 
-if run_capture "$tmp_live_out" "$tmp_live_err" env PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 "$local_runner" live-gates --quiet; then
+if run_capture "$tmp_live_out" "$tmp_live_err" "$local_runner" live-gates --quiet; then
   if assert_patterns "$tmp_live_out" \
     'Plugin runtime guard summary:' \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \

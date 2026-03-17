@@ -213,7 +213,7 @@ Scope {
 
                                             GradientStop {
                                                 position: 0.0
-                                                color: Colors.withAlpha(Colors.primary, 0.1)
+                                                color: Colors.primaryGhost
                                             }
 
                                             GradientStop {

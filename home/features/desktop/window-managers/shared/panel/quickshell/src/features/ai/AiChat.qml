@@ -73,7 +73,7 @@ PanelWindow {
             primary: Colors.primary,
             bgWidget: Colors.bgWidget,
             fontMono: Colors.fontMono,
-            codeBg: Colors.withAlpha(Colors.text, 0.06)
+            codeBg: Colors.textFaint
         })
 
     function _renderMarkdown(text) {
@@ -233,7 +233,7 @@ PanelWindow {
                     width: providerPickerText.implicitWidth + Colors.spacingL
                     height: 24
                     radius: Colors.radiusXXS
-                    color: providerPickerMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
+                    color: providerPickerMouse.containsMouse ? Colors.primaryGhost : "transparent"
                     border.color: providerPickerMouse.containsMouse ? Colors.primaryRing : "transparent"
                     border.width: 1
 
@@ -343,7 +343,7 @@ PanelWindow {
                     width: 28
                     height: 28
                     radius: Colors.radiusXS
-                    color: newChatHover.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
+                    color: newChatHover.containsMouse ? Colors.primaryGhost : "transparent"
                     border.color: newChatHover.containsMouse ? Colors.primaryRing : "transparent"
                     border.width: 1
 
@@ -1050,7 +1050,7 @@ PanelWindow {
                         width: slashHintsCol.width - Colors.spacingS * 2
                         height: 28
                         radius: Colors.radiusXXS
-                        color: slashItemMouse.containsMouse ? Colors.withAlpha(Colors.primary, 0.1) : "transparent"
+                        color: slashItemMouse.containsMouse ? Colors.primaryGhost : "transparent"
 
                         RowLayout {
                             anchors.fill: parent

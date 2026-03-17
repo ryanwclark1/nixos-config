@@ -167,7 +167,7 @@ Item {
                         width: root.compactMode ? 30 : 34
                         height: width
                         radius: Colors.radiusSmall
-                        color: hidden ? Colors.withAlpha(Colors.text, 0.06) : Colors.primarySubtle
+                        color: hidden ? Colors.textFaint : Colors.primarySubtle
 
                         Text {
                             anchors.centerIn: parent

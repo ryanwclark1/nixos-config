@@ -459,6 +459,44 @@ screenshot_with_grim() {
     fi
 }
 
+# OCR Screenshot - capture area and extract text to clipboard
+ocr_screenshot() {
+    local mode="$1"
+    local freeze_flag="$2"
+    local wait_time="$3"
+
+    if ! command -v tesseract >/dev/null 2>&1; then
+        log "Error: tesseract not found. OCR is not available."
+        notify "OCR Error" "tesseract-ocr is not installed" "critical"
+        return 1
+    fi
+
+    local temp_img
+    temp_img=$(mktemp --suffix=.png)
+    
+    # Reuse screenshot_with_grim to handle selection/capture
+    # We set copy_to_clipboard=false and use_satty=false for OCR
+    if screenshot_with_grim "$mode" "$temp_img" "$freeze_flag" "$wait_time" "false" "false" "false"; then
+        if [[ -f "$temp_img" ]]; then
+            log "Processing OCR on $temp_img..."
+            if tesseract "$temp_img" - -l eng 2>/dev/null | wl-copy; then
+                local text_preview
+                text_preview=$(wl-paste | head -c 100)
+                log "OCR successful, copied to clipboard"
+                notify "OCR Successful" "Text copied to clipboard:\n${text_preview}..."
+                rm -f "$temp_img"
+                return 0
+            else
+                log "Error: OCR processing failed"
+                notify "OCR Error" "Failed to extract text from image" "critical"
+            fi
+        fi
+    fi
+    
+    rm -f "$temp_img" 2>/dev/null
+    return 1
+}
+
 # Main screenshot function
 take_screenshot() {
     local mode="$1"
@@ -469,6 +507,12 @@ take_screenshot() {
     local format="${6:-$DEFAULT_FORMAT}"
     local use_satty="${7:-false}"
     local clipboard_only="${8:-false}"
+    local ocr_enabled="${9:-false}"
+
+    if [[ "$ocr_enabled" == "true" ]]; then
+        ocr_screenshot "$mode" "$freeze" "$wait_time"
+        return $?
+    fi
 
     log "Taking $mode screenshot"
     [[ "$clipboard_only" != "true" ]] && log "Output: $output_file"
@@ -556,6 +600,7 @@ Options:
     -o, --output FILE  Specify output file
     -F, --format FMT   Image format (png, jpg, webp)
     --satty            Use satty for editing after capture
+    --ocr              Extract text from selection (requires tesseract)
     --clipboard-only   Copy to clipboard only, don't save to file
     --no-copy          Don't copy to clipboard
     --no-notify        Disable notifications
@@ -565,6 +610,7 @@ Options:
 Examples:
     $0                          # Full screen screenshot
     $0 area                     # Interactive area selection
+    $0 area --ocr               # Extract text from area selection
     $0 smart                    # Smart mode with window detection
     $0 window --freeze          # Active window with frozen screen
     $0 screen -w 3              # Full screen after 3 second delay (with countdown)
@@ -579,7 +625,7 @@ Dependencies:
     - grim + slurp (required)
     - wl-copy (for clipboard)
     - notify-send (for notifications)
-    - Optional: hyprpicker (for freeze mode in Hyprland), wayfreeze (fallback freeze), swappy, image editors
+    - Optional: hyprpicker (for freeze mode), tesseract (for OCR), satty (editor)
 EOF
 }
 
@@ -595,6 +641,7 @@ main() {
     local use_satty="false"
     local clipboard_only="false"
     local open_folder="false"
+    local ocr_enabled="false"
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -638,6 +685,10 @@ main() {
                 ;;
             --satty)
                 use_satty="true"
+                shift
+                ;;
+            --ocr)
+                ocr_enabled="true"
                 shift
                 ;;
             --clipboard-only)
@@ -733,7 +784,7 @@ main() {
 
     # Take screenshot
     local result
-    take_screenshot "$mode" "$output_file" "$freeze" "$wait_time" "$copy_to_clipboard" "$format" "$use_satty" "$clipboard_only"
+    take_screenshot "$mode" "$output_file" "$freeze" "$wait_time" "$copy_to_clipboard" "$format" "$use_satty" "$clipboard_only" "$ocr_enabled"
     result=$?
 
     # Clean up temporary file if clipboard-only mode

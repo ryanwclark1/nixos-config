@@ -131,6 +131,11 @@ Scope {
     }
 
     // Global shortcuts (outside Variants to avoid duplicate registration)
+    // NOTE: These are standard focus-dependent shortcuts. Since Quickshell layers are
+    // typically configured with WlrKeyboardFocus.None, these will only work when
+    // another Quickshell window (like the Launcher) is focused.
+    // For global system-wide hotkeys, these MUST be mirrored in the compositor config
+    // (e.g., ~/.config/niri/config.kdl) calling into Quickshell IPC.
     Shortcut {
         sequence: "Meta+S"
         onActivated: settingsHub.toggle()

@@ -138,7 +138,10 @@ Item {
                             PrivacyMenu { Component.onCompleted: barWindow.wirePopup(this, "privacyMenu") }
                             MusicMenu { Component.onCompleted: barWindow.wirePopup(this, "musicMenu") }
                             BatteryMenu { Component.onCompleted: barWindow.wirePopup(this, "batteryMenu") }
-                            SystemStatsMenu { Component.onCompleted: barWindow.wirePopup(this, "systemStatsMenu") }
+                            SystemStatsMenu {
+                                implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                Component.onCompleted: barWindow.wirePopup(this, "systemStatsMenu")
+                            }
                             PrinterMenu { Component.onCompleted: barWindow.wirePopup(this, "printerMenu") }
                             ScreenshotMenu { Component.onCompleted: barWindow.wirePopup(this, "screenshotMenu") }
 

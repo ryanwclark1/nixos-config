@@ -17,12 +17,16 @@ QtObject {
   property bool isHealthChecking: false
   property date lastHealthCheckTime: new Date(0)
 
+  readonly property string configuredScriptRoot: Quickshell.env("QS_SCRIPT_ROOT") || ""
   readonly property string repoRoot: (Quickshell.env("HOME") || "/home/administrator") + "/nixos-config"
   readonly property string quickshellRepoRoot: repoRoot + "/home/features/desktop/window-managers/shared/panel/quickshell"
-  readonly property string scriptRoot: quickshellRepoRoot + "/scripts"
+  readonly property string defaultScriptRoot: quickshellRepoRoot + "/scripts"
+  readonly property string scriptRoot: configuredScriptRoot !== "" ? configuredScriptRoot : defaultScriptRoot
   readonly property string healthCheckScript: scriptRoot + "/health-check.sh"
   readonly property string pluginDoctorScript: scriptRoot + "/plugin-doctor.sh"
   readonly property string incidentRoot: Quickshell.env("HOME") + "/.local/state/quickshell/incidents"
+  property bool _helperScriptsAvailable: false
+  property bool _helperScriptWarningLogged: false
 
   // ── Named constants ──────────────────────────
   readonly property int _healthCheckIntervalMs: 300000  // 5 min
@@ -31,8 +35,18 @@ QtObject {
   readonly property int _cpuTempHighThreshold: 85
   readonly property int _gpuTempHighThreshold: 80
 
+  property Process _helperScriptProbe: Process {
+    command: ["sh", "-c", "test -f \"$1\" && test -f \"$2\"", "qs-system-status-probe", root.healthCheckScript, root.pluginDoctorScript]
+    running: true
+    onExited: (exitCode, exitStatus) => {
+      root._helperScriptsAvailable = exitCode === 0;
+      if (exitCode !== 0)
+        root._reportHelperScriptsUnavailable("helper scripts not executable", exitCode, exitStatus);
+    }
+  }
+
   property Process _healthProc: Process {
-    command: [root.healthCheckScript]
+    command: ["bash", root.healthCheckScript]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -50,7 +64,7 @@ QtObject {
   }
 
   property Process _pluginProc: Process {
-    command: [root.pluginDoctorScript, "--json"]
+    command: ["bash", root.pluginDoctorScript, "--json"]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -59,16 +73,40 @@ QtObject {
     }
   }
 
+  function _reportHelperScriptsUnavailable(reason, exitCode, exitStatus) {
+    if (_helperScriptWarningLogged)
+      return;
+    _helperScriptWarningLogged = true;
+    var details = reason || "helper scripts unavailable";
+    if (configuredScriptRoot !== "")
+      details += " (QS_SCRIPT_ROOT=" + configuredScriptRoot + ")";
+    else
+      details += " (set QS_SCRIPT_ROOT to override " + defaultScriptRoot + ")";
+    if (exitCode !== undefined)
+      details += " exitCode=" + exitCode;
+    if (exitStatus !== undefined)
+      details += " exitStatus=" + exitStatus;
+    console.warn("SystemStatus:", details);
+  }
+
   function refreshHealth() {
     if (isHealthChecking) return;
+    if (!_helperScriptsAvailable) {
+      _reportHelperScriptsUnavailable();
+      return;
+    }
     isHealthChecking = true;
     _healthProc.running = true;
     _pluginProc.running = true;
   }
 
   function applySafeFixes() {
+    if (!_helperScriptsAvailable) {
+      _reportHelperScriptsUnavailable();
+      return;
+    }
     var fixProc = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-    fixProc.command = [root.healthCheckScript, "--apply-safe-fixes"];
+    fixProc.command = ["bash", root.healthCheckScript, "--apply-safe-fixes"];
     fixProc.onExited.connect(function() {
       root.refreshHealth();
       fixProc.destroy();
@@ -190,7 +228,7 @@ QtObject {
       "sh",
       "-c",
       // CPU temp: try AMD Tctl → Intel Package id 0 → AMD Tdie → Intel Core 0
-      "cpu_temp=$( "
+      + "cpu_temp=$( "
       + "sensors 2>/dev/null | awk '"
       + "/Tctl:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
       + "/Package id 0:/ {gsub(/[+°C]/, \"\", $4); print $4; found=1; exit} "
@@ -206,7 +244,7 @@ QtObject {
       + "); "
       + "if [ -z \"$gpu_temp\" ] && command -v nvidia-smi >/dev/null 2>&1; then "
       + "gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
-      + "cpu_usage=$(top -bn1 | awk '/Cpu\\(s\\):/ {printf \"%d\", 100 - $8}'); "
+      + "cpu_usage=$(top -bn1 | awk '/Cpu\\(s\\):/ {for(i=1;i<=NF;i++) if($i==\"id,\") {printf \"%d\", 100-$(i-1); exit}}'); "
       // GPU usage: try AMD sysfs → nvidia-smi
       + "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
       + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
@@ -228,23 +266,32 @@ QtObject {
           root.cpuTemp = root.formatTemp(lines[0]);
           root.gpuTemp = root.formatTemp(lines[1]);
 
-          var cpuVal = parseInt(lines[2], 10) || 0;
-          root.cpuUsage = cpuVal + "%";
-          root.cpuPercent = Colors.clamp01(cpuVal / 100);
+          var cpuRaw = lines[2] || "";
+          var cpuVal = parseInt(cpuRaw, 10);
+          if (!isNaN(cpuVal)) {
+            root.cpuUsage = cpuVal + "%";
+            root.cpuPercent = Colors.clamp01(cpuVal / 100);
+          }
 
-          var gpuVal = parseInt(lines[3], 10) || 0;
-          root.gpuUsage = gpuVal + "%";
-          root.gpuPercent = Colors.clamp01(gpuVal / 100);
+          var gpuRaw = lines[3] || "";
+          var gpuVal = parseInt(gpuRaw, 10);
+          if (!isNaN(gpuVal)) {
+            root.gpuUsage = gpuVal + "%";
+            root.gpuPercent = Colors.clamp01(gpuVal / 100);
+          }
 
-          root.ramUsage = lines[4] || "0GB";
+          if (lines[4]) root.ramUsage = lines[4];
 
-          var ramVal = parseFloat(lines[5]) || 0;
-          root.ramPercent = Colors.clamp01(ramVal);
+          var ramRaw = lines[5] || "";
+          var ramVal = parseFloat(ramRaw);
+          if (!isNaN(ramVal)) {
+            root.ramPercent = Colors.clamp01(ramVal);
+          }
 
-          // Push to history arrays for graph widgets
-          root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
-          root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
-          root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
+          // Only push to history if we have valid data to avoid "reset" looks in graphs
+          if (!isNaN(cpuVal)) root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
+          if (!isNaN(ramVal)) root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
+          if (!isNaN(gpuVal)) root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
         }
       }
     }

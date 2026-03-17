@@ -17,10 +17,22 @@ Rectangle {
 
   HoverHandler { id: sysCardHover }
 
-  property var cpuHistory: new Array(30).fill(0)
-  property var memHistory: new Array(30).fill(0)
+  property var cpuHistory: SystemStatus.cpuHistory.slice(-30)
+  property var memHistory: SystemStatus.ramHistory.slice(-30)
 
   SharedWidgets.Ref { service: SystemStatus }
+
+  Connections {
+    target: SystemStatus
+    function onCpuHistoryChanged() {
+      root.cpuHistory = SystemStatus.cpuHistory.slice(-30);
+      cpuCanvas.requestPaint();
+    }
+    function onRamHistoryChanged() {
+      root.memHistory = SystemStatus.ramHistory.slice(-30);
+      memCanvas.requestPaint();
+    }
+  }
 
   function paintGraph(canvas, data, strokeColor) {
     if (!data.length || canvas.width <= 0 || canvas.height <= 0) return;
@@ -51,18 +63,6 @@ Rectangle {
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 2;
     ctx.stroke();
-  }
-
-  Timer {
-    interval: 2000
-    running: root.visible
-    repeat: true
-    onTriggered: {
-      root.cpuHistory = root.cpuHistory.slice(1).concat(SystemStatus.cpuPercent);
-      cpuCanvas.requestPaint();
-      root.memHistory = root.memHistory.slice(1).concat(SystemStatus.ramPercent);
-      memCanvas.requestPaint();
-    }
   }
 
   ColumnLayout {

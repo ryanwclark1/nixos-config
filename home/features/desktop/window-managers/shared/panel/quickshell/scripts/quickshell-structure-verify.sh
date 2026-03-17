@@ -6,6 +6,10 @@ repo_root="$(CDPATH= cd -- "${script_dir}/.." && pwd -P)"
 src_root="${repo_root}/src"
 quiet=0
 startup_timeout_seconds="${QS_VERIFY_STARTUP_TIMEOUT_SECONDS:-60}"
+launcher_timeout_seconds="${QS_VERIFY_LAUNCHER_SMOKE_TIMEOUT_SECONDS:-240}"
+panel_timeout_seconds="${QS_VERIFY_PANEL_RUNTIME_TIMEOUT_SECONDS:-360}"
+journal_timeout_seconds="${QS_VERIFY_JOURNAL_GATE_TIMEOUT_SECONDS:-180}"
+surface_timeout_seconds="${QS_VERIFY_SURFACE_RESPONSIVE_TIMEOUT_SECONDS:-180}"
 
 usage() {
   cat <<'EOF'
@@ -15,10 +19,11 @@ Run the automated post-migration verification stack:
   1. structural import-boundary checks
   2. qmldir target validation
   3. clipboard contract checks
-  4. repo-shell startup smoke
-  5. repo-shell launcher smoke
-  6. repo-shell panel runtime aggregate
-  7. live surface responsive smoke when a compositor session is available
+  4. startup smoke
+  5. quickshell.service journal warning gate when a live session is available
+  6. launcher runtime smoke
+  7. panel runtime aggregate
+  8. live surface responsive smoke when a compositor session is available
 EOF
 }
 
@@ -108,12 +113,16 @@ run_step "Checking import boundaries" bash "${repo_root}/tools/checks/check-impo
 run_step "Validating qmldir targets" run_qmldir_validation
 run_step "Running clipboard contract checks" bash "${script_dir}/check-clipboard-contracts.sh"
 run_step_timeout "Running startup smoke" "${startup_timeout_seconds}" bash "${script_dir}/check-quickshell-startup.sh"
-run_step "Running launcher smoke" bash "${script_dir}/check-launcher-smoke.sh" --repo-shell
-run_step "Running panel runtime aggregate" bash "${script_dir}/check-panel-runtime.sh" --repo-shell
 
 if has_live_session; then
-  run_step "Running live surface responsive smoke" bash "${script_dir}/check-surface-responsive.sh" --repo-shell
+  run_step_timeout "Running quickshell.service journal warning gate" "${journal_timeout_seconds}" bash "${script_dir}/check-runtime-journal-gate.sh"
+  run_step_timeout "Running launcher smoke" "${launcher_timeout_seconds}" bash "${script_dir}/check-launcher-smoke.sh" --repo-shell
+  run_step_timeout "Running panel runtime aggregate" "${panel_timeout_seconds}" bash "${script_dir}/check-panel-runtime.sh" --repo-shell
+  run_step_timeout "Running live surface responsive smoke" "${surface_timeout_seconds}" bash "${script_dir}/check-surface-responsive.sh" --repo-shell
 else
+  step_skip "quickshell.service journal warning gate: no live compositor session detected"
+  run_step_timeout "Running launcher smoke" "${launcher_timeout_seconds}" bash "${script_dir}/check-launcher-smoke.sh" --ci
+  run_step_timeout "Running panel runtime aggregate" "${panel_timeout_seconds}" bash "${script_dir}/check-panel-runtime.sh" --skip-settings --skip-surfaces
   step_skip "live surface responsive smoke: no live compositor session detected"
 fi
 

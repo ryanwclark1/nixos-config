@@ -213,23 +213,23 @@ summary_md="${output_dir}/summary.md"
 
 {
   printf '# Panel VM QA Summary\n\n'
-  printf '- status: `%s`\n' "${overall_status}"
-  printf '- selection: `%s`\n' "${vm_selector}"
-  printf '- artifacts: `%s`\n' "${output_dir}"
+  printf -- '- status: `%s`\n' "${overall_status}"
+  printf -- '- selection: `%s`\n' "${vm_selector}"
+  printf -- '- artifacts: `%s`\n' "${output_dir}"
   if (( ${#failed_vms[@]} > 0 )); then
-    printf '- failed VMs: `%s`\n' "$(IFS=', '; printf '%s' "${failed_vms[*]}")"
+    printf -- '- failed VMs: `%s`\n' "$(IFS=', '; printf '%s' "${failed_vms[*]}")"
   fi
   printf '\n'
   for vm in "${processed_vms[@]}"; do
     vm_dir="${output_dir}/${vm}"
     exit_code="$(cat "${vm_dir}/exit-code.txt" 2>/dev/null || printf '1')"
     printf '## %s\n\n' "${vm}"
-    printf '- status: `%s`\n' "$([[ "${exit_code}" == "0" ]] && printf 'pass' || printf 'fail')"
-    printf '- exit code: `%s`\n' "${exit_code}"
-    printf '- runtime: `%s`\n' "$(runtime_status_for_vm "${vm_dir}")"
-    printf '- settings: `%s`\n' "$(settings_status_for_vm "${vm_dir}")"
-    printf '- artifacts: `%s`\n' "${vm_dir}"
-    printf '- wrapper summary: `%s`\n\n' "${vm_dir}/summary.json"
+    printf -- '- status: `%s`\n' "$([[ "${exit_code}" == "0" ]] && printf 'pass' || printf 'fail')"
+    printf -- '- exit code: `%s`\n' "${exit_code}"
+    printf -- '- runtime: `%s`\n' "$(runtime_status_for_vm "${vm_dir}")"
+    printf -- '- settings: `%s`\n' "$(settings_status_for_vm "${vm_dir}")"
+    printf -- '- artifacts: `%s`\n' "${vm_dir}"
+    printf -- '- wrapper summary: `%s`\n\n' "${vm_dir}/summary.json"
   done
 } > "${summary_md}"
 

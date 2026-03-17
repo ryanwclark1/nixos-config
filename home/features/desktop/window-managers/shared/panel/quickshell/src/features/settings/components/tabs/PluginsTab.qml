@@ -195,7 +195,7 @@ Item {
         var base = severityColor(severity);
         if (String(severity || "") === "muted")
             return Colors.withAlpha(Colors.text, 0.08);
-        return Qt.rgba(base.r, base.g, base.b, 0.16);
+        return Colors.withAlpha(base, 0.16);
     }
 
     function pluginTypeIcon(typeName) {
@@ -474,7 +474,7 @@ Item {
                         width: root.compactMode ? 32 : 38
                         height: root.compactMode ? 32 : 38
                         radius: Colors.radiusSmall
-                        color: modelData.enabled ? Colors.primarySubtle : Colors.withAlpha(Colors.text, 0.06)
+                        color: modelData.enabled ? Colors.primarySubtle : Colors.textFaint
                         Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
                         Text {

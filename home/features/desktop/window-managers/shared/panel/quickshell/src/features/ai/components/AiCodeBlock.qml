@@ -11,7 +11,7 @@ Rectangle {
     width: parent ? parent.width : 0
     height: codeHeader.height + codeEdit.implicitHeight + Colors.spacingS * 2
     radius: Colors.radiusXS
-    color: Colors.withAlpha(Colors.text, 0.06)
+    color: Colors.textFaint
     border.color: Colors.withAlpha(Colors.text, 0.1)
     border.width: 1
 

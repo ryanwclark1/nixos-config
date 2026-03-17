@@ -40,7 +40,7 @@ Rectangle {
                 width: 64
                 height: 64
                 radius: Colors.radiusPill
-                color: Colors.withAlpha(Colors.primary, 0.1)
+                color: Colors.primaryGhost
                 border.color: Colors.withAlpha(Colors.primary, 0.2)
                 border.width: 1
                 Layout.bottomMargin: Colors.spacingS

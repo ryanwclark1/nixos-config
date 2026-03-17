@@ -880,7 +880,11 @@ EOF
       if (( quiet == 0 )); then
         printf '[INFO] Running %s...\n' "$(quickshell_guard_label "$guard_cmd")"
       fi
-      "${guard_parts[@]}"
+      if [[ ${#guard_parts[@]} -gt 0 && -f "${guard_parts[0]}" && ! -x "${guard_parts[0]}" ]]; then
+        bash "${guard_parts[@]}"
+      else
+        "${guard_parts[@]}"
+      fi
     done < <(quickshell_guard_commands)
     if (( quiet == 0 )); then
       printf '[INFO] Quickshell runtime checks passed.\n'

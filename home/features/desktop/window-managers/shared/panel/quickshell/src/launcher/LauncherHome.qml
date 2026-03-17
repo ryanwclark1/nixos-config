@@ -210,7 +210,7 @@ ColumnLayout {
                                     height: 42
                                     radius: Colors.radiusSmall
                                     color: Colors.surface
-                                    border.color: Colors.withAlpha(Colors.primary, 0.1)
+                                    border.color: Colors.primaryGhost
                                     border.width: 1
 
                                     SharedWidgets.AppIcon {

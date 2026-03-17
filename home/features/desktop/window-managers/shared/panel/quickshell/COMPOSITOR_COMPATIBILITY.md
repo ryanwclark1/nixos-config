@@ -66,6 +66,18 @@ Equivalent direct scripts:
 
 1. Add capability flag(s) and command/action helper(s) in `CompositorAdapter.qml`.
 2. Gate UI visibility and interactions by adapter capabilities (avoid direct compositor checks in UI).
-3. Keep compositor-specific command strings out of UI modules.
-4. Update guardrails/smoke checks if new compositor-sensitive behavior is introduced.
-5. Run `make quickshell-checks` before merge.
+## Keybindings & Shortcuts
+
+- **Global Hotkeys:** Standard QML `Shortcut` elements (e.g., `Meta+S` for Settings) only function when QuickShell has keyboard focus. Since the bar uses `WlrKeyboardFocus.None`, these must be mirrored in the compositor configuration to work globally.
+  - **Niri:** Add binds to `config.kdl` that call QuickShell IPC:
+    ```kdl
+    binds {
+        Mod+S { spawn "quickshell" "ipc" "call" "SettingsHub" "toggle"; }
+    }
+    ```
+  - **Hyprland:** Use `bind` in `hyprland.conf`:
+    ```conf
+    bind = SUPER, S, exec, quickshell ipc call SettingsHub toggle
+    ```
+
+- **Focus Policy:** QuickShell surfaces are generally non-interactive or "focus-on-open" to prevent interference with application workflows.

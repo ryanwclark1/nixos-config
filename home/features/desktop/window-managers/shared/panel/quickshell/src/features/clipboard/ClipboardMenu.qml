@@ -24,17 +24,19 @@ BasePopupMenu {
   }
 
   function clampSelection() {
-    if (filteredItemsResult.length <= 0) {
+    var items = filteredItemsResult || [];
+    if (items.length <= 0) {
       selectedIndex = 0;
       return;
     }
-    selectedIndex = Math.max(0, Math.min(selectedIndex, filteredItemsResult.length - 1));
+    selectedIndex = Math.max(0, Math.min(selectedIndex, items.length - 1));
   }
 
   function moveSelection(step) {
-    if (filteredItemsResult.length <= 0)
+    var items = filteredItemsResult || [];
+    if (items.length <= 0)
       return false;
-    selectedIndex = Math.max(0, Math.min(filteredItemsResult.length - 1, selectedIndex + step));
+    selectedIndex = Math.max(0, Math.min(items.length - 1, selectedIndex + step));
     return true;
   }
 
@@ -61,11 +63,12 @@ BasePopupMenu {
   // consecutive-character matching with gap penalty scoring.
   // Returns all items when query is empty, or items sorted by relevance.
   readonly property var filteredItemsResult: {
-    if (!searchQuery) return clipboardItems;
+    var items = Array.isArray(clipboardItems) ? clipboardItems : [];
+    if (!searchQuery) return items;
     var q = searchQuery.toLowerCase();
     var scored = [];
-    for (var i = 0; i < clipboardItems.length; i++) {
-      var item = clipboardItems[i];
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
       if (!item || !item.content) continue;
       var content = item.content.toLowerCase();
       var score = _fuzzyScore(q, content);
