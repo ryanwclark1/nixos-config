@@ -219,9 +219,12 @@ Rectangle {
   }
 
   // Only poll when NiriService is NOT available (Hyprland, or fallback)
+  readonly property int _workspaceListPollMs: 1200
+  readonly property int _activeWorkspacePollMs: 120
+
   Timer {
     id: workspacePollTimer
-    interval: 1200
+    interval: root._workspaceListPollMs
     running: root.workspaceApiAvailable && !CompositorAdapter.isNiri
     repeat: true
     triggeredOnStart: true

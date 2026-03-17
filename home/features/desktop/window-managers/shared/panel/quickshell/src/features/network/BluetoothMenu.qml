@@ -22,9 +22,11 @@ BasePopupMenu {
   property bool _optimisticLocked: false
   readonly property bool effectiveBtEnabled: _optimisticLocked ? _optimisticBtEnabled : btEnabled
 
+  readonly property int _optimisticLockMs: 4000
+
   Timer {
     id: optimisticTimer
-    interval: 4000
+    interval: root._optimisticLockMs
     onTriggered: root._optimisticLocked = false
   }
 
@@ -109,13 +111,16 @@ BasePopupMenu {
     if (visible) updateCounts();
   }
 
+  readonly property int _scanTickMs: 2000
+  readonly property int _scanTimeoutSec: 30
+
   Timer {
     id: scanTimer
-    interval: 2000
+    interval: root._scanTickMs
     repeat: true
     onTriggered: {
-      scanElapsed += 2;
-      if (scanElapsed >= 30) stopScan();
+      scanElapsed += root._scanTickMs / 1000;
+      if (scanElapsed >= root._scanTimeoutSec) stopScan();
     }
   }
 

@@ -75,7 +75,7 @@ Item {
                         implicitHeight: 34
                         implicitWidth: timePreview.implicitWidth + datePreview.implicitWidth + Colors.spacingM * 3
                         radius: Colors.radiusPill
-                        color: Colors.withAlpha(Colors.primary, 0.2)
+                        color: Colors.primaryTint
                         border.color: Colors.withAlpha(Colors.primary, 0.45)
                         border.width: 1
 
@@ -140,7 +140,7 @@ Item {
                         implicitHeight: 34
                         implicitWidth: timePreviewCompact.implicitWidth + datePreviewCompact.implicitWidth + Colors.spacingM * 3
                         radius: Colors.radiusPill
-                        color: Colors.withAlpha(Colors.primary, 0.2)
+                        color: Colors.primaryTint
                         border.color: Colors.withAlpha(Colors.primary, 0.45)
                         border.width: 1
 

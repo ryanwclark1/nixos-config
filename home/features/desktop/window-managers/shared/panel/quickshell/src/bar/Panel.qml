@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import "."
 import "widgets"
-import "./widgets" as Widgets
 import "../features/system/sections"
 import "../services"
 import "../widgets" as SharedWidgets
@@ -133,7 +132,8 @@ Item {
 
     Timer {
         id: diagnosticWarmupTimer
-        interval: 1200
+        readonly property int _diagnosticWarmupMs: 1200
+        interval: _diagnosticWarmupMs
         repeat: false
         onTriggered: root.diagnosticsReady = true
     }
@@ -171,12 +171,9 @@ Item {
     }
 
     function compactPercentText(value) { return PanelHelpers.compactPercentText(value); }
-    function widgetValueStyle(wi, widgetType) { return PanelHelpers.widgetValueStyle(wi, widgetType); }
     function statDisplayText(widgetType, wi) { return PanelHelpers.statDisplayText(widgetType, wi, SystemStatus); }
     function compactStatDisplayText(widgetType, wi) { return PanelHelpers.compactStatDisplayText(widgetType, wi, SystemStatus); }
     function statTooltipText(widgetType, wi) { return PanelHelpers.statTooltipText(widgetType, wi, SystemStatus); }
-    function widgetDisplayMode(wi) { return PanelHelpers.widgetDisplayMode(wi); }
-    function widgetSummaryDisplayMode(wi) { return PanelHelpers.widgetSummaryDisplayMode(wi); }
     function isCompactStatWidget(wi) { return PanelHelpers.isCompactStatWidget(wi, root.vertical); }
     function isIconOnlyStatWidget(wi) { return PanelHelpers.isIconOnlyStatWidget(wi); }
     function isSummaryWidgetIconOnly(wi) { return PanelHelpers.isSummaryWidgetIconOnly(wi, root.vertical); }
@@ -537,7 +534,8 @@ Item {
 
             Timer {
                 id: diagnosticGraceTimer
-                interval: 180
+                readonly property int _diagnosticGraceMs: 180
+                interval: _diagnosticGraceMs
                 repeat: false
                 onTriggered: {
                     if (parent.diagnosticState !== parent.deferredDiagnosticState)
