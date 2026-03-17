@@ -277,7 +277,7 @@ main() {
   fi
 
   if (( repo_shell_mode == 1 )); then
-    trap cleanup_repo_shell EXIT
+    trap cleanup_repo_shell EXIT TERM INT
     start_repo_shell
   fi
 

@@ -118,7 +118,7 @@ RowLayout {
                                 OpacityAnimator on opacity {
                                     from: 0.3
                                     to: 1.0
-                                    duration: 600
+                                    duration: Colors.durationPulse
                                     running: isActive && AiService.isStreaming
                                     loops: Animation.Infinite
                                 }

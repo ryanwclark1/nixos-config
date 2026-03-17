@@ -12,6 +12,10 @@ repo_shell_env=()
 run_settings=1
 run_surfaces=1
 run_multibar=1
+settings_timeout_seconds="${QS_VERIFY_SETTINGS_TIMEOUT_SECONDS:-150}"
+surfaces_timeout_seconds="${QS_VERIFY_SURFACES_TIMEOUT_SECONDS:-150}"
+warnings_timeout_seconds="${QS_VERIFY_WARNINGS_TIMEOUT_SECONDS:-120}"
+multibar_timeout_seconds="${QS_VERIFY_MULTIBAR_TIMEOUT_SECONDS:-120}"
 
 usage() {
   cat <<'EOF'
@@ -71,6 +75,26 @@ run_step() {
     bash "$@"
   else
     "$@"
+  fi
+}
+
+run_step_timeout() {
+  local label="$1"
+  local timeout_seconds="$2"
+  shift 2
+  printf '[INFO] %s...\n' "$label"
+  if command -v timeout >/dev/null 2>&1; then
+    if [[ $# -gt 0 && -f "$1" && ! -x "$1" ]]; then
+      timeout --foreground --signal=TERM --kill-after=10s "${timeout_seconds}s" bash "$@"
+    else
+      timeout --foreground --signal=TERM --kill-after=10s "${timeout_seconds}s" "$@"
+    fi
+  else
+    if [[ $# -gt 0 && -f "$1" && ! -x "$1" ]]; then
+      bash "$@"
+    else
+      "$@"
+    fi
   fi
 }
 
@@ -256,7 +280,7 @@ main() {
   local args=()
 
   if (( repo_shell_mode == 1 )); then
-    trap cleanup_repo_shell EXIT
+    trap cleanup_repo_shell EXIT TERM INT
     start_repo_shell
   fi
 
@@ -278,13 +302,13 @@ main() {
     if [[ -n "${instance_id}" ]]; then
       args+=(--id "${instance_id}")
     fi
-    run_step "Running settings responsive smoke" "${script_dir}/check-settings-responsive.sh" "${args[@]}"
+    run_step_timeout "Running settings responsive smoke" "${settings_timeout_seconds}" "${script_dir}/check-settings-responsive.sh" "${args[@]}"
     refresh_instance_args
     args=()
     if [[ -n "${instance_id}" ]]; then
       args+=(--id "${instance_id}")
     fi
-    run_step "Running SSH widget settings smoke" "${script_dir}/check-ssh-settings-smoke.sh"
+    run_step_timeout "Running SSH widget settings smoke" "${settings_timeout_seconds}" "${script_dir}/check-ssh-settings-smoke.sh"
   fi
 
   if (( run_surfaces == 1 )); then
@@ -293,17 +317,17 @@ main() {
     if [[ -n "${instance_id}" ]]; then
       args+=(--id "${instance_id}")
     fi
-    run_step "Running live surface responsive smoke" "${script_dir}/check-surface-responsive.sh" "${args[@]}"
+    run_step_timeout "Running live surface responsive smoke" "${surfaces_timeout_seconds}" "${script_dir}/check-surface-responsive.sh" "${args[@]}"
     refresh_instance_args
     args=()
     if [[ -n "${instance_id}" ]]; then
       args+=(--id "${instance_id}")
     fi
-    run_step "Running targeted runtime warning regressions" "${script_dir}/check-runtime-warning-regressions.sh" "${args[@]}"
+    run_step_timeout "Running targeted runtime warning regressions" "${warnings_timeout_seconds}" "${script_dir}/check-runtime-warning-regressions.sh" "${args[@]}"
   fi
 
   if (( run_multibar == 1 )); then
-    run_step "Running synthetic multibar smoke" "${script_dir}/check-multibar-smoke.sh"
+    run_step_timeout "Running synthetic multibar smoke" "${multibar_timeout_seconds}" "${script_dir}/check-multibar-smoke.sh"
   fi
 
   printf '[INFO] Panel runtime verification completed. In headless/offscreen environments, multibar [SKIP] results can be expected. Manual visual QA is still required for final signoff.\n'

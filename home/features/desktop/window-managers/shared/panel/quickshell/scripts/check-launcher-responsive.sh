@@ -29,7 +29,7 @@ usage() {
 Usage: check-launcher-responsive.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 
 Validates launcher responsive guardrails by:
-  - checking static compact/tight layout invariants in Launcher.qml/ShellCoreSectionTab.qml,
+  - checking static compact/tight layout invariants in Launcher.qml and the feature-owned launcher settings section,
   - exercising launcher open flows in a live QuickShell instance,
   - scanning fresh log output for warnings/errors.
 In --ci mode, only static checks are executed.
@@ -639,7 +639,7 @@ main() {
   fi
 
   if (( repo_shell_mode == 1 )); then
-    trap cleanup_repo_shell EXIT
+    trap cleanup_repo_shell EXIT TERM INT
     start_repo_shell
   fi
 

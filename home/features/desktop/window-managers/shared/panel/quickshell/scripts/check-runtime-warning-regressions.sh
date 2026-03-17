@@ -280,7 +280,7 @@ main() {
   local start_byte=1
   local surface_id=""
 
-  trap cleanup_repo_shell EXIT
+  trap cleanup_repo_shell EXIT TERM INT
 
   if (( repo_shell_mode == 1 )); then
     start_repo_shell

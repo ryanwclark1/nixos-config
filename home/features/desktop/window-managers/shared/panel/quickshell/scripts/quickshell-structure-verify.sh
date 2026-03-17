@@ -5,6 +5,10 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 repo_root="$(CDPATH= cd -- "${script_dir}/.." && pwd -P)"
 src_root="${repo_root}/src"
 quiet=0
+startup_timeout_seconds="${QS_VERIFY_STARTUP_TIMEOUT_SECONDS:-60}"
+launcher_timeout_seconds="${QS_VERIFY_LAUNCHER_TIMEOUT_SECONDS:-180}"
+panel_runtime_timeout_seconds="${QS_VERIFY_PANEL_RUNTIME_TIMEOUT_SECONDS:-240}"
+surface_timeout_seconds="${QS_VERIFY_SURFACE_TIMEOUT_SECONDS:-180}"
 
 usage() {
   cat <<'EOF'
@@ -55,6 +59,18 @@ run_step() {
   "$@"
 }
 
+run_step_timeout() {
+  local label="$1"
+  local timeout_seconds="$2"
+  shift 2
+  step_info "$label"
+  if command -v timeout >/dev/null 2>&1; then
+    timeout --foreground --signal=TERM --kill-after=10s "${timeout_seconds}s" "$@"
+  else
+    "$@"
+  fi
+}
+
 run_qmldir_validation() {
   python - <<'PY' "${src_root}"
 from pathlib import Path
@@ -92,12 +108,12 @@ has_live_session() {
 
 run_step "Checking import boundaries" bash "${repo_root}/tools/checks/check-import-boundaries.sh"
 run_step "Validating qmldir targets" run_qmldir_validation
-run_step "Running startup smoke" bash "${script_dir}/check-quickshell-startup.sh"
-run_step "Running launcher smoke" bash "${script_dir}/check-launcher-smoke.sh" --repo-shell
-run_step "Running panel runtime aggregate" bash "${script_dir}/check-panel-runtime.sh" --repo-shell
+run_step_timeout "Running startup smoke" "${startup_timeout_seconds}" bash "${script_dir}/check-quickshell-startup.sh"
+run_step_timeout "Running launcher smoke" "${launcher_timeout_seconds}" bash "${script_dir}/check-launcher-smoke.sh" --repo-shell
+run_step_timeout "Running panel runtime aggregate" "${panel_runtime_timeout_seconds}" bash "${script_dir}/check-panel-runtime.sh" --repo-shell
 
 if has_live_session; then
-  run_step "Running live surface responsive smoke" bash "${script_dir}/check-surface-responsive.sh" --repo-shell
+  run_step_timeout "Running live surface responsive smoke" "${surface_timeout_seconds}" bash "${script_dir}/check-surface-responsive.sh" --repo-shell
 else
   step_skip "live surface responsive smoke: no live compositor session detected"
 fi

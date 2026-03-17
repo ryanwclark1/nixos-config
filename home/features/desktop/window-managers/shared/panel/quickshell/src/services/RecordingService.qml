@@ -15,8 +15,10 @@ QtObject {
   property int subscriberCount: 0
 
   // ── Recording detection ──────────────────────
+  readonly property int _detectionPollMs: 2000
+
   property var recDetectPoll: CommandPoll {
-    interval: 2000
+    interval: root._detectionPollMs
     running: root.subscriberCount > 0
     command: ["sh", "-c", "pgrep -x wl-screenrec || pgrep -x wf-recorder || pgrep -f '^gpu-screen-recorder'"]
     parse: function(out) { return String(out || "").trim().length > 0 }

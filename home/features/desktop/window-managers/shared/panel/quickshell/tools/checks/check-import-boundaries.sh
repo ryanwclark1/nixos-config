@@ -6,12 +6,13 @@ script_dir="$(dirname "${script_path}")"
 repo_root="$(realpath "${script_dir}/../..")"
 src_dir="${repo_root}/src"
 
-python - <<'PY' "${src_dir}"
+python - <<'PY' "${repo_root}" "${src_dir}"
 from pathlib import Path
 import re
 import sys
 
-src_dir = Path(sys.argv[1])
+repo_root = Path(sys.argv[1])
+src_dir = Path(sys.argv[2])
 fail = 0
 
 allowed_feature_imports = {
@@ -78,6 +79,12 @@ forbidden_legacy_feature_imports = {
 }
 
 import_re = re.compile(r'^\s*import\s+"([^"]+)"', re.MULTILINE)
+compat_path_re = re.compile(r'(?:source\s*:\s*"[^"]*(?:menu/settings|menu|widgets)/|Qt\.resolvedUrl\(".*(?:menu/settings|menu|widgets)/)')
+
+legacy_config_dir = repo_root / 'config'
+if legacy_config_dir.exists():
+    print(f'check-import-boundaries: legacy runtime mirror still present at {legacy_config_dir}', file=sys.stderr)
+    fail = 1
 
 migrated_roots = (
     src_dir / 'app',
@@ -144,6 +151,19 @@ for path in src_dir.rglob('*.qml'):
         if target.startswith('root:'):
             print(f'check-import-boundaries: forbidden root import in {path}: {target}', file=sys.stderr)
             fail = 1
+    if compat_path_re.search(text):
+        print(f'check-import-boundaries: forbidden compatibility file-path load in {path}', file=sys.stderr)
+        fail = 1
+
+for path in (repo_root / 'scripts').rglob('*'):
+    if not path.is_file():
+        continue
+    if path.suffix not in {'.sh', '.py', '.js'}:
+        continue
+    text = path.read_text()
+    if compat_path_re.search(text):
+        print(f'check-import-boundaries: forbidden compatibility file-path load in {path}', file=sys.stderr)
+        fail = 1
 
 for module in (
     src_dir / 'app',

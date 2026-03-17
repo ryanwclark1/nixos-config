@@ -50,7 +50,7 @@ Rectangle {
                     text: root.icon
                     color: Colors.primary
                     font.family: Colors.fontMono
-                    font.pixelSize: 32
+                    font.pixelSize: Colors.fontSizeHuge
                 }
             }
 

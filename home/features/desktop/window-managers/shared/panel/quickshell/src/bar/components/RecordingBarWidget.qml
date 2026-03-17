@@ -33,7 +33,7 @@ SharedWidgets.BarPill {
             visible: root.showPulseDot
             width: 8
             height: 8
-            radius: 4
+            radius: width / 2
             color: Colors.error
             anchors.verticalCenter: parent.verticalCenter
             SequentialAnimation on opacity {

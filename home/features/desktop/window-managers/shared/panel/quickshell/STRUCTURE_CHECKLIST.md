@@ -7,7 +7,9 @@ Use this checklist before merging panel architecture changes.
 - [ ] Shared state changes live in `services/` (especially `Config.qml`) and are not duplicated across UI modules.
 - [ ] New reusable controls land in `src/shared/`, not `src/widgets/`.
 - [ ] New shell-only decoration surfaces land in `src/shell/`, not `src/widgets/`.
+- [ ] No top-level legacy runtime mirror tree such as `config/` is reintroduced.
 - [ ] `src/widgets/qmldir` remains a compatibility shim and does not regain real runtime ownership.
+- [ ] `src/notifications/qmldir` remains a compatibility shim and does not regain real runtime ownership.
 - [ ] `scripts/quickshell-structure-verify.sh` passes as the automated post-migration structure/runtime gate.
 - [ ] Compositor-specific behavior routes through `services/CompositorAdapter.qml` capabilities, not ad-hoc WM checks.
 - [ ] `scripts/check-compositor-guards.sh` passes for QML compositor guardrails.

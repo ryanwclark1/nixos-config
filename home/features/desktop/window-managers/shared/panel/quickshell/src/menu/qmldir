@@ -16,7 +16,7 @@ MusicMenu 1.0 ../features/media/MusicMenu.qml
 NetworkMenu 1.0 ../features/network/NetworkMenu.qml
 VpnMenu 1.0 ../features/network/VpnMenu.qml
 Notepad 1.0 ../features/workspace/Notepad.qml
-NotificationCenter 1.0 ../notifications/NotificationCenter.qml
+NotificationCenter 1.0 ../features/notifications/NotificationCenter.qml
 Powermenu 1.0 ../features/power/Powermenu.qml
 PrinterMenu 1.0 ../features/status/PrinterMenu.qml
 PrivacyMenu 1.0 ../features/status/PrivacyMenu.qml

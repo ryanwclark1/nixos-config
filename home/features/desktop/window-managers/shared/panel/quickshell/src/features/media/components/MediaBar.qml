@@ -105,7 +105,7 @@ Rectangle {
       Row {
         id: visualizerRow
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 2
+        spacing: Colors.spacingXXS
 
         Repeater {
           model: root.visualizerValues
@@ -114,7 +114,7 @@ Rectangle {
             required property var modelData
             width: 3
             height: 4 + Math.round(Math.max(0, Math.min(1, Number(modelData) || 0)) * 12)
-            radius: 1.5
+            radius: width / 2
             anchors.verticalCenter: parent.verticalCenter
             color: Colors.withAlpha(MediaService.artAccentColor, 0.9)
 

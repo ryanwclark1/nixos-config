@@ -424,13 +424,13 @@ PanelWindow {
                 scale: visible ? 1.0 : 0.95
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: 250
+                        duration: Colors.durationNormal
                         easing.type: Easing.OutCubic
                     }
                 }
                 Behavior on scale {
                     NumberAnimation {
-                        duration: 350
+                        duration: Colors.durationSlow
                         easing.type: Easing.OutBack
                     }
                 }
@@ -508,13 +508,13 @@ PanelWindow {
                 scale: visible ? 1.0 : 0.95
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: 250
+                        duration: Colors.durationNormal
                         easing.type: Easing.OutCubic
                     }
                 }
                 Behavior on scale {
                     NumberAnimation {
-                        duration: 350
+                        duration: Colors.durationSlow
                         easing.type: Easing.OutBack
                     }
                 }

@@ -203,7 +203,7 @@ PanelWindow {
             opacity: root.isVisible ? 1.0 : 0.0
             scale: root.isVisible ? 1.0 : 0.7
             transform: Translate { y: root.isVisible ? 0 : 30 }
-            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: 400; easing.type: Easing.OutCubic } } }
+            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } } }
             Behavior on scale { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: 550; easing.type: Easing.OutBack } } }
             Behavior on transform { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: 500; easing.type: Easing.OutCubic } } }
 

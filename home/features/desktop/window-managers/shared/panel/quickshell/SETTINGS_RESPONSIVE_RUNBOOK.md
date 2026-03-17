@@ -8,7 +8,7 @@ Reference:
 
 ## Quick Commands
 
-- Automated gate: headless config/migration contract check for Bar Widgets stat settings:
+- Automated gate: headless contract check for Bar Widgets stat settings:
   - `scripts/check-panel-config-contracts.sh`
 - Automated gate: static + runtime guardrails:
   - `scripts/check-settings-guardrails.sh`

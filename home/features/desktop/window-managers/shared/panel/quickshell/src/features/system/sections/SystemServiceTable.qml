@@ -462,7 +462,7 @@ SharedWidgets.CardBase {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Colors.spacingXXS
                         visible: root.visibleUnits.length > 0
 
                         Repeater {

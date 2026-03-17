@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import "."
 import "widgets"
 import "./widgets" as Widgets
 import "../features/system/sections"
@@ -39,6 +40,7 @@ Item {
     property var screenRef: null
     property var barConfig: null
     property string activeSurfaceId: ""
+    property var activeSurfaceContext: null
 
     readonly property string position: (barConfig && barConfig.position) || "top"
     readonly property bool vertical: Config.isVerticalBar(position)
@@ -160,8 +162,12 @@ Item {
         root.surfaceRequested(surfaceId, context);
     }
 
-    function isSurfaceActive(surfaceId) {
-        return root.activeSurfaceId === surfaceId;
+    function isSurfaceActive(surfaceId, extraKey, extraValue) {
+        if (root.activeSurfaceId !== surfaceId)
+            return false;
+        if (extraKey === undefined)
+            return true;
+        return !!(root.activeSurfaceContext && root.activeSurfaceContext[extraKey] === extraValue);
     }
 
     function compactPercentText(value) { return PanelHelpers.compactPercentText(value); }

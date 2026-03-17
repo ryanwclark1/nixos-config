@@ -78,7 +78,7 @@ SharedWidgets.BarPill {
         parent: root
         width: root.badgeStyle === "count" ? Math.max(14, unreadBadgeText.implicitWidth + 8) : 8
         height: 8
-        radius: 4
+        radius: width / 2
         color: Colors.error
         anchors.top: parent.top
         anchors.right: parent.right

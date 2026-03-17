@@ -153,7 +153,7 @@ ColumnLayout {
         visible: root.timerActive
         width: countdownRow.implicitWidth + 24
         height: 36
-        radius: 18
+        radius: Colors.radiusPill
         color: Colors.withAlpha(Colors.error, 0.15)
         border.color: Colors.error
         border.width: 1

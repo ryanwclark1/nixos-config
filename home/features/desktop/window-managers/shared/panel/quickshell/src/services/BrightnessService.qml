@@ -48,8 +48,10 @@ QtObject {
         }
     }
 
+    readonly property int _wakeSettleMs: 3000
+
     property Timer _detectTimer: Timer {
-        interval: 3000   // wait for hardware to settle after wake
+        interval: root._wakeSettleMs   // wait for hardware to settle after wake
         onTriggered: root._detectMonitors()
     }
 

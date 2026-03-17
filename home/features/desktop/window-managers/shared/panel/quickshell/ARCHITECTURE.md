@@ -27,6 +27,7 @@ Compositor-specific behavior notes and capability expectations are documented in
 - Feature roots in `src/features/` own their surfaces, local components, and registries.
 - Reusable UI lives in `src/shared/` and must not directly orchestrate other surfaces.
 - `src/widgets/qmldir` is a compatibility facade only; new runtime ownership does not belong there.
+- `src/notifications/qmldir` is a compatibility facade only; notification implementation lives under `src/features/notifications/`.
 - `menu/`, `bar/`, `launcher/`, `notifications/`, `shared/`, and `shell/` may depend on `services/`.
 - `services/` must not depend on higher-level UI modules.
 - Persistent settings shape is owned by `services/Config.qml`.
@@ -53,4 +54,4 @@ Compositor-specific behavior notes and capability expectations are documented in
 - Reusable leaf widgets and generic controls belong in `src/shared/`.
 - Shell-only decoration surfaces belong in `src/shell/`.
 - Shared state and integration logic belongs in `src/services/`.
-- `src/menu/` and `src/widgets/` exist for backward-compatible module resolution and should stay thin.
+- `src/menu/`, `src/widgets/`, and `src/notifications/` exist for backward-compatible module resolution and should stay thin.

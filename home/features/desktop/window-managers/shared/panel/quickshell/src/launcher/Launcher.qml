@@ -3489,7 +3489,7 @@ PanelWindow {
                             required property color modelData
                             width: 10
                             height: 10
-                            radius: 5
+                            radius: width / 2
                             color: modelData
                             opacity: 0.9
                         }

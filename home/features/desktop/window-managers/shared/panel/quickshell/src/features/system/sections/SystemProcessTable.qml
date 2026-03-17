@@ -666,7 +666,7 @@ SharedWidgets.CardBase {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Colors.spacingXXS
                         visible: root.visibleProcesses.length > 0
 
                         Repeater {

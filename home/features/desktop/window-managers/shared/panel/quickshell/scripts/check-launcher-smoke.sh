@@ -6,6 +6,9 @@ ci_mode=0
 instance_id=""
 repo_shell_mode=0
 expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
+responsive_timeout_seconds="${QS_VERIFY_LAUNCHER_RESPONSIVE_TIMEOUT_SECONDS:-120}"
+ipc_timeout_seconds="${QS_VERIFY_LAUNCHER_IPC_TIMEOUT_SECONDS:-120}"
+benchmarks_timeout_seconds="${QS_VERIFY_LAUNCHER_BENCHMARKS_TIMEOUT_SECONDS:-90}"
 
 usage() {
   cat <<'EOF'
@@ -106,26 +109,36 @@ discover_launcher_instance() {
   return 1
 }
 
+run_subcheck() {
+  local timeout_seconds="$1"
+  shift
+  if command -v timeout >/dev/null 2>&1; then
+    timeout --foreground --signal=TERM --kill-after=10s "${timeout_seconds}s" "$@"
+  else
+    "$@"
+  fi
+}
+
 "${script_dir}/check-launcher-guardrails.sh"
 if (( ci_mode == 0 )); then
   if (( repo_shell_mode == 0 )) && [[ -z "${instance_id}" ]]; then
     instance_id="$(discover_launcher_instance || true)"
   fi
   if (( repo_shell_mode == 1 )); then
-    "${script_dir}/check-launcher-responsive.sh" --repo-shell
-    "${script_dir}/check-launcher-ipc-health.sh" --repo-shell
+    run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --repo-shell
+    run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --repo-shell
   elif [[ -n "${instance_id}" ]]; then
-    "${script_dir}/check-launcher-responsive.sh" --id "${instance_id}"
-    "${script_dir}/check-launcher-ipc-health.sh" --id "${instance_id}"
+    run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --id "${instance_id}"
+    run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --id "${instance_id}"
   else
     printf '%s\n' "[WARN] No reachable launcher instance found; falling back to static launcher probes and skipping live category/Esc diagnostics." >&2
-    "${script_dir}/check-launcher-responsive.sh" --ci
-    "${script_dir}/check-launcher-ipc-health.sh" --ci
+    run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --ci
+    run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --ci
   fi
 else
-  "${script_dir}/check-launcher-responsive.sh" --ci
-  "${script_dir}/check-launcher-ipc-health.sh" --ci
+  run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --ci
+  run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --ci
 fi
-"${script_dir}/check-launcher-benchmarks.sh"
+run_subcheck "${benchmarks_timeout_seconds}" "${script_dir}/check-launcher-benchmarks.sh"
 
 printf '%s\n' "Launcher smoke checks passed."
