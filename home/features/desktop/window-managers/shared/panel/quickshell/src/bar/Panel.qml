@@ -661,8 +661,8 @@ Item {
             valueText: root.statDisplayText("cpuStatus", widgetInstance)
             compactValueText: root.compactStatDisplayText("cpuStatus", widgetInstance)
             tooltipText: root.statTooltipText("cpuStatus", widgetInstance)
-            isActive: root.isSurfaceActive("systemStatsMenu")
-            onClicked: root.requestSurface("systemStatsMenu", this)
+            isActive: root.isSurfaceActive("systemStatsMenu", "statKey", "cpuStatus")
+            onClicked: root.requestSurface("systemStatsMenu", this, { statKey: "cpuStatus" })
         }
     }
 
@@ -680,8 +680,8 @@ Item {
             valueText: root.statDisplayText("ramStatus", widgetInstance)
             compactValueText: root.compactStatDisplayText("ramStatus", widgetInstance)
             tooltipText: root.statTooltipText("ramStatus", widgetInstance)
-            isActive: root.isSurfaceActive("systemStatsMenu")
-            onClicked: root.requestSurface("systemStatsMenu", this)
+            isActive: root.isSurfaceActive("systemStatsMenu", "statKey", "ramStatus")
+            onClicked: root.requestSurface("systemStatsMenu", this, { statKey: "ramStatus" })
         }
     }
 
@@ -699,8 +699,8 @@ Item {
             valueText: root.statDisplayText("gpuStatus", widgetInstance)
             compactValueText: root.compactStatDisplayText("gpuStatus", widgetInstance)
             tooltipText: root.statTooltipText("gpuStatus", widgetInstance)
-            isActive: root.isSurfaceActive("systemStatsMenu")
-            onClicked: root.requestSurface("systemStatsMenu", this)
+            isActive: root.isSurfaceActive("systemStatsMenu", "statKey", "gpuStatus")
+            onClicked: root.requestSurface("systemStatsMenu", this, { statKey: "gpuStatus" })
         }
     }
 

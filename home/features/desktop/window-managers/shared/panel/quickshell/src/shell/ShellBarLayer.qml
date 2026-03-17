@@ -124,6 +124,7 @@ Item {
                                 screenRef: screenBars.modelData
                                 barConfig: barWindow.barConfig
                                 activeSurfaceId: root.shellRoot.barOwnsSurface(root.shellRoot.activeSurfaceContext, screenBars.modelData, barWindow.barId) ? root.shellRoot.activeSurfaceId : ""
+                                activeSurfaceContext: root.shellRoot.activeSurfaceContext
                                 onSurfaceRequested: (surfaceId, context) => root.shellRoot.toggleSurface(surfaceId, context)
                                 onContextMenuRequested: (actions, rect) => barContextPopup.show(actions, rect, barWindow.barPosition, barWindow)
                             }
