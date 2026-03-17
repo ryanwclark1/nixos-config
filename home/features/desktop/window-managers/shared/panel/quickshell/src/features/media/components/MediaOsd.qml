@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import "../services"
+import "../../../services"
+import "../../../widgets"
 
 Scope {
   id: root

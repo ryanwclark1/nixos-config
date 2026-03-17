@@ -1,0 +1,5 @@
+Dock 1.0 Dock.qml
+DockContent 1.0 components/DockContent.qml
+DockItem 1.0 components/DockItem.qml
+DockItemIndicators 1.0 components/DockItemIndicators.qml
+DockMenu 1.0 components/DockMenu.qml

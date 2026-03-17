@@ -1,7 +1,8 @@
 import QtQuick
 import Quickshell
-import "../../services"
 import ".."
+import "../../../services"
+import "../../../widgets"
 
 Item {
     id: root

@@ -1,2 +1,3 @@
 BatteryMenu 1.0 BatteryMenu.qml
+BatteryWidget 1.0 components/BatteryWidget.qml
 Powermenu 1.0 Powermenu.qml

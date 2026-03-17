@@ -1,6 +1,7 @@
 import QtQuick
-import "../system/sections"
-import "../services"
+import "../../../system/sections"
+import "../../../services"
+import "../../../widgets"
 
 Rectangle {
   id: root

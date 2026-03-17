@@ -1,3 +1,5 @@
 BluetoothMenu 1.0 BluetoothMenu.qml
+NetworkWidget 1.0 components/NetworkWidget.qml
 NetworkMenu 1.0 NetworkMenu.qml
+VpnWidget 1.0 components/VpnWidget.qml
 VpnMenu 1.0 VpnMenu.qml

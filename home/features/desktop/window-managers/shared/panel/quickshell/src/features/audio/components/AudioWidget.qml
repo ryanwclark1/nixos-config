@@ -1,6 +1,6 @@
 import QtQuick
-import "../system/sections"
-import "../services"
+import "../../../system/sections"
+import "../../../services"
 
 Row {
   id: root

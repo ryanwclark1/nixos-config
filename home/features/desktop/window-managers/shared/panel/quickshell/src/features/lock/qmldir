@@ -1,0 +1,3 @@
+LockPanel 1.0 LockPanel.qml
+LockContext 1.0 components/LockContext.qml
+NativeLock 1.0 components/NativeLock.qml

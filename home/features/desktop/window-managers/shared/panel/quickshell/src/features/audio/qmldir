@@ -1,1 +1,5 @@
 AudioMenu 1.0 AudioMenu.qml
+AppVolumeEntry 1.0 components/AppVolumeEntry.qml
+AudioDeviceSection 1.0 components/AudioDeviceSection.qml
+AudioWidget 1.0 components/AudioWidget.qml
+MuteButton 1.0 components/MuteButton.qml

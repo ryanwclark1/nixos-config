@@ -3,8 +3,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../bar"
+import "../features/lock"
 import "../launcher"
 import "../menu"
+import "../features/media"
+import "../features/osd"
 import "../system/sections"
 import "../notifications"
 import "../services"

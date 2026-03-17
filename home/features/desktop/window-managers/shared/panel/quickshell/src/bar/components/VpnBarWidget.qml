@@ -39,7 +39,7 @@ SharedWidgets.BarPill {
         spacing: Colors.spacingS
         Loader {
             id: vpnWidgetLoader
-            source: Qt.resolvedUrl("../../widgets/VpnWidget.qml")
+            source: Qt.resolvedUrl("../../features/network/components/VpnWidget.qml")
             asynchronous: false
         }
 

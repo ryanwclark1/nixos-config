@@ -1,7 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import "../services"
+import "."
+import "../../services"
 
 Scope {
   id: root

@@ -1,5 +1,6 @@
 import QtQuick
-import "../services"
+import "../../../services"
+import "../../../widgets"
 
 Row {
     id: root

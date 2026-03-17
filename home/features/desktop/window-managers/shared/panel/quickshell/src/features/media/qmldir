@@ -1,2 +1,4 @@
 CavaPopup 1.0 CavaPopup.qml
+MediaBar 1.0 components/MediaBar.qml
+MediaOsd 1.0 components/MediaOsd.qml
 MusicMenu 1.0 MusicMenu.qml

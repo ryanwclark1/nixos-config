@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell.Services.UPower
-import "../system/sections"
-import "../services"
+import "../../../system/sections"
+import "../../../services"
 
 Row {
   id: root

@@ -1,2 +1,2 @@
-DockItem 1.0 DockItem.qml
-DockItemIndicators 1.0 DockItemIndicators.qml
+DockItem 1.0 ../../features/dock/components/DockItem.qml
+DockItemIndicators 1.0 ../../features/dock/components/DockItemIndicators.qml

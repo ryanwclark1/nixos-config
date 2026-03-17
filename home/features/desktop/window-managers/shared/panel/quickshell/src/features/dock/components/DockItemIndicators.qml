@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell
-import "../../services"
+import "../../../services"
 
 Loader {
     id: root

@@ -1,8 +1,9 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import "../services"
-import "dock"
+import ".."
+import "../../../services"
+import "../../../widgets"
 
 Item {
   id: root
