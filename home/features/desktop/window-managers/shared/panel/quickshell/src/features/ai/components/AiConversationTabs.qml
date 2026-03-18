@@ -11,7 +11,12 @@ RowLayout {
     spacing: Colors.spacingS
 
     property string editingConversationId: ""
-    readonly property int visibleTabLimit: width < 380 ? 2 : (width < 520 ? 3 : 4)
+    readonly property bool compactMode: width < 420
+    readonly property bool narrowMode: width < 320
+    readonly property int visibleTabLimit: width < 260 ? 1 : (width < 380 ? 2 : (width < 520 ? 3 : 4))
+    readonly property int reservedWidth: 32 + Colors.spacingS + 32 + Colors.spacingXS + (overflowConversations.length > 0 ? 34 + Colors.spacingS : 0)
+    readonly property int tabStripWidth: Math.max(96, width - reservedWidth)
+    readonly property int tabMaxWidth: Math.max(narrowMode ? 96 : 112, Math.floor(tabStripWidth / Math.max(1, visibleTabLimit)) - Colors.spacingS)
 
     readonly property var sortedConversations: {
         var convs = AiService.conversations.slice();
@@ -124,11 +129,13 @@ RowLayout {
     Item {
         Layout.fillWidth: true
         height: 38
+        clip: true
 
         Row {
             id: tabRow
             anchors.fill: parent
             spacing: Colors.spacingS
+            clip: true
 
             Repeater {
                 model: root.primaryConversations
@@ -140,7 +147,7 @@ RowLayout {
                     readonly property bool isActive: modelData.id === AiService.activeConversationId
                     readonly property bool isEditing: root.editingConversationId === modelData.id
 
-                    width: isEditing ? Math.min(tabEditInput.width + 22, 156) : Math.min(tabLabelText.contentWidth + 70, 132)
+                    width: isEditing ? Math.min(tabEditInput.width + 22, root.tabMaxWidth) : Math.min(tabLabelText.contentWidth + (root.compactMode ? 52 : 70), root.tabMaxWidth)
                     height: 32
 
                     Behavior on width {
@@ -197,7 +204,7 @@ RowLayout {
                             color: isActive ? Colors.primary : Colors.textSecondary
                             font.family: Colors.fontMono
                             font.pixelSize: Colors.fontSizeSmall
-                            visible: !tabDelegate.isEditing
+                            visible: !tabDelegate.isEditing && !root.narrowMode
                         }
 
                         Rectangle {
@@ -220,6 +227,7 @@ RowLayout {
                         Text {
                             id: tabLabelText
                             Layout.fillWidth: true
+                            Layout.minimumWidth: 0
                             text: modelData.title
                             color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.text : Colors.textSecondary)
                             font.pixelSize: Colors.fontSizeSmall
@@ -236,7 +244,7 @@ RowLayout {
                         anchors.left: parent.left
                         anchors.leftMargin: Colors.spacingS
                         anchors.verticalCenter: parent.verticalCenter
-                        width: Math.min(Math.max(72, contentWidth + 8), 134)
+                        width: Math.min(Math.max(72, contentWidth + 8), root.tabMaxWidth - 20)
                         text: modelData.title
                         color: Colors.primary
                         font.pixelSize: Colors.fontSizeSmall
@@ -268,7 +276,7 @@ RowLayout {
                         anchors.rightMargin: 6
                         anchors.verticalCenter: parent.verticalCenter
                         color: "transparent"
-                        opacity: tabMouse.containsMouse || tabDelegate.isActive ? 1 : 0
+                        opacity: !root.compactMode && (tabMouse.containsMouse || tabDelegate.isActive) ? 1 : 0
                         Behavior on opacity {
                             NumberAnimation { duration: Colors.durationFast }
                         }
@@ -347,7 +355,7 @@ RowLayout {
 
         Text {
             anchors.centerIn: parent
-            text: "󰅁"
+            text: root.narrowMode ? "…" : "󰅁"
             color: overflowMouse.containsMouse ? Colors.primary : Colors.textSecondary
             font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeSmall

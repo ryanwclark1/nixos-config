@@ -10,7 +10,6 @@ BasePopupMenu {
   popupMaxWidth: 380; compactThreshold: 360
   implicitHeight: compactMode ? 540 : 480
   title: "Printers"
-  toggleMethod: "togglePrinterMenu"
   contentSpacing: Colors.spacingM
 
   // Subscribe to PrinterService while this menu is alive

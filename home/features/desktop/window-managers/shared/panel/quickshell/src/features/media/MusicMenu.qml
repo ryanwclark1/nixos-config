@@ -12,7 +12,6 @@ BasePopupMenu {
   popupMaxWidth: 360; compactThreshold: 350
   implicitHeight: compactMode ? 430 : 400
   title: "Music"
-  toggleMethod: "toggleMusicMenu"
   surfaceTint: Colors.withAlpha(root.dominantColor, 0.12)
 
   SharedWidgets.Ref { service: MediaService }

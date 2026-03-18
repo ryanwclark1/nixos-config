@@ -320,7 +320,7 @@ ColumnLayout {
                                 implicitHeight: 32
                                 radius: Colors.radiusSmall
                                 color: Colors.surface
-                                border.color: Colors.withAlpha(Colors.primary, 0.1)
+                                border.color: Colors.primaryGhost
                                 border.width: 1
                                 Layout.alignment: Qt.AlignVCenter
 
@@ -367,7 +367,7 @@ ColumnLayout {
                             Rectangle {
                                 radius: Colors.radiusPill
                                 color: selected ? Colors.primarySubtle : Colors.highlight
-                                border.color: selected ? Colors.withAlpha(Colors.primary, 0.3) : Colors.border
+                                border.color: selected ? Colors.primaryRing : Colors.border
                                 border.width: 1
                                 implicitWidth: suggestionBadge.implicitWidth + 14
                                 implicitHeight: 20

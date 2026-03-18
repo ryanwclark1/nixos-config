@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell.Io
 import "../../../services"
 import "../models/ModuleUtils.js" as MU
+import "../models/GraphUtils.js" as GU
 
 Rectangle {
   id: root
@@ -91,19 +92,7 @@ Rectangle {
   }
 
   function paintGraph(canvas, data, strokeColor) {
-    if (!data.length || canvas.width <= 0 || canvas.height <= 0) return;
-    var ctx = canvas.getContext("2d");
-    ctx.reset();
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    var w = data.length > 1 ? canvas.width / (data.length - 1) : canvas.width;
-    for (var i = 0; i < data.length; i++) {
-      var x = i * w;
-      var y = canvas.height - (data[i] * canvas.height);
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
+    GU.paintLineGraph(canvas, data, strokeColor, Colors.withAlpha, { fill: false });
   }
 
   function updateStats() {

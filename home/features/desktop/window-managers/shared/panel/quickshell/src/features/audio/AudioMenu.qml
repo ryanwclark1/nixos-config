@@ -10,7 +10,6 @@ BasePopupMenu {
   popupMinWidth: 340; popupMaxWidth: 380; compactThreshold: 360
   implicitHeight: compactMode ? 620 : 560
   title: "Audio"
-  toggleMethod: "toggleAudioMenu"
 
   SharedWidgets.Ref { service: AudioService }
 

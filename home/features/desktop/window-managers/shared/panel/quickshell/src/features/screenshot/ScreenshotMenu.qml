@@ -10,7 +10,6 @@ BasePopupMenu {
     popupMinWidth: 260; popupMaxWidth: 300; compactThreshold: 280
     implicitHeight: 280
     title: "Screenshot"
-    toggleMethod: "toggleScreenshotMenu"
 
     // ── Mode buttons ─────────────────────────────
     ColumnLayout {

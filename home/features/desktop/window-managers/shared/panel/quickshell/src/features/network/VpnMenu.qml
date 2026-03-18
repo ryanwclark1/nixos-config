@@ -13,7 +13,6 @@ BasePopupMenu {
     implicitHeight: compactMode ? 620 : 560
     title: "VPN Hub"
     subtitle: NetworkService.vpnPrimaryLabel + " • " + NetworkService.vpnStatusLabel(NetworkService.vpnPrimaryStatus)
-    toggleMethod: "toggleVpnMenu"
 
     function statusColor(statusKey) {
         if (statusKey === "connected")
@@ -27,7 +26,7 @@ BasePopupMenu {
 
     function openNetworkMenu() {
         root.closeRequested();
-        Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleNetworkMenu"]);
+        Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleSurface", "networkMenu"]);
     }
 
     function otherVpnChipText() {
@@ -70,10 +69,11 @@ BasePopupMenu {
 
         Rectangle {
             id: mainStatusCard
+            readonly property color _statusClr: root.statusColor(NetworkService.vpnPrimaryStatus)
             Layout.fillWidth: true
             radius: Colors.radiusLarge
             color: Colors.popupSurface
-            border.color: Colors.withAlpha(root.statusColor(NetworkService.vpnPrimaryStatus), 0.45)
+            border.color: Colors.withAlpha(_statusClr, 0.45)
             border.width: 1
             implicitHeight: mainStatusLayout.implicitHeight + (Colors.spacingM * 2)
 
@@ -92,7 +92,7 @@ BasePopupMenu {
 
                     Text {
                         text: "󰖂"
-                        color: root.statusColor(NetworkService.vpnPrimaryStatus)
+                        color: mainStatusCard._statusClr
                         font.family: Colors.fontMono
                         font.pixelSize: Colors.fontSizeHuge
                     }
@@ -120,9 +120,10 @@ BasePopupMenu {
                     }
 
                     Rectangle {
+                        readonly property color _statusClr: root.statusColor(NetworkService.vpnPrimaryStatus)
                         radius: Colors.radiusPill
-                        color: Colors.withAlpha(root.statusColor(NetworkService.vpnPrimaryStatus), 0.14)
-                        border.color: Colors.withAlpha(root.statusColor(NetworkService.vpnPrimaryStatus), 0.38)
+                        color: Colors.withAlpha(_statusClr, 0.14)
+                        border.color: Colors.withAlpha(_statusClr, 0.38)
                         border.width: 1
                         implicitHeight: 26
                         implicitWidth: statusChipLabel.implicitWidth + 18
@@ -131,7 +132,7 @@ BasePopupMenu {
                             id: statusChipLabel
                             anchors.centerIn: parent
                             text: NetworkService.vpnStatusLabel(NetworkService.vpnPrimaryStatus)
-                            color: root.statusColor(NetworkService.vpnPrimaryStatus)
+                            color: parent._statusClr
                             font.pixelSize: Colors.fontSizeXS
                             font.weight: Font.DemiBold
                         }

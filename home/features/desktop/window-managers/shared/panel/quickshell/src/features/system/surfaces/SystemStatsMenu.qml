@@ -8,12 +8,12 @@ import "../../../widgets" as SharedWidgets
 
 BasePopupMenu {
     id: root
-    popupMaxWidth: 380
-    compactThreshold: 360
+    popupMinWidth: 360
+    popupMaxWidth: 460
+    compactThreshold: 420
     implicitHeight: compactMode ? 620 : 580
     title: "System"
     subtitle: compactMode ? "Actions first" : "Processes, services, and live telemetry"
-    toggleMethod: "toggleSystemStatsMenu"
     focusOnOpen: true
 
     headerExtras: SharedWidgets.IconButton {

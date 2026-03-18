@@ -10,7 +10,6 @@ BasePopupMenu {
   implicitHeight: compactMode ? 760 : 700
   title: "Weather"
   subtitle: WeatherService.location || "Local"
-  toggleMethod: "toggleWeatherMenu"
 
   SharedWidgets.Ref { service: WeatherService }
 

@@ -10,7 +10,6 @@ BasePopupMenu {
   popupMinWidth: 300; popupMaxWidth: 320; compactThreshold: 310
   implicitHeight: compactMode ? 290 : 260
   title: "Privacy"
-  toggleMethod: "togglePrivacyMenu"
 
   SharedWidgets.Ref { service: PrivacyService }
 

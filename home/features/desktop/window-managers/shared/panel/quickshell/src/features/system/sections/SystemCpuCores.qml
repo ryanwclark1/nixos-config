@@ -6,12 +6,29 @@ import "../../../widgets" as SharedWidgets
 SharedWidgets.CardBase {
     id: root
 
-    property var coreUsages: []
     property var _previousTotals: ({})
     property var _previousIdles: ({})
 
     Layout.fillWidth: true
     Layout.preferredHeight: coreColumn.implicitHeight + root.pad * 2
+
+    ListModel {
+        id: coreModel
+    }
+
+    function syncCoreModel(nextCoreUsages) {
+        for (var i = 0; i < nextCoreUsages.length; ++i) {
+            var nextCore = nextCoreUsages[i];
+            if (i < coreModel.count) {
+                coreModel.set(i, nextCore);
+            } else {
+                coreModel.append(nextCore);
+            }
+        }
+
+        while (coreModel.count > nextCoreUsages.length)
+            coreModel.remove(coreModel.count - 1);
+    }
 
     function parseSnapshot(out) {
         var lines = String(out || "").trim().split("\n");
@@ -58,7 +75,7 @@ SharedWidgets.CardBase {
 
         _previousTotals = nextTotals;
         _previousIdles = nextIdles;
-        coreUsages = nextCoreUsages;
+        syncCoreModel(nextCoreUsages);
     }
 
     readonly property int _corePollMs: 1500
@@ -98,7 +115,7 @@ SharedWidgets.CardBase {
             SharedWidgets.Chip {
                 icon: ""
                 iconColor: Colors.primary
-                text: String(coreUsages.length) + " cores"
+                text: String(coreModel.count) + " cores"
                 textColor: Colors.primary
             }
         }
@@ -106,17 +123,18 @@ SharedWidgets.CardBase {
         GridLayout {
             id: coreGrid
             Layout.fillWidth: true
-            columns: width >= 420 ? (coreUsages.length >= 12 ? 4 : 3) : (width >= 280 ? 2 : 1)
+            columns: width >= 420 ? (coreModel.count >= 12 ? 4 : 3) : (width >= 280 ? 2 : 1)
             columnSpacing: Colors.spacingM
             rowSpacing: Colors.spacingS
 
             Repeater {
-                model: root.coreUsages
+                model: coreModel
 
                 delegate: Rectangle {
-                    required property var modelData
                     id: coreCell
+                    required property var modelData
                     readonly property real valueWidth: Math.max(34, (coreGrid.width / Math.max(1, coreGrid.columns)) * 0.34)
+                    readonly property color usageColor: modelData.usage >= 0.8 ? Colors.error : (modelData.usage >= 0.5 ? Colors.warning : Colors.primary)
                     Layout.fillWidth: true
                     radius: Colors.radiusSmall
                     color: Colors.cardSurface
@@ -146,7 +164,7 @@ SharedWidgets.CardBase {
 
                             Text {
                                 text: Math.round(modelData.usage * 100) + "%"
-                                color: modelData.usage >= 0.8 ? Colors.error : (modelData.usage >= 0.5 ? Colors.warning : Colors.primary)
+                                color: coreCell.usageColor
                                 font.pixelSize: Colors.fontSizeXS
                                 font.family: Colors.fontMono
                                 Layout.maximumWidth: coreCell.valueWidth
@@ -157,7 +175,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.MiniProgressBar {
                             value: modelData.usage
-                            barColor: modelData.usage >= 0.8 ? Colors.error : (modelData.usage >= 0.5 ? Colors.warning : Colors.primary)
+                            barColor: coreCell.usageColor
                         }
                     }
                 }

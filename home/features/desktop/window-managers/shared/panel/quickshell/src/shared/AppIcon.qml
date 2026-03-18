@@ -61,13 +61,23 @@ Item {
 
     if (iconMap) {
       var lower = candidate.toLowerCase();
+      var desktopLower = lower.endsWith(".desktop") ? lower.substring(0, lower.length - 8) : lower;
       var aliases = Config.iconAliases[lower] || [];
       for (var i = 0; i < aliases.length; ++i) {
         if (iconMap[aliases[i]])
           return "file://" + iconMap[aliases[i]];
       }
+      if (desktopLower !== lower) {
+        var desktopAliases = Config.iconAliases[desktopLower] || [];
+        for (var j = 0; j < desktopAliases.length; ++j) {
+          if (iconMap[desktopAliases[j]])
+            return "file://" + iconMap[desktopAliases[j]];
+        }
+      }
       if (iconMap[lower])
         return "file://" + iconMap[lower];
+      if (desktopLower !== lower && iconMap[desktopLower])
+        return "file://" + iconMap[desktopLower];
     }
 
     return Config.resolveIconSource(candidate);

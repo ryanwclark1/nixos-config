@@ -240,7 +240,7 @@ PanelWindow {
                   anchors.centerIn: parent
                   text: isPending ? Math.ceil(root.timeRemaining / 1000).toString() : modelData.icon
                   color: actionItem.isFocused ? Colors.text : actionItem.actionColor
-                  font.family: isPending ? undefined : Colors.fontMono
+                  font.family: isPending ? "" : Colors.fontMono
                   font.pixelSize: isPending ? 32 : 44
                   font.weight: isPending ? Font.Bold : Font.Normal
                   Behavior on color { ColorAnimation { duration: Colors.durationFast } }

@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
+import "../models/GraphUtils.js" as GU
 
 SharedWidgets.CardBase {
     id: root
@@ -25,37 +26,7 @@ SharedWidgets.CardBase {
     }
 
     function paintGraph(canvas, values, strokeColor) {
-        if (!values.length || canvas.width <= 0 || canvas.height <= 0)
-            return;
-
-        var ctx = canvas.getContext("2d");
-        ctx.reset();
-        var w = values.length > 1 ? canvas.width / (values.length - 1) : canvas.width;
-
-        var grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        grad.addColorStop(0, Colors.withAlpha(strokeColor, 0.28));
-        grad.addColorStop(1, Colors.withAlpha(strokeColor, 0.04));
-
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height);
-        for (var i = 0; i < values.length; ++i)
-            ctx.lineTo(i * w, canvas.height - (values[i] * canvas.height));
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        ctx.beginPath();
-        for (var j = 0; j < values.length; ++j) {
-            var x = j * w;
-            var y = canvas.height - (values[j] * canvas.height);
-            if (j === 0)
-                ctx.moveTo(x, y);
-            else
-                ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        GU.paintLineGraph(canvas, values, strokeColor, Colors.withAlpha, { fillAlphaTop: 0.28, fillAlphaBot: 0.04 });
     }
 
     onVisibleChanged: {

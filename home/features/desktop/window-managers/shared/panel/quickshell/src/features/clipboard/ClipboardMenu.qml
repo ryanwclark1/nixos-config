@@ -10,7 +10,6 @@ BasePopupMenu {
   popupMaxWidth: 360; compactThreshold: 350
   implicitHeight: compactMode ? 520 : 480
   title: "Clipboard"
-  toggleMethod: "toggleClipboardMenu"
   contentSpacing: Colors.spacingM
   focusOnOpen: true
   initialFocusTarget: searchInput

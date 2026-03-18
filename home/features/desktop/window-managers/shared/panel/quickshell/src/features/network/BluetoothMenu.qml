@@ -12,7 +12,6 @@ BasePopupMenu {
   popupMinWidth: 340; popupMaxWidth: 380; compactThreshold: 360
   implicitHeight: compactMode ? 560 : 520
   title: "Bluetooth"
-  toggleMethod: "toggleBluetoothMenu"
 
   readonly property bool hasAdapter: !!Bluetooth.defaultAdapter
   readonly property bool btEnabled: hasAdapter && Bluetooth.defaultAdapter.enabled

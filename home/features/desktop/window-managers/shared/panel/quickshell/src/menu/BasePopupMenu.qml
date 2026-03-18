@@ -10,8 +10,6 @@ PopupWindow {
 
   // ── Required customization ────────────────────
   property string title: ""
-  property string toggleMethod: ""
-
   // ── Optional customization ────────────────────
   property alias headerExtras: headerExtrasSlot.children
   property alias backgroundContent: backgroundSlot.data

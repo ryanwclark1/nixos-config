@@ -83,7 +83,7 @@ RowLayout {
       width: 2
       height: parent.height + 4
       radius: Colors.radiusXXXS
-      color: Colors.withAlpha(Colors.text, 0.4)
+      color: Colors.borderMedium
     }
 
     // Drag interaction for volume/brightness adjustment

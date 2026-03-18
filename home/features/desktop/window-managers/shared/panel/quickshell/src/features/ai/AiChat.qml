@@ -39,6 +39,10 @@ PanelWindow {
     property int panelWidth: 420
     readonly property int panelMinWidth: 320
     readonly property int panelMaxWidth: 600
+    readonly property bool compactHeader: slidePanel.width < 420
+    readonly property bool narrowHeader: slidePanel.width < 360
+    readonly property bool compactFooter: slidePanel.width < 380
+    readonly property bool narrowFooter: slidePanel.width < 340
     property bool includeWindowContext: false
     property bool includeVisualContext: false
     property bool includeSelectionContext: false
@@ -291,17 +295,24 @@ PanelWindow {
             // ---- Header ----
             RowLayout {
                 Layout.fillWidth: true
+                spacing: root.narrowHeader ? Colors.spacingXS : Colors.spacingS
+                clip: true
 
                 Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: "󰚩  AI Chat"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeXL
+                    font.pixelSize: root.narrowHeader ? Colors.fontSizeLarge : Colors.fontSizeXL
                     font.weight: Font.DemiBold
                     font.letterSpacing: Colors.letterSpacingTight
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
                 }
 
                 Item {
                     Layout.fillWidth: true
+                    visible: !root.narrowHeader
                 }
 
                 // Provider/model picker
@@ -311,6 +322,7 @@ PanelWindow {
                     Layout.maximumWidth: 140
                     width: providerPickerText.implicitWidth + Colors.spacingL
                     height: 24
+                    visible: !root.compactHeader
                     radius: Colors.radiusXXS
                     color: providerPickerMouse.containsMouse ? Colors.primaryGhost : "transparent"
                     border.color: providerPickerMouse.containsMouse ? Colors.primaryRing : "transparent"
@@ -343,7 +355,7 @@ PanelWindow {
                     height: 28
                     radius: Colors.radiusXS
                     color: "transparent"
-                    visible: AiService.activeMessages.length > 0
+                    visible: !root.narrowHeader && AiService.activeMessages.length > 0
                     Text {
                         anchors.centerIn: parent
                         text: "󰆏"
@@ -386,7 +398,7 @@ PanelWindow {
                     height: 28
                     radius: Colors.radiusXS
                     color: "transparent"
-                    visible: AiService.activeMessages.length > 0 || AiService.activeDraftText.length > 0
+                    visible: !root.narrowHeader && (AiService.activeMessages.length > 0 || AiService.activeDraftText.length > 0)
                     Text {
                         anchors.centerIn: parent
                         text: "󰃢"
@@ -1084,14 +1096,17 @@ PanelWindow {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
+                visible: !root.narrowFooter
 
                 Text {
+                    visible: !root.compactFooter
                     text: Providers.providerLabel(AiService.activeProvider)
                     color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeXS
                 }
 
                 Text {
+                    visible: !root.compactFooter
                     text: "·"
                     color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeXS
@@ -1103,12 +1118,14 @@ PanelWindow {
                     font.pixelSize: Colors.fontSizeXS
                     elide: Text.ElideRight
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                 }
 
                 Text {
                     text: AiService.conversations.length + " chat" + (AiService.conversations.length !== 1 ? "s" : "")
                     color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeXS
+                    visible: !root.compactFooter
                 }
             }
         }

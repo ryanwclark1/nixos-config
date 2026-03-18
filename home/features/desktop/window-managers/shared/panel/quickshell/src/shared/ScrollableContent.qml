@@ -150,7 +150,6 @@ Item {
 
   Item {
     anchors.fill: flick
-    visible: true
 
     readonly property real verticalOvershootSafe: flick ? flick.verticalOvershoot : 0
 

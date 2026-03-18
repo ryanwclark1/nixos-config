@@ -13,7 +13,6 @@ BasePopupMenu {
   readonly property int detailColumns: compactMode ? 1 : 2
   implicitHeight: compactMode ? 430 : 380
   title: "Battery"
-  toggleMethod: "toggleBatteryMenu"
 
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)

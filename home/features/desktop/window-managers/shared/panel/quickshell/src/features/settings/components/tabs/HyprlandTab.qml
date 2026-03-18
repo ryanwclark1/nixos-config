@@ -30,7 +30,7 @@ Item {
                 onClicked: {
                     if (root.settingsRoot)
                         root.settingsRoot.close();
-                    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleDisplayConfig"]);
+                    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "displayConfig"]);
                 }
             }
         }

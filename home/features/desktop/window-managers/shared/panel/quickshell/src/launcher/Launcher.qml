@@ -98,6 +98,10 @@ PanelWindow {
     property string modeLoadTarget: ""
     property var modeCache: ({})
     property var modeCacheTime: ({})
+    property string _lastFilterMode: ""
+    property string _lastFilterQuery: ""
+    property string _lastFilterCategory: ""
+    property var _lastFilterCandidates: []
     property var fileQueryCache: ({})
     property var fileQueryCacheTime: ({})
     property string fileSearchBackend: ""
@@ -157,6 +161,40 @@ PanelWindow {
         if (target !== "" && target !== mode)
             return;
         setModeLoadState(success ? "ready" : "error", targetMode, message);
+    }
+
+    function resetFilterCache() {
+        _lastFilterMode = "";
+        _lastFilterQuery = "";
+        _lastFilterCategory = "";
+        _lastFilterCandidates = [];
+    }
+
+    function updateDrunUsageCache(item) {
+        if (!item)
+            return;
+        var execKey = String(item.exec || "");
+        var rawFreq = (appFrequency[execKey] || 0) * 0.3;
+        var usageScore = UsageTrackerService.getUsageScore(execKey);
+        item._rawFrequencyScore = rawFreq;
+        item._usageScore = usageScore;
+        item._drunUsageBoost = Math.max(rawFreq, usageScore * 1.5);
+    }
+
+    function refreshDrunUsageCaches(items) {
+        var source = Array.isArray(items) ? items : [];
+        for (var i = 0; i < source.length; ++i)
+            updateDrunUsageCache(source[i]);
+    }
+
+    function prepareDrunItems(items) {
+        var source = Array.isArray(items) ? items : [];
+        for (var i = 0; i < source.length; ++i) {
+            var item = source[i];
+            ensureItemRankCache(item);
+            updateDrunUsageCache(item);
+        }
+        return source;
     }
 
     // ── Hover anti-flicker ─────────────────────────
@@ -1466,6 +1504,13 @@ PanelWindow {
         if (exec) {
             appFrequency[exec] = (appFrequency[exec] || 0) + 1;
             UsageTrackerService.recordUsage(exec);
+            var cached = getCached("drun");
+            if (cached) {
+                refreshDrunUsageCaches(cached);
+                if (allItems !== cached)
+                    refreshDrunUsageCaches(allItems);
+            }
+            resetFilterCache();
         }
         saveFrequency();
         rememberRecent(item || {});
@@ -1834,6 +1879,8 @@ PanelWindow {
         var cached = getCached("drun");
         if (cached) {
             allItems = cached;
+            refreshDrunUsageCaches(allItems);
+            resetFilterCache();
             filterItems();
             buildLauncherHome();
             completeModeLoad("drun", true, "");
@@ -1853,11 +1900,12 @@ PanelWindow {
                 _handleLoadFailure("drun", startedAt);
                 return;
             }
-            var appItems = Array.isArray(items) ? items : [];
+            var appItems = prepareDrunItems(items);
             setCached("drun", appItems);
             recordLoadMetric("drun", Date.now() - startedAt, false, true);
             if (mode === "drun") {
                 allItems = appItems;
+                resetFilterCache();
                 filterItems();
                 buildLauncherHome();
                 completeModeLoad("drun", true, "");
@@ -1880,7 +1928,7 @@ PanelWindow {
                 return;
             AppCatalogService.ensureLoaded(function(items, errorText) {
                 if (!errorText)
-                    setCached("drun", Array.isArray(items) ? items : []);
+                    setCached("drun", prepareDrunItems(items));
             });
         });
     }
@@ -2773,12 +2821,8 @@ PanelWindow {
         ensureItemRankCache(item);
         var categoryScore = mode === "drun" ? (fuzzyMatchLower(item._categoryKeywordsLower, cleanLower) * Config.launcherScoreCategoryWeight) : 0;
         var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * Config.launcherScoreNameWeight, fuzzyMatchLower(item._titleLower, cleanLower) * Config.launcherScoreTitleWeight, fuzzyMatchLower(item._execLower, cleanLower) * Config.launcherScoreExecWeight, fuzzyMatchLower(item._bodyLower, cleanLower) * Config.launcherScoreBodyWeight, categoryScore);
-        if (mode === "drun") {
-            // Blend raw frequency (legacy) with decay-weighted usage score
-            var rawFreq = (appFrequency[item.exec] || 0) * 0.3;
-            var decayScore = UsageTrackerService.getUsageScore(item.exec) * 1.5;
-            bestScore += Math.max(rawFreq, decayScore);
-        }
+        if (mode === "drun")
+            bestScore += Number(item._drunUsageBoost || 0);
         return bestScore;
     }
 
@@ -2860,8 +2904,16 @@ PanelWindow {
 
         var clean = String(actualSearch || "");
         var cleanLower = clean.toLowerCase();
+        var canReusePreviousCandidates = mode === "drun"
+                && cleanLower !== ""
+                && _lastFilterMode === mode
+                && _lastFilterCategory === drunCategoryFilter
+                && _lastFilterQuery !== ""
+                && cleanLower.indexOf(_lastFilterQuery) === 0;
+        var sourceItems = canReusePreviousCandidates ? _lastFilterCandidates : allItems;
 
         if (clean === "" && mode !== "files" && mode !== "ai") {
+            resetFilterCache();
             if (showLauncherHomeCards && mode === "drun") {
                 var homeItems = [];
                 var homeSeen = ({});
@@ -2912,8 +2964,8 @@ PanelWindow {
             }
         } else {
             var scoredItems = [];
-            for (var i = 0; i < allItems.length; i++) {
-                var item = allItems[i];
+            for (var i = 0; i < sourceItems.length; i++) {
+                var item = sourceItems[i];
                 if (mode === "web") {
                     var webItem = Object.assign({}, item);
                     webItem.title = "Search " + item.name + " for '" + clean + "'";
@@ -2934,7 +2986,7 @@ PanelWindow {
                     if (b._score !== a._score)
                         return b._score - a._score;
                     if (mode === "drun") {
-                        var usageDelta = UsageTrackerService.getUsageScore(b.exec) - UsageTrackerService.getUsageScore(a.exec);
+                        var usageDelta = Number(b._usageScore || 0) - Number(a._usageScore || 0);
                         if (Math.abs(usageDelta) > 0.01)
                             return usageDelta > 0 ? 1 : -1;
                     }
@@ -2959,6 +3011,10 @@ PanelWindow {
                     return 0;
                 });
             }
+            _lastFilterMode = mode;
+            _lastFilterQuery = cleanLower;
+            _lastFilterCategory = drunCategoryFilter;
+            _lastFilterCandidates = scoredItems.slice();
             filteredItems = decorateResultSections(scoredItems.slice(0, Config.launcherMaxResults));
         }
         selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));

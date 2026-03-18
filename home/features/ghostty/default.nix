@@ -42,7 +42,7 @@
       shell-integration-features = "no-cursor";
 
       # Background
-      background-opacity = 0.7;
+      background-opacity = 0.9;
       background-blur = true;
 
       # Behavior

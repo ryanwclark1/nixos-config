@@ -13,14 +13,13 @@ BasePopupMenu {
   implicitHeight: compactMode ? 620 : 552
   title: "Networking"
   subtitle: NetworkService.activePrimaryName === "Offline" ? "Network inspector" : NetworkService.activePrimaryName
-  toggleMethod: "toggleNetworkMenu"
 
   property string selectedSSID: ""
   property bool showAdvanced: false
 
   function openVpnHub() {
     root.closeRequested();
-    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleVpnMenu"]);
+    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleSurface", "vpnMenu"]);
   }
 
   // Subscriber-based polling: NetworkService polls only while we're visible.

@@ -36,6 +36,7 @@ Rectangle {
     Behavior on color { ColorAnimation { duration: 150 } }
     Behavior on border.color { ColorAnimation { duration: 150 } }
     Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+    layer.enabled: scale !== 1.0
 
     // Glow Effect
     Rectangle {
@@ -186,7 +187,7 @@ Rectangle {
                 appId: itemData ? String(itemData.appId || itemData.class || "") : ""
                 execName: itemData ? String(itemData.exec || "") : ""
                 appName: itemData ? String(itemData.name || itemData.title || "") : ""
-                iconMap: root.mode === "window" ? root.iconMap : null
+                iconMap: root.iconMap
                 iconSize: root.compactMode ? 18 : 20
                 fallbackIcon: root.itemFallbackIcon(itemData)
             }

@@ -177,7 +177,7 @@ Item {
         width: actionRow.implicitWidth + Colors.spacingM
         height: 28
         radius: Colors.radiusSmall
-        color: actionMouse.containsMouse ? Colors.primaryGhost : Colors.withAlpha(Colors.primary, 0.12)
+        color: actionMouse.containsMouse ? Colors.primaryGhost : Colors.primarySubtle
         border.color: Colors.withAlpha(Colors.primary, 0.25)
         border.width: 1
 

@@ -14,7 +14,6 @@ BasePopupMenu {
   implicitHeight: compactMode ? 560 : 520
   title: "SSH"
   subtitle: sshData.importBusy ? "Refreshing aliases..." : "Hosts, aliases, and quick actions"
-  toggleMethod: "toggleSshMenu"
   contentSpacing: Colors.spacingM
   focusOnOpen: true
   initialFocusTarget: searchInput

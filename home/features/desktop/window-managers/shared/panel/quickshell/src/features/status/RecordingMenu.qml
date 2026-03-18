@@ -10,7 +10,6 @@ BasePopupMenu {
   popupMinWidth: 280; popupMaxWidth: 300; compactThreshold: 295
   implicitHeight: compactMode ? 270 : 220
   title: "Screen Recording"
-  toggleMethod: "toggleRecordingMenu"
 
   SharedWidgets.Ref { service: RecordingService }
 

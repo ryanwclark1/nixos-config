@@ -30,9 +30,11 @@ PanelWindow {
     WlrLayershell.namespace: "quickshell"
 
     property bool showContent: false
-    property int panelWidth: 980
-    readonly property int panelMinWidth: 760
-    readonly property int panelMaxWidth: 1320
+    readonly property int telemetryColumnMinWidth: 320
+    readonly property int detailColumnMinWidth: 620
+    property int panelWidth: 1120
+    readonly property int panelMinWidth: telemetryColumnMinWidth + detailColumnMinWidth + Colors.spacingM + (Colors.paddingLarge * 2)
+    readonly property int panelMaxWidth: 1480
     property real _dragStartX: 0
     property real _dragStartWidth: 0
     property int keyboardSectionIndex: 0
@@ -330,7 +332,8 @@ PanelWindow {
                 spacing: Colors.spacingM
 
                 Item {
-                    Layout.preferredWidth: Math.max(340, Math.round(root.panelWidth * 0.4))
+                    Layout.minimumWidth: root.telemetryColumnMinWidth
+                    Layout.preferredWidth: Math.max(root.telemetryColumnMinWidth, Math.round(root.panelWidth * 0.36))
                     Layout.fillHeight: true
 
                     Flickable {
@@ -364,6 +367,7 @@ PanelWindow {
                 }
 
                 Item {
+                    Layout.minimumWidth: root.detailColumnMinWidth
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 

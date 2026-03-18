@@ -55,7 +55,7 @@ RowLayout {
         anchors.centerIn: parent
         text: awaitingConfirm ? "Confirm?" : modelData.icon
         color: awaitingConfirm ? Colors.background : Colors.text
-        font.family: awaitingConfirm ? undefined : Colors.fontMono
+        font.family: awaitingConfirm ? "" : Colors.fontMono
         font.pixelSize: awaitingConfirm ? Colors.fontSizeSmall : Colors.fontSizeXL
         font.weight: awaitingConfirm ? Font.Bold : Font.Normal
       }

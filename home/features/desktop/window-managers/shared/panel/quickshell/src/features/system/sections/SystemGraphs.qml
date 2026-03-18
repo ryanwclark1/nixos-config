@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
+import "../models/GraphUtils.js" as GU
 
 Rectangle {
   id: root
@@ -35,34 +36,7 @@ Rectangle {
   }
 
   function paintGraph(canvas, data, strokeColor) {
-    if (!data.length || canvas.width <= 0 || canvas.height <= 0) return;
-    var ctx = canvas.getContext("2d");
-    ctx.reset();
-    var w = data.length > 1 ? canvas.width / (data.length - 1) : canvas.width;
-
-    var grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, Colors.withAlpha(strokeColor, 0.3));
-    grad.addColorStop(1, Colors.withAlpha(strokeColor, 0));
-
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height);
-    for (var i = 0; i < data.length; i++) {
-      ctx.lineTo(i * w, canvas.height - (data[i] * canvas.height * 0.8));
-    }
-    ctx.lineTo(canvas.width, canvas.height);
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    ctx.beginPath();
-    for (var j = 0; j < data.length; j++) {
-      var x = j * w;
-      var y = canvas.height - (data[j] * canvas.height * 0.8);
-      if (j === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    GU.paintLineGraph(canvas, data, strokeColor, Colors.withAlpha, { yScale: 0.8 });
   }
 
   ColumnLayout {
