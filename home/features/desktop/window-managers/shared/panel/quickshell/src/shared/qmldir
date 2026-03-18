@@ -30,4 +30,5 @@ SurfaceGradient 1.0 SurfaceGradient.qml
 Toast 1.0 Toast.qml
 ToastOverlay 1.0 ToastOverlay.qml
 ToggleSwitch 1.0 ToggleSwitch.qml
+BasePopupMenu 1.0 BasePopupMenu.qml
 WavyProgress 1.0 WavyProgress.qml

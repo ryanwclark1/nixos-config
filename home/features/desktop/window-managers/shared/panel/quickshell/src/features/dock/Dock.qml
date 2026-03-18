@@ -259,8 +259,8 @@ Scope {
             margins.right: screenDelegate.isRight ? 12 : 0
             focusable: false
             color: "transparent"
-            implicitWidth: dockContent.implicitWidth + Colors.paddingLarge
-            implicitHeight: dockContent.implicitHeight + Colors.paddingLarge
+            implicitWidth: Math.max(1, dockContent.implicitWidth + Colors.paddingLarge)
+            implicitHeight: Math.max(1, dockContent.implicitHeight + Colors.paddingLarge)
 
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "quickshell-dock"

@@ -13,7 +13,7 @@ BasePopupMenu {
   title: "Clipboard"
   contentSpacing: Colors.spacingM
   focusOnOpen: true
-  initialFocusTarget: searchInput
+  initialFocusTarget: searchBar.inputItem
 
   property var clipboardItems: ClipboardHistoryService.items
   property string searchQuery: ""
@@ -71,7 +71,7 @@ BasePopupMenu {
       selectedIndex = 0;
       refresh();
     }
-    else if (searchInput.activeFocus) searchInput.focus = false;
+    else if (searchBar.inputItem.activeFocus) searchBar.inputItem.focus = false;
   }
 
   headerExtras: [
@@ -89,59 +89,26 @@ BasePopupMenu {
   ]
 
   // Search bar
-  Rectangle {
+  SharedWidgets.SearchBar {
+    id: searchBar
+    placeholder: "Search clipboard..."
+    preferredHeight: root.compactMode ? 34 : 36
     Layout.fillWidth: true
-    height: root.compactMode ? 34 : 36
-    radius: height / 2
-    color: Colors.bgWidget
-    border.color: searchInput.activeFocus ? Colors.primary : Colors.border
-    border.width: 1
-
-    RowLayout {
-      anchors.fill: parent
-      anchors.leftMargin: Colors.spacingM
-      anchors.rightMargin: Colors.spacingM
-      spacing: Colors.spacingS
-
-      Text {
-        text: "󰍉"
-        color: Colors.textDisabled
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeMedium
-      }
-
-      TextInput {
-        id: searchInput
-        Layout.fillWidth: true
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeMedium
-        clip: true
-        Keys.onEscapePressed: root.closeRequested()
-        onTextChanged: root.searchQuery = text
-        Keys.onDownPressed: event => {
-          if (root.moveSelection(1))
-            event.accepted = true;
-        }
-        Keys.onUpPressed: event => {
-          if (root.moveSelection(-1))
-            event.accepted = true;
-        }
-        Keys.onPressed: event => {
-          if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-            if (root.filteredItemsResult.length > 0) {
-              root.activateClipboardItem(root.filteredItemsResult[root.selectedIndex]);
-              event.accepted = true;
-            }
-          }
-        }
-
-        Text {
-          anchors.fill: parent
-          text: "Search clipboard..."
-          color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeMedium
-          visible: !searchInput.text && !searchInput.activeFocus
-          verticalAlignment: Text.AlignVCenter
+    onTextChanged: root.searchQuery = text
+    inputItem.Keys.onEscapePressed: root.closeRequested()
+    inputItem.Keys.onDownPressed: event => {
+      if (root.moveSelection(1))
+        event.accepted = true;
+    }
+    inputItem.Keys.onUpPressed: event => {
+      if (root.moveSelection(-1))
+        event.accepted = true;
+    }
+    inputItem.Keys.onPressed: event => {
+      if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+        if (root.filteredItemsResult.length > 0) {
+          root.activateClipboardItem(root.filteredItemsResult[root.selectedIndex]);
+          event.accepted = true;
         }
       }
     }

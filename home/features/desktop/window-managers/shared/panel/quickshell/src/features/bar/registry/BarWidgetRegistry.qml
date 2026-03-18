@@ -43,6 +43,14 @@ QtObject {
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "compact", label: "Compact" }, { value: "icon", label: "Icon" } ] },
       { type: "mode", key: "valueStyle", label: "Value Style", description: "Choose whether this stat shows percent only, usage text, or usage with temperature. Compact mode can shorten long values automatically.", options: [ { value: "percent", label: "Percent" }, { value: "usage", label: "Usage" }, { value: "usageTemp", label: "Usage + Temp" } ] }
     ] },
+    { widgetType: "diskStatus", label: "Disk", icon: "󰋊", section: "left", description: "Disk usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "percent" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "compact", label: "Compact" }, { value: "icon", label: "Icon" } ] },
+      { type: "mode", key: "valueStyle", label: "Value Style", description: "Choose whether to show disk usage as a percentage.", options: [ { value: "percent", label: "Percent" } ] }
+    ] },
+    { widgetType: "networkStatus", label: "Network Throughput", icon: "󰛳", section: "left", description: "Network throughput with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "rate" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "compact", label: "Compact" }, { value: "icon", label: "Icon" } ] },
+      { type: "mode", key: "valueStyle", label: "Value Style", description: "Choose whether to show download rate, upload rate, or combined.", options: [ { value: "rate", label: "Download" }, { value: "up", label: "Upload" } ] }
+    ] },
     { widgetType: "systemMonitor", label: "System Monitor", icon: "󰍛", section: "left", description: "Legacy combined system monitor widget with the full stats surface." },
     { widgetType: "dateTime", label: "Clock", icon: "󰥔", section: "center", description: "Current time and date popup.", hasSettings: true, defaultSettings: { displayMode: "auto", showDate: true }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the clock adapts to bar orientation automatically, always shows the full time row, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
@@ -295,7 +303,7 @@ QtObject {
     var chips = [];
     var parsed;
 
-    if (widgetType === "cpuStatus" || widgetType === "ramStatus" || widgetType === "gpuStatus") {
+    if (widgetType === "cpuStatus" || widgetType === "ramStatus" || widgetType === "gpuStatus" || widgetType === "diskStatus" || widgetType === "networkStatus") {
       var valueStyle = String(settings.valueStyle || (widgetType === "ramStatus" ? "usage" : "percent"));
       var valueLabel = "Percent";
       if (valueStyle === "usageTemp")

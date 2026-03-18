@@ -881,7 +881,7 @@ PanelWindow {
 
         var proc = commandCheckProcComponent.createObject(launcherRoot);
         proc._commandName = cmd;
-        proc.command = ["bash", "-c", "command -v " + ModeData.shellQuote(cmd) + " >/dev/null 2>&1 && echo 1 || echo 0"];
+        proc.command = ["sh", "-c", "command -v \"$1\" >/dev/null 2>&1 && echo 1 || echo 0", "sh", cmd];
         var nextProcMap = Object.assign({}, _commandCheckProcs);
         nextProcMap[cmd] = proc;
         _commandCheckProcs = nextProcMap;
@@ -1158,9 +1158,8 @@ PanelWindow {
         fileIndexReady = false;
         if (mode === "files" && fileIndexItems.length === 0)
             beginModeLoad("files", "Building file index");
-        var script = "cd " + ModeData.shellQuote(homeDir) + " && fd --hidden --exclude .git --exclude .cache --exclude node_modules --exclude .local/share/Trash --exclude .local/share/Steam --exclude .cargo --exclude .npm --exclude .mozilla . 2>/dev/null";
         fileIndexProc._startedAt = Date.now();
-        fileIndexProc.command = ["bash", "-lc", script];
+        fileIndexProc.command = ["bash", "-lc", "cd \"$1\" && fd --hidden --exclude .git --exclude .cache --exclude node_modules --exclude .local/share/Trash --exclude .local/share/Steam --exclude .cargo --exclude .npm --exclude .mozilla . 2>/dev/null", "bash", homeDir];
         fileIndexProc.running = true;
     }
 

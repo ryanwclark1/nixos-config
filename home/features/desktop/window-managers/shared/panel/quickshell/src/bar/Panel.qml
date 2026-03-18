@@ -204,6 +204,10 @@ Item {
             return ramStatusComponent;
         if (widgetType === "gpuStatus")
             return gpuStatusComponent;
+        if (widgetType === "diskStatus")
+            return diskStatusComponent;
+        if (widgetType === "networkStatus")
+            return networkStatusComponent;
         if (widgetType === "systemMonitor")
             return legacySystemMonitorComponent;
         if (widgetType === "dateTime")
@@ -703,6 +707,44 @@ Item {
             tooltipText: root.statTooltipText("gpuStatus", widgetInstance)
             isActive: root.isSurfaceActive("systemStatsMenu", "statKey", "gpuStatus")
             onClicked: root.requestSurface("systemStatsMenu", this, { statKey: "gpuStatus" })
+        }
+    }
+
+    Component {
+        id: diskStatusComponent
+        StatPill {
+            property var widgetInstance: null
+            statKey: "diskStatus"
+            icon: "󰋊"
+            iconColor: Colors.secondary
+            label: "Disk"
+            anchorWindow: root.anchorWindow
+            compact: root.isCompactStatWidget(widgetInstance)
+            iconOnly: root.isIconOnlyStatWidget(widgetInstance)
+            valueText: root.statDisplayText("diskStatus", widgetInstance)
+            compactValueText: root.compactStatDisplayText("diskStatus", widgetInstance)
+            tooltipText: root.statTooltipText("diskStatus", widgetInstance)
+            isActive: root.isSurfaceActive("systemStatsMenu", "statKey", "diskStatus")
+            onClicked: root.requestSurface("systemStatsMenu", this, { statKey: "diskStatus" })
+        }
+    }
+
+    Component {
+        id: networkStatusComponent
+        StatPill {
+            property var widgetInstance: null
+            statKey: "networkStatus"
+            icon: "󰛳"
+            iconColor: Colors.primary
+            label: "Net"
+            anchorWindow: root.anchorWindow
+            compact: root.isCompactStatWidget(widgetInstance)
+            iconOnly: root.isIconOnlyStatWidget(widgetInstance)
+            valueText: root.statDisplayText("networkStatus", widgetInstance)
+            compactValueText: root.compactStatDisplayText("networkStatus", widgetInstance)
+            tooltipText: root.statTooltipText("networkStatus", widgetInstance)
+            isActive: root.isSurfaceActive("systemStatsMenu", "statKey", "networkStatus")
+            onClicked: root.requestSurface("systemStatsMenu", this, { statKey: "networkStatus" })
         }
     }
 

@@ -1,6 +1,6 @@
 AiChat 1.0 ../features/ai/AiChat.qml
 AudioMenu 1.0 ../features/audio/AudioMenu.qml
-BasePopupMenu 1.0 BasePopupMenu.qml
+BasePopupMenu 1.0 ../shared/BasePopupMenu.qml
 BatteryMenu 1.0 ../features/power/BatteryMenu.qml
 BluetoothMenu 1.0 ../features/network/BluetoothMenu.qml
 CavaPopup 1.0 ../features/media/CavaPopup.qml

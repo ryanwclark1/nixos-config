@@ -75,11 +75,9 @@ BasePopupMenu {
     if (!address) return;
 
     root.stopScan();
-    var quotedAddress = ShellUtils.shellQuote(address);
     Quickshell.execDetached(["sh", "-c",
-      "bluetoothctl pair " + quotedAddress
-      + " && bluetoothctl trust " + quotedAddress
-      + " && bluetoothctl connect " + quotedAddress + " || true"
+      "bluetoothctl pair \"$1\" && bluetoothctl trust \"$1\" && bluetoothctl connect \"$1\" || true",
+      "sh", address
     ]);
   }
 

@@ -421,8 +421,8 @@ QtObject {
         _recomputeMerged();
     }
 
-    function _buildManualCommand(host) {
-        var parts = ["ssh"];
+    function _buildManualSshArgs(host) {
+        var parts = [];
         if (Number(host.port || 22) !== 22) {
             parts.push("-p");
             parts.push(String(host.port));
@@ -431,10 +431,15 @@ QtObject {
         parts.push(target);
         if (String(host.remoteCommand || "").trim() !== "")
             parts.push(String(host.remoteCommand));
+        return parts;
+    }
+
+    function _buildManualCommand(host) {
+        var parts = _buildManualSshArgs(host);
         var escaped = [];
         for (var i = 0; i < parts.length; ++i)
             escaped.push(ShellUtils.shellQuote(parts[i]));
-        return "exec " + escaped.join(" ");
+        return "exec ssh " + escaped.join(" ");
     }
 
     function _copyText(text) {
@@ -442,9 +447,7 @@ QtObject {
         if (value === "")
             return false;
         Quickshell.execDetached([
-            "bash",
-            "-lc",
-            "printf '%s' " + ShellUtils.shellQuote(value) + " | wl-copy"
+            "sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", value
         ]);
         return true;
     }
@@ -509,10 +512,13 @@ QtObject {
     function connectHost(host) {
         if (!host)
             return false;
-        var terminalCommand = host.source === "imported"
-            ? "exec ssh " + ShellUtils.shellQuote(String(host.alias || ""))
-            : _buildManualCommand(host);
-        Quickshell.execDetached(ShellUtils.terminalCommand(terminalCommand));
+        if (host.source === "imported") {
+            Quickshell.execDetached(ShellUtils.terminalCommand("exec ssh \"$1\"", String(host.alias || "")));
+        } else {
+            var sshArgs = _buildManualSshArgs(host);
+            // Build exec ssh $@ script with positional args
+            Quickshell.execDetached(ShellUtils.terminalCommand.apply(null, ["exec ssh \"$@\""].concat(sshArgs)));
+        }
         _rememberHost(host);
         return true;
     }

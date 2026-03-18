@@ -6,9 +6,11 @@ Rectangle {
     id: root
     property string placeholder: "Search..."
     property alias text: searchInput.text
+    readonly property alias inputItem: searchInput
+    property int preferredHeight: 38
 
     Layout.fillWidth: true
-    height: 38
+    height: preferredHeight
     radius: Colors.radiusSmall
     color: Colors.highlightLight
     border.color: searchInput.activeFocus ? Colors.primary : "transparent"

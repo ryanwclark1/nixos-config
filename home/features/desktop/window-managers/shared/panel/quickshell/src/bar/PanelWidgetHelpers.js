@@ -36,6 +36,14 @@ function compactPercentText(value) {
 
 function widgetValueStyle(widgetInstance, widgetType) {
     var settings = widgetSettings(widgetInstance);
+    if (widgetType === "diskStatus") {
+        var diskStyle = String(settings.valueStyle || "percent");
+        return ["percent", "usage"].indexOf(diskStyle) !== -1 ? diskStyle : "percent";
+    }
+    if (widgetType === "networkStatus") {
+        var netStyle = String(settings.valueStyle || "rate");
+        return ["rate", "down", "up"].indexOf(netStyle) !== -1 ? netStyle : "rate";
+    }
     var fallback = widgetType === "ramStatus" ? "usage" : "percent";
     var style = String(settings.valueStyle || fallback);
     if (widgetType === "ramStatus")
@@ -60,10 +68,22 @@ function statDisplayText(widgetType, widgetInstance, SystemStatus) {
             return SystemStatus.gpuUsage + " • " + SystemStatus.gpuTemp;
         return SystemStatus.gpuUsage;
     }
+    if (widgetType === "diskStatus")
+        return SystemStatus.diskUsage;
+    if (widgetType === "networkStatus") {
+        if (style === "down") return "↓" + SystemStatus.netDown;
+        if (style === "up") return "↑" + SystemStatus.netUp;
+        return "↓" + SystemStatus.netDown;
+    }
     return "";
 }
 
 function compactStatDisplayText(widgetType, widgetInstance, SystemStatus) {
+    if (widgetType === "diskStatus")
+        return SystemStatus.diskUsage;
+    if (widgetType === "networkStatus")
+        return "↓" + SystemStatus.netDown;
+
     var style = widgetValueStyle(widgetInstance, widgetType);
     if (style === "percent")
         return statDisplayText(widgetType, widgetInstance, SystemStatus);
@@ -87,6 +107,10 @@ function statTooltipText(widgetType, widgetInstance, SystemStatus) {
         return "RAM " + statDisplayText(widgetType, widgetInstance, SystemStatus) + " • " + compactPercentText(SystemStatus.ramPercent);
     if (widgetType === "gpuStatus")
         return "GPU " + statDisplayText(widgetType, widgetInstance, SystemStatus);
+    if (widgetType === "diskStatus")
+        return "Disk " + SystemStatus.diskUsage + " used";
+    if (widgetType === "networkStatus")
+        return "Net ↓" + SystemStatus.netDown + " ↑" + SystemStatus.netUp;
     return "";
 }
 

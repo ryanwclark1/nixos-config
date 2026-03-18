@@ -19,7 +19,7 @@ PanelWindow {
   margins.top: edgeMargins.top
   margins.left: edgeMargins.left
   margins.right: edgeMargins.right
-  implicitHeight: toastLoader.item ? toastLoader.item.implicitHeight + 16 : 80
+  implicitHeight: Math.max(1, toastLoader.item ? toastLoader.item.implicitHeight + 16 : 80)
   color: "transparent"
 
   WlrLayershell.layer: WlrLayer.Top

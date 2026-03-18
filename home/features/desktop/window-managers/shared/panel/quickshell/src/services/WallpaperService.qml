@@ -270,7 +270,7 @@ QtObject {
 
         if (Config.wallpaperRunPywal && !Config.themeName) {
           Quickshell.execDetached(["sh", "-c",
-            "wal -i " + ShellUtils.shellQuote(root._applyImagePath) + " -n -q 2>/dev/null || true"
+            "wal -i \"$1\" -n -q 2>/dev/null || true", "sh", root._applyImagePath
           ]);
         }
         var backendLine = "";

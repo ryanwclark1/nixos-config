@@ -166,6 +166,16 @@ QtObject {
   property real ramPercent: 0.0
   property real gpuPercent: 0.0
 
+  // Disk summary (lightweight, polled alongside main stats when subscribers > 0)
+  property real diskPercent: 0.0
+  property string diskUsage: "0%"
+
+  // Network summary (polled alongside main stats when subscribers > 0)
+  property string netDown: "0 KB/s"
+  property string netUp: "0 KB/s"
+  property real _netLastRx: 0
+  property real _netLastTx: 0
+
   // History arrays — 60 samples (2 minutes at default 2s poll).
   // Enables sparkline/graph visualizations in SystemStatsMenu.
   readonly property int historyMaxSamples: 60
@@ -201,6 +211,13 @@ QtObject {
     return isNaN(parsed) || parsed === 0 ? "--" : Math.round(parsed) + "°C";
   }
 
+  function _formatRate(bytesPerSec) {
+    if (bytesPerSec >= 1073741824) return (bytesPerSec / 1073741824).toFixed(1) + " GB/s";
+    if (bytesPerSec >= 1048576) return (bytesPerSec / 1048576).toFixed(1) + " MB/s";
+    if (bytesPerSec >= 1024) return (bytesPerSec / 1024).toFixed(0) + " KB/s";
+    return bytesPerSec.toFixed(0) + " B/s";
+  }
+
   function parseStatsOutput(rawText) {
     var text = String(rawText || "").replace(/\r/g, "");
     if (text.endsWith("\n"))
@@ -224,7 +241,13 @@ QtObject {
       + "gpu_usage=$(cat /sys/class/drm/card{1,0}/device/gpu_busy_percent 2>/dev/null | head -1); "
       + "if [ -z \"$gpu_usage\" ] && command -v nvidia-smi >/dev/null 2>&1; then gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
       + "ram_stats=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; printf \"%.1fGB\\n%.4f\", used/1024/1024, used/total}' /proc/meminfo); "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n' \"$cpu_temp\" \"$gpu_temp\" \"$cpu_raw\" \"$gpu_usage\" \"$ram_stats\""
+      + "disk_pct=$(df / 2>/dev/null | awk 'NR==2 {print $5}'); "
+      + "iface=$(ip route show default 2>/dev/null | awk 'NR==1 {print $5}'); "
+      + "net_rx=0; net_tx=0; "
+      + "if [ -n \"$iface\" ] && [ -r \"/sys/class/net/$iface/statistics/rx_bytes\" ]; then "
+      + "net_rx=$(cat /sys/class/net/$iface/statistics/rx_bytes); "
+      + "net_tx=$(cat /sys/class/net/$iface/statistics/tx_bytes); fi; "
+      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' \"$cpu_temp\" \"$gpu_temp\" \"$cpu_raw\" \"$gpu_usage\" \"$ram_stats\" \"$disk_pct\" \"$net_rx\" \"$net_tx\""
     ]
 
     property var lastTotal: 0
@@ -239,8 +262,6 @@ QtObject {
         // CPU Usage calculation via /proc/stat delta
         var cpuParts = (lines[2] || "").split(/\s+/);
         if (cpuParts.length >= 5) {
-          // cpu  user nice system idle iowait irq softirq steal guest guest_nice
-          // index: 0    1    2      3    4      5   6       7     8     9         10
           var user = parseInt(cpuParts[1], 10) || 0;
           var nice = parseInt(cpuParts[2], 10) || 0;
           var system = parseInt(cpuParts[3], 10) || 0;
@@ -284,6 +305,29 @@ QtObject {
         if (!isNaN(ramVal)) {
           root.ramPercent = Colors.clamp01(ramVal);
           root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
+        }
+
+        // Disk usage (line 6: e.g. "45%")
+        if (lines.length >= 7) {
+          var diskRaw = parseInt(String(lines[6] || "").replace("%", ""), 10);
+          if (!isNaN(diskRaw)) {
+            root.diskPercent = Colors.clamp01(diskRaw / 100);
+            root.diskUsage = Math.max(0, Math.min(100, diskRaw)) + "%";
+          }
+        }
+
+        // Network throughput (lines 7-8: rx_bytes, tx_bytes)
+        if (lines.length >= 9) {
+          var rx = parseInt(lines[7], 10) || 0;
+          var tx = parseInt(lines[8], 10) || 0;
+          if (root._netLastRx > 0) {
+            var diffRx = Math.max(0, rx - root._netLastRx);
+            var diffTx = Math.max(0, tx - root._netLastTx);
+            root.netDown = root._formatRate(diffRx / (root.pollIntervalMs / 1000));
+            root.netUp = root._formatRate(diffTx / (root.pollIntervalMs / 1000));
+          }
+          root._netLastRx = rx;
+          root._netLastTx = tx;
         }
       }
     }
