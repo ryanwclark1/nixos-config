@@ -333,13 +333,13 @@ PanelWindow {
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: Colors.paddingMedium
-                            opacity: root.entranceOpacity(5)
-                            scale: root.entranceScale(5)
-                            transform: Translate { y: root.entranceY(5) }
+                            opacity: root.entranceOpacity(7)
+                            scale: root.entranceScale(7)
+                            transform: Translate { y: root.entranceY(7) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(5); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(5); easing.type: Easing.OutBack } } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutBack } } }
 
                             ColumnLayout {
                                 Layout.fillWidth: true
@@ -506,13 +506,13 @@ PanelWindow {
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: Colors.spacingM
-                            opacity: root.entranceOpacity(6)
-                            scale: root.entranceScale(6)
-                            transform: Translate { y: root.entranceY(6) }
+                            opacity: root.entranceOpacity(8)
+                            scale: root.entranceScale(8)
+                            transform: Translate { y: root.entranceY(8) }
                             visible: opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(6) } NumberAnimation { duration: root.entranceDuration(6); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(6) } NumberAnimation { duration: root.entranceDuration(6); easing.type: Easing.OutBack } } }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutBack } } }
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 60
@@ -625,16 +625,6 @@ PanelWindow {
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutBack } } }
-                        }
-                        TodoWidget {
-                            Layout.fillWidth: true
-                            opacity: root.entranceOpacity(14)
-                            scale: root.entranceScale(14)
-                            transform: Translate { y: root.entranceY(14) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutBack } } }
                         }
                     }
                 }
