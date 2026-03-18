@@ -230,91 +230,61 @@ QtObject {
     return text === "" ? [] : text.split("\n");
   }
 
-  property Process statsProc: Process {
+  property var statsPoll: CommandPoll {
+    id: statsPoll
+    interval: Math.max(1000, root.pollIntervalMs)
+    running: root.subscriberCount > 0
     command: [
       "sh",
       "-c",
-      // CPU temp: try AMD Tctl → Intel Package id 0 → AMD Tdie → Intel Core 0
-      "cpu_temp=$( "
-      + "sensors 2>/dev/null | awk '"
-      + "/Tctl:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
-      + "/Package id 0:/ {gsub(/[+°C]/, \"\", $4); print $4; found=1; exit} "
-      + "/Tdie:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
-      + "/Core 0:/ {gsub(/[+°C]/, \"\", $3); print $3; found=1; exit} "
-      + "END {if (!found) print \"\"}'"
-      + "); "
-      // GPU temp: try AMD edge → nvidia-smi → AMD junction
-      + "gpu_temp=$( "
-      + "sensors 2>/dev/null | awk '/edge:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
-      + "/junction:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
-      + "END {if (!found) print \"\"}'"
-      + "); "
-      + "if [ -z \"$gpu_temp\" ] && command -v nvidia-smi >/dev/null 2>&1; then "
-      + "gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
-      // CPU usage: use 'top' but handle idler percentage more robustly
+      // Optimized single-pass system stats collection
+      "sensors_out=$(sensors 2>/dev/null); "
+      + "cpu_temp=$(echo \"$sensors_out\" | awk '/Tctl:|Package id 0:|Tdie:|Core 0:/ {gsub(/[+°C]/, \"\", $0); for(i=1;i<=NF;i++) if($i ~ /^[0-9.]+$/) {print $i; exit}}'); "
+      + "gpu_temp=$(echo \"$sensors_out\" | awk '/edge:|junction:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
+      + "if [ -z \"$gpu_temp\" ] && command -v nvidia-smi >/dev/null 2>&1; then gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
       + "cpu_usage=$(top -bn1 | awk '/Cpu\\(s\\):/ {for(i=1;i<=NF;i++) if($i ~ /id,?/) {printf \"%d\", 100-$(i-1); exit}}'); "
-      // GPU usage: try AMD sysfs → nvidia-smi
-      + "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
-      + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
-      + "| sort -rn | head -1 | awk '{print $2}'); "
-      + "gpu_usage=$(cat \"$gpu_card/device/gpu_busy_percent\" 2>/dev/null || echo ''); "
-      + "if [ -z \"$gpu_usage\" ] && command -v nvidia-smi >/dev/null 2>&1; then "
-      + "gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
-      + "gpu_usage=${gpu_usage:-0}; "
-      + "ram_usage=$(free -h | awk '/^Mem:/ {print $3}' | sed 's/Gi/GB/;s/Mi/MB/'); "
-      + "ram_pct=$(free | awk '/^Mem:/ {printf \"%.4f\", $3/$2}'); "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' "
-      + "\"$cpu_temp\" \"$gpu_temp\" \"$cpu_usage\" \"$gpu_usage\" \"$ram_usage\" \"$ram_pct\""
+      + "gpu_usage=$(cat /sys/class/drm/card{1,0}/device/gpu_busy_percent 2>/dev/null | head -1); "
+      + "if [ -z \"$gpu_usage\" ] && command -v nvidia-smi >/dev/null 2>&1; then gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
+      + "ram_stats=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; printf \"%.1fGB\\n%.4f\", used/1024/1024, used/total}' /proc/meminfo); "
+      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n' \"$cpu_temp\" \"$gpu_temp\" \"$cpu_usage\" \"$gpu_usage\" \"$ram_stats\""
     ]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var lines = root.parseStatsOutput(this.text);
-        if (lines.length >= 6) {
-          root.cpuTemp = root.formatTemp(lines[0]);
-          root.gpuTemp = root.formatTemp(lines[1]);
 
-          var cpuRaw = lines[2] || "";
-          var cpuVal = parseInt(cpuRaw, 10);
-          if (!isNaN(cpuVal)) {
-            root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
-            root.cpuPercent = Colors.clamp01(cpuVal / 100);
-          }
+    onUpdated: {
+      var lines = root.parseStatsOutput(this.value);
+      if (lines.length >= 6) {
+        root.cpuTemp = root.formatTemp(lines[0]);
+        root.gpuTemp = root.formatTemp(lines[1]);
 
-          var gpuRaw = lines[3] || "";
-          var gpuVal = parseInt(gpuRaw, 10);
-          if (!isNaN(gpuVal)) {
-            root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
-            root.gpuPercent = Colors.clamp01(gpuVal / 100);
-          }
+        var cpuRaw = lines[2] || "";
+        var cpuVal = parseInt(cpuRaw, 10);
+        if (!isNaN(cpuVal)) {
+          root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
+          root.cpuPercent = Colors.clamp01(cpuVal / 100);
+          root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
+        }
 
-          if (lines[4]) root.ramUsage = lines[4];
+        var gpuRaw = lines[3] || "";
+        var gpuVal = parseInt(gpuRaw, 10);
+        if (!isNaN(gpuVal)) {
+          root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
+          root.gpuPercent = Colors.clamp01(gpuVal / 100);
+          root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
+        }
 
-          var ramRaw = lines[5] || "";
-          var ramVal = parseFloat(ramRaw);
-          if (!isNaN(ramVal)) {
-            root.ramPercent = Colors.clamp01(ramVal);
-          }
+        if (lines[4]) root.ramUsage = lines[4];
 
-          // Only push to history if we have valid data to avoid "reset" looks in graphs
-          if (!isNaN(cpuVal)) root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
-          if (!isNaN(ramVal)) root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
-          if (!isNaN(gpuVal)) root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
+        var ramRaw = lines[5] || "";
+        var ramVal = parseFloat(ramRaw);
+        if (!isNaN(ramVal)) {
+          root.ramPercent = Colors.clamp01(ramVal);
+          root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
         }
       }
     }
   }
 
-
   function setBrightness(value) {
     BrightnessService.setBrightness(BrightnessService.primaryMonitor.name, value);
-  }
-
-  property Timer refreshTimer: Timer {
-    interval: root.pollIntervalMs
-    running: root.subscriberCount > 0
-    repeat: true
-    onTriggered: { if (!statsProc.running) statsProc.running = true; }
   }
 
   // ── MPRIS players ────────────────────────────

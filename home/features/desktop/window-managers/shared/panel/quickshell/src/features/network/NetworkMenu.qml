@@ -110,40 +110,42 @@ BasePopupMenu {
     Layout.fillHeight: true
     columnSpacing: Colors.spacingM
 
+        // ── NETWORK SUMMARY CARD ──────────────────────────────────────────────
         Rectangle {
           Layout.fillWidth: true
           radius: Colors.radiusMedium
-          color: Colors.cardSurface
-          border.color: NetworkService.activePrimaryName === "Offline" ? Colors.border : Colors.primary
+          color: NetworkService.activePrimaryName === "Offline" ? Colors.cardSurface : Colors.primaryGhost
+          border.color: NetworkService.activePrimaryName === "Offline" ? Colors.border : Colors.primarySubtle
           border.width: 1
-          implicitHeight: root.compactMode ? 126 : 96
-
-          // Inner highlight
-          SharedWidgets.InnerHighlight { }
+          implicitHeight: summaryCol.implicitHeight + 32
 
           ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.paddingSmall
+            id: summaryCol
+            anchors {
+              left: parent.left; right: parent.right
+              verticalCenter: parent.verticalCenter
+              margins: Colors.spacingL
+            }
+            spacing: Colors.spacingM
 
             RowLayout {
-              visible: !root.compactMode
               Layout.fillWidth: true
-              spacing: Colors.spacingM
+              spacing: Colors.spacingL
 
               Text {
                 text: NetworkService.networkIcon()
                 color: NetworkService.activePrimaryName === "Offline" ? Colors.textDisabled : Colors.primary
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeHuge
+                Layout.alignment: Qt.AlignVCenter
               }
 
               ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
+                spacing: 0
                 Text {
                   text: NetworkService.activePrimaryName
-                  color: Colors.text
+                  color: NetworkService.activePrimaryName === "Offline" ? Colors.textSecondary : Colors.text
                   font.pixelSize: Colors.fontSizeLarge
                   font.weight: Font.DemiBold
                   Layout.fillWidth: true
@@ -151,95 +153,45 @@ BasePopupMenu {
                 }
                 Text {
                   text: NetworkService.networkSubtitle()
-                  color: Colors.textSecondary
+                  color: Colors.textDisabled
                   font.pixelSize: Colors.fontSizeSmall
+                  font.weight: Font.Medium
                   Layout.fillWidth: true
                   elide: Text.ElideRight
                 }
               }
 
               Rectangle {
-                width: 90
-                height: 30
+                width: 96
+                height: 32
                 radius: height / 2
                 color: NetworkService.activePrimaryName === "Offline"
-                  ? Colors.primaryStrong
-                  : Colors.withAlpha(Colors.error, 0.16)
+                  ? Colors.primaryMid
+                  : Colors.errorLight
                 border.color: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
                 border.width: 1
+
                 Text {
                   anchors.centerIn: parent
                   text: NetworkService.activePrimaryName === "Offline" ? "Refresh" : "Disconnect"
                   color: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
-                  font.pixelSize: Colors.fontSizeSmall
-                  font.weight: Font.Medium
+                  font.pixelSize: Colors.fontSizeXS
+                  font.weight: Font.Bold
+                  font.capitalization: Font.AllUppercase
                 }
-                MouseArea {
+
+                SharedWidgets.StateLayer {
                   anchors.fill: parent
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: {
-                    if (NetworkService.activePrimaryName === "Offline") NetworkService.refreshData();
-                    else NetworkService.disconnectPrimary();
-                  }
-                }
-              }
-            }
-
-            ColumnLayout {
-              visible: root.compactMode
-              Layout.fillWidth: true
-              spacing: Colors.spacingS
-
-              RowLayout {
-                Layout.fillWidth: true
-                spacing: Colors.spacingM
-
-                Text {
-                  text: NetworkService.networkIcon()
-                  color: NetworkService.activePrimaryName === "Offline" ? Colors.textDisabled : Colors.primary
-                  font.family: Colors.fontMono
-                  font.pixelSize: Colors.fontSizeHuge
+                  radius: parent.radius
+                  stateColor: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
+                  hovered: disconnectHover.containsMouse
+                  pressed: disconnectHover.pressed
                 }
 
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: Colors.spacingXXS
-                  Text {
-                    text: NetworkService.activePrimaryName
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeLarge
-                    font.weight: Font.DemiBold
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                  }
-                  Text {
-                    text: NetworkService.networkSubtitle()
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                  }
-                }
-              }
-
-              Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: 30
-                radius: height / 2
-                color: NetworkService.activePrimaryName === "Offline"
-                  ? Colors.primaryStrong
-                  : Colors.withAlpha(Colors.error, 0.16)
-                border.color: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
-                border.width: 1
-                Text {
-                  anchors.centerIn: parent
-                  text: NetworkService.activePrimaryName === "Offline" ? "Refresh" : "Disconnect"
-                  color: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
-                  font.pixelSize: Colors.fontSizeSmall
-                  font.weight: Font.Medium
-                }
                 MouseArea {
+                  id: disconnectHover
                   anchors.fill: parent
+                  hoverEnabled: true
                   cursorShape: Qt.PointingHandCursor
                   onClicked: {
                     if (NetworkService.activePrimaryName === "Offline") NetworkService.refreshData();
@@ -260,9 +212,9 @@ BasePopupMenu {
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
-                implicitWidth: deviceLabel.implicitWidth + 18
-                implicitHeight: 24
-                Text { id: deviceLabel; anchors.centerIn: parent; text: NetworkService.primaryDevice; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+                implicitWidth: deviceLabel.implicitWidth + 16
+                implicitHeight: 22
+                Text { id: deviceLabel; anchors.centerIn: parent; text: NetworkService.primaryDevice.toUpperCase(); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
               }
 
               Rectangle {
@@ -270,9 +222,9 @@ BasePopupMenu {
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
-                implicitWidth: reachabilityLabel.implicitWidth + 18
-                implicitHeight: 24
-                Text { id: reachabilityLabel; anchors.centerIn: parent; text: NetworkService.connectivityStatus; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+                implicitWidth: reachabilityLabel.implicitWidth + 16
+                implicitHeight: 22
+                Text { id: reachabilityLabel; anchors.centerIn: parent; text: NetworkService.connectivityStatus.toUpperCase(); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
               }
 
               Rectangle {
@@ -281,11 +233,10 @@ BasePopupMenu {
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
-                implicitWidth: signalLabel.implicitWidth + 18
-                implicitHeight: 24
-                Text { id: signalLabel; anchors.centerIn: parent; text: NetworkService.signalIcon(NetworkService.primarySignal) + " " + NetworkService.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium; font.family: Colors.fontMono }
+                implicitWidth: signalLabel.implicitWidth + 16
+                implicitHeight: 22
+                Text { id: signalLabel; anchors.centerIn: parent; text: NetworkService.signalIcon(NetworkService.primarySignal) + " " + NetworkService.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold; font.family: Colors.fontMono }
               }
-
             }
           }
         }
