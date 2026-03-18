@@ -16,7 +16,7 @@ Item {
     id: iconText
     anchors.centerIn: parent
     font.family: Colors.fontMono
-    font.pixelSize: Colors.fontSizeSmall
+    font.pixelSize: Math.max(Colors.fontSizeSmall, root.width * 0.28)
     color: root.color
   }
 

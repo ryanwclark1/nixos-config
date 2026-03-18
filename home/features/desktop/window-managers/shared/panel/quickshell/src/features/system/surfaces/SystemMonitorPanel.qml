@@ -349,10 +349,12 @@ PanelWindow {
                             width: telemetryFlick.width
                             spacing: Colors.spacingM
 
-                            SystemMonitorSummary {}
+                            CpuWidget {}
                             SystemCpuCores {}
-                            SystemGraphs {}
+                            RamWidget {}
                             GPUWidget {}
+                            DiskWidget {}
+                            NetworkGraphs {}
                             SystemIoHistory {}
                         }
                     }

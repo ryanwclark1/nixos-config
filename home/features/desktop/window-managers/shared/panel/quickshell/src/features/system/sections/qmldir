@@ -1,5 +1,6 @@
 Calendar 1.0 Calendar.qml
 CircularGauge 1.0 CircularGauge.qml
+CpuWidget 1.0 CpuWidget.qml
 DevOpsSection 1.0 DevOpsSection.qml
 DiskWidget 1.0 DiskWidget.qml
 GPUWidget 1.0 GPUWidget.qml
@@ -8,6 +9,7 @@ MediaWidget 1.0 MediaWidget.qml
 NetworkGraphs 1.0 NetworkGraphs.qml
 PowerActionsRow 1.0 PowerActionsRow.qml
 ProcessWidget 1.0 ProcessWidget.qml
+RamWidget 1.0 RamWidget.qml
 QuickLinkCard 1.0 QuickLinkCard.qml
 QuickToggle 1.0 QuickToggle.qml
 QuickToggleGrid 1.0 QuickToggleGrid.qml
