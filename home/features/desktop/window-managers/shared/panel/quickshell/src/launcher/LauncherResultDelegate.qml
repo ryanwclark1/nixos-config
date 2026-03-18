@@ -7,8 +7,8 @@ import "LauncherModeData.js" as ModeData
 
 Rectangle {
     id: root
-    property var modelData: null
-    property int index: -1
+    property var itemData: null
+    property int itemIndex: -1
     property int selectedIndex: -1
     property string searchText: ""
     property string mode: "drun"
@@ -24,7 +24,7 @@ Rectangle {
     width: parent ? parent.width : 0
     height: tightMode ? 48 : (compactMode ? 54 : 64)
 
-    readonly property bool highlighted: index === selectedIndex
+    readonly property bool highlighted: itemIndex === selectedIndex
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
 
     color: highlighted ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
@@ -181,14 +181,14 @@ Rectangle {
 
             SharedWidgets.AppIcon {
                 anchors.centerIn: parent
-                iconName: root.itemIconName(modelData)
-                desktopId: modelData ? String(modelData.desktopId || "") : ""
-                appId: modelData ? String(modelData.appId || modelData.class || "") : ""
-                execName: modelData ? String(modelData.exec || "") : ""
-                appName: modelData ? String(modelData.name || modelData.title || "") : ""
+                iconName: root.itemIconName(itemData)
+                desktopId: itemData ? String(itemData.desktopId || "") : ""
+                appId: itemData ? String(itemData.appId || itemData.class || "") : ""
+                execName: itemData ? String(itemData.exec || "") : ""
+                appName: itemData ? String(itemData.name || itemData.title || "") : ""
                 iconMap: root.mode === "window" ? root.iconMap : null
                 iconSize: root.compactMode ? 18 : 20
-                fallbackIcon: root.itemFallbackIcon(modelData)
+                fallbackIcon: root.itemFallbackIcon(itemData)
             }
         }
 
@@ -197,7 +197,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.minimumWidth: 0
             Text {
-                text: root.highlightMatch(modelData ? modelData.name || modelData.title || "" : "", root.searchText)
+                text: root.highlightMatch(itemData ? itemData.name || itemData.title || "" : "", root.searchText)
                 color: highlighted ? Colors.primary : Colors.text
                 textFormat: Text.StyledText
                 font.pixelSize: root.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
@@ -209,7 +209,7 @@ Rectangle {
                 Layout.minimumWidth: 0
             }
             Text {
-                text: root.itemSecondaryLabel(modelData)
+                text: root.itemSecondaryLabel(itemData)
                 color: highlighted ? Colors.withAlpha(Colors.primary, 0.82) : Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight
@@ -228,7 +228,7 @@ Rectangle {
 
             // Provider Badge
             Rectangle {
-                property string provider: root.itemProviderLabel(modelData)
+                property string provider: root.itemProviderLabel(itemData)
                 visible: provider !== ""
                 radius: Colors.radiusPill
                 color: highlighted ? Colors.primaryMarked : Colors.highlight
@@ -250,7 +250,7 @@ Rectangle {
 
             // Action Badge
             Rectangle {
-                property string action: root.itemActionLabel(modelData)
+                property string action: root.itemActionLabel(itemData)
                 visible: action !== ""
                 radius: Colors.radiusPill
                 color: highlighted ? Colors.primaryMid : Colors.surface

@@ -68,21 +68,7 @@ Item {
       anchors.verticalCenter: parent.verticalCenter
       sourceSize: Qt.size(20, 20)
       source: Quickshell.iconPath("nix-snowflake") || ""
-      visible: status === Image.Ready
-      // Apply status color to the image if it's a template
-      layer.enabled: SystemStatus.overallStatus !== "healthy"
-      layer.effect: ShaderEffect {
-          fragmentShader: "
-              varying highp vec2 qt_TexCoord0;
-              uniform highp float qt_Opacity;
-              uniform lowp sampler2D source;
-              uniform lowp vec4 color;
-              void main() {
-                  lowp vec4 tex = texture2D(source, qt_TexCoord0);
-                  gl_FragColor = vec4(color.rgb, tex.a) * qt_Opacity;
-              }"
-          property color color: root.statusColor
-      }
+      visible: status === Image.Ready && SystemStatus.overallStatus === "healthy"
     }
 
     Text {

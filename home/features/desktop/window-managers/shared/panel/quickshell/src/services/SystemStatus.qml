@@ -212,7 +212,7 @@ QtObject {
     BrightnessService.setKbdBrightness(value);
   }
 
-  property int pollIntervalMs: 5000
+  property int pollIntervalMs: 2000
 
   // Subscriber-based polling: only runs when at least one consumer is active.
   // Use Ref { service: SystemStatus } for automatic lifecycle management.
@@ -220,7 +220,7 @@ QtObject {
 
   function formatTemp(rawValue) {
     var parsed = parseFloat(rawValue);
-    return isNaN(parsed) ? "--" : Math.round(parsed) + "°C";
+    return isNaN(parsed) || parsed === 0 ? "--" : Math.round(parsed) + "°C";
   }
 
   function parseStatsOutput(rawText) {
@@ -235,7 +235,7 @@ QtObject {
       "sh",
       "-c",
       // CPU temp: try AMD Tctl → Intel Package id 0 → AMD Tdie → Intel Core 0
-      + "cpu_temp=$( "
+      "cpu_temp=$( "
       + "sensors 2>/dev/null | awk '"
       + "/Tctl:/ {gsub(/[+°C]/, \"\", $2); print $2; found=1; exit} "
       + "/Package id 0:/ {gsub(/[+°C]/, \"\", $4); print $4; found=1; exit} "
@@ -251,7 +251,8 @@ QtObject {
       + "); "
       + "if [ -z \"$gpu_temp\" ] && command -v nvidia-smi >/dev/null 2>&1; then "
       + "gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
-      + "cpu_usage=$(top -bn1 | awk '/Cpu\\(s\\):/ {for(i=1;i<=NF;i++) if($i==\"id,\") {printf \"%d\", 100-$(i-1); exit}}'); "
+      // CPU usage: use 'top' but handle idler percentage more robustly
+      + "cpu_usage=$(top -bn1 | awk '/Cpu\\(s\\):/ {for(i=1;i<=NF;i++) if($i ~ /id,?/) {printf \"%d\", 100-$(i-1); exit}}'); "
       // GPU usage: try AMD sysfs → nvidia-smi
       + "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
       + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
@@ -276,14 +277,14 @@ QtObject {
           var cpuRaw = lines[2] || "";
           var cpuVal = parseInt(cpuRaw, 10);
           if (!isNaN(cpuVal)) {
-            root.cpuUsage = cpuVal + "%";
+            root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
             root.cpuPercent = Colors.clamp01(cpuVal / 100);
           }
 
           var gpuRaw = lines[3] || "";
           var gpuVal = parseInt(gpuRaw, 10);
           if (!isNaN(gpuVal)) {
-            root.gpuUsage = gpuVal + "%";
+            root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
             root.gpuPercent = Colors.clamp01(gpuVal / 100);
           }
 

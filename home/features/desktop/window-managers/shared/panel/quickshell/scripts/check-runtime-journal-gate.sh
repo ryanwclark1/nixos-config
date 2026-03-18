@@ -136,6 +136,20 @@ wait_for_unit() {
   return 1
 }
 
+wait_for_query_ready() {
+  local deadline
+
+  deadline=$((SECONDS + 15))
+  while (( SECONDS < deadline )); do
+    if run_ipc quickshell ipc --pid "${unit_pid}" show >/dev/null && resolve_instance_id; then
+      return 0
+    fi
+    sleep 0.2
+  done
+
+  return 1
+}
+
 call_ipc() {
   local target="$1"
   local action="$2"
@@ -291,11 +305,16 @@ main() {
 
   if call_ipc Shell reloadConfig >/dev/null; then
     pass "Shell.reloadConfig"
+    if ! wait_for_query_ready; then
+      fail "Shell reload did not return to query-ready state"
+      printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
+      exit 1
+    fi
   else
     fail "Shell.reloadConfig"
   fi
 
-  sleep 1
+  sleep 0.5
   exercise_launcher
   sleep 0.5
   exercise_surfaces

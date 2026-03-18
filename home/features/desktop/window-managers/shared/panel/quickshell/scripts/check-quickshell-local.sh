@@ -123,7 +123,7 @@ else
 fi
 
 if run_capture "$tmp_flow_out" "$tmp_flow_err" "$local_runner" quickshell-flow; then
-  if assert_patterns "$tmp_flow_out" '^Quickshell Manual Flow$' 'scripts/check-clipboard-contracts\.sh' 'scripts/vm/run-panel-vm-qa\.sh --vm hyprland' 'scripts/vm/run-hyprland-panel-qa\.sh --mode panel' 'PLUGIN_LOCAL_QUICKSHELL_USE_VM=0' 'scripts/plugin-local\.sh quickshell-all'; then
+  if assert_patterns "$tmp_flow_out" '^Quickshell Manual Flow$' 'scripts/quickshell-structure-verify\.sh' 'scripts/quickshell-structure-verify\.sh --vm' 'scripts/vm/run-hyprland-panel-qa\.sh --mode panel' 'check-panel-capture-artifacts\.sh --dir DIR' 'PLUGIN_LOCAL_QUICKSHELL_USE_VM=0' 'scripts/plugin-local\.sh quickshell-all'; then
     pass "plugin-local quickshell-flow documents the expected Quickshell runtime validation sequence"
   else
     fail "plugin-local quickshell-flow output drifted from the expected Quickshell manual flow"

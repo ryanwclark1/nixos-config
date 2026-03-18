@@ -13,7 +13,7 @@
   systemd.user.services.hypridle = {
     Unit = {
       Description = "Hyprland's idle daemon";
-      ConditionEnvironment = "WAYLAND_DISPLAY";
+      ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
       After = [ "graphical-session.target" ];
       PartOf = [ "graphical-session.target" ];
     };

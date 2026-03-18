@@ -10,9 +10,12 @@ QtObject {
   property var items: []
   property bool loaded: false
   property bool loading: false
+  property bool cacheLoaded: false
+  property bool loadedFromCache: false
   property string lastError: ""
   property var _waiters: []
   property var _paths: []
+  readonly property string cachePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/app_catalog.json"
 
   readonly property var desktopRoots: [
     "/usr/share/applications",
@@ -127,8 +130,11 @@ QtObject {
     root.loading = false;
     root.loaded = errorText === "";
     root.lastError = String(errorText || "");
-    if (root.loaded)
+    if (root.loaded) {
+      root.loadedFromCache = false;
       root.items = Array.isArray(itemsValue) ? itemsValue : [];
+      root._persistItems(root.items);
+    }
     var waiters = root._waiters.slice();
     root._waiters = [];
     for (var i = 0; i < waiters.length; ++i) {
@@ -182,10 +188,54 @@ QtObject {
     return items;
   }
 
+  function _loadPersistedCache() {
+    root.cacheLoaded = true;
+    var raw = "";
+    try {
+      raw = _cacheFile.text();
+    } catch (err) {
+      raw = "";
+    }
+    if (!raw)
+      return false;
+    try {
+      var parsed = JSON.parse(raw);
+      var cachedItems = Array.isArray(parsed) ? parsed : parsed.items;
+      if (!Array.isArray(cachedItems))
+        return false;
+      root.items = cachedItems;
+      root.loaded = true;
+      root.loadedFromCache = true;
+      return true;
+    } catch (err2) {
+      return false;
+    }
+  }
+
+  function _persistItems(itemsValue) {
+    try {
+      _cacheFile.setText(JSON.stringify({
+        savedAt: Date.now(),
+        items: Array.isArray(itemsValue) ? itemsValue : []
+      }));
+    } catch (err) {}
+  }
+
   function ensureLoaded(callback) {
     if (root.loaded) {
       if (callback)
         callback(root.items, "");
+      if (root.loadedFromCache && !root.loading)
+        refresh(null);
+      return;
+    }
+    if (!root.cacheLoaded)
+      root._loadPersistedCache();
+    if (root.loaded) {
+      if (callback)
+        callback(root.items, "");
+      if (!root.loading)
+        refresh(null);
       return;
     }
     refresh(callback);
@@ -205,6 +255,10 @@ QtObject {
 
   function prewarm() {
     ensureLoaded(null);
+  }
+
+  Component.onCompleted: {
+    root._loadPersistedCache();
   }
 
   property Process _enumeration: Process {
@@ -237,5 +291,11 @@ QtObject {
       blockLoading: true
       printErrors: false
     }
+  }
+
+  property FileView _cacheFile: FileView {
+    path: root.cachePath
+    blockLoading: true
+    printErrors: false
   }
 }

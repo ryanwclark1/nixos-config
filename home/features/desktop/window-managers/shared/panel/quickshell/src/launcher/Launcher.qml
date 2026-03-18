@@ -4029,8 +4029,8 @@ PanelWindow {
                             }
 
                             delegate: LauncherResultDelegate {
-                                modelData: modelData
-                                index: index
+                                itemData: modelData
+                                itemIndex: index
                                 selectedIndex: launcherRoot.selectedIndex
                                 searchText: launcherRoot.searchText
                                 mode: launcherRoot.mode

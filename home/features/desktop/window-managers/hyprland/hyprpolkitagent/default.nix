@@ -1,6 +1,5 @@
 {
   inputs,
-  lib,
   pkgs,
   ...
 }:
@@ -13,9 +12,9 @@
 
   systemd.user.services.hyprpolkitagent = {
     Unit = {
-      ConditionEnvironment = "WAYLAND_DISPLAY";
+      ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
     };
-
-    Install = lib.mkForce { };
   };
 }

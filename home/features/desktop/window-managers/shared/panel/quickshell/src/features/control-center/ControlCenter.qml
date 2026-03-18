@@ -36,6 +36,7 @@ PanelWindow {
     readonly property int maxLayerTextureSize: 4096
     readonly property int staggerDelay: 35
     readonly property int settingsOpenDelayMs: 130
+    readonly property int screenshotOpenDelayMs: 130
     signal closeRequested
 
     function entranceOpacity(index) {
@@ -165,6 +166,13 @@ PanelWindow {
                 onTriggered: Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "open"])
             }
 
+            Timer {
+                id: openScreenshotTimer
+                interval: root.screenshotOpenDelayMs
+                repeat: false
+                onTriggered: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "screenshotMenu"])
+            }
+
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -202,7 +210,7 @@ PanelWindow {
                                     clickAction: modelData.id === "screenshotControls"
                                         ? function() {
                                             root.closeRequested();
-                                            Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "screenshotMenu"]);
+                                            openScreenshotTimer.restart();
                                         }
                                         : null
                                 }

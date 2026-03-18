@@ -26,11 +26,6 @@
     ];
   };
 
-  # Hyprland already provides a user polkit agent via Home Manager.
-  # Prevent niri-flake from starting a second agent in the same session.
-  systemd.user.services.niri-flake-polkit.wantedBy = lib.mkForce [ ];
-
-
   # System services
   services = {
     gnome.gnome-keyring.enable = lib.mkDefault true;  # secret service
