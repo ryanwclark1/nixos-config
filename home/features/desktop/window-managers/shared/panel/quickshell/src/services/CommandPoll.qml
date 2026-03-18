@@ -33,9 +33,23 @@ QtObject {
       onStreamFinished: {
         root.text = this.text ?? "";
         var parsed = root.parse(root.text);
-        var changed = (typeof parsed === "object")
-          ? JSON.stringify(parsed) !== JSON.stringify(root.value)
-          : parsed !== root.value;
+        var changed;
+        if (typeof parsed !== "object" || parsed === null) {
+          changed = parsed !== root.value;
+        } else {
+          var prev = root.value;
+          if (typeof prev !== "object" || prev === null) {
+            changed = true;
+          } else {
+            var ka = Object.keys(parsed), kb = Object.keys(prev);
+            changed = ka.length !== kb.length;
+            if (!changed) {
+              for (var i = 0; i < ka.length; ++i) {
+                if (parsed[ka[i]] !== prev[ka[i]]) { changed = true; break; }
+              }
+            }
+          }
+        }
         if (changed) {
           root.value = parsed;
           root.updated();

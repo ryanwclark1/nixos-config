@@ -1027,9 +1027,6 @@ PanelWindow {
                             smooth: true
                             mipmap: true
 
-                            layer.enabled: true
-                            layer.effect: null
-
                             Rectangle {
                               anchors.fill: parent
                               radius: Colors.radiusSmall - 4

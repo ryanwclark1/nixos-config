@@ -18,10 +18,15 @@ Rectangle {
 
   HoverHandler { id: sysCardHover }
 
-  property var cpuHistory: SystemStatus.cpuHistory.slice(-30)
-  property var memHistory: SystemStatus.ramHistory.slice(-30)
+  property var cpuHistory: []
+  property var memHistory: []
 
   SharedWidgets.Ref { service: SystemStatus }
+
+  Component.onCompleted: {
+    cpuHistory = SystemStatus.cpuHistory.slice(-30);
+    memHistory = SystemStatus.ramHistory.slice(-30);
+  }
 
   Connections {
     target: SystemStatus

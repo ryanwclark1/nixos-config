@@ -45,6 +45,11 @@ Item {
         anchors.fill: parent
         visible: DesktopWidgetRegistry.editMode && Config.desktopWidgetsGridSnap
         opacity: 0.08
+        renderTarget: Canvas.FramebufferObject
+        renderStrategy: Canvas.Cooperative
+        onVisibleChanged: if (visible) requestPaint()
+        onWidthChanged: if (visible) requestPaint()
+        onHeightChanged: if (visible) requestPaint()
         onPaint: {
             var ctx = getContext("2d");
             ctx.clearRect(0, 0, width, height);

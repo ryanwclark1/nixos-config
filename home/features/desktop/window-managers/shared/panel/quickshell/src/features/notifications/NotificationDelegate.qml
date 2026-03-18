@@ -64,8 +64,9 @@ Rectangle {
   radius: Colors.radiusLarge
   clip: true
 
-  Behavior on height { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-  Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
+  Behavior on height { NumberAnimation { id: notifHeightAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+  Behavior on opacity { NumberAnimation { id: notifFadeAnim; duration: Colors.durationNormal } }
+  layer.enabled: notifHeightAnim.running || notifFadeAnim.running
 
   // Inner highlight
   SharedWidgets.InnerHighlight { highlightOpacity: root.isUrgent ? 0.25 : 0.12 }

@@ -13,7 +13,6 @@ Rectangle {
     // Function references injected by AiChat.qml
     required property var renderBlocksFn    // function(text) -> blocks array
     required property var renderMarkdownFn  // function(text) -> HTML string (for system messages)
-    required property var shellEscapeFn     // function(str) -> shell-escaped string
 
     color: Colors.cardSurface
     border.color: Colors.border
@@ -194,7 +193,7 @@ Rectangle {
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
-                                        Quickshell.execDetached(["sh", "-c", "printf '%s' " + root.shellEscapeFn(modelData.content) + " | wl-copy"]);
+                                        Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", modelData.content]);
                                         ToastService.showNotice("Copied", "Message copied to clipboard");
                                     }
                                 }

@@ -30,55 +30,21 @@ QtObject {
     readonly property var launcherProviderInstances: runtimeDelegate.launcherProviderInstances
     readonly property var pluginApis: runtimeDelegate.pluginApis
 
-    readonly property var barPlugins: {
+    function _filterByEntryPoint(key) {
         var result = [];
         for (var i = 0; i < plugins.length; ++i) {
             var p = plugins[i];
-            if (p.enabled && p.entryPoints && p.entryPoints.barWidget)
+            if (p.enabled && p.entryPoints && p.entryPoints[key])
                 result.push(p);
         }
         return result;
     }
 
-    readonly property var desktopPlugins: {
-        var result = [];
-        for (var i = 0; i < plugins.length; ++i) {
-            var p = plugins[i];
-            if (p.enabled && p.entryPoints && p.entryPoints.desktopWidget)
-                result.push(p);
-        }
-        return result;
-    }
-
-    readonly property var launcherPlugins: {
-        var result = [];
-        for (var i = 0; i < plugins.length; ++i) {
-            var p = plugins[i];
-            if (p.enabled && p.entryPoints && p.entryPoints.launcherProvider)
-                result.push(p);
-        }
-        return result;
-    }
-
-    readonly property var daemonPlugins: {
-        var result = [];
-        for (var i = 0; i < plugins.length; ++i) {
-            var p = plugins[i];
-            if (p.enabled && p.entryPoints && p.entryPoints.daemon)
-                result.push(p);
-        }
-        return result;
-    }
-
-    readonly property var controlCenterPlugins: {
-        var result = [];
-        for (var i = 0; i < plugins.length; ++i) {
-            var p = plugins[i];
-            if (p.enabled && p.entryPoints && p.entryPoints.controlCenterWidget)
-                result.push(p);
-        }
-        return result;
-    }
+    readonly property var barPlugins: root._filterByEntryPoint("barWidget")
+    readonly property var desktopPlugins: root._filterByEntryPoint("desktopWidget")
+    readonly property var launcherPlugins: root._filterByEntryPoint("launcherProvider")
+    readonly property var daemonPlugins: root._filterByEntryPoint("daemon")
+    readonly property var controlCenterPlugins: root._filterByEntryPoint("controlCenterWidget")
 
     property var _visibleControlCenterPlugins: []
     readonly property alias visibleControlCenterPlugins: root._visibleControlCenterPlugins

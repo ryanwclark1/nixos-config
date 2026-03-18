@@ -15,10 +15,6 @@ Rectangle {
     border.color: Colors.textThin
     border.width: 1
 
-    function _shellEscape(str) {
-        return "'" + str.replace(/'/g, "'\\''") + "'";
-    }
-
     // Language label + copy button header
     RowLayout {
         id: codeHeader
@@ -56,7 +52,7 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     if (root.blockData) {
-                        Quickshell.execDetached(["sh", "-c", "printf '%s' " + root._shellEscape(root.blockData.content) + " | wl-copy"]);
+                        Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", root.blockData.content]);
                         ToastService.showNotice("Copied", "Code copied to clipboard");
                     }
                 }

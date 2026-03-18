@@ -483,15 +483,7 @@ QtObject {
     function renameConversation(id, newTitle) {
         var trimmed = (newTitle || "").trim();
         if (!trimmed) return;
-        var newConvs = conversations.slice();
-        for (var i = 0; i < newConvs.length; i++) {
-            if (newConvs[i].id === id) {
-                newConvs[i] = _cloneConv(newConvs[i]);
-                newConvs[i].title = trimmed;
-                break;
-            }
-        }
-        conversations = newConvs;
+        _updateConv(id, function(c) { c.title = trimmed; });
         _scheduleSave();
     }
 
@@ -500,18 +492,20 @@ QtObject {
             return;
         if (isStreaming && activeConversationId === id)
             cancelStream(false);
+        _updateConv(id, function(c) { c.messages = []; c.draftText = ""; c.updatedAt = Date.now(); });
+        _scheduleSave();
+    }
+
+    function _updateConv(id, mutator) {
         var newConvs = conversations.slice();
         for (var i = 0; i < newConvs.length; i++) {
             if (newConvs[i].id === id) {
                 newConvs[i] = _cloneConv(newConvs[i]);
-                newConvs[i].messages = [];
-                newConvs[i].draftText = "";
-                newConvs[i].updatedAt = Date.now();
+                mutator(newConvs[i]);
                 break;
             }
         }
         conversations = newConvs;
-        _scheduleSave();
     }
 
     function _cloneConv(conv) {
@@ -552,25 +546,12 @@ QtObject {
     }
 
     function _appendMessage(role, content) {
-        var newConvs = conversations.slice();
-        for (var i = 0; i < newConvs.length; i++) {
-            if (newConvs[i].id === activeConversationId) {
-                newConvs[i] = _cloneConv(newConvs[i]);
-                var msgs = newConvs[i].messages;
-                // Enforce max messages
-                while (msgs.length >= Config.aiMaxMessages * 2) {
-                    msgs.shift();
-                }
-                msgs.push({
-                    role: role,
-                    content: content,
-                    timestamp: Date.now()
-                });
-                newConvs[i].updatedAt = Date.now();
-                break;
-            }
-        }
-        conversations = newConvs;
+        _updateConv(activeConversationId, function(c) {
+            while (c.messages.length >= Config.aiMaxMessages * 2)
+                c.messages.shift();
+            c.messages.push({ role: role, content: content, timestamp: Date.now() });
+            c.updatedAt = Date.now();
+        });
     }
 
     // ── Streaming ───────────────────────────────
@@ -714,18 +695,49 @@ QtObject {
     function _syncActiveConversationRuntime() {
         if (!activeConversationId)
             return;
-        var newConvs = conversations.slice();
-        for (var i = 0; i < newConvs.length; i++) {
-            if (newConvs[i].id === activeConversationId) {
-                if (newConvs[i].provider === Config.aiProvider && newConvs[i].model === activeModel)
-                    return;
-                newConvs[i] = _cloneConv(newConvs[i]);
-                newConvs[i].provider = Config.aiProvider;
-                newConvs[i].model = activeModel;
-                conversations = newConvs;
-                return;
-            }
+        _updateConv(activeConversationId, function(c) {
+            c.provider = Config.aiProvider;
+            c.model = activeModel;
+        });
+    }
+
+    function _buildSystemPrompt(contextWindow, visualContext) {
+        var prompt = Config.aiSystemPrompt;
+        if (!prompt) {
+            prompt = "You are a senior Linux desktop assistant for Quickshell on NixOS. " +
+                "Your goal is to help the user manage their system, troubleshoot issues, and automate tasks. " +
+                "\n\nCapabilities:\n" +
+                "1. Suggest system actions: [COMMAND: Label | command args]. Example: [COMMAND: Update System | make update].\n" +
+                "2. Propose scripts to ~/.local/bin: [SCRIPT: filename | content]. Ensure scripts have a proper shebang.\n" +
+                "3. Rename workspaces: [RENAME_WORKSPACE: id | name].\n" +
+                "\n\nGuidelines:\n" +
+                "- Be concise and technical. Prefer shell commands over long explanations.\n" +
+                "- When suggesting fixes, consider that this is a NixOS system (declarative config in ~/nixos-config).\n" +
+                "- Use markdown for formatting. Use code blocks for all code or command output.\n" +
+                "- If the user provides visual context or window titles, use them to provide more relevant help.\n" +
+                "- You can see system stats like CPU/RAM usage when provided in context.";
         }
+        var contextInfo = "";
+        if (Config.aiSystemContext) {
+            contextInfo = "System: " + (Quickshell.env("HOSTNAME") || "unknown") +
+                " | CPU: " + SystemStatus.cpuUsage +
+                " | RAM: " + SystemStatus.ramUsage +
+                " | CPU temp: " + SystemStatus.cpuTemp;
+        }
+        if (contextWindow) {
+            var winInfo = "Active Window: " + contextWindow;
+            contextInfo = contextInfo ? contextInfo + "\n" + winInfo : winInfo;
+        }
+        if (visualContext) {
+            var visInfo = "Visual Context (latest cropped region): " + visualContext +
+                "\n(Note: The assistant can reference this image if the multimodal backend supports it, otherwise it sees this path as a hint.)";
+            if (root.lastOcrText)
+                visInfo += "\nExtracted Text from Region:\n```\n" + root.lastOcrText + "\n```";
+            contextInfo = contextInfo ? contextInfo + "\n" + visInfo : visInfo;
+        }
+        if (contextInfo)
+            prompt = prompt ? prompt + "\n\n" + contextInfo : contextInfo;
+        return prompt || "";
     }
 
     function _fuzzyMatch(items, query, accessor, allowContains) {
@@ -806,50 +818,9 @@ QtObject {
         // Build messages array for the script
         var msgs = [];
 
-        // System prompt
-        var systemPrompt = Config.aiSystemPrompt;
-        if (!systemPrompt) {
-            systemPrompt = "You are a senior Linux desktop assistant for Quickshell on NixOS. " +
-                "Your goal is to help the user manage their system, troubleshoot issues, and automate tasks. " +
-                "\n\nCapabilities:\n" +
-                "1. Suggest system actions: [COMMAND: Label | command args]. Example: [COMMAND: Update System | make update].\n" +
-                "2. Propose scripts to ~/.local/bin: [SCRIPT: filename | content]. Ensure scripts have a proper shebang.\n" +
-                "3. Rename workspaces: [RENAME_WORKSPACE: id | name].\n" +
-                "\n\nGuidelines:\n" +
-                "- Be concise and technical. Prefer shell commands over long explanations.\n" +
-                "- When suggesting fixes, consider that this is a NixOS system (declarative config in ~/nixos-config).\n" +
-                "- Use markdown for formatting. Use code blocks for all code or command output.\n" +
-                "- If the user provides visual context or window titles, use them to provide more relevant help.\n" +
-                "- You can see system stats like CPU/RAM usage when provided in context.";
-        }
-        var contextInfo = "";
-        if (Config.aiSystemContext) {
-            contextInfo = "System: " + (Quickshell.env("HOSTNAME") || "unknown") +
-                " | CPU: " + SystemStatus.cpuUsage +
-                " | RAM: " + SystemStatus.ramUsage +
-                " | CPU temp: " + SystemStatus.cpuTemp;
-        }
-        
-        if (contextWindow) {
-            var winInfo = "Active Window: " + contextWindow;
-            contextInfo = contextInfo ? contextInfo + "\n" + winInfo : winInfo;
-        }
-
-        if (visualContext) {
-            var visInfo = "Visual Context (latest cropped region): " + visualContext + 
-                "\n(Note: The assistant can reference this image if the multimodal backend supports it, otherwise it sees this path as a hint.)";
-            if (root.lastOcrText) {
-                visInfo += "\nExtracted Text from Region:\n```\n" + root.lastOcrText + "\n```";
-            }
-            contextInfo = contextInfo ? contextInfo + "\n" + visInfo : visInfo;
-        }
-
-        if (contextInfo) {
-            systemPrompt = systemPrompt ? systemPrompt + "\n\n" + contextInfo : contextInfo;
-        }
-        if (systemPrompt) {
+        var systemPrompt = _buildSystemPrompt(contextWindow, visualContext);
+        if (systemPrompt)
             msgs.push({ role: "system", content: systemPrompt });
-        }
 
         // Conversation messages (skip system messages — those are local command output)
         var convMsgs = activeMessages;
@@ -915,16 +886,7 @@ QtObject {
 
         if (!lastUserMsg) return;
 
-        // Update conversation messages
-        var newConvs = conversations.slice();
-        for (var i = 0; i < newConvs.length; i++) {
-            if (newConvs[i].id === activeConversationId) {
-                newConvs[i] = _cloneConv(newConvs[i]);
-                newConvs[i].messages = newMsgs;
-                break;
-            }
-        }
-        conversations = newConvs;
+        _updateConv(activeConversationId, function(c) { c.messages = newMsgs; });
 
         // Re-send
         sendMessage(lastUserMsg);

@@ -380,7 +380,7 @@ PanelWindow {
                             for (var i = 0; i < msgs.length; i++) {
                                 fullText += (msgs[i].role === "user" ? "### User\n" : "### Assistant\n") + msgs[i].content + "\n\n";
                             }
-                            Quickshell.execDetached(["sh", "-c", "printf '%s' " + root._shellEscape(fullText) + " | wl-copy"]);
+                            Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", fullText]);
                             ToastService.showNotice("Copied", "Full conversation copied to clipboard");
                         }
                     }
@@ -704,7 +704,6 @@ PanelWindow {
                 Layout.fillHeight: true
                 renderBlocksFn: root._renderBlocks
                 renderMarkdownFn: root._renderMarkdown
-                shellEscapeFn: root._shellEscape
             }
 
             // ---- Input area ----
@@ -1308,7 +1307,4 @@ PanelWindow {
         }
     }
 
-    function _shellEscape(str) {
-        return "'" + str.replace(/'/g, "'\\''") + "'";
-    }
 }

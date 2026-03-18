@@ -134,7 +134,7 @@ QtObject {
     var line = String(root._entryLinesById[key] || "");
     if (line === "")
       return false;
-    Quickshell.execDetached(["sh", "-c", "printf '%s\\n' " + root.SU.shellQuote(line) + " | cliphist delete"]);
+    Quickshell.execDetached(["sh", "-c", "printf '%s\\n' \"$1\" | cliphist delete", "sh", line]);
     Qt.callLater(function() { root.refresh(null); });
     return true;
   }

@@ -208,6 +208,7 @@ PanelWindow {
         Canvas {
           id: svCanvas
           anchors.fill: parent
+          renderTarget: Canvas.FramebufferObject
           renderStrategy: Canvas.Threaded
 
           onPaint: {
@@ -291,6 +292,7 @@ PanelWindow {
         Canvas {
           id: hueCanvas
           anchors.fill: parent
+          renderTarget: Canvas.FramebufferObject
           renderStrategy: Canvas.Threaded
 
           onPaint: {
@@ -373,6 +375,7 @@ PanelWindow {
         Canvas {
           id: alphaCanvas
           anchors.fill: parent
+          renderTarget: Canvas.FramebufferObject
           renderStrategy: Canvas.Threaded
 
           onPaint: {

@@ -30,6 +30,7 @@ Rectangle {
       Canvas {
         id: cdCanvas
         anchors.fill: parent
+        renderTarget: Canvas.FramebufferObject
         onPaint: {
           var ctx = getContext("2d");
           ctx.clearRect(0, 0, width, height);

@@ -28,6 +28,8 @@ Item {
     // Dot grid pattern via Canvas
     Canvas {
       anchors.fill: parent
+      renderTarget: Canvas.FramebufferObject
+      renderStrategy: Canvas.Cooperative
       onPaint: {
         var ctx = getContext("2d");
         ctx.clearRect(0, 0, width, height);

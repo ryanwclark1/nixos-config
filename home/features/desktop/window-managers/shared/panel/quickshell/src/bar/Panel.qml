@@ -107,6 +107,12 @@ Item {
         return items;
     }
 
+    // Cached section arrays — computed once per sectionWidgets change instead of 10× per layout pass
+    readonly property var _leftLeading: leadingLauncherItems("left")
+    readonly property var _leftTrailing: trailingSectionItems("left")
+    readonly property var _centerItems: sectionItems("center")
+    readonly property var _rightItems: sectionItems("right")
+
     function widgetSettings(wi) { return PanelHelpers.widgetSettings(wi); }
     function widgetDiagnosticId(wi) { return PanelHelpers.widgetDiagnosticId(wi, root.barConfig); }
     function itemLayoutFootprint(item) { return PanelHelpers.itemLayoutFootprint(item, root.vertical); }
@@ -380,16 +386,16 @@ Item {
         spacing: runtimeSpacing + sectionSpacing
 
         Repeater {
-            model: root.leadingLauncherItems("left")
+            model: root._leftLeading
             delegate: widgetLoaderDelegate
         }
 
         Row {
-            visible: root.trailingSectionItems("left").length > 0
+            visible: root._leftTrailing.length > 0
             spacing: runtimeSpacing
 
             Repeater {
-                model: root.trailingSectionItems("left")
+                model: root._leftTrailing
                 delegate: widgetLoaderDelegate
             }
         }
@@ -403,7 +409,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: runtimeSpacing
         Repeater {
-            model: root.sectionItems("center")
+            model: root._centerItems
             delegate: widgetLoaderDelegate
         }
     }
@@ -416,7 +422,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: runtimeSpacing
         Repeater {
-            model: root.sectionItems("right")
+            model: root._rightItems
             delegate: widgetLoaderDelegate
         }
     }
@@ -430,16 +436,16 @@ Item {
         spacing: runtimeSpacing + sectionSpacing
 
         Repeater {
-            model: root.leadingLauncherItems("left")
+            model: root._leftLeading
             delegate: widgetLoaderDelegate
         }
 
         Column {
-            visible: root.trailingSectionItems("left").length > 0
+            visible: root._leftTrailing.length > 0
             spacing: runtimeSpacing
 
             Repeater {
-                model: root.trailingSectionItems("left")
+                model: root._leftTrailing
                 delegate: widgetLoaderDelegate
             }
         }
@@ -451,7 +457,7 @@ Item {
         anchors.centerIn: parent
         spacing: runtimeSpacing
         Repeater {
-            model: root.sectionItems("center")
+            model: root._centerItems
             delegate: widgetLoaderDelegate
         }
     }
@@ -464,7 +470,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: runtimeSpacing
         Repeater {
-            model: root.sectionItems("right")
+            model: root._rightItems
             delegate: widgetLoaderDelegate
         }
     }

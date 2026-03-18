@@ -3018,7 +3018,7 @@ PanelWindow {
     }
 
     function copyToClipboard(text) {
-        Quickshell.execDetached(["sh", "-c", "printf %s " + ModeData.shellQuote(text) + " | wl-copy"]);
+        Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", text]);
     }
 
     function restoreClipboardHistoryItem(id) {
@@ -3376,7 +3376,7 @@ PanelWindow {
             close();
         } else if (mode === "dmenu") {
             var fifoPath = "/tmp/qs-dmenu-result";
-            Quickshell.execDetached(["bash", "-c", "echo " + ModeData.shellQuote(item.name) + " > " + ModeData.shellQuote(fifoPath)]);
+            Quickshell.execDetached(["sh", "-c", "printf '%s\\n' \"$1\" > \"$2\"", "sh", item.name, fifoPath]);
             close();
         } else if (mode === "emoji" || mode === "calc") {
             copyToClipboard(item.name);

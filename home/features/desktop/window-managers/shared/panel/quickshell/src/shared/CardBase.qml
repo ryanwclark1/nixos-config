@@ -31,7 +31,8 @@ Item {
     clip: true
 
     scale: cardHover.hovered ? root.hoverScale : 1.0
-    Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
+    Behavior on scale { NumberAnimation { id: cardScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
+    layer.enabled: cardScaleAnim.running
 
     Rectangle {
       id: bg

@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Io
+import Quickshell
 import "../../../services"
 import "../../../widgets" as SharedWidgets
 
@@ -17,17 +17,8 @@ Rectangle {
   // Inner highlight
   SharedWidgets.InnerHighlight { }
 
-  property string username: "User"
+  property string username: Quickshell.env("USER") || Quickshell.env("LOGNAME") || "User"
   property string uptime: "0h 0m"
-
-  Process {
-    id: fetchUser
-    command: ["whoami"]
-    running: true
-    stdout: StdioCollector {
-      onStreamFinished: root.username = this.text.trim()
-    }
-  }
 
   readonly property int _uptimePollMs: 60000  // 1 min
 

@@ -14,7 +14,7 @@ BasePopupMenu {
   title: "Networking"
   subtitle: root.isOffline ? "Network inspector" : NetworkService.activePrimaryName
 
-  readonly property bool isOffline: root.isOffline
+  readonly property bool isOffline: NetworkService.activePrimaryName === "Offline"
   property string selectedSSID: ""
   property bool showAdvanced: false
 
