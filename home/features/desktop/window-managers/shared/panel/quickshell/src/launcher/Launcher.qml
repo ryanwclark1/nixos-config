@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import Quickshell.Bluetooth
 import Quickshell.Services.Mpris
 import "../services"
+import "../services/ShellUtils.js" as SU
 import "../widgets" as SharedWidgets
 import "LauncherModeData.js" as ModeData
 import "LauncherSearch.js" as Search
@@ -3025,9 +3026,13 @@ PanelWindow {
     }
 
     function launchInTerminal(cmd) {
-        var safe = cmd ? String(cmd).replace(/'/g, "'\\''") : "";
-        var suffix = safe !== "" ? (" -e bash -lc '" + safe + "'") : "";
-        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t" + suffix + "; fi; done"]);
+        if (cmd && String(cmd).trim() !== "") {
+            Quickshell.execDetached(SU.terminalCommand(cmd));
+        } else {
+            Quickshell.execDetached(["sh", "-c",
+                "for t in ghostty kitty foot alacritty wezterm; do " +
+                "if command -v $t >/dev/null 2>&1; then exec $t; fi; done"]);
+        }
     }
 
     function launchExecString(execString, runInTerminal) {
@@ -3632,7 +3637,7 @@ PanelWindow {
                 spacing: launcherRoot.tightMode ? Colors.spacingXS : Colors.spacingS
 
                 Row {
-                    spacing: 8
+                    spacing: Colors.spacingS
                     Repeater {
                         model: [Qt.rgba(0.98, 0.36, 0.31, 0.9), Qt.rgba(0.96, 0.74, 0.28, 0.9), Qt.rgba(0.18, 0.8, 0.44, 0.9)]
                         delegate: Rectangle {

@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "ShellUtils.js" as SU
 
 QtObject {
   id: root
@@ -63,10 +64,6 @@ QtObject {
         requires: []
       }
     })
-
-  function _shellQuote(text) {
-    return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
-  }
 
   function _managedCommandNames() {
     return Object.keys(root._managedCommandSpecs);
@@ -187,7 +184,7 @@ QtObject {
     for (i = 0; i < root._systemDependencies.length; ++i) {
       var binary = root._systemDependencies[i];
       script.push(
-        "if command -v " + root._shellQuote(binary) + " >/dev/null 2>&1; then printf 'system|" + binary + "|1\\n'; else printf 'system|" + binary + "|0\\n'; fi"
+        "if command -v " + SU.shellQuote(binary) + " >/dev/null 2>&1; then printf 'system|" + binary + "|1\\n'; else printf 'system|" + binary + "|0\\n'; fi"
       );
     }
 
@@ -196,8 +193,8 @@ QtObject {
       var helper = helpers[i];
       var fallbackPath = root._managedFallbackPath(helper);
       script.push(
-        "if command -v " + root._shellQuote(helper) + " >/dev/null 2>&1; then printf 'managed|" + helper + "|%s\\n' \"$(command -v " + root._shellQuote(helper) + ")\"; " +
-        "elif [ -x " + root._shellQuote(fallbackPath) + " ]; then printf 'managed|" + helper + "|" + fallbackPath.replace(/'/g, "'\\''") + "\\n'; " +
+        "if command -v " + SU.shellQuote(helper) + " >/dev/null 2>&1; then printf 'managed|" + helper + "|%s\\n' \"$(command -v " + SU.shellQuote(helper) + ")\"; " +
+        "elif [ -x " + SU.shellQuote(fallbackPath) + " ]; then printf 'managed|" + helper + "|" + fallbackPath.replace(/'/g, "'\\''") + "\\n'; " +
         "else printf 'managed|" + helper + "|\\n'; fi"
       );
     }
@@ -274,7 +271,7 @@ QtObject {
       if (binary === "")
         continue;
       script.push(
-        "if command -v " + root._shellQuote(binary) + " >/dev/null 2>&1; then printf '" + binary.replace(/'/g, "'\\''") + ":1\\n'; else printf '" + binary.replace(/'/g, "'\\''") + ":0\\n'; fi"
+        "if command -v " + SU.shellQuote(binary) + " >/dev/null 2>&1; then printf '" + binary.replace(/'/g, "'\\''") + ":1\\n'; else printf '" + binary.replace(/'/g, "'\\''") + ":0\\n'; fi"
       );
     }
 

@@ -164,7 +164,7 @@ Rectangle {
                 id: controlsLayout
                 anchors.fill: parent
                 anchors.margins: Colors.paddingMedium
-                spacing: 2
+                spacing: Colors.spacingXXS
                 Text {
                     text: "SHORTCUTS"
                     color: Colors.textDisabled

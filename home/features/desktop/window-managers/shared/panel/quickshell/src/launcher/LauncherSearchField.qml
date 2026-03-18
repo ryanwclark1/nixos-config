@@ -69,7 +69,7 @@ Rectangle {
 
         RowLayout {
             anchors.centerIn: parent
-            spacing: 4
+            spacing: Colors.spacingXS
             Text {
                 id: categoryLabel
                 text: categoryBadge.category
