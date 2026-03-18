@@ -2,8 +2,9 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-repo_root="$(CDPATH= cd -- "${script_dir}/.." && pwd -P)"
-src_root="${repo_root}/src"
+quickshell_root="$(CDPATH= cd -- "${script_dir}/.." && pwd -P)"
+nixos_repo_root="$(CDPATH= cd -- "${script_dir}/../../../../../../../../" && pwd -P)"
+src_root="${quickshell_root}/src"
 quiet=0
 use_vm=0
 vm_selector="${QS_VERIFY_VM_SELECTOR:-hyprland}"
@@ -159,7 +160,7 @@ has_live_session() {
 
 trap print_stage_summary EXIT
 
-run_step "Checking import boundaries" bash "${repo_root}/tools/checks/check-import-boundaries.sh"
+run_step "Checking import boundaries" bash "${quickshell_root}/tools/checks/check-import-boundaries.sh"
 run_step "Validating qmldir targets" run_qmldir_validation
 run_step "Running clipboard contract checks" bash "${script_dir}/check-clipboard-contracts.sh"
 run_step_timeout "Running startup smoke" "${startup_timeout_seconds}" bash "${script_dir}/check-quickshell-startup.sh"
@@ -176,7 +177,7 @@ if (( use_vm == 1 )); then
   run_step_timeout \
     "Running VM-backed runtime/settings gate (${vm_selector})" \
     "${vm_timeout_seconds}" \
-    bash "${repo_root}/scripts/vm/run-panel-vm-qa.sh" --vm "${vm_selector}"
+    bash "${nixos_repo_root}/scripts/vm/run-panel-vm-qa.sh" --vm "${vm_selector}"
 fi
 
 if (( quiet == 0 )); then
