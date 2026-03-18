@@ -1,0 +1,87 @@
+import QtQuick
+import QtQuick.Layouts
+import "../../../services"
+
+Rectangle {
+    id: root
+    Layout.fillWidth: true
+
+    required property var modelData
+    required property bool isActive
+    property bool actionPending: false
+
+    signal actionClicked()
+
+    implicitHeight: 60
+    radius: Colors.radiusMedium
+    color: Colors.cardSurface
+    border.color: Colors.border
+    border.width: 1
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.margins: Colors.spacingM
+        spacing: Colors.spacingS
+
+        Text {
+            text: "󰖂"
+            color: root.isActive ? Colors.accent : Colors.textSecondary
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeLarge
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 0
+
+            Text {
+                text: root.modelData.name || "VPN"
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeMedium
+                font.weight: Font.Medium
+                Layout.fillWidth: true
+                elide: Text.ElideRight
+            }
+
+            Text {
+                text: root.isActive
+                    ? (root.modelData.device !== "" ? (root.modelData.type + " • " + root.modelData.device) : root.modelData.type)
+                    : (root.modelData.type || "vpn")
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                Layout.fillWidth: true
+                elide: Text.ElideRight
+            }
+        }
+
+        Rectangle {
+            readonly property color actionColor: root.isActive ? Colors.error : Colors.primary
+            radius: Colors.radiusPill
+            color: root.actionPending
+                ? Colors.withAlpha(Colors.textSecondary, 0.12)
+                : (root.isActive ? Colors.withAlpha(Colors.error, 0.12) : Colors.primaryAccent)
+            border.color: root.actionPending ? Colors.border : actionColor
+            border.width: 1
+            implicitHeight: 24
+            implicitWidth: actionLabel.implicitWidth + 18
+
+            Text {
+                id: actionLabel
+                anchors.centerIn: parent
+                text: root.actionPending
+                    ? (root.isActive ? "Disconnecting" : "Connecting")
+                    : (root.isActive ? "Disconnect" : "Connect")
+                color: root.actionPending ? Colors.textSecondary : parent.actionColor
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.DemiBold
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: !root.actionPending && NetworkService.pendingVpnProfileUuid === ""
+                cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
+                onClicked: root.actionClicked()
+            }
+        }
+    }
+}

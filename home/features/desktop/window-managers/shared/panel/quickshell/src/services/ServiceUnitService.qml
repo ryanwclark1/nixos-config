@@ -489,7 +489,7 @@ QtObject {
 
         var prefix = scope === "system" ? "journalctl -u " : "journalctl --user -u ";
         var cmd = prefix + String(unitName) + " -n 120 --no-pager; echo; read -n 1 -s -r -p \"Press any key to close\"";
-        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
+        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc \"$1\"; fi; done", "sh", cmd]);
         return true;
     }
 
@@ -499,7 +499,7 @@ QtObject {
 
         var prefix = scope === "system" ? "systemctl status " : "systemctl --user status ";
         var cmd = prefix + String(unitName) + " --no-pager; echo; read -n 1 -s -r -p \"Press any key to close\"";
-        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
+        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc \"$1\"; fi; done", "sh", cmd]);
         return true;
     }
 

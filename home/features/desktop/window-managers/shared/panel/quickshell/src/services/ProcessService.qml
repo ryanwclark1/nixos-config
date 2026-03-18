@@ -399,7 +399,7 @@ QtObject {
         if (safePid <= 0)
             return false;
         var cmd = "if command -v htop >/dev/null 2>&1; then exec htop -p " + String(safePid) + "; else exec top -p " + String(safePid) + "; fi";
-        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
+        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc \"$1\"; fi; done", "sh", cmd]);
         return true;
     }
 
@@ -408,7 +408,7 @@ QtObject {
         if (safePid <= 0)
             return false;
         var cmd = "if command -v lsof >/dev/null 2>&1; then lsof -p " + String(safePid) + "; else ps -fp " + String(safePid) + "; echo; echo \"lsof not available\"; fi; echo; read -n 1 -s -r -p \"Press any key to close\"";
-        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
+        Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc \"$1\"; fi; done", "sh", cmd]);
         return true;
     }
 

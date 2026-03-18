@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../menu"
 import "../../services"
+import "../../services/SearchUtils.js" as SU
 import "../../widgets" as SharedWidgets
 import "."
 import "../settings/components"
@@ -26,21 +27,7 @@ BasePopupMenu {
   })
   readonly property var menuWidgetInstance: surfaceContext && surfaceContext.widgetInstance ? surfaceContext.widgetInstance : fallbackWidgetInstance
   readonly property var filteredHostsResult: {
-    if (!searchQuery)
-      return sshData.mergedHosts;
-    var query = searchQuery.toLowerCase();
-    var scored = [];
-    for (var i = 0; i < sshData.mergedHosts.length; ++i) {
-      var host = sshData.mergedHosts[i];
-      var score = _searchScore(query, host);
-      if (score > 0)
-        scored.push({ host: host, score: score });
-    }
-    scored.sort(function(a, b) { return b.score - a.score; });
-    var out = [];
-    for (var j = 0; j < scored.length; ++j)
-      out.push(scored[j].host);
-    return out;
+    return SU.filterByFuzzy(sshData.mergedHosts, searchQuery, _hostSearchText, { minFuzzyLength: 2, minFuzzyScore: 24 });
   }
   readonly property bool hasSearchQuery: searchQuery.trim() !== ""
   readonly property bool hasHosts: sshData.mergedHosts.length > 0
@@ -88,36 +75,6 @@ BasePopupMenu {
     }).join(" ");
   }
 
-  function _searchScore(query, host) {
-    var haystack = _hostSearchText(host);
-    if (!haystack)
-      return 0;
-    var queryLength = query.length;
-    var exactIndex = haystack.indexOf(query);
-    if (exactIndex !== -1)
-      return 1000 + (1.0 / (1 + exactIndex));
-    if (queryLength <= 2)
-      return 0;
-
-    var qi = 0;
-    var score = 0;
-    var lastMatch = -1;
-    for (var i = 0; i < haystack.length && qi < query.length; ++i) {
-      if (haystack[i] !== query[qi])
-        continue;
-      var gap = lastMatch >= 0 ? (i - lastMatch - 1) : 0;
-      score += 10 - Math.min(gap, 8);
-      if (i === 0 || haystack[i - 1] === " " || haystack[i - 1] === "/" || haystack[i - 1] === "-" || haystack[i - 1] === "_")
-        score += 5;
-      lastMatch = i;
-      qi += 1;
-    }
-    if (qi !== query.length)
-      return 0;
-    if (queryLength === 3 && score < 24)
-      return 0;
-    return score;
-  }
 
   function _hostSectionMeta(host) {
     var isImported = host && String(host.source || "") === "imported";

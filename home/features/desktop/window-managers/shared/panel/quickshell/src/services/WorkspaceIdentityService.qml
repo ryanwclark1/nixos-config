@@ -37,7 +37,7 @@ QtObject {
     function saveState() {
         if (_loading) return;
         var content = JSON.stringify(workspaceData);
-        _saveProc.command = ["sh", "-c", "mkdir -p $(dirname '" + savePath + "') && cat > '" + savePath + "'"];
+        _saveProc.command = ["sh", "-c", "mkdir -p \"$(dirname \"$1\")\" && cat > \"$1\"", "sh", savePath];
         _saveProc.running = true;
     }
 

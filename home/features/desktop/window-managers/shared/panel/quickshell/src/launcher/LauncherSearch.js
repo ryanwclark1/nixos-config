@@ -96,6 +96,42 @@ function ensureItemRankCache(item) {
     item._rankCacheReady = true;
 }
 
+// Safe arithmetic evaluator — handles +, -, *, /, parentheses, decimals.
+// Replaces eval() for calculator mode to eliminate code injection surface.
+function safeCalcEval(expr) {
+    var s = expr.replace(/[^-+/*() .0-9]/g, "").replace(/\s+/g, "");
+    if (s === "")
+        return NaN;
+    var pos = 0;
+    function peek() { return pos < s.length ? s[pos] : ""; }
+    function advance() { return s[pos++]; }
+    function parseNumber() {
+        var start = pos;
+        if (peek() === "-") advance();
+        while (pos < s.length && ((s[pos] >= "0" && s[pos] <= "9") || s[pos] === ".")) pos++;
+        return pos > start ? parseFloat(s.substring(start, pos)) : NaN;
+    }
+    function parseFactor() {
+        if (peek() === "(") { advance(); var v = parseExpr(); if (peek() === ")") advance(); return v; }
+        if (peek() === "-" && (pos === 0 || s[pos - 1] === "(" || s[pos - 1] === "+" || s[pos - 1] === "-" || s[pos - 1] === "*" || s[pos - 1] === "/")) {
+            advance(); return -parseFactor();
+        }
+        return parseNumber();
+    }
+    function parseTerm() {
+        var v = parseFactor();
+        while (peek() === "*" || peek() === "/") { var op = advance(); v = op === "*" ? v * parseFactor() : v / parseFactor(); }
+        return v;
+    }
+    function parseExpr() {
+        var v = parseTerm();
+        while (peek() === "+" || peek() === "-") { var op = advance(); v = op === "+" ? v + parseTerm() : v - parseTerm(); }
+        return v;
+    }
+    var result = parseExpr();
+    return pos >= s.length ? result : NaN;
+}
+
 function compareLauncherItemsAlpha(a, b) {
     var aName = String(a && a.name ? a.name : "");
     var bName = String(b && b.name ? b.name : "");

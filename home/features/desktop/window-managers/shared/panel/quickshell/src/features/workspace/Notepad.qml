@@ -146,7 +146,7 @@ PanelWindow {
 
   function saveToFile(filePath, content) {
     fileWriteProc.stdinEnabled = true;
-    fileWriteProc.command = ["sh", "-c", "cat > '" + filePath.replace(/'/g, "'\\''") + "'"];
+    fileWriteProc.command = ["sh", "-c", "cat > \"$1\"", "sh", filePath];
     fileWriteProc.running = true;
     // Write content after process starts
     _pendingWriteContent = content;

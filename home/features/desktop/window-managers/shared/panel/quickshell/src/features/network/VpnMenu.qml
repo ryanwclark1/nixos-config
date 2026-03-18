@@ -263,77 +263,10 @@ BasePopupMenu {
             Repeater {
                 model: NetworkService.vpnActiveProfiles
 
-                delegate: Rectangle {
-                    Layout.fillWidth: true
-                    required property var modelData
-                    readonly property bool actionPending: NetworkService.pendingVpnProfileUuid === String(modelData.uuid || "")
-                    implicitHeight: 60
-                    radius: Colors.radiusMedium
-                    color: Colors.cardSurface
-                    border.color: Colors.border
-                    border.width: 1
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingS
-
-                        Text {
-                            text: "󰖂"
-                            color: Colors.accent
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeLarge
-                        }
-
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 0
-
-                            Text {
-                                text: modelData.name || "VPN"
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
-                                font.weight: Font.Medium
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
-                            }
-
-                            Text {
-                                text: modelData.device !== "" ? (modelData.type + " • " + modelData.device) : modelData.type
-                                color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
-                            }
-                        }
-
-                        Rectangle {
-                            radius: Colors.radiusPill
-                            color: actionPending
-                                ? Colors.withAlpha(Colors.textSecondary, 0.12)
-                                : Colors.withAlpha(Colors.error, 0.12)
-                            border.color: actionPending ? Colors.border : Colors.error
-                            border.width: 1
-                            implicitHeight: 24
-                            implicitWidth: otherStateLabel.implicitWidth + 18
-
-                            Text {
-                                id: otherStateLabel
-                                anchors.centerIn: parent
-                                text: actionPending ? "Disconnecting" : "Disconnect"
-                                color: actionPending ? Colors.textSecondary : Colors.error
-                                font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.DemiBold
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                enabled: !actionPending && NetworkService.pendingVpnProfileUuid === ""
-                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
-                                onClicked: NetworkService.disconnectVpnProfile(modelData.uuid)
-                            }
-                        }
-                    }
+                delegate: VpnProfileDelegate {
+                    isActive: true
+                    actionPending: NetworkService.pendingVpnProfileUuid === String(modelData.uuid || "")
+                    onActionClicked: NetworkService.disconnectVpnProfile(modelData.uuid)
                 }
             }
         }
@@ -348,77 +281,10 @@ BasePopupMenu {
             Repeater {
                 model: NetworkService.vpnInactiveProfiles
 
-                delegate: Rectangle {
-                    Layout.fillWidth: true
-                    required property var modelData
-                    readonly property bool actionPending: NetworkService.pendingVpnProfileUuid === String(modelData.uuid || "")
-                    implicitHeight: 60
-                    radius: Colors.radiusMedium
-                    color: Colors.cardSurface
-                    border.color: Colors.border
-                    border.width: 1
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingS
-
-                        Text {
-                            text: "󰖂"
-                            color: Colors.textSecondary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeLarge
-                        }
-
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 0
-
-                            Text {
-                                text: modelData.name || "VPN"
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
-                                font.weight: Font.Medium
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
-                            }
-
-                            Text {
-                                text: modelData.type || "vpn"
-                                color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
-                            }
-                        }
-
-                        Rectangle {
-                            radius: Colors.radiusPill
-                            color: actionPending
-                                ? Colors.withAlpha(Colors.textSecondary, 0.12)
-                                : Colors.primaryAccent
-                            border.color: actionPending ? Colors.border : Colors.primary
-                            border.width: 1
-                            implicitHeight: 24
-                            implicitWidth: availableActionLabel.implicitWidth + 18
-
-                            Text {
-                                id: availableActionLabel
-                                anchors.centerIn: parent
-                                text: actionPending ? "Connecting" : "Connect"
-                                color: actionPending ? Colors.textSecondary : Colors.primary
-                                font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.DemiBold
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                enabled: !actionPending && NetworkService.pendingVpnProfileUuid === ""
-                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.BusyCursor
-                                onClicked: NetworkService.connectVpnProfile(modelData.uuid)
-                            }
-                        }
-                    }
+                delegate: VpnProfileDelegate {
+                    isActive: false
+                    actionPending: NetworkService.pendingVpnProfileUuid === String(modelData.uuid || "")
+                    onActionClicked: NetworkService.connectVpnProfile(modelData.uuid)
                 }
             }
         }

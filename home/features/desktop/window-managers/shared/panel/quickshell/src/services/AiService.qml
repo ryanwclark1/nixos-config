@@ -95,7 +95,7 @@ QtObject {
         var path = binDir + "/" + name;
         
         // Ensure binDir exists and write file
-        var cmd = ["sh", "-c", "mkdir -p '" + binDir + "' && cat > '" + path + "' && chmod +x '" + path + "'"];
+        var cmd = ["sh", "-c", "mkdir -p \"$(dirname \"$1\")\" && cat > \"$1\" && chmod +x \"$1\"", "sh", path];
         var proc = Qt.createQmlObject('import Quickshell.Io; Process { command: ' + JSON.stringify(cmd) + '; stdinEnabled: true }', root);
         proc.onStarted.connect(function() {
             proc.write(content);
@@ -1015,7 +1015,7 @@ QtObject {
         if (!imagePath || isOcrBusy) return;
         isOcrBusy = true;
         lastOcrText = "";
-        ocrProc.command = ["sh", "-c", "tesseract '" + imagePath + "' stdout -l eng 2>/dev/null"];
+        ocrProc.command = ["sh", "-c", "tesseract \"$1\" stdout -l eng 2>/dev/null", "sh", imagePath];
         ocrProc.running = true;
     }
 
@@ -1072,7 +1072,7 @@ QtObject {
 
     function _writeTempFile(path, content) {
         _pendingTempContent = content;
-        tempWriteProc.command = ["sh", "-c", "cat > '" + path.replace(/'/g, "'\\''") + "'"];
+        tempWriteProc.command = ["sh", "-c", "cat > \"$1\"", "sh", path];
         tempWriteProc.running = true;
     }
 

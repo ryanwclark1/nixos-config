@@ -12,9 +12,9 @@ BasePopupMenu {
   readonly property int detailColumns: compactMode ? 1 : 2
   implicitHeight: compactMode ? 620 : 552
   title: "Networking"
-  subtitle: NetworkService.activePrimaryName === "Offline" ? "Network inspector" : NetworkService.activePrimaryName
+  subtitle: root.isOffline ? "Network inspector" : NetworkService.activePrimaryName
 
-  readonly property bool isOffline: NetworkService.activePrimaryName === "Offline"
+  readonly property bool isOffline: root.isOffline
   property string selectedSSID: ""
   property bool showAdvanced: false
 
@@ -113,8 +113,8 @@ BasePopupMenu {
         Rectangle {
           Layout.fillWidth: true
           radius: Colors.radiusMedium
-          color: NetworkService.activePrimaryName === "Offline" ? Colors.cardSurface : Colors.primaryGhost
-          border.color: NetworkService.activePrimaryName === "Offline" ? Colors.border : Colors.primarySubtle
+          color: root.isOffline ? Colors.cardSurface : Colors.primaryGhost
+          border.color: root.isOffline ? Colors.border : Colors.primarySubtle
           border.width: 1
           implicitHeight: summaryCol.implicitHeight + 32
 
@@ -133,7 +133,7 @@ BasePopupMenu {
 
               Text {
                 text: NetworkService.networkIcon()
-                color: NetworkService.activePrimaryName === "Offline" ? Colors.textDisabled : Colors.primary
+                color: root.isOffline ? Colors.textDisabled : Colors.primary
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeHuge
                 Layout.alignment: Qt.AlignVCenter
@@ -144,7 +144,7 @@ BasePopupMenu {
                 spacing: 0
                 Text {
                   text: NetworkService.activePrimaryName
-                  color: NetworkService.activePrimaryName === "Offline" ? Colors.textSecondary : Colors.text
+                  color: root.isOffline ? Colors.textSecondary : Colors.text
                   font.pixelSize: Colors.fontSizeLarge
                   font.weight: Font.DemiBold
                   Layout.fillWidth: true
@@ -164,16 +164,16 @@ BasePopupMenu {
                 width: 96
                 height: 32
                 radius: height / 2
-                color: NetworkService.activePrimaryName === "Offline"
+                color: root.isOffline
                   ? Colors.primaryMid
                   : Colors.errorLight
-                border.color: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
+                border.color: root.isOffline ? Colors.primary : Colors.error
                 border.width: 1
 
                 Text {
                   anchors.centerIn: parent
-                  text: NetworkService.activePrimaryName === "Offline" ? "Refresh" : "Disconnect"
-                  color: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
+                  text: root.isOffline ? "Refresh" : "Disconnect"
+                  color: root.isOffline ? Colors.primary : Colors.error
                   font.pixelSize: Colors.fontSizeXS
                   font.weight: Font.Bold
                   font.capitalization: Font.AllUppercase
@@ -182,7 +182,7 @@ BasePopupMenu {
                 SharedWidgets.StateLayer {
                   anchors.fill: parent
                   radius: parent.radius
-                  stateColor: NetworkService.activePrimaryName === "Offline" ? Colors.primary : Colors.error
+                  stateColor: root.isOffline ? Colors.primary : Colors.error
                   hovered: disconnectHover.containsMouse
                   pressed: disconnectHover.pressed
                 }
@@ -193,7 +193,7 @@ BasePopupMenu {
                   hoverEnabled: true
                   cursorShape: Qt.PointingHandCursor
                   onClicked: {
-                    if (NetworkService.activePrimaryName === "Offline") NetworkService.refreshData();
+                    if (root.isOffline) NetworkService.refreshData();
                     else NetworkService.disconnectPrimary();
                   }
                 }

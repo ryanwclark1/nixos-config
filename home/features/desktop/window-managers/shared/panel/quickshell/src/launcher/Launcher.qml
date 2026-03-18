@@ -205,15 +205,10 @@ PanelWindow {
     property real globalLastMouseY: 0
 
     readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "system" || mode === "files")
-    readonly property bool showLauncherHomeCards: false
     readonly property bool showLauncherHomePanel: showLauncherHome && mode !== "orchestrator"
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
-    readonly property string selectedHomeItemKey: {
-        if (!showLauncherHomeCards || selectedIndex < 0 || selectedIndex >= filteredItems.length)
-            return "";
-        return homeItemKey(filteredItems[selectedIndex]);
-    }
+    readonly property string selectedHomeItemKey: ""
     readonly property string drunCategoryFilterLabel: {
         for (var i = 0; i < drunCategoryOptions.length; ++i) {
             var option = drunCategoryOptions[i];
@@ -942,8 +937,10 @@ PanelWindow {
         return ModeData.stripModePrefix(text);
     }
 
+    readonly property var _cachedWebProviders: ModeData.configuredWebProviders(Config.launcherWebProviderOrder)
+
     function configuredWebProviders() {
-        return ModeData.configuredWebProviders(Config.launcherWebProviderOrder);
+        return _cachedWebProviders;
     }
 
     function primaryWebProvider() {
@@ -2858,7 +2855,7 @@ PanelWindow {
             actualSearch = searchText.startsWith("=") ? searchText.substring(1).trim() : searchText;
             try {
                 if (actualSearch !== "") {
-                    var result = eval(actualSearch.replace(/[^-+/*() .0-9]/g, ""));
+                    var result = Search.safeCalcEval(actualSearch);
                     if (result !== undefined && !isNaN(result)) {
                         filteredItems = [
                             {
@@ -2914,54 +2911,16 @@ PanelWindow {
 
         if (clean === "" && mode !== "files" && mode !== "ai") {
             resetFilterCache();
-            if (showLauncherHomeCards && mode === "drun") {
-                var homeItems = [];
-                var homeSeen = ({});
-
-                function appendHomeSection(sourceItems, sectionLabel) {
-                    var source = Array.isArray(sourceItems) ? sourceItems : [];
-                    for (var homeIndex = 0; homeIndex < source.length; ++homeIndex) {
-                        var sourceItem = source[homeIndex];
-                        var homeKey = homeItemKey(sourceItem);
-                        if (homeKey === "" || homeSeen[homeKey])
-                            continue;
-                        var homeEntry = Object.assign({}, sourceItem);
-                        homeEntry._homeSection = sectionLabel.toLowerCase();
-                        homeEntry._homeKey = homeKey;
-                        homeEntry.sectionLabel = sectionLabel;
-                        homeItems.push(homeEntry);
-                        homeSeen[homeKey] = true;
-                    }
-                }
-
-                appendHomeSection(recentItems, "Recent");
-                appendHomeSection(suggestionItems, "Suggested");
-
-                var remainingItems = [];
-                for (var baseIndex = 0; baseIndex < allItems.length; ++baseIndex) {
-                    var baseItem = allItems[baseIndex];
-                    if (homeSeen[homeItemKey(baseItem)])
-                        continue;
-                    
-                    if (drunCategoryFilter !== "" && !itemMatchesDrunCategory(baseItem, drunCategoryFilter))
-                        continue;
-                        
-                    remainingItems.push(baseItem);
-                }
-
-                filteredItems = homeItems.concat(decorateResultSections(remainingItems));
-            } else {
-                var baseItems = [];
-                for (var j = 0; j < allItems.length; ++j) {
-                    var item = allItems[j];
-                    if (mode === "drun" && drunCategoryFilter !== "" && !itemMatchesDrunCategory(item, drunCategoryFilter))
-                        continue;
-                    if (mode === "drun")
-                        item.sectionLabel = drunBrowseSectionLabel();
-                    baseItems.push(item);
-                }
-                filteredItems = decorateResultSections(baseItems);
+            var baseItems = [];
+            for (var j = 0; j < allItems.length; ++j) {
+                var item = allItems[j];
+                if (mode === "drun" && drunCategoryFilter !== "" && !itemMatchesDrunCategory(item, drunCategoryFilter))
+                    continue;
+                if (mode === "drun")
+                    item.sectionLabel = drunBrowseSectionLabel();
+                baseItems.push(item);
             }
+            filteredItems = decorateResultSections(baseItems);
         } else {
             var scoredItems = [];
             for (var i = 0; i < sourceItems.length; i++) {
@@ -4025,7 +3984,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     launcher: launcherRoot
                     visible: launcherRoot.showLauncherHomePanel && !launcherRoot.isModeLoading
-                    showHomeSections: launcherRoot.showLauncherHomeCards
+                    showHomeSections: false
                 }
 
                 OrchestratorView {

@@ -180,7 +180,7 @@ ColumnLayout {
                             iconColor: Colors.textDisabled
                             onClicked: {
                                 var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec -it " + modelData.id + " sh; else exit 1; fi";
-                                Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
+                                Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc \"$1\"; fi; done", "sh", cmd]);
                             }
                         }
                         SharedWidgets.IconButton {
@@ -234,7 +234,7 @@ ColumnLayout {
                         onClicked: {
                             var host = modelData.split("@")[1] || modelData;
                             var cmd = "ssh " + host;
-                            Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc '" + cmd.replace(/'/g, "'\\''") + "'; fi; done"]);
+                            Quickshell.execDetached(["sh", "-c", "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc \"$1\"; fi; done", "sh", cmd]);
                         }
                     }
                 }

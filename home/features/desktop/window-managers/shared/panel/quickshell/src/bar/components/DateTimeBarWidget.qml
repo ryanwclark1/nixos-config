@@ -35,12 +35,12 @@ Item {
             {
                 label: "Copy Time",
                 icon: "󰅍",
-                action: () => Quickshell.execDetached(["sh", "-c", "echo -n '" + Qt.formatDateTime(centerClock.date, "HH:mm:ss") + "' | wl-copy"])
+                action: () => Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" | wl-copy", "sh", Qt.formatDateTime(centerClock.date, "HH:mm:ss")])
             },
             {
                 label: "Copy Date",
                 icon: "󰃭",
-                action: () => Quickshell.execDetached(["sh", "-c", "echo -n '" + Qt.formatDateTime(centerClock.date, "yyyy-MM-dd") + "' | wl-copy"])
+                action: () => Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" | wl-copy", "sh", Qt.formatDateTime(centerClock.date, "yyyy-MM-dd")])
             }
         ]
         onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)

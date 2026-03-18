@@ -192,7 +192,7 @@ Item {
         var safeDesc = (valueDesc || "value").replace(/['"\\]/g, "");
         var path = HookService.hookDir + "/" + hookName;
         // Use stdin to avoid shell injection — content is piped, not interpolated
-        _templateProc.command = ["sh", "-c", "cat > '" + path + "' && chmod +x '" + path + "'"];
+        _templateProc.command = ["sh", "-c", "cat > \"$1\" && chmod +x \"$1\"", "sh", path];
         root._pendingTemplateContent = "#!/bin/sh\n# Hook: " + hookName + "\n# $1 = hook name, $2 = " + safeDesc + "\n\necho \"Hook fired: $1 = $2\" >> /tmp/quickshell-hooks.log\n";
         root._pendingTemplatePath = path;
         _templateProc.running = true;
