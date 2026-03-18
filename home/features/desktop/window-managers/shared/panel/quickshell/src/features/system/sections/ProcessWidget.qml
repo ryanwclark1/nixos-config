@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
@@ -261,15 +262,11 @@ SharedWidgets.CardBase {
                     border.width: 1
 
                     Behavior on color {
-                        ColorAnimation {
-                            duration: Colors.durationFast
-                        }
+                        CAnim {}
                     }
 
                     Behavior on border.color {
-                        ColorAnimation {
-                            duration: Colors.durationFast
-                        }
+                        CAnim {}
                     }
 
                     RowLayout {

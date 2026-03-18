@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../../../shared"
 import "../../../services"
 
 ColumnLayout {
@@ -43,9 +44,7 @@ ColumnLayout {
             border.width: 1
 
             Behavior on border.color {
-                ColorAnimation {
-                    duration: Colors.durationFast
-                }
+                CAnim {}
             }
 
             RowLayout {

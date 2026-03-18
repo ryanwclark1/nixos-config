@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../services"
+import "../shared"
 import "../widgets" as SharedWidgets
 
 ColumnLayout {
@@ -179,17 +180,11 @@ ColumnLayout {
                         id: wsSlide
                         y: 20
                         Behavior on y {
-                            NumberAnimation {
-                                duration: Colors.durationNormal
-                                easing.type: Easing.OutCubic
-                            }
+                            Anim {}
                         }
                     }
                     Behavior on opacity {
-                        NumberAnimation {
-                            duration: Colors.durationNormal
-                            easing.type: Easing.OutCubic
-                        }
+                        Anim {}
                     }
 
                     Timer {

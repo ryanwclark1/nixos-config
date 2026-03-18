@@ -564,24 +564,6 @@ PanelWindow {
                         }
 
                         SystemGraphs {
-                            opacity: root.entranceOpacity(7)
-                            scale: root.entranceScale(7)
-                            transform: Translate { y: root.entranceY(7) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutBack } } }
-                        }
-                        ProcessWidget {
-                            opacity: root.entranceOpacity(8)
-                            scale: root.entranceScale(8)
-                            transform: Translate { y: root.entranceY(8) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutBack } } }
-                        }
-                        NetworkGraphs {
                             opacity: root.entranceOpacity(9)
                             scale: root.entranceScale(9)
                             transform: Translate { y: root.entranceY(9) }
@@ -590,7 +572,7 @@ PanelWindow {
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutBack } } }
                         }
-                        DiskWidget {
+                        ProcessWidget {
                             opacity: root.entranceOpacity(10)
                             scale: root.entranceScale(10)
                             transform: Translate { y: root.entranceY(10) }
@@ -599,7 +581,7 @@ PanelWindow {
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutBack } } }
                         }
-                        GPUWidget {
+                        NetworkGraphs {
                             opacity: root.entranceOpacity(11)
                             scale: root.entranceScale(11)
                             transform: Translate { y: root.entranceY(11) }
@@ -608,7 +590,7 @@ PanelWindow {
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutBack } } }
                         }
-                        UpdateWidget {
+                        DiskWidget {
                             opacity: root.entranceOpacity(12)
                             scale: root.entranceScale(12)
                             transform: Translate { y: root.entranceY(12) }
@@ -617,7 +599,7 @@ PanelWindow {
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutBack } } }
                         }
-                        ScratchpadWidget {
+                        GPUWidget {
                             opacity: root.entranceOpacity(13)
                             scale: root.entranceScale(13)
                             transform: Translate { y: root.entranceY(13) }
@@ -625,6 +607,24 @@ PanelWindow {
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutBack } } }
+                        }
+                        UpdateWidget {
+                            opacity: root.entranceOpacity(14)
+                            scale: root.entranceScale(14)
+                            transform: Translate { y: root.entranceY(14) }
+                            visible: opacity > 0
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutBack } } }
+                        }
+                        ScratchpadWidget {
+                            opacity: root.entranceOpacity(15)
+                            scale: root.entranceScale(15)
+                            transform: Translate { y: root.entranceY(15) }
+                            visible: opacity > 0
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutBack } } }
                         }
                     }
                 }
@@ -639,7 +639,7 @@ PanelWindow {
 
             PowerActionsRow {
                 showContent: root.showContent
-                baseIndex: 14
+                baseIndex: 16
                 staggerDelay: root.staggerDelay
             }
         }

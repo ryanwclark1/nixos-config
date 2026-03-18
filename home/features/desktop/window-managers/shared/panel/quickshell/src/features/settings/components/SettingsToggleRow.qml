@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -36,9 +37,7 @@ Rectangle {
         radius: parent.radius
         color: root._active ? Colors.primaryFaint : "transparent"
         Behavior on color {
-            ColorAnimation {
-                duration: Colors.durationFast
-            }
+            CAnim {}
         }
     }
 

@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import "../sections"
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 PanelWindow {
@@ -196,9 +197,7 @@ PanelWindow {
                 }
             }
             Behavior on color {
-                ColorAnimation {
-                    duration: Colors.durationFast
-                }
+                CAnim {}
             }
 
             MouseArea {

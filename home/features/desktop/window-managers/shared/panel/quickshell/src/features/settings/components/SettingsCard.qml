@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -28,10 +29,7 @@ Rectangle {
     SharedWidgets.InnerHighlight { }
 
     Behavior on implicitHeight {
-        NumberAnimation {
-            duration: Colors.durationNormal
-            easing.type: Easing.OutCubic
-        }
+        Anim {}
     }
 
     Rectangle {

@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import "../../../../services"
 import "../../../../services/ShellUtils.js" as ShellUtils
+import "../../../../shared"
 import "../../../../widgets" as SharedWidgets
 import ".."
 
@@ -484,9 +485,7 @@ Item {
                             font.family: Colors.fontMono
                             font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             Behavior on color {
-                                ColorAnimation {
-                                    duration: Colors.durationFast
-                                }
+                                CAnim {}
                             }
                         }
                     }

@@ -137,10 +137,7 @@ RowLayout {
                     height: 32
 
                     Behavior on width {
-                        NumberAnimation {
-                            duration: Colors.durationFast
-                            easing.type: Easing.OutCubic
-                        }
+                        Anim { duration: Colors.durationFast }
                     }
 
                     Rectangle {

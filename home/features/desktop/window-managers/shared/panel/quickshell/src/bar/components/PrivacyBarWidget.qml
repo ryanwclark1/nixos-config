@@ -1,5 +1,6 @@
 import QtQuick
 import "../../services"
+import "../../shared"
 import "../../widgets" as SharedWidgets
 import "../PanelWidgetHelpers.js" as PanelHelpers
 
@@ -27,10 +28,7 @@ SharedWidgets.BarPill {
     ]
 
     Behavior on width {
-        NumberAnimation {
-            duration: Colors.durationNormal
-            easing.type: Easing.OutCubic
-        }
+        Anim {}
     }
 
     Row {

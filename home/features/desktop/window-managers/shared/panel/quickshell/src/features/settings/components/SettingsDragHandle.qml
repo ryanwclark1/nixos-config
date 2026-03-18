@@ -1,4 +1,5 @@
 import QtQuick
+import "../../../shared"
 import "../../../services"
 
 Rectangle {
@@ -26,9 +27,7 @@ Rectangle {
     opacity: root.enabled ? 1.0 : 0.45
 
     Behavior on color {
-        ColorAnimation {
-            duration: Colors.durationFast
-        }
+        CAnim {}
     }
 
     Text {

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -51,9 +52,7 @@ Rectangle {
     border.width: 1
 
     Behavior on border.color {
-        ColorAnimation {
-            duration: Colors.durationFast
-        }
+        CAnim {}
     }
 
     ColumnLayout {

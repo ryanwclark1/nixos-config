@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland._Screencopy
 import "../services"
+import "../shared"
 import "../widgets" as SharedWidgets
 
 ColumnLayout {
@@ -108,9 +109,7 @@ ColumnLayout {
                                 border.color: hoverArea.containsMouse ? Colors.primary : Colors.border
                                 border.width: 1
                                 Behavior on border.color {
-                                    ColorAnimation {
-                                        duration: Colors.durationFast
-                                    }
+                                    CAnim {}
                                 }
                                 clip: true
 

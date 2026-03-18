@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -23,15 +24,11 @@ Rectangle {
     SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: root.active }
 
     Behavior on color {
-        ColorAnimation {
-            duration: Colors.durationFast
-        }
+        CAnim {}
     }
 
     Behavior on border.color {
-        ColorAnimation {
-            duration: Colors.durationFast
-        }
+        CAnim {}
     }
 
     RowLayout {

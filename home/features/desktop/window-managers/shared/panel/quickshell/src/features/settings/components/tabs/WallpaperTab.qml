@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import "../../../../services"
 import "../../../../services/ColorUtils.js" as ColorUtils
+import "../../../../shared"
 import "../../../../widgets" as SharedWidgets
 import ".."
 
@@ -940,9 +941,7 @@ Item {
                             }
                         }
                         Behavior on color {
-                            ColorAnimation {
-                                duration: Colors.durationFast
-                            }
+                            CAnim {}
                         }
                     }
                 }
@@ -962,9 +961,7 @@ Item {
                         }
                     }
                     Behavior on color {
-                        ColorAnimation {
-                            duration: Colors.durationFast
-                        }
+                        CAnim {}
                     }
                 }
 
@@ -1102,14 +1099,10 @@ Item {
                         clip: true
 
                         Behavior on border.color {
-                            ColorAnimation {
-                                duration: Colors.durationFast
-                            }
+                            CAnim {}
                         }
                         Behavior on color {
-                            ColorAnimation {
-                                duration: Colors.durationFast
-                            }
+                            CAnim {}
                         }
 
                         Image {

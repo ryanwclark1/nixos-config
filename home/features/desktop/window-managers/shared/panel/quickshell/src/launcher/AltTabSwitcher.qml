@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import "../services"
+import "../shared"
 import "../widgets" as SharedWidgets
 
 Scope {
@@ -206,9 +207,7 @@ Scope {
                                             }
                                         }
                                         Behavior on color {
-                                            ColorAnimation {
-                                                duration: Colors.durationFast
-                                            }
+                                            CAnim {}
                                         }
 
                                         gradient: isSelected ? selectedGradient : null

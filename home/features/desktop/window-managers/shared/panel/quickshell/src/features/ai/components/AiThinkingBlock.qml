@@ -20,10 +20,7 @@ Rectangle {
     clip: true
 
     Behavior on height {
-        NumberAnimation {
-            duration: Colors.durationFast
-            easing.type: Easing.OutCubic
-        }
+        Anim { duration: Colors.durationFast }
     }
 
     RowLayout {

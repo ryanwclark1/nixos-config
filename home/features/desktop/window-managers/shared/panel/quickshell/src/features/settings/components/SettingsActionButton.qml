@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -23,9 +24,7 @@ Rectangle {
     opacity: root.enabled ? 1.0 : 0.45
 
     Behavior on color {
-        ColorAnimation {
-            duration: Colors.durationFast
-        }
+        CAnim {}
     }
 
     SharedWidgets.StateLayer {

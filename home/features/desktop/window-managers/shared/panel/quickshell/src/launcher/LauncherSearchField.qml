@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../shared"
 import "../widgets" as SharedWidgets
 
 Rectangle {
@@ -29,9 +30,7 @@ Rectangle {
     }
 
     Behavior on border.color {
-        ColorAnimation {
-            duration: Colors.durationFast
-        }
+        CAnim {}
     }
 
     // Inner highlight
@@ -49,9 +48,7 @@ Rectangle {
             font.pixelSize: Colors.fontSizeXL
             font.family: Colors.fontMono
             Behavior on color {
-                ColorAnimation {
-                    duration: Colors.durationFast
-                }
+                CAnim {}
             }
         }
 

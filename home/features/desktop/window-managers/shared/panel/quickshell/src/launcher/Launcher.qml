@@ -7,6 +7,7 @@ import Quickshell.Bluetooth
 import Quickshell.Services.Mpris
 import "../services"
 import "../services/ShellUtils.js" as SU
+import "../shared"
 import "../widgets" as SharedWidgets
 import "LauncherModeData.js" as ModeData
 import "LauncherSearch.js" as Search
@@ -2767,10 +2768,7 @@ PanelWindow {
         opacity: launcherOpacity
         layer.enabled: opacity > 0 && opacity < 1
         Behavior on opacity {
-            NumberAnimation {
-                duration: Colors.durationNormal
-                easing.type: Easing.OutCubic
-            }
+            Anim {}
         }
         MouseArea {
             anchors.fill: parent

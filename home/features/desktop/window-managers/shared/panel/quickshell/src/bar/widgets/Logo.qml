@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../services"
+import "../../shared"
 import "../../widgets" as SharedWidgets
 
 Item {
@@ -109,10 +110,7 @@ Item {
   scale: mouseArea.containsMouse ? 1.06 : 1.0
   layer.enabled: mouseArea.containsMouse
   Behavior on scale {
-    NumberAnimation {
-      duration: Colors.durationFast
-      easing.type: Easing.OutCubic
-    }
+    Anim { duration: Colors.durationFast }
   }
 
   MouseArea {

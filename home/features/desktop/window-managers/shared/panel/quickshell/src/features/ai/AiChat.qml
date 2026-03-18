@@ -7,6 +7,7 @@ import Quickshell.Io
 import "../../services"
 import "services/AiProviders.js" as Providers
 import "services/AiMarkdown.js" as Markdown
+import "../../shared"
 import "../../widgets" as SharedWidgets
 import "../../features/settings/components"
 import "components"
@@ -261,9 +262,7 @@ PanelWindow {
                 }
             }
             Behavior on color {
-                ColorAnimation {
-                    duration: Colors.durationFast
-                }
+                CAnim {}
             }
 
             MouseArea {
@@ -517,10 +516,7 @@ PanelWindow {
                 opacity: visible ? 1.0 : 0.0
                 scale: visible ? 1.0 : 0.95
                 Behavior on opacity {
-                    NumberAnimation {
-                        duration: Colors.durationNormal
-                        easing.type: Easing.OutCubic
-                    }
+                    Anim {}
                 }
                 Behavior on scale {
                     NumberAnimation {
@@ -601,10 +597,7 @@ PanelWindow {
                 opacity: visible ? 1.0 : 0.0
                 scale: visible ? 1.0 : 0.95
                 Behavior on opacity {
-                    NumberAnimation {
-                        duration: Colors.durationNormal
-                        easing.type: Easing.OutCubic
-                    }
+                    Anim {}
                 }
                 Behavior on scale {
                     NumberAnimation {
@@ -716,9 +709,7 @@ PanelWindow {
                 radius: Colors.radiusMedium
                 clip: true
                 Behavior on border.color {
-                    ColorAnimation {
-                        duration: Colors.durationFast
-                    }
+                    CAnim {}
                 }
 
                 ColumnLayout {

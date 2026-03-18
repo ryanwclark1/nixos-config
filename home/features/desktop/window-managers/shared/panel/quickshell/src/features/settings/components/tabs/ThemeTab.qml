@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
+import "../../../../shared"
 import "../../../../widgets" as SharedWidgets
 import ".."
 
@@ -376,9 +377,7 @@ Item {
                                                 border.width: themeCardWrapper._themeIsActive ? 2 : 1
 
                                                 Behavior on border.color {
-                                                    ColorAnimation {
-                                                        duration: Colors.durationFast
-                                                    }
+                                                    CAnim {}
                                                 }
 
                                                 Rectangle {

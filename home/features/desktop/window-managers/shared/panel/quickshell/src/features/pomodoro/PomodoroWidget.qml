@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
 import "../../services"
+import "../../shared"
 import "../../widgets" as SharedWidgets
 
 Rectangle {
