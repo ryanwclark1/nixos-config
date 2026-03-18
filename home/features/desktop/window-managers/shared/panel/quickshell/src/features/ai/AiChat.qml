@@ -31,7 +31,7 @@ PanelWindow {
         item: slidePanel
     }
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+    WlrLayershell.keyboardFocus: root.showContent ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     WlrLayershell.namespace: "quickshell"
 
     // --- State ---
@@ -49,6 +49,13 @@ PanelWindow {
 
     signal closeRequested
 
+    function clearInteractiveFocus() {
+        if (inputField.activeFocus)
+            inputField.focus = false;
+        if (slidePanel.activeFocus)
+            slidePanel.focus = false;
+    }
+
     // Panel visibility: stay mapped during slide-out animation
     visible: showContent || slidePanel.x < panelWidth
 
@@ -57,8 +64,7 @@ PanelWindow {
             root._syncInputFromService();
             inputField.forceActiveFocus();
         } else {
-            if (inputField.activeFocus)
-                inputField.focus = false;
+            clearInteractiveFocus();
             providerDropdown.visible = false;
         }
     }

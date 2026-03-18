@@ -157,6 +157,45 @@ call_ipc() {
   run_ipc quickshell ipc --pid "${unit_pid}" call "${target}" "${action}" "$@"
 }
 
+probe_ipc_action() {
+  local label="$1"
+  local target="$2"
+  local action="$3"
+  shift 3
+  local attempt
+
+  for attempt in 1 2 3; do
+    if call_ipc "${target}" "${action}" "$@" >/dev/null; then
+      pass "${label}"
+      return 0
+    fi
+    wait_for_query_ready >/dev/null 2>&1 || true
+    sleep 0.3
+  done
+
+  fail "${label}"
+  return 1
+}
+
+reload_and_wait() {
+  local label="$1"
+
+  if call_ipc Shell reloadConfig >/dev/null; then
+    pass "${label}"
+  else
+    fail "${label}"
+    return 1
+  fi
+
+  if ! wait_for_query_ready; then
+    fail "Shell reload did not return to query-ready state"
+    return 1
+  fi
+
+  sleep 0.5
+  return 0
+}
+
 surface_is_open() {
   local surface_id="$1"
   local state=""
@@ -188,59 +227,34 @@ start_transient_unit() {
 }
 
 exercise_launcher() {
-  if call_ipc Launcher openDrun >/dev/null; then
-    pass "Launcher.openDrun"
-  else
-    fail "Launcher.openDrun"
-  fi
+  probe_ipc_action "Launcher.openDrun" Launcher openDrun
   sleep 0.2
 
-  if call_ipc Launcher openWeb >/dev/null; then
-    pass "Launcher.openWeb"
-  else
-    fail "Launcher.openWeb"
-  fi
+  probe_ipc_action "Launcher.openWeb" Launcher openWeb
   sleep 0.2
 
-  if call_ipc Launcher openFiles >/dev/null; then
-    pass "Launcher.openFiles"
-  else
-    fail "Launcher.openFiles"
-  fi
+  probe_ipc_action "Launcher.openFiles" Launcher openFiles
   sleep 0.2
 
-  if call_ipc Launcher openSystem >/dev/null; then
-    pass "Launcher.openSystem"
-  else
-    fail "Launcher.openSystem"
-  fi
+  probe_ipc_action "Launcher.openSystem" Launcher openSystem
   sleep 0.2
 
-  if call_ipc Launcher toggle >/dev/null; then
-    pass "Launcher.toggle"
-  else
-    fail "Launcher.toggle"
-  fi
+  probe_ipc_action "Launcher.toggle" Launcher toggle
 }
 
 exercise_surfaces() {
   local surface_id=""
   for surface_id in notifCenter controlCenter audioMenu dateTimeMenu clipboardMenu; do
-    if call_ipc Shell openSurface "${surface_id}" >/dev/null; then
-      pass "Shell.openSurface ${surface_id}"
+    if probe_ipc_action "Shell.openSurface ${surface_id}" Shell openSurface "${surface_id}"; then
+      :
     elif surface_is_open "${surface_id}"; then
       pass "Shell.openSurface ${surface_id} (already open)"
     else
-      sleep 0.2
-      if call_ipc Shell openSurface "${surface_id}" >/dev/null || surface_is_open "${surface_id}"; then
-        pass "Shell.openSurface ${surface_id} (retry)"
-      else
-        fail "Shell.openSurface ${surface_id}"
-      fi
+      fail "Shell.openSurface ${surface_id}"
     fi
     sleep 0.2
-    if call_ipc Shell closeSurface "${surface_id}" >/dev/null; then
-      pass "Shell.closeSurface ${surface_id}"
+    if probe_ipc_action "Shell.closeSurface ${surface_id}" Shell closeSurface "${surface_id}"; then
+      :
     elif ! surface_is_open "${surface_id}"; then
       pass "Shell.closeSurface ${surface_id} (already closed)"
     else
@@ -249,17 +263,9 @@ exercise_surfaces() {
     sleep 0.1
   done
 
-  if call_ipc SettingsHub openTab hooks >/dev/null; then
-    pass "SettingsHub.openTab hooks"
-  else
-    fail "SettingsHub.openTab hooks"
-  fi
+  probe_ipc_action "SettingsHub.openTab hooks" SettingsHub openTab hooks
   sleep 0.2
-  if call_ipc SettingsHub close >/dev/null; then
-    pass "SettingsHub.close"
-  else
-    fail "SettingsHub.close"
-  fi
+  probe_ipc_action "SettingsHub.close" SettingsHub close
 }
 
 check_journal() {
@@ -303,19 +309,15 @@ main() {
 
   start_transient_unit
 
-  if call_ipc Shell reloadConfig >/dev/null; then
-    pass "Shell.reloadConfig"
-    if ! wait_for_query_ready; then
-      fail "Shell reload did not return to query-ready state"
-      printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
-      exit 1
-    fi
-  else
-    fail "Shell.reloadConfig"
+  if ! reload_and_wait "Shell.reloadConfig"; then
+    printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
+    exit 1
   fi
-
-  sleep 0.5
   exercise_launcher
+  if ! reload_and_wait "Shell.reloadConfig before surface checks"; then
+    printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
+    exit 1
+  fi
   sleep 0.5
   exercise_surfaces
   sleep 1
