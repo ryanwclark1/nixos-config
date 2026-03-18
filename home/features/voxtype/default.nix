@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   pkgs,
   ...
 }:
@@ -25,5 +26,13 @@ in
         fallback_to_clipboard = true;
       };
     };
+  };
+
+  systemd.user.services.voxtype = {
+    Unit = {
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+    };
+
+    Install = lib.mkForce { };
   };
 }

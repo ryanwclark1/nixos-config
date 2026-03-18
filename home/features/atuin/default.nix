@@ -11,7 +11,6 @@
     flags = [
       "--disable-ctrl-r"
     ];
-    forceOverwriteSettings = true;
     settings = {
       auto_sync = false;
       dialect = "us";

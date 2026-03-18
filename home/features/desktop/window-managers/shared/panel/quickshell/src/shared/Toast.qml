@@ -14,6 +14,8 @@ Item {
   property string type: "notice"
   property int duration: 3000
   property real progress: 1.0
+  property string actionLabel: ""
+  property string actionToken: ""
 
   signal hidden()
 
@@ -29,12 +31,16 @@ Item {
   readonly property real _dismissThreshold: Math.max(80, width * 0.28)
 
   // ── Show / Hide ────────────────────────────────
-  function show(t, d, i, ty, dur) {
+  function show(t, d, i, ty, dur, actionText, actionId) {
+    if (actionToken && actionToken !== (actionId || ""))
+      ToastService.clearAction(actionToken);
     title = t || "";
     description = d || "";
     icon = i || "󰋼";
     type = ty || "notice";
     duration = dur || 3000;
+    actionLabel = actionText || "";
+    actionToken = actionId || "";
     progress = 1.0;
     _swipeOffset = 0;
     visible = true;
@@ -66,7 +72,15 @@ Item {
     id: hideAnim
     NumberAnimation { target: root; property: "opacity"; to: 0; duration: Colors.durationNormal; easing.type: Easing.InCubic }
     NumberAnimation { target: root; property: "scale"; to: 0.9; duration: Colors.durationNormal; easing.type: Easing.InCubic }
-    onFinished: { root.visible = false; root.hidden(); }
+    onFinished: {
+      root.visible = false;
+      if (root.actionToken) {
+        ToastService.clearAction(root.actionToken);
+        root.actionToken = "";
+      }
+      root.actionLabel = "";
+      root.hidden();
+    }
   }
 
   // ── Hover pause ────────────────────────────────
@@ -156,6 +170,47 @@ Item {
         width: parent.width
         wrapMode: Text.Wrap
         visible: text !== ""
+      }
+
+      Rectangle {
+        visible: root.actionLabel !== ""
+        width: actionRow.implicitWidth + Colors.spacingM
+        height: 28
+        radius: Colors.radiusSmall
+        color: actionMouse.containsMouse ? Colors.primaryGhost : Colors.withAlpha(Colors.primary, 0.12)
+        border.color: Colors.withAlpha(Colors.primary, 0.25)
+        border.width: 1
+
+        Row {
+          id: actionRow
+          anchors.centerIn: parent
+          spacing: Colors.spacingXS
+
+          Text {
+            text: "󰕌"
+            color: Colors.primary
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeSmall
+          }
+
+          Text {
+            text: root.actionLabel
+            color: Colors.primary
+            font.pixelSize: Colors.fontSizeSmall
+            font.weight: Font.DemiBold
+          }
+        }
+
+        MouseArea {
+          id: actionMouse
+          anchors.fill: parent
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: {
+            ToastService.triggerAction(root.actionToken);
+            root.hide();
+          }
+        }
       }
     }
 

@@ -62,7 +62,7 @@ Item {
 
     Timer {
       id: hideTimer
-      interval: _scrollbarHideMs
+      interval: scrollbar._scrollbarHideMs
       repeat: false
       onTriggered: if (!thumbDrag.drag.active && !thumbDrag.containsMouse) scrollbar.visibleState = false
     }

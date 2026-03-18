@@ -150,9 +150,13 @@ QtObject {
     readonly property int fontSizeDisplay: scaledMetric(28, _fontScale, 20)
 
     function withAlpha(c, a) {
+        if (c === undefined || c === null || c === "")
+            return "transparent";
         return Qt.rgba(c.r, c.g, c.b, a);
     }
     function solid(c) {
+        if (c === undefined || c === null || c === "")
+            return "transparent";
         return Qt.rgba(c.r, c.g, c.b, 1);
     }
     function clamp01(value) {

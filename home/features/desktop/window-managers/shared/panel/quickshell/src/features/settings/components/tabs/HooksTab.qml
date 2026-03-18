@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import "../../../../features/bar" as BarComponents
 import "../../../../services"
 import ".."
 
@@ -117,14 +118,15 @@ Item {
                                 font.pixelSize: Colors.fontSizeLarge
 
                                 MouseArea {
+                                    id: createTemplateMouse
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
                                     hoverEnabled: true
                                     onClicked: _createTemplate(modelData.name, modelData.valueDescription)
 
-                                    BarTooltip {
-                                        anchorItem: parent
-                                        hovered: parent.containsMouse
+                                    BarComponents.BarTooltip {
+                                        anchorItem: createTemplateMouse
+                                        hovered: createTemplateMouse.containsMouse
                                         text: "Create template script"
                                     }
                                 }

@@ -2,243 +2,388 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
+import "../services/AiProviders.js" as Providers
 
-// Horizontal tab bar showing all AI conversations with add/delete/rename controls.
-// All interactions go directly to the AiService singleton.
+// Horizontal AI conversation switcher with a visible recent strip, overflow menu,
+// close/restore actions, and tab context menus.
 RowLayout {
     id: root
     spacing: Colors.spacingS
 
-    // Scrollable tab strip
+    property string editingConversationId: ""
+
+    readonly property var sortedConversations: {
+        var convs = AiService.conversations.slice();
+        convs.sort(function(a, b) {
+            return (b.updatedAt || 0) - (a.updatedAt || 0);
+        });
+        return convs;
+    }
+
+    readonly property var primaryConversations: {
+        var visible = [];
+        var active = AiService.activeConversation;
+        var seen = ({});
+        if (active) {
+            visible.push(active);
+            seen[active.id] = true;
+        }
+        for (var i = 0; i < sortedConversations.length && visible.length < 4; i++) {
+            if (!seen[sortedConversations[i].id]) {
+                visible.push(sortedConversations[i]);
+                seen[sortedConversations[i].id] = true;
+            }
+        }
+        return visible;
+    }
+
+    readonly property var overflowConversations: {
+        var hidden = [];
+        var visibleIds = ({});
+        for (var i = 0; i < primaryConversations.length; i++)
+            visibleIds[primaryConversations[i].id] = true;
+        for (var j = 0; j < sortedConversations.length; j++) {
+            if (!visibleIds[sortedConversations[j].id])
+                hidden.push(sortedConversations[j]);
+        }
+        return hidden;
+    }
+
+    function _formatUpdatedAt(timestamp) {
+        if (!timestamp)
+            return "Unknown";
+        return Qt.formatDateTime(new Date(timestamp), "MMM d · hh:mm");
+    }
+
+    function _tabTooltip(conv) {
+        return conv.title + "\n" + Providers.providerLabel(conv.provider) + " · " + conv.model + "\nUpdated " + _formatUpdatedAt(conv.updatedAt);
+    }
+
+    function _closeConversationWithUndo(id, wasStreaming) {
+        if (!AiService.closeConversation(id))
+            return;
+        editingConversationId = "";
+        ToastService.showNoticeAction("Chat closed", wasStreaming ? "Stream cancelled. Undo is available." : "Undo is available for the most recently closed chat.", "Undo", function() {
+            AiService.restoreLastClosedConversation();
+        });
+    }
+
+    function _closeOthersWithNotice(id) {
+        var closed = AiService.closeOtherConversations(id);
+        if (closed > 0)
+            ToastService.showNotice("Other chats closed", closed + " chat" + (closed !== 1 ? "s" : "") + " closed. Use Ctrl+Shift+T to reopen.");
+    }
+
+    function _buildTabContextModel(conv) {
+        return [
+            {
+                label: "Rename",
+                icon: "󰑕",
+                action: function() {
+                    AiService.setActiveConversation(conv.id);
+                    editingConversationId = conv.id;
+                }
+            },
+            {
+                label: "Clear",
+                icon: "󰃢",
+                action: function() {
+                    var wasStreaming = AiService.isStreaming && AiService.activeConversationId === conv.id;
+                    AiService.clearConversation(conv.id);
+                    ToastService.showNotice("Chat cleared", wasStreaming ? "Stream cancelled and messages were cleared." : "Messages and draft were cleared.");
+                }
+            },
+            {
+                label: "Duplicate Prompt",
+                icon: "󰆏",
+                action: function() {
+                    AiService.duplicateConversationPrompt(conv.id);
+                }
+            },
+            { separator: true },
+            {
+                label: "Close Others",
+                icon: "󰘴",
+                disabled: AiService.conversations.length <= 1,
+                action: function() {
+                    _closeOthersWithNotice(conv.id);
+                }
+            },
+            {
+                label: "Close",
+                icon: "󰅖",
+                danger: true,
+                action: function() {
+                    _closeConversationWithUndo(conv.id, AiService.isStreaming && AiService.activeConversationId === conv.id);
+                }
+            }
+        ];
+    }
+
     Item {
         Layout.fillWidth: true
         height: 38
-        clip: true
 
-        Flickable {
-            id: tabFlickable
+        Row {
+            id: tabRow
             anchors.fill: parent
-            contentWidth: tabRow.implicitWidth + 32
-            contentHeight: height
-            flickableDirection: Flickable.HorizontalFlick
-            boundsBehavior: Flickable.StopAtBounds
-            clip: true
+            spacing: Colors.spacingS
 
-            Row {
-                id: tabRow
-                spacing: Colors.spacingS
-                height: parent.height
-                leftPadding: Colors.spacingS
-                rightPadding: Colors.spacingS
-                topPadding: 3
+            Repeater {
+                model: root.primaryConversations
 
-                Repeater {
-                    model: AiService.conversations
+                delegate: Item {
+                    id: tabDelegate
+                    required property var modelData
+                    required property int index
+                    readonly property bool isActive: modelData.id === AiService.activeConversationId
+                    readonly property bool isEditing: root.editingConversationId === modelData.id
 
-                    delegate: Item {
-                        id: tabDelegate
-                        required property var modelData
-                        required property int index
-                        property bool isActive: modelData.id === AiService.activeConversationId
-                        property bool isEditing: false
+                    width: isEditing ? tabEditInput.width + 22 : Math.min(tabLabelText.contentWidth + 70, 168)
+                    height: 32
 
-                        width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + (isActive ? 44 : 38), 160)
-                        height: 32
+                    Behavior on width {
+                        NumberAnimation {
+                            duration: Colors.durationFast
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Colors.radiusSmall
+                        color: isActive ? Colors.highlightLight : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.05) : "transparent")
+                        border.color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.25) : Colors.border)
+                        border.width: isActive ? 1.5 : 1
+
+                        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                        Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+
+                        SharedWidgets.StateLayer {
+                            id: tabStateLayer
+                            hovered: tabMouse.containsMouse
+                            pressed: tabMouse.pressed
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottomMargin: 1.5
+                        width: isActive ? parent.width - 20 : 0
+                        height: 2
+                        radius: Colors.radiusXXXS
+                        color: Colors.primary
+                        opacity: isActive ? 1 : 0
+                        visible: width > 0
 
                         Behavior on width {
-                            NumberAnimation {
-                                duration: Colors.durationFast
-                                easing.type: Easing.OutCubic
-                            }
+                            NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
                         }
-
-                        // Auto-scroll to make the active tab visible
-                        onIsActiveChanged: {
-                            if (isActive) {
-                                if (x < tabFlickable.contentX) {
-                                    tabFlickable.contentX = x - 16;
-                                } else if (x + width > tabFlickable.contentX + tabFlickable.width) {
-                                    tabFlickable.contentX = x + width - tabFlickable.width + 16;
-                                }
-                            }
+                        Behavior on opacity {
+                            NumberAnimation { duration: Colors.durationFast }
                         }
+                    }
 
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: Colors.radiusSmall
-                            color: isActive ? Colors.highlightLight : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.05) : "transparent")
-                            border.color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.25) : Colors.border)
-                            border.width: isActive ? 1.5 : 1
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: Colors.spacingS
+                        anchors.rightMargin: 6
+                        spacing: Colors.spacingXS
 
-                            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-                            Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
-
-                            SharedWidgets.StateLayer {
-                                id: tabStateLayer
-                                hovered: tabMouse.containsMouse
-                                pressed: tabMouse.pressed
-                            }
-                        }
-
-                        // Active indicator underline
-                        Rectangle {
-                            anchors.bottom: parent.bottom
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottomMargin: 1.5
-                            width: isActive ? parent.width - 20 : 0
-                            height: 2
-                            radius: Colors.radiusXXXS
-                            color: Colors.primary
-                            opacity: isActive ? 1 : 0
-                            visible: width > 0
-
-                            Behavior on width {
-                                NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
-                            }
-                            Behavior on opacity {
-                                NumberAnimation { duration: Colors.durationFast }
-                            }
-                        }
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: Colors.spacingS
-                            anchors.rightMargin: 6
-                            spacing: Colors.spacingXS
-
-                            // Streaming activity dot
-                            Rectangle {
-                                width: 6
-                                height: 6
-                                radius: Colors.radiusXS
-                                color: Colors.primary
-                                visible: isActive && AiService.isStreaming
-                                Layout.alignment: Qt.AlignVCenter
-
-                                OpacityAnimator on opacity {
-                                    from: 0.3
-                                    to: 1.0
-                                    duration: Colors.durationPulse
-                                    running: isActive && AiService.isStreaming
-                                    loops: Animation.Infinite
-                                }
-                            }
-
-                            Text {
-                                id: tabLabelText
-                                Layout.fillWidth: true
-                                text: modelData.title
-                                color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.text : Colors.textSecondary)
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.weight: isActive ? Font.DemiBold : Font.Normal
-                                elide: Text.ElideRight
-                                visible: !tabDelegate.isEditing
-                                horizontalAlignment: Text.AlignLeft
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                        }
-
-                        TextInput {
-                            id: tabEditInput
-                            anchors.left: parent.left
-                            anchors.leftMargin: Colors.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: Math.max(60, contentWidth + 4)
-                            text: modelData.title
-                            color: Colors.primary
+                        Text {
+                            text: Providers.providerIcon(modelData.provider)
+                            color: isActive ? Colors.primary : Colors.textSecondary
+                            font.family: Colors.fontMono
                             font.pixelSize: Colors.fontSizeSmall
-                            font.weight: Font.DemiBold
-                            visible: tabDelegate.isEditing
-                            selectByMouse: true
-                            onVisibleChanged: if (visible) {
-                                selectAll();
-                                forceActiveFocus();
-                            }
-                            Keys.onReturnPressed: {
-                                AiService.renameConversation(modelData.id, text);
-                                tabDelegate.isEditing = false;
-                            }
-                            Keys.onEscapePressed: tabDelegate.isEditing = false
-                            onEditingFinished: {
-                                AiService.renameConversation(modelData.id, text);
-                                tabDelegate.isEditing = false;
-                            }
+                            visible: !tabDelegate.isEditing
                         }
 
                         Rectangle {
-                            id: deleteTabBtn
-                            width: 16
-                            height: 16
-                            radius: width / 2
-                            anchors.right: parent.right
-                            anchors.rightMargin: 6
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: "transparent"
-                            opacity: (tabMouse.containsMouse || tabDelegate.isActive) && AiService.conversations.length > 1 ? 1 : 0
-                            visible: AiService.conversations.length > 1
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Colors.durationFast
-                                }
-                            }
+                            width: 6
+                            height: 6
+                            radius: Colors.radiusXS
+                            color: Colors.primary
+                            visible: isActive && AiService.isStreaming
+                            Layout.alignment: Qt.AlignVCenter
 
-                            SharedWidgets.StateLayer {
-                                id: deleteTabStateLayer
-                                hovered: deleteTabMouse.containsMouse
-                                pressed: deleteTabMouse.pressed
-                                stateColor: Colors.error
+                            OpacityAnimator on opacity {
+                                from: 0.3
+                                to: 1.0
+                                duration: Colors.durationPulse
+                                running: isActive && AiService.isStreaming
+                                loops: Animation.Infinite
                             }
+                        }
 
-                            Text {
-                                anchors.centerIn: parent
-                                text: "󰅖"
-                                color: deleteTabMouse.containsMouse ? "white" : Colors.textDisabled
-                                font.family: Colors.fontMono
-                                font.pixelSize: 10
-                            }
-                            MouseArea {
-                                id: deleteTabMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: mouse => {
-                                    deleteTabStateLayer.burst(mouse.x, mouse.y);
-                                    mouse.accepted = true;
-                                    AiService.deleteConversation(modelData.id);
-                                }
-                            }
+                        Text {
+                            id: tabLabelText
+                            Layout.fillWidth: true
+                            text: modelData.title
+                            color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.text : Colors.textSecondary)
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: isActive ? Font.DemiBold : Font.Normal
+                            elide: Text.ElideRight
+                            visible: !tabDelegate.isEditing
+                            horizontalAlignment: Text.AlignLeft
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+                    TextInput {
+                        id: tabEditInput
+                        anchors.left: parent.left
+                        anchors.leftMargin: Colors.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: Math.max(72, contentWidth + 8)
+                        text: modelData.title
+                        color: Colors.primary
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.DemiBold
+                        visible: tabDelegate.isEditing
+                        selectByMouse: true
+                        onVisibleChanged: if (visible) {
+                            selectAll();
+                            forceActiveFocus();
+                        }
+                        Keys.onReturnPressed: {
+                            AiService.renameConversation(modelData.id, text);
+                            root.editingConversationId = "";
+                        }
+                        Keys.onEscapePressed: root.editingConversationId = ""
+                        onEditingFinished: {
+                            AiService.renameConversation(modelData.id, text);
+                            root.editingConversationId = "";
+                        }
+                    }
+
+                    Rectangle {
+                        id: closeTabBtn
+                        width: 16
+                        height: 16
+                        z: 2
+                        radius: width / 2
+                        anchors.right: parent.right
+                        anchors.rightMargin: 6
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "transparent"
+                        opacity: tabMouse.containsMouse || tabDelegate.isActive ? 1 : 0
+                        Behavior on opacity {
+                            NumberAnimation { duration: Colors.durationFast }
+                        }
+
+                        SharedWidgets.StateLayer {
+                            id: closeTabStateLayer
+                            hovered: closeTabMouse.containsMouse
+                            pressed: closeTabMouse.pressed
+                            stateColor: Colors.error
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "󰅖"
+                            color: closeTabMouse.containsMouse ? "white" : Colors.textDisabled
+                            font.family: Colors.fontMono
+                            font.pixelSize: 10
                         }
 
                         MouseArea {
-                            id: tabMouse
+                            id: closeTabMouse
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            acceptedButtons: Qt.LeftButton | Qt.RightButton
                             onClicked: mouse => {
-                                tabStateLayer.burst(mouse.x, mouse.y);
-                                if (mouse.button === Qt.RightButton) {
-                                    tabDelegate.isEditing = true;
-                                    return;
-                                }
-                                if (!tabDelegate.isEditing)
-                                    AiService.setActiveConversation(modelData.id);
+                                closeTabStateLayer.burst(mouse.x, mouse.y);
+                                mouse.accepted = true;
+                                root._closeConversationWithUndo(modelData.id, AiService.isStreaming && AiService.activeConversationId === modelData.id);
                             }
-                            onDoubleClicked: tabDelegate.isEditing = true
                         }
+                    }
 
-                        SharedWidgets.BarTooltip {
-                            text: modelData.title
-                            hovered: tabMouse.containsMouse && tabLabelText.truncated
-                            anchorItem: tabDelegate
+                    MouseArea {
+                        id: tabMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        onClicked: mouse => {
+                            tabStateLayer.burst(mouse.x, mouse.y);
+                            if (mouse.button === Qt.RightButton) {
+                                var pos = tabDelegate.mapToItem(root, 0, tabDelegate.height);
+                                tabContextMenu.model = root._buildTabContextModel(modelData);
+                                tabContextMenu.popup(pos.x, pos.y + Colors.spacingXS);
+                                return;
+                            }
+                            if (!tabDelegate.isEditing)
+                                AiService.setActiveConversation(modelData.id);
                         }
+                        onDoubleClicked: {
+                            AiService.setActiveConversation(modelData.id);
+                            root.editingConversationId = modelData.id;
+                        }
+                    }
+
+                    SharedWidgets.BarTooltip {
+                        text: root._tabTooltip(modelData)
+                        hovered: tabMouse.containsMouse
+                        anchorItem: tabDelegate
                     }
                 }
             }
         }
     }
 
-    // "+" new conversation button
+    Rectangle {
+        id: overflowButton
+        visible: root.overflowConversations.length > 0
+        width: 34
+        height: 32
+        radius: Colors.radiusSmall
+        color: overflowMouse.containsMouse ? Colors.primaryGhost : Colors.bgWidget
+        border.color: overflowMouse.containsMouse ? Colors.primary : Colors.border
+        border.width: 1
+        Layout.alignment: Qt.AlignVCenter
+
+        Text {
+            anchors.centerIn: parent
+            text: "󰅁"
+            color: overflowMouse.containsMouse ? Colors.primary : Colors.textSecondary
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeSmall
+        }
+
+        MouseArea {
+            id: overflowMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+                var model = [];
+                for (var i = 0; i < root.overflowConversations.length; i++) {
+                    var conv = root.overflowConversations[i];
+                    model.push({
+                        label: conv.title,
+                        icon: Providers.providerIcon(conv.provider),
+                        action: (function(convId) {
+                            return function() {
+                                AiService.setActiveConversation(convId);
+                            };
+                        })(conv.id)
+                    });
+                }
+                var pos = parent.mapToItem(root, 0, parent.height);
+                overflowMenu.model = model;
+                overflowMenu.popup(pos.x, pos.y + Colors.spacingXS);
+            }
+        }
+
+        SharedWidgets.BarTooltip {
+            text: "More chats"
+            hovered: overflowMouse.containsMouse
+            anchorItem: overflowButton
+        }
+    }
+
     Rectangle {
         width: 32
         height: 32
@@ -256,11 +401,13 @@ RowLayout {
             font.pixelSize: Colors.fontSizeXL
             font.weight: Font.Light
         }
+
         SharedWidgets.StateLayer {
             id: addConvStateLayer
             hovered: addConvMouse.containsMouse
             pressed: addConvMouse.pressed
         }
+
         MouseArea {
             id: addConvMouse
             anchors.fill: parent
@@ -271,5 +418,13 @@ RowLayout {
                 AiService.newConversation();
             }
         }
+    }
+
+    SharedWidgets.ContextMenu {
+        id: tabContextMenu
+    }
+
+    SharedWidgets.ContextMenu {
+        id: overflowMenu
     }
 }

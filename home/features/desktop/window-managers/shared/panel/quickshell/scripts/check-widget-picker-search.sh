@@ -3,24 +3,44 @@ set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
+repo_root="$(cd -- "${script_dir}/.." >/dev/null 2>&1 && pwd -P)"
 source "${script_dir}/harness-warnings.sh"
 
 tmp_home="$(mktemp -d)"
 tmp_runtime="$(mktemp -d)"
-tmp_dir="$(mktemp -d)"
-tmp_qml="${tmp_dir}/widget-picker-search-harness.qml"
+tmp_qml="$(mktemp "${repo_root}/tmp-widget-picker-search-harness-XXXXXX.qml")"
 
 cleanup() {
-  rm -rf -- "${tmp_home}" "${tmp_runtime}" "${tmp_dir}"
+  rm -rf -- "${tmp_home}" "${tmp_runtime}"
+  rm -f -- "${tmp_qml}"
 }
 trap cleanup EXIT
 
-mkdir -p "${tmp_home}/.local/state/quickshell" "${tmp_home}/.config/quickshell" "${tmp_runtime}/quickshell" "${tmp_dir}/features/settings"
+mkdir -p "${tmp_home}/.local/state/quickshell" "${tmp_home}/.config/quickshell" "${tmp_runtime}/quickshell"
 chmod 700 "${tmp_runtime}"
 printf '{"themes":[]}\n' > "${tmp_home}/.config/quickshell/themes.json"
-ln -s "${config_dir}/services" "${tmp_dir}/services"
-ln -s "${config_dir}/widgets" "${tmp_dir}/widgets"
-ln -s "${config_dir}/features/settings/components" "${tmp_dir}/features/settings/components"
+mkdir -p "${tmp_home}/.config/quickshell/plugins/test-bar"
+
+cat > "${tmp_home}/.config/quickshell/plugins/test-bar/manifest.json" <<'JSON'
+{
+  "id": "test-bar",
+  "name": "Test Bar Plugin",
+  "description": "Temporary widget picker harness plugin.",
+  "author": "Codex",
+  "version": "1.0.0",
+  "type": "bar-widget",
+  "permissions": [],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  }
+}
+JSON
+
+cat > "${tmp_home}/.config/quickshell/plugins/test-bar/BarWidget.qml" <<'QML'
+import QtQuick
+
+Item {}
+QML
 
 cat > "${tmp_home}/.local/state/quickshell/config.json" <<'JSON'
 {
@@ -57,9 +77,9 @@ cat > "${tmp_qml}" <<'QML'
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import "./services"
-import "./widgets"
-import "./features/settings/components/tabs"
+import "./src/services"
+import "./src/widgets"
+import "./src/features/settings/components/tabs"
 
 Item {
   width: 960
@@ -113,6 +133,8 @@ Item {
       console.log("BAR_ALL_COUNT", barAllTypes.length);
       console.log("BAR_HAS_BATTERY", hasValue(barAllTypes, "battery"));
       console.log("BAR_HAS_PRINTER", hasValue(barAllTypes, "printer"));
+      console.log("BAR_HAS_SYSTEM_MONITOR", hasValue(barAllTypes, "systemMonitor"));
+      console.log("BAR_HAS_PLUGIN_TEST", hasValue(barAllTypes, "plugin:test-bar"));
 
       barPicker.widgetSearchQuery = "print";
       var barPrintTypes = widgetTypes(barPicker.availableWidgetsForPicker());
@@ -167,6 +189,16 @@ grep -q 'BAR_HAS_BATTERY true' <<<"${output}" || {
 
 grep -q 'BAR_HAS_PRINTER true' <<<"${output}" || {
   printf '[FAIL] Bar widget picker did not expose the full widget catalog.\n' >&2
+  exit 1
+}
+
+grep -q 'BAR_HAS_SYSTEM_MONITOR true' <<<"${output}" || {
+  printf '[FAIL] Bar widget picker did not expose the legacy internal system monitor widget.\n' >&2
+  exit 1
+}
+
+grep -q 'BAR_HAS_PLUGIN_TEST true' <<<"${output}" || {
+  printf '[FAIL] Bar widget picker did not expose enabled plugin widgets.\n' >&2
   exit 1
 }
 

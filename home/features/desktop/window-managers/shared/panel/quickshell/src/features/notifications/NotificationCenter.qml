@@ -322,8 +322,14 @@ PanelWindow {
             }
 
             onDismissRequested: notification.dismiss()
-            onActionInvoked: action => { action.invoke(); notification.dismiss(); }
-            onReplySent: text => { notification.invoke(text); notification.dismiss(); }
+            onActionInvoked: function(action) {
+              action.invoke();
+              notification.dismiss();
+            }
+            onReplySent: function(text) {
+              notification.invoke(text);
+              notification.dismiss();
+            }
           }
 
           SharedWidgets.Scrollbar { flickable: notifList }

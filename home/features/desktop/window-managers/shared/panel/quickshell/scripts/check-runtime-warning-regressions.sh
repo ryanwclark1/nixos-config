@@ -29,6 +29,7 @@ Reloads the shell, opens the targeted warning-regression surfaces:
   - audioMenu
   - controlCenter
   - aiChat
+  - notifCenter
   - SettingsHub hooks tab
 
 Then scans fresh QuickShell log output for new warnings/errors.
@@ -316,7 +317,7 @@ main() {
     fail "Shell.reloadConfig"
   fi
 
-  for surface_id in audioMenu controlCenter aiChat; do
+  for surface_id in audioMenu controlCenter aiChat notifCenter; do
     if call_ipc Shell openSurface "${surface_id}" >/dev/null; then
       pass "Shell.openSurface ${surface_id}"
     else

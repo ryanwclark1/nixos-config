@@ -35,31 +35,39 @@ PanelWindow {
 
   Connections {
     target: ToastService
-    function onNotify(title, description, icon, type, duration) {
-      root._enqueue(title, description, icon, type, duration);
+    function onNotify(title, description, icon, type, duration, actionLabel, actionToken) {
+      root._enqueue(title, description, icon, type, duration, actionLabel, actionToken);
     }
   }
 
-  function _enqueue(title, description, icon, type, duration) {
+  function _enqueue(title, description, icon, type, duration, actionLabel, actionToken) {
     // Replace current toast if showing
     if (_showing && toastLoader.item) {
-      toastLoader.item.show(title, description, icon, type, duration);
+      toastLoader.item.show(title, description, icon, type, duration, actionLabel, actionToken);
       return;
     }
 
     if (_showing) {
-      _messageQueue.push({ title: title, description: description, icon: icon, type: type, duration: duration });
+      _messageQueue.push({
+        title: title,
+        description: description,
+        icon: icon,
+        type: type,
+        duration: duration,
+        actionLabel: actionLabel,
+        actionToken: actionToken
+      });
       return;
     }
 
-    _showToast(title, description, icon, type, duration);
+    _showToast(title, description, icon, type, duration, actionLabel, actionToken);
   }
 
-  function _showToast(title, description, icon, type, duration) {
+  function _showToast(title, description, icon, type, duration, actionLabel, actionToken) {
     _showing = true;
     toastLoader.active = true;
     if (toastLoader.item) {
-      toastLoader.item.show(title, description, icon, type, duration);
+      toastLoader.item.show(title, description, icon, type, duration, actionLabel, actionToken);
     }
   }
 
@@ -69,7 +77,7 @@ PanelWindow {
 
     if (_messageQueue.length > 0) {
       var next = _messageQueue.shift();
-      _showToast(next.title, next.description, next.icon, next.type, next.duration);
+      _showToast(next.title, next.description, next.icon, next.type, next.duration, next.actionLabel, next.actionToken);
     }
   }
 

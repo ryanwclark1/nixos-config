@@ -101,7 +101,10 @@ Rectangle {
     // Close when clicking outside
     MouseArea {
         parent: root.parent
-        anchors.fill: parent
+        x: 0
+        y: 0
+        width: parent ? parent.width : 0
+        height: parent ? parent.height : 0
         visible: root.showMenu
         z: root.z - 1
         onClicked: root.close()

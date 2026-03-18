@@ -9,7 +9,7 @@ Rectangle {
     required property var launcher
 
     radius: Colors.radiusLarge
-    color: Colors.withAlpha(Colors.black, 0.15)
+    color: Colors.withAlpha("#000000", 0.15)
     border.color: Colors.border
     border.width: 1
 
@@ -88,7 +88,7 @@ Rectangle {
                         readonly property bool isCurrent: root.launcher.mode === modelData
                         readonly property bool isHovered: modeHover.containsMouse
                         
-                        color: isCurrent ? Colors.highlight : (isHovered ? Colors.withAlpha(Colors.white, 0.04) : "transparent")
+                        color: isCurrent ? Colors.highlight : (isHovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
                         Behavior on color { ColorAnimation { duration: 150 } }
                         
                         border.color: isCurrent ? Colors.withAlpha(Colors.primary, 0.4) : (isHovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
@@ -155,7 +155,7 @@ Rectangle {
             Layout.topMargin: Colors.spacingS
             implicitHeight: controlsLayout.implicitHeight + (Colors.paddingMedium * 2)
             radius: Colors.radiusMedium
-            color: Colors.withAlpha(Colors.black, 0.1)
+            color: Colors.withAlpha("#000000", 0.1)
             border.color: Colors.border
             border.width: 1
             visible: Config.launcherShowModeHints && !root.launcher.sidebarCompact

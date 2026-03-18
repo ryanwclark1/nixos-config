@@ -90,7 +90,17 @@ PanelWindow {
         function animatedDismiss() {
           if (isDismissing) return;
           isDismissing = true;
+          dismissTimer.stop();
+          dismissTimer.dismissProgress = 0;
           dismissAnim.start();
+        }
+
+        function canAutoDismiss() {
+          return !!notifWrapper.notification
+            && !delegate.isReplying
+            && !notifWrapper.isDismissing
+            && notifWrapper._urgencyTimeout > 0
+            && !delegate.isHovered;
         }
 
         ParallelAnimation {
@@ -106,8 +116,15 @@ PanelWindow {
           isPopup: true
           showContent: !notifWrapper.isDismissing
           onDismissRequested: notifWrapper.animatedDismiss()
-          onActionInvoked: action => { action.invoke(); notifWrapper.animatedDismiss(); }
-          onReplySent: text => { notification.invoke(text); notifWrapper.animatedDismiss(); }
+          onActionInvoked: function(action) {
+            action.invoke();
+            notifWrapper.animatedDismiss();
+          }
+          onReplySent: function(text) {
+            if (notifWrapper.notification)
+              notifWrapper.notification.invoke(text);
+            notifWrapper.animatedDismiss();
+          }
 
           // Progress bar for auto-dismiss
           Rectangle {
@@ -118,20 +135,24 @@ PanelWindow {
             radius: Colors.radiusXS
             color: notifWrapper.isUrgent ? Colors.error : Colors.primary
             opacity: 0.6
-            width: parent.width * (1.0 - dismissTimer.progress)
+            width: parent.width * (1.0 - dismissTimer.dismissProgress)
             visible: !notifWrapper.isDismissing && notifWrapper._urgencyTimeout > 0
           }
         }
 
         Timer {
           id: dismissTimer
-          property real progress: 0
+          property real dismissProgress: 0
           interval: 50
           repeat: true
-          running: notifWrapper.notification && !delegate.isReplying && !notifWrapper.isDismissing && notifWrapper._urgencyTimeout > 0 && !delegate.isHovered
+          running: notifWrapper.canAutoDismiss()
+          onRunningChanged: {
+            if (!running && !notifWrapper.isDismissing)
+              dismissProgress = 0;
+          }
           onTriggered: {
-            progress += 50 / notifWrapper._urgencyTimeout;
-            if (progress >= 1.0) {
+            dismissProgress += 50 / notifWrapper._urgencyTimeout;
+            if (dismissProgress >= 1.0) {
               stop();
               notifWrapper.animatedDismiss();
             }

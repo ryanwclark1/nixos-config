@@ -56,6 +56,24 @@
             command = [
               "sh"
               "-c"
+              "systemctl --user reset-failed quickshell.service swayosd.service voxtype.service >/dev/null 2>&1 || true"
+            ];
+          }
+          {
+            command = [
+              "systemctl"
+              "--user"
+              "start"
+              "--no-block"
+              "quickshell.service"
+              "swayosd.service"
+              "voxtype.service"
+            ];
+          }
+          {
+            command = [
+              "sh"
+              "-c"
               "systemctl --user reset-failed waybar.service || true"
             ];
           }

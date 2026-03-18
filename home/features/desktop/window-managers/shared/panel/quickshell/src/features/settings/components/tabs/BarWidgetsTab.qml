@@ -23,6 +23,7 @@ Item {
     property string dragTargetSection: ""
     property int dragTargetIndex: -1
     property bool applyingPendingBarWidgetTarget: false
+    property int pickerCatalogRevision: 0
     property var editingWidget: null
     property var editingWidgetSchema: []
     readonly property int overlayInset: root.tightSpacing ? 20 : 40
@@ -77,6 +78,16 @@ Item {
         }
     }
 
+    Connections {
+        target: PluginService
+        function onPluginCatalogUpdated() {
+            root.pickerCatalogRevision += 1;
+        }
+        function onPluginRuntimeUpdated() {
+            root.pickerCatalogRevision += 1;
+        }
+    }
+
     function sectionWidgets(section) {
         return currentSectionWidgets[section] || [];
     }
@@ -88,6 +99,7 @@ Item {
     function openWidgetPicker(section) {
         addSection = section;
         widgetSearchQuery = "";
+        pickerCatalogRevision += 1;
         widgetPickerOpen = true;
     }
 
@@ -138,6 +150,7 @@ Item {
     }
 
     function availableWidgetsForPicker() {
+        var _revision = pickerCatalogRevision;
         var items = BarWidgetRegistry.search(widgetSearchQuery, "");
         if (!addSection)
             return items;
@@ -806,6 +819,7 @@ Item {
                             model: root.availablePickerWidgets
                             delegate: SettingsListRow {
                                 required property var modelData
+                                width: pickerColumn.width
                                 minimumHeight: root.compactMode ? 88 : 64
 
                                 Text {

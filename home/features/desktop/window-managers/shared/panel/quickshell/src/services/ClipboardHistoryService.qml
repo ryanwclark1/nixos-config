@@ -48,7 +48,7 @@ QtObject {
         continue;
       var id = rawLine.substring(0, tabIndex);
       var content = rawLine.substring(tabIndex + 1);
-      if (id === "" || content === "" || content.indexOf("[[ binary data") !== -1)
+      if (id === "" || content === "")
         continue;
       lineMap[id] = rawLine;
       entries.push({

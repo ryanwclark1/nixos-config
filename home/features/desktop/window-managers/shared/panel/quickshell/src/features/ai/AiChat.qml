@@ -54,6 +54,7 @@ PanelWindow {
 
     onShowContentChanged: {
         if (showContent) {
+            root._syncInputFromService();
             inputField.forceActiveFocus();
         } else {
             if (inputField.activeFocus)
@@ -61,6 +62,8 @@ PanelWindow {
             providerDropdown.visible = false;
         }
     }
+
+    Component.onCompleted: root._syncInputFromService()
 
     // --- Drag-resize state ---
     property real _dragStartX: 0
@@ -84,6 +87,52 @@ PanelWindow {
         return Markdown.toBlocks(text, _mdColors);
     }
 
+    function _sortedConversationIds() {
+        var convs = AiService.conversations.slice();
+        convs.sort(function(a, b) {
+            return (b.updatedAt || 0) - (a.updatedAt || 0);
+        });
+        var ids = [];
+        for (var i = 0; i < convs.length; i++)
+            ids.push(convs[i].id);
+        return ids;
+    }
+
+    function _activateConversationOffset(delta) {
+        var ids = _sortedConversationIds();
+        if (ids.length <= 1)
+            return;
+        var currentIndex = ids.indexOf(AiService.activeConversationId);
+        if (currentIndex === -1)
+            currentIndex = 0;
+        var nextIndex = (currentIndex + delta + ids.length) % ids.length;
+        AiService.setActiveConversation(ids[nextIndex]);
+    }
+
+    function _closeConversationWithUndo(id) {
+        if (!id)
+            return;
+        var wasStreaming = AiService.isStreaming && AiService.activeConversationId === id;
+        if (!AiService.closeConversation(id))
+            return;
+        ToastService.showNoticeAction("Chat closed", wasStreaming ? "Stream cancelled. Undo is available." : "Undo is available for the most recently closed chat.", "Undo", function() {
+            AiService.restoreLastClosedConversation();
+        });
+    }
+
+    function _clearConversationWithNotice(id) {
+        if (!id)
+            return;
+        var wasStreaming = AiService.isStreaming && AiService.activeConversationId === id;
+        AiService.clearConversation(id);
+        ToastService.showNotice("Chat cleared", wasStreaming ? "Stream cancelled and messages were cleared." : "Messages and draft were cleared.");
+    }
+
+    function _syncInputFromService() {
+        if (inputField && inputField.text !== AiService.activeDraftText)
+            inputField.text = AiService.activeDraftText;
+    }
+
     // =========================================================
     //  Keyboard shortcuts
     // =========================================================
@@ -97,6 +146,30 @@ PanelWindow {
         sequence: "Ctrl+N"
         enabled: root.showContent
         onActivated: AiService.newConversation()
+    }
+
+    Shortcut {
+        sequence: "Ctrl+W"
+        enabled: root.showContent
+        onActivated: root._closeConversationWithUndo(AiService.activeConversationId)
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Shift+T"
+        enabled: root.showContent && AiService.hasRestorableClosedConversation
+        onActivated: AiService.restoreLastClosedConversation()
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Tab"
+        enabled: root.showContent
+        onActivated: root._activateConversationOffset(1)
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Shift+Tab"
+        enabled: root.showContent
+        onActivated: root._activateConversationOffset(-1)
     }
 
     // =========================================================
@@ -307,7 +380,7 @@ PanelWindow {
                     height: 28
                     radius: Colors.radiusXS
                     color: "transparent"
-                    visible: AiService.activeMessages.length > 0
+                    visible: AiService.activeMessages.length > 0 || AiService.activeDraftText.length > 0
                     Text {
                         anchors.centerIn: parent
                         text: "󰃢"
@@ -327,11 +400,11 @@ PanelWindow {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: mouse => {
                             clearChatStateLayer.burst(mouse.x, mouse.y);
-                            AiService.clearConversation(AiService.activeConversationId);
+                            root._clearConversationWithNotice(AiService.activeConversationId);
                         }
                     }
                     SharedWidgets.BarTooltip {
-                        text: "Clear current chat"
+                        text: "Clear current chat messages"
                         hovered: clearChatHover.containsMouse
                         anchorItem: clearChatButton
                     }
@@ -624,6 +697,7 @@ PanelWindow {
                 border.color: inputField.activeFocus ? Colors.primary : Colors.border
                 border.width: inputField.activeFocus ? 1.5 : 1
                 radius: Colors.radiusMedium
+                clip: true
                 Behavior on border.color {
                     ColorAnimation {
                         duration: Colors.durationFast
@@ -636,37 +710,69 @@ PanelWindow {
                     anchors.margins: Colors.spacingM
                     spacing: Colors.spacingXS
 
-                    TextEdit {
-                        id: inputField
+                    Flickable {
+                        id: inputFlickable
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 24
-                        Layout.maximumHeight: 120
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
-                        wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
-                        selectByMouse: true
-                        selectedTextColor: Colors.background
-                        selectionColor: Colors.primary
-                        text: AiService.currentInputText
-                        onTextChanged: AiService.currentInputText = text
+                        Layout.preferredHeight: Math.max(24 + Colors.spacingS * 2, Math.min(120 + Colors.spacingS * 2, inputField.contentHeight + Colors.spacingS * 2))
+                        Layout.maximumHeight: 120 + Colors.spacingS * 2
+                        contentWidth: width
+                        contentHeight: Math.max(height, inputField.contentHeight + Colors.spacingS * 2)
+                        flickableDirection: Flickable.VerticalFlick
+                        boundsBehavior: Flickable.StopAtBounds
+                        clip: true
+                        interactive: contentHeight > height
 
-                        // Placeholder
-                        Text {
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "Type a message..."
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeMedium
-                            visible: inputField.text.length === 0 && !inputField.activeFocus
+                        ScrollBar.vertical: ScrollBar {
+                            policy: inputFlickable.contentHeight > inputFlickable.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                         }
 
-                        onActiveFocusChanged: if (activeFocus)
-                            providerDropdown.visible = false
+                        TextEdit {
+                            id: inputField
+                            width: inputFlickable.width - (inputFlickable.contentHeight > inputFlickable.height ? 12 : 0)
+                            topPadding: Colors.spacingS
+                            bottomPadding: Colors.spacingS
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeMedium
+                            wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
+                            selectByMouse: true
+                            selectedTextColor: Colors.background
+                            selectionColor: Colors.primary
 
-                        Keys.onPressed: event => {
-                            if (event.key === Qt.Key_Return && !(event.modifiers & Qt.ShiftModifier)) {
-                                event.accepted = true;
-                                root._sendCurrentMessage();
+                            // Placeholder
+                            Text {
+                                anchors.left: parent.left
+                                anchors.leftMargin: 1
+                                anchors.top: parent.top
+                                anchors.topMargin: Colors.spacingS
+                                text: "Type a message..."
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeMedium
+                                visible: inputField.text.length === 0 && !inputField.activeFocus
+                            }
+
+                            onActiveFocusChanged: if (activeFocus)
+                                providerDropdown.visible = false
+
+                            onTextChanged: {
+                                if (text !== AiService.activeDraftText)
+                                    AiService.setActiveDraftText(text);
+                            }
+
+                            onCursorRectangleChanged: {
+                                var cursorBottom = cursorRectangle.y + cursorRectangle.height;
+                                var cursorTop = cursorRectangle.y;
+                                if (cursorBottom > inputFlickable.contentY + inputFlickable.height) {
+                                    inputFlickable.contentY = cursorBottom - inputFlickable.height + Colors.spacingS;
+                                } else if (cursorTop < inputFlickable.contentY) {
+                                    inputFlickable.contentY = Math.max(0, cursorTop - Colors.spacingS);
+                                }
+                            }
+
+                            Keys.onPressed: event => {
+                                if (event.key === Qt.Key_Return && !(event.modifiers & Qt.ShiftModifier)) {
+                                    event.accepted = true;
+                                    root._sendCurrentMessage();
+                                }
                             }
                         }
                     }
@@ -1149,6 +1255,12 @@ PanelWindow {
             if (root.includeSelectionContext && root._pendingMsgText !== "") {
                 root._finishAndSendMessage();
             }
+        }
+        function onActiveConversationIdChanged() {
+            root._syncInputFromService();
+        }
+        function onConversationsChanged() {
+            root._syncInputFromService();
         }
     }
 

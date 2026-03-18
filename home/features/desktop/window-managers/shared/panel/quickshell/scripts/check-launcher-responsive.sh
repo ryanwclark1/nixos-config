@@ -117,6 +117,17 @@ handle_termination() {
   exit 124
 }
 
+wait_for_instance_ready() {
+  local deadline=$((SECONDS + 15))
+  while (( SECONDS < deadline )); do
+    if quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  return 1
+}
+
 populate_repo_shell_env() {
   local line key value
   repo_shell_env=()
@@ -262,12 +273,19 @@ call_ipc() {
 
 launcher_action_available() {
   local action="$1"
-  local show_output
-  show_output="$(quickshell ipc --id "${instance_id}" show 2>/dev/null || true)"
-  if [[ -z "${show_output}" ]]; then
-    return 1
-  fi
-  printf '%s' "${show_output}" | rg -q "function ${action}\\("
+  local show_output=""
+  local attempt
+
+  for attempt in 1 2 3 4 5; do
+    show_output="$(quickshell ipc --id "${instance_id}" show 2>/dev/null || true)"
+    if [[ -n "${show_output}" ]]; then
+      printf '%s' "${show_output}" | rg -q "function ${action}\\("
+      return $?
+    fi
+    sleep 0.2
+  done
+
+  return 1
 }
 
 static_checks() {
@@ -330,8 +348,15 @@ runtime_checks() {
 
   if call_ipc Shell reloadConfig >/dev/null 2>&1; then
     pass "Shell.reloadConfig"
+    if wait_for_instance_ready; then
+      sleep 0.5
+    else
+      fail "Launcher instance did not become query-ready after Shell.reloadConfig"
+      return
+    fi
   else
     fail "Shell.reloadConfig"
+    return
   fi
 
   local action
@@ -433,7 +458,8 @@ if (!(Number(payload.filteredItemCount || 0) > 0)) process.exit(1);
   if ! launcher_action_available "drunCategoryState"; then
     # Try to refresh stale QML on long-running sessions before downgrading to warning.
     if call_ipc Shell reloadConfig >/dev/null 2>&1; then
-      sleep 1
+      wait_for_instance_ready >/dev/null 2>&1 || true
+      sleep 0.5
     fi
   fi
   if ! launcher_action_available "drunCategoryState"; then
@@ -495,7 +521,8 @@ if (errors.length > 0) {
 
   if ! launcher_action_available "escapeActionState"; then
     if call_ipc Shell reloadConfig >/dev/null 2>&1; then
-      sleep 1
+      wait_for_instance_ready >/dev/null 2>&1 || true
+      sleep 0.5
     fi
   fi
   if ! launcher_action_available "escapeActionState" || ! launcher_action_available "diagnosticSetSearchText" || ! launcher_action_available "diagnosticSetDrunCategoryFilter" || ! launcher_action_available "invokeEscapeAction"; then

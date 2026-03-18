@@ -384,8 +384,7 @@ EOF
     systemd.user.services.quickshell = {
       Unit = {
         Description = "Quickshell (QML shell)";
-        After = [ "graphical-session.target" ];
-        Wants = [ "graphical-session.target" ];
+        ConditionEnvironment = "WAYLAND_DISPLAY";
       };
 
       Service = {
@@ -419,16 +418,14 @@ EOF
         RestartSec = 2;
       };
 
-      Install = {
-        WantedBy = [ "graphical-session.target" ];
-      };
+      Install = { };
     };
 
     systemd.user.services.quickshell-health = {
       Unit = {
         Description = "Quickshell health monitor";
-        After = [ "graphical-session.target" "quickshell.service" ];
-        Wants = [ "graphical-session.target" "quickshell.service" ];
+        After = [ "quickshell.service" ];
+        Wants = [ "quickshell.service" ];
       };
 
       Service = {

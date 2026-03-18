@@ -26,7 +26,6 @@
   home.file = {
     # Rofi scripts (common across window managers)
     ".local/bin/scripts/rofi/rofi-apps-unified.sh" = {
-      force = true;
       source = ./launcher/scripts/rofi/rofi-apps-unified.sh;
       executable = true;
     };

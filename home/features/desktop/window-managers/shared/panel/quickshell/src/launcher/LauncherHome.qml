@@ -204,7 +204,7 @@ ColumnLayout {
                             readonly property bool hovered: recentHover.containsMouse
                             readonly property bool selected: root.isSelected(modelData)
                             
-                            color: selected ? Colors.highlight : (hovered ? Colors.withAlpha(Colors.white, 0.04) : Colors.withAlpha(Colors.black, 0.15))
+                            color: selected ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : Colors.withAlpha("#000000", 0.15))
                             border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
                             border.width: 1
                             scale: hovered ? 1.04 : 1.0
@@ -302,7 +302,7 @@ ColumnLayout {
                         readonly property bool hovered: suggestionHover.containsMouse
                         readonly property bool selected: root.isSelected(modelData)
                         
-                        color: selected ? Colors.highlight : (hovered ? Colors.withAlpha(Colors.white, 0.04) : "transparent")
+                        color: selected ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
                         border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
                         border.width: 1
                         scale: selected ? 1.01 : (hovered ? 1.005 : 1.0)

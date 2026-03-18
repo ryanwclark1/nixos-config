@@ -22,6 +22,8 @@ QtObject {
     property var conversations: []
     property string activeConversationId: ""
     property int _nextConversationNum: 1
+    property var _closedConversationStack: []
+    property string _sessionDraftMigrationText: ""
 
     readonly property var activeConversation: {
         for (var i = 0; i < conversations.length; i++) {
@@ -32,6 +34,8 @@ QtObject {
     }
 
     readonly property var activeMessages: activeConversation ? activeConversation.messages : []
+    readonly property string activeDraftText: activeConversation ? (activeConversation.draftText || "") : ""
+    readonly property bool hasRestorableClosedConversation: _closedConversationStack.length > 0
 
     // ── Streaming state ─────────────────────────
     property bool isStreaming: false
@@ -139,14 +143,12 @@ QtObject {
     }
 
     // ── Session Persistence ─────────────────────
-    property string currentInputText: ""
     readonly property string sessionPath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/ai-chat-session.json"
 
     function saveSession() {
         if (_loading) return;
         var data = {
-            activeConversationId: root.activeConversationId,
-            currentInputText: root.currentInputText
+            activeConversationId: root.activeConversationId
         };
         sessionFile.setText(JSON.stringify(data));
     }
@@ -157,7 +159,7 @@ QtObject {
             try {
                 var data = JSON.parse(this.text);
                 root.activeConversationId = data.activeConversationId || "";
-                root.currentInputText = data.currentInputText || "";
+                root._sessionDraftMigrationText = data.currentInputText || "";
                 if (root.activeConversationId) {
                     for (var i = 0; i < root.conversations.length; i++) {
                         if (root.conversations[i].id === root.activeConversationId) {
@@ -166,6 +168,7 @@ QtObject {
                         }
                     }
                 }
+                root._applySessionDraftMigration();
             } catch(e) {}
         }
     }
@@ -173,8 +176,6 @@ QtObject {
     onActiveConversationIdChanged: {
         saveSession();
     }
-
-    onCurrentInputTextChanged: saveSession()
 
     // ── Persistence ─────────────────────────────
     readonly property string savePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/ai-chat.json"
@@ -207,6 +208,70 @@ QtObject {
         if (!_loading) _saveTimer.restart();
     }
 
+    function _copyMessages(messages) {
+        var out = [];
+        var list = Array.isArray(messages) ? messages : [];
+        for (var i = 0; i < list.length; i++) {
+            out.push({
+                role: list[i].role || "assistant",
+                content: list[i].content || "",
+                timestamp: list[i].timestamp || Date.now()
+            });
+        }
+        return out;
+    }
+
+    function _latestMessageTimestamp(messages, fallback) {
+        var latest = fallback || Date.now();
+        var list = Array.isArray(messages) ? messages : [];
+        for (var i = 0; i < list.length; i++) {
+            latest = Math.max(latest, list[i].timestamp || fallback || Date.now());
+        }
+        return latest;
+    }
+
+    function _normalizeConversation(conv) {
+        var createdAt = conv && conv.createdAt ? conv.createdAt : Date.now();
+        var messages = _copyMessages(conv && conv.messages ? conv.messages : []);
+        return {
+            id: conv && conv.id ? conv.id : "conv-" + _nextConversationNum++,
+            title: conv && conv.title ? conv.title : "New Chat",
+            messages: messages,
+            provider: conv && conv.provider ? conv.provider : Config.aiProvider,
+            model: conv && conv.model ? conv.model : activeModel,
+            createdAt: createdAt,
+            updatedAt: conv && conv.updatedAt ? conv.updatedAt : _latestMessageTimestamp(messages, createdAt),
+            draftText: conv && typeof conv.draftText === "string" ? conv.draftText : ""
+        };
+    }
+
+    function _makeConversation(seedDraft) {
+        var now = Date.now();
+        return {
+            id: "conv-" + _nextConversationNum++,
+            title: "New Chat",
+            messages: [],
+            provider: Config.aiProvider,
+            model: activeModel,
+            createdAt: now,
+            updatedAt: now,
+            draftText: seedDraft || ""
+        };
+    }
+
+    function _applySessionDraftMigration() {
+        if (!_sessionDraftMigrationText)
+            return;
+        if (!activeConversation)
+            return;
+        if ((activeConversation.draftText || "").length > 0) {
+            _sessionDraftMigrationText = "";
+            return;
+        }
+        setDraftText(activeConversation.id, _sessionDraftMigrationText);
+        _sessionDraftMigrationText = "";
+    }
+
     function _loadData() {
         var raw = _chatFile.text();
         if (!raw) {
@@ -217,13 +282,16 @@ QtObject {
         try {
             var data = JSON.parse(raw);
             if (data.conversations && Array.isArray(data.conversations) && data.conversations.length > 0) {
-                conversations = data.conversations;
+                var normalized = [];
                 // Compute next number
                 var maxNum = 0;
-                for (var i = 0; i < conversations.length; i++) {
-                    var num = parseInt(conversations[i].id.replace("conv-", "")) || 0;
+                for (var i = 0; i < data.conversations.length; i++) {
+                    var conv = _normalizeConversation(data.conversations[i]);
+                    normalized.push(conv);
+                    var num = parseInt(String(conv.id).replace("conv-", "")) || 0;
                     if (num > maxNum) maxNum = num;
                 }
+                conversations = normalized;
                 _nextConversationNum = maxNum + 1;
             }
             if (data.activeConversationId) {
@@ -239,7 +307,9 @@ QtObject {
         _loading = false;
         if (conversations.length === 0) {
             newConversation();
+            return;
         }
+        _applySessionDraftMigration();
     }
 
     function _saveData() {
@@ -267,39 +337,147 @@ QtObject {
     }
 
     // ── Conversation Management ─────────────────
-    function newConversation() {
-        var id = "conv-" + _nextConversationNum++;
-        var conv = {
-            id: id,
-            title: "New Chat",
-            messages: [],
-            provider: Config.aiProvider,
-            model: activeModel,
-            createdAt: Date.now()
-        };
+    function newConversation(seedDraft) {
+        var conv = _makeConversation(seedDraft || "");
         var newConvs = conversations.slice();
         newConvs.push(conv);
         conversations = newConvs;
+        activeConversationId = conv.id;
+        _scheduleSave();
+        return conv.id;
+    }
+
+    function _pushClosedConversation(conv) {
+        var closed = _cloneConv(conv);
+        var stack = _closedConversationStack.slice();
+        stack.push(closed);
+        while (stack.length > 10)
+            stack.shift();
+        _closedConversationStack = stack;
+    }
+
+    function closeConversation(id) {
+        if (!id) return;
+        var target = null;
+        for (var i = 0; i < conversations.length; i++) {
+            if (conversations[i].id === id) {
+                target = _cloneConv(conversations[i]);
+                break;
+            }
+        }
+        if (!target)
+            return false;
+
+        if (isStreaming && activeConversationId === id)
+            cancelStream(false);
+
+        _pushClosedConversation(target);
+
+        var newConvs = [];
+        for (var j = 0; j < conversations.length; j++) {
+            if (conversations[j].id !== id)
+                newConvs.push(conversations[j]);
+        }
+
+        if (newConvs.length === 0) {
+            conversations = [];
+            activeConversationId = "";
+            newConversation();
+            return true;
+        }
+
+        if (activeConversationId === id) {
+            var nextActive = newConvs[0];
+            for (var k = 1; k < newConvs.length; k++) {
+                if ((newConvs[k].updatedAt || 0) > (nextActive.updatedAt || 0))
+                    nextActive = newConvs[k];
+            }
+            activeConversationId = nextActive.id;
+        }
+        conversations = newConvs;
+        _scheduleSave();
+        return true;
+    }
+
+    function deleteConversation(id) {
+        return closeConversation(id);
+    }
+
+    function restoreLastClosedConversation() {
+        if (_closedConversationStack.length === 0)
+            return "";
+        var stack = _closedConversationStack.slice();
+        var restored = _cloneConv(stack.pop());
+        restored.updatedAt = Date.now();
+        _closedConversationStack = stack;
+        var newConvs = conversations.slice();
+        newConvs.push(restored);
+        conversations = newConvs;
+        activeConversationId = restored.id;
+        _scheduleSave();
+        return restored.id;
+    }
+
+    function closeOtherConversations(id) {
+        if (!id)
+            return 0;
+        var shouldCancelStream = isStreaming && activeConversationId !== id;
+        var keep = null;
+        var closing = [];
+        for (var i = 0; i < conversations.length; i++) {
+            if (conversations[i].id === id)
+                keep = conversations[i];
+            else
+                closing.push(_cloneConv(conversations[i]));
+        }
+        if (!keep)
+            return 0;
+        closing.sort(function(a, b) {
+            return (a.updatedAt || 0) - (b.updatedAt || 0);
+        });
+        for (var j = 0; j < closing.length; j++)
+            _pushClosedConversation(closing[j]);
+        conversations = [_cloneConv(keep)];
+        activeConversationId = keep.id;
+        if (shouldCancelStream)
+            cancelStream(false);
+        _scheduleSave();
+        return closing.length;
+    }
+
+    function setActiveConversation(id) {
+        if (!id || id === activeConversationId)
+            return;
         activeConversationId = id;
         _scheduleSave();
     }
 
-    function deleteConversation(id) {
-        if (conversations.length <= 1) return;
-        var newConvs = [];
-        for (var i = 0; i < conversations.length; i++) {
-            if (conversations[i].id !== id) newConvs.push(conversations[i]);
+    function setDraftText(id, text) {
+        if (!id)
+            return;
+        var nextText = text || "";
+        var newConvs = conversations.slice();
+        var changed = false;
+        for (var i = 0; i < newConvs.length; i++) {
+            if (newConvs[i].id === id) {
+                if ((newConvs[i].draftText || "") === nextText)
+                    return;
+                newConvs[i] = _cloneConv(newConvs[i]);
+                newConvs[i].draftText = nextText;
+                changed = true;
+                break;
+            }
         }
-        if (activeConversationId === id) {
-            activeConversationId = newConvs.length > 0 ? newConvs[newConvs.length - 1].id : "";
-        }
+        if (!changed)
+            return;
         conversations = newConvs;
         _scheduleSave();
     }
 
-    function setActiveConversation(id) {
-        activeConversationId = id;
-        _scheduleSave();
+    function setActiveDraftText(text) {
+        if (!activeConversationId)
+            return;
+        setDraftText(activeConversationId, text || "");
     }
 
     function renameConversation(id, newTitle) {
@@ -318,11 +496,17 @@ QtObject {
     }
 
     function clearConversation(id) {
+        if (!id)
+            return;
+        if (isStreaming && activeConversationId === id)
+            cancelStream(false);
         var newConvs = conversations.slice();
         for (var i = 0; i < newConvs.length; i++) {
             if (newConvs[i].id === id) {
                 newConvs[i] = _cloneConv(newConvs[i]);
                 newConvs[i].messages = [];
+                newConvs[i].draftText = "";
+                newConvs[i].updatedAt = Date.now();
                 break;
             }
         }
@@ -334,11 +518,37 @@ QtObject {
         return {
             id: conv.id,
             title: conv.title,
-            messages: conv.messages.slice(),
+            messages: _copyMessages(conv.messages),
             provider: conv.provider,
             model: conv.model,
-            createdAt: conv.createdAt
+            createdAt: conv.createdAt,
+            updatedAt: conv.updatedAt || conv.createdAt,
+            draftText: conv.draftText || ""
         };
+    }
+
+    function duplicateConversationPrompt(id) {
+        if (!id)
+            return "";
+        var source = null;
+        for (var i = 0; i < conversations.length; i++) {
+            if (conversations[i].id === id) {
+                source = conversations[i];
+                break;
+            }
+        }
+        if (!source)
+            return "";
+        var seed = (source.draftText || "").trim();
+        if (seed.length === 0) {
+            for (var j = source.messages.length - 1; j >= 0; j--) {
+                if (source.messages[j].role === "user") {
+                    seed = source.messages[j].content || "";
+                    break;
+                }
+            }
+        }
+        return newConversation(seed);
     }
 
     function _appendMessage(role, content) {
@@ -356,6 +566,7 @@ QtObject {
                     content: content,
                     timestamp: Date.now()
                 });
+                newConvs[i].updatedAt = Date.now();
                 break;
             }
         }
@@ -501,6 +712,23 @@ QtObject {
         _scheduleSave();
     }
 
+    function _syncActiveConversationRuntime() {
+        if (!activeConversationId)
+            return;
+        var newConvs = conversations.slice();
+        for (var i = 0; i < newConvs.length; i++) {
+            if (newConvs[i].id === activeConversationId) {
+                if (newConvs[i].provider === Config.aiProvider && newConvs[i].model === activeModel)
+                    return;
+                newConvs[i] = _cloneConv(newConvs[i]);
+                newConvs[i].provider = Config.aiProvider;
+                newConvs[i].model = activeModel;
+                conversations = newConvs;
+                return;
+            }
+        }
+    }
+
     function _fuzzyMatch(items, query, accessor, allowContains) {
         var q = query.toLowerCase();
         var i;
@@ -569,8 +797,12 @@ QtObject {
             return;
         }
 
+        _syncActiveConversationRuntime();
+
         // Append user message
         _appendMessage("user", text.trim());
+        setActiveDraftText("");
+        _autoTitle();
 
         // Build messages array for the script
         var msgs = [];
@@ -647,11 +879,12 @@ QtObject {
         _writeTempFile(tmpFile, JSON.stringify(msgs));
     }
 
-    function cancelStream() {
+    function cancelStream(commitPartial) {
         if (!isStreaming) return;
+        var shouldCommitPartial = commitPartial === undefined ? true : !!commitPartial;
         streamProc.signal(15); // SIGTERM
         // Commit partial response if any
-        if (streamingContent.trim().length > 0) {
+        if (shouldCommitPartial && streamingContent.trim().length > 0) {
             _appendMessage("assistant", streamingContent + "\n\n*(cancelled)*");
             _autoTitle();
         }
@@ -803,7 +1036,6 @@ QtObject {
         var conv = activeConversation;
         if (!conv) return;
         if (conv.title !== "New Chat") return; // Already titled
-        if (conv.messages.length < 2) return;
 
         // Use first user message as title
         for (var i = 0; i < conv.messages.length; i++) {

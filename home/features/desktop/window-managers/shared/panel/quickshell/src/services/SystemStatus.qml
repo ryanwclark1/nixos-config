@@ -223,6 +223,13 @@ QtObject {
     return isNaN(parsed) ? "--" : Math.round(parsed) + "°C";
   }
 
+  function parseStatsOutput(rawText) {
+    var text = String(rawText || "").replace(/\r/g, "");
+    if (text.endsWith("\n"))
+      text = text.slice(0, -1);
+    return text === "" ? [] : text.split("\n");
+  }
+
   property Process statsProc: Process {
     command: [
       "sh",
@@ -261,7 +268,7 @@ QtObject {
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
-        var lines = (this.text || "").trim().split("\n");
+        var lines = root.parseStatsOutput(this.text);
         if (lines.length >= 6) {
           root.cpuTemp = root.formatTemp(lines[0]);
           root.gpuTemp = root.formatTemp(lines[1]);

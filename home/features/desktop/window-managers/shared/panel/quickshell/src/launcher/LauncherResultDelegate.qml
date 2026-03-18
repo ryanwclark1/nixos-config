@@ -27,7 +27,7 @@ Rectangle {
     readonly property bool highlighted: index === selectedIndex
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
 
-    color: highlighted ? Colors.highlight : (hovered ? Colors.withAlpha(Colors.white, 0.04) : "transparent")
+    color: highlighted ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
     radius: Colors.radiusMedium
     border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
     border.width: 1

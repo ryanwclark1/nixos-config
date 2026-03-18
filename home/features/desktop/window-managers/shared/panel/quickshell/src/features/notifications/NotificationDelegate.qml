@@ -17,10 +17,41 @@ Rectangle {
   property bool isUrgent: !!(notification && notification.urgency === NotificationUrgency.Critical)
   property bool isReplying: false
   readonly property bool isHovered: delegateMouseArea.containsMouse
+  readonly property string notificationTimeText: {
+    if (root.isPopup || !notification)
+      return "";
+    return root.formatNotificationTime(notification.time !== undefined ? notification.time : notification.timestamp);
+  }
 
   signal dismissRequested()
   signal actionInvoked(var action)
   signal replySent(string text)
+
+  function formatNotificationTime(rawTime) {
+    if (rawTime === undefined || rawTime === null || rawTime === "")
+      return "";
+
+    var dateValue = null;
+
+    if (rawTime instanceof Date) {
+      dateValue = rawTime;
+    } else if (typeof rawTime === "number" || typeof rawTime === "string") {
+      dateValue = new Date(rawTime);
+    } else if (rawTime && typeof rawTime.toMSecsSinceEpoch === "function") {
+      dateValue = new Date(rawTime.toMSecsSinceEpoch());
+    } else if (rawTime && typeof rawTime.toSecsSinceEpoch === "function") {
+      dateValue = new Date(rawTime.toSecsSinceEpoch() * 1000);
+    } else if (rawTime && typeof rawTime.getTime === "function") {
+      dateValue = new Date(rawTime.getTime());
+    }
+
+    if (!dateValue || isNaN(dateValue.getTime()))
+      return "";
+
+    return String(dateValue.getHours()).padStart(2, "0")
+      + ":"
+      + String(dateValue.getMinutes()).padStart(2, "0");
+  }
 
   width: parent.width
   height: root.showContent ? colMain.implicitHeight + Colors.paddingLarge * 2 : 0
@@ -112,8 +143,8 @@ Rectangle {
       }
 
       Text {
-        visible: !root.isPopup && notification && notification.time
-        text: notification ? Qt.formatDateTime(notification.time, "HH:mm") : ""
+        visible: root.notificationTimeText !== ""
+        text: root.notificationTimeText
         color: Colors.textDisabled
         font.pixelSize: Colors.fontSizeXS
       }

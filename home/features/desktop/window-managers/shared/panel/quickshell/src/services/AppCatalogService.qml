@@ -142,7 +142,7 @@ QtObject {
     var quotedRoots = [];
     for (var i = 0; i < root.desktopRoots.length; ++i)
       quotedRoots.push(root._shellQuote(root.desktopRoots[i]));
-    return "for dir in " + quotedRoots.join(" ") + "; do [ -d \"$dir\" ] || continue; find \"$dir\" -maxdepth 1 -type f -name '*.desktop' -print; done";
+    return "for dir in " + quotedRoots.join(" ") + "; do [ -d \"$dir\" ] || continue; find \"$dir\" -maxdepth 1 \\( -type f -o -type l \\) -name '*.desktop' -print; done";
   }
 
   function _parseEnumeratedPaths(raw) {

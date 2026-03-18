@@ -18,6 +18,8 @@ BasePopupMenu {
   property var clipboardItems: ClipboardHistoryService.items
   property string searchQuery: ""
   property int selectedIndex: 0
+  readonly property bool isLoadingHistory: ClipboardHistoryService.loading
+  readonly property string clipboardError: String(ClipboardHistoryService.lastError || "")
 
   function refresh() {
     ClipboardHistoryService.refresh(null);
@@ -44,7 +46,7 @@ BasePopupMenu {
     if (!item)
       return;
     ClipboardHistoryService.restore(item.id);
-    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleClipboardMenu"]);
+    root.closeRequested();
   }
 
   function deleteClipboardItem(item) {
@@ -105,13 +107,22 @@ BasePopupMenu {
   onSearchQueryChanged: selectedIndex = 0
 
   onVisibleChanged: {
-    if (visible) refresh();
+    if (visible) {
+      searchQuery = "";
+      selectedIndex = 0;
+      refresh();
+    }
     else if (searchInput.activeFocus) searchInput.focus = false;
   }
 
   headerExtras: [
     SharedWidgets.IconButton {
+      icon: ClipboardHistoryService.loading ? "󰇚" : "󰑐"
+      onClicked: root.refresh()
+    },
+    SharedWidgets.IconButton {
       icon: "󰃢"
+      enabled: root.clipboardItems.length > 0
       onClicked: {
         ClipboardHistoryService.wipe();
       }
@@ -202,7 +213,7 @@ BasePopupMenu {
           border.width: 1
           Behavior on color { ColorAnimation { duration: 150 } }
 
-          readonly property bool isImage: modelData.content && modelData.content.includes("[[ binary data")
+          readonly property bool isImage: !!(modelData && modelData.content && String(modelData.content).includes("[[ binary data"))
 
           SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
 
@@ -232,7 +243,7 @@ BasePopupMenu {
             ColumnLayout {
               Layout.fillWidth: true; spacing: 0
               Text {
-                text: clipCard.isImage ? "IMAGE DATA" : modelData.content
+                text: clipCard.isImage ? "IMAGE DATA" : String((modelData && modelData.content) || "")
                 color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium
                 elide: Text.ElideRight; Layout.fillWidth: true
                 font.capitalization: clipCard.isImage ? Font.AllUppercase : Font.MixedCase
@@ -276,8 +287,12 @@ BasePopupMenu {
         Layout.topMargin: Colors.spacingS
         Layout.bottomMargin: Colors.spacingS
         visible: root.filteredItemsResult.length === 0
-        icon: root.searchQuery ? "󰍉" : "󰅗"
-        message: root.searchQuery ? "No matching items" : "Clipboard is empty"
+        icon: root.isLoadingHistory ? "󰔟" : (root.clipboardError !== "" ? "󰅙" : (root.searchQuery ? "󰍉" : "󰅗"))
+        message: root.isLoadingHistory
+          ? "Loading clipboard history…"
+          : (root.clipboardError !== ""
+              ? root.clipboardError
+              : (root.searchQuery ? "No matching items" : "Clipboard is empty"))
       }
   }
 }

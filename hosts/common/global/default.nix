@@ -22,8 +22,8 @@
 
   # Global settings
   home-manager.useUserPackages = true;
-  # Use timestamped backups to avoid conflicts with existing backup files
-  home-manager.backupCommand = "cp -f $src $src.backup.$(date +%Y%m%d_%H%M%S)";
+  # In NixOS module mode, Home Manager expects a same-directory backup target.
+  home-manager.backupFileExtension = "hm-backup";
   home-manager.extraSpecialArgs = { inherit inputs outputs; };
 
   nixpkgs = {

@@ -124,10 +124,11 @@ write_tab_harnesses() {
   local bar_tab_qml="${harness_dir}/bar-tab-harness.qml"
   local bar_widgets_qml="${harness_dir}/bar-widgets-harness.qml"
 
-  mkdir -p "${harness_dir}/features/settings"
   ln -s "${config_dir}/services" "${harness_dir}/services"
   ln -s "${config_dir}/widgets" "${harness_dir}/widgets"
-  ln -s "${config_dir}/features/settings/components" "${harness_dir}/features/settings/components"
+  ln -s "${config_dir}/shared" "${harness_dir}/shared"
+  ln -s "${config_dir}/shell" "${harness_dir}/shell"
+  ln -s "${config_dir}/features" "${harness_dir}/features"
 
   cat > "${bar_tab_qml}" <<QML
 import Quickshell
