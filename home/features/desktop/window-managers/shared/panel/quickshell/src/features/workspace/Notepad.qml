@@ -18,7 +18,7 @@ PanelWindow {
     bottom: true
   }
   margins.top: edgeMargins.top
-  margins.right: edgeMargins.right
+  margins.right: Math.max(edgeMargins.right, Colors.spacingS)
   margins.bottom: edgeMargins.bottom
 
   implicitWidth: notepadWidth

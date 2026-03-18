@@ -15,6 +15,8 @@ Item {
   property bool iconOnly: true
   property string labelText: "Apps"
 
+  signal contextMenuRequested(var actions, var triggerRect)
+
   property color statusColor: {
     switch (SystemStatus.overallStatus) {
       case "healthy": return Colors.primary;
@@ -110,20 +112,16 @@ Item {
       if (mouse.button === Qt.LeftButton) {
         Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "openDrun"]);
       } else {
-        logoMenu.popup(mouse.x, mouse.y);
+        var globalPos = root.mapToItem(null, 0, 0);
+        root.contextMenuRequested([
+            { label: "Check Health", icon: "󰓅", action: () => SystemStatus.refreshHealth() },
+            { label: "Apply Safe Fixes", icon: "󰁨", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.activeIncidents.length > 0 },
+            { label: "Open Health Dashboard", icon: "󰒓", action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "health"]) },
+            { separator: true },
+            { label: "Restart Shell", icon: "󰑐", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }
+        ], { x: globalPos.x, y: globalPos.y, width: root.width, height: root.height });
       }
     }
-  }
-
-  SharedWidgets.ContextMenu {
-    id: logoMenu
-    model: [
-        { label: "Check Health", icon: "󰓅", action: () => SystemStatus.refreshHealth() },
-        { label: "Apply Safe Fixes", icon: "󰁨", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.activeIncidents.length > 0 },
-        { label: "Open Health Dashboard", icon: "󰒓", action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "health"]) },
-        { separator: true },
-        { label: "Restart Shell", icon: "󰑐", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }
-    ]
   }
 
   SharedWidgets.BarTooltip {

@@ -16,9 +16,9 @@ PanelWindow {
     right: Config.notifPosition.indexOf("right") !== -1 || Config.notifPosition === "top" || Config.notifPosition === "bottom"
   }
   margins.top: edgeMargins.top
-  margins.right: edgeMargins.right
+  margins.right: Math.max(edgeMargins.right, Colors.spacingS)
   margins.bottom: edgeMargins.bottom || edgeMargins.top
-  margins.left: edgeMargins.left || edgeMargins.right
+  margins.left: Math.max(edgeMargins.left || edgeMargins.right, Colors.spacingS)
 
   implicitWidth: Config.notifWidth
   implicitHeight: Math.max(1, col.implicitHeight)

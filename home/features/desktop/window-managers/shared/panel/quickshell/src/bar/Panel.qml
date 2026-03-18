@@ -570,6 +570,7 @@ Item {
             anchorWindow: root.anchorWindow
             iconOnly: root.triggerWidgetIconOnly(widgetInstance)
             labelText: root.triggerWidgetLabel(widgetInstance, "Apps")
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
 
