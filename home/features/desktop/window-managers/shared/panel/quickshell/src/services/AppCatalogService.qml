@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "ShellUtils.js" as SU
 
 QtObject {
   id: root
@@ -24,10 +25,6 @@ QtObject {
     (Quickshell.env("HOME") || "/home") + "/.nix-profile/share/applications",
     "/run/current-system/sw/share/applications"
   ]
-
-  function _shellQuote(text) {
-    return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
-  }
 
   function _desktopIdForPath(path) {
     var value = String(path || "");
@@ -147,7 +144,7 @@ QtObject {
   function _enumerateDesktopFiles() {
     var quotedRoots = [];
     for (var i = 0; i < root.desktopRoots.length; ++i)
-      quotedRoots.push(root._shellQuote(root.desktopRoots[i]));
+      quotedRoots.push(SU.shellQuote(root.desktopRoots[i]));
     return "for dir in " + quotedRoots.join(" ") + "; do [ -d \"$dir\" ] || continue; find \"$dir\" -maxdepth 1 \\( -type f -o -type l \\) -name '*.desktop' -print; done";
   }
 

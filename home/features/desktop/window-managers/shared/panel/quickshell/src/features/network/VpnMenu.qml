@@ -143,80 +143,36 @@ BasePopupMenu {
                     width: parent.width
                     spacing: Colors.spacingS
 
-                    Rectangle {
+                    SharedWidgets.Chip {
                         visible: NetworkService.tailscaleIp !== ""
-                        radius: Colors.radiusPill
-                        color: Colors.chipSurface
-                        border.color: Colors.border
-                        border.width: 1
-                        implicitHeight: 24
-                        implicitWidth: tsIpLabel.implicitWidth + 18
-
-                        Text {
-                            id: tsIpLabel
-                            anchors.centerIn: parent
-                            text: NetworkService.tailscaleIp
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Medium
-                        }
+                        text: NetworkService.tailscaleIp
+                        textColor: Colors.textSecondary
+                        bgColor: Colors.chipSurface
+                        borderColor: Colors.border
                     }
 
-                    Rectangle {
+                    SharedWidgets.Chip {
                         visible: NetworkService.vpnOtherCount > 0
-                        radius: Colors.radiusPill
-                        color: Colors.chipSurface
-                        border.color: Colors.border
-                        border.width: 1
-                        implicitHeight: 24
-                        implicitWidth: otherCountLabel.implicitWidth + 18
-
-                        Text {
-                            id: otherCountLabel
-                            anchors.centerIn: parent
-                            text: root.otherVpnChipText()
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Medium
-                        }
+                        text: root.otherVpnChipText()
+                        textColor: Colors.textSecondary
+                        bgColor: Colors.chipSurface
+                        borderColor: Colors.border
                     }
 
-                    Rectangle {
+                    SharedWidgets.Chip {
                         visible: NetworkService.vpnHasSavedProfiles
-                        radius: Colors.radiusPill
-                        color: Colors.chipSurface
-                        border.color: Colors.border
-                        border.width: 1
-                        implicitHeight: 24
-                        implicitWidth: savedCountLabel.implicitWidth + 18
-
-                        Text {
-                            id: savedCountLabel
-                            anchors.centerIn: parent
-                            text: root.savedVpnChipText()
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Medium
-                        }
+                        text: root.savedVpnChipText()
+                        textColor: Colors.textSecondary
+                        bgColor: Colors.chipSurface
+                        borderColor: Colors.border
                     }
 
-                    Rectangle {
+                    SharedWidgets.Chip {
                         visible: NetworkService.routeDevice !== ""
-                        radius: Colors.radiusPill
-                        color: Colors.chipSurface
-                        border.color: Colors.border
-                        border.width: 1
-                        implicitHeight: 24
-                        implicitWidth: routeLabel.implicitWidth + 18
-
-                        Text {
-                            id: routeLabel
-                            anchors.centerIn: parent
-                            text: "Route " + NetworkService.routeDevice
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Medium
-                        }
+                        text: "Route " + NetworkService.routeDevice
+                        textColor: Colors.textSecondary
+                        bgColor: Colors.chipSurface
+                        borderColor: Colors.border
                     }
                 }
 

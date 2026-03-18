@@ -8,10 +8,12 @@ Rectangle {
   property string text: ""
   property color iconColor: Colors.accent
   property color textColor: Colors.text
+  property color bgColor: Colors.withAlpha(root.iconColor, 0.16)
+  property color borderColor: Colors.withAlpha(Colors.textDisabled, 0.06)
 
   radius: Colors.radiusPill
-  color: Colors.withAlpha(root.iconColor, 0.16)
-  border.color: Colors.withAlpha(Colors.textDisabled, 0.06)
+  color: root.bgColor
+  border.color: root.borderColor
   border.width: 1
   implicitWidth: row.implicitWidth + 14
   implicitHeight: 22

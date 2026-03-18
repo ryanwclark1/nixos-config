@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import ".."
 import "../../../services"
 import "../../../widgets"

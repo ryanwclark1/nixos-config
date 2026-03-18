@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import "ShellCoreHelpers.js" as Helpers
 import "../../../../services"
 import "../../../../widgets" as SharedWidgets

@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "ShellUtils.js" as SU
 
 QtObject {
   id: root
@@ -29,10 +30,6 @@ QtObject {
   }
 
   readonly property bool available: DependencyService.allAvailable(["cliphist", "wl-copy", "wl-paste"])
-
-  function _shellQuote(text) {
-    return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
-  }
 
   function _finalize(itemsValue, errorText) {
     root.loading = false;
@@ -85,13 +82,13 @@ QtObject {
       return;
 
     var dir = root._cacheDir;
-    var script = "mkdir -p " + _shellQuote(dir) + "\n";
+    var script = "mkdir -p " + SU.shellQuote(dir) + "\n";
     for (var j = 0; j < imageIds.length; ++j) {
       var safeId = parseInt(imageIds[j], 10);
       if (isNaN(safeId))
         continue;
       var outPath = dir + "/" + safeId + ".png";
-      script += "cliphist decode " + safeId + " > " + _shellQuote(outPath) + " 2>/dev/null &\n";
+      script += "cliphist decode " + safeId + " > " + SU.shellQuote(outPath) + " 2>/dev/null &\n";
     }
     script += "wait\n";
     _imageDecodePoll.command = ["sh", "-c", script];
@@ -137,7 +134,7 @@ QtObject {
     var line = String(root._entryLinesById[key] || "");
     if (line === "")
       return false;
-    Quickshell.execDetached(["sh", "-c", "printf '%s\\n' " + root._shellQuote(line) + " | cliphist delete"]);
+    Quickshell.execDetached(["sh", "-c", "printf '%s\\n' " + root.SU.shellQuote(line) + " | cliphist delete"]);
     Qt.callLater(function() { root.refresh(null); });
     return true;
   }
