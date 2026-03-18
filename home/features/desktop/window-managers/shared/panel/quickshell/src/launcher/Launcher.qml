@@ -17,6 +17,7 @@ import "LauncherMetrics.js" as Metrics
 import "LauncherSystemItems.js" as SystemItems
 import "LauncherHomeBuilder.js" as HomeBuilder
 import "LauncherCategoryHelpers.js" as CategoryHelpers
+import "LauncherTextHelpers.js" as TextHelpers
 import "EmojiData.js" as EmojiData
 
 PanelWindow {
@@ -228,29 +229,11 @@ PanelWindow {
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
     readonly property string selectedHomeItemKey: ""
-    readonly property string drunCategoryFilterLabel: {
-        for (var i = 0; i < drunCategoryOptions.length; ++i) {
-            var option = drunCategoryOptions[i];
-            if (String(option.key || "") === drunCategoryFilter)
-                return String(option.label || "All");
-        }
-        return "All";
-    }
-    readonly property string drunCategoryFilterSummary: {
-        var options = Array.isArray(drunCategoryOptions) ? drunCategoryOptions : [];
-        var totalCount = options.length > 0 ? Math.max(0, Math.round(Number((options[0] || {}).count || 0))) : 0;
-        var activeCount = totalCount;
-        for (var i = 0; i < options.length; ++i) {
-            var option = options[i] || ({});
-            if (String(option.key || "") === drunCategoryFilter) {
-                activeCount = Math.max(0, Math.round(Number(option.count || 0)));
-                break;
-            }
-        }
-        if (drunCategoryFilter === "")
-            return activeCount + " apps ready";
-        return activeCount + " of " + totalCount + " apps";
-    }
+    readonly property string _cleanSearch: ModeData.stripModePrefix(searchText).trim()
+    readonly property string _webPrimaryName: { var p = primaryWebProvider(); return p ? p.name : "Web"; }
+    readonly property string _webSecondaryName: { var s = secondaryWebProvider(); return s ? s.name : "Google"; }
+    readonly property string drunCategoryFilterLabel: TextHelpers.categoryFilterLabel(drunCategoryOptions, drunCategoryFilter)
+    readonly property string drunCategoryFilterSummary: TextHelpers.categoryFilterSummary(drunCategoryOptions, drunCategoryFilter)
     readonly property var allKnownModes: ModeData.allKnownModes
     readonly property var transientModes: ModeData.transientModes
     readonly property var defaultModeOrder: ModeData.defaultModeOrder

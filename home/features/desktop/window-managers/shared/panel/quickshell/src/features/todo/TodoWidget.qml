@@ -125,7 +125,7 @@ Item {
       }
 
       displaced: Transition {
-        NumberAnimation { property: "y"; duration: Colors.durationMedium; easing.type: Easing.OutCubic }
+        Anim { property: "y"; duration: Colors.durationMedium }
       }
 
       delegate: Rectangle {

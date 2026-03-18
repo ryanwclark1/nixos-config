@@ -3,6 +3,8 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import "../system/sections"
+import "../pomodoro"
+import "../todo"
 import "../../services"
 import "../../widgets" as SharedWidgets
 
@@ -296,10 +298,34 @@ PanelWindow {
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(4) } NumberAnimation { duration: root.entranceDuration(4); easing.type: Easing.OutBack } } }
                         }
 
+                        // Pomodoro Timer
+                        PomodoroWidget {
+                            Layout.fillWidth: true
+                            opacity: root.entranceOpacity(5)
+                            scale: root.entranceScale(5)
+                            transform: Translate { y: root.entranceY(5) }
+                            visible: opacity > 0
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(5); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(5); easing.type: Easing.OutBack } } }
+                        }
+
+                        // Todo List
+                        TodoWidget {
+                            Layout.fillWidth: true
+                            opacity: root.entranceOpacity(6)
+                            scale: root.entranceScale(6)
+                            transform: Translate { y: root.entranceY(6) }
+                            visible: opacity > 0
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(6) } NumberAnimation { duration: root.entranceDuration(6); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(6) } NumberAnimation { duration: root.entranceDuration(6); easing.type: Easing.OutBack } } }
+                        }
+
                         // DevOps & Services
                         DevOpsSection {
                             showContent: root.showContent
-                            baseIndex: 15
+                            baseIndex: 17
                             staggerDelay: root.staggerDelay
                         }
 
@@ -599,6 +625,16 @@ PanelWindow {
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutBack } } }
+                        }
+                        TodoWidget {
+                            Layout.fillWidth: true
+                            opacity: root.entranceOpacity(14)
+                            scale: root.entranceScale(14)
+                            transform: Translate { y: root.entranceY(14) }
+                            visible: opacity > 0
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutBack } } }
                         }
                     }
                 }

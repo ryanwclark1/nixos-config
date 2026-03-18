@@ -32,6 +32,14 @@ QtObject {
             source: "builtin",
             componentSource: Qt.resolvedUrl("../components/DesktopWeather.qml"),
             settingsSource: ""
+        },
+        {
+            id: "Todo",
+            name: "Todo List",
+            icon: "󰄬",
+            source: "builtin",
+            componentSource: Qt.resolvedUrl("../../todo/TodoWidget.qml"),
+            settingsSource: ""
         }
     ]
 
