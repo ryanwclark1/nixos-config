@@ -62,6 +62,12 @@ Item {
                 step: 0.05
                 onMoved: v => Config.settingsSurfaceOpacity = v
             }
+
+            SettingsToggleRow {
+                label: "Auto Transparency"
+                icon: "󰂵"
+                configKey: "autoTransparency"
+            }
         }
 
         SettingsCard {

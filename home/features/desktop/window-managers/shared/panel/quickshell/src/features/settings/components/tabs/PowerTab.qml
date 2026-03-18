@@ -45,6 +45,11 @@ Item {
                     configKey: "showScreenBorders"
                 }
                 SettingsToggleRow {
+                    label: "Hot Corners"
+                    icon: "󰘖"
+                    configKey: "hotCornersEnabled"
+                }
+                SettingsToggleRow {
                     label: "Idle Inhibitor"
                     icon: "󰈈"
                     configKey: "idleInhibitEnabled"

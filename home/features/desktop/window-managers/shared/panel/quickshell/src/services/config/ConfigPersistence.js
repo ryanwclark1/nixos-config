@@ -65,7 +65,8 @@ var _MAPS = {
         ["blur", "blurEnabled"],
         ["opacity", "glassOpacity"],
         ["settingsBackdropOpacity", "settingsBackdropOpacity"],
-        ["settingsSurfaceOpacity", "settingsSurfaceOpacity"]
+        ["settingsSurfaceOpacity", "settingsSurfaceOpacity"],
+        ["autoTransparency", "autoTransparency"]
     ],
     notifications: [
         ["width", "notifWidth"],
@@ -128,6 +129,9 @@ var _MAPS = {
         ["clockEnabled", "backgroundClockEnabled"],
         ["autoHide", "backgroundAutoHide"],
         ["clockPosition", "backgroundClockPosition"]
+    ],
+    hotCorners: [
+        ["enabled", "hotCornersEnabled"]
     ],
     screenBorders: [
         ["show", "showScreenBorders"]

@@ -248,6 +248,12 @@ QtObject {
         function onBackgroundClockPositionChanged() {
             root.config.scheduleSave();
         }
+        function onAutoTransparencyChanged() {
+            root.config.scheduleSave();
+        }
+        function onHotCornersEnabledChanged() {
+            root.config.scheduleSave();
+        }
         function onShowScreenBordersChanged() {
             root.config.scheduleSave();
         }
