@@ -15,11 +15,7 @@ PanelWindow {
     // ── Visibility / RetainableLock ──────────────────────────────────────────
     property bool isVisible: false
 
-    RetainableLock {
-        id: _visLock
-        locked: root.isVisible || _enterAnim.running || _exitAnim.running
-    }
-    visible: _visLock.retained
+    visible: root.isVisible || _enterAnim.running || _exitAnim.running
 
     // ── Layer shell config ───────────────────────────────────────────────────
     anchors {

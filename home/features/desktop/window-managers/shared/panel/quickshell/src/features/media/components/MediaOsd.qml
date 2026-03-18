@@ -51,11 +51,7 @@ Scope {
 
         // Deferred unmap: stay mapped while exit animations run
         property bool _wantVisible: root.shouldShowOsd
-        RetainableLock {
-            id: _visLock
-            locked: osdWindow._wantVisible || osdFadeAnim.running || osdScaleAnim.running
-        }
-        visible: _visLock.retained
+        visible: osdWindow._wantVisible || osdFadeAnim.running || osdScaleAnim.running
 
         anchors.top: true
         anchors.left: true

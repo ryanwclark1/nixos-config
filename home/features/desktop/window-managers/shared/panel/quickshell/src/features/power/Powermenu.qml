@@ -25,11 +25,7 @@ PanelWindow {
   color: "transparent"
 
   property bool isVisible: false
-  RetainableLock {
-    id: _visLock
-    locked: root.isVisible || pmFadeAnim.running || pmScaleAnim.running
-  }
-  visible: _visLock.retained
+  visible: root.isVisible || pmFadeAnim.running || pmScaleAnim.running
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None

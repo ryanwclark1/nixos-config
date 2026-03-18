@@ -11,11 +11,7 @@ PanelWindow {
 
     property bool isVisible: false
 
-    RetainableLock {
-        id: _visLock
-        locked: root.isVisible || _fadeAnim.running
-    }
-    visible: _visLock.retained
+    visible: root.isVisible || _fadeAnim.running
 
     anchors {
         top: true; bottom: true; left: true; right: true

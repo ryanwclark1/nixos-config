@@ -16,11 +16,7 @@ PopupWindow {
   signal closeRequested()
   property bool wantVisible: false
   property bool showContent: wantVisible
-  RetainableLock {
-    id: _visLock
-    locked: root.wantVisible || cavaFadeAnim.running || cavaScaleAnim.running
-  }
-  visible: _visLock.retained
+  visible: root.wantVisible || cavaFadeAnim.running || cavaScaleAnim.running
 
   Rectangle {
     anchors.fill: parent

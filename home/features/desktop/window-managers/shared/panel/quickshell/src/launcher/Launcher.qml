@@ -1004,7 +1004,7 @@ PanelWindow {
             drunCategoryFiltersEnabled: drunCategoryFiltersEnabled,
             formatDrunCategoryLabel: formatDrunCategoryLabel,
             ensureItemRankCache: Search.ensureItemRankCache,
-            modeInfoFn: modeInfo
+            modeInfoFn: ModeData.modeInfo
         });
     }
 
@@ -1403,8 +1403,8 @@ PanelWindow {
     function _handleLoadFailure(modeKey, startedAt) {
         recordLoadMetric(modeKey, Date.now() - startedAt, false, false);
         if (mode === modeKey) {
-            setModeHint("Failed to load " + modeInfo(modeKey).label, "Check helper command output and logs.", "󰅚");
-            completeModeLoad(modeKey, false, "Failed to load " + modeInfo(modeKey).label);
+            setModeHint("Failed to load " + ModeData.modeInfo(modeKey).label, "Check helper command output and logs.", "󰅚");
+            completeModeLoad(modeKey, false, "Failed to load " + ModeData.modeInfo(modeKey).label);
         }
     }
 
@@ -1423,14 +1423,14 @@ PanelWindow {
         if (_preloadProcs[modeKey]) {
             allItems = [];
             filteredItems = [];
-            beginModeLoad(modeKey, "Loading " + modeInfo(modeKey).label);
+            beginModeLoad(modeKey, "Loading " + ModeData.modeInfo(modeKey).label);
             filterItems();
             _waitForPreload(modeKey);
             return;
         }
         allItems = [];
         filteredItems = [];
-        beginModeLoad(modeKey, "Loading " + modeInfo(modeKey).label);
+        beginModeLoad(modeKey, "Loading " + ModeData.modeInfo(modeKey).label);
         filterItems();
         var token = beginRequest(modeKey);
         runCommand(command, function (raw) {
@@ -1474,7 +1474,7 @@ PanelWindow {
         }
         allItems = [];
         filteredItems = [];
-        beginModeLoad("drun", "Loading " + modeInfo("drun").label);
+        beginModeLoad("drun", "Loading " + ModeData.modeInfo("drun").label);
         filterItems();
         var token = beginRequest("drun");
         AppCatalogService.ensureLoaded(function(items, errorText) {
@@ -1571,7 +1571,7 @@ PanelWindow {
         }
         allItems = [];
         filteredItems = [];
-        beginModeLoad("clip", "Loading " + modeInfo("clip").label);
+        beginModeLoad("clip", "Loading " + ModeData.modeInfo("clip").label);
         filterItems();
         var token = beginRequest("clip");
         ClipboardHistoryService.refresh(function(items, errorText) {
