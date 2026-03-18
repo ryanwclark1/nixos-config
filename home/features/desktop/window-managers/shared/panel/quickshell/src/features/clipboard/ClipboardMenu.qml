@@ -210,7 +210,7 @@ BasePopupMenu {
           color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.highlight : Colors.cardSurface
           border.color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
           border.width: 1
-          Behavior on color { ColorAnimation { duration: 150 } }
+          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
           readonly property bool isImage: !!(modelData && modelData.content && String(modelData.content).includes("[[ binary data"))
 

@@ -54,11 +54,11 @@ Rectangle {
 
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: 5
+        spacing: Colors.spacingSM
         RowLayout {
           Layout.fillWidth: true
           Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide; Layout.fillWidth: true; elide: Text.ElideRight }
-          Text { text: Math.round(root.cpuHistory[root.cpuHistory.length-1] * 100) + "%"; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+          Text { text: root.cpuHistory.length > 0 ? Math.round(root.cpuHistory[root.cpuHistory.length-1] * 100) + "%" : "—"; color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
         }
         Canvas {
           id: cpuCanvas
@@ -73,11 +73,11 @@ Rectangle {
 
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: 5
+        spacing: Colors.spacingSM
         RowLayout {
           Layout.fillWidth: true
           Text { text: "MEM"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Colors.letterSpacingWide; Layout.fillWidth: true; elide: Text.ElideRight }
-          Text { text: Math.round(root.memHistory[root.memHistory.length-1] * 100) + "%"; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
+          Text { text: root.memHistory.length > 0 ? Math.round(root.memHistory[root.memHistory.length-1] * 100) + "%" : "—"; color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold }
         }
         Canvas {
           id: memCanvas

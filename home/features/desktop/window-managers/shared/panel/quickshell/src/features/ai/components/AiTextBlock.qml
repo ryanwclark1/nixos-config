@@ -5,7 +5,7 @@ import "../../../services"
 // Instantiated via Loader; the Loader delegate provides `modelData` (blockData).
 Rectangle {
     id: root
-    property var blockData: parent ? parent.modelData : null
+    readonly property var blockData: parent ? parent.modelData : null
     width: parent ? parent.width : 0
     height: textBlockEdit.implicitHeight + Colors.spacingM * 2
     radius: Colors.radiusMedium

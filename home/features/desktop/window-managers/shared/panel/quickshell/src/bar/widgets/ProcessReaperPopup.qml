@@ -8,7 +8,7 @@ import "../../features/settings/components"
 Rectangle {
     id: root
     width: 280
-    implicitHeight: contentCol.implicitHeight + 24
+    implicitHeight: contentCol.implicitHeight + Colors.paddingLarge
     radius: Colors.radiusMedium
     color: Colors.bgGlass
     border.color: Colors.border

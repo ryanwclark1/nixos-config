@@ -508,7 +508,7 @@ PanelWindow {
       // ── Selected monitor settings ──────────────────────────────
       Item {
         Layout.fillWidth: true
-        implicitHeight: settingsPane.implicitHeight + 24
+        implicitHeight: settingsPane.implicitHeight + Colors.paddingLarge
         visible: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
 
         ColumnLayout {

@@ -62,10 +62,11 @@ case "$MODE" in
     # Convert to JSON array string
     json_items=$(printf '%s\n' "${items[@]}" | jq -R . | jq -s -c .)
     
-    # Setup FIFO
+    # Setup FIFO (remove stale pipe before recreating)
     fifo_path="/tmp/qs-dmenu-result"
-    [ -p "$fifo_path" ] || mkfifo "$fifo_path"
-    trap 'rm -f "$fifo_path"' EXIT
+    rm -f "$fifo_path"
+    mkfifo "$fifo_path" || exit 1
+    trap 'rm -f "$fifo_path"' EXIT INT TERM
 
     # Send to Quickshell
     quickshell ipc call Launcher openDmenu "$json_items"

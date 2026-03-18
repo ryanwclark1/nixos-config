@@ -39,7 +39,7 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: 1
         contentWidth: width
-        contentHeight: messageColumn.implicitHeight + 24
+        contentHeight: messageColumn.implicitHeight + Colors.paddingLarge
         flickableDirection: Flickable.VerticalFlick
         boundsBehavior: Flickable.StopAtBounds
         clip: true

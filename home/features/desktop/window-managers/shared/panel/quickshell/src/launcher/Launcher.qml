@@ -757,13 +757,13 @@ PanelWindow {
 
     // Reactive watchers: ObjectModel doesn't expose countChanged as a signal,
     // so we use property bindings that re-evaluate when the model count changes.
-    property int _toplevelCount: availableToplevels ? availableToplevels.length || 0 : 0
+    readonly property int _toplevelCount: availableToplevels ? availableToplevels.length || 0 : 0
     on_ToplevelCountChanged: {
         if (launcherRoot.mode === "window" && launcherRoot.launcherOpacity > 0)
             launcherRoot.loadWindows();
     }
 
-    property int _mprisCount: Mpris.players ? Mpris.players.length || 0 : 0
+    readonly property int _mprisCount: Mpris.players ? Mpris.players.length || 0 : 0
     on_MprisCountChanged: {
         if (launcherRoot.mode === "media" && launcherRoot.launcherOpacity > 0)
             launcherRoot.refreshMediaPlayers();

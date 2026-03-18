@@ -8,7 +8,7 @@ Item {
     id: root
     anchors.fill: parent
 
-    property string screenName: parent ? (parent.screen ? parent.screen.name : "") : ""
+    readonly property string screenName: parent ? (parent.screen ? parent.screen.name : "") : ""
     property string widgetSearchQuery: ""
     property bool widgetPickerOpen: false
     readonly property var screenRef: parent && parent.screen ? parent.screen : null

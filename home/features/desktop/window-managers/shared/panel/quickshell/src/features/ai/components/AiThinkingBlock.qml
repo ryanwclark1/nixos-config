@@ -6,7 +6,7 @@ import "../../../services"
 // Instantiated via Loader; the Loader delegate provides `modelData` (blockData).
 Rectangle {
     id: root
-    property var blockData: parent ? parent.modelData : null
+    readonly property var blockData: parent ? parent.modelData : null
     property bool expanded: AiService.isStreaming // Expanded by default while streaming
     width: parent ? parent.width : 0
     height: thinkingHeader.height + (expanded ? thinkingContent.implicitHeight + Colors.spacingS : 0)

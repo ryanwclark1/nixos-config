@@ -10,7 +10,7 @@ Row {
 
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent
-  property bool showBattery: hasBattery && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
+  readonly property bool showBattery: hasBattery && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
   readonly property string batteryStateText: {
     if (!device) return "Unknown";
     if (device.state === UPower.DeviceStateCharging) return "Charging";

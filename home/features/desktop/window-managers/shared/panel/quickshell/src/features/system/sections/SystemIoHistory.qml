@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
-import "../models/GraphUtils.js" as GU
 
 SharedWidgets.CardBase {
     id: root
@@ -23,10 +22,6 @@ SharedWidgets.CardBase {
         for (var i = 0; i < raw.length; ++i)
             normalized.push(Number(raw[i] || 0) / maxValue);
         return normalized;
-    }
-
-    function paintGraph(canvas, values, strokeColor) {
-        GU.paintLineGraph(canvas, values, strokeColor, Colors.withAlpha, { fillAlphaTop: 0.28, fillAlphaBot: 0.04 });
     }
 
     onVisibleChanged: {
@@ -149,217 +144,54 @@ SharedWidgets.CardBase {
             columnSpacing: Colors.spacingM
             rowSpacing: Colors.spacingM
 
-            Rectangle {
-                id: netDownCard
-                readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
-                Layout.fillWidth: true
-                radius: Colors.radiusSmall
-                color: Colors.cardSurface
-                border.color: Colors.primary
-                border.width: SystemIoTelemetryService.networkHotspot ? 2 : 1
-                implicitHeight: netDownColumn.implicitHeight + Colors.spacingS * 2
-
-                ColumnLayout {
-                    id: netDownColumn
-                    anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingXS
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "NET DOWN"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(SystemIoTelemetryService.currentNetworkDown); color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: netDownCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(SystemIoTelemetryService.peakNetworkDown); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netDownCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.networkHistoryDown)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netDownCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    Canvas {
-                        id: downCanvas
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 54
-                        renderTarget: Canvas.FramebufferObject
-                        renderStrategy: Canvas.Threaded
-                        onPaint: root.paintGraph(downCanvas, root.normalizedHistory(SystemIoTelemetryService.networkHistoryDown), Colors.primary)
-                    }
-                }
+            IoMetricCard {
+                label: "NET DOWN"
+                accentColor: Colors.primary
+                currentFormatted: MU.formatRate(SystemIoTelemetryService.currentNetworkDown)
+                peakFormatted: MU.formatRate(SystemIoTelemetryService.peakNetworkDown)
+                maxFormatted: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.networkHistoryDown))
+                normalizedData: root.normalizedHistory(SystemIoTelemetryService.networkHistoryDown)
+                hotspot: SystemIoTelemetryService.networkHotspot
+                gridWidth: metricsGrid.width
+                gridColumns: metricsGrid.columns
             }
 
-            Rectangle {
-                id: netUpCard
-                readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
-                Layout.fillWidth: true
-                radius: Colors.radiusSmall
-                color: Colors.cardSurface
-                border.color: Colors.accent
-                border.width: SystemIoTelemetryService.networkHotspot ? 2 : 1
-                implicitHeight: netUpColumn.implicitHeight + Colors.spacingS * 2
-
-                ColumnLayout {
-                    id: netUpColumn
-                    anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingXS
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "NET UP"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(SystemIoTelemetryService.currentNetworkUp); color: Colors.accent; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: netUpCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(SystemIoTelemetryService.peakNetworkUp); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netUpCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.networkHistoryUp)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: netUpCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    Canvas {
-                        id: upCanvas
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 54
-                        renderTarget: Canvas.FramebufferObject
-                        renderStrategy: Canvas.Threaded
-                        onPaint: root.paintGraph(upCanvas, root.normalizedHistory(SystemIoTelemetryService.networkHistoryUp), Colors.accent)
-                    }
-                }
+            IoMetricCard {
+                label: "NET UP"
+                accentColor: Colors.accent
+                currentFormatted: MU.formatRate(SystemIoTelemetryService.currentNetworkUp)
+                peakFormatted: MU.formatRate(SystemIoTelemetryService.peakNetworkUp)
+                maxFormatted: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.networkHistoryUp))
+                normalizedData: root.normalizedHistory(SystemIoTelemetryService.networkHistoryUp)
+                hotspot: SystemIoTelemetryService.networkHotspot
+                gridWidth: metricsGrid.width
+                gridColumns: metricsGrid.columns
             }
 
-            Rectangle {
-                id: diskReadCard
-                readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
-                Layout.fillWidth: true
-                radius: Colors.radiusSmall
-                color: Colors.cardSurface
-                border.color: Colors.secondary
-                border.width: SystemIoTelemetryService.diskHotspot ? 2 : 1
-                implicitHeight: diskReadColumn.implicitHeight + Colors.spacingS * 2
-
-                ColumnLayout {
-                    id: diskReadColumn
-                    anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingXS
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "DISK READ"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(SystemIoTelemetryService.currentDiskRead); color: Colors.secondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: diskReadCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(SystemIoTelemetryService.peakDiskRead); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskReadCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.diskHistoryRead)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskReadCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    Canvas {
-                        id: readCanvas
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 54
-                        renderTarget: Canvas.FramebufferObject
-                        renderStrategy: Canvas.Threaded
-                        onPaint: root.paintGraph(readCanvas, root.normalizedHistory(SystemIoTelemetryService.diskHistoryRead), Colors.secondary)
-                    }
-                }
+            IoMetricCard {
+                label: "DISK READ"
+                accentColor: Colors.secondary
+                currentFormatted: MU.formatRate(SystemIoTelemetryService.currentDiskRead)
+                peakFormatted: MU.formatRate(SystemIoTelemetryService.peakDiskRead)
+                maxFormatted: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.diskHistoryRead))
+                normalizedData: root.normalizedHistory(SystemIoTelemetryService.diskHistoryRead)
+                hotspot: SystemIoTelemetryService.diskHotspot
+                gridWidth: metricsGrid.width
+                gridColumns: metricsGrid.columns
             }
 
-            Rectangle {
-                id: diskWriteCard
-                readonly property real valueWidth: Math.max(72, (metricsGrid.width / Math.max(1, metricsGrid.columns)) * 0.42)
-                Layout.fillWidth: true
-                radius: Colors.radiusSmall
-                color: Colors.cardSurface
-                border.color: Colors.warning
-                border.width: SystemIoTelemetryService.diskHotspot ? 2 : 1
-                implicitHeight: diskWriteColumn.implicitHeight + Colors.spacingS * 2
-
-                ColumnLayout {
-                    id: diskWriteColumn
-                    anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingXS
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "DISK WRITE"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(SystemIoTelemetryService.currentDiskWrite); color: Colors.warning; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: diskWriteCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(SystemIoTelemetryService.peakDiskWrite); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskWriteCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text { text: "Max Label"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Item { Layout.fillWidth: true }
-                        Text { text: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.diskHistoryWrite)); color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: diskWriteCard.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
-                    }
-
-                    Canvas {
-                        id: writeCanvas
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 54
-                        renderTarget: Canvas.FramebufferObject
-                        renderStrategy: Canvas.Threaded
-                        onPaint: root.paintGraph(writeCanvas, root.normalizedHistory(SystemIoTelemetryService.diskHistoryWrite), Colors.warning)
-                    }
-                }
+            IoMetricCard {
+                label: "DISK WRITE"
+                accentColor: Colors.warning
+                currentFormatted: MU.formatRate(SystemIoTelemetryService.currentDiskWrite)
+                peakFormatted: MU.formatRate(SystemIoTelemetryService.peakDiskWrite)
+                maxFormatted: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.diskHistoryWrite))
+                normalizedData: root.normalizedHistory(SystemIoTelemetryService.diskHistoryWrite)
+                hotspot: SystemIoTelemetryService.diskHotspot
+                gridWidth: metricsGrid.width
+                gridColumns: metricsGrid.columns
             }
         }
     }
 
-    Connections {
-        target: SystemIoTelemetryService
-
-        function onNetworkHistoryDownChanged() {
-            downCanvas.requestPaint();
-        }
-
-        function onNetworkHistoryUpChanged() {
-            upCanvas.requestPaint();
-        }
-
-        function onDiskHistoryReadChanged() {
-            readCanvas.requestPaint();
-        }
-
-        function onDiskHistoryWriteChanged() {
-            writeCanvas.requestPaint();
-        }
-    }
 }

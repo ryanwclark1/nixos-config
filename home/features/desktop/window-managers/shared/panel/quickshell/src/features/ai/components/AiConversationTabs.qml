@@ -255,14 +255,16 @@ RowLayout {
                             selectAll();
                             forceActiveFocus();
                         }
+                        property bool _cancelledEdit: false
                         Keys.onReturnPressed: {
                             AiService.renameConversation(modelData.id, text);
                             root.editingConversationId = "";
                         }
-                        Keys.onEscapePressed: root.editingConversationId = ""
+                        Keys.onEscapePressed: { _cancelledEdit = true; root.editingConversationId = ""; }
                         onEditingFinished: {
-                            AiService.renameConversation(modelData.id, text);
-                            root.editingConversationId = "";
+                            if (!_cancelledEdit)
+                                AiService.renameConversation(modelData.id, text);
+                            _cancelledEdit = false;
                         }
                     }
 
@@ -293,7 +295,7 @@ RowLayout {
                             text: "󰅖"
                             color: closeTabMouse.containsMouse ? "white" : Colors.textDisabled
                             font.family: Colors.fontMono
-                            font.pixelSize: 10
+                            font.pixelSize: Colors.fontSizeXS
                         }
 
                         MouseArea {

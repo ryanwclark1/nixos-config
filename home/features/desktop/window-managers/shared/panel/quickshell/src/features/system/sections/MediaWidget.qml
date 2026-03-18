@@ -9,7 +9,7 @@ import "../../../widgets" as SharedWidgets
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: contentCol.implicitHeight + 24
+  Layout.preferredHeight: contentCol.implicitHeight + Colors.paddingLarge
   visible: Config.controlCenterShowMediaWidget && activePlayers.length > 0
   color: Colors.cardSurface
   radius: Colors.radiusMedium

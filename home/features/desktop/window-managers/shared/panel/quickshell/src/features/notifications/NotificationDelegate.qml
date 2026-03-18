@@ -14,7 +14,7 @@ Rectangle {
   property bool showContent: true
   property real swipeOffset: 0
   property bool isSwiping: false
-  property bool isUrgent: !!(notification && notification.urgency === NotificationUrgency.Critical)
+  readonly property bool isUrgent: !!(notification && notification.urgency === NotificationUrgency.Critical)
   property bool isReplying: false
   readonly property bool isHovered: delegateMouseArea.containsMouse
   readonly property string notificationTimeText: {

@@ -85,9 +85,6 @@ SharedWidgets.CardBase {
         interval: root._corePollMs
         running: root.visible
         command: ["sh", "-c", "grep '^cpu[0-9][0-9]* ' /proc/stat 2>/dev/null"]
-        parse: function(out) {
-            return String(out || "");
-        }
         onUpdated: root.parseSnapshot(statPoll.value)
     }
 

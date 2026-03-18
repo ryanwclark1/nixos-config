@@ -124,7 +124,7 @@ BasePopupMenu {
   }
 
   // Reactive device count watcher (ObjectModel doesn't expose countChanged signal)
-  property int _btDeviceCount: (Bluetooth.devices && Bluetooth.devices.values) ? Bluetooth.devices.values.length : 0
+  readonly property int _btDeviceCount: (Bluetooth.devices && Bluetooth.devices.values) ? Bluetooth.devices.values.length : 0
   on_BtDeviceCountChanged: root.updateCounts()
 
   headerExtras: [
@@ -262,7 +262,7 @@ BasePopupMenu {
 
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: 1
+              spacing: Colors.spacingXXS
               Text {
                 text: modelData.name || "Unknown Device"
                 color: Colors.text
@@ -335,7 +335,7 @@ BasePopupMenu {
 
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: 1
+              spacing: Colors.spacingXXS
               Text {
                 text: modelData.name || "Unknown Device"
                 color: Colors.text
@@ -425,7 +425,7 @@ BasePopupMenu {
 
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: 1
+              spacing: Colors.spacingXXS
               Text {
                 text: modelData.name || "Unknown Device"
                 color: Colors.text

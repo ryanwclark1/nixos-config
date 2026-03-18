@@ -5,7 +5,7 @@ import "../services"
 Item {
   id: root
   width: 340
-  height: contentCol.height + 24
+  height: contentCol.height + Colors.paddingLarge
   visible: false
 
   property string title: ""

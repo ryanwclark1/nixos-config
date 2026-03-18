@@ -35,7 +35,7 @@ Rectangle {
     interval: 1000
     running: root.visible
     repeat: true
-    onTriggered: updateStats()
+    onTriggered: { if (!netProc.running) netProc.running = true; }
   }
 
   Process {
@@ -95,9 +95,7 @@ Rectangle {
     GU.paintLineGraph(canvas, data, strokeColor, Colors.withAlpha, { fill: false });
   }
 
-  function updateStats() {
-    if (!netProc.running) netProc.running = true;
-  }
+  readonly property real _valueWidth: Math.max(72, (graphGrid.width / Math.max(1, graphGrid.columns)) * 0.42)
 
   ColumnLayout {
     id: networkContent
@@ -114,7 +112,6 @@ Rectangle {
 
       ColumnLayout {
         id: downloadGraph
-        readonly property real valueWidth: Math.max(72, (graphGrid.width / Math.max(1, graphGrid.columns)) * 0.42)
         Layout.fillWidth: true
         spacing: Colors.spacingXS
 
@@ -135,7 +132,7 @@ Rectangle {
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.Bold
             font.family: Colors.fontMono
-            Layout.maximumWidth: downloadGraph.valueWidth
+            Layout.maximumWidth: root._valueWidth
             horizontalAlignment: Text.AlignRight
             elide: Text.ElideLeft
           }
@@ -162,7 +159,6 @@ Rectangle {
 
       ColumnLayout {
         id: uploadGraph
-        readonly property real valueWidth: Math.max(72, (graphGrid.width / Math.max(1, graphGrid.columns)) * 0.42)
         Layout.fillWidth: true
         spacing: Colors.spacingXS
 
@@ -183,7 +179,7 @@ Rectangle {
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.Bold
             font.family: Colors.fontMono
-            Layout.maximumWidth: uploadGraph.valueWidth
+            Layout.maximumWidth: root._valueWidth
             horizontalAlignment: Text.AlignRight
             elide: Text.ElideLeft
           }

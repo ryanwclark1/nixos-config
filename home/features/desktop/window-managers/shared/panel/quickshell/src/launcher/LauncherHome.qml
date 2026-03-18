@@ -208,8 +208,8 @@ ColumnLayout {
                             border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
                             border.width: 1
                             scale: hovered ? 1.04 : 1.0
-                            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                            Behavior on color { ColorAnimation { duration: 150 } }
+                            Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
+                            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
 
                             ColumnLayout {
                                 anchors.centerIn: parent
@@ -307,8 +307,8 @@ ColumnLayout {
                         border.width: 1
                         scale: selected ? 1.01 : (hovered ? 1.005 : 1.0)
 
-                        Behavior on color { ColorAnimation { duration: 150 } }
-                        Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                        Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
 
                         RowLayout {
                             anchors.fill: parent

@@ -89,7 +89,7 @@ Rectangle {
                         readonly property bool isHovered: modeHover.containsMouse
                         
                         color: isCurrent ? Colors.highlight : (isHovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
-                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
                         
                         border.color: isCurrent ? Colors.withAlpha(Colors.primary, 0.4) : (isHovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
                         border.width: 1

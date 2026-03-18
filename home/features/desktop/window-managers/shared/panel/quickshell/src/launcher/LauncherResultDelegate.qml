@@ -33,10 +33,10 @@ Rectangle {
     border.width: 1
     scale: highlighted ? 1.01 : 1.0
 
-    Behavior on color { ColorAnimation { duration: 150 } }
-    Behavior on border.color { ColorAnimation { duration: 150 } }
-    Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-    layer.enabled: scale !== 1.0
+    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
+    layer.enabled: highlighted && scale !== 1.0
 
     // Glow Effect
     Rectangle {
@@ -46,7 +46,7 @@ Rectangle {
         color: Colors.primary
         opacity: highlighted ? 0.08 : 0
         visible: highlighted
-        Behavior on opacity { NumberAnimation { duration: 300 } }
+        Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
     }
 
     function highlightMatch(text, query) {
@@ -142,9 +142,9 @@ Rectangle {
         radius: Colors.radiusPill
         color: Colors.primary
         opacity: highlighted ? 1.0 : 0.0
-        Behavior on height { NumberAnimation { duration: 250; easing.type: Easing.OutBack } }
-        Behavior on width { NumberAnimation { duration: 200 } }
-        Behavior on opacity { NumberAnimation { duration: 150 } }
+        Behavior on height { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
+        Behavior on width { NumberAnimation { duration: Colors.durationMedium } }
+        Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
     }
 
     RowLayout {
@@ -194,7 +194,7 @@ Rectangle {
         }
 
         ColumnLayout {
-            spacing: 1
+            spacing: Colors.spacingXXS
             Layout.fillWidth: true
             Layout.minimumWidth: 0
             Text {

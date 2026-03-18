@@ -33,8 +33,8 @@ output_status_json() {
 
     local device_info disabled_count total_count dev_line active_wifi_line speed_raw rate
     device_info=$(nmcli -t -f TYPE,STATE,DEVICE device 2>/dev/null || true)
-    disabled_count=$(nmcli -t -f STATE device 2>/dev/null | grep -c '^unavailable$' || true)
-    total_count=$(nmcli -t -f STATE device 2>/dev/null | grep -c '.' || true)
+    disabled_count=$(printf '%s\n' "$device_info" | awk -F: '{print $2}' | grep -c '^unavailable$' || true)
+    total_count=$(printf '%s\n' "$device_info" | awk -F: '{print $2}' | grep -c '.' || true)
 
     if [[ "$total_count" -gt 0 && "$disabled_count" -eq "$total_count" ]]; then
         icon="󰖪"

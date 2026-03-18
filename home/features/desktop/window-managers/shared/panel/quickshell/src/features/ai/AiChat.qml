@@ -506,7 +506,7 @@ PanelWindow {
             // ---- Command Confirmation ----
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: cmdCol.implicitHeight + 24
+                implicitHeight: cmdCol.implicitHeight + Colors.paddingLarge
                 radius: Colors.radiusMedium
                 color: Colors.withAlpha(Colors.accent, 0.12)
                 border.color: Colors.accent
@@ -590,7 +590,7 @@ PanelWindow {
             // ---- Script Confirmation ----
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: scriptCol.implicitHeight + 24
+                implicitHeight: scriptCol.implicitHeight + Colors.paddingLarge
                 radius: Colors.radiusMedium
                 color: Colors.withAlpha(Colors.success, 0.12)
                 border.color: Colors.success

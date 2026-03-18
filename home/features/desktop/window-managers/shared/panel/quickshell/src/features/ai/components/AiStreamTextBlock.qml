@@ -6,8 +6,8 @@ import "../../../services"
 // and `index` (position in the streaming blocks Repeater).
 Rectangle {
     id: root
-    property var blockData: parent ? parent.modelData : null
-    property int blockIndex: parent ? parent.index : 0
+    readonly property var blockData: parent ? parent.modelData : null
+    readonly property int blockIndex: parent ? parent.index : 0
     width: parent ? parent.width : 0
     height: streamTextBlockEdit.implicitHeight + Colors.spacingM * 2
     radius: Colors.radiusMedium

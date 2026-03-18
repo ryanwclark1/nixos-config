@@ -512,7 +512,7 @@ QtObject {
 
     property Process scanProc: Process {
         id: scanProc
-        command: ["sh", "-c", "PLUGINS_DIR=" + root.pluginsDir + "; " + "for d in \"$PLUGINS_DIR\"/*/; do " + "[ -d \"$d\" ] || continue; " + "[ -f \"$d/manifest.json\" ] || continue; " + "manifest=$(jq -c . \"$d/manifest.json\" 2>/dev/null) || continue; " + "fingerprint=$(find \"$d\" -type f -printf '%P:%T@\\n' 2>/dev/null | sort | sha256sum | cut -d' ' -f1); " + "printf '{\"path\":%s,\"fingerprint\":%s,\"manifest\":%s}\\n' \"$(printf %s \"$d\" | jq -Rsa .)\" \"$(printf %s \"$fingerprint\" | jq -Rsa .)\" \"$manifest\"; " + "done 2>/dev/null"]
+        command: ["sh", "-c", "PLUGINS_DIR=\"$1\"; " + "for d in \"$PLUGINS_DIR\"/*/; do " + "[ -d \"$d\" ] || continue; " + "[ -f \"$d/manifest.json\" ] || continue; " + "manifest=$(jq -c . \"$d/manifest.json\" 2>/dev/null) || continue; " + "fingerprint=$(find \"$d\" -type f -printf '%P:%T@\\n' 2>/dev/null | sort | sha256sum | cut -d' ' -f1); " + "printf '{\"path\":%s,\"fingerprint\":%s,\"manifest\":%s}\\n' \"$(printf %s \"$d\" | jq -Rsa .)\" \"$(printf %s \"$fingerprint\" | jq -Rsa .)\" \"$manifest\"; " + "done 2>/dev/null", "sh", root.pluginsDir]
         running: false
 
         stdout: StdioCollector {

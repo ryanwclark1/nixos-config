@@ -132,7 +132,7 @@ BasePopupMenu {
     // Power details grid
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: detailsGrid.implicitHeight + 24
+      implicitHeight: detailsGrid.implicitHeight + Colors.paddingLarge
       radius: Colors.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border

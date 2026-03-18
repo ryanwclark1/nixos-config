@@ -103,7 +103,7 @@ PanelWindow {
   // Clipboard copy helper
   Process {
     id: clipboardProc
-    command: ["sh", "-c", "wl-copy '" + root.hexValue + "'"]
+    command: ["sh", "-c", "printf %s \"$1\" | wl-copy", "sh", root.hexValue]
     running: false
   }
 
@@ -537,7 +537,7 @@ PanelWindow {
             cursorShape: Qt.PointingHandCursor
             onClicked: (mouse) => {
               copyStateLayer.burst(mouse.x, mouse.y);
-              clipboardProc.command = ["sh", "-c", "printf '%s' '" + root.hexValue + "' | wl-copy"];
+              clipboardProc.command = ["sh", "-c", "printf %s \"$1\" | wl-copy", "sh", root.hexValue];
               clipboardProc.running = true;
               clipCopied.restart();
             }

@@ -119,7 +119,7 @@ QtObject {
   }
 
   property Process _incidentCollector: Process {
-    command: ["sh", "-c", "mkdir -p '" + root.incidentRoot + "'; find '" + root.incidentRoot + "' -name 'incident.json' -exec cat {} + | jq -s ."]
+    command: ["sh", "-c", "mkdir -p \"$1\"; find \"$1\" -name 'incident.json' -exec cat {} + | jq -s .", "sh", root.incidentRoot]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {

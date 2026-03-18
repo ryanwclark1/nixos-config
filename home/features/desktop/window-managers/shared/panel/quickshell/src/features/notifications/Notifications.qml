@@ -51,7 +51,7 @@ PanelWindow {
         Layout.preferredWidth: Config.notifWidth
         Layout.preferredHeight: visible ? delegate.height : 0
 
-        property bool isUrgent: !!(notification && notification.urgency === NotificationUrgency.Critical)
+        readonly property bool isUrgent: !!(notification && notification.urgency === NotificationUrgency.Critical)
         readonly property int _urgencyTimeout: {
           if (!notification) return Config.popupTimer;
           var rules = Config.notifRules;

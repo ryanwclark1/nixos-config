@@ -99,14 +99,12 @@ RowLayout {
       function applyValue(mouseX) {
         var ratio = Math.max(0, Math.min(1.0, mouseX / osdTrack.width));
         var value = ratio * root.maxValue;
+        var pct = Math.round(value * 100);
         if (root.osdType === "volume") {
-          var pct = Math.round(value * 100);
           Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", pct + "%"]);
         } else if (root.osdType === "mic") {
-          var pct = Math.round(value * 100);
           Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SOURCE@", pct + "%"]);
         } else if (root.osdType === "brightness") {
-          var pct = Math.round(value * 100);
           Quickshell.execDetached(["brightnessctl", "set", pct + "%"]);
         } else if (root.osdType === "kbdbrightness") {
           BrightnessService.setKbdBrightness(value);

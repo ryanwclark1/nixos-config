@@ -14,6 +14,7 @@ BasePopupMenu {
   title: "Networking"
   subtitle: NetworkService.activePrimaryName === "Offline" ? "Network inspector" : NetworkService.activePrimaryName
 
+  readonly property bool isOffline: NetworkService.activePrimaryName === "Offline"
   property string selectedSSID: ""
   property bool showAdvanced: false
 
@@ -84,7 +85,6 @@ BasePopupMenu {
       Column {
         anchors.fill: parent
         anchors.margins: Colors.spacingM
-        anchors.leftMargin: Colors.spacingM
         spacing: Colors.spacingXS
         SharedWidgets.SectionLabel { label: modelData.label }
         Text {

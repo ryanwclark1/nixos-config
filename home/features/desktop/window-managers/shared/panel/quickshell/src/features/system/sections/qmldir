@@ -3,6 +3,7 @@ CircularGauge 1.0 CircularGauge.qml
 DevOpsSection 1.0 DevOpsSection.qml
 DiskWidget 1.0 DiskWidget.qml
 GPUWidget 1.0 GPUWidget.qml
+IoMetricCard 1.0 IoMetricCard.qml
 MediaWidget 1.0 MediaWidget.qml
 NetworkGraphs 1.0 NetworkGraphs.qml
 PowerActionsRow 1.0 PowerActionsRow.qml
