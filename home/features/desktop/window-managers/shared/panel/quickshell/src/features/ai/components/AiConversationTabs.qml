@@ -11,6 +11,7 @@ RowLayout {
     spacing: Colors.spacingS
 
     property string editingConversationId: ""
+    readonly property int visibleTabLimit: width < 380 ? 2 : (width < 520 ? 3 : 4)
 
     readonly property var sortedConversations: {
         var convs = AiService.conversations.slice();
@@ -28,7 +29,7 @@ RowLayout {
             visible.push(active);
             seen[active.id] = true;
         }
-        for (var i = 0; i < sortedConversations.length && visible.length < 4; i++) {
+        for (var i = 0; i < sortedConversations.length && visible.length < visibleTabLimit; i++) {
             if (!seen[sortedConversations[i].id]) {
                 visible.push(sortedConversations[i]);
                 seen[sortedConversations[i].id] = true;
@@ -139,7 +140,7 @@ RowLayout {
                     readonly property bool isActive: modelData.id === AiService.activeConversationId
                     readonly property bool isEditing: root.editingConversationId === modelData.id
 
-                    width: isEditing ? tabEditInput.width + 22 : Math.min(tabLabelText.contentWidth + 70, 168)
+                    width: isEditing ? Math.min(tabEditInput.width + 22, 156) : Math.min(tabLabelText.contentWidth + 70, 132)
                     height: 32
 
                     Behavior on width {
@@ -235,7 +236,7 @@ RowLayout {
                         anchors.left: parent.left
                         anchors.leftMargin: Colors.spacingS
                         anchors.verticalCenter: parent.verticalCenter
-                        width: Math.max(72, contentWidth + 8)
+                        width: Math.min(Math.max(72, contentWidth + 8), 134)
                         text: modelData.title
                         color: Colors.primary
                         font.pixelSize: Colors.fontSizeSmall
