@@ -13,6 +13,8 @@ import "LauncherSearch.js" as Search
 import "LauncherDiagnostics.js" as Diag
 import "LauncherFileParser.js" as FileParser
 import "LauncherExecutor.js" as Executor
+import "LauncherMetrics.js" as Metrics
+import "LauncherSystemItems.js" as SystemItems
 import "EmojiData.js" as EmojiData
 
 PanelWindow {
@@ -1041,37 +1043,11 @@ PanelWindow {
     }
 
     function modeMetric(modeKey) {
-        var perMode = launcherMetrics.perMode || ({});
-        return perMode[modeKey] || ({
-                loads: 0,
-                cacheHits: 0,
-                cacheMisses: 0,
-                failures: 0,
-                lastLoadMs: 0,
-                avgLoadMs: 0
-            });
+        return Metrics.modeMetric(launcherMetrics, modeKey);
     }
 
     function clearLauncherMetrics() {
-        launcherMetrics = ({
-                opens: 0,
-                cacheHits: 0,
-                cacheMisses: 0,
-                commandFailures: 0,
-                filterRuns: 0,
-                lastFilterMs: 0,
-                avgFilterMs: 0,
-                filesFdLoads: 0,
-                filesFindLoads: 0,
-                filesFdLastMs: 0,
-                filesFindLastMs: 0,
-                filesFdAvgMs: 0,
-                filesFindAvgMs: 0,
-                filesResolveRuns: 0,
-                filesResolveLastMs: 0,
-                filesResolveAvgMs: 0,
-                perMode: ({})
-            });
+        launcherMetrics = Metrics.freshMetrics();
     }
 
     function fileIndexStale() {

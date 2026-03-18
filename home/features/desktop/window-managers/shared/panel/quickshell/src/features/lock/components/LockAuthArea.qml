@@ -38,6 +38,55 @@ ColumnLayout {
         PropertyAnimation { target: root; property: "shakeOffset"; to: 0; duration: Colors.durationShake }
     }
 
+    // Fingerprint status
+    ColumnLayout {
+        Layout.alignment: Qt.AlignHCenter
+        spacing: Colors.spacingXS
+        visible: root.lockContext && root.lockContext.fprintAvailable && Config.lockScreenFingerprint
+
+        Text {
+            id: fprintIcon
+            Layout.alignment: Qt.AlignHCenter
+            text: "󰈷"
+            color: {
+                if (!root.lockContext) return Colors.textDisabled;
+                switch (root.lockContext.fprintStatus) {
+                case "scanning": return Colors.primary;
+                case "error":
+                case "max_tries": return Colors.error;
+                default: return Colors.textDisabled;
+                }
+            }
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeDisplay
+
+            SequentialAnimation on opacity {
+                id: fprintPulse
+                running: root.lockContext && root.lockContext.fprintStatus === "scanning"
+                loops: Animation.Infinite
+                NumberAnimation { to: 0.4; duration: Colors.durationPulse }
+                NumberAnimation { to: 1.0; duration: Colors.durationPulse }
+            }
+        }
+
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: {
+                if (!root.lockContext) return "";
+                switch (root.lockContext.fprintStatus) {
+                case "scanning": return "Touch sensor to unlock";
+                case "error": return "Try again or use password";
+                case "max_tries": return "Use password";
+                default: return "";
+                }
+            }
+            color: root.lockContext && root.lockContext.fprintStatus === "scanning"
+                ? Colors.textSecondary : Colors.error
+            font.pixelSize: Colors.fontSizeSmall
+            visible: text !== ""
+        }
+    }
+
     // Password input
     Rectangle {
         Layout.fillWidth: true

@@ -55,8 +55,25 @@ if [ "$TOOL_NAME" = "Edit" ] || [ "$TOOL_NAME" = "Write" ]; then
     "yarn.lock"          # Often auto-generated
   )
 
+  FILE_BASENAME=$(basename "$FILE_PATH")
+
   for pattern in "${PROTECTED_PATTERNS[@]}"; do
-    if echo "$FILE_PATH" | grep -qiE "$pattern"; then
+    MATCHED=0
+    # Use a case statement for glob patterns (e.g. *.key, *.pem) so they are
+    # evaluated against the basename only, not as a substring regex against the
+    # full path. This prevents false positives like LauncherKeyHandler.qml
+    # matching *.key because the path contains the substring "Key".
+    case "$FILE_BASENAME" in
+      $pattern) MATCHED=1 ;;
+    esac
+    # For directory/path-segment patterns (e.g. secrets/, .git/) also check the
+    # full path using literal fixed-string matching.
+    if [ "$MATCHED" = "0" ]; then
+      if echo "$FILE_PATH" | grep -qF "$pattern" 2>/dev/null; then
+        MATCHED=1
+      fi
+    fi
+    if [ "$MATCHED" = "1" ]; then
       jq -n '{
         hookSpecificOutput: {
           hookEventName: "PreToolUse",

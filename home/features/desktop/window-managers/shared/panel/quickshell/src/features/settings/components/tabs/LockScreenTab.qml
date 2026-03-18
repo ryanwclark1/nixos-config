@@ -43,6 +43,11 @@ Item {
                     icon: "󰐥"
                     configKey: "lockScreenSessionButtons"
                 }
+                SettingsToggleRow {
+                    label: "Fingerprint Unlock"
+                    icon: "󰈷"
+                    configKey: "lockScreenFingerprint"
+                }
             }
 
             SettingsSliderRow {
