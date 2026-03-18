@@ -165,14 +165,19 @@ BasePopupMenu {
           id: clipCard
           required property int index
           Layout.fillWidth: true
-          implicitHeight: 54
+          implicitHeight: (clipCard.isImage && clipCard.imageSrc !== "") ? 140 : 54
           radius: Colors.radiusMedium
           color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.highlight : Colors.cardSurface
           border.color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
           border.width: 1
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on implicitHeight { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
 
-          readonly property bool isImage: !!(modelData && modelData.content && String(modelData.content).includes("[[ binary data"))
+          readonly property bool isImage: !!(modelData && modelData.content && String(modelData.content).indexOf("[[ binary data") !== -1)
+          readonly property string imageSrc: {
+            void ClipboardHistoryService._imageGeneration;
+            return isImage ? ClipboardHistoryService.imagePath(modelData.id) : "";
+          }
 
           SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
 
@@ -182,44 +187,73 @@ BasePopupMenu {
             pressed: clipMouse.pressed
           }
 
-          RowLayout {
+          ColumnLayout {
             id: clipContent
             anchors.fill: parent
             anchors.margins: Colors.paddingSmall
-            spacing: Colors.spacingM
+            spacing: Colors.spacingXS
 
+            // Image preview row
             Rectangle {
-              width: 32; height: 32; radius: Colors.radiusSmall
-              color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.surface : Colors.chipSurface
-              Text {
-                anchors.centerIn: parent
-                text: clipCard.isImage ? "󰋩" : "󰅍"
-                color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.primary : Colors.textSecondary
-                font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
+              Layout.fillWidth: true
+              Layout.fillHeight: true
+              radius: Colors.radiusXS
+              color: Colors.withAlpha(Colors.text, 0.04)
+              visible: clipCard.isImage && clipCard.imageSrc !== ""
+              clip: true
+
+              Image {
+                anchors.fill: parent
+                anchors.margins: 2
+                source: clipCard.imageSrc !== "" ? ("file://" + clipCard.imageSrc) : ""
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                cache: false
+                sourceSize.height: 120
               }
             }
 
-            ColumnLayout {
-              Layout.fillWidth: true; spacing: 0
-              Text {
-                text: clipCard.isImage ? "IMAGE DATA" : String((modelData && modelData.content) || "")
-                color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium
-                elide: Text.ElideRight; Layout.fillWidth: true
-                font.capitalization: clipCard.isImage ? Font.AllUppercase : Font.MixedCase
-                font.letterSpacing: clipCard.isImage ? 0.5 : 0
-              }
-              Text {
-                text: modelData.id || ""
-                color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS
-                visible: text !== ""
-              }
-            }
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: Colors.spacingM
 
-            SharedWidgets.IconButton {
-              icon: "󰎟"; size: 28; iconSize: Colors.fontSizeLarge; iconColor: Colors.textDisabled
-              stateColor: Colors.error
-              onClicked: {
-                root.deleteClipboardItem(modelData);
+              Rectangle {
+                width: 32; height: 32; radius: Colors.radiusSmall
+                color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.surface : Colors.chipSurface
+                visible: !(clipCard.isImage && clipCard.imageSrc !== "")
+                Text {
+                  anchors.centerIn: parent
+                  text: clipCard.isImage ? "󰋩" : "󰅍"
+                  color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.primary : Colors.textSecondary
+                  font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
+                }
+              }
+
+              ColumnLayout {
+                Layout.fillWidth: true; spacing: 0
+                Text {
+                  text: {
+                    if (!clipCard.isImage) return String((modelData && modelData.content) || "");
+                    var raw = String(modelData.content || "");
+                    var m = raw.match(/\[\[ binary data (.+?) \]\]/);
+                    return m ? m[1] : "Image";
+                  }
+                  color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium
+                  elide: Text.ElideRight; Layout.fillWidth: true
+                }
+                Text {
+                  text: modelData.id || ""
+                  color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS
+                  visible: text !== ""
+                }
+              }
+
+              SharedWidgets.IconButton {
+                icon: "󰎟"; size: 28; iconSize: Colors.fontSizeLarge; iconColor: Colors.textDisabled
+                stateColor: Colors.error
+                onClicked: {
+                  root.deleteClipboardItem(modelData);
+                }
               }
             }
           }

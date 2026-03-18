@@ -299,13 +299,13 @@ Rectangle {
     }
     onPressed: function(mouse) {
       if (mouse.button === Qt.LeftButton && root.isPopup) {
-        root._swipeStartX = mouse.x;
+        delegateMouseArea._swipeStartX = mouse.x;
         root.isSwiping = true;
       }
     }
     onPositionChanged: function(mouse) {
       if (root.isSwiping) {
-        var delta = mouse.x - root._swipeStartX;
+        var delta = mouse.x - delegateMouseArea._swipeStartX;
         root.swipeOffset = Math.max(0, delta);
       }
     }

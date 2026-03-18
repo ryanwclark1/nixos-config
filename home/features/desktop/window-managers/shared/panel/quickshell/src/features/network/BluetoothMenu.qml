@@ -127,6 +127,88 @@ BasePopupMenu {
   readonly property int _btDeviceCount: (Bluetooth.devices && Bluetooth.devices.values) ? Bluetooth.devices.values.length : 0
   on_BtDeviceCountChanged: root.updateCounts()
 
+  component BtDeviceCard: Rectangle {
+    id: _btCard
+    required property var modelData
+    property color iconColor: Colors.textDisabled
+    property int nameWeight: Font.Normal
+    property color bgColor: Colors.cardSurface
+    property color borderColor: Colors.border
+    property bool highlightAlways: false
+    property string chipText: ""
+    property color chipColor: Colors.textSecondary
+    property bool chipInteractive: false
+    property string actionIcon: ""
+    property bool showAction: actionIcon !== ""
+    signal chipClicked()
+    signal actionClicked()
+
+    Layout.fillWidth: true
+    implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
+    radius: Colors.radiusMedium
+    color: _cardHover.containsMouse ? Colors.primaryFaint : bgColor
+    border.color: borderColor
+    border.width: 1
+
+    SharedWidgets.InnerHighlight { hoveredOpacity: highlightAlways ? 0.25 : 0.2; hovered: highlightAlways || _cardHover.containsMouse }
+
+    RowLayout {
+      anchors.fill: parent
+      anchors.margins: Colors.paddingSmall
+      spacing: Colors.paddingSmall
+
+      Text {
+        text: root.deviceIcon(modelData)
+        color: iconColor
+        font.family: Colors.fontMono
+        font.pixelSize: Colors.fontSizeXL
+      }
+
+      ColumnLayout {
+        Layout.fillWidth: true
+        spacing: Colors.spacingXXS
+        Text {
+          text: modelData.name || "Unknown Device"
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
+          font.weight: nameWeight
+          elide: Text.ElideRight
+          Layout.fillWidth: true
+        }
+        Text {
+          text: modelData.address
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeXS
+          visible: !!modelData.address
+        }
+      }
+
+      SharedWidgets.StatusChip {
+        text: chipText
+        chipColor: _btCard.chipColor
+        interactive: _btCard.chipInteractive
+        visible: !root.compactMode
+        onClicked: _btCard.chipClicked()
+      }
+
+      SharedWidgets.IconButton {
+        size: 28; radius: Colors.radiusMedium
+        icon: _btCard.actionIcon; stateColor: Colors.error
+        visible: _btCard.showAction
+        onClicked: _btCard.actionClicked()
+      }
+    }
+
+    SharedWidgets.StateLayer { hovered: _cardHover.containsMouse; pressed: _cardHover.pressed; stateColor: Colors.primary; enableRipple: false }
+
+    MouseArea {
+      id: _cardHover
+      anchors.fill: parent
+      hoverEnabled: true
+      acceptedButtons: Qt.NoButton
+    }
+  }
+
   headerExtras: [
     SharedWidgets.FilterChip {
       label: root.effectiveBtEnabled ? "On" : "Off"
@@ -236,70 +318,18 @@ BasePopupMenu {
 
       Repeater {
         model: Bluetooth.devices
-        delegate: Rectangle {
-          id: connCard
-          Layout.fillWidth: true
-          implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
+        delegate: BtDeviceCard {
           visible: modelData.connected
-          radius: Colors.radiusMedium
-          color: modelData.connected ? Colors.primarySubtle : (connHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface)
-          border.color: modelData.connected ? Colors.primary : Colors.border
-          border.width: 1
-
-          SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: modelData.connected }
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: Colors.paddingSmall
-            spacing: Colors.paddingSmall
-
-            Text {
-              text: root.deviceIcon(modelData)
-              color: Colors.primary
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeXL
-            }
-
-            ColumnLayout {
-              Layout.fillWidth: true
-              spacing: Colors.spacingXXS
-              Text {
-                text: modelData.name || "Unknown Device"
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
-                font.weight: Font.DemiBold
-                elide: Text.ElideRight
-                Layout.fillWidth: true
-              }
-              Text {
-                text: modelData.address
-                color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
-                visible: !!modelData.address
-              }
-            }
-
-            SharedWidgets.StatusChip {
-              text: "Connected"
-              chipColor: Colors.primary
-              visible: !root.compactMode
-            }
-
-            SharedWidgets.IconButton {
-              size: 28; radius: Colors.radiusMedium
-              icon: "󰅖"; stateColor: Colors.error
-              onClicked: modelData.disconnect()
-            }
-          }
-
-          SharedWidgets.StateLayer { id: connStateLayer; hovered: connHover.containsMouse; pressed: connHover.pressed; stateColor: Colors.primary; enableRipple: false }
-
-          MouseArea {
-            id: connHover
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
-          }
+          iconColor: Colors.primary
+          nameWeight: Font.DemiBold
+          bgColor: Colors.primarySubtle
+          borderColor: Colors.primary
+          highlightAlways: true
+          chipText: "Connected"
+          chipColor: Colors.primary
+          actionIcon: "󰅖"
+          onChipClicked: {}
+          onActionClicked: modelData.disconnect()
         }
       }
 
@@ -308,73 +338,14 @@ BasePopupMenu {
 
       Repeater {
         model: Bluetooth.devices
-        delegate: Rectangle {
-          id: pairedCard
-          Layout.fillWidth: true
-          implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
+        delegate: BtDeviceCard {
           visible: modelData.paired && !modelData.connected
-          radius: Colors.radiusMedium
-          color: pairedHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
-          border.color: Colors.border
-          border.width: 1
-
-          // Inner highlight
-          SharedWidgets.InnerHighlight { }
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: Colors.paddingSmall
-            spacing: Colors.paddingSmall
-
-            Text {
-              text: root.deviceIcon(modelData)
-              color: Colors.textSecondary
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeXL
-            }
-
-            ColumnLayout {
-              Layout.fillWidth: true
-              spacing: Colors.spacingXXS
-              Text {
-                text: modelData.name || "Unknown Device"
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
-                font.weight: Font.Normal
-                elide: Text.ElideRight
-                Layout.fillWidth: true
-              }
-              Text {
-                text: modelData.address
-                color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
-                visible: !!modelData.address
-              }
-            }
-
-            SharedWidgets.StatusChip {
-              text: "Connect"
-              chipColor: Colors.textSecondary
-              interactive: true
-              visible: !root.compactMode
-              onClicked: root.connectDevice(modelData)
-            }
-
-            SharedWidgets.IconButton {
-              size: 28; radius: Colors.radiusMedium
-              icon: "󰆴"; stateColor: Colors.error
-              onClicked: Quickshell.execDetached(["bluetoothctl", "remove", modelData.address])
-            }
-          }
-
-          SharedWidgets.StateLayer { id: pairedStateLayer; hovered: pairedHover.containsMouse; pressed: pairedHover.pressed; stateColor: Colors.primary; enableRipple: false }
-
-          MouseArea {
-            id: pairedHover
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
-          }
+          iconColor: Colors.textSecondary
+          chipText: "Connect"
+          chipInteractive: true
+          actionIcon: "󰆴"
+          onChipClicked: root.connectDevice(modelData)
+          onActionClicked: Quickshell.execDetached(["bluetoothctl", "remove", modelData.address])
         }
       }
 
@@ -399,65 +370,13 @@ BasePopupMenu {
 
       Repeater {
         model: Bluetooth.devices
-        delegate: Rectangle {
-          id: availCard
-          Layout.fillWidth: true
-          implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
+        delegate: BtDeviceCard {
           visible: !modelData.paired && !modelData.connected
-          radius: Colors.radiusMedium
-          color: availHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
-          border.color: Colors.border
-          border.width: 1
-
-          SharedWidgets.InnerHighlight { hoveredOpacity: 0.2; hovered: availHover.containsMouse }
-
-          RowLayout {
-            anchors.fill: parent
-            anchors.margins: Colors.paddingSmall
-            spacing: Colors.paddingSmall
-
-            Text {
-              text: root.deviceIcon(modelData)
-              color: Colors.textDisabled
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeXL
-            }
-
-            ColumnLayout {
-              Layout.fillWidth: true
-              spacing: Colors.spacingXXS
-              Text {
-                text: modelData.name || "Unknown Device"
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
-                elide: Text.ElideRight
-                Layout.fillWidth: true
-              }
-              Text {
-                text: modelData.address
-                color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
-                visible: !!modelData.address
-              }
-            }
-
-            SharedWidgets.StatusChip {
-              text: "Pair"
-              chipColor: Colors.textSecondary
-              interactive: true
-              visible: !root.compactMode
-              onClicked: root.pairDevice(modelData.address)
-            }
-          }
-
-          SharedWidgets.StateLayer { id: availStateLayer; hovered: availHover.containsMouse; pressed: availHover.pressed; stateColor: Colors.primary; enableRipple: false }
-
-          MouseArea {
-            id: availHover
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
-          }
+          iconColor: Colors.textDisabled
+          chipText: "Pair"
+          chipInteractive: true
+          showAction: false
+          onChipClicked: root.pairDevice(modelData.address)
         }
       }
 

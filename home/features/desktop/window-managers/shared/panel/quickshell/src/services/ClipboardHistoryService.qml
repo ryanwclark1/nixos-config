@@ -14,6 +14,20 @@ QtObject {
   property var _waiters: []
   property var _entryLinesById: ({})
 
+  readonly property string _cacheDir: {
+    var rt = Quickshell.env("XDG_RUNTIME_DIR");
+    return (rt !== "" ? rt : "/tmp") + "/quickshell-clipboard";
+  }
+  property var _decodedImages: ({})
+  property int _imageGeneration: 0
+
+  function imagePath(id) {
+    var _gen = _imageGeneration; // force binding dependency
+    void _gen;
+    var key = String(id || "");
+    return _decodedImages.hasOwnProperty(key) ? _decodedImages[key] : "";
+  }
+
   readonly property bool available: DependencyService.allAvailable(["cliphist", "wl-copy", "wl-paste"])
 
   function _shellQuote(text) {
@@ -58,6 +72,31 @@ QtObject {
     }
     root._entryLinesById = lineMap;
     return entries;
+  }
+
+  function _decodeImages(entries) {
+    var imageIds = [];
+    for (var i = 0; i < entries.length; ++i) {
+      var c = String(entries[i].content || "");
+      if (c.indexOf("[[ binary data") !== -1 && (c.indexOf("png") !== -1 || c.indexOf("jpg") !== -1 || c.indexOf("jpeg") !== -1 || c.indexOf("bmp") !== -1 || c.indexOf("webp") !== -1))
+        imageIds.push(String(entries[i].id));
+    }
+    if (imageIds.length === 0)
+      return;
+
+    var dir = root._cacheDir;
+    var script = "mkdir -p " + _shellQuote(dir) + "\n";
+    for (var j = 0; j < imageIds.length; ++j) {
+      var safeId = parseInt(imageIds[j], 10);
+      if (isNaN(safeId))
+        continue;
+      var outPath = dir + "/" + safeId + ".png";
+      script += "cliphist decode " + safeId + " > " + _shellQuote(outPath) + " 2>/dev/null &\n";
+    }
+    script += "wait\n";
+    _imageDecodePoll.command = ["sh", "-c", script];
+    _imageDecodePoll._pendingIds = imageIds;
+    _imageDecodePoll.running = true;
   }
 
   function refresh(callback) {
@@ -113,7 +152,9 @@ QtObject {
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
-        root._finalize(root._parseHistory(this.text || ""), "");
+        var entries = root._parseHistory(this.text || "");
+        root._finalize(entries, "");
+        root._decodeImages(entries);
       }
     }
     stderr: StdioCollector {
@@ -128,6 +169,24 @@ QtObject {
         return;
       if (exitCode !== 0)
         root._finalize([], root.lastError !== "" ? root.lastError : "Failed to load clipboard history.");
+    }
+  }
+
+  property Process _imageDecodePoll: Process {
+    property var _pendingIds: []
+    running: false
+    onExited: (exitCode, _exitStatus) => {
+      if (exitCode !== 0)
+        return;
+      var newMap = {};
+      var ids = _pendingIds;
+      for (var i = 0; i < ids.length; ++i) {
+        var safeId = parseInt(ids[i], 10);
+        if (!isNaN(safeId))
+          newMap[String(safeId)] = root._cacheDir + "/" + safeId + ".png";
+      }
+      root._decodedImages = newMap;
+      root._imageGeneration += 1;
     }
   }
 }
