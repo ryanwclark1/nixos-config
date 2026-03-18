@@ -12,9 +12,24 @@ BasePopupMenu {
     popupMaxWidth: 460
     compactThreshold: 420
     implicitHeight: compactMode ? 620 : 580
-    title: "System"
-    subtitle: compactMode ? "Actions first" : "Processes, services, and live telemetry"
     focusOnOpen: true
+
+    property var surfaceContext: null
+    readonly property string statKey: (surfaceContext && surfaceContext.statKey) || ""
+    readonly property bool showAll: statKey === ""
+
+    title: {
+        if (statKey === "cpuStatus") return "CPU";
+        if (statKey === "ramStatus") return "Memory";
+        if (statKey === "gpuStatus") return "GPU";
+        return "System";
+    }
+    subtitle: {
+        if (statKey === "cpuStatus") return "Processor usage and processes";
+        if (statKey === "ramStatus") return "Memory usage and processes";
+        if (statKey === "gpuStatus") return "Graphics processor telemetry";
+        return compactMode ? "Actions first" : "Processes, services, and live telemetry";
+    }
 
     headerExtras: SharedWidgets.IconButton {
         icon: "󰄨"
@@ -34,13 +49,13 @@ BasePopupMenu {
         }
     }
     Loader {
-        active: root.visible
+        active: root.visible && (root.showAll || root.statKey === "cpuStatus" || root.statKey === "ramStatus")
         sourceComponent: SharedWidgets.Ref {
             service: ProcessService
         }
     }
     Loader {
-        active: root.visible
+        active: root.visible && root.showAll
         sourceComponent: SharedWidgets.Ref {
             service: ServiceUnitService
         }
@@ -54,12 +69,15 @@ BasePopupMenu {
 
         SharedWidgets.SectionLabel {
             label: "ACTIONS"
+            visible: root.showAll || root.statKey === "cpuStatus" || root.statKey === "ramStatus"
         }
 
         ProcessWidget {
+            visible: root.showAll || root.statKey === "cpuStatus" || root.statKey === "ramStatus"
             compactMode: root.compactMode
         }
         ServiceUnitWidget {
+            visible: root.showAll
             compactMode: root.compactMode
         }
 
@@ -67,10 +85,10 @@ BasePopupMenu {
             label: "TELEMETRY"
         }
 
-        CpuWidget {}
-        RamWidget {}
-        GPUWidget {}
-        DiskWidget {}
-        NetworkGraphs {}
+        CpuWidget { visible: root.showAll || root.statKey === "cpuStatus" }
+        RamWidget { visible: root.showAll || root.statKey === "ramStatus" }
+        GPUWidget { visible: root.showAll || root.statKey === "gpuStatus" }
+        DiskWidget { visible: root.showAll }
+        NetworkGraphs { visible: root.showAll }
     }
 }
