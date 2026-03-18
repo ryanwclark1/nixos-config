@@ -13,21 +13,80 @@ Item {
     Component.onCompleted: _loadKeybinds()
 
     function _loadKeybinds() {
+        _stdoutBuffer = "";
         keybindProcess.running = true;
     }
+
+    property string _stdoutBuffer: ""
 
     Process {
         id: keybindProcess
         command: ["qs-keybinds"]
         stdout: SplitParser {
             onRead: data => {
-                try {
-                    root.keybinds = JSON.parse(data);
-                } catch (e) {
-                    console.warn("Cheatsheet: failed to parse keybinds:", e);
-                }
+                root._stdoutBuffer += data + "\n";
             }
         }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0) {
+                console.warn("Cheatsheet: qs-keybinds exited with code", exitCode);
+                return;
+            }
+            var trimmed = root._stdoutBuffer.trim();
+            if (!trimmed) return;
+            try {
+                var parsed = JSON.parse(trimmed);
+                // --flatten output is [{name, desc, disp, args}]; transform to [{section, binds}]
+                if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].name !== undefined && parsed[0].section === undefined) {
+                    var byCategory = {};
+                    var order = [];
+                    for (var i = 0; i < parsed.length; i++) {
+                        var item = parsed[i];
+                        var cat = _categorize(item.desc || "");
+                        if (!(cat in byCategory)) {
+                            byCategory[cat] = [];
+                            order.push(cat);
+                        }
+                        byCategory[cat].push({ keys: item.name || "", desc: item.desc || "" });
+                    }
+                    var sections = [];
+                    for (var j = 0; j < order.length; j++)
+                        sections.push({ section: order[j], binds: byCategory[order[j]] });
+                    root.keybinds = sections;
+                } else {
+                    root.keybinds = parsed;
+                }
+            } catch (e) {
+                console.warn("Cheatsheet: failed to parse keybinds:", e);
+            }
+        }
+    }
+
+    function _categorize(desc) {
+        var d = desc.toLowerCase();
+        if (["niri overview", "quit niri", "inhibit", "power off", "hotkey overlay"].some(function(x) { return d.includes(x); }))
+            return "System";
+        if (["clipboard", "lock screen", "wallpaper", "settings", "cheatsheet"].some(function(x) { return d.includes(x); }))
+            return "Shell";
+        if (d.includes("window") && (d.includes("next") || d.includes("previous")))
+            return "Window Switcher";
+        if (["screenshot", "ocr", "image search"].some(function(x) { return d.includes(x); }))
+            return "Screenshots";
+        if (["terminal", "file manager", "browser"].some(function(x) { return d.includes(x); }))
+            return "Applications";
+        if (["close", "maximize", "fullscreen", "floating", "consume", "expel", "center"].some(function(x) { return d.includes(x); }))
+            return "Window Management";
+        if (d.includes("focus") && !d.includes("workspace"))
+            return "Focus";
+        if (d.includes("move") && !d.includes("workspace") && !d.includes("track"))
+            return "Move Windows";
+        if (d.includes("workspace"))
+            return "Workspaces";
+        if (["volume", "mute", "play", "pause", "track", "audio", "microphone"].some(function(x) { return d.includes(x); }))
+            return "Media";
+        if (d.includes("brightness"))
+            return "Brightness";
+        return "Other";
     }
 
     // Flickable with flow of keybinding section cards
