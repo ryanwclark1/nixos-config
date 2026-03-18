@@ -91,14 +91,15 @@ Rectangle {
         Flow {
             Layout.fillWidth: true
             Layout.preferredWidth: parent.width
+            Layout.leftMargin: (root.icon !== "" && !root.narrowLayout) ? 38 + Colors.spacingM : 0
             spacing: Colors.spacingS
-            leftPadding: (root.icon !== "" && !root.narrowLayout) ? 38 + Colors.spacingM : 0
 
             Repeater {
                 model: root.options
                 delegate: SharedWidgets.FilterChip {
                     required property var modelData
                     label: modelData.label
+                    icon: modelData.icon || ""
                     selected: root.currentValue === modelData.value
                     onClicked: root.modeSelected(modelData.value)
                 }

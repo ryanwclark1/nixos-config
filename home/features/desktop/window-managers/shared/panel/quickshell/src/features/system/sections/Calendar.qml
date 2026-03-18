@@ -107,14 +107,15 @@ Rectangle {
     // Header: Month and Year with navigation
     RowLayout {
       Layout.fillWidth: true
+      Layout.bottomMargin: Colors.spacingS
 
       MouseArea {
-        width: 24; height: 24
+        width: 32; height: 32
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.prevMonth()
         Rectangle {
-          anchors.fill: parent; radius: Colors.radiusCard
+          anchors.fill: parent; radius: Colors.radiusSmall
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }
@@ -123,28 +124,27 @@ Rectangle {
           text: "󰍞"
           color: Colors.text
           font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Colors.fontSizeLarge
         }
       }
 
       Item { Layout.fillWidth: true }
 
-      MouseArea {
-        width: monthLabel.implicitWidth + 8
-        height: monthLabel.implicitHeight
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: root.goToday()
+      Text {
+        id: monthLabel
+        text: root.monthName
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeLarge
+        font.weight: Font.Bold
+      }
 
-        Text {
-          id: monthLabel
-          anchors.centerIn: parent
-          text: root.monthName
-          color: parent.containsMouse ? Colors.primary : Colors.text
-          font.pixelSize: Colors.fontSizeLarge
-          font.weight: Font.Bold
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-        }
+      // "Today" dot (visible when viewing current month)
+      Rectangle {
+        visible: root.isCurrentMonth
+        width: 6; height: 6
+        radius: 3
+        color: Colors.primary
+        Layout.leftMargin: Colors.spacingXS
       }
 
       Item { Layout.fillWidth: true }
@@ -152,8 +152,8 @@ Rectangle {
       // "Today" pill button (visible when not viewing current month)
       MouseArea {
         visible: !root.isCurrentMonth
-        width: todayLabel.implicitWidth + 16
-        height: 22
+        width: todayLabel.implicitWidth + 24
+        height: 28
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.goToday()
@@ -179,12 +179,12 @@ Rectangle {
       }
 
       MouseArea {
-        width: 24; height: 24
+        width: 32; height: 32
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.nextMonth()
         Rectangle {
-          anchors.fill: parent; radius: Colors.radiusCard
+          anchors.fill: parent; radius: Colors.radiusSmall
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
         }
@@ -193,7 +193,7 @@ Rectangle {
           text: "󰍟"
           color: Colors.text
           font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Colors.fontSizeLarge
         }
       }
     }
@@ -202,14 +202,16 @@ Rectangle {
     RowLayout {
       Layout.fillWidth: true
       spacing: 0
+      Layout.bottomMargin: Colors.spacingXS
       Repeater {
         model: root.dayHeaders
         delegate: Text {
           Layout.fillWidth: true
           text: modelData
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Colors.fontSizeXXS
           font.weight: Font.Bold
+          font.letterSpacing: 1.0
           horizontalAlignment: Text.AlignHCenter
         }
       }
@@ -221,31 +223,36 @@ Rectangle {
       columns: 7
       Layout.fillWidth: true
       Layout.fillHeight: true
-      rowSpacing: 2
+      rowSpacing: 4
       columnSpacing: 0
 
       Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
       Repeater {
         model: root.daysModel
-        delegate: Rectangle {
+        delegate: Item {
           Layout.fillWidth: true
-          Layout.preferredHeight: 28
-          color: modelData.isToday ? Colors.primary
-            : dayMouse.containsMouse && modelData.currentMonth ? Colors.highlightLight
-            : "transparent"
-          radius: Colors.radiusMedium
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Layout.preferredHeight: 32
 
-          Text {
+          Rectangle {
             anchors.centerIn: parent
-            text: modelData.day
-            color: modelData.isToday ? Colors.background
-              : modelData.currentMonth ? Colors.text
-              : Colors.textDisabled
-            font.pixelSize: Colors.fontSizeSmall
-            font.weight: modelData.isToday ? Font.Bold : Font.Normal
-            opacity: modelData.currentMonth ? 1.0 : 0.4
+            width: 32; height: 32
+            color: modelData.isToday ? Colors.primary
+              : dayMouse.containsMouse && modelData.currentMonth ? Colors.highlightLight
+              : "transparent"
+            radius: width / 2
+            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+
+            Text {
+              anchors.centerIn: parent
+              text: modelData.day
+              color: modelData.isToday ? Colors.background
+                : modelData.currentMonth ? Colors.text
+                : Colors.textDisabled
+              font.pixelSize: Colors.fontSizeSmall
+              font.weight: modelData.isToday ? Font.Bold : Font.Normal
+              opacity: modelData.currentMonth ? 1.0 : 0.4
+            }
           }
 
           MouseArea {

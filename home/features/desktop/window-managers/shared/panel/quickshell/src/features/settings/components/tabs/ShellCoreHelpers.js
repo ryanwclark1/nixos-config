@@ -83,7 +83,8 @@ function defaultModeOptions(launcherModes, CompositorAdapter) {
     return supportedLauncherModes(launcherModes, CompositorAdapter).map(function (modeMeta) {
         return {
             value: modeMeta.key,
-            label: modeMeta.label
+            label: modeMeta.label,
+            icon: modeMeta.icon || ""
         };
     });
 }

@@ -165,19 +165,29 @@ BasePopupMenu {
           id: clipCard
           required property int index
           Layout.fillWidth: true
-          implicitHeight: (clipCard.isImage && clipCard.imageSrc !== "") ? 140 : 54
+          readonly property bool isSelected: clipMouse.containsMouse || root.selectedIndex === index
+          implicitHeight: (clipCard.isImage && clipCard.imageSrc !== "") ? 140 : clipContentCol.implicitHeight + Colors.spacingM * 2
           radius: Colors.radiusMedium
-          color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.highlight : Colors.cardSurface
-          border.color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
+          color: isSelected ? Colors.primarySubtle : Colors.cardSurface
+          border.color: isSelected ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
           border.width: 1
           Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-          Behavior on implicitHeight { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
 
           readonly property bool isImage: !!(modelData && modelData.content && String(modelData.content).indexOf("[[ binary data") !== -1)
           readonly property string imageSrc: {
             void ClipboardHistoryService._imageGeneration;
             return isImage ? ClipboardHistoryService.imagePath(modelData.id) : "";
           }
+          readonly property string contentText: {
+            if (!modelData || !modelData.content) return "";
+            if (clipCard.isImage) {
+              var raw = String(modelData.content);
+              var m = raw.match(/\[\[ binary data (.+?) \]\]/);
+              return m ? m[1] : "Image";
+            }
+            return String(modelData.content);
+          }
+          readonly property int charCount: contentText.length
 
           SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
 
@@ -188,15 +198,17 @@ BasePopupMenu {
           }
 
           ColumnLayout {
-            id: clipContent
-            anchors.fill: parent
-            anchors.margins: Colors.paddingSmall
+            id: clipContentCol
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: Colors.spacingM
             spacing: Colors.spacingXS
 
-            // Image preview row
+            // Image preview
             Rectangle {
               Layout.fillWidth: true
-              Layout.fillHeight: true
+              Layout.preferredHeight: 100
               radius: Colors.radiusXS
               color: Colors.withAlpha(Colors.text, 0.04)
               visible: clipCard.isImage && clipCard.imageSrc !== ""
@@ -213,47 +225,38 @@ BasePopupMenu {
               }
             }
 
+            // Content text — multiline with word wrap
+            Text {
+              Layout.fillWidth: true
+              text: clipCard.contentText
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeSmall
+              font.family: clipCard.isImage ? Colors.font : Colors.fontMono
+              wrapMode: Text.WrapAnywhere
+              maximumLineCount: 3
+              elide: Text.ElideRight
+              lineHeight: 1.3
+            }
+
+            // Footer: character count + delete
             RowLayout {
               Layout.fillWidth: true
-              spacing: Colors.spacingM
+              spacing: Colors.spacingS
 
-              Rectangle {
-                width: 32; height: 32; radius: Colors.radiusSmall
-                color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.surface : Colors.chipSurface
-                visible: !(clipCard.isImage && clipCard.imageSrc !== "")
-                Text {
-                  anchors.centerIn: parent
-                  text: clipCard.isImage ? "󰋩" : "󰅍"
-                  color: (clipMouse.containsMouse || root.selectedIndex === index) ? Colors.primary : Colors.textSecondary
-                  font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
-                }
-              }
-
-              ColumnLayout {
-                Layout.fillWidth: true; spacing: 0
-                Text {
-                  text: {
-                    if (!clipCard.isImage) return String((modelData && modelData.content) || "");
-                    var raw = String(modelData.content || "");
-                    var m = raw.match(/\[\[ binary data (.+?) \]\]/);
-                    return m ? m[1] : "Image";
-                  }
-                  color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium
-                  elide: Text.ElideRight; Layout.fillWidth: true
-                }
-                Text {
-                  text: modelData.id || ""
-                  color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS
-                  visible: text !== ""
-                }
+              Text {
+                text: clipCard.isImage ? "Image" : (clipCard.charCount + " chars")
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXXS
+                Layout.fillWidth: true
               }
 
               SharedWidgets.IconButton {
-                icon: "󰎟"; size: 28; iconSize: Colors.fontSizeLarge; iconColor: Colors.textDisabled
+                icon: "󰆴"
+                size: 22
+                iconSize: Colors.fontSizeSmall
+                iconColor: Colors.textDisabled
                 stateColor: Colors.error
-                onClicked: {
-                  root.deleteClipboardItem(modelData);
-                }
+                onClicked: root.deleteClipboardItem(modelData)
               }
             }
           }
@@ -261,7 +264,7 @@ BasePopupMenu {
           MouseArea {
             id: clipMouse
             anchors.fill: parent
-            anchors.rightMargin: 40
+            anchors.rightMargin: 32
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onEntered: root.selectedIndex = index

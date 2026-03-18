@@ -214,7 +214,7 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 0
+        spacing: Colors.spacingL
 
         // ----- Launcher Behavior (general) ----------------------------------
         SettingsCard {
@@ -225,14 +225,14 @@ Item {
             description: "Choose the default launcher behavior and opening mode."
 
             SettingsInfoCallout {
-                iconName: "󰍉"
+                iconName: "󰛢"
                 title: "Dedicated launcher settings"
                 body: "Launcher controls now live under their own settings section so search, modes, home layout, and diagnostics are easier to tune without digging through Shell settings."
             }
 
             SettingsModeRow {
                 label: "Default Mode"
-                icon: "󰍉"
+                icon: "󰀻"
                 currentValue: Config.launcherDefaultMode
                 options: root.defaultModeOptions()
                 onModeSelected: modeValue => Config.launcherDefaultMode = modeValue
@@ -249,7 +249,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "Keep Query on Mode Switch"
-                    icon: "󰍉"
+                    icon: "󰔟"
                     configKey: "launcherKeepSearchOnModeSwitch"
                 }
                 SettingsModeRow {
@@ -259,15 +259,18 @@ Item {
                     options: [
                         {
                             value: "contextual",
-                            label: "Contextual"
+                            label: "Contextual",
+                            icon: "󰛢"
                         },
                         {
                             value: "results",
-                            label: "Results Only"
+                            label: "Results Only",
+                            icon: "󰍉"
                         },
                         {
                             value: "mode",
-                            label: "Mode Switch"
+                            label: "Mode Switch",
+                            icon: "󰌌"
                         }
                     ]
                     onModeSelected: modeValue => Config.launcherTabBehavior = modeValue
@@ -294,7 +297,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "App Category Filters"
-                    icon: "󰍉"
+                    icon: "󰀻"
                     configKey: "launcherDrunCategoryFiltersEnabled"
                 }
             }
@@ -312,7 +315,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Recent Apps on Home"
-                icon: "󰍉"
+                icon: "󰑓"
                 min: 1
                 max: 20
                 step: 1
@@ -338,12 +341,12 @@ Item {
             visible: root.isLauncherSearchSection
             Layout.fillWidth: true
             title: "Search Limits"
-            iconName: "󰍉"
+            iconName: "󰔛"
             description: "Tune search breadth, file query thresholds, and response timing."
 
             SettingsSliderRow {
                 label: "Max Results"
-                icon: "󰍉"
+                icon: "󰔛"
                 min: 20
                 max: 200
                 step: 5
@@ -429,7 +432,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Title Weight"
-                icon: "󰍉"
+                icon: "󰌌"
                 min: 0.1
                 max: 2.0
                 step: 0.05

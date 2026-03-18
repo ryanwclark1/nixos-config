@@ -23,11 +23,11 @@ BasePopupMenu {
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.spacingM
+    columnSpacing: Colors.spacingL
 
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: root.compactMode ? 188 : 122
+      implicitHeight: root.compactMode ? 196 : 132
       radius: Colors.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
@@ -35,14 +35,14 @@ BasePopupMenu {
 
       GridLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
+        anchors.margins: Colors.spacingL
         columns: root.compactMode ? 1 : 2
-        columnSpacing: Colors.spacingM
-        rowSpacing: Colors.spacingM
+        columnSpacing: Colors.spacingL
+        rowSpacing: Colors.spacingL
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingXS
+          spacing: Colors.spacingXXS
 
           Text {
             text: Qt.formatDateTime(
@@ -52,8 +52,9 @@ BasePopupMenu {
                 : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP")
             )
             color: Colors.text
-            font.pixelSize: root.compactMode ? 44 : 56
+            font.pixelSize: root.compactMode ? 48 : 60
             font.weight: Font.Bold
+            font.letterSpacing: -1.0
           }
 
           Text {
@@ -67,40 +68,52 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: root.compactMode
-          Layout.preferredWidth: root.compactMode ? -1 : 152
+          Layout.preferredWidth: root.compactMode ? -1 : 160
           spacing: Colors.spacingXS
 
           Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 84
+            implicitHeight: 88
             radius: Colors.radiusMedium
-            color: Colors.primaryMid
-            border.color: Colors.withAlpha(Colors.primary, 0.42)
+            color: Colors.withAlpha(Colors.primary, 0.08)
+            border.color: Colors.withAlpha(Colors.primary, 0.2)
             border.width: 1
 
             ColumnLayout {
               anchors.fill: parent
-              anchors.margins: Colors.spacingS
-              spacing: Colors.spacingXXS
+              anchors.margins: Colors.spacingM
+              spacing: 2
 
-              Text {
-                text: Colors.weatherIcon(WeatherService.condition)
-                color: Colors.accent
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeLarge
-              }
-
-              Text {
-                text: WeatherService.temp || "--"
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeHuge
-                font.weight: Font.Bold
+              RowLayout {
+                spacing: Colors.spacingXS
+                Text {
+                  text: Colors.weatherIcon(WeatherService.condition)
+                  color: Colors.accent
+                  font.family: Colors.fontMono
+                  font.pixelSize: Colors.fontSizeLarge
+                }
+                Text {
+                  text: WeatherService.temp || "--"
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeXL
+                  font.weight: Font.Bold
+                }
               }
 
               Text {
                 text: WeatherService.location || "Local"
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Colors.fontSizeSmall
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
+
+              Text {
+                text: WeatherService.condition || "Clear"
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXXS
+                font.weight: Font.Bold
+                font.letterSpacing: 0.5
                 elide: Text.ElideRight
                 Layout.fillWidth: true
               }
@@ -112,96 +125,128 @@ BasePopupMenu {
 
     Calendar {
       Layout.fillWidth: true
-      Layout.preferredHeight: 280
+      Layout.preferredHeight: 310
     }
 
-    SharedWidgets.SectionLabel { label: "WEATHER" }
-
-    Rectangle {
+    ColumnLayout {
       Layout.fillWidth: true
-      implicitHeight: root.compactMode ? 122 : 88
-      radius: Colors.radiusMedium
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
+      spacing: Colors.spacingS
 
-      GridLayout {
-        anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        columns: root.compactMode ? 1 : 2
-        columnSpacing: Colors.spacingM
-        rowSpacing: Colors.spacingS
+      SharedWidgets.SectionLabel { label: "WEATHER DETAILS" }
 
-        RowLayout {
-          Layout.fillWidth: true
-          spacing: Colors.spacingM
+      Rectangle {
+        Layout.fillWidth: true
+        implicitHeight: root.compactMode ? 140 : 96
+        radius: Colors.radiusMedium
+        color: Colors.cardSurface
+        border.color: Colors.border
+        border.width: 1
 
-          Text {
-            text: Colors.weatherIcon(WeatherService.condition)
-            color: Colors.accent
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeDisplay
-          }
+        GridLayout {
+          anchors.fill: parent
+          anchors.margins: Colors.spacingL
+          columns: root.compactMode ? 1 : 2
+          columnSpacing: Colors.spacingL
+          rowSpacing: Colors.spacingM
 
-          ColumnLayout {
+          RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingXXS
+            spacing: Colors.spacingL
 
-            Text {
-              text: WeatherService.condition || "Loading weather"
-              color: Colors.text
-              font.pixelSize: Colors.fontSizeXL
-              font.weight: Font.DemiBold
-              elide: Text.ElideRight
-              Layout.fillWidth: true
+            Rectangle {
+              width: 44; height: 44
+              radius: Colors.radiusSmall
+              color: Colors.withAlpha(Colors.accent, 0.1)
+              Text {
+                anchors.centerIn: parent
+                text: Colors.weatherIcon(WeatherService.condition)
+                color: Colors.accent
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeDisplay
+              }
             }
 
-            Text {
-              text: (WeatherService.location || "Local") + "  •  Feels like " + (WeatherService.feelsLike || "--") + "  •  Humidity " + (WeatherService.humidity || "--")
-              color: Colors.textSecondary
-              font.pixelSize: Colors.fontSizeMedium
-              elide: Text.ElideRight
+            ColumnLayout {
               Layout.fillWidth: true
+              spacing: 0
+
+              Text {
+                text: WeatherService.condition || "Loading weather"
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeLarge
+                font.weight: Font.DemiBold
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
+
+              Text {
+                text: (WeatherService.location || "Local") + "  •  Feels like " + (WeatherService.feelsLike || "--")
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeSmall
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+              }
             }
           }
-        }
 
-        Rectangle {
-          implicitWidth: weatherButtonLabel.implicitWidth + 24
-          implicitHeight: 34
-          radius: Colors.radiusSmall
-          color: Colors.highlight
-          border.color: Colors.border
-          border.width: 1
-          Layout.alignment: root.compactMode ? Qt.AlignLeft : (Qt.AlignRight | Qt.AlignVCenter)
+          RowLayout {
+            Layout.fillWidth: true
+            spacing: Colors.spacingM
 
-          SharedWidgets.StateLayer {
-            id: fullWeatherState
-            hovered: fullWeatherMouse.containsMouse
-            pressed: fullWeatherMouse.pressed
-          }
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: 0
+              Text {
+                text: "Humidity: " + (WeatherService.humidity || "--")
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+              }
+              Text {
+                text: "Wind: " + (WeatherService.windSpeed || "--")
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+              }
+            }
 
-          Text {
-            id: weatherButtonLabel
-            anchors.centerIn: parent
-            text: "Weather"
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
-            font.weight: Font.DemiBold
-          }
+            Rectangle {
+              implicitWidth: weatherButtonLabel.implicitWidth + 28
+              implicitHeight: 32
+              radius: Colors.radiusPill
+              color: Colors.highlight
+              border.color: Colors.primary
+              border.width: 1
+              Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
-          MouseArea {
-            id: fullWeatherMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => {
-              fullWeatherState.burst(mouse.x, mouse.y);
-              Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleSurface", "weatherMenu"]);
+              SharedWidgets.StateLayer {
+                id: fullWeatherState
+                hovered: fullWeatherMouse.containsMouse
+                pressed: fullWeatherMouse.pressed
+              }
+
+              Text {
+                id: weatherButtonLabel
+                anchors.centerIn: parent
+                text: "Full Report"
+                color: Colors.primary
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.Bold
+              }
+
+              MouseArea {
+                id: fullWeatherMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  fullWeatherState.burst(mouse.x, mouse.y);
+                  Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleSurface", "weatherMenu"]);
+                }
+              }
             }
           }
         }
       }
     }
+  }
   }
 }
