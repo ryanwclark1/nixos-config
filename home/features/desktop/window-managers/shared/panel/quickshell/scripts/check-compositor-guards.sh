@@ -33,6 +33,7 @@ allow_direct_compositor_checks=(
   "${config_dir}/services/PowerService.qml"
   "${config_dir}/services/WorkspaceIdentityService.qml"
   "${config_dir}/shell.qml"
+  "${config_dir}/app/ShellRoot.qml"
 )
 
 contains_path() {

@@ -21,7 +21,7 @@ Item {
     switch (SystemStatus.overallStatus) {
       case "healthy": return Colors.primary;
       case "warning": return Colors.warning;
-      case "manual_review_required": return Colors.error;
+      case "manual_review_required": return Colors.warning;
       case "failure": return Colors.error;
       default: return Colors.primary;
     }
@@ -33,16 +33,30 @@ Item {
     anchors.margins: -2
     radius: Colors.radiusSmall
     color: root.statusColor
-    opacity: (SystemStatus.overallStatus === "healthy") ? 0 : 0.3
+    opacity: SystemStatus.overallStatus === "healthy" ? 0
+           : SystemStatus.overallStatus === "warning" ? 0.18
+           : 0.3
     visible: opacity > 0
     Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
-    Behavior on opacity { NumberAnimation { duration: Colors.durationEmphasis } }
 
     SequentialAnimation on opacity {
-        running: SystemStatus.overallStatus !== "healthy"
+        id: pulseAnim
+        property bool isFailure: SystemStatus.overallStatus === "failure"
+        running: SystemStatus.overallStatus === "failure"
+              || SystemStatus.overallStatus === "manual_review_required"
         loops: Animation.Infinite
-        NumberAnimation { from: 0.15; to: 0.45; duration: 1500; easing.type: Easing.InOutSine }
-        NumberAnimation { from: 0.45; to: 0.15; duration: 1500; easing.type: Easing.InOutSine }
+        NumberAnimation {
+            from: pulseAnim.isFailure ? 0.15 : 0.10
+            to: pulseAnim.isFailure ? 0.45 : 0.25
+            duration: pulseAnim.isFailure ? 1500 : 2000
+            easing.type: Easing.InOutSine
+        }
+        NumberAnimation {
+            from: pulseAnim.isFailure ? 0.45 : 0.25
+            to: pulseAnim.isFailure ? 0.15 : 0.10
+            duration: pulseAnim.isFailure ? 1500 : 2000
+            easing.type: Easing.InOutSine
+        }
     }
   }
 
@@ -70,7 +84,7 @@ Item {
       anchors.verticalCenter: parent.verticalCenter
       sourceSize: Qt.size(20, 20)
       source: Quickshell.iconPath("nix-snowflake") || ""
-      visible: status === Image.Ready && SystemStatus.overallStatus === "healthy"
+      visible: status === Image.Ready && SystemStatus.overallStatus !== "failure"
     }
 
     Text {
