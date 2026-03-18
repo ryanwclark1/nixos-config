@@ -152,7 +152,7 @@ if run_capture "$tmp_all_out" "$tmp_all_err" "$local_runner" quickshell-all --qu
   if assert_patterns "$tmp_all_out" \
     'Stage timing summary:' \
     'Quickshell startup smoke summary: 1 pass, 0 fail' \
-    'Clipboard contract summary: 17 pass, 0 fail' \
+    'Clipboard contract summary: 25 pass, 0 fail' \
     'Running transient repo-shell journal warning gate' \
     'Launcher smoke checks passed.' \
     'Aggregate artifacts saved to'; then

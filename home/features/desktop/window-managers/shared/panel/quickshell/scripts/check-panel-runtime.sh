@@ -19,7 +19,7 @@ multibar_timeout_seconds="${QS_VERIFY_MULTIBAR_TIMEOUT_SECONDS:-120}"
 
 usage() {
   cat <<'EOF'
-Usage: check-panel-runtime.sh [--id INSTANCE_ID] [--repo-shell] [--skip-settings] [--skip-surfaces] [--skip-multibar]
+Usage: check-panel-runtime.sh [--id INSTANCE_ID] [--repo-shell] [--skip-settings] [--skip-surfaces] [--skip-multibar] [--skip-launcher]
 
 Run the shared panel runtime verification stack:
   1. panel config contract checks
@@ -53,6 +53,9 @@ while [[ $# -gt 0 ]]; do
       ;;
     --skip-multibar)
       run_multibar=0
+      shift
+      ;;
+    --skip-launcher)
       shift
       ;;
     -h|--help)

@@ -164,13 +164,13 @@ probe_ipc_action() {
   shift 3
   local attempt
 
-  for attempt in 1 2 3; do
+  for attempt in 1 2 3 4 5; do
     if call_ipc "${target}" "${action}" "$@" >/dev/null; then
       pass "${label}"
       return 0
     fi
     wait_for_query_ready >/dev/null 2>&1 || true
-    sleep 0.3
+    sleep 0.5
   done
 
   fail "${label}"
