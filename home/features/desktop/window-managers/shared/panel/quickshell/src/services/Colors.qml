@@ -5,6 +5,7 @@ import Quickshell.Io
 
 QtObject {
     id: colors
+    default property list<QtObject> _data
 
     // --- COLORS (Dynamic) ---
     property color background: "#0a0a0c"
@@ -237,8 +238,12 @@ QtObject {
         return "󰖐";
     }
 
-    function applyBase24(palette) {
+    property bool _themeActive: false
+
+    function applyBase24(palette, variant) {
         if (!palette) return;
+        _themeActive = true;
+        _isLight = (variant === "light");
         background = palette.base00 || background;
         surface = palette.base01 || surface;
         primary = palette.base0D || primary;
@@ -253,6 +258,7 @@ QtObject {
     }
 
     function reloadColors() {
+        if (_themeActive) return;
         var raw = walColorsFile.text();
         if (!raw) return;
         try {

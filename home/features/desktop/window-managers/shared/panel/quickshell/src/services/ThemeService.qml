@@ -69,6 +69,7 @@ QtObject {
     Config.themeName = "";
     activeThemeId = "";
     activeTheme = null;
+    Colors._themeActive = false;
     Colors._isLight = false;
     Colors.reloadColors();
   }

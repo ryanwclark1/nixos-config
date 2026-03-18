@@ -6,6 +6,7 @@ import "../../../../services"
 import "../../../../services/ColorUtils.js" as ColorUtils
 import "../../../../shared"
 import "../../../../widgets" as SharedWidgets
+import "WallpaperTabHelpers.js" as WTH
 import ".."
 
 Item {
@@ -29,26 +30,15 @@ Item {
     property string _settingsExportText: ""
     property var _unsupportedImagePaths: ({})
 
-    function isWallpaperFolderPathValid(path) {
-        var p = (path || "").trim();
-        return p.length > 0 && (p.indexOf("/") === 0 || p === "~" || p.indexOf("~/") === 0);
-    }
-
     function applyWallpaperFolder() {
         var trimmed = (wallpaperFolderInput || "").trim();
-        if (!isWallpaperFolderPathValid(trimmed)) {
+        if (!WTH.isWallpaperFolderPathValid(trimmed)) {
             wallpaperFolderError = "Use an absolute path, ~, or ~/path.";
             return;
         }
         wallpaperFolderError = "";
         Config.wallpaperDefaultFolder = trimmed;
         WallpaperService.scanWallpapers();
-    }
-
-    function _imageSource(path) {
-        if (!path || _unsupportedImagePaths[path])
-            return "";
-        return "file://" + path;
     }
 
     function _markUnsupportedImage(path) {
@@ -58,26 +48,8 @@ Item {
         _unsupportedImagePaths = Object.assign({}, _unsupportedImagePaths);
     }
 
-    function _normalizeSolidColor(value) {
-        var v = (value || "").trim();
-        if (v.indexOf("#") === 0)
-            v = v.slice(1);
-        v = v.toLowerCase();
-        if (/^[0-9a-f]{6}$/.test(v))
-            return v + "ff";
-        if (/^[0-9a-f]{8}$/.test(v))
-            return v;
-        return "";
-    }
-
-    function _pickerHex() {
-        var rgb = ColorUtils.hsvToRgb(pickerHue, pickerSaturation / 100, pickerValue / 100);
-        var a = Math.round(Math.max(0, Math.min(100, pickerAlpha)) * 2.55);
-        return ColorUtils.hex2(rgb.r) + ColorUtils.hex2(rgb.g) + ColorUtils.hex2(rgb.b) + ColorUtils.hex2(a);
-    }
-
     function openSolidPicker() {
-        var normalized = _normalizeSolidColor(solidColorInput);
+        var normalized = WTH.normalizeSolidColor(solidColorInput);
         if (!normalized)
             normalized = Config.wallpaperSolidColor || "000000ff";
         var r = parseInt(normalized.slice(0, 2), 16);
@@ -92,46 +64,37 @@ Item {
         solidPickerOpen = true;
     }
 
+    function _pickerHex() {
+        var rgb = ColorUtils.hsvToRgb(pickerHue, pickerSaturation / 100, pickerValue / 100);
+        var a = Math.round(Math.max(0, Math.min(100, pickerAlpha)) * 2.55);
+        return ColorUtils.hex2(rgb.r) + ColorUtils.hex2(rgb.g) + ColorUtils.hex2(rgb.b) + ColorUtils.hex2(a);
+    }
+
     function applyPickerColor() {
         var hex = _pickerHex();
         solidColorInput = "#" + hex.slice(0, 6);
         solidColorError = "";
-        _rememberRecentSolidColor(hex);
-        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+        Config.wallpaperRecentSolidColors = WTH.rememberRecentSolidColor(hex, Config.wallpaperRecentSolidColors);
+        var mon = WTH.resolveMonitor(root.wallpaperSelectedMonitor);
         WallpaperService.setSolidColor(hex, mon);
         solidPickerOpen = false;
     }
 
     function applySolidColor() {
-        var normalized = _normalizeSolidColor(solidColorInput);
+        var normalized = WTH.normalizeSolidColor(solidColorInput);
         if (!normalized) {
             solidColorError = "Use #RRGGBB or #RRGGBBAA.";
             return;
         }
         solidColorError = "";
         solidColorInput = "#" + normalized.slice(0, 6);
-        _rememberRecentSolidColor(normalized);
-        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+        Config.wallpaperRecentSolidColors = WTH.rememberRecentSolidColor(normalized, Config.wallpaperRecentSolidColors);
+        var mon = WTH.resolveMonitor(root.wallpaperSelectedMonitor);
         WallpaperService.setSolidColor(normalized, mon);
     }
 
-    function _rememberRecentSolidColor(hex8) {
-        var normalized = _normalizeSolidColor(hex8);
-        if (!normalized)
-            return;
-        var list = (Config.wallpaperRecentSolidColors || []).slice();
-        var next = [normalized];
-        for (var i = 0; i < list.length; i++) {
-            if ((list[i] || "").toLowerCase() !== normalized)
-                next.push((list[i] || "").toLowerCase());
-        }
-        if (next.length > 12)
-            next = next.slice(0, 12);
-        Config.wallpaperRecentSolidColors = next;
-    }
-
     function copySolidColor() {
-        var normalized = _normalizeSolidColor(solidColorInput);
+        var normalized = WTH.normalizeSolidColor(solidColorInput);
         if (!normalized) {
             solidColorError = "Use #RRGGBB or #RRGGBBAA.";
             return;
@@ -154,10 +117,6 @@ Item {
     function pasteSolidColor() {
         if (!solidPasteProc.running)
             solidPasteProc.running = true;
-    }
-
-    function clearRecentSolidColors() {
-        Config.wallpaperRecentSolidColors = [];
     }
 
     function exportWallpaperSettings() {
@@ -191,38 +150,6 @@ Item {
             settingsImportProc.running = true;
     }
 
-    function _sanitizeSolidColorMap(value) {
-        var out = {};
-        if (!value || typeof value !== "object")
-            return out;
-        var keys = Object.keys(value);
-        for (var i = 0; i < keys.length; i++) {
-            var key = String(keys[i] || "");
-            if (!key.length)
-                continue;
-            var color = _normalizeSolidColor(value[key]);
-            if (!color)
-                continue;
-            out[key] = color;
-        }
-        return out;
-    }
-
-    function _sanitizeRecentSolidColors(value) {
-        var out = [];
-        if (!Array.isArray(value))
-            return out;
-        for (var i = 0; i < value.length; i++) {
-            var color = _normalizeSolidColor(value[i]);
-            if (!color || out.indexOf(color) >= 0)
-                continue;
-            out.push(color);
-            if (out.length >= 12)
-                break;
-        }
-        return out;
-    }
-
     function _loadFallbackMonitorNames() {
         var names = [];
         var screens = Quickshell.screens || [];
@@ -237,6 +164,8 @@ Item {
         if (root.wallpaperSelectedMonitor === "" && names.length > 0)
             root.wallpaperSelectedMonitor = names[0];
     }
+
+    // ── Processes ────────────────────────────────────────────────────────────────
 
     Process {
         id: wallpaperMonProc
@@ -288,7 +217,7 @@ Item {
                 var pasted = (this.text || "").trim();
                 if (!pasted.length)
                     return;
-                var normalized = root._normalizeSolidColor(pasted);
+                var normalized = WTH.normalizeSolidColor(pasted);
                 if (!normalized) {
                     root.solidColorError = "Clipboard must contain #RRGGBB or #RRGGBBAA.";
                     return;
@@ -340,7 +269,7 @@ Item {
 
                     if (data.defaultFolder !== undefined) {
                         var folder = String(data.defaultFolder || "").trim();
-                        if (root.isWallpaperFolderPathValid(folder))
+                        if (WTH.isWallpaperFolderPathValid(folder))
                             Config.wallpaperDefaultFolder = folder;
                         else
                             skipped.push("defaultFolder");
@@ -350,7 +279,7 @@ Item {
                     if (data.runPywal !== undefined)
                         Config.wallpaperRunPywal = !!data.runPywal;
                     if (data.solidColor !== undefined) {
-                        var solid = root._normalizeSolidColor(data.solidColor);
+                        var solid = WTH.normalizeSolidColor(data.solidColor);
                         if (solid)
                             Config.wallpaperSolidColor = solid;
                         else
@@ -359,11 +288,11 @@ Item {
                     if (data.useSolidOnStartup !== undefined)
                         Config.wallpaperUseSolidOnStartup = !!data.useSolidOnStartup;
                     if (data.solidColorsByMonitor !== undefined) {
-                        var solidMap = root._sanitizeSolidColorMap(data.solidColorsByMonitor);
+                        var solidMap = WTH.sanitizeSolidColorMap(data.solidColorsByMonitor);
                         Config.wallpaperSolidColorsByMonitor = Object.assign({}, solidMap);
                     }
                     if (data.recentSolidColors !== undefined) {
-                        var recents = root._sanitizeRecentSolidColors(data.recentSolidColors);
+                        var recents = WTH.sanitizeRecentSolidColors(data.recentSolidColors);
                         Config.wallpaperRecentSolidColors = recents;
                     }
 
@@ -403,6 +332,8 @@ Item {
         }
     }
 
+    // ── UI ───────────────────────────────────────────────────────────────────────
+
     SettingsTabPage {
         anchors.fill: parent
         tabId: root.tabId
@@ -415,9 +346,7 @@ Item {
             spacing: Colors.spacingS
             Layout.fillWidth: true
 
-            SettingsSectionLabel {
-                text: "MONITOR"
-            }
+            SettingsSectionLabel { text: "MONITOR" }
 
             SettingsSelectRow {
                 label: "Monitor"
@@ -425,19 +354,14 @@ Item {
                 description: "Use a single target selector when you have multiple displays configured."
                 currentValue: root.wallpaperSelectedMonitor
                 options: [{ value: "__all__", label: "All Monitors" }].concat(root.wallpaperMonitorNames.map(function (monitorName) {
-                    return {
-                        value: String(monitorName),
-                        label: String(monitorName)
-                    };
+                    return { value: String(monitorName), label: String(monitorName) };
                 }))
                 onOptionSelected: value => root.wallpaperSelectedMonitor = value
             }
         }
 
         // Current wallpaper preview
-        SettingsSectionLabel {
-            text: "CURRENT WALLPAPER"
-        }
+        SettingsSectionLabel { text: "CURRENT WALLPAPER" }
 
         Flow {
             Layout.fillWidth: true
@@ -455,7 +379,7 @@ Item {
                     id: sourceText
                     anchors.centerIn: parent
                     text: {
-                        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+                        var mon = WTH.resolveMonitor(root.wallpaperSelectedMonitor);
                         var solidHex = WallpaperService.solidColorForMonitor(mon);
                         if (solidHex.length > 0) return "Source: Solid #" + solidHex.slice(0, 6).toUpperCase();
                         var key = root.wallpaperSelectedMonitor || "__all__";
@@ -488,163 +412,10 @@ Item {
             }
         }
 
-        Rectangle {
-            id: previewContainer
-            Layout.fillWidth: true
-            height: 160
-            radius: Colors.radiusMedium
-            color: Colors.bgWidget
-            border.color: Colors.border
-            border.width: 1
-            clip: true
-
-            readonly property string previewPath: {
-                var key = root.wallpaperSelectedMonitor || "__all__";
-                return WallpaperService.wallpapers[key] || WallpaperService.wallpapers["__all__"] || "";
-            }
-            readonly property string _previewMonitor: root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor
-            readonly property string solidHex: WallpaperService.solidColorForMonitor(_previewMonitor)
-            readonly property bool solidPreview: solidHex.length > 0
-
-            property bool _previewFlip: false
-
-            onPreviewPathChanged: {
-                if (!previewPath || root._unsupportedImagePaths[previewPath]) {
-                    previewA.source = "";
-                    previewB.source = "";
-                    return;
-                }
-                var src = root._imageSource(previewPath);
-                if (_previewFlip) {
-                    previewA.previewPath = previewPath;
-                    previewA.source = src;
-                } else {
-                    previewB.previewPath = previewPath;
-                    previewB.source = src;
-                }
-            }
-
-            Image {
-                id: previewA
-                property string previewPath: ""
-                anchors.fill: parent
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-                smooth: true
-                sourceSize: Qt.size(previewContainer.width * 2, previewContainer.height * 2)
-                opacity: previewContainer._previewFlip ? 0.0 : 1.0
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Colors.durationEmphasis
-                        easing.type: Easing.InOutQuad
-                    }
-                }
-                onStatusChanged: {
-                    if (status === Image.Ready && previewContainer._previewFlip) {
-                        previewContainer._previewFlip = false;
-                    } else if (status === Image.Error && previewPath.length > 0) {
-                        root._markUnsupportedImage(previewPath);
-                        source = "";
-                    }
-                }
-            }
-
-            Image {
-                id: previewB
-                property string previewPath: ""
-                anchors.fill: parent
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-                smooth: true
-                sourceSize: Qt.size(previewContainer.width * 2, previewContainer.height * 2)
-                opacity: previewContainer._previewFlip ? 1.0 : 0.0
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Colors.durationEmphasis
-                        easing.type: Easing.InOutQuad
-                    }
-                }
-                onStatusChanged: {
-                    if (status === Image.Ready && !previewContainer._previewFlip) {
-                        previewContainer._previewFlip = true;
-                    } else if (status === Image.Error && previewPath.length > 0) {
-                        root._markUnsupportedImage(previewPath);
-                        source = "";
-                    }
-                }
-            }
-
-            ColumnLayout {
-                anchors.centerIn: parent
-                spacing: Colors.spacingS
-                visible: !previewContainer.solidPreview
-                    && (previewContainer.previewPath === "" || (previewA.status !== Image.Ready && previewB.status !== Image.Ready))
-
-                Text {
-                    text: "󰸉"
-                    color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeHuge
-                    Layout.alignment: Qt.AlignHCenter
-                }
-                Text {
-                    text: previewContainer.previewPath !== "" ? "Loading preview…" : "No wallpaper set"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeMedium
-                    Layout.alignment: Qt.AlignHCenter
-                }
-            }
-
-            Rectangle {
-                anchors.centerIn: parent
-                visible: previewContainer.solidPreview
-                width: Math.min(previewContainer.width - Colors.spacingM * 4, 220)
-                height: 96
-                radius: Colors.radiusMedium
-                color: "#" + previewContainer.solidHex.slice(0, 6)
-                border.color: Colors.border
-                border.width: 1
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "Solid #" + previewContainer.solidHex.slice(0, 6).toUpperCase()
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
-                    font.weight: Font.Medium
-                }
-            }
-
-            Rectangle {
-                anchors {
-                    bottom: parent.bottom
-                    right: parent.right
-                    margins: Colors.spacingM
-                }
-                visible: previewContainer.previewPath !== "" || previewContainer.solidPreview
-                width: Math.min(previewContainer.width - Colors.spacingM * 2, previewName.implicitWidth + 16)
-                height: 22
-                radius: Colors.radiusPill
-                color: Qt.rgba(0, 0, 0, 0.55)
-
-                Text {
-                    id: previewName
-                    anchors.centerIn: parent
-                    text: {
-                        var p = previewContainer.previewPath;
-                        if (previewContainer.solidPreview)
-                            return "Solid #" + previewContainer.solidHex.slice(0, 6).toUpperCase();
-                        if (!p)
-                            return "";
-                        var parts = p.split("/");
-                        return parts[parts.length - 1];
-                    }
-                    color: "#ffffff"
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
-                    elide: Text.ElideLeft
-                    maximumLineCount: 1
-                }
-            }
+        WallpaperPreviewContainer {
+            selectedMonitor: root.wallpaperSelectedMonitor
+            unsupportedImagePaths: root._unsupportedImagePaths
+            onImageUnsupported: path => root._markUnsupportedImage(path)
         }
 
         // Quick action buttons
@@ -654,26 +425,10 @@ Item {
 
             Repeater {
                 model: [
-                    {
-                        icon: "󰒭",
-                        label: "Next",
-                        action: "next"
-                    },
-                    {
-                        icon: "󰒝",
-                        label: "Random",
-                        action: "random"
-                    },
-                    {
-                        icon: "󰝤",
-                        label: "Solid",
-                        action: "solid"
-                    },
-                    {
-                        icon: "󰉋",
-                        label: "Browse...",
-                        action: "browse"
-                    }
+                    { icon: "󰒭", label: "Next", action: "next" },
+                    { icon: "󰒝", label: "Random", action: "random" },
+                    { icon: "󰝤", label: "Solid", action: "solid" },
+                    { icon: "󰉋", label: "Browse...", action: "browse" }
                 ]
 
                 delegate: SettingsActionButton {
@@ -682,14 +437,14 @@ Item {
                     label: modelData.label
                     iconName: modelData.icon
                     onClicked: {
-                        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+                        var mon = WTH.resolveMonitor(root.wallpaperSelectedMonitor);
                         if (modelData.action === "next")
                             WallpaperService.nextWallpaper(mon);
                         else if (modelData.action === "random")
                             WallpaperService.randomWallpaper(mon);
                         else if (modelData.action === "solid") {
-                            var quickHex = root._normalizeSolidColor(root.solidColorInput);
-                            root._rememberRecentSolidColor(quickHex || "000000ff");
+                            var quickHex = WTH.normalizeSolidColor(root.solidColorInput);
+                            Config.wallpaperRecentSolidColors = WTH.rememberRecentSolidColor(quickHex || "000000ff", Config.wallpaperRecentSolidColors);
                             WallpaperService.setSolidColor(quickHex || "000000ff", mon);
                         }
                         else if (modelData.action === "browse" && root.settingsRoot)
@@ -700,16 +455,13 @@ Item {
         }
 
         // Settings
-        SettingsSectionLabel {
-            text: "SETTINGS"
-        }
+        SettingsSectionLabel { text: "SETTINGS" }
 
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Colors.spacingS
 
             SettingsTextInputRow {
-                id: wallpaperFolderField
                 Layout.fillWidth: true
                 label: "Default wallpaper folder"
                 placeholderText: "~/.config/wallpapers"
@@ -729,8 +481,7 @@ Item {
                 SettingsActionButton {
                     label: "Pick Folder"
                     compact: true
-                    onClicked: if (root.settingsRoot)
-                        root.settingsRoot.pickWallpaperFolder()
+                    onClicked: if (root.settingsRoot) root.settingsRoot.pickWallpaperFolder()
                 }
             }
 
@@ -750,28 +501,24 @@ Item {
                     emphasized: true
                     onClicked: root.applySolidColor()
                 }
-
                 SettingsActionButton {
                     label: "Pick"
                     compact: true
                     onClicked: root.openSolidPicker()
                 }
-
                 SettingsActionButton {
                     label: "Reset Solid"
                     compact: true
                     onClicked: {
-                        var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
+                        var mon = WTH.resolveMonitor(root.wallpaperSelectedMonitor);
                         WallpaperService.clearSolidForMonitor(mon, true, true);
                     }
                 }
-
                 SettingsActionButton {
                     label: "Copy"
                     compact: true
                     onClicked: root.copySolidColor()
                 }
-
                 SettingsActionButton {
                     label: "Paste"
                     compact: true
@@ -826,7 +573,7 @@ Item {
                 SettingsActionButton {
                     label: "Clear"
                     compact: true
-                    onClicked: root.clearRecentSolidColors()
+                    onClicked: Config.wallpaperRecentSolidColors = []
                 }
 
                 Repeater {
@@ -892,119 +639,8 @@ Item {
         }
 
         // Auto-cycle interval slider
-        ColumnLayout {
-            spacing: Colors.spacingM
-            Layout.fillWidth: true
-
-            Flow {
-                Layout.fillWidth: true
-                width: parent.width
-                spacing: Colors.spacingS
-
-                Text {
-                    width: root.compactMode ? parent.width : undefined
-                    text: "Auto-Cycle Interval"
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
-                    font.weight: Font.Medium
-                    wrapMode: Text.WordWrap
-                }
-
-                Text {
-                    text: Config.wallpaperCycleInterval === 0 ? "Off" : Config.wallpaperCycleInterval + " min"
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.family: Colors.fontMono
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-                height: 24
-
-                Rectangle {
-                    id: cycleTrack
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width
-                    height: 6
-                    color: Colors.surface
-                    radius: Colors.radiusXS
-
-                    Rectangle {
-                        width: parent.width * (Config.wallpaperCycleInterval / 60)
-                        height: parent.height
-                        color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
-                        radius: Colors.radiusXS
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: Colors.durationSnap
-                            }
-                        }
-                        Behavior on color {
-                            CAnim {}
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: 14
-                    height: 14
-                    radius: width / 2
-                    color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
-                    border.color: Colors.bgWidget
-                    border.width: 2
-                    x: Math.max(0, Math.min(parent.width - width, parent.width * (Config.wallpaperCycleInterval / 60) - width / 2))
-                    anchors.verticalCenter: parent.verticalCenter
-                    Behavior on x {
-                        NumberAnimation {
-                            duration: Colors.durationSnap
-                        }
-                    }
-                    Behavior on color {
-                        CAnim {}
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.topMargin: -4
-                    anchors.bottomMargin: -4
-                    cursorShape: Qt.PointingHandCursor
-                    function updateCycle(mouse) {
-                        var raw = (mouse.x / width) * 60;
-                        if (raw < 2) {
-                            Config.wallpaperCycleInterval = 0;
-                            return;
-                        }
-                        var snapped = Math.round(raw / 5) * 5;
-                        Config.wallpaperCycleInterval = Math.max(5, Math.min(60, snapped));
-                    }
-                    onPressed: mouse => updateCycle(mouse)
-                    onPositionChanged: mouse => {
-                        if (pressed)
-                            updateCycle(mouse);
-                    }
-                }
-            }
-
-            Flow {
-                Layout.fillWidth: true
-                width: parent.width
-                spacing: Colors.spacingS
-
-                Text {
-                    width: root.compactMode ? parent.width : undefined
-                    text: "Off"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
-                }
-
-                Text {
-                    text: "60 min"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
-                }
-            }
+        WallpaperCycleSlider {
+            compactMode: root.compactMode
         }
 
         // Wallpaper grid
@@ -1038,9 +674,7 @@ Item {
             Layout.fillWidth: true
             spacing: Colors.spacingS
 
-            SharedWidgets.LoadingSpinner {
-                Layout.alignment: Qt.AlignHCenter
-            }
+            SharedWidgets.LoadingSpinner { Layout.alignment: Qt.AlignHCenter }
             Text {
                 text: "Scanning directories…"
                 color: Colors.textDisabled
@@ -1057,141 +691,15 @@ Item {
             Repeater {
                 model: WallpaperService.availableWallpapers
 
-                delegate: Item {
-                    id: thumbDelegate
-                    required property var modelData
-                    required property int index
-
-                    readonly property string activePath: {
-                        var key = root.wallpaperSelectedMonitor || "__all__";
-                        return WallpaperService.wallpapers[key] || WallpaperService.wallpapers["__all__"] || "";
+                delegate: WallpaperThumbnail {
+                    selectedMonitor: root.wallpaperSelectedMonitor
+                    unsupportedImagePaths: root._unsupportedImagePaths
+                    compactMode: root.compactMode
+                    onWallpaperSelected: path => {
+                        var mon = WTH.resolveMonitor(root.wallpaperSelectedMonitor);
+                        WallpaperService.setWallpaper(path, mon);
                     }
-                    readonly property bool isActive: modelData.path === activePath
-
-                    width: root.compactMode ? 92 : 108
-                    height: root.compactMode ? 72 : 80
-                    scale: 1.0
-
-                    SequentialAnimation {
-                        id: thumbPulse
-                        NumberAnimation {
-                            target: thumbDelegate
-                            property: "scale"
-                            to: 0.92
-                            duration: Colors.durationSnap
-                            easing.type: Easing.InQuad
-                        }
-                        NumberAnimation {
-                            target: thumbDelegate
-                            property: "scale"
-                            to: 1.0
-                            duration: Colors.durationSnap
-                            easing.type: Easing.OutQuad
-                        }
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Colors.radiusSmall
-                        color: isActive ? Colors.highlight : Colors.bgWidget
-                        border.color: isActive ? Colors.primary : Colors.border
-                        border.width: isActive ? 2 : 1
-                        clip: true
-
-                        Behavior on border.color {
-                            CAnim {}
-                        }
-                        Behavior on color {
-                            CAnim {}
-                        }
-
-                        Image {
-                            id: thumbImage
-                            anchors.fill: parent
-                            source: root._imageSource(modelData.path)
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
-                            smooth: true
-                            cache: false
-                            sourceSize: Qt.size(216, 160)
-                            opacity: status === Image.Ready ? 1.0 : 0.0
-                            onStatusChanged: {
-                                if (status === Image.Error)
-                                    root._markUnsupportedImage(modelData.path);
-                            }
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Colors.durationNormal
-                                }
-                            }
-                        }
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: "󰸉"
-                            color: Colors.textDisabled
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeHuge
-                            visible: thumbImage.status !== Image.Ready
-                        }
-
-                        Rectangle {
-                            anchors {
-                                top: parent.top
-                                right: parent.right
-                                margins: 5
-                            }
-                            visible: isActive
-                            width: 18
-                            height: 18
-                            radius: height / 2
-                            color: Colors.primary
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "󰄬"
-                                color: Colors.text
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeXS
-                            }
-                        }
-
-                        Rectangle {
-                            anchors.fill: parent
-                            color: thumbMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.35) : "transparent"
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Colors.durationSnap
-                                }
-                            }
-                        }
-
-                        Text {
-                            anchors {
-                                bottom: parent.bottom
-                                left: parent.left
-                                right: parent.right
-                                margins: Colors.spacingXS
-                            }
-                            text: modelData.filename
-                            color: "#ffffff"
-                            font.pixelSize: Colors.fontSizeXS
-                            elide: Text.ElideLeft
-                            visible: thumbMouse.containsMouse
-                        }
-
-                        MouseArea {
-                            id: thumbMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                thumbPulse.restart();
-                                var mon = root.wallpaperSelectedMonitor === "__all__" ? "" : root.wallpaperSelectedMonitor;
-                                WallpaperService.setWallpaper(modelData.path, mon);
-                            }
-                        }
-                    }
+                    onImageUnsupported: path => root._markUnsupportedImage(path)
                 }
             }
         }
@@ -1217,129 +725,19 @@ Item {
         }
     }
 
-    Rectangle {
-        anchors.fill: parent
+    WallpaperSolidPicker {
         visible: root.solidPickerOpen
-        color: Qt.rgba(0, 0, 0, 0.45)
-        z: 2000
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.solidPickerOpen = false
-        }
-
-        Rectangle {
-            width: Math.min(parent.width - (root.tightSpacing ? 32 : 60), 560)
-            color: Colors.bgGlass
-            border.color: Colors.border
-            border.width: 1
-            radius: Colors.radiusLarge
-            anchors.centerIn: parent
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: Colors.spacingL
-                spacing: Colors.spacingM
-
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
-
-                    Text {
-                        width: root.compactMode ? parent.width : Math.max(0, parent.width - solidPickerCloseButton.implicitWidth - Colors.spacingS)
-                        text: "Solid Color Picker"
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeLarge
-                        font.weight: Font.DemiBold
-                        wrapMode: Text.WordWrap
-                    }
-
-                    SettingsActionButton {
-                        id: solidPickerCloseButton
-                        label: "Close"
-                        compact: true
-                        onClicked: root.solidPickerOpen = false
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 52
-                    radius: Colors.radiusMedium
-                    color: "#" + root._pickerHex().slice(0, 6)
-                    border.color: Colors.border
-                    border.width: 1
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: "#" + root._pickerHex().toUpperCase()
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
-                        font.family: Colors.fontMono
-                        font.weight: Font.Medium
-                    }
-                }
-
-                SettingsSliderRow {
-                    label: "Hue"
-                    min: 0
-                    max: 360
-                    step: 1
-                    unit: ""
-                    value: root.pickerHue
-                    onMoved: v => root.pickerHue = v
-                }
-
-                SettingsSliderRow {
-                    label: "Saturation"
-                    min: 0
-                    max: 100
-                    step: 1
-                    unit: "%"
-                    value: root.pickerSaturation
-                    onMoved: v => root.pickerSaturation = v
-                }
-
-                SettingsSliderRow {
-                    label: "Brightness"
-                    min: 0
-                    max: 100
-                    step: 1
-                    unit: "%"
-                    value: root.pickerValue
-                    onMoved: v => root.pickerValue = v
-                }
-
-                SettingsSliderRow {
-                    label: "Alpha"
-                    min: 0
-                    max: 100
-                    step: 1
-                    unit: "%"
-                    value: root.pickerAlpha
-                    onMoved: v => root.pickerAlpha = v
-                }
-
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
-
-                    SettingsActionButton {
-                        label: "Cancel"
-                        compact: true
-                        onClicked: root.solidPickerOpen = false
-                    }
-
-                    SettingsActionButton {
-                        label: "Apply Color"
-                        compact: true
-                        emphasized: true
-                        onClicked: root.applyPickerColor()
-                    }
-                }
-            }
-        }
+        compactMode: root.compactMode
+        tightSpacing: root.tightSpacing
+        pickerHue: root.pickerHue
+        pickerSaturation: root.pickerSaturation
+        pickerValue: root.pickerValue
+        pickerAlpha: root.pickerAlpha
+        onPickerHueChanged: v => root.pickerHue = v
+        onPickerSaturationChanged: v => root.pickerSaturation = v
+        onPickerValueChanged: v => root.pickerValue = v
+        onPickerAlphaChanged: v => root.pickerAlpha = v
+        onApplyRequested: root.applyPickerColor()
+        onCancelRequested: root.solidPickerOpen = false
     }
 }
