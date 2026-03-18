@@ -15,6 +15,8 @@ import "LauncherFileParser.js" as FileParser
 import "LauncherExecutor.js" as Executor
 import "LauncherMetrics.js" as Metrics
 import "LauncherSystemItems.js" as SystemItems
+import "LauncherHomeBuilder.js" as HomeBuilder
+import "LauncherCategoryHelpers.js" as CategoryHelpers
 import "EmojiData.js" as EmojiData
 
 PanelWindow {
@@ -1221,55 +1223,9 @@ PanelWindow {
             resetDrunCategoryState(Array.isArray(apps) ? apps.length : 0);
             return;
         }
-        var source = Array.isArray(apps) ? apps : [];
-        var counts = ({});
-        var labels = ({});
-        for (var i = 0; i < source.length; ++i) {
-            var app = source[i];
-            Search.ensureItemRankCache(app);
-            var key = String(app._primaryCategoryKey || "");
-            if (key === "")
-                continue;
-            counts[key] = (counts[key] || 0) + 1;
-            if (!labels[key])
-                labels[key] = formatDrunCategoryLabel(key);
-        }
-        var keys = Object.keys(counts);
-        keys.sort(function (a, b) {
-            if ((counts[b] || 0) !== (counts[a] || 0))
-                return (counts[b] || 0) - (counts[a] || 0);
-            return String(labels[a] || a).localeCompare(String(labels[b] || b));
-        });
-
-        var next = [
-            {
-                key: "",
-                label: "All",
-                count: source.length,
-                hotkey: "0"
-            }
-        ];
-        var limit = Math.min(9, keys.length);
-        for (var j = 0; j < limit; ++j) {
-            var categoryKey = keys[j];
-            next.push({
-                key: categoryKey,
-                label: String(labels[categoryKey] || categoryKey),
-                count: counts[categoryKey] || 0,
-                hotkey: String(j + 1)
-            });
-        }
+        var next = CategoryHelpers.buildCategoryOptions(apps, formatDrunCategoryLabel);
         drunCategoryOptions = next;
-
-        var exists = false;
-        for (var k = 0; k < next.length; ++k) {
-            if (String(next[k].key || "") === drunCategoryFilter) {
-                exists = true;
-                break;
-            }
-        }
-        if (!exists)
-            drunCategoryFilter = "";
+        drunCategoryFilter = CategoryHelpers.validateCategoryFilter(drunCategoryFilter, next);
     }
 
     function setDrunCategoryFilter(categoryKey) {
@@ -1364,72 +1320,13 @@ PanelWindow {
         if (mode === "drun") {
             var apps = getCached("drun") || [];
             refreshDrunCategoryOptions(apps);
-            var recent = [];
-            var seen = ({});
-            var appsByExec = ({});
-            var usageRanked = [];
-            for (var i = 0; i < apps.length; ++i) {
-                var app = apps[i];
-                var execKey = String(app.exec || "");
-                if (execKey !== "" && !appsByExec[execKey])
-                    appsByExec[execKey] = app;
-                var usageScore = UsageTrackerService.getUsageScore(execKey);
-                if (usageScore > 0) {
-                    var rankedByUsage = Object.assign({}, app);
-                    rankedByUsage._usage = usageScore;
-                    usageRanked.push(rankedByUsage);
-                }
-            }
-            for (var j = 0; j < launchHistory.length; ++j) {
-                var launch = launchHistory[j];
-                var launchExec = String(launch.exec || "");
-                var matchedApp = launchExec === "" ? null : appsByExec[launchExec];
-                if (matchedApp && !seen[launchExec]) {
-                    var matched = Object.assign({}, matchedApp);
-                    matched._recent = launch.timestamp || 0;
-                    recent.push(matched);
-                    seen[launchExec] = true;
-                }
-            }
-            usageRanked.sort(function (a, b) {
-                if ((b._usage || 0) !== (a._usage || 0))
-                    return (b._usage || 0) - (a._usage || 0);
-                return Search.compareLauncherItemsAlpha(a, b);
+            var result = HomeBuilder.buildDrunHome(apps, launchHistory, drunCategoryFilter, UsageTrackerService, {
+                recentAppsLimit: Config.launcherRecentAppsLimit,
+                suggestionsLimit: Config.launcherSuggestionsLimit,
+                itemMatchesDrunCategory: itemMatchesDrunCategory
             });
-            recent.sort(function (a, b) {
-                if ((b._recent || 0) !== (a._recent || 0))
-                    return (b._recent || 0) - (a._recent || 0);
-                return Search.compareLauncherItemsAlpha(a, b);
-            });
-            if (drunCategoryFilter !== "") {
-                recent = recent.filter(function (item) {
-                    return itemMatchesDrunCategory(item, drunCategoryFilter);
-                });
-            }
-            if (recent.length < Config.launcherRecentAppsLimit) {
-                for (var k = 0; k < usageRanked.length; ++k) {
-                    var fallback = usageRanked[k];
-                    var fallbackExec = String(fallback.exec || "");
-                    if (fallbackExec === "" || seen[fallbackExec] || !itemMatchesDrunCategory(fallback, drunCategoryFilter))
-                        continue;
-                    var promoted = Object.assign({}, fallback);
-                    promoted._recent = fallback._usage || 0;
-                    recent.push(promoted);
-                    seen[fallbackExec] = true;
-                    if (recent.length >= Config.launcherRecentAppsLimit)
-                        break;
-                }
-            }
-            recentItems = recent.slice(0, Config.launcherRecentAppsLimit);
-            var suggestions = [];
-            for (var m = 0; m < usageRanked.length; ++m) {
-                var candidate = usageRanked[m];
-                var candidateExec = String(candidate.exec || "");
-                if (candidateExec === "" || seen[candidateExec] || !itemMatchesDrunCategory(candidate, drunCategoryFilter))
-                    continue;
-                suggestions.push(candidate);
-            }
-            suggestionItems = suggestions.slice(0, Config.launcherSuggestionsLimit);
+            recentItems = result.recentItems;
+            suggestionItems = result.suggestionItems;
         } else if (mode === "system") {
             resetDrunCategoryState(0);
             recentItems = SystemActionRegistry.shellEntryActions;
@@ -2452,17 +2349,7 @@ PanelWindow {
         if (state.token !== _filterChunkToken)
             return;
         if (done) {
-            state.scoredItems.sort(function (a, b) {
-                if (b._score !== a._score)
-                    return b._score - a._score;
-                var aDepth = Number(a.pathDepth || 0);
-                var bDepth = Number(b.pathDepth || 0);
-                if (aDepth !== bDepth)
-                    return aDepth - bDepth;
-                var aPath = a.relativePath || a.fullPath || a.title || "";
-                var bPath = b.relativePath || b.fullPath || b.title || "";
-                return aPath.localeCompare(bPath);
-            });
+            state.scoredItems.sort(Search.compareByScoreThenDepth);
             _lastFilterMode = mode;
             _lastFilterQuery = state.cleanLower;
             _lastFilterCategory = drunCategoryFilter;
@@ -2476,11 +2363,7 @@ PanelWindow {
             // Progressive partial results after first chunk
             if (state.scoredItems.length > 0) {
                 var partial = state.scoredItems.slice();
-                partial.sort(function (a, b) {
-                    if (b._score !== a._score)
-                        return b._score - a._score;
-                    return 0;
-                });
+                partial.sort(Search.compareByScoreOnly);
                 filteredItems = decorateResultSections(partial.slice(0, Config.launcherMaxResults));
                 selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
             }
@@ -2532,22 +2415,12 @@ PanelWindow {
             return;
         }
 
-        if (mode === "run" && searchText.startsWith(">"))
-            actualSearch = searchText.substring(1).trim();
-        if (mode === "emoji" && searchText.startsWith(":"))
-            actualSearch = searchText.substring(1).trim();
         if (mode === "web") {
             webContext = parseWebQuery(searchText);
             actualSearch = webContext.query;
+        } else {
+            actualSearch = Search.stripSearchPrefix(mode, searchText);
         }
-        if (mode === "ai" && searchText.startsWith("!"))
-            actualSearch = searchText.substring(1).trim();
-        if (mode === "files" && searchText.startsWith("/"))
-            actualSearch = searchText.substring(1).trim();
-        if (mode === "bookmarks" && searchText.startsWith("@"))
-            actualSearch = searchText.substring(1).trim();
-        if (mode === "settings" && searchText.startsWith(","))
-            actualSearch = searchText.substring(1).trim();
 
         var clean = String(actualSearch || "");
         var cleanLower = clean.toLowerCase();
@@ -2597,36 +2470,12 @@ PanelWindow {
                         break;
                 }
             }
-            if (mode !== "web" && mode !== "ai" && mode !== "files") {
-                scoredItems.sort(function (a, b) {
-                    if (b._score !== a._score)
-                        return b._score - a._score;
-                    if (mode === "drun") {
-                        var usageDelta = Number(b._usageScore || 0) - Number(a._usageScore || 0);
-                        if (Math.abs(usageDelta) > 0.01)
-                            return usageDelta > 0 ? 1 : -1;
-                    }
-                    return Search.compareLauncherItemsAlpha(a, b);
-                });
-            } else if (mode === "files") {
-                scoredItems.sort(function (a, b) {
-                    if (b._score !== a._score)
-                        return b._score - a._score;
-                    var aDepth = Number(a.pathDepth || 0);
-                    var bDepth = Number(b.pathDepth || 0);
-                    if (aDepth !== bDepth)
-                        return aDepth - bDepth;
-                    var aPath = a.relativePath || a.fullPath || a.title || "";
-                    var bPath = b.relativePath || b.fullPath || b.title || "";
-                    return aPath.localeCompare(bPath);
-                });
-            } else if (mode === "ai") {
-                scoredItems.sort(function (a, b) {
-                    if (b._score !== a._score)
-                        return b._score - a._score;
-                    return 0;
-                });
-            }
+            if (mode !== "web" && mode !== "ai" && mode !== "files")
+                scoredItems.sort(Search.compareByScoreThenUsage);
+            else if (mode === "files")
+                scoredItems.sort(Search.compareByScoreThenDepth);
+            else if (mode === "ai")
+                scoredItems.sort(Search.compareByScoreOnly);
             _lastFilterMode = mode;
             _lastFilterQuery = cleanLower;
             _lastFilterCategory = drunCategoryFilter;

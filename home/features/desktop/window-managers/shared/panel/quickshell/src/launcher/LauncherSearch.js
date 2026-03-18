@@ -170,6 +170,54 @@ function safeCalcEval(expr) {
     return pos >= s.length ? result : NaN;
 }
 
+// Sort comparator: score desc → usage desc → alpha. Used for drun/general modes.
+function compareByScoreThenUsage(a, b) {
+    if (b._score !== a._score)
+        return b._score - a._score;
+    var usageDelta = Number(b._usageScore || 0) - Number(a._usageScore || 0);
+    if (Math.abs(usageDelta) > 0.01)
+        return usageDelta > 0 ? 1 : -1;
+    return compareLauncherItemsAlpha(a, b);
+}
+
+// Sort comparator: score desc → pathDepth asc → path alpha. Used for files mode.
+function compareByScoreThenDepth(a, b) {
+    if (b._score !== a._score)
+        return b._score - a._score;
+    var aDepth = Number(a.pathDepth || 0);
+    var bDepth = Number(b.pathDepth || 0);
+    if (aDepth !== bDepth)
+        return aDepth - bDepth;
+    var aPath = a.relativePath || a.fullPath || a.title || "";
+    var bPath = b.relativePath || b.fullPath || b.title || "";
+    return aPath.localeCompare(bPath);
+}
+
+// Sort comparator: score desc only. Used for ai/partial results.
+function compareByScoreOnly(a, b) {
+    if (b._score !== a._score)
+        return b._score - a._score;
+    return 0;
+}
+
+// Strip mode-specific prefix character from search text.
+// Web mode is handled separately by the caller (parseWebQuery).
+function stripSearchPrefix(mode, searchText) {
+    if (mode === "run" && searchText.startsWith(">"))
+        return searchText.substring(1).trim();
+    if (mode === "emoji" && searchText.startsWith(":"))
+        return searchText.substring(1).trim();
+    if (mode === "ai" && searchText.startsWith("!"))
+        return searchText.substring(1).trim();
+    if (mode === "files" && searchText.startsWith("/"))
+        return searchText.substring(1).trim();
+    if (mode === "bookmarks" && searchText.startsWith("@"))
+        return searchText.substring(1).trim();
+    if (mode === "settings" && searchText.startsWith(","))
+        return searchText.substring(1).trim();
+    return searchText;
+}
+
 function compareLauncherItemsAlpha(a, b) {
     var aName = String(a && a.name ? a.name : "");
     var bName = String(b && b.name ? b.name : "");
