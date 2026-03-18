@@ -230,8 +230,10 @@ PanelWindow {
     readonly property bool isModeLoading: modeLoadState === "loading"
     readonly property string selectedHomeItemKey: ""
     readonly property string _cleanSearch: ModeData.stripModePrefix(searchText).trim()
-    readonly property string _webPrimaryName: { var p = primaryWebProvider(); return p ? p.name : "Web"; }
-    readonly property string _webSecondaryName: { var s = secondaryWebProvider(); return s ? s.name : "Google"; }
+    readonly property var _webPrimaryProvider: primaryWebProvider()
+    readonly property var _webSecondaryProvider: secondaryWebProvider()
+    readonly property string _webPrimaryName: _webPrimaryProvider ? _webPrimaryProvider.name : "Web"
+    readonly property string _webSecondaryName: _webSecondaryProvider ? _webSecondaryProvider.name : "Google"
     readonly property string drunCategoryFilterLabel: TextHelpers.categoryFilterLabel(drunCategoryOptions, drunCategoryFilter)
     readonly property string drunCategoryFilterSummary: TextHelpers.categoryFilterSummary(drunCategoryOptions, drunCategoryFilter)
     readonly property var allKnownModes: ModeData.allKnownModes
@@ -243,130 +245,14 @@ PanelWindow {
         return launcherRoot.isModeAllowedByCompositor(modeKey);
     })
     readonly property var modeIcons: ModeData.modeIcons
-    readonly property string emptyStateTitle: {
-        var clean = ModeData.stripModePrefix(searchText).trim();
-        if (mode === "files") {
-            if (clean.length < Config.launcherFileMinQueryLength)
-                return "Start typing to search Home";
-            return "No files match '" + clean + "'";
-        }
-        if (mode === "ai")
-            return "Describe what you want and press Enter";
-        if (mode === "clip")
-            return "Clipboard history is empty";
-        if (mode === "window")
-            return "No open windows found";
-        return "No results";
-    }
-    readonly property string emptyStateSubtitle: {
-        var clean = ModeData.stripModePrefix(searchText).trim();
-        if (mode === "files") {
-            if (clean.length < Config.launcherFileMinQueryLength)
-                return "Filename-first search across your home directory. Prefix with / to jump here from any mode.";
-            return "Try a shorter filename fragment or browse Home directly.";
-        }
-        if (mode === "ai")
-            return "The response will be copied to your clipboard";
-        if (mode === "clip")
-            return "Copy something to populate clipboard history";
-        if (mode === "window")
-            return "Open some applications to see them here";
-        return "Try another query or switch modes";
-    }
-    readonly property string emptyPrimaryCta: {
-        var clean = ModeData.stripModePrefix(searchText).trim();
-        var webPrimary = primaryWebProvider();
-        var webPrimaryName = webPrimary ? webPrimary.name : "Web";
-        if (mode === "files")
-            return "Open Home";
-        if (mode === "web")
-            return clean !== "" ? "Search " + webPrimaryName : "Open " + webPrimaryName;
-        if (mode === "ai")
-            return clean.length >= 3 ? "Ask AI" : "Switch to Apps";
-        if (mode === "run")
-            return clean !== "" ? "Run Command" : "Switch to Apps";
-        if (mode === "window")
-            return "Open Apps";
-        if (mode === "bookmarks")
-            return "Switch to Web";
-        if (mode === "clip")
-            return "Switch to Apps";
-        return "Switch to Apps";
-    }
-    readonly property string emptySecondaryCta: {
-        var clean = ModeData.stripModePrefix(searchText).trim();
-        var webSecondary = secondaryWebProvider();
-        var webSecondaryName = webSecondary ? webSecondary.name : "Google";
-        if (mode === "files")
-            return FileParser.fileQueryLooksLikePath(clean) ? "Open Folder" : (searchText !== "" ? "Clear Query" : "");
-        if (mode === "web")
-            return clean !== "" ? "Search " + webSecondaryName : "Open " + webSecondaryName;
-        if (mode === "system")
-            return "Open Controls";
-        if (mode === "run")
-            return clean !== "" ? "Run In Terminal" : "Open Terminal";
-        return searchText !== "" ? "Clear Query" : "";
-    }
-    readonly property string emptyPrimaryHint: {
-        var clean = ModeData.stripModePrefix(searchText).trim();
-        var webPrimary = primaryWebProvider();
-        var webPrimaryName = webPrimary ? webPrimary.name : "default provider";
-        if (mode === "files")
-            return "Open your home directory in the default file manager.";
-        if (mode === "web")
-            return clean !== "" ? "Search " + webPrimaryName + " using the current query." : "Open " + webPrimaryName + " homepage.";
-        if (mode === "ai")
-            return clean.length >= 3 ? "Send prompt to AI helper and show copyable result." : "Switch back to app launcher mode.";
-        if (mode === "run")
-            return clean !== "" ? "Execute command directly in shell." : "Switch back to app launcher mode.";
-        if (mode === "system")
-            return "Switch back to app launcher mode.";
-        if (mode === "bookmarks")
-            return "Switch to web mode for broader search.";
-        return "Switch to app launcher mode.";
-    }
-    readonly property string emptyPrimaryHintIcon: {
-        if (mode === "files")
-            return "󰉋";
-        if (mode === "web")
-            return "󰖟";
-        if (mode === "ai")
-            return "󰚩";
-        if (mode === "run")
-            return "󰆍";
-        if (mode === "bookmarks")
-            return "󰃀";
-        return "󰀻";
-    }
-    readonly property string emptySecondaryHint: {
-        var clean = ModeData.stripModePrefix(searchText).trim();
-        var webSecondary = secondaryWebProvider();
-        var webSecondaryName = webSecondary ? webSecondary.name : "Google";
-        if (mode === "files")
-            return FileParser.fileQueryLooksLikePath(clean) ? "Open the folder implied by the current path-like query." : (searchText !== "" ? "Clear the current query text." : "");
-        if (mode === "web")
-            return clean !== "" ? "Search " + webSecondaryName + " using the current query." : "Open " + webSecondaryName + " homepage.";
-        if (mode === "system")
-            return "Open quickshell control center panel.";
-        if (mode === "run")
-            return clean !== "" ? "Run command inside terminal for interactive output." : "Open terminal app.";
-        if (searchText !== "")
-            return "Clear the current query text.";
-        return "";
-    }
-    readonly property string emptySecondaryHintIcon: {
-        if (mode === "files")
-            return "󰉋";
-        if (mode === "web")
-            return "󰇥";
-        if (mode === "system")
-            return "󰒓";
-        if (mode === "run")
-            return "󰆍";
-        if (searchText !== "")
-            return "󰅖";
-        return "";
-    }
+    readonly property string emptyStateTitle: TextHelpers.emptyStateTitle(mode, _cleanSearch, Config.launcherFileMinQueryLength)
+    readonly property string emptyStateSubtitle: TextHelpers.emptyStateSubtitle(mode, _cleanSearch, Config.launcherFileMinQueryLength)
+    readonly property string emptyPrimaryCta: TextHelpers.emptyPrimaryCta(mode, _cleanSearch, _webPrimaryName)
+    readonly property string emptySecondaryCta: TextHelpers.emptySecondaryCta(mode, _cleanSearch, searchText, _webSecondaryName)
+    readonly property string emptyPrimaryHint: TextHelpers.emptyPrimaryHint(mode, _cleanSearch, _webPrimaryName, _webPrimaryProvider ? _webPrimaryName : "default provider")
+    readonly property string emptyPrimaryHintIcon: TextHelpers.emptyPrimaryHintIcon(mode)
+    readonly property string emptySecondaryHint: TextHelpers.emptySecondaryHint(mode, _cleanSearch, searchText, _webSecondaryName)
+    readonly property string emptySecondaryHintIcon: TextHelpers.emptySecondaryHintIcon(mode, searchText)
     readonly property bool hasResults: filteredItems.length > 0
     readonly property var selectedItem: hasResults && selectedIndex >= 0 && selectedIndex < filteredItems.length ? filteredItems[selectedIndex] : null
     readonly property string launcherTabBehavior: {
@@ -393,11 +279,8 @@ PanelWindow {
             return "Enter: Confirm";
         if (!hasResults)
             return "Enter: " + emptyPrimaryCta;
-        if (mode === "web" && Config.launcherWebEnterUsesPrimary) {
-            var primary = primaryWebProvider();
-            var label = primary ? primary.name : "Web";
-            return "Enter: Search " + label;
-        }
+        if (mode === "web" && Config.launcherWebEnterUsesPrimary)
+            return "Enter: Search " + _webPrimaryName;
         var action = Executor.itemActionLabel(mode, selectedItem);
         if (action === "")
             action = "Open";
@@ -421,10 +304,7 @@ PanelWindow {
             return "Esc: Reset";
         return "Shift+Tab: Next Mode";
     }
-    readonly property string webPrimaryProviderLabel: {
-        var provider = primaryWebProvider();
-        return provider ? provider.name : "Primary";
-    }
+    readonly property string webPrimaryProviderLabel: _webPrimaryProvider ? _webPrimaryProvider.name : "Primary"
     readonly property string webHotkeyHint: {
         if (!Config.launcherWebNumberHotkeysEnabled)
             return "Ctrl+Enter: Home";
@@ -450,25 +330,9 @@ PanelWindow {
     readonly property string webSelectedProviderLabel: activeProviderLabel !== "" ? activeProviderLabel : "Selected"
     readonly property string webPrimaryEnterHint: Config.launcherWebEnterUsesPrimary ? ("Enter: " + webPrimaryProviderLabel) : ("Enter: " + webSelectedProviderLabel)
     readonly property string webSecondaryEnterHint: Config.launcherWebEnterUsesPrimary ? ("Shift+Enter: " + webSelectedProviderLabel) : ("Shift+Enter: " + emptySecondaryCta)
-    readonly property string webAliasHint: {
-        var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
-        var providers = configuredWebProviders();
-        var parts = [];
-        for (var i = 0; i < providers.length; ++i) {
-            var providerKey = String(providers[i].key || "");
-            if (providerKey === "")
-                continue;
-            var list = aliases[providerKey];
-            if (!Array.isArray(list) || list.length === 0)
-                continue;
-            var first = String(list[0] || "").trim();
-            if (first !== "")
-                parts.push("?" + first);
-        }
-        if (parts.length > 0)
-            return (webHintCompact ? "Aliases: " : "Alias: ") + parts.join(" ");
-        return webHintCompact ? "Aliases: provider key" : "Alias: provider key";
-    }
+    readonly property string webAliasHint: TextHelpers.webAliasHint(
+        (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({}),
+        configuredWebProviders(), webHintCompact)
     readonly property string activeProviderLabel: {
         if (mode !== "web")
             return "";

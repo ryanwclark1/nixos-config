@@ -63,11 +63,12 @@ function emptySecondaryCta(mode, clean, searchText, webSecondaryName) {
     return searchText !== "" ? "Clear Query" : "";
 }
 
-function emptyPrimaryHint(mode, clean, webPrimaryName) {
+function emptyPrimaryHint(mode, clean, webPrimaryName, webPrimaryHintName) {
+    var hintName = webPrimaryHintName || webPrimaryName;
     if (mode === "files")
         return "Open your home directory in the default file manager.";
     if (mode === "web")
-        return clean !== "" ? "Search " + webPrimaryName + " using the current query." : "Open " + webPrimaryName + " homepage.";
+        return clean !== "" ? "Search " + hintName + " using the current query." : "Open " + hintName + " homepage.";
     if (mode === "ai")
         return clean.length >= 3 ? "Send prompt to AI helper and show copyable result." : "Switch back to app launcher mode.";
     if (mode === "run")
