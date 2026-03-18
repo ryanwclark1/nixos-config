@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "."
 import "../../../services"
+import "../../../shared"
 import "../../../widgets"
 
 ColumnLayout {
@@ -117,7 +118,7 @@ ColumnLayout {
       color: isDefault ? Colors.primaryStrong : (isHovered ? Colors.primarySubtle : Colors.cardSurface)
       border.color: isDefault ? Colors.primary : Colors.border
       border.width: 1
-      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on color { CAnim {} }
 
       InnerHighlight { highlightOpacity: 0.15; hoveredOpacity: 0.3; hovered: deviceCard.isDefault }
 

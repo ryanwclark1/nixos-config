@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 import "../models/GraphUtils.js" as GU
 
@@ -14,7 +15,7 @@ Rectangle {
   clip: true
   scale: sysCardHover.hovered ? 1.01 : 1.0
   Behavior on scale { NumberAnimation { id: sysScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
-  Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on border.color { CAnim {} }
   layer.enabled: sysScaleAnim.running
 
   HoverHandler { id: sysCardHover }

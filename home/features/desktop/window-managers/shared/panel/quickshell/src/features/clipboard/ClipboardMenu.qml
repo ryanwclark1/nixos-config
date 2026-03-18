@@ -138,7 +138,7 @@ BasePopupMenu {
           color: isSelected ? Colors.primarySubtle : Colors.cardSurface
           border.color: isSelected ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
           border.width: 1
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color { CAnim {} }
 
           readonly property bool isImage: !!(modelData && modelData.content && String(modelData.content).indexOf("[[ binary data") !== -1)
           readonly property string imageSrc: {

@@ -72,8 +72,8 @@ Rectangle {
     }
     border.width: isEmpty ? 0 : 1
 
-    Behavior on color        { ColorAnimation { duration: Colors.durationFast } }
-    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color        { CAnim {} }
+    Behavior on border.color { CAnim {} }
 
     // ── Modifier toggle state (Ctrl / Alt, non-shift modkeys) ────────────────
     property bool _isModToggled: false
@@ -191,7 +191,7 @@ Rectangle {
                          ? Font.Bold : Font.Normal
             color: (isShift && YdotoolService.shiftMode > 0) || _isModToggled
                    ? Colors.primary : Colors.text
-            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+            Behavior on color { CAnim {} }
         }
 
         // Interactive state layer

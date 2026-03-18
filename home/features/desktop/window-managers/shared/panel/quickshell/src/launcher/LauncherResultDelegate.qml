@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../shared"
 import "../widgets" as SharedWidgets
 import "LauncherSearch.js" as Search
 import "LauncherModeData.js" as ModeData
@@ -33,8 +34,8 @@ Rectangle {
     border.width: 1
     scale: highlighted ? 1.01 : 1.0
 
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
+    Behavior on border.color { CAnim {} }
     Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
     layer.enabled: highlighted && scale !== 1.0
 
@@ -164,20 +165,13 @@ Rectangle {
             scale: highlighted ? 1.04 : 1.0
 
             Behavior on color {
-                ColorAnimation {
-                    duration: Colors.durationFast
-                }
+                CAnim {}
             }
             Behavior on border.color {
-                ColorAnimation {
-                    duration: Colors.durationFast
-                }
+                CAnim {}
             }
             Behavior on scale {
-                NumberAnimation {
-                    duration: Colors.durationFast
-                    easing.type: Easing.OutCubic
-                }
+                Anim { duration: Colors.durationFast }
             }
 
             SharedWidgets.AppIcon {

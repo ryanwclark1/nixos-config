@@ -35,6 +35,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             text: {
                 var d = SystemClock.now;
+                if (!d) return "";
                 var h = d.getHours();
                 var m = d.getMinutes();
                 if (!Config.timeUse24Hour) {
@@ -53,6 +54,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             text: {
                 var d = SystemClock.now;
+                if (!d) return "";
                 return Qt.formatDate(d, "dddd, MMMM d");
             }
             color: Colors.withAlpha(Colors.text, 0.6)

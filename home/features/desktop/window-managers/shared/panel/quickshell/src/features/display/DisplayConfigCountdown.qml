@@ -16,7 +16,7 @@ Rectangle {
   radius: Colors.radiusLarge
 
   opacity: active ? 1.0 : 0.0
-  Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+  Behavior on opacity { Anim {} }
 
   ColumnLayout {
     anchors.centerIn: parent

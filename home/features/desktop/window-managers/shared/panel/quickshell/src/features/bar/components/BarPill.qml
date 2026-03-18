@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../services"
+import "../../../shared"
 import "../../../widgets"
 
 MouseArea {
@@ -71,7 +72,7 @@ MouseArea {
 
   // Y-offset physics: hover lifts, press pushes down
   property real _yOffset: pressed ? 1.5 : (containsMouse ? -0.5 : 0)
-  Behavior on _yOffset { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+  Behavior on _yOffset { Anim {} }
   transform: Translate { y: root._yOffset }
 
   property bool shimmerEnabled: true
@@ -98,9 +99,9 @@ MouseArea {
     border.color: root.isActive ? root.activeBorderColor : root.normalBorderColor
     border.width: 1
     opacity: root.isActive ? 1.0 : (root.containsMouse ? 1.0 : 0.8)
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
     Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
-    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on border.color { CAnim {} }
 
     gradient: SurfaceGradient {}
 

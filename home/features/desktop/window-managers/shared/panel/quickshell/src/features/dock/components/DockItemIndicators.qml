@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../services"
+import "../../../shared"
 
 Loader {
     id: root
@@ -25,7 +26,7 @@ Loader {
                             return Colors.primary;
                         return Colors.textSecondary;
                     }
-                    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on color { CAnim {} }
                 }
             }
         }
@@ -47,7 +48,7 @@ Loader {
                             return Colors.primary;
                         return Colors.textSecondary;
                     }
-                    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on color { CAnim {} }
                 }
             }
         }

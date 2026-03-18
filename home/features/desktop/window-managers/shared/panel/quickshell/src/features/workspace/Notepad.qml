@@ -6,6 +6,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import "../../services"
 import "../../widgets" as SharedWidgets
+import "../../shared"
 
 PanelWindow {
   id: root
@@ -400,7 +401,7 @@ PanelWindow {
       anchors.verticalCenter: parent.verticalCenter
       opacity: dragArea.containsMouse || dragArea.pressed ? 1.0 : 0.4
       Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
-      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on color { CAnim {} }
 
       MouseArea {
         id: dragArea
@@ -552,7 +553,7 @@ PanelWindow {
                   width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + 36, 140)
                   height: 28
 
-                  Behavior on width { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+                  Behavior on width { Anim { duration: Colors.durationFast } }
 
                   Rectangle {
                     id: tabBg
@@ -563,8 +564,8 @@ PanelWindow {
                       : (hasSearchMatch ? Colors.withAlpha(Colors.accent, 0.12) : Colors.bgWidget)
                     border.color: isActive ? Colors.primary : (hasSearchMatch ? Colors.accent : Colors.border)
                     border.width: (isActive || hasSearchMatch) ? 1.5 : 1
-                    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-                    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on color { CAnim {} }
+                    Behavior on border.color { CAnim {} }
 
                     SharedWidgets.StateLayer {
                       id: tabStateLayer
@@ -723,7 +724,7 @@ PanelWindow {
         border.color: notepadText.activeFocus ? Colors.primary : Colors.border
         border.width: notepadText.activeFocus ? 1.5 : 1
         radius: Colors.radiusMedium
-        Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+        Behavior on border.color { CAnim {} }
         clip: true
 
         Flickable {

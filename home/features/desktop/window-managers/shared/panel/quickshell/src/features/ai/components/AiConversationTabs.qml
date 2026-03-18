@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 import "../services/AiProviders.js" as Providers
 
@@ -149,8 +150,8 @@ RowLayout {
                         border.color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.25) : Colors.border)
                         border.width: isActive ? 1.5 : 1
 
-                        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-                        Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+                        Behavior on color { CAnim {} }
+                        Behavior on border.color { CAnim {} }
 
                         SharedWidgets.StateLayer {
                             id: tabStateLayer

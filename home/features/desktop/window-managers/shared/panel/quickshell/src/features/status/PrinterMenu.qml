@@ -169,7 +169,7 @@ BasePopupMenu {
 
             border.color: isDefault ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
             border.width: 1
-            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+            Behavior on color { CAnim {} }
 
             SharedWidgets.StateLayer {
               anchors.fill: parent
@@ -299,7 +299,7 @@ BasePopupMenu {
                     color: setDefaultHover.containsMouse ? Colors.primary : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     font.weight: Font.Medium
-                    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on color { CAnim {} }
                   }
 
                   SharedWidgets.StateLayer {
@@ -338,7 +338,7 @@ BasePopupMenu {
                     color: testPageHover.containsMouse ? Colors.accent : Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                     font.weight: Font.Medium
-                    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on color { CAnim {} }
                   }
 
                   SharedWidgets.StateLayer {
@@ -377,7 +377,7 @@ BasePopupMenu {
                     color: cancelJobsHover.containsMouse ? Colors.error : Colors.withAlpha(Colors.error, 0.70)
                     font.pixelSize: Colors.fontSizeXS
                     font.weight: Font.Medium
-                    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on color { CAnim {} }
                   }
 
                   SharedWidgets.StateLayer {
@@ -407,7 +407,7 @@ BasePopupMenu {
                   implicitHeight: 26
                   radius: height / 2
                   color: Colors.withAlpha(printerCard.isDisabled ? Colors.success : Colors.warning, 0.10)
-                  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                  Behavior on color { CAnim {} }
 
                   Text {
                     id: toggleLabel

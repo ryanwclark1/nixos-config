@@ -38,12 +38,6 @@ PanelWindow {
         function close():  void { root.close(); }
     }
 
-    GlobalShortcut {
-        name: "cheatsheetToggle"
-        description: "Toggle keybinding cheatsheet"
-        onPressed: root.toggle()
-    }
-
     Keys.onEscapePressed: root.close()
 
     // Scrim background
@@ -73,7 +67,7 @@ PanelWindow {
         opacity: root.isVisible ? 1.0 : 0.0
         scale: root.isVisible ? 1.0 : 0.95
         Behavior on opacity { NumberAnimation { id: _fadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: Colors.durationPanelOpen; easing.type: Easing.OutBack; overshoot: 1.3 } }
+        Behavior on scale { NumberAnimation { duration: Colors.durationPanelOpen; easing.type: Easing.OutBack; easing.overshoot: 1.3 } }
         layer.enabled: _fadeAnim.running
 
         InnerHighlight { highlightOpacity: 0.12 }

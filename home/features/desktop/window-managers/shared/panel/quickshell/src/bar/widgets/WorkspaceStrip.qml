@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../services"
+import "../../shared"
 
 Flow {
   id: root
@@ -74,7 +75,7 @@ Flow {
 
       Behavior on color {
         enabled: !wsPill.isUrgent
-        ColorAnimation { duration: Colors.durationFast }
+        CAnim {}
       }
 
       DropArea {
@@ -173,7 +174,7 @@ Flow {
     border.width: 1
     visible: root.showAddButton && (Config.workspaceShowEmpty || root.state.workspaces.length < 10)
     
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
     scale: addWsHover.containsMouse ? 1.1 : 1.0
     Behavior on scale { SpringAnimation { spring: 4; damping: 0.3 } }
 

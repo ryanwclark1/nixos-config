@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import "."
 import "../../services"
+import "../../shared"
 
 Scope {
   id: root
@@ -276,9 +277,9 @@ Scope {
               visible: opacity > 0
               property real xOffset: screenDelegate.hidden ? (screenDelegate.isLeft ? -20 : (screenDelegate.isRight ? 20 : 0)) : 0
               property real yOffset: screenDelegate.hidden ? (screenDelegate.isBottom ? 20 : (screenDelegate.isTop ? -20 : 0)) : 0
-              Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-              Behavior on xOffset { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-              Behavior on yOffset { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+              Behavior on opacity { Anim {} }
+              Behavior on xOffset { Anim {} }
+              Behavior on yOffset { Anim {} }
               transform: Translate { x: dockAnimWrapper.xOffset; y: dockAnimWrapper.yOffset }
 
               MouseArea {

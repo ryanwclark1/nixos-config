@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -17,7 +18,7 @@ Rectangle {
   clip: true
   scale: cardHover.hovered ? 1.01 : 1.0
   Behavior on scale { NumberAnimation { id: mediaScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
-  Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on border.color { CAnim {} }
   layer.enabled: mediaScaleAnim.running
 
   gradient: SharedWidgets.SurfaceGradient {}
@@ -158,7 +159,7 @@ Rectangle {
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeXL
                 anchors.centerIn: parent
-                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                Behavior on color { CAnim {} }
               }
               onClicked: modelData.previous()
             }
@@ -175,14 +176,14 @@ Rectangle {
                 color: playBtn.containsMouse ? Colors.primary : Colors.cardSurface
                 border.color: playBtn.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
-                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                Behavior on color { CAnim {} }
                 Text { 
                   text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
                   color: playBtn.containsMouse ? Colors.background : Colors.text
                   font.family: Colors.fontMono
                   font.pixelSize: Colors.fontSizeLarge
                   anchors.centerIn: parent
-                  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                  Behavior on color { CAnim {} }
                 }
               }
               onClicked: modelData.playPause()
@@ -200,7 +201,7 @@ Rectangle {
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeXL
                 anchors.centerIn: parent
-                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                Behavior on color { CAnim {} }
               }
               onClicked: modelData.next()
             }

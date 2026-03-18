@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Services.SystemTray
 import "."
 import "../../../services"
+import "../../../shared"
 import "../../../widgets"
 
 
@@ -27,7 +28,7 @@ Flow {
       color: "transparent"
       scale: mouseArea.containsMouse ? 1.08 : 1.0
 
-      Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+      Behavior on scale { Anim { duration: Colors.durationFast } }
 
       Image {
         anchors.centerIn: parent

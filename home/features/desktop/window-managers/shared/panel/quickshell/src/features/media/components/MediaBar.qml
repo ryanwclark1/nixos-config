@@ -1,6 +1,7 @@
 import QtQuick
 import "../../system/sections"
 import "../../../services"
+import "../../../shared"
 import "../../../widgets"
 
 Rectangle {
@@ -62,7 +63,7 @@ Rectangle {
 
   Behavior on width { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
   Behavior on opacity { NumberAnimation { duration: Colors.durationSlow } }
-  Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+  Behavior on scale { Anim { duration: Colors.durationFast } }
   opacity: visible ? 1.0 : 0.0
   scale: mediaMouse.containsMouse ? 1.04 : 1.0
 

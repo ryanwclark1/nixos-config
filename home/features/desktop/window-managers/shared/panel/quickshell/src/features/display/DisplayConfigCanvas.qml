@@ -1,5 +1,6 @@
 import QtQuick
 import "../../services"
+import "../../shared"
 
 Item {
   id: root
@@ -97,8 +98,8 @@ Item {
           border.width: monDelegate.isSelected ? 2 : 1
           radius: Colors.radiusSmall
 
-          Behavior on color        { ColorAnimation { duration: Colors.durationFast } }
-          Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color        { CAnim {} }
+          Behavior on border.color { CAnim {} }
 
           // Monitor name
           Text {

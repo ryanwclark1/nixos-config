@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../services"
+import "../../shared"
 import "../../widgets" as SharedWidgets
 
 Rectangle {
@@ -41,8 +42,8 @@ Rectangle {
     return isPinned ? "Pinned app" : "Running app";
   }
 
-  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-  Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+  Behavior on color { CAnim {} }
+  Behavior on scale { Anim { duration: Colors.durationFast } }
 
   // Running indicator dot
   Rectangle {

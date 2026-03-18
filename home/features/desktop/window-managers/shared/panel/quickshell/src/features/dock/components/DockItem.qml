@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import ".."
 import "../../../services"
+import "../../../shared"
 import "../../../widgets"
 
 Item {
@@ -112,8 +113,8 @@ Item {
         transform: Translate {
             x: root.vertical ? 0 : iconContainer.shiftMain
             y: root.vertical ? iconContainer.shiftMain : 0
-            Behavior on x { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
-            Behavior on y { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+            Behavior on x { Anim { duration: Colors.durationFast } }
+            Behavior on y { Anim { duration: Colors.durationFast } }
         }
 
         Rectangle {

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 RowLayout {
@@ -47,7 +48,7 @@ RowLayout {
       radius: Colors.radiusXS
       border.color: Colors.border
       border.width: 1
-      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on color { CAnim {} }
 
       // Inner highlight border
       SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }

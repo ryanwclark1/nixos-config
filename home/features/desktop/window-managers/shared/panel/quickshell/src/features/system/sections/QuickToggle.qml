@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -38,8 +39,8 @@ Rectangle {
   opacity: enabled ? 1.0 : 0.4
   scale: toggleMouse.pressed ? 0.96 : 1.0
   Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
-  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-  Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on color { CAnim {} }
+  Behavior on border.color { CAnim {} }
 
   RowLayout {
     anchors.fill: parent

@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../../services"
+import "../../../shared"
 import "../../../widgets"
 
 PopupWindow {
@@ -121,7 +122,7 @@ PopupWindow {
 
     opacity: root.ready ? 1.0 : 0.0
     scale: root.ready ? 1.0 : 0.92
-    Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+    Behavior on opacity { Anim { duration: Colors.durationFast } }
     Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
 
     // Subtly lighter inner border

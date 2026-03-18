@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../shared"
 
 Rectangle {
     id: root
@@ -85,7 +86,7 @@ Rectangle {
                 implicitHeight: 38
                 implicitWidth: emptyPrimaryText.implicitWidth + 32
                 scale: primaryHover.containsMouse ? 1.02 : 1.0
-                Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+                Behavior on scale { Anim { duration: Colors.durationFast } }
 
                 Text {
                     id: emptyPrimaryText
@@ -114,7 +115,7 @@ Rectangle {
                 implicitHeight: 38
                 implicitWidth: emptySecondaryText.implicitWidth + 32
                 scale: secondaryHover.containsMouse ? 1.02 : 1.0
-                Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+                Behavior on scale { Anim { duration: Colors.durationFast } }
 
                 Text {
                     id: emptySecondaryText

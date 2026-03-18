@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -117,7 +118,7 @@ Rectangle {
         Rectangle {
           anchors.fill: parent; radius: Colors.radiusSmall
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color { CAnim {} }
         }
         Text {
           anchors.centerIn: parent
@@ -164,7 +165,7 @@ Rectangle {
           color: parent.containsMouse ? Colors.primary : Colors.highlightLight
           border.color: Colors.primary
           border.width: 1
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color { CAnim {} }
         }
 
         Text {
@@ -174,7 +175,7 @@ Rectangle {
           color: parent.containsMouse ? Colors.background : Colors.primary
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Bold
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color { CAnim {} }
         }
       }
 
@@ -186,7 +187,7 @@ Rectangle {
         Rectangle {
           anchors.fill: parent; radius: Colors.radiusSmall
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color { CAnim {} }
         }
         Text {
           anchors.centerIn: parent
@@ -226,7 +227,7 @@ Rectangle {
       rowSpacing: 4
       columnSpacing: 0
 
-      Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+      Behavior on opacity { Anim { duration: Colors.durationFast } }
 
       Repeater {
         model: root.daysModel
@@ -241,7 +242,7 @@ Rectangle {
               : dayMouse.containsMouse && modelData.currentMonth ? Colors.highlightLight
               : "transparent"
             radius: width / 2
-            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+            Behavior on color { CAnim {} }
 
             Text {
               anchors.centerIn: parent

@@ -346,7 +346,7 @@ Scope {
             anchors.margins: 1
             radius: parent.radius - 1
             color: Colors.withAlpha(root.osdColor, 0.06 + (root.currentValue / root.maxValue) * 0.08)
-            Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+            Behavior on color { CAnim {} }
           }
 
           Loader {

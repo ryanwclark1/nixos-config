@@ -54,13 +54,6 @@ PanelWindow {
         function close():  void { root.close();  }
     }
 
-    // ── Global shortcut ──────────────────────────────────────────────────────
-    GlobalShortcut {
-        name:        "oskToggle"
-        description: "Toggle the on-screen keyboard"
-        onPressed:   root.toggle()
-    }
-
     // ── Escape to close ──────────────────────────────────────────────────────
     Keys.onEscapePressed: root.close()
 
@@ -154,8 +147,8 @@ PanelWindow {
                     border.color: root.pinned ? Colors.primary : Colors.border
                     border.width: 1
 
-                    Behavior on color        { ColorAnimation { duration: Colors.durationFast } }
-                    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+                    Behavior on color        { CAnim {} }
+                    Behavior on border.color { CAnim {} }
 
                     Text {
                         anchors.centerIn: parent
@@ -163,7 +156,7 @@ PanelWindow {
                         font.family: Colors.fontMono
                         font.pixelSize: Colors.fontSizeMedium
                         color: root.pinned ? Colors.primary : Colors.textSecondary
-                        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                        Behavior on color { CAnim {} }
                     }
 
                     StateLayer {

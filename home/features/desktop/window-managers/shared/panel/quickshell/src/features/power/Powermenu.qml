@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import "../../services"
 import "../../widgets" as SharedWidgets
+import "../../shared"
 
 PanelWindow {
   id: root
@@ -220,7 +221,7 @@ PanelWindow {
               color: Colors.cardSurface
               border.color: actionItem.isFocused ? actionItem.actionColor : Colors.border
               border.width: actionItem.isFocused ? 3 : 1
-              Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+              Behavior on border.color { CAnim {} }
 
 
               SharedWidgets.InnerHighlight { highlightOpacity: actionItem.isFocused ? 0.25 : 0.12 }
@@ -248,7 +249,7 @@ PanelWindow {
                   font.family: isPending ? "" : Colors.fontMono
                   font.pixelSize: isPending ? 32 : 44
                   font.weight: isPending ? Font.Bold : Font.Normal
-                  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                  Behavior on color { CAnim {} }
                 }
               }
               Text {
@@ -257,7 +258,7 @@ PanelWindow {
                 font.pixelSize: Colors.fontSizeSmall
                 font.weight: actionItem.isFocused ? Font.Bold : Font.Medium
                 Layout.alignment: Qt.AlignHCenter
-                Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+                Behavior on color { CAnim {} }
               }
             }
 

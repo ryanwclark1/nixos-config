@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
@@ -61,7 +62,7 @@ SharedWidgets.CardBase {
           border.width: 1
           radius: Colors.radiusXXS
           implicitHeight: scratchRow.implicitHeight + Colors.paddingSmall * 2
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color { CAnim {} }
 
           SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: scratchHover.containsMouse }
 

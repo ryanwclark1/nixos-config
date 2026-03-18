@@ -18,9 +18,9 @@ BasePopupMenu {
     implicitHeight: 50
     radius: Colors.radiusMedium
     color: RecordingService.isRecording ? Colors.errorLight : Colors.cardSurface
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
     border.color: RecordingService.isRecording ? Colors.error : Colors.border
-    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on border.color { CAnim {} }
     border.width: 1
 
     RowLayout {
@@ -31,7 +31,7 @@ BasePopupMenu {
       Rectangle {
         width: 12; height: 12; radius: Colors.radiusXXS
         color: RecordingService.isRecording ? Colors.error : Colors.textDisabled
-        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+        Behavior on color { CAnim {} }
         SequentialAnimation on opacity {
           running: RecordingService.isRecording
           loops: Animation.Infinite
@@ -43,7 +43,7 @@ BasePopupMenu {
       Text {
         text: RecordingService.isRecording ? "Recording" : "Idle"
         color: RecordingService.isRecording ? Colors.error : Colors.text
-        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+        Behavior on color { CAnim {} }
         font.pixelSize: Colors.fontSizeMedium
         font.weight: Font.DemiBold
       }
@@ -53,7 +53,7 @@ BasePopupMenu {
       Text {
         text: RecordingService.elapsedText
         color: RecordingService.isRecording ? Colors.error : Colors.textDisabled
-        Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+        Behavior on color { CAnim {} }
         font.pixelSize: Colors.fontSizeLarge
         font.weight: Font.Bold
         font.family: Colors.fontMono
@@ -76,7 +76,7 @@ BasePopupMenu {
       color: Colors.cardSurface
       border.color: fullscreenHover.containsMouse ? Colors.primary : Colors.border
       border.width: 1
-      Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on border.color { CAnim {} }
 
       ColumnLayout {
         anchors.centerIn: parent
@@ -107,7 +107,7 @@ BasePopupMenu {
       color: Colors.cardSurface
       border.color: regionHover.containsMouse ? Colors.primary : Colors.border
       border.width: 1
-      Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on border.color { CAnim {} }
 
       ColumnLayout {
         anchors.centerIn: parent
@@ -139,7 +139,7 @@ BasePopupMenu {
     radius: Colors.radiusMedium
     visible: RecordingService.isRecording
     color: stopHover.containsMouse ? Qt.darker(Colors.error, 1.1) : Colors.error
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
 
     Text {
       anchors.centerIn: parent

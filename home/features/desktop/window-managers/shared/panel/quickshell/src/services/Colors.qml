@@ -49,8 +49,35 @@ QtObject {
     readonly property color primaryMarked: withAlpha(primary, 0.22)  // Drag target / strong selection
     readonly property color primaryRing: withAlpha(primary, 0.3)     // Focus ring / emphasis border
 
+    // --- AUTO-TRANSPARENCY (wallpaper-driven) ---
+    property bool autoTransparencyEnabled: Config.autoTransparency !== undefined ? Config.autoTransparency : false
+
+    ColorQuantizer {
+        id: _wallpaperQuant
+        source: {
+            var keys = Object.keys(WallpaperService.wallpapers);
+            var path = WallpaperService.wallpapers["__all__"]
+                || (keys.length > 0 ? WallpaperService.wallpapers[keys[0]] : "");
+            return path ? Qt.resolvedUrl("file://" + path) : "";
+        }
+        depth: 0
+        rescaleSize: 10
+    }
+
+    readonly property real _wallpaperVibrancy: {
+        var c = _wallpaperQuant.colors;
+        if (!c || c.length === 0) return 0.5;
+        return (c[0].hslSaturation + c[0].hslLightness) / 2;
+    }
+
+    readonly property real autoGlassOpacity: {
+        var x = _wallpaperVibrancy;
+        var y = 0.5768 * x * x - 0.759 * x + 0.2896;
+        return Math.max(0, Math.min(0.22, y));
+    }
+
     // --- GLASSMORPHISM ---
-    readonly property real bgOpacity: Config.glassOpacity
+    readonly property real bgOpacity: autoTransparencyEnabled ? (1.0 - autoGlassOpacity) : Config.glassOpacity
     readonly property color bgGlass: withAlpha(background, bgOpacity)
     readonly property color bgWidget: _isLight ? Qt.rgba(0, 0, 0, 0.06) : Qt.rgba(1, 1, 1, 0.08)
     readonly property color bg: background

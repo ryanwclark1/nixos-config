@@ -6,6 +6,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import "../../services"
 import "../../widgets" as SharedWidgets
+import "../../shared"
 import "DisplayConfigHelpers.js" as Helpers
 
 PanelWindow {
@@ -381,7 +382,7 @@ PanelWindow {
       anchors.fill: parent
       color: Colors.background
       opacity: displayRoot.isOpen ? 0.55 : 0.0
-      Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+      Behavior on opacity { Anim {} }
     }
   }
 
@@ -917,7 +918,7 @@ PanelWindow {
           color: displayRoot.applyInProgress
                  ? Colors.withAlpha(Colors.primary, 0.4)
                  : Colors.primary
-          Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on color { CAnim {} }
 
           RowLayout {
             anchors.centerIn: parent

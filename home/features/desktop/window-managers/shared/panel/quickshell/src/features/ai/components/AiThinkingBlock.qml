@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 
 // Collapsible thinking block for extended-thinking model responses.
 // Instantiated via Loader; the Loader delegate provides `modelData` (blockData).
@@ -43,7 +44,7 @@ Rectangle {
             font.pixelSize: Colors.fontSizeSmall
 
             Behavior on rotation {
-                NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic }
+                Anim { duration: Colors.durationFast }
             }
         }
 

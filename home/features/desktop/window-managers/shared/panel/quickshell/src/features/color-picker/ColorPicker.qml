@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import "../../services"
 import "../../services/ColorUtils.js" as ColorUtils
 import "../../widgets" as SharedWidgets
+import "../../shared"
 
 PanelWindow {
   id: root
@@ -460,7 +461,7 @@ PanelWindow {
           color: Colors.bgWidget
           border.color: hexInput.activeFocus ? Colors.primary : Colors.border
           border.width: 1
-          Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+          Behavior on border.color { CAnim {} }
 
           RowLayout {
             anchors { fill: parent; leftMargin: Colors.spacingM; rightMargin: Colors.spacingM }
