@@ -242,12 +242,15 @@ QtObject {
       + "cpu_temp=$(echo \"$sensors_out\" | awk '/Tctl:|Package id 0:|Tdie:|Core 0:/ {gsub(/[+°C]/, \"\", $0); for(i=1;i<=NF;i++) if($i ~ /^[0-9.]+$/) {print $i; exit}}'); "
       + "gpu_temp=$(echo \"$sensors_out\" | awk '/edge:|junction:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
       + "if [ -z \"$gpu_temp\" ] && command -v nvidia-smi >/dev/null 2>&1; then gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
-      + "cpu_usage=$(top -bn1 | awk '/Cpu\\(s\\):/ {for(i=1;i<=NF;i++) if($i ~ /id,?/) {printf \"%d\", 100-$(i-1); exit}}'); "
+      + "cpu_raw=$(grep '^cpu ' /proc/stat); "
       + "gpu_usage=$(cat /sys/class/drm/card{1,0}/device/gpu_busy_percent 2>/dev/null | head -1); "
       + "if [ -z \"$gpu_usage\" ] && command -v nvidia-smi >/dev/null 2>&1; then gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
       + "ram_stats=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; printf \"%.1fGB\\n%.4f\", used/1024/1024, used/total}' /proc/meminfo); "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n' \"$cpu_temp\" \"$gpu_temp\" \"$cpu_usage\" \"$gpu_usage\" \"$ram_stats\""
+      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n' \"$cpu_temp\" \"$gpu_temp\" \"$cpu_raw\" \"$gpu_usage\" \"$ram_stats\""
     ]
+
+    property var lastTotal: 0
+    property var lastIdle: 0
 
     onUpdated: {
       var lines = root.parseStatsOutput(this.value);
@@ -255,12 +258,37 @@ QtObject {
         root.cpuTemp = root.formatTemp(lines[0]);
         root.gpuTemp = root.formatTemp(lines[1]);
 
-        var cpuRaw = lines[2] || "";
-        var cpuVal = parseInt(cpuRaw, 10);
-        if (!isNaN(cpuVal)) {
-          root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
-          root.cpuPercent = Colors.clamp01(cpuVal / 100);
-          root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
+        // CPU Usage calculation via /proc/stat delta
+        var cpuParts = (lines[2] || "").split(/\s+/);
+        if (cpuParts.length >= 5) {
+          // cpu  user nice system idle iowait irq softirq steal guest guest_nice
+          // index: 0    1    2      3    4      5   6       7     8     9         10
+          var user = parseInt(cpuParts[1], 10) || 0;
+          var nice = parseInt(cpuParts[2], 10) || 0;
+          var system = parseInt(cpuParts[3], 10) || 0;
+          var idle = parseInt(cpuParts[4], 10) || 0;
+          var iowait = parseInt(cpuParts[5], 10) || 0;
+          var irq = parseInt(cpuParts[6], 10) || 0;
+          var softirq = parseInt(cpuParts[7], 10) || 0;
+          var steal = parseInt(cpuParts[8], 10) || 0;
+
+          var currentTotal = user + nice + system + idle + iowait + irq + softirq + steal;
+          var currentIdle = idle + iowait;
+
+          if (this.lastTotal > 0) {
+            var totalDiff = currentTotal - this.lastTotal;
+            var idleDiff = currentIdle - this.lastIdle;
+
+            if (totalDiff > 0) {
+              var usage = 1.0 - (idleDiff / totalDiff);
+              var cpuVal = Math.round(usage * 100);
+              root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
+              root.cpuPercent = Colors.clamp01(usage);
+              root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
+            }
+          }
+          this.lastTotal = currentTotal;
+          this.lastIdle = currentIdle;
         }
 
         var gpuRaw = lines[3] || "";
