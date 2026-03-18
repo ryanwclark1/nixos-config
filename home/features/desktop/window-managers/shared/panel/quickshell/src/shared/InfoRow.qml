@@ -7,6 +7,7 @@ RowLayout {
 
   property string label: ""
   property string value: ""
+  property color valueColor: Colors.text
 
   spacing: Colors.spacingS
 
@@ -23,7 +24,7 @@ RowLayout {
 
   Text {
     text: root.value
-    color: Colors.text
+    color: root.valueColor
     font.pixelSize: Colors.fontSizeSmall
     font.weight: Font.DemiBold
     elide: Text.ElideRight
