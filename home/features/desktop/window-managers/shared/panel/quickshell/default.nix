@@ -431,6 +431,7 @@ EOF
       Service = {
         Type = "oneshot";
         ExecStart = "${healthCheckScript}/bin/qs-health-check --apply-safe-fixes";
+        SuccessExitStatus = [ 20 ];
         StandardOutput = "journal";
         StandardError = "journal";
       };

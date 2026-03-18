@@ -1,5 +1,4 @@
 {
-  lib,
   pkgs,
   ...
 }:
@@ -13,9 +12,20 @@
 
   systemd.user.services.hypridle = {
     Unit = {
+      Description = "Hyprland's idle daemon";
       ConditionEnvironment = "WAYLAND_DISPLAY";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
     };
 
-    Install = lib.mkForce { };
+    Service = {
+      ExecStart = "${pkgs.hypridle}/bin/hypridle";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
   };
 }

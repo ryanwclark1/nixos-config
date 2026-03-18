@@ -5,6 +5,9 @@
   ...
 }:
 
+let
+  wgEndpointPeer = "zgZzw342CCMDrIjW2/sFf7ixAYR881h6LOG8hVDoclw=";
+in
 {
   environment.systemPackages = [
     pkgs.wireguard-tools
@@ -57,8 +60,29 @@
       # `networking.wireguard` does not shell-expand endpoint strings, so keep
       # endpoint material in a secret and apply it after the interface comes up.
       postSetup = ''
-        endpoint="$(tr -d '\n' < ${config.sops.secrets.accent-wg-server.path})"
-        ${pkgs.wireguard-tools}/bin/wg set wg0 peer zgZzw342CCMDrIjW2/sFf7ixAYR881h6LOG8hVDoclw= endpoint "$endpoint"
+        endpoint="$(tr -d '[:space:]' < ${config.sops.secrets.accent-wg-server.path})"
+        host="''${endpoint%:*}"
+        port="''${endpoint##*:}"
+
+        if [ -z "$host" ] || [ -z "$port" ] || [ "$host" = "$endpoint" ]; then
+          echo "Invalid WireGuard endpoint format in accent-wg-server secret" >&2
+          exit 1
+        fi
+
+        resolved_ip=""
+        for _attempt in 1 2 3 4 5; do
+          resolved_ip="$(${pkgs.getent}/bin/getent ahostsv4 "$host" | ${pkgs.gawk}/bin/awk 'NR == 1 { print $1; exit }')"
+          if [ -n "$resolved_ip" ]; then
+            break
+          fi
+          sleep 2
+        done
+
+        if [ -n "$resolved_ip" ]; then
+          ${pkgs.wireguard-tools}/bin/wg set wg0 peer ${wgEndpointPeer} endpoint "$resolved_ip:$port"
+        else
+          echo "Warning: unable to resolve WireGuard endpoint $host after retries; leaving peer endpoint unchanged" >&2
+        fi
       '';
     };
   };
@@ -66,7 +90,7 @@
   # Ensure WireGuard starts after SOPS secrets are decrypted
   # This is important for services that depend on encrypted secrets
   # Extend the auto-generated service without replacing it
-  systemd.services.wg-quick-wg0 = {
+  systemd.services.wireguard-wg0 = {
     after = lib.mkAfter [
       "network-online.target"
       "sops-nix.service"
@@ -75,6 +99,8 @@
       "network-online.target"
       "sops-nix.service"
     ];
+    serviceConfig.Restart = "on-failure";
+    serviceConfig.RestartSec = "10s";
     restartTriggers = [
       config.sops.secrets.wg-key.path
       config.sops.secrets.accent-wg-server.path

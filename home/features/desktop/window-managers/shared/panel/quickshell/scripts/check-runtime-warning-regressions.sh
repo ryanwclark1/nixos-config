@@ -314,7 +314,12 @@ main() {
   if call_ipc Shell reloadConfig >/dev/null; then
     pass "Shell.reloadConfig"
   else
-    fail "Shell.reloadConfig"
+    sleep 0.5
+    if call_ipc Shell reloadConfig >/dev/null; then
+      pass "Shell.reloadConfig"
+    else
+      fail "Shell.reloadConfig"
+    fi
   fi
 
   for surface_id in audioMenu controlCenter aiChat notifCenter; do

@@ -637,7 +637,6 @@ QtObject {
 
             case "/clear":
                 clearConversation(activeConversationId);
-                _addSystemMessage("Conversation cleared.");
                 return true;
 
             case "/model":

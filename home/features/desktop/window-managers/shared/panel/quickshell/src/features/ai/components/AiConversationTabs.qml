@@ -310,7 +310,7 @@ RowLayout {
                         onClicked: mouse => {
                             tabStateLayer.burst(mouse.x, mouse.y);
                             if (mouse.button === Qt.RightButton) {
-                                var pos = tabDelegate.mapToItem(root, 0, tabDelegate.height);
+                                var pos = tabDelegate.mapToItem(root.parent, 0, tabDelegate.height);
                                 tabContextMenu.model = root._buildTabContextModel(modelData);
                                 tabContextMenu.popup(pos.x, pos.y + Colors.spacingXS);
                                 return;
@@ -372,7 +372,7 @@ RowLayout {
                         })(conv.id)
                     });
                 }
-                var pos = parent.mapToItem(root, 0, parent.height);
+                var pos = parent.mapToItem(root.parent, 0, parent.height);
                 overflowMenu.model = model;
                 overflowMenu.popup(pos.x, pos.y + Colors.spacingXS);
             }
@@ -423,9 +423,11 @@ RowLayout {
 
     SharedWidgets.ContextMenu {
         id: tabContextMenu
+        parent: root.parent
     }
 
     SharedWidgets.ContextMenu {
         id: overflowMenu
+        parent: root.parent
     }
 }

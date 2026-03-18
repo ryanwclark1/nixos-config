@@ -50,10 +50,10 @@ BasePopupMenu {
   Rectangle {
     visible: PrinterService.hasPrinters
     Layout.fillWidth: true
-    implicitHeight: statusGrid.implicitHeight + 16
+    implicitHeight: statusGrid.implicitHeight + 32
     radius: Colors.radiusMedium
-    color: Colors.cardSurface
-    border.color: Colors.border
+    color: Colors.primaryGhost
+    border.color: Colors.primarySubtle
     border.width: 1
 
     GridLayout {
@@ -61,18 +61,19 @@ BasePopupMenu {
       anchors {
         left: parent.left
         right: parent.right
-        top: parent.top
-        margins: Colors.spacingM
+        verticalCenter: parent.verticalCenter
+        leftMargin: Colors.spacingL
+        rightMargin: Colors.spacingL
       }
       columns: root.compactMode ? 1 : (PrinterService.activeJobs > 0 ? 3 : 2)
-      columnSpacing: Colors.spacingM
+      columnSpacing: Colors.spacingL
       rowSpacing: Colors.spacingS
 
       ColumnLayout {
-        spacing: Colors.spacingXXS
+        spacing: 0
         Text {
           text: PrinterService.printers.length
-          color: Colors.text
+          color: Colors.primary
           font.pixelSize: Colors.fontSizeHuge
           font.weight: Font.Bold
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
@@ -80,8 +81,9 @@ BasePopupMenu {
         Text {
           text: "printer" + (PrinterService.printers.length !== 1 ? "s" : "")
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
-          font.weight: Font.Medium
+          font.pixelSize: Colors.fontSizeXXS
+          font.weight: Font.Bold
+          font.capitalization: Font.AllUppercase
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
         }
       }
@@ -90,10 +92,11 @@ BasePopupMenu {
         Layout.fillWidth: true
         spacing: Colors.spacingXXS
         Text {
-          text: "Default"
+          text: "System Default"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
-          font.weight: Font.Medium
+          font.pixelSize: Colors.fontSizeXXS
+          font.weight: Font.Bold
+          font.capitalization: Font.AllUppercase
         }
         Text {
           text: PrinterService.defaultPrinter || "None set"
@@ -107,7 +110,7 @@ BasePopupMenu {
 
       ColumnLayout {
         visible: PrinterService.activeJobs > 0
-        spacing: Colors.spacingXXS
+        spacing: 0
         Text {
           text: PrinterService.activeJobs
           color: Colors.warning
@@ -118,8 +121,9 @@ BasePopupMenu {
         Text {
           text: "active job" + (PrinterService.activeJobs !== 1 ? "s" : "")
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
-          font.weight: Font.Medium
+          font.pixelSize: Colors.fontSizeXXS
+          font.weight: Font.Bold
+          font.capitalization: Font.AllUppercase
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
         }
       }
@@ -189,7 +193,7 @@ BasePopupMenu {
               // Top row: icon + name + status badge
               RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.paddingSmall
+                spacing: Colors.spacingM
 
                 // Printer icon
                 Text {
@@ -211,16 +215,7 @@ BasePopupMenu {
                     Layout.fillWidth: true
                     spacing: Colors.spacingS
 
-                    Text {
-                      text: modelData.name
-                      color: printerCard.isDisabled ? Colors.textSecondary : Colors.text
-                      font.pixelSize: Colors.fontSizeMedium
-                      font.weight: Font.DemiBold
-                      elide: Text.ElideRight
-                      Layout.fillWidth: true
-                    }
-
-                    // Default badge
+                    // Default badge (placed BEFORE name to avoid right-side collision)
                     Rectangle {
                       visible: printerCard.isDefault
                       implicitWidth: defaultBadgeLabel.implicitWidth + 12
@@ -233,9 +228,19 @@ BasePopupMenu {
                         anchors.centerIn: parent
                         text: "Default"
                         color: Colors.primary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.DemiBold
+                        font.pixelSize: Colors.fontSizeXXS
+                        font.weight: Font.Bold
+                        font.capitalization: Font.AllUppercase
                       }
+                    }
+
+                    Text {
+                      text: modelData.name
+                      color: printerCard.isDisabled ? Colors.textSecondary : Colors.text
+                      font.pixelSize: Colors.fontSizeMedium
+                      font.weight: Font.DemiBold
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
                     }
                   }
 
