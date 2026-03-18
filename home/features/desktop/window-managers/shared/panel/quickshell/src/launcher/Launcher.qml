@@ -19,6 +19,7 @@ import "LauncherSystemItems.js" as SystemItems
 import "LauncherHomeBuilder.js" as HomeBuilder
 import "LauncherCategoryHelpers.js" as CategoryHelpers
 import "LauncherTextHelpers.js" as TextHelpers
+import "LauncherWebProviders.js" as WebProviders
 import "EmojiData.js" as EmojiData
 
 PanelWindow {
@@ -735,20 +736,11 @@ PanelWindow {
     }
 
     function primaryWebProvider() {
-        var list = configuredWebProviders();
-        return list.length > 0 ? list[0] : null;
+        return WebProviders.primaryProvider(configuredWebProviders());
     }
 
     function configuredWebProviderByKey(providerKey) {
-        var key = String(providerKey || "");
-        if (key === "")
-            return null;
-        var list = configuredWebProviders();
-        for (var i = 0; i < list.length; ++i) {
-            if (String(list[i].key || "") === key)
-                return list[i];
-        }
-        return null;
+        return WebProviders.providerByKey(configuredWebProviders(), providerKey);
     }
 
     function webAliasToProviderKey(token) {
@@ -762,19 +754,11 @@ PanelWindow {
     }
 
     function secondaryWebProvider() {
-        var list = configuredWebProviders();
-        if (list.length <= 1)
-            return null;
-        return list[1];
+        return WebProviders.secondaryProvider(configuredWebProviders());
     }
 
     function preferredWebProviderKey() {
-        if (Config.launcherRememberWebProvider) {
-            var persisted = String(Config.launcherWebLastProviderKey || "");
-            if (persisted !== "")
-                return persisted;
-        }
-        return String(_sessionWebProviderKey || "");
+        return WebProviders.preferredProviderKey(Config.launcherRememberWebProvider, Config.launcherWebLastProviderKey, _sessionWebProviderKey);
     }
 
     function applyRememberedWebProviderSelection() {
@@ -2529,21 +2513,11 @@ PanelWindow {
         var provider = providers[slot - 1];
         if (!provider)
             return false;
-        var webCtx = parseWebQuery(searchText);
-        var query = String(webCtx.query || "");
-        var target = "";
-        if (query !== "" && provider.exec)
-            target = String(provider.exec) + encodeURIComponent(query);
-        else
-            target = String(provider.home || provider.exec || "");
+        var query = String(parseWebQuery(searchText).query || "");
+        var target = WebProviders.buildWebTarget(provider, query);
         if (target === "")
             return false;
-        rememberRecent({
-            name: provider.name || "Web",
-            title: target,
-            icon: provider.icon || "󰖟",
-            exec: String(provider.exec || "")
-        });
+        rememberRecent(WebProviders.buildWebRecent(provider, target));
         Quickshell.execDetached(["xdg-open", target]);
         close();
         return true;
@@ -2552,15 +2526,7 @@ PanelWindow {
     function openSelectedWebHomepage() {
         if (mode !== "web" || filteredItems.length <= 0 || selectedIndex < 0 || selectedIndex >= filteredItems.length)
             return;
-        var item = filteredItems[selectedIndex];
-        var home = String(item.home || "");
-        if (home === "") {
-            var exec = String(item.exec || "");
-            var qIndex = exec.indexOf("?");
-            home = qIndex >= 0 ? exec.substring(0, qIndex) : exec;
-            if (home !== "" && home.charAt(home.length - 1) !== "/")
-                home += "/";
-        }
+        var home = WebProviders.deriveHomepage(filteredItems[selectedIndex]);
         if (home !== "") {
             Quickshell.execDetached(["xdg-open", home]);
             close();
@@ -2574,20 +2540,10 @@ PanelWindow {
         var provider = configuredWebProviderByKey(webCtx.providerKey) || primaryWebProvider();
         if (!provider)
             return;
-        var clean = webCtx.query;
-        var target = "";
-        if (clean !== "" && provider.exec)
-            target = String(provider.exec) + encodeURIComponent(clean);
-        else
-            target = String(provider.home || provider.exec || "");
+        var target = WebProviders.buildWebTarget(provider, webCtx.query);
         if (target === "")
             return;
-        rememberRecent({
-            name: provider.name || "Web",
-            title: target,
-            icon: provider.icon || "󰖟",
-            exec: String(provider.exec || "")
-        });
+        rememberRecent(WebProviders.buildWebRecent(provider, target));
         Quickshell.execDetached(["xdg-open", target]);
         close();
     }
@@ -2799,89 +2755,11 @@ PanelWindow {
         SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
         SharedWidgets.SurfaceGradient {}
 
-        Rectangle {
+        LauncherWindowChrome {
             id: windowChrome
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: launcherRoot.tightMode ? 34 : 44
-            radius: hudBox.radius
-            color: Colors.withAlpha(Colors.surface, 0.98)
-            border.color: Colors.border
-            border.width: 1
-
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: 1
-                color: Colors.border
-            }
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: launcherRoot.tightMode ? Colors.spacingS : Colors.spacingM
-                anchors.rightMargin: launcherRoot.tightMode ? Colors.spacingS : Colors.spacingM
-                spacing: launcherRoot.tightMode ? Colors.spacingXS : Colors.spacingS
-
-                Row {
-                    spacing: Colors.spacingS
-                    Repeater {
-                        model: [Qt.rgba(0.98, 0.36, 0.31, 0.9), Qt.rgba(0.96, 0.74, 0.28, 0.9), Qt.rgba(0.18, 0.8, 0.44, 0.9)]
-                        delegate: Rectangle {
-                            required property color modelData
-                            width: 12
-                            height: 12
-                            radius: width / 2
-                            color: modelData
-                            opacity: 0.9
-                            SharedWidgets.InnerHighlight { highlightOpacity: 0.2 }
-                        }
-                    }
-                }
-
-                Item { Layout.preferredWidth: Colors.spacingS }
-
-                Text {
-                    text: "Launcher"
-                    color: Colors.text
-                    font.pixelSize: launcherRoot.tightMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
-                    font.weight: Font.Black
-                    font.capitalization: Font.AllUppercase
-                    font.letterSpacing: Colors.letterSpacingWide
-                }
-
-                Rectangle {
-                    radius: Colors.radiusPill
-                    color: Colors.primaryMarked
-                    border.color: Colors.withAlpha(Colors.primary, 0.35)
-                    border.width: 1
-                    implicitHeight: launcherRoot.tightMode ? 22 : 24
-                    implicitWidth: chromeModeLabel.implicitWidth + 16
-
-                    Text {
-                        id: chromeModeLabel
-                        anchors.centerIn: parent
-                        text: ModeData.modeInfo(launcherRoot.mode).label
-                        color: Colors.primary
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.weight: Font.Black
-                        font.capitalization: Font.AllUppercase
-                    }
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                Text {
-                    visible: !launcherRoot.tightMode
-                    text: "V3.0"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Black
-                }
-            }
+            tightMode: launcherRoot.tightMode
+            mode: launcherRoot.mode
+            parentRadius: hudBox.radius
         }
 
         // Anti-flicker: track mouse movement after open to enable hover-select
@@ -3023,73 +2901,14 @@ PanelWindow {
                     }
                 }
 
-                Rectangle {
-                    id: metricsBox
-                    Layout.fillWidth: true
-                    visible: Config.launcherShowRuntimeMetrics && !launcherRoot.tightMode
-                    color: Colors.bgWidget
-                    radius: Colors.radiusMedium
-                    border.color: Colors.border
-                    border.width: 1
-                    implicitHeight: metricsLayout.implicitHeight + (Colors.spacingM * 2)
-
-                    RowLayout {
-                        id: metricsLayout
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingM
-
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Colors.spacingXXS
-                            Text {
-                                text: "Launcher Metrics"
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.weight: Font.DemiBold
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "opens " + launcherRoot.launcherMetrics.opens + " • cache " + launcherRoot.launcherMetrics.cacheHits + "/" + launcherRoot.launcherMetrics.cacheMisses + " • failures " + launcherRoot.launcherMetrics.commandFailures + " • filter avg " + (launcherRoot.launcherMetrics.avgFilterMs || 0) + "ms" + " / last " + (launcherRoot.launcherMetrics.lastFilterMs || 0) + "ms" + (launcherRoot.mode === "files" ? (" • backend " + launcherRoot.filesBackendLabel + " • fd/find " + (launcherRoot.launcherMetrics.filesFdLoads || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLoads || 0) + " • fd " + (launcherRoot.launcherMetrics.filesFdAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFdLastMs || 0) + "ms" + " • find " + (launcherRoot.launcherMetrics.filesFindAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesFindLastMs || 0) + "ms" + " • resolve " + (launcherRoot.launcherMetrics.filesResolveAvgMs || 0) + "/" + (launcherRoot.launcherMetrics.filesResolveLastMs || 0) + "ms") : "")
-                                color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                wrapMode: Text.WordWrap
-                            }
-                            Text {
-                                readonly property var modeStats: launcherRoot.modeMetric(launcherRoot.mode)
-                                Layout.fillWidth: true
-                                text: ModeData.modeInfo(launcherRoot.mode).label + ": avg " + modeStats.avgLoadMs + "ms" + " • last " + modeStats.lastLoadMs + "ms" + " • failures " + modeStats.failures + (launcherRoot.mode === "files" ? (" • cache " + launcherRoot.filesCacheStatsLabel) : "")
-                                color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-
-                        Rectangle {
-                            radius: Colors.radiusPill
-                            color: Colors.surface
-                            border.color: Colors.border
-                            border.width: 1
-                            implicitHeight: 28
-                            implicitWidth: metricResetText.implicitWidth + 18
-
-                            Text {
-                                id: metricResetText
-                                anchors.centerIn: parent
-                                text: "Reset"
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.DemiBold
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: launcherRoot.clearLauncherMetrics()
-                            }
-                        }
-                    }
+                LauncherMetricsBox {
+                    metrics: launcherRoot.launcherMetrics
+                    mode: launcherRoot.mode
+                    tightMode: launcherRoot.tightMode
+                    filesBackendLabel: launcherRoot.filesBackendLabel
+                    filesCacheStatsLabel: launcherRoot.filesCacheStatsLabel
+                    modeMetricFn: launcherRoot.modeMetric
+                    onResetRequested: launcherRoot.clearLauncherMetrics()
                 }
 
                 LauncherHome {
@@ -3120,39 +2939,8 @@ PanelWindow {
                             enabled: !launcherRoot.showingConfirm
                             topMargin: launcherRoot.compactMode ? Colors.spacingXXS : Colors.spacingXS
                             section.property: "sectionLabel"
-                            section.delegate: Item {
-                                width: resultsList.width
-                                height: launcherRoot.compactMode ? 26 : 30
-
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.topMargin: launcherRoot.compactMode ? Colors.spacingXXS : Colors.spacingXS
-                                    spacing: launcherRoot.compactMode ? Colors.spacingXS : Colors.spacingS
-
-                                    Rectangle {
-                                        radius: Colors.radiusPill
-                                        color: Colors.primarySubtle
-                                        border.color: Colors.primaryMarked
-                                        border.width: 1
-                                        implicitHeight: launcherRoot.compactMode ? 18 : 20
-                                        implicitWidth: sectionHeaderLabel.implicitWidth + (launcherRoot.compactMode ? 12 : 14)
-
-                                        SharedWidgets.SectionLabel {
-                                            id: sectionHeaderLabel
-                                            anchors.centerIn: parent
-                                            label: section
-                                            color: Colors.primary
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        Layout.fillWidth: true
-                                        Layout.alignment: Qt.AlignVCenter
-                                        implicitHeight: 1
-                                        radius: Colors.radiusXXXS
-                                        color: Colors.withAlpha(Colors.border, 0.9)
-                                    }
-                                }
+                            section.delegate: LauncherSectionHeader {
+                                compactMode: launcherRoot.compactMode
                             }
 
                             delegate: LauncherResultDelegate {
