@@ -20,7 +20,7 @@ QtObject {
 
     function _start() {
         if (CompositorAdapter.isHyprland) {
-            Quickshell.execDetached(["hyprctl", "dispatch", "exec", "hyprsunset -t " + temperature]);
+            CompositorAdapter.dispatchAction("exec", "hyprsunset -t " + temperature, "Night light");
         } else {
             Quickshell.execDetached(["wlsunset", "-T", temperature.toString()]);
         }
@@ -29,11 +29,8 @@ QtObject {
     }
 
     function _stop() {
-        if (CompositorAdapter.isHyprland) {
-            Quickshell.execDetached(["pkill", "-x", "hyprsunset"]);
-        } else {
-            Quickshell.execDetached(["pkill", "-x", "wlsunset"]);
-        }
+        // Both hyprsunset and wlsunset are standalone processes; pkill is compositor-agnostic
+        Quickshell.execDetached(["pkill", "-x", CompositorAdapter.isHyprland ? "hyprsunset" : "wlsunset"]);
         root.active = false;
         Config.nightLightEnabled = false;
     }

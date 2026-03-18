@@ -413,14 +413,7 @@ QtObject {
          + "  fi; "
          + "fi; ";
 
-    if (CompositorAdapter.isHyprland) {
-      script += "if [ \"$ok\" -eq 0 ] && command -v hyprctl >/dev/null 2>&1; then "
-         + "  hypr_target=\"${mon:+$mon,}${mon:-,}$img\"; "
-         + "  if hyprctl hyprpaper wallpaper \"$hypr_target\"; then "
-         + "    echo BACKEND:hyprpaper; ok=1; "
-         + "  fi; "
-         + "fi; ";
-    }
+    script += CompositorAdapter.wallpaperCompositorFallbackSnippet('"${mon:+$mon,}${mon:-,}$img"');
 
     script += "if [ \"$ok\" -eq 0 ] && command -v swaybg >/dev/null 2>&1; then "
          + "  pkill swaybg >/dev/null 2>&1 || true; "

@@ -2,8 +2,10 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "."
+import "../features/background"
 import "../features/desktop"
 import "../features/dock"
+import "../services"
 import "../shared"
 
 Item {
@@ -38,6 +40,18 @@ Item {
                     anchors.top: parent.top
                     anchors.leftMargin: 80
                     anchors.topMargin: 120
+                }
+
+                BackgroundVisualizer {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: parent.height * 0.4
+                    visible: Config.backgroundVisualizerEnabled
+                }
+
+                BackgroundClock {
+                    visible: Config.backgroundClockEnabled
                 }
             }
         }

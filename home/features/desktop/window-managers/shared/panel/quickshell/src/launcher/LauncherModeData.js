@@ -36,6 +36,25 @@ var modeIcons = {
     "settings": "󰒓", "devops": "󰒍", "orchestrator": "󰓅"
 };
 
+var modeDeps = {
+    "run": ["qs-run"],
+    "clip": ["cliphist", "wl-copy", "wl-paste"],
+    "keybinds": ["qs-keybinds"],
+    "bookmarks": ["qs-bookmarks"],
+    "wallpapers": ["qs-wallpapers"],
+    "ai": ["qs-ai", "wl-copy"]
+};
+
+function modeDependencies(key) {
+    return modeDeps[key] || [];
+}
+
+function missingDependencyMessage(key, cmd) {
+    if (key === "files")
+        return "Required command missing: " + cmd;
+    return "Install '" + cmd + "' to use " + modeInfo(key).label + " mode.";
+}
+
 function modeInfo(key) {
     return modeMeta[key] || { label: key.toUpperCase(), hint: "", prefix: "" };
 }

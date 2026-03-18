@@ -6,7 +6,8 @@ import Quickshell.Wayland
 QtObject {
     id: root
 
-    readonly property bool inhibiting: Config.idleInhibitEnabled
+    readonly property bool inhibiting: Config.idleInhibitEnabled || _mediaInhibit
+    readonly property bool _mediaInhibit: Config.inhibitIdleWhenPlaying && MediaService.isPlaying
     readonly property bool canUseIdleInhibitor: (Quickshell.env("QT_QPA_PLATFORM") || "").toLowerCase() !== "offscreen"
     property var _idleInhibitor: null
     property var _inhibitorWindow: null

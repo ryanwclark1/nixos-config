@@ -19,11 +19,6 @@ let
     ${builtins.readFile ./scripts/run.sh}
   '';
 
-  emojiScript = pkgs.writeShellScriptBin "qs-emoji" ''
-    PATH="${pkgs.coreutils}/bin:$PATH"
-    ${builtins.readFile ./scripts/emojis.sh}
-  '';
-
   wallpaperScript = pkgs.writeShellScriptBin "qs-wallpapers" ''
     PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:$PATH"
     ${builtins.readFile ./scripts/wallpapers.sh}
@@ -264,7 +259,6 @@ let
       # Quickshell utility scripts
       qsRofiScript
       runScript
-      emojiScript
       wallpaperScript
       keybindsScript
       aiScript

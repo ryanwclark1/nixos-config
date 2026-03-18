@@ -96,6 +96,44 @@ function ensureItemRankCache(item) {
     item._rankCacheReady = true;
 }
 
+function rankItem(item, clean, cleanLower, mode, weights) {
+    if (clean === "")
+        return 1;
+    if (mode === "files")
+        return rankFileItem(item, cleanLower);
+    ensureItemRankCache(item);
+    var categoryScore = mode === "drun" ? (fuzzyMatchLower(item._categoryKeywordsLower, cleanLower) * weights.category) : 0;
+    var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * weights.name, fuzzyMatchLower(item._titleLower, cleanLower) * weights.title, fuzzyMatchLower(item._execLower, cleanLower) * weights.exec, fuzzyMatchLower(item._bodyLower, cleanLower) * weights.body, categoryScore);
+    if (mode === "drun")
+        bestScore += Number(item._drunUsageBoost || 0);
+    return bestScore;
+}
+
+function rankFileItem(item, cleanLower) {
+    ensureItemRankCache(item);
+    // Fast reject: skip expensive fuzzy scoring when first query char absent
+    if (cleanLower !== ""
+        && item._relativePathLower.indexOf(cleanLower[0]) === -1
+        && item._extensionLower.indexOf(cleanLower[0]) === -1)
+        return 0;
+    var exactName = item._nameLower === cleanLower;
+    var namePrefix = cleanLower !== "" && item._nameLower.startsWith(cleanLower);
+    var relPrefix = cleanLower !== "" && item._relativePathLower.startsWith(cleanLower);
+    var parentPrefix = cleanLower !== "" && item._parentPathLower.startsWith(cleanLower);
+    var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * 2.2, fuzzyMatchLower(item._relativePathLower, cleanLower) * 1.2, fuzzyMatchLower(item._parentPathLower, cleanLower) * 0.75, fuzzyMatchLower(item._titleLower, cleanLower) * 0.65, fuzzyMatchLower(item._extensionLower, cleanLower) * 0.35);
+    if (exactName)
+        bestScore += 220;
+    else if (namePrefix)
+        bestScore += 160;
+    else if (relPrefix)
+        bestScore += 90;
+    else if (parentPrefix)
+        bestScore += 30;
+    bestScore -= Math.min(20, item._pathDepth * 2);
+    bestScore -= Math.min(16, Math.floor(item._relativePathLower.length / 24));
+    return bestScore;
+}
+
 // Safe arithmetic evaluator — handles +, -, *, /, parentheses, decimals.
 // Replaces eval() for calculator mode to eliminate code injection surface.
 function safeCalcEval(expr) {

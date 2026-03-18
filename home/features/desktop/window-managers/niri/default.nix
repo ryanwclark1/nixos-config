@@ -175,6 +175,9 @@
           # Power menu
           "Mod+Escape".action.spawn = [ "quickshell" "ipc" "call" "Shell" "toggleSurface" "powerMenu" ];
 
+          # Emergency close all Quickshell overlays (launcher, overview, menus)
+          "Mod+Shift+Escape".action.spawn = [ "quickshell" "ipc" "call" "Shell" "panicClose" ];
+
           # Clipboard history
           "Mod+V".action.spawn = [ "sh" "-c" "cliphist list | rofi -dmenu | cliphist decode | wl-copy" ];
           "Mod+Shift+V".action.spawn = [ "sh" "-c" "cliphist list | rofi -dmenu -theme ~/.config/rofi/style/cliphist.rasi | cliphist decode | wl-copy" ];

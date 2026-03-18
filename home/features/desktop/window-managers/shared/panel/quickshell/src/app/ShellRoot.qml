@@ -124,6 +124,18 @@ Scope {
         function closeAll() {
             root.closeAllSurfaces();
         }
+        // Emergency escape: closes all surfaces, forces launcher closed,
+        // and forces overview closed locally (bypasses Niri IPC).
+        // Bind this to a compositor hotkey as a last resort:
+        //   quickshell ipc call Shell panicClose
+        function panicClose() {
+            root.closeAllSurfaces();
+            launcher.close();
+            if (overview)
+                overview.forceClose();
+            if (altTabSwitcher.item && altTabSwitcher.item.hide)
+                altTabSwitcher.item.hide();
+        }
         function reloadConfig() {
             Config.load();
         }
@@ -204,26 +216,19 @@ Scope {
         id: workspaceOsd
     }
 
-    Loader {
-        id: overview
+    LazyLoader {
+        id: overviewLoader
         active: CompositorAdapter.supportsOverview
-        sourceComponent: CompositorAdapter.isNiri ? overviewNiriComponent : overviewComponent
+
+        Overview {
+            id: overview
+        }
     }
 
     Loader {
         id: altTabSwitcher
         active: CompositorAdapter.isNiri && NiriService.available
         sourceComponent: altTabSwitcherComponent
-    }
-
-    Component {
-        id: overviewComponent
-        Overview {}
-    }
-
-    Component {
-        id: overviewNiriComponent
-        OverviewNiri {}
     }
 
     Component {

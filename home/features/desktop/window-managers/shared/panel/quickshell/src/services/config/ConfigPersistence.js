@@ -123,6 +123,12 @@ var _MAPS = {
         ["gridSnap", "desktopWidgetsGridSnap"],
         ["monitorWidgets", "desktopWidgetsMonitorWidgets"]
     ],
+    background: [
+        ["visualizerEnabled", "backgroundVisualizerEnabled"],
+        ["clockEnabled", "backgroundClockEnabled"],
+        ["autoHide", "backgroundAutoHide"],
+        ["clockPosition", "backgroundClockPosition"]
+    ],
     screenBorders: [
         ["show", "showScreenBorders"]
     ],
@@ -134,7 +140,8 @@ var _MAPS = {
         ["mediaControls", "lockScreenMediaControls"],
         ["weather", "lockScreenWeather"],
         ["sessionButtons", "lockScreenSessionButtons"],
-        ["countdown", "lockScreenCountdown"]
+        ["countdown", "lockScreenCountdown"],
+        ["fingerprint", "lockScreenFingerprint"]
     ],
     privacy: [
         ["indicatorsEnabled", "privacyIndicatorsEnabled"],
@@ -162,6 +169,7 @@ var _MAPS = {
     ],
     power: [
         ["idleInhibit", "idleInhibitEnabled"],
+        ["inhibitIdleWhenPlaying", "inhibitIdleWhenPlaying"],
         ["acMonitorTimeout", "powerAcMonitorTimeout"],
         ["acLockTimeout", "powerAcLockTimeout"],
         ["acSuspendTimeout", "powerAcSuspendTimeout"],

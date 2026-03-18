@@ -46,6 +46,11 @@ QtObject {
             id: "recording",
             icon: "󰑊",
             label: "Recording"
+        },
+        {
+            id: "gameMode",
+            icon: "󰊗",
+            label: "Game Mode"
         }
     ]
     readonly property var visibleQuickToggleItems: orderedQuickToggleItems()
@@ -97,6 +102,8 @@ QtObject {
             return Services.CaffeineService.inhibiting;
         case "recording":
             return Services.RecordingService.isRecording;
+        case "gameMode":
+            return Services.GameModeService.active;
         default:
             return false;
         }
@@ -123,6 +130,9 @@ QtObject {
                 Services.RecordingService.stopRecording();
             else
                 Services.RecordingService.startRecording("fullscreen");
+            return;
+        case "gameMode":
+            Services.GameModeService.toggle();
             return;
         }
     }

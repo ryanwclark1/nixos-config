@@ -17,9 +17,11 @@ ColumnLayout {
     id: root
 
     property string title: ""
+    property string subtitle: ""
     property string icon: ""
     property bool expanded: true
     property alias headerColor: headerText.color
+    property alias headerExtras: headerExtrasContainer.data
 
     default property alias content: contentContainer.data
 
@@ -47,18 +49,12 @@ ColumnLayout {
             spacing: Colors.spacingS
 
             Text {
-                text: root.expanded ? "󰅀" : "󰅂"
+                text: "\u{f0140}"
                 color: Colors.textDisabled
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeSmall
-
-                Behavior on text {
-                    SequentialAnimation {
-                        NumberAnimation { target: parent; property: "opacity"; to: 0; duration: Colors.durationFlash }
-                        PropertyAction {}
-                        NumberAnimation { target: parent; property: "opacity"; to: 1; duration: Colors.durationFlash }
-                    }
-                }
+                rotation: root.expanded ? 0 : -90
+                Behavior on rotation { Anim { duration: Colors.durationFast } }
             }
 
             Text {
@@ -69,14 +65,29 @@ ColumnLayout {
                 font.pixelSize: Colors.fontSizeMedium
             }
 
-            Text {
-                id: headerText
-                text: root.title
-                color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
-                font.weight: Font.DemiBold
+            ColumnLayout {
                 Layout.fillWidth: true
+                spacing: 1
+
+                Text {
+                    id: headerText
+                    text: root.title
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.DemiBold
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    visible: !!root.subtitle
+                    text: root.subtitle
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    Layout.fillWidth: true
+                }
             }
+
+            Row { id: headerExtrasContainer; spacing: Colors.spacingXS }
         }
 
         MouseArea {
@@ -96,12 +107,7 @@ ColumnLayout {
         implicitHeight: root.expanded ? contentContainer.implicitHeight : 0
         clip: true
 
-        Behavior on implicitHeight {
-            NumberAnimation {
-                duration: Colors.durationNormal
-                easing.type: Easing.OutCubic
-            }
-        }
+        Behavior on implicitHeight { Anim {} }
 
         ColumnLayout {
             id: contentContainer

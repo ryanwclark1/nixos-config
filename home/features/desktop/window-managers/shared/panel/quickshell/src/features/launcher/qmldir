@@ -12,4 +12,6 @@ LauncherWebHints 1.0 ../../launcher/LauncherWebHints.qml
 LauncherWebProviderBar 1.0 ../../launcher/LauncherWebProviderBar.qml
 OrchestratorView 1.0 ../../launcher/OrchestratorView.qml
 Overview 1.0 ../../launcher/Overview.qml
+OverviewHyprland 1.0 ../../launcher/OverviewHyprland.qml
 OverviewNiri 1.0 ../../launcher/OverviewNiri.qml
+OverviewWindow 1.0 ../../launcher/OverviewWindow.qml

@@ -10,6 +10,10 @@ import "../services/ShellUtils.js" as SU
 import "../widgets" as SharedWidgets
 import "LauncherModeData.js" as ModeData
 import "LauncherSearch.js" as Search
+import "LauncherDiagnostics.js" as Diag
+import "LauncherFileParser.js" as FileParser
+import "LauncherExecutor.js" as Executor
+import "EmojiData.js" as EmojiData
 
 PanelWindow {
     id: launcherRoot
@@ -61,6 +65,14 @@ PanelWindow {
             });
     }
 
+    // Safety-net Escape: works even if focus falls to an unexpected item
+    // (Shortcut doesn't depend on the QML focus chain)
+    Shortcut {
+        enabled: launcherRoot.launcherOpacity > 0
+        sequence: "Escape"
+        onActivated: launcherRoot.handleEscapeAction()
+    }
+
     property string searchText: ""
     property var allItems: []
     property var filteredItems: []
@@ -103,6 +115,11 @@ PanelWindow {
     property string _lastFilterQuery: ""
     property string _lastFilterCategory: ""
     property var _lastFilterCandidates: []
+    property int _filterChunkToken: 0
+    property var _filterChunkState: null
+    property bool _filterChunking: false
+    property int _parseChunkToken: 0
+    property var _parseChunkState: null
     property var fileQueryCache: ({})
     property var fileQueryCacheTime: ({})
     property string fileSearchBackend: ""
@@ -117,9 +134,6 @@ PanelWindow {
     property int openCount: 0
     property int _requestToken: 0
     property var _activeRequests: ({})
-    property var commandAvailability: ({})
-    property var _commandCheckProcs: ({})
-    property var _commandWaiters: ({})
     property var mediaPlayers: []
     property var preloadFailureState: ({})
     property var launcherIconMap: ({})
@@ -192,7 +206,7 @@ PanelWindow {
         var source = Array.isArray(items) ? items : [];
         for (var i = 0; i < source.length; ++i) {
             var item = source[i];
-            ensureItemRankCache(item);
+            Search.ensureItemRankCache(item);
             updateDrunUsageCache(item);
         }
         return source;
@@ -243,7 +257,7 @@ PanelWindow {
     })
     readonly property var modeIcons: ModeData.modeIcons
     readonly property string emptyStateTitle: {
-        var clean = stripModePrefix(searchText).trim();
+        var clean = ModeData.stripModePrefix(searchText).trim();
         if (mode === "files") {
             if (clean.length < Config.launcherFileMinQueryLength)
                 return "Start typing to search Home";
@@ -258,7 +272,7 @@ PanelWindow {
         return "No results";
     }
     readonly property string emptyStateSubtitle: {
-        var clean = stripModePrefix(searchText).trim();
+        var clean = ModeData.stripModePrefix(searchText).trim();
         if (mode === "files") {
             if (clean.length < Config.launcherFileMinQueryLength)
                 return "Filename-first search across your home directory. Prefix with / to jump here from any mode.";
@@ -273,7 +287,7 @@ PanelWindow {
         return "Try another query or switch modes";
     }
     readonly property string emptyPrimaryCta: {
-        var clean = stripModePrefix(searchText).trim();
+        var clean = ModeData.stripModePrefix(searchText).trim();
         var webPrimary = primaryWebProvider();
         var webPrimaryName = webPrimary ? webPrimary.name : "Web";
         if (mode === "files")
@@ -293,11 +307,11 @@ PanelWindow {
         return "Switch to Apps";
     }
     readonly property string emptySecondaryCta: {
-        var clean = stripModePrefix(searchText).trim();
+        var clean = ModeData.stripModePrefix(searchText).trim();
         var webSecondary = secondaryWebProvider();
         var webSecondaryName = webSecondary ? webSecondary.name : "Google";
         if (mode === "files")
-            return fileQueryLooksLikePath(clean) ? "Open Folder" : (searchText !== "" ? "Clear Query" : "");
+            return FileParser.fileQueryLooksLikePath(clean) ? "Open Folder" : (searchText !== "" ? "Clear Query" : "");
         if (mode === "web")
             return clean !== "" ? "Search " + webSecondaryName : "Open " + webSecondaryName;
         if (mode === "system")
@@ -307,7 +321,7 @@ PanelWindow {
         return searchText !== "" ? "Clear Query" : "";
     }
     readonly property string emptyPrimaryHint: {
-        var clean = stripModePrefix(searchText).trim();
+        var clean = ModeData.stripModePrefix(searchText).trim();
         var webPrimary = primaryWebProvider();
         var webPrimaryName = webPrimary ? webPrimary.name : "default provider";
         if (mode === "files")
@@ -338,11 +352,11 @@ PanelWindow {
         return "󰀻";
     }
     readonly property string emptySecondaryHint: {
-        var clean = stripModePrefix(searchText).trim();
+        var clean = ModeData.stripModePrefix(searchText).trim();
         var webSecondary = secondaryWebProvider();
         var webSecondaryName = webSecondary ? webSecondary.name : "Google";
         if (mode === "files")
-            return fileQueryLooksLikePath(clean) ? "Open the folder implied by the current path-like query." : (searchText !== "" ? "Clear the current query text." : "");
+            return FileParser.fileQueryLooksLikePath(clean) ? "Open the folder implied by the current path-like query." : (searchText !== "" ? "Clear the current query text." : "");
         if (mode === "web")
             return clean !== "" ? "Search " + webSecondaryName + " using the current query." : "Open " + webSecondaryName + " homepage.";
         if (mode === "system")
@@ -397,7 +411,7 @@ PanelWindow {
             var label = primary ? primary.name : "Web";
             return "Enter: Search " + label;
         }
-        var action = itemActionLabel(selectedItem);
+        var action = Executor.itemActionLabel(mode, selectedItem);
         if (action === "")
             action = "Open";
         return "Enter: " + action;
@@ -472,7 +486,7 @@ PanelWindow {
         if (mode !== "web")
             return "";
         if (selectedItem)
-            return itemProviderLabel(selectedItem);
+            return Executor.itemProviderLabel(mode, selectedItem);
         return "";
     }
     readonly property string selectedWebProviderKey: {
@@ -584,6 +598,7 @@ PanelWindow {
             }
         }
         onExited: (exitCode, exitStatus) => {
+            commandTimeoutTimer.stop();
             var outputCb = launcherRoot.onCommandOutput;
             var errorCb = launcherRoot.onCommandError;
             var stdoutText = launcherRoot.commandStdoutBuffer || "";
@@ -646,7 +661,9 @@ PanelWindow {
                 launcherRoot._handleFileIndexBuilt(this.text || "", fileIndexProc._startedAt || Date.now());
             }
         }
+        stderr: StdioCollector {}
         onExited: exitCode => {
+            fileIndexTimeoutTimer.stop();
             if (exitCode !== 0 && launcherRoot.fileIndexBuilding) {
                 launcherRoot.fileIndexBuilding = false;
                 launcherRoot.fileIndexReady = false;
@@ -685,6 +702,52 @@ PanelWindow {
         onTriggered: launcherRoot.applySearchRefresh(true)
     }
 
+    // Kill commandProc if it runs longer than 10 seconds
+    Timer {
+        id: commandTimeoutTimer
+        interval: 10000
+        repeat: false
+        onTriggered: {
+            if (!commandProc.running)
+                return;
+            console.warn("Launcher: command timed out after 10s");
+            launcherRoot.suppressNextCommandExit = true;
+            commandProc.running = false;
+            if (!launcherRoot.pendingCommand && launcherRoot.modeLoadState === "loading")
+                launcherRoot.completeModeLoad(launcherRoot.mode, false, "Command timed out");
+        }
+    }
+
+    // Kill fileIndexProc if it runs longer than 30 seconds
+    Timer {
+        id: fileIndexTimeoutTimer
+        interval: 30000
+        repeat: false
+        onTriggered: {
+            if (!fileIndexProc.running)
+                return;
+            console.warn("Launcher: file index build timed out after 30s");
+            fileIndexProc.running = false;
+            launcherRoot.fileIndexBuilding = false;
+            if (launcherRoot.modeLoadState === "loading" && launcherRoot.mode === "files")
+                launcherRoot.completeModeLoad("files", false, "File index timed out");
+        }
+    }
+
+    Timer {
+        id: filterChunkTimer
+        interval: 0
+        repeat: false
+        onTriggered: launcherRoot._processFilterChunk()
+    }
+
+    Timer {
+        id: parseChunkTimer
+        interval: 0
+        repeat: false
+        onTriggered: launcherRoot._processParseChunk()
+    }
+
     Component {
         id: preloadProcComponent
         Process {
@@ -700,18 +763,8 @@ PanelWindow {
         }
     }
 
-    Component {
-        id: commandCheckProcComponent
-        Process {
-            id: _checkProc
-            property string _commandName: ""
-            running: false
-            stdout: StdioCollector {
-                onStreamFinished: {
-                    launcherRoot._finalizeCommandCheck(_checkProc, (this.text || "").trim() === "1");
-                }
-            }
-        }
+    LauncherDependencyChecker {
+        id: depChecker
     }
 
     Timer {
@@ -775,10 +828,6 @@ PanelWindow {
         launcherRoot.rememberCurrentWebProviderSelection();
     }
 
-    function modeInfo(key) {
-        return ModeData.modeInfo(key);
-    }
-
     function computeModeOrder() {
         var order = ModeData.sanitizeModeList(Config.launcherModeOrder, defaultModeOrder, allKnownModes);
         var enabled = ModeData.sanitizeModeList(Config.launcherEnabledModes, defaultModeOrder, allKnownModes);
@@ -825,117 +874,6 @@ PanelWindow {
             }
         ];
         filterItems();
-    }
-
-    function modeDependencies(modeKey) {
-        if (modeKey === "drun")
-            return [];
-        if (modeKey === "run")
-            return ["qs-run"];
-        if (modeKey === "emoji")
-            return ["qs-emoji"];
-        if (modeKey === "clip")
-            return ["cliphist", "wl-copy", "wl-paste"];
-        if (modeKey === "keybinds")
-            return ["qs-keybinds"];
-        if (modeKey === "bookmarks")
-            return ["qs-bookmarks"];
-        if (modeKey === "wallpapers")
-            return ["qs-wallpapers"];
-        if (modeKey === "ai")
-            return ["qs-ai", "wl-copy"];
-        if (modeKey === "files")
-            return [];
-        if (modeKey === "plugins")
-            return [];
-        return [];
-    }
-
-    function missingDependencyMessage(modeKey, cmd) {
-        if (modeKey === "files")
-            return "Required command missing: " + cmd;
-        return "Install '" + cmd + "' to use " + modeInfo(modeKey).label + " mode.";
-    }
-
-    function checkCommandAvailable(cmd, callback) {
-        if (!cmd) {
-            callback(false);
-            return;
-        }
-        if (DependencyService.knows(cmd)) {
-            callback(DependencyService.isAvailable(cmd));
-            return;
-        }
-        if (commandAvailability[cmd] !== undefined) {
-            callback(commandAvailability[cmd] === true);
-            return;
-        }
-        if (_commandCheckProcs[cmd]) {
-            var queued = _commandWaiters[cmd] || [];
-            queued.push(callback);
-            var queuedMap = Object.assign({}, _commandWaiters);
-            queuedMap[cmd] = queued;
-            _commandWaiters = queuedMap;
-            return;
-        }
-
-        var proc = commandCheckProcComponent.createObject(launcherRoot);
-        proc._commandName = cmd;
-        proc.command = ["sh", "-c", "command -v \"$1\" >/dev/null 2>&1 && echo 1 || echo 0", "sh", cmd];
-        var nextProcMap = Object.assign({}, _commandCheckProcs);
-        nextProcMap[cmd] = proc;
-        _commandCheckProcs = nextProcMap;
-
-        var waiters = Object.assign({}, _commandWaiters);
-        waiters[cmd] = [callback];
-        _commandWaiters = waiters;
-        proc.running = true;
-    }
-
-    function _finalizeCommandCheck(proc, ok) {
-        var cmd = proc._commandName;
-        var nextAvailability = Object.assign({}, commandAvailability);
-        nextAvailability[cmd] = ok;
-        commandAvailability = nextAvailability;
-        var next = Object.assign({}, _commandCheckProcs);
-        delete next[cmd];
-        _commandCheckProcs = next;
-        var waiters = _commandWaiters[cmd] || [];
-        var nextWaiters = Object.assign({}, _commandWaiters);
-        delete nextWaiters[cmd];
-        _commandWaiters = nextWaiters;
-        for (var i = 0; i < waiters.length; ++i) {
-            try {
-                waiters[i](ok);
-            } catch (e) {}
-        }
-        proc.destroy();
-    }
-
-    function ensureModeDependencies(modeKey, onReady) {
-        var deps = modeDependencies(modeKey);
-        if (!deps || deps.length === 0) {
-            onReady(true, "");
-            return;
-        }
-
-        var pending = deps.length;
-        var failed = "";
-        for (var i = 0; i < deps.length; ++i) {
-            (function (depName) {
-                    checkCommandAvailable(depName, function (ok) {
-                        if (!ok && failed === "")
-                            failed = depName;
-                        pending--;
-                        if (pending === 0)
-                            onReady(failed === "", failed);
-                    });
-                })(deps[i]);
-        }
-    }
-
-    function stripModePrefix(text) {
-        return ModeData.stripModePrefix(text);
     }
 
     readonly property var _cachedWebProviders: ModeData.configuredWebProviders(Config.launcherWebProviderOrder)
@@ -1075,14 +1013,6 @@ PanelWindow {
         fileIndexBuiltAt = 0;
     }
 
-    function invalidateCommandAvailability(cmd) {
-        if (commandAvailability[cmd] === undefined)
-            return;
-        var nextAvailability = Object.assign({}, commandAvailability);
-        delete nextAvailability[cmd];
-        commandAvailability = nextAvailability;
-    }
-
     function getFileQueryCached(queryKey) {
         var items = fileQueryCache[queryKey];
         if (!items)
@@ -1159,21 +1089,37 @@ PanelWindow {
         if (mode === "files" && fileIndexItems.length === 0)
             beginModeLoad("files", "Building file index");
         fileIndexProc._startedAt = Date.now();
-        fileIndexProc.command = ["bash", "-lc", "cd \"$1\" && fd --hidden --exclude .git --exclude .cache --exclude node_modules --exclude .local/share/Trash --exclude .local/share/Steam --exclude .cargo --exclude .npm --exclude .mozilla . 2>/dev/null", "bash", homeDir];
+        fileIndexProc.command = ["fd", "--hidden", "--base-directory", homeDir, "--max-depth", "8",
+            "--max-results", "50000",
+            "--exclude", ".git", "--exclude", ".cache", "--exclude", "node_modules",
+            "--exclude", ".local/share/Trash", "--exclude", ".local/share/Steam",
+            "--exclude", ".cargo", "--exclude", ".npm", "--exclude", ".mozilla",
+            "."];
         fileIndexProc.running = true;
+        fileIndexTimeoutTimer.restart();
     }
 
     function _handleFileIndexBuilt(raw, startedAt) {
+        fileIndexTimeoutTimer.stop();
         var tookMs = Math.max(0, Date.now() - startedAt);
         fileIndexBuilding = false;
-        fileIndexItems = buildFileItemsFromRaw(raw, Quickshell.env("HOME") || "/");
-        fileIndexReady = true;
-        fileIndexBuiltAt = Date.now();
-        recordFilesBackendLoad("fd", tookMs);
-        if (mode === "files" && stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength)
-            loadFiles();
-        else if (mode === "files" && modeLoadState === "loading")
-            completeModeLoad("files", true, "");
+        var homeDir = Quickshell.env("HOME") || "/";
+        function _finishIndex(items) {
+            fileIndexItems = items;
+            fileIndexReady = true;
+            fileIndexBuiltAt = Date.now();
+            recordFilesBackendLoad("fd", tookMs);
+            if (mode === "files" && ModeData.stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength)
+                loadFiles();
+            else if (mode === "files" && modeLoadState === "loading")
+                completeModeLoad("files", true, "");
+        }
+        // Estimate line count cheaply: raw length > ~500KB likely means >10k lines
+        if (raw && raw.length > 500000) {
+            _startChunkedParse(raw, homeDir, _finishIndex);
+        } else {
+            _finishIndex(FileParser.buildFileItemsFromRaw(raw, homeDir));
+        }
     }
 
     function recordFilesBackendLoad(backend, durationMs) {
@@ -1305,7 +1251,7 @@ PanelWindow {
         if (mode === "drun") {
             if (!drunCategoryFiltersEnabled)
                 return "Applications";
-            ensureItemRankCache(item);
+            Search.ensureItemRankCache(item);
             var drunKey = String(item._primaryCategoryKey || "");
             return drunKey === "" ? "Applications" : formatDrunCategoryLabel(drunKey);
         }
@@ -1357,7 +1303,7 @@ PanelWindow {
         var key = String(categoryKey || "");
         if (key === "")
             return true;
-        ensureItemRankCache(item);
+        Search.ensureItemRankCache(item);
         var tokens = item._categoryTokens || [];
         for (var i = 0; i < tokens.length; ++i) {
             if (tokens[i] === key)
@@ -1381,7 +1327,7 @@ PanelWindow {
         var labels = ({});
         for (var i = 0; i < source.length; ++i) {
             var app = source[i];
-            ensureItemRankCache(app);
+            Search.ensureItemRankCache(app);
             var key = String(app._primaryCategoryKey || "");
             if (key === "")
                 continue;
@@ -1549,12 +1495,12 @@ PanelWindow {
             usageRanked.sort(function (a, b) {
                 if ((b._usage || 0) !== (a._usage || 0))
                     return (b._usage || 0) - (a._usage || 0);
-                return compareLauncherItemsAlpha(a, b);
+                return Search.compareLauncherItemsAlpha(a, b);
             });
             recent.sort(function (a, b) {
                 if ((b._recent || 0) !== (a._recent || 0))
                     return (b._recent || 0) - (a._recent || 0);
-                return compareLauncherItemsAlpha(a, b);
+                return Search.compareLauncherItemsAlpha(a, b);
             });
             if (drunCategoryFilter !== "") {
                 recent = recent.filter(function (item) {
@@ -1652,9 +1598,9 @@ PanelWindow {
                 searchInputComp.searchInput.forceActiveFocus();
         });
 
-        ensureModeDependencies(mode, function (ok, missingCmd) {
+        depChecker.ensureModeDependencies(mode, function (ok, missingCmd) {
             if (!ok) {
-                setModeHint("Dependency missing", missingDependencyMessage(mode, missingCmd), "󰋼");
+                setModeHint("Dependency missing", ModeData.missingDependencyMessage(mode, missingCmd), "󰋼");
                 completeModeLoad(mode, false, "Dependency missing");
                 return;
             }
@@ -1729,6 +1675,19 @@ PanelWindow {
         mouseTrackingDelayTimer.stop();
         searchDebounceTimer.stop();
         fileSearchDebounceTimer.stop();
+        commandTimeoutTimer.stop();
+        fileIndexTimeoutTimer.stop();
+        _cancelChunkedFilter();
+        _parseChunkToken++;
+        parseChunkTimer.stop();
+        _parseChunkState = null;
+        if (commandProc.running) {
+            suppressNextCommandExit = true;
+            pendingCommand = null;
+            pendingCommandOutput = null;
+            pendingCommandError = null;
+            commandProc.running = false;
+        }
         preloadDelayTimer.stop();
         preloadWaitTimer.stop();
         var _keys = Object.keys(_preloadProcs);
@@ -1798,6 +1757,7 @@ PanelWindow {
         commandStderrBuffer = "";
         commandProc.command = command;
         commandProc.running = true;
+        commandTimeoutTimer.restart();
     }
 
     function runCommand(command, callback, errorCallback) {
@@ -1918,7 +1878,7 @@ PanelWindow {
         if (shouldBackoffPreload("drun"))
             return;
 
-        ensureModeDependencies("drun", function (ok, _missingCmd) {
+        depChecker.ensureModeDependencies("drun", function (ok, _missingCmd) {
             if (!ok)
                 return;
             if (getCached("drun"))
@@ -1942,20 +1902,6 @@ PanelWindow {
         loadCached("bookmarks", DependencyService.resolveCommand("qs-bookmarks"), JSON.parse);
     }
 
-    function parseEmoji(raw) {
-        var lines = raw.split("\n");
-        var items = [];
-        for (var i = 0; i < lines.length; i++) {
-            if (lines[i].trim() !== "") {
-                var parts = lines[i].split(" ");
-                items.push({
-                    name: parts[0],
-                    title: parts.slice(1).join(" ")
-                });
-            }
-        }
-        return items;
-    }
 
     function clipModeItems(items) {
         return (Array.isArray(items) ? items : []).map(function (it) {
@@ -1967,9 +1913,22 @@ PanelWindow {
             };
         });
     }
-
     function loadEmojis() {
-        loadCached("emoji", DependencyService.resolveCommand("qs-emoji"), parseEmoji);
+        var cached = getCached("emoji");
+        if (cached) {
+            allItems = cached;
+            filterItems();
+            buildLauncherHome();
+            completeModeLoad("emoji", true, "");
+            recordLoadMetric("emoji", 0, true, true);
+            return;
+        }
+        setCached("emoji", EmojiData.emojis);
+        allItems = EmojiData.emojis;
+        filterItems();
+        buildLauncherHome();
+        completeModeLoad("emoji", true, "");
+        recordLoadMetric("emoji", 0, false, true);
     }
     function loadClip() {
         var startedAt = Date.now();
@@ -2012,10 +1971,6 @@ PanelWindow {
             "run": {
                 command: DependencyService.resolveCommand("qs-run"),
                 parse: JSON.parse
-            },
-            "emoji": {
-                command: DependencyService.resolveCommand("qs-emoji"),
-                parse: parseEmoji
             },
             "keybinds": {
                 command: DependencyService.resolveCommand("qs-keybinds"),
@@ -2062,7 +2017,7 @@ PanelWindow {
             return;
         if (shouldBackoffPreload("clip"))
             return;
-        ensureModeDependencies("clip", function(ok, _missingCmd) {
+        depChecker.ensureModeDependencies("clip", function(ok, _missingCmd) {
             if (!ok)
                 return;
             ClipboardHistoryService.ensureLoaded(function(items, errorText) {
@@ -2098,48 +2053,37 @@ PanelWindow {
         preloadWaitTimer.restart();
     }
 
-    function buildFileItemsFromRaw(raw, homeDir) {
+    function _startChunkedParse(raw, homeDir, callback) {
+        _parseChunkToken++;
         var lines = raw ? raw.split("\n") : [];
-        var items = new Array(lines.length);
-        var count = 0;
         var homePrefix = homeDir.endsWith("/") ? homeDir : (homeDir + "/");
-        for (var i = 0; i < lines.length; ++i) {
-            var path = String(lines[i] || "");
-            if (path === "")
-                continue;
-            var fullPath = path.charCodeAt(0) === 47 ? path : (homeDir + "/" + path);
-            var relativePath = fullPath.indexOf(homePrefix) === 0 ? fullPath.substring(homePrefix.length) : fullPath;
-            var slash = relativePath.lastIndexOf("/");
-            var name = slash >= 0 ? relativePath.substring(slash + 1) : relativePath;
-            if (name === "")
-                name = path;
-            var parentPath = slash >= 0 ? relativePath.substring(0, slash) : "";
-            var displayPath = parentPath !== "" ? ("~/" + parentPath) : "~";
-            var extension = "";
-            var extIndex = name.lastIndexOf(".");
-            if (extIndex > 0 && extIndex < (name.length - 1))
-                extension = name.substring(extIndex + 1);
-            var pathDepth = parentPath === "" ? 0 : parentPath.split("/").length;
-            items[count] = {
-                name: name,
-                title: fullPath,
-                fullPath: fullPath,
-                relativePath: relativePath,
-                parentPath: parentPath,
-                displayPath: displayPath,
-                extension: extension,
-                pathDepth: pathDepth
-            };
-            count += 1;
-        }
-        if (count < items.length)
-            items.length = count;
-        return items;
+        _parseChunkState = {
+            token: _parseChunkToken,
+            lines: lines,
+            homeDir: homeDir,
+            homePrefix: homePrefix,
+            items: new Array(lines.length),
+            idx: 0,
+            count: 0,
+            callback: callback
+        };
+        parseChunkTimer.restart();
     }
 
-    function fileQueryLooksLikePath(clean) {
-        var normalized = String(clean || "").trim();
-        return normalized.startsWith("/") || normalized.startsWith("~") || normalized.indexOf("/") !== -1;
+    function _processParseChunk() {
+        var state = _parseChunkState;
+        if (!state || state.token !== _parseChunkToken)
+            return;
+        var result = FileParser.processParseChunk(state, 5000);
+        if (state.token !== _parseChunkToken)
+            return;
+        if (result.done) {
+            var cb = state.callback;
+            _parseChunkState = null;
+            cb(result.items);
+        } else {
+            parseChunkTimer.restart();
+        }
     }
 
     function prewarmFileIndex() {
@@ -2160,11 +2104,11 @@ PanelWindow {
             }
             fileSearchBackend = "";
             fileSearchBackendResolvedAt = 0;
-            invalidateCommandAvailability("fd");
-            invalidateCommandAvailability("find");
+            depChecker.invalidateCommandAvailability("fd");
+            depChecker.invalidateCommandAvailability("find");
         }
         var startedAt = Date.now();
-        checkCommandAvailable("fd", function (fdOk) {
+        depChecker.checkCommandAvailable("fd", function (fdOk) {
             if (fdOk) {
                 fileSearchBackend = "fd";
                 fileSearchBackendResolvedAt = Date.now();
@@ -2172,7 +2116,7 @@ PanelWindow {
                 callback("fd");
                 return;
             }
-            checkCommandAvailable("find", function (findOk) {
+            depChecker.checkCommandAvailable("find", function (findOk) {
                 fileSearchBackend = findOk ? "find" : "none";
                 fileSearchBackendResolvedAt = Date.now();
                 recordFilesBackendResolveMetric(Date.now() - startedAt);
@@ -2192,169 +2136,79 @@ PanelWindow {
     }
 
     function filesBackendStatusObject() {
-        var modeStats = modeMetric("files");
-        var resolveRuns = launcherMetrics.filesResolveRuns || 0;
-        var resolveAvgMs = launcherMetrics.filesResolveAvgMs || 0;
-        var resolveLastMs = launcherMetrics.filesResolveLastMs || 0;
-        var filesFdLoads = launcherMetrics.filesFdLoads || 0;
-        var filesFindLoads = launcherMetrics.filesFindLoads || 0;
-        var filesFdAvgMs = launcherMetrics.filesFdAvgMs || 0;
-        var filesFdLastMs = launcherMetrics.filesFdLastMs || 0;
-        var filesFindAvgMs = launcherMetrics.filesFindAvgMs || 0;
-        var filesFindLastMs = launcherMetrics.filesFindLastMs || 0;
-        var fileCacheHits = modeStats.cacheHits || 0;
-        var fileCacheMisses = modeStats.cacheMisses || 0;
-        return ({
-                backend: filesBackendLabel,
-                backendRaw: String(fileSearchBackend || ""),
-                resolvedAt: fileSearchBackendResolvedAt,
-                indexReady: fileIndexReady,
-                indexBuilding: fileIndexBuilding,
-                indexSize: fileIndexItems.length,
-                metrics: ({
-                        filesResolveRuns: resolveRuns,
-                        filesResolveAvgMs: resolveAvgMs,
-                        filesResolveLastMs: resolveLastMs,
-                        filesFdLoads: filesFdLoads,
-                        filesFindLoads: filesFindLoads,
-                        filesFdAvgMs: filesFdAvgMs,
-                        filesFdLastMs: filesFdLastMs,
-                        filesFindAvgMs: filesFindAvgMs,
-                        filesFindLastMs: filesFindLastMs
-                    }),
-                cache: ({
-                        hits: fileCacheHits,
-                        misses: fileCacheMisses,
-                        hitRateLabel: filesCacheStatsLabel
-                    }),
-                // Backward-compatible flat fields for existing consumers.
-                resolveRuns: resolveRuns,
-                resolveAvgMs: resolveAvgMs,
-                resolveLastMs: resolveLastMs,
-                filesFdLoads: filesFdLoads,
-                filesFindLoads: filesFindLoads,
-                filesFdAvgMs: filesFdAvgMs,
-                filesFdLastMs: filesFdLastMs,
-                filesFindAvgMs: filesFindAvgMs,
-                filesFindLastMs: filesFindLastMs,
-                fileCacheHits: fileCacheHits,
-                fileCacheMisses: fileCacheMisses,
-                fileCacheHitRateLabel: filesCacheStatsLabel,
-                fileIndexReady: fileIndexReady,
-                fileIndexBuilding: fileIndexBuilding,
-                fileIndexSize: fileIndexItems.length
-            });
+        return Diag.filesBackendStatusObject({
+            filesBackendLabel: filesBackendLabel,
+            fileSearchBackend: fileSearchBackend,
+            fileSearchBackendResolvedAt: fileSearchBackendResolvedAt,
+            fileIndexReady: fileIndexReady,
+            fileIndexBuilding: fileIndexBuilding,
+            fileIndexItemsLength: fileIndexItems.length,
+            launcherMetrics: launcherMetrics,
+            filesCacheStatsLabel: filesCacheStatsLabel,
+            modeMetricFn: modeMetric
+        });
     }
 
     function drunCategoryStateObject() {
-        var options = Array.isArray(drunCategoryOptions) ? drunCategoryOptions : [];
-        var normalized = [];
-        var active = null;
-        for (var i = 0; i < options.length; ++i) {
-            var raw = options[i] || ({});
-            var key = String(raw.key || "");
-            var label = String(raw.label || formatDrunCategoryLabel(key));
-            var count = Math.max(0, Math.round(Number(raw.count || 0)));
-            var hotkey = String(raw.hotkey || "");
-            var selected = key === drunCategoryFilter;
-            var item = ({
-                    key: key,
-                    label: label,
-                    count: count,
-                    hotkey: hotkey,
-                    selected: selected
-                });
-            if (selected && !active)
-                active = item;
-            normalized.push(item);
-        }
-
-        if (!active && normalized.length > 0) {
-            var fallback = normalized[0];
-            active = Object.assign({}, fallback, {
-                selected: true
-            });
-            normalized[0] = active;
-        }
-
-        var totalCount = normalized.length > 0 ? Math.max(0, Math.round(Number(normalized[0].count || 0))) : 0;
-        var activeCount = active ? Math.max(0, Math.round(Number(active.count || 0))) : totalCount;
-
-        return ({
-                enabled: drunCategoryFiltersEnabled === true,
-                mode: String(mode || ""),
-                showLauncherHome: showLauncherHome === true,
-                visible: launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1,
-                activeKey: active ? String(active.key || "") : "",
-                activeLabel: active ? String(active.label || "All") : "All",
-                activeCount: activeCount,
-                totalCount: totalCount,
-                options: normalized
-            });
+        return Diag.drunCategoryStateObject({
+            drunCategoryOptions: drunCategoryOptions,
+            drunCategoryFilter: drunCategoryFilter,
+            drunCategoryFiltersEnabled: drunCategoryFiltersEnabled,
+            mode: mode,
+            showLauncherHome: showLauncherHome,
+            formatLabelFn: formatDrunCategoryLabel
+        });
     }
 
     function escapeActionStateObject() {
-        var action = "close";
-        if (showingConfirm)
-            action = "cancelConfirm";
-        else if (searchText !== "")
-            action = "resetQuery";
-        else if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "")
-            action = "resetCategory";
-        else if (drunCategoryFiltersEnabled && mode === "drun" && drunCategorySectionExpanded)
-            action = "collapseCategorySummary";
-
-        return ({
-                action: action,
-                mode: String(mode || ""),
-                showingConfirm: showingConfirm === true,
-                hasQuery: searchText !== "",
-                searchText: String(searchText || ""),
-                hasCategoryFilter: drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "",
-                drunCategoryFilter: String(drunCategoryFilter || "")
-            });
+        return Diag.escapeActionStateObject({
+            showingConfirm: showingConfirm,
+            searchText: searchText,
+            drunCategoryFiltersEnabled: drunCategoryFiltersEnabled,
+            mode: mode,
+            drunCategoryFilter: drunCategoryFilter,
+            drunCategorySectionExpanded: drunCategorySectionExpanded
+        });
     }
 
     function launcherStateObject() {
-        return ({
-                visible: launcherOpacity > 0,
-                mode: String(mode || ""),
-                searchText: String(searchText || ""),
-                showLauncherHome: showLauncherHome === true,
-                drunCategoryFilter: String(drunCategoryFilter || ""),
-                drunCategorySectionExpanded: drunCategorySectionExpanded === true,
-                hasResults: filteredItems.length > 0,
-                loadState: String(modeLoadState || "idle"),
-                loadMessage: String(modeLoadMessage || ""),
-                allItemCount: allItems.length,
-                filteredItemCount: filteredItems.length,
-                recentCount: recentItems.length,
-                suggestionCount: suggestionItems.length,
-                fileIndexReady: fileIndexReady === true,
-                fileIndexBuilding: fileIndexBuilding === true,
-                fileIndexSize: fileIndexItems.length,
-                selectedIndex: selectedIndex,
-                resultCount: filteredItems.length,
-                windowWidth: width,
-                windowHeight: height,
-                screenWidth: screenRef ? screenRef.width : 0,
-                screenHeight: screenRef ? screenRef.height : 0,
-                actualViewportWidth: actualViewportWidth,
-                actualViewportHeight: actualViewportHeight,
-                viewportWidth: viewportWidth,
-                viewportHeight: viewportHeight,
-                usableWidth: usableWidth,
-                usableHeight: usableHeight,
-                actualUsableWidth: actualUsableWidth,
-                actualUsableHeight: actualUsableHeight,
-                diagnosticViewportOffsetX: diagnosticViewportOffsetX,
-                diagnosticViewportOffsetY: diagnosticViewportOffsetY,
-                hudX: hudBox.x,
-                hudY: hudBox.y + yOffset,
-                hudWidth: hudBox.width,
-                hudHeight: hudBox.height,
-                hudScale: scaleValue
-            });
+        return Diag.launcherStateObject({
+            launcherOpacity: launcherOpacity,
+            mode: mode,
+            searchText: searchText,
+            showLauncherHome: showLauncherHome,
+            drunCategoryFilter: drunCategoryFilter,
+            drunCategorySectionExpanded: drunCategorySectionExpanded,
+            filteredItemsLength: filteredItems.length,
+            modeLoadState: modeLoadState,
+            modeLoadMessage: modeLoadMessage,
+            allItemsLength: allItems.length,
+            recentItemsLength: recentItems.length,
+            suggestionItemsLength: suggestionItems.length,
+            fileIndexReady: fileIndexReady,
+            fileIndexBuilding: fileIndexBuilding,
+            fileIndexItemsLength: fileIndexItems.length,
+            selectedIndex: selectedIndex,
+            width: width,
+            height: height,
+            screenWidth: screenRef ? screenRef.width : 0,
+            screenHeight: screenRef ? screenRef.height : 0,
+            actualViewportWidth: actualViewportWidth,
+            actualViewportHeight: actualViewportHeight,
+            viewportWidth: viewportWidth,
+            viewportHeight: viewportHeight,
+            usableWidth: usableWidth,
+            usableHeight: usableHeight,
+            actualUsableWidth: actualUsableWidth,
+            actualUsableHeight: actualUsableHeight,
+            diagnosticViewportOffsetX: diagnosticViewportOffsetX,
+            diagnosticViewportOffsetY: diagnosticViewportOffsetY,
+            hudX: hudBox.x,
+            hudY: hudBox.y + yOffset,
+            hudWidth: hudBox.width,
+            hudHeight: hudBox.height,
+            hudScale: scaleValue
+        });
     }
 
     function diagnosticSetSearchText(text) {
@@ -2390,8 +2244,8 @@ PanelWindow {
         fileIndexReady = false;
         fileIndexBuilding = false;
         fileIndexBuiltAt = 0;
-        invalidateCommandAvailability("fd");
-        invalidateCommandAvailability("find");
+        depChecker.invalidateCommandAvailability("fd");
+        depChecker.invalidateCommandAvailability("find");
         resolveFileSearchBackend(function (backend) {
             if (shouldAnnounce)
                 showTransientNotice("Files backend re-detected: " + backend, 2600);
@@ -2417,10 +2271,31 @@ PanelWindow {
             return;
         }
         var cacheKey = String(searchQuery).toLowerCase();
-        var token = beginRequest("files");
         var startedAt = Date.now();
         var homeDir = Quickshell.env("HOME") || "/";
         var maxResults = Math.max(20, Config.launcherFileMaxResults);
+
+        // Fast path: index already loaded — filter in-memory, skip backend resolution
+        if (fileIndexReady && fileIndexItems.length > 0) {
+            allItems = fileIndexItems;
+            var cachedItems = getFileQueryCached(cacheKey);
+            if (cachedItems) {
+                filteredItems = decorateResultSections(cachedItems.slice(0, Config.launcherMaxResults));
+                selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
+                completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
+                recordLoadMetric("files", 0, true, true);
+                return;
+            }
+            filterItems();
+            setFileQueryCached(cacheKey, filteredItems.slice());
+            completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
+            recordLoadMetric("files", Date.now() - startedAt, false, true);
+            if (fileIndexStale() && !fileIndexBuilding)
+                buildFileIndex(homeDir);
+            return;
+        }
+
+        var token = beginRequest("files");
         beginModeLoad("files", "Searching files");
         resolveFileSearchBackend(function (backend) {
             if (!isRequestCurrent("files", token))
@@ -2436,17 +2311,8 @@ PanelWindow {
                 if (fileIndexStale() && !fileIndexBuilding)
                     buildFileIndex(homeDir);
 
-                var cachedItems = getFileQueryCached(cacheKey);
                 if (fileIndexItems.length > 0) {
                     allItems = fileIndexItems;
-                    if (cachedItems) {
-                        filteredItems = decorateResultSections(cachedItems.slice(0, Config.launcherMaxResults));
-                        selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
-                        completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
-                        recordLoadMetric("files", 0, true, true);
-                        return;
-                    }
-
                     filterItems();
                     setFileQueryCached(cacheKey, filteredItems.slice());
                     completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
@@ -2459,7 +2325,7 @@ PanelWindow {
                         return;
                     var tookMs = Date.now() - startedAt;
                     recordFilesBackendLoad("fd", tookMs);
-                    var items = buildFileItemsFromRaw(raw, homeDir);
+                    var items = FileParser.buildFileItemsFromRaw(raw, homeDir);
                     allItems = items;
                     setFileQueryCached(cacheKey, items);
                     filterItems();
@@ -2469,13 +2335,14 @@ PanelWindow {
                 return;
             }
 
-            var script = "find " + ModeData.shellQuote(homeDir) + " -mindepth 1 -maxdepth 6 -iname '*" + searchQuery.replace(/'/g, "'\\''") + "*' 2>/dev/null | head -n " + maxResults;
-            runCommand(["bash", "-lc", script], function (raw) {
+            runCommand(["find", homeDir, "-mindepth", "1", "-maxdepth", "6", "-iname", "*" + searchQuery + "*"], function (raw) {
                 if (!isRequestCurrent("files", token))
                     return;
                 var tookMs = Date.now() - startedAt;
                 recordFilesBackendLoad("find", tookMs);
-                var items = buildFileItemsFromRaw(raw, homeDir);
+                var lines = raw ? raw.split("\n") : [];
+                if (lines.length > maxResults) lines.length = maxResults;
+                var items = FileParser.buildFileItemsFromRaw(lines.join("\n"), homeDir);
                 allItems = items;
                 setFileQueryCached(cacheKey, items);
                 filterItems();
@@ -2798,56 +2665,98 @@ PanelWindow {
         completeModeLoad("window", true, "");
     }
 
-    function highlightMatch(fullText, query) {
-        return Search.highlightMatch(fullText, query, stripModePrefix);
+    readonly property var _rankWeights: ({
+        name: Config.launcherScoreNameWeight,
+        title: Config.launcherScoreTitleWeight,
+        exec: Config.launcherScoreExecWeight,
+        body: Config.launcherScoreBodyWeight,
+        category: Config.launcherScoreCategoryWeight
+    })
+
+    function _startChunkedFilter(sourceItems, clean, cleanLower, filesScanCap, startedAt) {
+        _filterChunkToken++;
+        _filterChunkState = {
+            token: _filterChunkToken,
+            sourceItems: sourceItems,
+            clean: clean,
+            cleanLower: cleanLower,
+            filesScanCap: filesScanCap,
+            startedAt: startedAt,
+            scoredItems: [],
+            idx: 0
+        };
+        _filterChunking = true;
+        filterChunkTimer.restart();
     }
 
-    function fuzzyMatchLower(s, p) {
-        return Search.fuzzyMatchLower(s, p);
+    function _processFilterChunk() {
+        var state = _filterChunkState;
+        if (!state || state.token !== _filterChunkToken)
+            return;
+        var chunkSize = 2000;
+        var end = Math.min(state.idx + chunkSize, state.sourceItems.length);
+        for (var i = state.idx; i < end; i++) {
+            var item = state.sourceItems[i];
+            var bestScore = Search.rankItem(item, state.clean, state.cleanLower, mode, _rankWeights);
+            if (bestScore > 0 || state.clean === "") {
+                item._score = bestScore;
+                state.scoredItems.push(item);
+                if (state.filesScanCap > 0 && state.scoredItems.length >= state.filesScanCap)
+                    break;
+            }
+        }
+        state.idx = end;
+        var done = state.idx >= state.sourceItems.length
+            || (state.filesScanCap > 0 && state.scoredItems.length >= state.filesScanCap);
+        if (state.token !== _filterChunkToken)
+            return;
+        if (done) {
+            state.scoredItems.sort(function (a, b) {
+                if (b._score !== a._score)
+                    return b._score - a._score;
+                var aDepth = Number(a.pathDepth || 0);
+                var bDepth = Number(b.pathDepth || 0);
+                if (aDepth !== bDepth)
+                    return aDepth - bDepth;
+                var aPath = a.relativePath || a.fullPath || a.title || "";
+                var bPath = b.relativePath || b.fullPath || b.title || "";
+                return aPath.localeCompare(bPath);
+            });
+            _lastFilterMode = mode;
+            _lastFilterQuery = state.cleanLower;
+            _lastFilterCategory = drunCategoryFilter;
+            _lastFilterCandidates = state.scoredItems.slice();
+            filteredItems = decorateResultSections(state.scoredItems.slice(0, Config.launcherMaxResults));
+            selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
+            _filterChunking = false;
+            _filterChunkState = null;
+            recordFilterMetric(Date.now() - state.startedAt);
+        } else {
+            // Progressive partial results after first chunk
+            if (state.scoredItems.length > 0) {
+                var partial = state.scoredItems.slice();
+                partial.sort(function (a, b) {
+                    if (b._score !== a._score)
+                        return b._score - a._score;
+                    return 0;
+                });
+                filteredItems = decorateResultSections(partial.slice(0, Config.launcherMaxResults));
+                selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
+            }
+            filterChunkTimer.restart();
+        }
     }
 
-    function ensureItemRankCache(item) {
-        Search.ensureItemRankCache(item);
-    }
-
-    function rankItem(item, clean, cleanLower) {
-        if (clean === "")
-            return 1;
-        if (mode === "files")
-            return rankFileItem(item, cleanLower);
-        ensureItemRankCache(item);
-        var categoryScore = mode === "drun" ? (fuzzyMatchLower(item._categoryKeywordsLower, cleanLower) * Config.launcherScoreCategoryWeight) : 0;
-        var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * Config.launcherScoreNameWeight, fuzzyMatchLower(item._titleLower, cleanLower) * Config.launcherScoreTitleWeight, fuzzyMatchLower(item._execLower, cleanLower) * Config.launcherScoreExecWeight, fuzzyMatchLower(item._bodyLower, cleanLower) * Config.launcherScoreBodyWeight, categoryScore);
-        if (mode === "drun")
-            bestScore += Number(item._drunUsageBoost || 0);
-        return bestScore;
-    }
-
-    function rankFileItem(item, cleanLower) {
-        ensureItemRankCache(item);
-        var exactName = item._nameLower === cleanLower;
-        var namePrefix = cleanLower !== "" && item._nameLower.startsWith(cleanLower);
-        var relPrefix = cleanLower !== "" && item._relativePathLower.startsWith(cleanLower);
-        var parentPrefix = cleanLower !== "" && item._parentPathLower.startsWith(cleanLower);
-        var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * 2.2, fuzzyMatchLower(item._relativePathLower, cleanLower) * 1.2, fuzzyMatchLower(item._parentPathLower, cleanLower) * 0.75, fuzzyMatchLower(item._titleLower, cleanLower) * 0.65, fuzzyMatchLower(item._extensionLower, cleanLower) * 0.35);
-        if (exactName)
-            bestScore += 220;
-        else if (namePrefix)
-            bestScore += 160;
-        else if (relPrefix)
-            bestScore += 90;
-        else if (parentPrefix)
-            bestScore += 30;
-        bestScore -= Math.min(20, item._pathDepth * 2);
-        bestScore -= Math.min(16, Math.floor(item._relativePathLower.length / 24));
-        return bestScore;
-    }
-
-    function compareLauncherItemsAlpha(a, b) {
-        return Search.compareLauncherItemsAlpha(a, b);
+    function _cancelChunkedFilter() {
+        _filterChunkToken++;
+        filterChunkTimer.stop();
+        _filterChunking = false;
+        _filterChunkState = null;
     }
 
     function filterItems() {
+        if (_filterChunking)
+            _cancelChunkedFilter();
         var startedAt = Date.now();
         var actualSearch = searchText;
         var webContext = null;
@@ -2901,10 +2810,10 @@ PanelWindow {
 
         var clean = String(actualSearch || "");
         var cleanLower = clean.toLowerCase();
-        var canReusePreviousCandidates = mode === "drun"
+        var canReusePreviousCandidates = (mode === "drun" || mode === "files")
                 && cleanLower !== ""
                 && _lastFilterMode === mode
-                && _lastFilterCategory === drunCategoryFilter
+                && (mode !== "drun" || _lastFilterCategory === drunCategoryFilter)
                 && _lastFilterQuery !== ""
                 && cleanLower.indexOf(_lastFilterQuery) === 0;
         var sourceItems = canReusePreviousCandidates ? _lastFilterCandidates : allItems;
@@ -2923,6 +2832,11 @@ PanelWindow {
             filteredItems = decorateResultSections(baseItems);
         } else {
             var scoredItems = [];
+            var filesScanCap = mode === "files" ? Math.max(200, Config.launcherMaxResults * 4) : 0;
+            if (mode === "files" && cleanLower !== "" && sourceItems.length >= 5000) {
+                _startChunkedFilter(sourceItems, clean, cleanLower, filesScanCap, startedAt);
+                return;
+            }
             for (var i = 0; i < sourceItems.length; i++) {
                 var item = sourceItems[i];
                 if (mode === "web") {
@@ -2932,12 +2846,14 @@ PanelWindow {
                     scoredItems.push(webItem);
                     continue;
                 }
-                var bestScore = rankItem(item, clean, cleanLower);
+                var bestScore = Search.rankItem(item, clean, cleanLower, mode, _rankWeights);
                 if (bestScore > 0 || (clean === "" && (mode === "files" || mode === "ai"))) {
                     if (mode === "drun" && drunCategoryFilter !== "" && !itemMatchesDrunCategory(item, drunCategoryFilter))
                         continue;
                     item._score = bestScore;
                     scoredItems.push(item);
+                    if (filesScanCap > 0 && scoredItems.length >= filesScanCap)
+                        break;
                 }
             }
             if (mode !== "web" && mode !== "ai" && mode !== "files") {
@@ -2949,7 +2865,7 @@ PanelWindow {
                         if (Math.abs(usageDelta) > 0.01)
                             return usageDelta > 0 ? 1 : -1;
                     }
-                    return compareLauncherItemsAlpha(a, b);
+                    return Search.compareLauncherItemsAlpha(a, b);
                 });
             } else if (mode === "files") {
                 scoredItems.sort(function (a, b) {
@@ -3044,117 +2960,33 @@ PanelWindow {
         Quickshell.execDetached(["bash", "-lc", String(execString)]);
     }
 
-    function itemActionLabel(item) {
-        if (!item || item.isHint)
-            return "";
-        if (mode === "clip" || mode === "emoji" || mode === "calc" || mode === "ai")
-            return "Copy";
-        if (mode === "window")
-            return "Focus";
-        if (mode === "files" || mode === "web" || mode === "bookmarks" || mode === "wallpapers")
-            return "Open";
-        if (mode === "drun" || mode === "run")
-            return "Run";
-        if (mode === "system" || mode === "nixos" || mode === "keybinds" || mode === "media" || mode === "plugins")
-            return "Action";
-        return "";
-    }
-
-    function itemProviderLabel(item) {
-        if (!item || item.isHint)
-            return "";
-        if (mode === "web")
-            return item.name || "";
-        if (mode === "bookmarks") {
-            var raw = String(item.exec || "");
-            var match = raw.match(/^https?:\/\/([^\/?#]+)/i);
-            return match && match.length > 1 ? match[1] : "";
-        }
-        return "";
-    }
-
     function executeEmptyPrimary() {
-        var clean = stripModePrefix(searchText).trim();
-        if (mode === "files") {
-            Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") || "/"]);
-            close();
-            return;
-        }
-        if (mode === "web") {
-            var webCtx = parseWebQuery(searchText);
-            var primary = configuredWebProviderByKey(webCtx.providerKey) || primaryWebProvider();
-            var url = primary ? String(primary.home || "") : "";
-            if (url === "")
-                url = "https://duckduckgo.com/";
-            if (webCtx.query !== "" && primary && primary.exec)
-                url = String(primary.exec) + encodeURIComponent(webCtx.query);
-            Quickshell.execDetached(["xdg-open", url]);
-            close();
-            return;
-        }
-        if (mode === "ai" && clean.length >= 3) {
-            loadAi();
-            return;
-        }
-        if (mode === "run" && clean !== "") {
-            launchExecString(clean, false);
-            close();
-            return;
-        }
-        if (mode === "bookmarks") {
-            open("web", true);
-            return;
-        }
-        if (mode === "plugins") {
-            open("drun");
-            return;
-        }
-        open("drun");
+        var clean = ModeData.stripModePrefix(searchText).trim();
+        Executor.executeEmptyPrimary(mode, clean, searchText, {
+            open: open,
+            close: close,
+            loadAi: loadAi,
+            launchExecString: launchExecString,
+            execDetached: Quickshell.execDetached,
+            parseWebQuery: parseWebQuery,
+            configuredWebProviderByKey: configuredWebProviderByKey,
+            primaryWebProvider: primaryWebProvider,
+            homeDir: Quickshell.env("HOME") || "/"
+        });
     }
 
     function executeEmptySecondary() {
-        var clean = stripModePrefix(searchText).trim();
-        if (mode === "files") {
-            if (!fileQueryLooksLikePath(clean)) {
-                clearSearchQuery();
-                return;
-            }
-            var target = Quickshell.env("HOME") || "/";
-            if (clean.startsWith("~")) {
-                target = (Quickshell.env("HOME") || "/") + clean.substring(1);
-            } else if (clean.startsWith("/")) {
-                target = clean;
-            }
-            Quickshell.execDetached(["xdg-open", target]);
-            close();
-            return;
-        }
-        if (mode === "web") {
-            var secondary = secondaryWebProvider();
-            var secondaryUrl = secondary ? String(secondary.home || "") : "";
-            if (secondaryUrl === "")
-                secondaryUrl = "https://www.google.com/";
-            if (clean !== "" && secondary && secondary.exec)
-                secondaryUrl = String(secondary.exec) + encodeURIComponent(clean);
-            Quickshell.execDetached(["xdg-open", secondaryUrl]);
-            close();
-            return;
-        }
-        if (mode === "system") {
-            runShellEntryAction("commandCenter");
-            close();
-            return;
-        }
-        if (mode === "run") {
-            if (clean !== "") {
-                launchExecString(clean, true);
-            } else {
-                launchInTerminal("");
-            }
-            close();
-            return;
-        }
-        clearSearchQuery();
+        var clean = ModeData.stripModePrefix(searchText).trim();
+        Executor.executeEmptySecondary(mode, clean, {
+            close: close,
+            clearSearchQuery: clearSearchQuery,
+            launchInTerminal: launchInTerminal,
+            launchExecString: launchExecString,
+            runShellEntryAction: runShellEntryAction,
+            execDetached: Quickshell.execDetached,
+            secondaryWebProvider: secondaryWebProvider,
+            homeDir: Quickshell.env("HOME") || "/"
+        });
     }
 
     function clearSearchQuery() {
@@ -3346,98 +3178,20 @@ PanelWindow {
         if (filteredItems.length === 0 || selectedIndex < 0 || selectedIndex >= filteredItems.length)
             return;
         var item = filteredItems[selectedIndex];
-
-        if (mode === "drun") {
-            trackLaunch(item);
-            launchExecString(item.exec, item.terminal === "true" || item.terminal === "True");
-            close();
-        } else if (mode === "run") {
-            rememberRecent({
-                name: item.name || item.exec,
-                title: item.exec || "",
-                icon: "󰆍",
-                exec: item.exec || ""
-            });
-            if (item.exec)
-                Quickshell.execDetached(["bash", "-c", item.exec]);
-            close();
-        } else if (mode === "window") {
-            rememberRecent({
-                name: item.name || item.title || "Window",
-                title: item.title || item.appId || "",
-                icon: item.icon || item.appId || "󰖯",
-                appId: item.appId || "",
-                address: item.address || "",
-                openMode: "window"
-            });
-            if (item.toplevel && item.toplevel.activate)
-                item.toplevel.activate();
-            close();
-        } else if (mode === "dmenu") {
-            var fifoPath = "/tmp/qs-dmenu-result";
-            Quickshell.execDetached(["sh", "-c", "printf '%s\\n' \"$1\" > \"$2\"", "sh", item.name, fifoPath]);
-            close();
-        } else if (mode === "emoji" || mode === "calc") {
-            copyToClipboard(item.name);
-            close();
-        } else if (mode === "clip") {
-            if (item.id) {
-                restoreClipboardHistoryItem(item.id);
-                close();
-            }
-        } else if (mode === "web" || mode === "bookmarks") {
-            rememberRecent({
-                name: item.name || "Link",
-                title: item.title || item.exec || "",
-                icon: item.icon || "󰖟",
-                exec: item.exec || ""
-            });
-            if (item.exec) {
-                Quickshell.execDetached(["xdg-open", item.exec + (item.query ? encodeURIComponent(item.query) : "")]);
-                close();
-            }
-        } else if (mode === "ai") {
-            if (item.body) {
-                copyToClipboard(item.body);
-                close();
-            }
-        } else if (mode === "files") {
-            if (!item.isHint && item.fullPath) {
-                rememberRecent({
-                    name: item.name || item.fullPath,
-                    title: item.fullPath,
-                    icon: "󰈔",
-                    fullPath: item.fullPath
-                });
-                Quickshell.execDetached(["xdg-open", item.fullPath]);
-                close();
-            }
-        } else if (mode === "system" || mode === "nixos") {
-            rememberRecent({
-                name: item.name || "Action",
-                title: item.category || item.title || "",
-                icon: item.icon || "󰒓",
-                exec: item.exec || ""
-            });
-            if (item.ipcTarget && item.ipcAction)
-                Quickshell.execDetached(["quickshell", "ipc", "call", item.ipcTarget, item.ipcAction]);
-            else if (item.action)
-                item.action();
-            if (!showingConfirm)
-                close();
-        } else if (mode === "wallpapers") {
-            Quickshell.execDetached(["swww", "img", item.path, "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "1.5"]);
-            Quickshell.execDetached(["wallust", "run", item.path]);
-            close();
-        } else if (mode === "keybinds") {
-            if (item.disp && CompositorAdapter.supportsDispatcherActions)
-                CompositorAdapter.dispatchAction(item.disp, item.args || "", "Trigger keybind action");
-            close();
-        } else if (mode === "plugins") {
-            var executed = PluginService.executeLauncherItem(item, searchText);
-            if (executed)
-                close();
-        }
+        Executor.executeSelection(mode, item, {
+            trackLaunch: trackLaunch,
+            launchExecString: launchExecString,
+            close: close,
+            rememberRecent: rememberRecent,
+            copyToClipboard: copyToClipboard,
+            restoreClipboardHistoryItem: restoreClipboardHistoryItem,
+            execDetached: Quickshell.execDetached,
+            supportsDispatcherActions: CompositorAdapter.supportsDispatcherActions,
+            dispatchAction: CompositorAdapter.dispatchAction,
+            executeLauncherItem: PluginService.executeLauncherItem,
+            showingConfirm: showingConfirm,
+            searchText: searchText
+        });
     }
 
     function handleSearchAccepted(modifiers) {
@@ -3450,7 +3204,7 @@ PanelWindow {
             executeEmptySecondary();
         } else if (mode === "ai" && filteredItems.length === 0) {
             loadAi();
-        } else if (mode === "files" && stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength && filteredItems.length === 0) {
+        } else if (mode === "files" && ModeData.stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength && filteredItems.length === 0) {
             loadFiles();
         } else if (filteredItems.length === 0) {
             executeEmptyPrimary();
@@ -3673,7 +3427,7 @@ PanelWindow {
                     Text {
                         id: chromeModeLabel
                         anchors.centerIn: parent
-                        text: launcherRoot.modeInfo(launcherRoot.mode).label
+                        text: ModeData.modeInfo(launcherRoot.mode).label
                         color: Colors.primary
                         font.pixelSize: Colors.fontSizeXXS
                         font.weight: Font.Black
@@ -3741,7 +3495,7 @@ PanelWindow {
                     Layout.bottomMargin: launcherRoot.tightMode ? 0 : Colors.spacingXXS
                     text: launcherRoot.searchText
                     accentColor: Colors.primary
-                    placeholder: launcherRoot.modeInfo(launcherRoot.mode).hint || "Search..."
+                    placeholder: ModeData.modeInfo(launcherRoot.mode).hint || "Search..."
                     onAccepted: modifiers => launcherRoot.handleSearchAccepted(modifiers)
 
                     onTextChanged: {
@@ -3869,7 +3623,7 @@ PanelWindow {
                 LauncherActionLegend {
                     visible: Config.launcherShowModeHints && !launcherRoot.tightMode
                     Layout.bottomMargin: visible ? Colors.spacingXXS : 0
-                    hintText: launcherRoot.modeInfo(launcherRoot.mode).hint
+                    hintText: ModeData.modeInfo(launcherRoot.mode).hint
                     primaryAction: launcherRoot.legendPrimaryAction
                     secondaryAction: launcherRoot.legendSecondaryAction
                     tertiaryAction: launcherRoot.legendTertiaryAction
@@ -3950,7 +3704,7 @@ PanelWindow {
                             Text {
                                 readonly property var modeStats: launcherRoot.modeMetric(launcherRoot.mode)
                                 Layout.fillWidth: true
-                                text: launcherRoot.modeInfo(launcherRoot.mode).label + ": avg " + modeStats.avgLoadMs + "ms" + " • last " + modeStats.lastLoadMs + "ms" + " • failures " + modeStats.failures + (launcherRoot.mode === "files" ? (" • cache " + launcherRoot.filesCacheStatsLabel) : "")
+                                text: ModeData.modeInfo(launcherRoot.mode).label + ": avg " + modeStats.avgLoadMs + "ms" + " • last " + modeStats.lastLoadMs + "ms" + " • failures " + modeStats.failures + (launcherRoot.mode === "files" ? (" • cache " + launcherRoot.filesCacheStatsLabel) : "")
                                 color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
                                 wrapMode: Text.WordWrap
@@ -4080,7 +3834,7 @@ PanelWindow {
                                 }
                                 Text {
                                     Layout.alignment: Qt.AlignHCenter
-                                    text: launcherRoot.modeLoadMessage !== "" ? launcherRoot.modeLoadMessage : ("Loading " + launcherRoot.modeInfo(launcherRoot.mode).label)
+                                    text: launcherRoot.modeLoadMessage !== "" ? launcherRoot.modeLoadMessage : ("Loading " + ModeData.modeInfo(launcherRoot.mode).label)
                                     color: Colors.text
                                     font.pixelSize: Colors.fontSizeSmall
                                     font.weight: Font.DemiBold

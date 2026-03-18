@@ -61,7 +61,7 @@ slugify() {
 
 ensure_incident_store() {
   mkdir -p "${incident_root}"
-  if [[ ! -f "${index_file}" ]]; then
+  if [[ ! -s "${index_file}" ]] || ! jq -e 'type == "object"' "${index_file}" >/dev/null 2>&1; then
     printf '{}\n' > "${index_file}"
   fi
 }
@@ -69,7 +69,7 @@ ensure_incident_store() {
 incident_dir_for_signature() {
   local signature="$1"
   local dir
-  dir="$(jq -r --arg signature "${signature}" '.[$signature] // empty' "${index_file}")"
+  dir="$(jq -r --arg signature "${signature}" '.[$signature] // empty' "${index_file}" 2>/dev/null)" || dir=""
   if [[ -n "${dir}" && -d "${dir}" ]]; then
     printf '%s\n' "${dir}"
     return 0
@@ -77,9 +77,16 @@ incident_dir_for_signature() {
 
   dir="${incident_root}/$(date -u +%Y%m%dT%H%M%SZ)-$(slugify "${signature}")"
   mkdir -p "${dir}"
+  local tmp_index
   tmp_index="$(mktemp)"
-  jq --arg signature "${signature}" --arg dir "${dir}" '.[$signature] = $dir' "${index_file}" > "${tmp_index}"
-  mv "${tmp_index}" "${index_file}"
+  if jq --arg signature "${signature}" --arg dir "${dir}" '.[$signature] = $dir' "${index_file}" > "${tmp_index}" 2>/dev/null \
+     && [[ -s "${tmp_index}" ]]; then
+    mv "${tmp_index}" "${index_file}"
+  else
+    # Index was unreadable; rebuild from this single entry
+    printf '{%s:%s}\n' "$(printf '%s' "${signature}" | jq -Rs .)" "$(printf '%s' "${dir}" | jq -Rs .)" > "${tmp_index}"
+    mv "${tmp_index}" "${index_file}"
+  fi
   printf '%s\n' "${dir}"
 }
 
@@ -214,21 +221,26 @@ update_incident_fix_status() {
 
 resolve_inactive_incidents() {
   local existing signature dir tmp
-  mapfile -t existing < <(jq -r 'keys[]?' "${index_file}")
+  mapfile -t existing < <(jq -r 'keys[]?' "${index_file}" 2>/dev/null)
   for signature in "${existing[@]}"; do
-    if printf '%s\n' "${active_signatures[@]}" | rg -qx -- "${signature}"; then
+    [[ -n "${signature}" ]] || continue
+    if (( ${#active_signatures[@]} > 0 )) \
+       && printf '%s\n' "${active_signatures[@]}" | rg -qx -- "${signature}"; then
       continue
     fi
-    dir="$(jq -r --arg signature "${signature}" '.[$signature] // empty' "${index_file}")"
-    if [[ -n "${dir}" && -f "${dir}/incident.json" ]]; then
-      tmp="$(mktemp)"
-      jq '.status = "resolved"
-          | .last_seen = (now | strftime("%Y-%m-%dT%H:%M:%SZ"))' "${dir}/incident.json" > "${tmp}"
-      mv "${tmp}" "${dir}/incident.json"
-    fi
+    dir="$(jq -r --arg signature "${signature}" '.[$signature] // empty' "${index_file}" 2>/dev/null)" || dir=""
     tmp="$(mktemp)"
-    jq --arg signature "${signature}" 'del(.[$signature])' "${index_file}" > "${tmp}"
-    mv "${tmp}" "${index_file}"
+    if jq --arg signature "${signature}" 'del(.[$signature])' "${index_file}" > "${tmp}" 2>/dev/null \
+       && [[ -s "${tmp}" ]]; then
+      mv "${tmp}" "${index_file}"
+    else
+      rm -f "${tmp}"
+    fi
+    # Delete the directory only after the index entry is removed, so a crash
+    # between the two operations leaves a resolvable (not orphaned) state.
+    if [[ -n "${dir}" && -d "${dir}" ]]; then
+      rm -rf "${dir}"
+    fi
   done
 }
 

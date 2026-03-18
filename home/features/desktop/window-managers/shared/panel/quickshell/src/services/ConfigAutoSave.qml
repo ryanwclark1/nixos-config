@@ -236,6 +236,18 @@ QtObject {
         function onDesktopWidgetsMonitorWidgetsChanged() {
             root.config.scheduleSave();
         }
+        function onBackgroundVisualizerEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onBackgroundClockEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onBackgroundAutoHideChanged() {
+            root.config.scheduleSave();
+        }
+        function onBackgroundClockPositionChanged() {
+            root.config.scheduleSave();
+        }
         function onShowScreenBordersChanged() {
             root.config.scheduleSave();
         }
@@ -255,6 +267,9 @@ QtObject {
             root.config.scheduleSave();
         }
         function onLockScreenCountdownChanged() {
+            root.config.scheduleSave();
+        }
+        function onLockScreenFingerprintChanged() {
             root.config.scheduleSave();
         }
         function onPrivacyIndicatorsEnabledChanged() {
@@ -291,6 +306,9 @@ QtObject {
             root.config.scheduleSave();
         }
         function onIdleInhibitEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onInhibitIdleWhenPlayingChanged() {
             root.config.scheduleSave();
         }
         function onRecentPickerColorsChanged() {

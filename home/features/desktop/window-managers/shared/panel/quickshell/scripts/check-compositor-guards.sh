@@ -7,15 +7,14 @@ config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 # Files intentionally compositor-scoped today.
 allow_hyprctl=(
   "${config_dir}/bar/widgets/Workspaces.qml"
-  "${config_dir}/launcher/Overview.qml"
+  "${config_dir}/launcher/OverviewHyprland.qml"
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/DependencyService.qml"
-  "${config_dir}/services/NightLightService.qml"
   "${config_dir}/services/PowerService.qml"
 )
 
 allow_hyprland_import=(
-  "${config_dir}/launcher/Overview.qml"
+  "${config_dir}/launcher/OverviewHyprland.qml"
   "${config_dir}/services/CompositorAdapter.qml"
 )
 
@@ -25,6 +24,7 @@ allow_direct_compositor_checks=(
   "${config_dir}/bar/widgets/WindowTitle.qml"
   "${config_dir}/bar/widgets/Workspaces.qml"
   "${config_dir}/launcher/AltTabSwitcher.qml"
+  "${config_dir}/launcher/Overview.qml"
   "${config_dir}/features/settings/components/tabs/HotkeysTab.qml"
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/NightLightService.qml"

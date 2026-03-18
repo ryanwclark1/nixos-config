@@ -49,6 +49,11 @@ Item {
                     icon: "󰈈"
                     configKey: "idleInhibitEnabled"
                 }
+                SettingsToggleRow {
+                    label: "Prevent Idle When Playing"
+                    icon: "󰎈"
+                    configKey: "inhibitIdleWhenPlaying"
+                }
             }
         }
 

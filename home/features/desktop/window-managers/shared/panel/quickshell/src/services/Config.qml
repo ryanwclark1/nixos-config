@@ -125,6 +125,12 @@ QtObject {
     property bool desktopWidgetsGridSnap: false
     property var desktopWidgetsMonitorWidgets: []
 
+    // --- BACKGROUND ---
+    property bool backgroundVisualizerEnabled: false
+    property bool backgroundClockEnabled: false
+    property bool backgroundAutoHide: true
+    property string backgroundClockPosition: "center"
+
     // --- SCREEN BORDERS ---
     property bool showScreenBorders: false
 
@@ -137,6 +143,7 @@ QtObject {
     property bool lockScreenWeather: true
     property bool lockScreenSessionButtons: true
     property int lockScreenCountdown: 5000
+    property bool lockScreenFingerprint: true
 
     // --- PRIVACY ---
     property bool privacyIndicatorsEnabled: true
@@ -167,6 +174,7 @@ QtObject {
     property int batteryWarningThreshold: 20
     property int batteryCriticalThreshold: 10
     property bool idleInhibitEnabled: false
+    property bool inhibitIdleWhenPlaying: false
     property int powerAcMonitorTimeout: 0
     property int powerAcLockTimeout: 0
     property int powerAcSuspendTimeout: 0

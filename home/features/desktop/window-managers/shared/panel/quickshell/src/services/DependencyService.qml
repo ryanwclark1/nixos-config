@@ -33,9 +33,6 @@ QtObject {
       "qs-cava": {
         requires: []
       },
-      "qs-emoji": {
-        requires: []
-      },
       "qs-icon-resolver": {
         requires: []
       },
