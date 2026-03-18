@@ -199,6 +199,7 @@ PanelWindow {
                             transform: Translate { y: root.entranceY(0) }
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutBack } } }
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
 
                             Repeater {
                                 model: ControlCenterRegistry.quickLinkItems

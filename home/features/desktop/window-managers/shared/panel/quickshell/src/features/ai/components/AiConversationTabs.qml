@@ -18,42 +18,27 @@ RowLayout {
     readonly property int tabStripWidth: Math.max(96, width - reservedWidth)
     readonly property int tabMaxWidth: Math.max(narrowMode ? 96 : 112, Math.floor(tabStripWidth / Math.max(1, visibleTabLimit)) - Colors.spacingS)
 
-    readonly property var sortedConversations: {
+    readonly property var _splitConversations: {
         var convs = AiService.conversations.slice();
         convs.sort(function(a, b) {
             return (b.updatedAt || 0) - (a.updatedAt || 0);
         });
-        return convs;
-    }
-
-    readonly property var primaryConversations: {
-        var visible = [];
         var active = AiService.activeConversation;
+        var limit = visibleTabLimit;
+        var primary = [];
         var seen = ({});
-        if (active) {
-            visible.push(active);
-            seen[active.id] = true;
+        if (active) { primary.push(active); seen[active.id] = true; }
+        for (var i = 0; i < convs.length && primary.length < limit; i++) {
+            if (!seen[convs[i].id]) { primary.push(convs[i]); seen[convs[i].id] = true; }
         }
-        for (var i = 0; i < sortedConversations.length && visible.length < visibleTabLimit; i++) {
-            if (!seen[sortedConversations[i].id]) {
-                visible.push(sortedConversations[i]);
-                seen[sortedConversations[i].id] = true;
-            }
+        var overflow = [];
+        for (var j = 0; j < convs.length; j++) {
+            if (!seen[convs[j].id]) overflow.push(convs[j]);
         }
-        return visible;
+        return { primary: primary, overflow: overflow };
     }
-
-    readonly property var overflowConversations: {
-        var hidden = [];
-        var visibleIds = ({});
-        for (var i = 0; i < primaryConversations.length; i++)
-            visibleIds[primaryConversations[i].id] = true;
-        for (var j = 0; j < sortedConversations.length; j++) {
-            if (!visibleIds[sortedConversations[j].id])
-                hidden.push(sortedConversations[j]);
-        }
-        return hidden;
-    }
+    readonly property var primaryConversations: _splitConversations.primary
+    readonly property var overflowConversations: _splitConversations.overflow
 
     function _formatUpdatedAt(timestamp) {
         if (!timestamp)

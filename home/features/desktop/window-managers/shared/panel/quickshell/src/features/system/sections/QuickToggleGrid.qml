@@ -20,9 +20,10 @@ GridLayout {
   transform: Translate { y: showContent ? 0 : 8 }
   visible: opacity > 0
 
-  Behavior on opacity { SequentialAnimation { PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
-  Behavior on scale { SequentialAnimation { PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutBack } } }
+  Behavior on opacity { SequentialAnimation { id: toggleFadeAnim; PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
+  Behavior on scale { SequentialAnimation { id: toggleScaleAnim; PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutBack } } }
   Behavior on transform { SequentialAnimation { PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
+  layer.enabled: toggleFadeAnim.running || toggleScaleAnim.running
 
   Repeater {
     model: ControlCenterRegistry.visibleQuickToggleItems

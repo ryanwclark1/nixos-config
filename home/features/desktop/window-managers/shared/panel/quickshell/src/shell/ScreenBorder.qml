@@ -57,6 +57,7 @@ PanelWindow {
     width: win.borderRadius; height: win.borderRadius
     anchors { top: parent.top; left: parent.left }
     anchors.topMargin: win.thickness; anchors.leftMargin: win.thickness
+    renderTarget: Canvas.FramebufferObject
     property color c: win.frameColor
     onCChanged: requestPaint()
     onPaint: win.drawInvertedCorner(getContext("2d"), width, height, "TL")
@@ -66,6 +67,7 @@ PanelWindow {
     width: win.borderRadius; height: win.borderRadius
     anchors { top: parent.top; right: parent.right }
     anchors.topMargin: win.thickness; anchors.rightMargin: win.thickness
+    renderTarget: Canvas.FramebufferObject
     property color c: win.frameColor
     onCChanged: requestPaint()
     onPaint: win.drawInvertedCorner(getContext("2d"), width, height, "TR")
@@ -75,6 +77,7 @@ PanelWindow {
     width: win.borderRadius; height: win.borderRadius
     anchors { bottom: parent.bottom; left: parent.left }
     anchors.bottomMargin: win.thickness; anchors.leftMargin: win.thickness
+    renderTarget: Canvas.FramebufferObject
     property color c: win.frameColor
     onCChanged: requestPaint()
     onPaint: win.drawInvertedCorner(getContext("2d"), width, height, "BL")
@@ -84,6 +87,7 @@ PanelWindow {
     width: win.borderRadius; height: win.borderRadius
     anchors { bottom: parent.bottom; right: parent.right }
     anchors.bottomMargin: win.thickness; anchors.rightMargin: win.thickness
+    renderTarget: Canvas.FramebufferObject
     property color c: win.frameColor
     onCChanged: requestPaint()
     onPaint: win.drawInvertedCorner(getContext("2d"), width, height, "BR")

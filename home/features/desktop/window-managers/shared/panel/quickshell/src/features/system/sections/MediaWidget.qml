@@ -16,8 +16,9 @@ Rectangle {
   border.color: cardHover.hovered ? Colors.primary : Colors.border
   clip: true
   scale: cardHover.hovered ? 1.01 : 1.0
-  Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
+  Behavior on scale { NumberAnimation { id: mediaScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
   Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+  layer.enabled: mediaScaleAnim.running
 
   gradient: SharedWidgets.SurfaceGradient {}
 

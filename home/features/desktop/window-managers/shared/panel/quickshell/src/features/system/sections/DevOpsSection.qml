@@ -23,6 +23,7 @@ ColumnLayout {
 
     Behavior on opacity {
         SequentialAnimation {
+            id: devopsFadeAnim
             PauseAnimation {
                 duration: showContent ? (root.baseIndex * root.staggerDelay) : 0
             }
@@ -34,6 +35,7 @@ ColumnLayout {
     }
     Behavior on scale {
         SequentialAnimation {
+            id: devopsScaleAnim
             PauseAnimation {
                 duration: showContent ? (root.baseIndex * root.staggerDelay) : 0
             }
@@ -54,6 +56,7 @@ ColumnLayout {
             }
         }
     }
+    layer.enabled: devopsFadeAnim.running || devopsScaleAnim.running
 
     Text {
         text: "DEVOPS & SERVICES"

@@ -14,8 +14,9 @@ Rectangle {
   border.color: netCardHover.hovered ? Colors.primary : Colors.border
   clip: true
   scale: netCardHover.hovered ? 1.01 : 1.0
-  Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
+  Behavior on scale { NumberAnimation { id: netScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
   Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+  layer.enabled: netScaleAnim.running
 
   HoverHandler { id: netCardHover }
 

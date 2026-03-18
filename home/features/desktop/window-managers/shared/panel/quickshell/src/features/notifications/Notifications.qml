@@ -21,7 +21,7 @@ PanelWindow {
   margins.left: edgeMargins.left || edgeMargins.right
 
   implicitWidth: Config.notifWidth
-  implicitHeight: col.implicitHeight
+  implicitHeight: Math.max(1, col.implicitHeight)
   color: "transparent"
   mask: Region {
     item: col

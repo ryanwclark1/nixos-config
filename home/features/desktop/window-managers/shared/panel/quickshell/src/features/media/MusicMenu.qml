@@ -22,6 +22,7 @@ BasePopupMenu {
       radius: Colors.radiusLarge
       color: "transparent"
       clip: true
+      layer.enabled: MediaService.isPlaying && root.wantVisible
 
       Rectangle {
         anchors.centerIn: parent
@@ -34,7 +35,7 @@ BasePopupMenu {
         Behavior on scale { NumberAnimation { duration: 2000; easing.type: Easing.InOutSine } }
 
         SequentialAnimation on opacity {
-          running: MediaService.isPlaying
+          running: MediaService.isPlaying && root.wantVisible
           loops: Animation.Infinite
           NumberAnimation { from: 0.08; to: 0.18; duration: 3000; easing.type: Easing.InOutSine }
           NumberAnimation { from: 0.18; to: 0.08; duration: 3000; easing.type: Easing.InOutSine }
@@ -215,7 +216,7 @@ BasePopupMenu {
         SharedWidgets.WavyProgress {
           anchors.fill: parent
           value: MediaService.trackLength > 0 ? MediaService.currentPosition / MediaService.trackLength : 0
-          active: MediaService.isPlaying
+          active: MediaService.isPlaying && root.wantVisible
           color: root.dominantColor
           trackColor: Colors.withAlpha(root.dominantColor, 0.18)
           amplitude: 2.5

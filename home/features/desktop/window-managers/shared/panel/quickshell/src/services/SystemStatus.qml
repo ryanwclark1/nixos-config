@@ -183,33 +183,11 @@ QtObject {
   // We use Connections instead of a binding so the imperative OSD assignment doesn't
   // permanently destroy the sync (QML bindings break on imperative write).
   property real brightness: 0.0
-  readonly property bool brightnessAvailable: BrightnessService.primaryMonitor.available
-  readonly property string brightnessStatus: {
-      if (BrightnessService.monitors.length === 0) return "No brightness device detected";
-      if (BrightnessService.primaryMonitor.available) return "Brightness control ready";
-      return "Brightness control unavailable";
-  }
-
   property Connections _brightnessSyncConn: Connections {
       target: BrightnessService
       function onMonitorsChanged() {
           root.brightness = BrightnessService.primaryMonitor.brightness;
       }
-  }
-
-  // Keyboard backlight brightness, synced from BrightnessService
-  property real kbdBrightness: 0.0
-  readonly property bool kbdBrightnessAvailable: BrightnessService.kbdAvailable
-
-  property Connections _kbdBrightnessSyncConn: Connections {
-      target: BrightnessService
-      function onKbdDeviceChanged() {
-          root.kbdBrightness = BrightnessService.kbdDevice.brightness;
-      }
-  }
-
-  function setKbdBrightness(value) {
-    BrightnessService.setKbdBrightness(value);
   }
 
   property int pollIntervalMs: 2000
@@ -309,10 +287,6 @@ QtObject {
         }
       }
     }
-  }
-
-  function setBrightness(value) {
-    BrightnessService.setBrightness(BrightnessService.primaryMonitor.name, value);
   }
 
   // ── MPRIS players ────────────────────────────
