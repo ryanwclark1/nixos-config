@@ -255,6 +255,7 @@ let
       qt6.qtmultimedia
       qt6.qt5compat
       python3 # Needed for various scripts (Niri binds parser, etc.)
+      ydotool # On-screen keyboard input injection
 
       # Quickshell utility scripts
       qsRofiScript

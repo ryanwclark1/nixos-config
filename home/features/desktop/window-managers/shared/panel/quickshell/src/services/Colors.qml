@@ -132,6 +132,35 @@ QtObject {
     readonly property int durationPanelOpen: 320   // Sidebar panel scale in (OutBack)
     readonly property int durationLong: 800        // Extended pulse/countdown animations
 
+    // --- ANIMATION EASING PRESETS ---
+    // Named bezier-curve presets for consistent motion across the shell.
+    // Based on Material Design 3 expressive motion.
+    readonly property var animMove: ({
+        duration: 320,
+        type: Easing.BezierSpline,
+        bezierCurve: [0.38, 1.21, 0.22, 1.00, 1, 1]
+    })
+    readonly property var animEnter: ({
+        duration: 400,
+        type: Easing.BezierSpline,
+        bezierCurve: [0.05, 0.7, 0.1, 1, 1, 1]
+    })
+    readonly property var animExit: ({
+        duration: 200,
+        type: Easing.BezierSpline,
+        bezierCurve: [0.3, 0, 0.8, 0.15, 1, 1]
+    })
+    readonly property var animFastSpatial: ({
+        duration: 350,
+        type: Easing.BezierSpline,
+        bezierCurve: [0.42, 1.67, 0.21, 0.90, 1, 1]
+    })
+    readonly property var animEffect: ({
+        duration: 200,
+        type: Easing.BezierSpline,
+        bezierCurve: [0.34, 0.80, 0.34, 1.00, 1, 1]
+    })
+
     // --- LETTER-SPACING TOKENS ---
     readonly property real letterSpacingTight: -0.5
     readonly property real letterSpacingWide: 1.0

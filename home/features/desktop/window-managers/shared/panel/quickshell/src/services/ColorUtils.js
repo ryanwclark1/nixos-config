@@ -48,3 +48,30 @@ function hex2(v) {
     var s = n.toString(16);
     return s.length < 2 ? "0" + s : s;
 }
+
+// Linear RGB mix between two Qt color objects.
+// t=0 returns c1, t=1 returns c2.
+function mix(c1, c2, t) {
+    var tt = Math.max(0, Math.min(1, t));
+    return Qt.rgba(
+        c1.r + (c2.r - c1.r) * tt,
+        c1.g + (c2.g - c1.g) * tt,
+        c1.b + (c2.b - c1.b) * tt,
+        c1.a + (c2.a - c1.a) * tt
+    );
+}
+
+// Given a base color, a desired target composite, and an overlay opacity,
+// algebraically solve for the overlay color that produces the target:
+//   target = overlay * opacity + base * (1 - opacity)
+//   overlay = (target - base * (1 - opacity)) / opacity
+function solveOverlayColor(base, target, opacity) {
+    if (opacity <= 0) return target;
+    var inv = 1.0 - opacity;
+    return Qt.rgba(
+        Math.max(0, Math.min(1, (target.r - base.r * inv) / opacity)),
+        Math.max(0, Math.min(1, (target.g - base.g * inv) / opacity)),
+        Math.max(0, Math.min(1, (target.b - base.b * inv) / opacity)),
+        1.0
+    );
+}

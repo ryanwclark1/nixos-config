@@ -7,7 +7,9 @@ import "../../../services"
 Rectangle {
     id: root
     readonly property var blockData: parent ? parent.modelData : null
-    property bool expanded: AiService.isStreaming // Expanded by default while streaming
+    property bool expanded: AiService.isStreaming
+    readonly property string rawText: blockData ? (blockData.text || "") : ""
+    readonly property int charCount: rawText.length
     width: parent ? parent.width : 0
     height: thinkingHeader.height + (expanded ? thinkingContent.implicitHeight + Colors.spacingS : 0)
     radius: Colors.radiusXS
@@ -29,20 +31,54 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: Colors.spacingS
-        height: 24
+        height: 28
         spacing: Colors.spacingXS
 
+        // Animated chevron
         Text {
-            text: root.expanded ? "▾" : "▸"
+            text: "\u{f0156}"
+            rotation: root.expanded ? 0 : -90
             color: Colors.textDisabled
+            font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeSmall
+
+            Behavior on rotation {
+                NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic }
+            }
         }
+
         Text {
-            text: "Thinking..."
+            text: AiService.isStreaming ? "Thinking..." : "Thought process"
             color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeSmall
-            font.italic: true
+            font.italic: AiService.isStreaming
             Layout.fillWidth: true
+
+            // Pulsing opacity while streaming
+            SequentialAnimation on opacity {
+                running: AiService.isStreaming
+                loops: Animation.Infinite
+                NumberAnimation { from: 1.0; to: 0.5; duration: Colors.durationPulse }
+                NumberAnimation { from: 0.5; to: 1.0; duration: Colors.durationPulse }
+            }
+        }
+
+        // Character count badge
+        Rectangle {
+            visible: root.charCount > 0 && !root.expanded
+            width: countLabel.implicitWidth + Colors.spacingS * 2
+            height: 18
+            radius: Colors.radiusPill
+            color: Colors.primaryFaint
+
+            Text {
+                id: countLabel
+                anchors.centerIn: parent
+                text: root.charCount > 999 ? (Math.floor(root.charCount / 1000) + "k chars") : root.charCount + " chars"
+                color: Colors.primary
+                font.pixelSize: Colors.fontSizeXXS
+                font.weight: Font.Bold
+            }
         }
     }
 

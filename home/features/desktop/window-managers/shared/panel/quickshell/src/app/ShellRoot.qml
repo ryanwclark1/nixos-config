@@ -11,6 +11,8 @@ import "../features/lock"
 import "../features/launcher"
 import "../features/media"
 import "../features/osd"
+import "../features/cheatsheet"
+import "../features/osk"
 import "../features/notifications"
 import "../features/power"
 import "../features/system/surfaces"
@@ -131,6 +133,7 @@ Scope {
         function panicClose() {
             root.closeAllSurfaces();
             launcher.close();
+            osk.close();
             if (overview)
                 overview.forceClose();
             if (altTabSwitcher.item && altTabSwitcher.item.hide)
@@ -361,6 +364,14 @@ Scope {
         onIsOpenChanged: fileFlow.handleFileBrowserOpenChanged(isOpen)
         onFileSelected: filePath => fileFlow.handleFileSelected(filePath)
         onFolderSelected: folderPath => fileFlow.handleFolderSelected(folderPath)
+    }
+
+    Cheatsheet {
+        id: cheatsheet
+    }
+
+    OnScreenKeyboard {
+        id: osk
     }
 
     NativeLock {
