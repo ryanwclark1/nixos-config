@@ -1,2 +1,8 @@
 FileBrowser 1.0 FileBrowser.qml
+FileBrowserFooter 1.0 FileBrowserFooter.qml
+FileBrowserGridItem 1.0 FileBrowserGridItem.qml
+FileBrowserListItem 1.0 FileBrowserListItem.qml
+FileBrowserPathBar 1.0 FileBrowserPathBar.qml
+FileBrowserSidebar 1.0 FileBrowserSidebar.qml
+FileBrowserSortHeader 1.0 FileBrowserSortHeader.qml
 Notepad 1.0 Notepad.qml

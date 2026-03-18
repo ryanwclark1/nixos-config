@@ -14,7 +14,7 @@ Rectangle {
     required property bool compactActions
     required property bool isOpen
 
-    signal saveFileNameChanged(string name)
+    signal saveFileNameEdited(string name)
     signal filterCycled()
     signal confirmAction()
     signal cancelAction()
@@ -78,7 +78,7 @@ Rectangle {
                             focus = false;
                     }
 
-                    onTextChanged: root.saveFileNameChanged(text)
+                    onTextChanged: root.saveFileNameEdited(text)
 
                     Keys.onReturnPressed: {
                         if (root.saveFileName.length > 0)

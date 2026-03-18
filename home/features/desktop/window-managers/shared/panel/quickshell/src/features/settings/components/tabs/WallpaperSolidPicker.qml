@@ -13,10 +13,10 @@ Rectangle {
     required property real pickerValue
     required property real pickerAlpha
 
-    signal pickerHueChanged(real v)
-    signal pickerSaturationChanged(real v)
-    signal pickerValueChanged(real v)
-    signal pickerAlphaChanged(real v)
+    signal pickerHueEdited(real v)
+    signal pickerSaturationEdited(real v)
+    signal pickerValueEdited(real v)
+    signal pickerAlphaEdited(real v)
     signal applyRequested()
     signal cancelRequested()
 
@@ -95,7 +95,7 @@ Rectangle {
                 step: 1
                 unit: ""
                 value: root.pickerHue
-                onMoved: v => root.pickerHueChanged(v)
+                onMoved: v => root.pickerHueEdited(v)
             }
 
             SettingsSliderRow {
@@ -105,7 +105,7 @@ Rectangle {
                 step: 1
                 unit: "%"
                 value: root.pickerSaturation
-                onMoved: v => root.pickerSaturationChanged(v)
+                onMoved: v => root.pickerSaturationEdited(v)
             }
 
             SettingsSliderRow {
@@ -115,7 +115,7 @@ Rectangle {
                 step: 1
                 unit: "%"
                 value: root.pickerValue
-                onMoved: v => root.pickerValueChanged(v)
+                onMoved: v => root.pickerValueEdited(v)
             }
 
             SettingsSliderRow {
@@ -125,7 +125,7 @@ Rectangle {
                 step: 1
                 unit: "%"
                 value: root.pickerAlpha
-                onMoved: v => root.pickerAlphaChanged(v)
+                onMoved: v => root.pickerAlphaEdited(v)
             }
 
             Flow {

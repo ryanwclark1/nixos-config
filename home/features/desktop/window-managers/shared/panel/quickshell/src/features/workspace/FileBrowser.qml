@@ -590,7 +590,7 @@ PanelWindow {
             activeFilterIndex: root.activeFilterIndex
             compactActions: root._compactActions
             isOpen: root.isOpen
-            onSaveFileNameChanged: (name) => { root.saveFileName = name; }
+            onSaveFileNameEdited: (name) => { root.saveFileName = name; }
             onFilterCycled: {
               root.activeFilterIndex = (root.activeFilterIndex + 1) % root.fileFilters.length;
               root._listDirectory();

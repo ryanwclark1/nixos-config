@@ -733,10 +733,10 @@ Item {
         pickerSaturation: root.pickerSaturation
         pickerValue: root.pickerValue
         pickerAlpha: root.pickerAlpha
-        onPickerHueChanged: v => root.pickerHue = v
-        onPickerSaturationChanged: v => root.pickerSaturation = v
-        onPickerValueChanged: v => root.pickerValue = v
-        onPickerAlphaChanged: v => root.pickerAlpha = v
+        onPickerHueEdited: v => root.pickerHue = v
+        onPickerSaturationEdited: v => root.pickerSaturation = v
+        onPickerValueEdited: v => root.pickerValue = v
+        onPickerAlphaEdited: v => root.pickerAlpha = v
         onApplyRequested: root.applyPickerColor()
         onCancelRequested: root.solidPickerOpen = false
     }

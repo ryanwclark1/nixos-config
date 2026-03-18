@@ -61,12 +61,7 @@ Scope {
         }
     }
 
-    // ── Global shortcut ─────────────────────────
-    GlobalShortcut {
-        name: "regionScreenshot"
-        description: "Select a screen region to capture"
-        onPressed: root.open("screenshot")
-    }
+    // Region screenshot accessible via IPC: quickshell ipc call region screenshot
 
     // ── Wire up ScreenshotService signal ────────
     Connections {
