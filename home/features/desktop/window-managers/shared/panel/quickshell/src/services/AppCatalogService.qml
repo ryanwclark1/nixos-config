@@ -141,11 +141,10 @@ QtObject {
     }
   }
 
-  function _enumerateDesktopFiles() {
-    var quotedRoots = [];
-    for (var i = 0; i < root.desktopRoots.length; ++i)
-      quotedRoots.push(SU.shellQuote(root.desktopRoots[i]));
-    return "for dir in " + quotedRoots.join(" ") + "; do [ -d \"$dir\" ] || continue; find \"$dir\" -maxdepth 1 \\( -type f -o -type l \\) -name '*.desktop' -print; done";
+  function _enumerateDesktopFilesCommand() {
+    return ["sh", "-c",
+      "for dir in \"$@\"; do [ -d \"$dir\" ] || continue; find \"$dir\" -maxdepth 1 \\( -type f -o -type l \\) -name '*.desktop' -print; done",
+      "sh"].concat(root.desktopRoots);
   }
 
   function _parseEnumeratedPaths(raw) {
@@ -246,7 +245,7 @@ QtObject {
 
     root.loading = true;
     root.lastError = "";
-    _enumeration.command = ["sh", "-c", _enumerateDesktopFiles()];
+    _enumeration.command = _enumerateDesktopFilesCommand();
     _enumeration.running = true;
   }
 

@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
-import "../../menu"
+import "../../shared"
 import "../../services"
 import "../../widgets" as SharedWidgets
 import "../../services/ShellUtils.js" as ShellUtils

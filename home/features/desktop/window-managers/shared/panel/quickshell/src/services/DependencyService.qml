@@ -179,27 +179,32 @@ QtObject {
   }
 
   function _checkKnownDependencies() {
-    var script = [];
-    var i;
-    for (i = 0; i < root._systemDependencies.length; ++i) {
-      var binary = root._systemDependencies[i];
-      script.push(
-        "if command -v " + SU.shellQuote(binary) + " >/dev/null 2>&1; then printf 'system|" + binary + "|1\\n'; else printf 'system|" + binary + "|0\\n'; fi"
-      );
-    }
-
+    // Pass all names as positional args: system deps first, then a sentinel "---",
+    // then managed helpers (each followed by its fallback path).
+    var args = root._systemDependencies.slice();
+    args.push("---");
     var helpers = root._managedCommandNames();
-    for (i = 0; i < helpers.length; ++i) {
-      var helper = helpers[i];
-      var fallbackPath = root._managedFallbackPath(helper);
-      script.push(
-        "if command -v " + SU.shellQuote(helper) + " >/dev/null 2>&1; then printf 'managed|" + helper + "|%s\\n' \"$(command -v " + SU.shellQuote(helper) + ")\"; " +
-        "elif [ -x " + SU.shellQuote(fallbackPath) + " ]; then printf 'managed|" + helper + "|" + fallbackPath.replace(/'/g, "'\\''") + "\\n'; " +
-        "else printf 'managed|" + helper + "|\\n'; fi"
-      );
+    for (var i = 0; i < helpers.length; ++i) {
+      args.push(helpers[i]);
+      args.push(root._managedFallbackPath(helpers[i]));
     }
 
-    _checker.command = ["sh", "-c", script.join("; ")];
+    var script =
+      // Phase 1: system deps — iterate until sentinel
+      "while [ \"$#\" -gt 0 ] && [ \"$1\" != '---' ]; do " +
+      "  if command -v \"$1\" >/dev/null 2>&1; then printf 'system|%s|1\\n' \"$1\"; " +
+      "  else printf 'system|%s|0\\n' \"$1\"; fi; shift; " +
+      "done; " +
+      "[ \"$1\" = '---' ] && shift; " +
+      // Phase 2: managed helpers — consume pairs (name, fallbackPath)
+      "while [ \"$#\" -ge 2 ]; do " +
+      "  name=\"$1\"; fb=\"$2\"; shift 2; " +
+      "  if command -v \"$name\" >/dev/null 2>&1; then printf 'managed|%s|%s\\n' \"$name\" \"$(command -v \"$name\")\"; " +
+      "  elif [ -x \"$fb\" ]; then printf 'managed|%s|%s\\n' \"$name\" \"$fb\"; " +
+      "  else printf 'managed|%s|\\n' \"$name\"; fi; " +
+      "done";
+
+    _checker.command = ["sh", "-c", script, "sh"].concat(args);
     _checker.running = true;
   }
 
@@ -265,14 +270,16 @@ QtObject {
       return;
     }
 
-    var script = [];
+    var args = [];
     for (var i = 0; i < binaries.length; ++i) {
       var binary = String(binaries[i] || "");
-      if (binary === "")
-        continue;
-      script.push(
-        "if command -v " + SU.shellQuote(binary) + " >/dev/null 2>&1; then printf '" + binary.replace(/'/g, "'\\''") + ":1\\n'; else printf '" + binary.replace(/'/g, "'\\''") + ":0\\n'; fi"
-      );
+      if (binary !== "")
+        args.push(binary);
+    }
+    if (args.length === 0) {
+      if (callback)
+        callback({});
+      return;
     }
 
     var proc = Qt.createQmlObject('import Quickshell.Io; Process { }', root);
@@ -297,7 +304,9 @@ QtObject {
       proc.destroy();
     });
 
-    proc.command = ["sh", "-c", script.join("; ")];
+    proc.command = ["sh", "-c",
+      "for b in \"$@\"; do if command -v \"$b\" >/dev/null 2>&1; then printf '%s:1\\n' \"$b\"; else printf '%s:0\\n' \"$b\"; fi; done",
+      "sh"].concat(args);
     proc.running = true;
   }
 }

@@ -248,7 +248,11 @@ Scope {
         // Delayed unmap: stay mapped while exit animations run.
         // Keep this compositor-agnostic; OSD is safe to render on all screens.
         property bool _wantVisible: root.shouldShowOsd
-        visible: _wantVisible || osdFadeAnim.running || osdScaleAnim.running
+        RetainableLock {
+            id: _visLock
+            locked: osdWindow._wantVisible || osdFadeAnim.running || osdScaleAnim.running
+        }
+        visible: _visLock.retained
 
         // --- 9-position anchoring ---
         anchors.top: root.posTop || root.posVCenter

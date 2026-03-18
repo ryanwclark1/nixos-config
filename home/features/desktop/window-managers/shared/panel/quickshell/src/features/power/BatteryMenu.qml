@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.UPower
-import "../../menu"
+import "../../shared"
 import "../../services"
 import "../system/sections"
 import "../../widgets" as SharedWidgets

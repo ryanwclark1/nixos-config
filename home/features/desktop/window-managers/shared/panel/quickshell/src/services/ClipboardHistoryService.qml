@@ -82,16 +82,17 @@ QtObject {
       return;
 
     var dir = root._cacheDir;
-    var script = "mkdir -p " + SU.shellQuote(dir) + "\n";
+    // safeId is always parseInt'd, and dir is a hardcoded path, so $1 is sufficient
+    var idList = [];
     for (var j = 0; j < imageIds.length; ++j) {
       var safeId = parseInt(imageIds[j], 10);
-      if (isNaN(safeId))
-        continue;
-      var outPath = dir + "/" + safeId + ".png";
-      script += "cliphist decode " + safeId + " > " + SU.shellQuote(outPath) + " 2>/dev/null &\n";
+      if (!isNaN(safeId))
+        idList.push(String(safeId));
     }
-    script += "wait\n";
-    _imageDecodePoll.command = ["sh", "-c", script];
+    if (idList.length === 0) return;
+    _imageDecodePoll.command = ["sh", "-c",
+      "d=\"$1\"; mkdir -p \"$d\"; shift; for id in \"$@\"; do cliphist decode \"$id\" > \"$d/$id.png\" 2>/dev/null & done; wait",
+      "sh", dir].concat(idList);
     _imageDecodePoll._pendingIds = imageIds;
     _imageDecodePoll.running = true;
   }

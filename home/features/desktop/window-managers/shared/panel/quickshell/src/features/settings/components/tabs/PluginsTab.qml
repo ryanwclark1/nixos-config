@@ -176,7 +176,7 @@ Item {
         _pluginDiagnosticsSavePath = root.pluginDiagnosticsOutputPath();
         if (pluginDiagnosticsSaveProc.running)
             return;
-        pluginDiagnosticsSaveProc.command = ["sh", "-c", "mkdir -p " + ShellUtils.shellQuote(root.diagnosticsOutputDir()) + " && cat > " + ShellUtils.shellQuote(_pluginDiagnosticsSavePath)];
+        pluginDiagnosticsSaveProc.command = ["sh", "-c", "mkdir -p \"$1\" && cat > \"$2\"", "sh", root.diagnosticsOutputDir(), _pluginDiagnosticsSavePath];
         pluginDiagnosticsSaveProc.running = true;
     }
 

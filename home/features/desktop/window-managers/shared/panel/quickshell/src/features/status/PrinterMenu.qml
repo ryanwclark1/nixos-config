@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import "../../menu"
+import "../../shared"
 import "../../services"
 import "../../widgets" as SharedWidgets
 

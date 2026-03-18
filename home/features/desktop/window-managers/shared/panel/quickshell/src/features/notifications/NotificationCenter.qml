@@ -36,7 +36,11 @@ PanelWindow {
   readonly property int maxLayerTextureSize: 4096
   signal closeRequested()
   property string searchQuery: ""
-  visible: showContent || ncSlideAnim.running || ncFadeAnim.running
+  RetainableLock {
+    id: _visLock
+    locked: root.showContent || ncSlideAnim.running || ncFadeAnim.running
+  }
+  visible: _visLock.retained
 
   function allowLayer(width, height) {
     return width > 0 && height > 0

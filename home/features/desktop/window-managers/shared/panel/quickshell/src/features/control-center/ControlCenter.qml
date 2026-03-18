@@ -72,7 +72,11 @@ PanelWindow {
         }
     }
 
-    visible: showContent || ccSlideAnim.running || ccFadeAnim.running
+    RetainableLock {
+        id: _visLock
+        locked: root.showContent || ccSlideAnim.running || ccFadeAnim.running
+    }
+    visible: _visLock.retained
 
     // --- Services ---
     SharedWidgets.Ref { service: AudioService }

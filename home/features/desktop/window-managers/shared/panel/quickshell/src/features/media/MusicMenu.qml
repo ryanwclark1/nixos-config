@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Mpris
 import Quickshell.Widgets
-import "../../menu"
+import "../../shared"
 import "../../services"
 import "../../widgets" as SharedWidgets
 

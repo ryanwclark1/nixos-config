@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import "../../menu"
+import "../../shared"
 import "../../services"
 import "../../services/SearchUtils.js" as SU
 import "../../widgets" as SharedWidgets
@@ -17,7 +17,7 @@ BasePopupMenu {
   subtitle: sshData.importBusy ? "Refreshing aliases..." : "Hosts, aliases, and quick actions"
   contentSpacing: Colors.spacingM
   focusOnOpen: true
-  initialFocusTarget: searchInput
+  initialFocusTarget: searchBar.inputItem
 
   property var surfaceContext: null
   property string searchQuery: ""
@@ -230,51 +230,17 @@ BasePopupMenu {
     }
   }
 
-  Rectangle {
+  SharedWidgets.SearchBar {
+    id: searchBar
+    placeholder: "Search SSH hosts..."
+    preferredHeight: root.compactMode ? 34 : 36
     Layout.fillWidth: true
-    height: root.compactMode ? 34 : 36
-    radius: height / 2
-    color: Colors.bgWidget
-    border.color: searchInput.activeFocus ? Colors.primary : Colors.border
-    border.width: 1
-
-    RowLayout {
-      anchors.fill: parent
-      anchors.leftMargin: Colors.spacingM
-      anchors.rightMargin: Colors.spacingM
-      spacing: Colors.spacingS
-
-      Text {
-        text: "󰍉"
-        color: Colors.textDisabled
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeMedium
-      }
-
-      TextInput {
-        id: searchInput
-        Layout.fillWidth: true
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeMedium
-        clip: true
-        onVisibleChanged: if (!visible && activeFocus) focus = false
-        onTextChanged: root.searchQuery = text
-        Keys.onEscapePressed: {
-          if (text !== "")
-            text = "";
-          else
-            root.closeRequested();
-        }
-
-        Text {
-          anchors.fill: parent
-          text: "Search SSH hosts..."
-          color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeMedium
-          visible: !searchInput.text && !searchInput.activeFocus
-          verticalAlignment: Text.AlignVCenter
-        }
-      }
+    onTextChanged: root.searchQuery = text
+    inputItem.Keys.onEscapePressed: {
+      if (searchBar.text !== "")
+        searchBar.text = "";
+      else
+        root.closeRequested();
     }
   }
 

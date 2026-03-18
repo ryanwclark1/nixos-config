@@ -37,7 +37,11 @@ PopupWindow {
   // Parent binds wantVisible instead of visible/showContent.
   // The popup stays mapped while exit animations are running, then unmaps.
   property bool wantVisible: false
-  visible: wantVisible || _opacAnim.running || _scaleAnim.running
+  RetainableLock {
+    id: _visLock
+    locked: root.wantVisible || _opacAnim.running || _scaleAnim.running
+  }
+  visible: _visLock.retained
   property bool showContent: wantVisible
 
   function allowLayer(width, height) {

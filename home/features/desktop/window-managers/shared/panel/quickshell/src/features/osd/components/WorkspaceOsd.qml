@@ -70,7 +70,11 @@ Scope {
         readonly property int usableHeight: Math.max(0, screen.height - edgeMargins.top - edgeMargins.bottom)
 
         property bool _wantVisible: CompositorAdapter.supportsWorkspaceOsd && root.shouldShowOsd
-        visible: _wantVisible || osdFadeAnim.running || osdScaleAnim.running
+        RetainableLock {
+            id: _visLock
+            locked: osdWindow._wantVisible || osdFadeAnim.running || osdScaleAnim.running
+        }
+        visible: _visLock.retained
 
         anchors.top: true
         margins.top: edgeMargins.top + Math.max(0, (usableHeight - implicitHeight) / 2)

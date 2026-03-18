@@ -140,7 +140,6 @@ Item {
                             BatteryMenu { Component.onCompleted: barWindow.wirePopup(this, "batteryMenu") }
                             SystemStatsMenu {
                                 surfaceContext: barWindow.surfaceContext("systemStatsMenu")
-                                implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 Component.onCompleted: barWindow.wirePopup(this, "systemStatsMenu")
                             }
                             PrinterMenu { Component.onCompleted: barWindow.wirePopup(this, "printerMenu") }

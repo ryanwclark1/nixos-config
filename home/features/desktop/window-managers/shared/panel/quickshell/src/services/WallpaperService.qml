@@ -104,7 +104,7 @@ QtObject {
     _applyMonitorName = request.monitorName;
     _applyStdout = "";
     _applyStderr = "";
-    applyProc.command = ["sh", "-c", _buildSetterScript(_applyImagePath, _applyMonitorName)];
+    applyProc.command = _buildSetterCommand(_applyImagePath, _applyMonitorName);
     applyProc.running = true;
   }
 
@@ -146,7 +146,7 @@ QtObject {
     if (request.persistSetting)
       Config.wallpaperSolidColor = _colorHex;
     _colorApplyStderr = "";
-    colorApplyProc.command = ["sh", "-c", _buildSolidColorScript(_colorHex, _colorMonitorName)];
+    colorApplyProc.command = _buildSolidColorCommand(_colorHex, _colorMonitorName);
     colorApplyProc.running = true;
   }
 
@@ -398,39 +398,49 @@ QtObject {
     return fallback;
   }
 
-  function _buildSetterScript(imagePath, monitorName) {
-    var quoted = ShellUtils.shellQuote(imagePath);
-    var outputFlag = monitorName ? ("--outputs " + ShellUtils.shellQuote(monitorName) + " ") : "";
-    var hyprTarget = monitorName ? (monitorName + ",") : ",";
-    var compositorWallpaperArg = ShellUtils.shellQuote(hyprTarget + imagePath);
-
-    return "set -u; ok=0; "
+  // Returns [script, ...args] for positional-arg invocation.
+  // $1 = imagePath, $2 = monitorName (may be empty)
+  function _buildSetterCommand(imagePath, monitorName) {
+    var script = "set -u; ok=0; img=\"$1\"; mon=\"$2\"; "
+         + "output_flag=''; [ -n \"$mon\" ] && output_flag=\"--outputs $mon \"; "
          + "if command -v swww >/dev/null 2>&1; then "
          + "  if ! swww query >/dev/null 2>&1; then "
          + "    swww-daemon >/dev/null 2>&1 & "
          + "    tries=0; while ! swww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
          + "  fi; "
-         + "  if swww img " + outputFlag + quoted + " --transition-type fade --transition-duration 2; then "
+         + "  if eval swww img $output_flag '\"$img\"' --transition-type fade --transition-duration 2; then "
          + "    echo BACKEND:swww; ok=1; "
          + "  fi; "
-         + "fi; "
-         + CompositorAdapter.wallpaperCompositorFallbackSnippet(compositorWallpaperArg)
-         + "if [ \"$ok\" -eq 0 ] && command -v swaybg >/dev/null 2>&1; then "
+         + "fi; ";
+
+    if (CompositorAdapter.isHyprland) {
+      script += "if [ \"$ok\" -eq 0 ] && command -v hyprctl >/dev/null 2>&1; then "
+         + "  hypr_target=\"${mon:+$mon,}${mon:-,}$img\"; "
+         + "  if hyprctl hyprpaper wallpaper \"$hypr_target\"; then "
+         + "    echo BACKEND:hyprpaper; ok=1; "
+         + "  fi; "
+         + "fi; ";
+    }
+
+    script += "if [ \"$ok\" -eq 0 ] && command -v swaybg >/dev/null 2>&1; then "
          + "  pkill swaybg >/dev/null 2>&1 || true; "
-         + "  swaybg -i " + quoted + " -m fill >/dev/null 2>&1 & "
+         + "  swaybg -i \"$img\" -m fill >/dev/null 2>&1 & "
          + "  echo BACKEND:swaybg; ok=1; "
          + "fi; "
          + "[ \"$ok\" -eq 1 ]";
+
+    return ["sh", "-c", script, "sh", imagePath, monitorName || ""];
   }
 
-  function _buildSolidColorScript(colorHex, monitorName) {
-    var outputFlag = monitorName ? ("--outputs " + ShellUtils.shellQuote(monitorName) + " ") : "";
-    return "set -u; "
+  // Returns command array. $1 = colorHex, $2 = monitorName (may be empty)
+  function _buildSolidColorCommand(colorHex, monitorName) {
+    var script = "set -u; color=\"$1\"; mon=\"$2\"; "
          + "command -v swww >/dev/null 2>&1 || { echo 'swww not installed' >&2; exit 1; }; "
          + "if ! swww query >/dev/null 2>&1; then "
          + "  swww-daemon >/dev/null 2>&1 & "
          + "  tries=0; while ! swww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
          + "fi; "
-         + "swww clear " + outputFlag + ShellUtils.shellQuote(colorHex);
+         + "if [ -n \"$mon\" ]; then swww clear --outputs \"$mon\" \"$color\"; else swww clear \"$color\"; fi";
+    return ["sh", "-c", script, "sh", colorHex, monitorName || ""];
   }
 }
