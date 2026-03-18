@@ -10,6 +10,7 @@ Rectangle {
     property string title
     property string subtitle
     property var clickCommand: []
+    property var clickAction: null
 
     Layout.fillWidth: true
     implicitHeight: 68
@@ -81,7 +82,10 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: mouse => {
             stateLayer.burst(mouse.x, mouse.y);
-            Quickshell.execDetached(clickCommand);
+            if (typeof root.clickAction === "function")
+                root.clickAction();
+            else if (Array.isArray(root.clickCommand) && root.clickCommand.length > 0)
+                Quickshell.execDetached(root.clickCommand);
         }
     }
 }

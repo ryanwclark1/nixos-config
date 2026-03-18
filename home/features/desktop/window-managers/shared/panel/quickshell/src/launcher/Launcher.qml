@@ -166,8 +166,9 @@ PanelWindow {
     property real globalLastMouseX: 0
     property real globalLastMouseY: 0
 
-    readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "system" || mode === "files")
-    readonly property bool showLauncherHomeCards: Config.launcherShowHomeSections && searchText === "" && mode === "drun"
+    readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "system" || mode === "files")
+    readonly property bool showLauncherHomeCards: false
+    readonly property bool showLauncherHomePanel: showLauncherHome && mode !== "orchestrator"
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
     readonly property string selectedHomeItemKey: {
@@ -3967,7 +3968,7 @@ PanelWindow {
                 LauncherHome {
                     Layout.fillWidth: true
                     launcher: launcherRoot
-                    visible: launcherRoot.showLauncherHome && launcherRoot.mode !== "orchestrator" && !launcherRoot.isModeLoading
+                    visible: launcherRoot.showLauncherHomePanel && !launcherRoot.isModeLoading
                     showHomeSections: launcherRoot.showLauncherHomeCards
                 }
 

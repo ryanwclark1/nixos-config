@@ -55,7 +55,7 @@ QtObject {
     // --- LAUNCHER ---
     property string launcherDefaultMode: "drun"
     property bool launcherShowModeHints: true
-    property bool launcherShowHomeSections: true
+    property bool launcherShowHomeSections: false
     property bool launcherDrunCategoryFiltersEnabled: false
     property bool launcherEnablePreload: true
     property bool launcherKeepSearchOnModeSwitch: true

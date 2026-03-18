@@ -199,6 +199,12 @@ PanelWindow {
                                     title: modelData.title
                                     subtitle: modelData.subtitle
                                     clickCommand: modelData.clickCommand
+                                    clickAction: modelData.id === "screenshotControls"
+                                        ? function() {
+                                            root.closeRequested();
+                                            Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "screenshotMenu"]);
+                                        }
+                                        : null
                                 }
                             }
                         }

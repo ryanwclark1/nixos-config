@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
-import "../../../../features/bar" as BarComponents
 import "../../../../services"
+import "../../../../widgets" as SharedWidgets
 import ".."
 
 Item {
@@ -124,7 +124,7 @@ Item {
                                     hoverEnabled: true
                                     onClicked: _createTemplate(modelData.name, modelData.valueDescription)
 
-                                    BarComponents.BarTooltip {
+                                    SharedWidgets.BarTooltip {
                                         anchorItem: createTemplateMouse
                                         hovered: createTemplateMouse.containsMouse
                                         text: "Create template script"

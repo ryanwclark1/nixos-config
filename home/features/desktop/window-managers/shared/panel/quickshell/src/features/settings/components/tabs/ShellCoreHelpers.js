@@ -421,7 +421,7 @@ function toggleHiddenListValue(Config, configKey, value) {
 function resetLauncherDefaults(Config, webAliasDefaults, webProviderDefaultOrder, launcherDefaultModes, CompositorAdapter, launcherModes) {
     Config.launcherDefaultMode = "drun";
     Config.launcherShowModeHints = true;
-    Config.launcherShowHomeSections = true;
+    Config.launcherShowHomeSections = false;
     Config.launcherDrunCategoryFiltersEnabled = false;
     Config.launcherEnablePreload = true;
     Config.launcherKeepSearchOnModeSwitch = true;

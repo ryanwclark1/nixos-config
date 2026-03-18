@@ -519,7 +519,7 @@ PanelWindow {
 
           Timer {
             id: clipCopied
-            interval: _copyFeedbackMs
+            interval: parent._copyFeedbackMs
           }
 
           SharedWidgets.StateLayer {

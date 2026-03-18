@@ -157,7 +157,7 @@ function applyLauncherConfig(config, data) {
         config.launcherDefaultMode = config.launcherEnabledModes[0] || "drun";
 
     config.launcherShowModeHints = asBool(launcher.showModeHints, true);
-    config.launcherShowHomeSections = asBool(launcher.showHomeSections, true);
+    config.launcherShowHomeSections = asBool(launcher.showHomeSections, false);
     config.launcherDrunCategoryFiltersEnabled = asBool(launcher.drunCategoryFiltersEnabled, false);
     config.launcherEnablePreload = asBool(launcher.enablePreload, true);
     config.launcherKeepSearchOnModeSwitch = asBool(launcher.keepSearchOnModeSwitch, true);

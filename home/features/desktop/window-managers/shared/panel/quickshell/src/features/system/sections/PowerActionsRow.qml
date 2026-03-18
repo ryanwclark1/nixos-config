@@ -33,6 +33,7 @@ RowLayout {
     model: SystemActionRegistry.actionsByIds([
       "shutdown",
       "reboot",
+      "logout",
       "lock"
     ])
     delegate: Rectangle {
