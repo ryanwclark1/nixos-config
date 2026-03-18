@@ -4,7 +4,6 @@ import Quickshell.Io
 
 QtObject {
   id: rt
-  default property list<QtObject> _data
 
   required property var service  // parent PluginService singleton
 

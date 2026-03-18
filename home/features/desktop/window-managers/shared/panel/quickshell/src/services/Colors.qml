@@ -5,8 +5,6 @@ import Quickshell.Io
 
 QtObject {
     id: colors
-    default property list<QtObject> _data
-
     // --- COLORS (Dynamic) ---
     property color background: "#0a0a0c"
     property color surface: "#1e1e24"
@@ -53,8 +51,7 @@ QtObject {
     // --- AUTO-TRANSPARENCY (wallpaper-driven) ---
     property bool autoTransparencyEnabled: Config.autoTransparency !== undefined ? Config.autoTransparency : false
 
-    ColorQuantizer {
-        id: _wallpaperQuant
+    property ColorQuantizer _wallpaperQuant: ColorQuantizer {
         source: {
             var keys = Object.keys(WallpaperService.wallpapers);
             var path = WallpaperService.wallpapers["__all__"]

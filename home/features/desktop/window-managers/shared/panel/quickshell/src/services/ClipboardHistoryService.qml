@@ -189,15 +189,14 @@ QtObject {
   }
 
   // Auto-refresh when clipboard content changes
-  Connections {
+  property Connections _clipboardConn: Connections {
     target: Quickshell
     function onClipboardTextChanged() {
       _autoRefreshTimer.restart();
     }
   }
 
-  Timer {
-    id: _autoRefreshTimer
+  property Timer _autoRefreshTimer: Timer {
     interval: 200  // Small delay to avoid race with cliphist daemon
     repeat: false
     onTriggered: root.refresh(null)

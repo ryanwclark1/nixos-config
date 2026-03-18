@@ -7,7 +7,6 @@ import "ShellUtils.js" as SU
 
 QtObject {
   id: root
-  default property list<QtObject> _data
 
   property var items: []
   property bool loaded: false

@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
-import "../../shared" as SharedWidgets
+import "../../shared"
+import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: root

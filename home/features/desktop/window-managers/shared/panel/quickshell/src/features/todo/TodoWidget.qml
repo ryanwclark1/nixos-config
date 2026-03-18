@@ -46,7 +46,7 @@ Item {
           font.pixelSize: Colors.fontSizeSmall
           selectionColor: Colors.withAlpha(Colors.primary, 0.35)
           clip: true
-          placeholderText: "Add a task…"
+          property string placeholderText: "Add a task…"
 
           // placeholderText support via overlay text
           Text {

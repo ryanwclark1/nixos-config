@@ -8,6 +8,7 @@ IoMetricCard 1.0 IoMetricCard.qml
 MediaWidget 1.0 MediaWidget.qml
 NetworkGraphs 1.0 NetworkGraphs.qml
 PowerActionsRow 1.0 PowerActionsRow.qml
+ProcessDetailPanel 1.0 ProcessDetailPanel.qml
 ProcessWidget 1.0 ProcessWidget.qml
 RamWidget 1.0 RamWidget.qml
 QuickLinkCard 1.0 QuickLinkCard.qml
