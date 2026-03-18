@@ -115,6 +115,8 @@ Item {
     }
 
     function toggle() {
+      if (!visible && (implicitWidth <= 0 || implicitHeight <= 0))
+        return;
       visible = !visible;
     }
 
