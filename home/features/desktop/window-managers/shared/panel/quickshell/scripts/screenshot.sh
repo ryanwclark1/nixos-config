@@ -58,7 +58,7 @@ capture_region() {
     emit_error "missing dependency: slurp"
     exit 1
   fi
-  
+
   # Try to get window rectangles if on Hyprland for better slurp experience
   local rects=""
   if command -v hyprctl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
@@ -66,23 +66,35 @@ capture_region() {
   fi
 
   freezescreen
-  
+
   local geometry
   if [[ -n "$rects" ]]; then
     geometry=$(echo "$rects" | slurp 2>/dev/null) || geometry=""
   else
     geometry=$(slurp 2>/dev/null) || geometry=""
   fi
-  
+
   unfreezescreen
 
   if [[ -z "$geometry" ]]; then
     echo "ERROR|cancelled"
     exit 0
   fi
-  
+
   if ! grim -g "$geometry" "$FILEPATH" 2>/dev/null; then
     emit_error "grim failed to capture region"
+    exit 1
+  fi
+}
+
+capture_area() {
+  local geometry="$MONITOR"
+  if [[ -z "$geometry" ]]; then
+    emit_error "no geometry provided for area mode"
+    exit 1
+  fi
+  if ! grim -g "$geometry" "$FILEPATH" 2>/dev/null; then
+    emit_error "grim failed to capture area"
     exit 1
   fi
 }
@@ -111,8 +123,11 @@ fi
 ensure_output_dir
 
 case "$MODE" in
-  region|area)
+  region)
     capture_region
+    ;;
+  area)
+    capture_area
     ;;
   screen)
     capture_screen

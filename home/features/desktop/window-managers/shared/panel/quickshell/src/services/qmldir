@@ -43,6 +43,7 @@ singleton SystemIoTelemetryService 1.0 SystemIoTelemetryService.qml
 singleton SystemStatus 1.0 SystemStatus.qml
 singleton ThemeService 1.0 ThemeService.qml
 singleton ToastService 1.0 ToastService.qml
+singleton TodoService 1.0 TodoService.qml
 singleton UsageTrackerService 1.0 UsageTrackerService.qml
 singleton WallpaperService 1.0 WallpaperService.qml
 singleton WeatherService 1.0 WeatherService.qml

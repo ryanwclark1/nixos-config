@@ -12,9 +12,11 @@ import "../features/launcher"
 import "../features/media"
 import "../features/osd"
 import "../features/cheatsheet"
+import "../features/hot-corners"
 import "../features/osk"
 import "../features/notifications"
 import "../features/power"
+import "../features/region-selector"
 import "../features/system/surfaces"
 import "../features/settings"
 import "../features/workspace"
@@ -134,6 +136,7 @@ Scope {
             root.closeAllSurfaces();
             launcher.close();
             osk.close();
+            regionSelector.dismiss();
             if (overview)
                 overview.forceClose();
             if (altTabSwitcher.item && altTabSwitcher.item.hide)
@@ -372,6 +375,23 @@ Scope {
 
     OnScreenKeyboard {
         id: osk
+    }
+
+    RegionSelector {
+        id: regionSelector
+    }
+
+    HotCorners {
+        id: hotCorners
+        onCornerActivated: function(corner) {
+            if (corner === "topLeft") {
+                if (CompositorAdapter.supportsOverview)
+                    root.toggleSurface("overview");
+            } else if (corner === "topRight") {
+                root.toggleSurface("notifCenter");
+            }
+            // bottomLeft / bottomRight: no default action — extend here
+        }
     }
 
     NativeLock {

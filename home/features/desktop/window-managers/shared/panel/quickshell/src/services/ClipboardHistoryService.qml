@@ -187,4 +187,19 @@ QtObject {
       root._imageGeneration += 1;
     }
   }
+
+  // Auto-refresh when clipboard content changes
+  Connections {
+    target: Quickshell
+    function onClipboardTextChanged() {
+      _autoRefreshTimer.restart();
+    }
+  }
+
+  Timer {
+    id: _autoRefreshTimer
+    interval: 200  // Small delay to avoid race with cliphist daemon
+    repeat: false
+    onTriggered: root.refresh(null)
+  }
 }

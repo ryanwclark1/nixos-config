@@ -24,11 +24,17 @@ QtObject {
     signal captureCompleted(string path)
     signal regionCaptured(string path)
     signal captureFailed(string error)
+    signal regionSelectionRequested()
 
     // ── Actions ──────────────────────────────────
-    function captureRegion() { _capture("region", ""); }
+    function captureRegion() { root.regionSelectionRequested(); }
     function captureScreen(monitorName) { _capture("screen", monitorName || ""); }
     function captureFullscreen() { _capture("fullscreen", ""); }
+
+    function captureArea(x, y, w, h) {
+        var geometry = Math.round(x) + "," + Math.round(y) + " " + Math.round(w) + "x" + Math.round(h);
+        _capture("area", geometry);
+    }
 
     function _capture(mode, monitor) {
         if (root.capturing) return;
@@ -69,7 +75,7 @@ QtObject {
         if (root._captureExitCode === 0 && parts[0] === "OK" && parts[1]) {
             var path = parts[1];
             root.lastScreenshotPath = path;
-            if (root._captureMode === "region") {
+            if (root._captureMode === "region" || root._captureMode === "area") {
                 root.lastRegionPath = path;
                 root.regionCaptured(path);
             }

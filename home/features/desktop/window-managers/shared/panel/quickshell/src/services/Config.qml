@@ -23,6 +23,7 @@ QtObject {
     property real cardOpacity: 1.0
     property real settingsBackdropOpacity: 0.92
     property real settingsSurfaceOpacity: 1.0
+    property bool autoTransparency: false
 
     // --- NOTIFICATIONS ---
     property int notifWidth: 350
@@ -137,6 +138,9 @@ QtObject {
 
     // --- SCREEN BORDERS ---
     property bool showScreenBorders: false
+
+    // --- HOT CORNERS ---
+    property bool hotCornersEnabled: false
 
     // --- POWER MENU ---
     property int powermenuCountdown: 3000
