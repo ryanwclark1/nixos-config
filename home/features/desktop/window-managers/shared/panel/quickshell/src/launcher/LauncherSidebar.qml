@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../services"
 import "../widgets" as SharedWidgets
+import "LauncherModeData.js" as ModeData
 
 Rectangle {
     id: root
@@ -126,7 +127,7 @@ Rectangle {
                                 visible: !root.launcher.sidebarCompact
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
-                                text: root.launcher.modeInfo(modelData).label
+                                text: ModeData.modeInfo(modelData).label
                                 color: isCurrent ? Colors.primary : Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeSmall
                                 font.weight: isCurrent ? Font.Black : Font.Medium

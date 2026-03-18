@@ -105,6 +105,10 @@ QtObject {
     property var controlCenterPluginOrder: []
     property var controlCenterHiddenPlugins: []
 
+    // --- ON-SCREEN KEYBOARD ---
+    property string oskLayout: "English (US)"
+    property bool oskPinnedOnStartup: false
+
     // --- OSD ---
     property int osdDuration: 2000
     property int osdSize: 180

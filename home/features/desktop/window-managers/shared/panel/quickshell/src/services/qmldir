@@ -25,6 +25,7 @@ singleton NixOS 1.0 NixOS.qml
 singleton PluginRuntimeCatalog 1.0 PluginRuntimeCatalog.qml
 singleton PluginService 1.0 PluginService.qml
 PluginRuntime 1.0 PluginRuntime.qml
+singleton PomodoroService 1.0 PomodoroService.qml
 singleton PowerProfileService 1.0 PowerProfileService.qml
 singleton PowerService 1.0 PowerService.qml
 singleton PresetService 1.0 PresetService.qml
@@ -46,4 +47,5 @@ singleton UsageTrackerService 1.0 UsageTrackerService.qml
 singleton WallpaperService 1.0 WallpaperService.qml
 singleton WeatherService 1.0 WeatherService.qml
 singleton WorkspaceIdentityService 1.0 WorkspaceIdentityService.qml
+singleton YdotoolService 1.0 YdotoolService.qml
 CommandPoll 1.0 CommandPoll.qml

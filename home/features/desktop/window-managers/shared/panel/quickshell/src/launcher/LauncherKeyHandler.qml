@@ -1,5 +1,5 @@
 import QtQuick
-import "LauncherModeData.js" as ModeData
+import "../services"
 
 // Encapsulates the keyboard dispatch logic for the launcher search field.
 // Instantiate this alongside the search field and forward Keys.onPressed

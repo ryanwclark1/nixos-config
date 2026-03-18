@@ -39,7 +39,7 @@ Rectangle {
   }
 
   height: sliderMouse.pressed ? 32 : 28
-  Behavior on height { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+  Behavior on height { Anim { duration: Colors.durationFast } }
 
   transform: Scale {
     origin.x: root.width / 2
@@ -54,8 +54,8 @@ Rectangle {
   border.color: root.muted ? root.mutedColor : (sliderMouse.containsMouse ? root.activeColor : Colors.border)
   border.width: 1
 
-  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-  Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on color { CAnim {} }
+  Behavior on border.color { CAnim {} }
 
   // Background inner shadow/depth
   Rectangle {
@@ -86,7 +86,7 @@ Rectangle {
     width: Math.max(root.minThumbWidth, parent.width * (root.muted ? 0 : root.value))
     radius: parent.radius
     color: root.muted ? root.mutedColor : root.activeColor
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
 
     gradient: Gradient {
       orientation: Gradient.Horizontal
@@ -108,7 +108,7 @@ Rectangle {
       anchors.centerIn: parent
       text: root.muted ? root.mutedIcon : root.icon
       color: root.value > 0.15 ? Colors.background : Colors.text
-      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on color { CAnim {} }
       font.family: Colors.fontMono
       font.pixelSize: Colors.fontSizeSmall
       visible: root.muted || root.value > root.minVisibleValue

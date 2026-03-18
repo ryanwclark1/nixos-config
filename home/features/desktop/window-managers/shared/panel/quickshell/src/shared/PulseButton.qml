@@ -17,7 +17,7 @@ Rectangle {
   color: mouse.pressed ? Qt.rgba(tint.r, tint.g, tint.b, 0.22)
                        : (mouse.containsMouse ? Qt.rgba(tint.r, tint.g, tint.b, 0.14) : "transparent")
 
-  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on color { CAnim {} }
 
   // Ripple pulse overlay
   Rectangle {

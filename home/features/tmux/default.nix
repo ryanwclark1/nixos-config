@@ -83,6 +83,8 @@
       set -g renumber-windows on
       set -g set-clipboard on
       set -g allow-passthrough on
+      # Keep PATH in sync from the client shell to avoid stale fnm shim paths.
+      set -g update-environment "DISPLAY KRB5CCNAME MSYSTEM SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY PATH"
 
       ###################################
       # Configure the forceline plugin

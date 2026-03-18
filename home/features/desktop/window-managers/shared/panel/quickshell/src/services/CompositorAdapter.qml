@@ -99,6 +99,22 @@ QtObject {
       + " id=" + windowIdentifier(activeWindow);
   }
 
+  // ── Fullscreen detection ──────────────────────
+  readonly property bool hasFullscreenWindow: {
+    if (isNiri) {
+      var wins = NiriService.windows;
+      for (var i = 0; i < wins.length; i++) {
+        if (wins[i].is_fullscreen) return true;
+      }
+      return false;
+    }
+    if (isHyprland) {
+      // hyprctl activewindow JSON includes fullscreen field
+      return !!(hyprlandCtlWindow && hyprlandCtlWindow.fullscreen);
+    }
+    return false;
+  }
+
   // ── Niri reactive state (delegated to NiriService) ──
   // These provide zero-latency access to Niri state without polling.
   readonly property var niriWorkspaces: isNiri ? NiriService.allWorkspaces : []

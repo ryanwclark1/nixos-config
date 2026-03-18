@@ -10,5 +10,5 @@ Rectangle {
   color: "transparent"
   border.color: Colors.borderLight; border.width: 1
   opacity: (hoveredOpacity > 0 && hovered) ? hoveredOpacity : highlightOpacity
-  Behavior on opacity { enabled: hoveredOpacity > 0; NumberAnimation { duration: Colors.durationFast } }
+  Behavior on opacity { enabled: hoveredOpacity > 0; Anim { duration: Colors.durationFast } }
 }

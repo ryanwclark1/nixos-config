@@ -28,8 +28,8 @@ Item {
     border.color: root.checked ? "transparent" : Colors.border
     border.width: root.checked ? 0 : 1
 
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-    Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
+    Behavior on border.color { CAnim {} }
 
     StateLayer {
       id: trackStateLayer
@@ -66,7 +66,7 @@ Item {
     Behavior on height {
       NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
     }
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
 
     // Press squish
     scale: mouse.pressed ? 0.88 : 1.0

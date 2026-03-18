@@ -21,8 +21,8 @@ Rectangle {
   border.width: 1
   opacity: enabled ? 1.0 : 0.4
 
-  Behavior on color { ColorAnimation { duration: Colors.durationFast } }
-  Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+  Behavior on color { CAnim {} }
+  Behavior on border.color { CAnim {} }
 
   Row {
     id: row
@@ -47,7 +47,7 @@ Rectangle {
       font.pixelSize: Colors.fontSizeMedium
       visible: root.icon !== ""
       anchors.verticalCenter: parent.verticalCenter
-      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on color { CAnim {} }
     }
 
     Text {
@@ -56,7 +56,7 @@ Rectangle {
       font.pixelSize: Colors.fontSizeSmall
       font.weight: root.selected ? Font.DemiBold : Font.Normal
       anchors.verticalCenter: parent.verticalCenter
-      Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on color { CAnim {} }
     }
   }
 

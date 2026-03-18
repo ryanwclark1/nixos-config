@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
 QtObject {
     id: root
@@ -46,9 +47,24 @@ QtObject {
         }
     }
 
-    IpcHandler {
-        target: "GameMode"
-        function toggle() { root.toggle() }
-        function isActive() { return root.active }
+    property var _ipcHandler: null
+
+    property Component _ipcHandlerComponent: Component {
+        IpcHandler {
+            target: "GameMode"
+            function toggle() { root.toggle() }
+            function isActive() { return root.active }
+        }
+    }
+
+    Component.onCompleted: {
+        _ipcHandler = _ipcHandlerComponent.createObject(root);
+    }
+
+    Component.onDestruction: {
+        if (_ipcHandler) {
+            _ipcHandler.destroy();
+            _ipcHandler = null;
+        }
     }
 }

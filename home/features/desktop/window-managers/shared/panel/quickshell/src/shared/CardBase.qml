@@ -41,7 +41,7 @@ Item {
       color: Colors.bgWidget
       border.color: cardHover.hovered ? Colors.primary : Colors.border
       border.width: 1
-      Behavior on border.color { ColorAnimation { duration: Colors.durationFast } }
+      Behavior on border.color { CAnim {} }
 
       gradient: SurfaceGradient {}
     }

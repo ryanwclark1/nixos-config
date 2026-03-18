@@ -54,9 +54,7 @@ Item {
     visible: overflow
     opacity: visibleState ? 1.0 : 0.0
 
-    Behavior on opacity {
-      NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic }
-    }
+    Behavior on opacity { Anim { duration: Colors.durationFast } }
 
     readonly property int _scrollbarHideMs: 1200
 
@@ -97,9 +95,7 @@ Item {
       radius: width / 2
       color: thumbDrag.drag.active ? Colors.primary : (thumbDrag.containsMouse ? Colors.textSecondary : Colors.border)
 
-      Behavior on color {
-        ColorAnimation { duration: Colors.durationFast }
-      }
+      Behavior on color { CAnim {} }
 
       Behavior on y {
         enabled: !thumbDrag.drag.active

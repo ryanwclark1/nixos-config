@@ -20,7 +20,7 @@ Rectangle {
     height: parent.height
     color: root.barColor
     radius: root.safeRadius
-    Behavior on width { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on width { Anim {} }
 
     // Subtle highlight on the progress bar itself
     Rectangle {

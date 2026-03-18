@@ -1099,74 +1099,19 @@ PanelWindow {
     }
 
     function recordFilesBackendLoad(backend, durationMs) {
-        var next = Object.assign({}, launcherMetrics);
-        var took = Math.max(0, Math.round(durationMs || 0));
-        if (backend === "fd") {
-            var fdLoads = (next.filesFdLoads || 0) + 1;
-            next.filesFdLoads = fdLoads;
-            next.filesFdLastMs = took;
-            next.filesFdAvgMs = Math.round((((next.filesFdAvgMs || 0) * (fdLoads - 1)) + took) / fdLoads);
-        } else if (backend === "find") {
-            var findLoads = (next.filesFindLoads || 0) + 1;
-            next.filesFindLoads = findLoads;
-            next.filesFindLastMs = took;
-            next.filesFindAvgMs = Math.round((((next.filesFindAvgMs || 0) * (findLoads - 1)) + took) / findLoads);
-        }
-        launcherMetrics = next;
+        launcherMetrics = Metrics.recordFilesBackendLoad(launcherMetrics, backend, durationMs);
     }
 
     function recordFilesBackendResolveMetric(durationMs) {
-        var next = Object.assign({}, launcherMetrics);
-        var runs = (next.filesResolveRuns || 0) + 1;
-        var took = Math.max(0, Math.round(durationMs || 0));
-        next.filesResolveRuns = runs;
-        next.filesResolveLastMs = took;
-        next.filesResolveAvgMs = Math.round((((next.filesResolveAvgMs || 0) * (runs - 1)) + took) / runs);
-        launcherMetrics = next;
+        launcherMetrics = Metrics.recordFilesBackendResolveMetric(launcherMetrics, durationMs);
     }
 
     function recordFilterMetric(durationMs) {
-        var next = Object.assign({}, launcherMetrics);
-        var runs = Math.max(0, Math.round(next.filterRuns || 0)) + 1;
-        var last = Math.max(0, Math.round(durationMs || 0));
-        var avg = Math.round((((next.avgFilterMs || 0) * (runs - 1)) + last) / runs);
-        next.filterRuns = runs;
-        next.lastFilterMs = last;
-        next.avgFilterMs = avg;
-        launcherMetrics = next;
+        launcherMetrics = Metrics.recordFilterMetric(launcherMetrics, durationMs);
     }
 
     function recordLoadMetric(modeKey, durationMs, cacheHit, success) {
-        var next = Object.assign({}, launcherMetrics);
-        if (!next.perMode)
-            next.perMode = ({});
-        var current = Object.assign({
-            loads: 0,
-            cacheHits: 0,
-            cacheMisses: 0,
-            failures: 0,
-            lastLoadMs: 0,
-            avgLoadMs: 0
-        }, next.perMode[modeKey] || ({}));
-
-        current.loads += 1;
-        if (cacheHit) {
-            current.cacheHits += 1;
-            next.cacheHits = (next.cacheHits || 0) + 1;
-        } else {
-            current.cacheMisses += 1;
-            next.cacheMisses = (next.cacheMisses || 0) + 1;
-        }
-        if (!success) {
-            current.failures += 1;
-            next.commandFailures = (next.commandFailures || 0) + 1;
-        }
-
-        var clampedDuration = Math.max(0, Math.round(durationMs || 0));
-        current.lastLoadMs = clampedDuration;
-        current.avgLoadMs = Math.round((((current.avgLoadMs || 0) * (current.loads - 1)) + clampedDuration) / current.loads);
-        next.perMode[modeKey] = current;
-        launcherMetrics = next;
+        launcherMetrics = Metrics.recordLoadMetric(launcherMetrics, modeKey, durationMs, cacheHit, success);
     }
 
     function shouldBackoffPreload(modeKey) {
@@ -1221,34 +1166,12 @@ PanelWindow {
     }
 
     function resultSectionLabel(item) {
-        if (!item)
-            return "";
-
-        if (mode === "drun") {
-            if (!drunCategoryFiltersEnabled)
-                return "Applications";
-            Search.ensureItemRankCache(item);
-            var drunKey = String(item._primaryCategoryKey || "");
-            return drunKey === "" ? "Applications" : formatDrunCategoryLabel(drunKey);
-        }
-
-        if (mode === "files")
-            return "Files";
-        if (mode === "run")
-            return "Commands";
-        if (mode === "clip")
-            return "Clipboard";
-        if (mode === "emoji")
-            return "Emoji";
-        if (mode === "bookmarks")
-            return "Bookmarks";
-        if (mode === "web")
-            return String(item.providerName || item.category || "Web");
-
-        var category = String(item.category || "");
-        if (category !== "")
-            return category;
-        return String(modeInfo(mode).label || "Results");
+        return SystemItems.resultSectionLabel(mode, item, {
+            drunCategoryFiltersEnabled: drunCategoryFiltersEnabled,
+            formatDrunCategoryLabel: formatDrunCategoryLabel,
+            ensureItemRankCache: Search.ensureItemRankCache,
+            modeInfoFn: modeInfo
+        });
     }
 
     function homeItemKey(item) {
@@ -2411,59 +2334,14 @@ PanelWindow {
     }
 
     function loadDevOps() {
-        var items = [];
-
-        // Docker Containers
-        var containers = ServiceUnitService.dockerContainers;
-        for (var i = 0; i < containers.length; i++) {
-            var c = containers[i];
-            items.push({
-                category: "Docker",
-                name: c.name,
-                description: c.status + " (" + c.image + ")",
-                icon: "󰡨",
-                action: (function (id, state) {
-                        return function () {
-                            ServiceUnitService.runDockerAction(id, state === "running" ? "stop" : "start");
-                            close();
-                        };
-                    })(c.id, c.state)
-            });
-        }
-
-        // SSH Sessions
-        var ssh = ServiceUnitService.sshSessions;
-        for (var j = 0; j < ssh.length; j++) {
-            items.push({
-                category: "SSH",
-                name: ssh[j],
-                icon: "󰣀",
-                action: function () {
-                    close();
-                } // Just info for now
-            });
-        }
-
-        // System Services
-        var units = ServiceUnitService.userUnits;
-        for (var k = 0; k < units.length; k++) {
-            var u = units[k];
-            if (u.active === "active" || u.name.indexOf("quickshell") !== -1) {
-                items.push({
-                    category: "Service",
-                    name: u.name.replace(".service", ""),
-                    icon: u.active === "active" ? "󰄬" : "󰅚",
-                    action: (function (name) {
-                            return function () {
-                                ServiceUnitService.restartUnit("user", name);
-                                close();
-                            };
-                        })(u.name)
-                });
-            }
-        }
-
-        allItems = items;
+        allItems = SystemItems.buildDevOpsItems({
+            dockerContainers: ServiceUnitService.dockerContainers,
+            sshSessions: ServiceUnitService.sshSessions,
+            userUnits: ServiceUnitService.userUnits,
+            runDockerAction: function(id, op) { ServiceUnitService.runDockerAction(id, op); },
+            restartUnit: function(scope, name) { ServiceUnitService.restartUnit(scope, name); },
+            close: close
+        });
         filterItems();
         completeModeLoad("devops", true, "");
     }
@@ -2475,141 +2353,28 @@ PanelWindow {
     }
 
     function loadSystem() {
-        var items = [];
-        var powerActions = SystemActionRegistry.sessionActions;
-        var controlActions = SystemActionRegistry.shellEntryActions;
-        for (var i = 0; i < powerActions.length; ++i) {
-            var action = powerActions[i];
-            var item = {
-                category: action.category,
-                name: action.name,
-                title: action.title,
-                icon: action.icon
-            };
-            if (action.ipcTarget && action.ipcAction) {
-                item.ipcTarget = action.ipcTarget;
-                item.ipcAction = action.ipcAction;
-            } else if (action.requiresConfirmation) {
-                item.action = makeConfirmedSystemAction(action.title, action.id);
-            } else {
-                item.action = makeDetachedSystemAction(action.id);
-            }
-            items.push(item);
-        }
-        items = items.concat([
-            {
-                category: "Capture",
-                name: "Screenshot (Area)",
-                icon: "󰹑",
-                action: () => Quickshell.execDetached(DependencyService.resolveCommand("qs-screenshot", ["area", "--satty"]))
-            },
-            {
-                category: "Capture",
-                name: "Screenshot (Display)",
-                icon: "󰍹",
-                action: () => Quickshell.execDetached(DependencyService.resolveCommand("qs-screenshot", ["screen", "--satty"]))
-            },
-            {
-                category: "Capture",
-                name: "Color Picker",
-                icon: "󰏘",
-                action: () => Quickshell.execDetached(["hyprpicker", "-a"])
-            },
-            {
-                category: "Toggles",
-                name: "Toggle Bluetooth",
-                icon: "󰂯",
-                action: () => {
-                    if (Bluetooth.defaultAdapter)
-                        Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled;
-                }
-            },
-            {
-                category: "Toggles",
-                name: "Toggle Night Light",
-                icon: "󰖔",
-                action: () => Quickshell.execDetached(["os-toggle-nightlight"])
-            }
-        ]);
-        for (var j = 0; j < controlActions.length; ++j) {
-            var control = controlActions[j];
-            items.push({
-                category: control.category,
-                name: control.name,
-                title: control.title,
-                icon: control.icon,
-                ipcTarget: control.ipcTarget,
-                ipcAction: control.ipcAction
-            });
-        }
-        items = items.concat([
-            {
-                category: "Utilities",
-                name: "System Monitor",
-                icon: "󰄨",
-                action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "systemMonitor"])
-            },
-            {
-                category: "Utilities",
-                name: "System Monitor (terminal btop)",
-                icon: "󱓞",
-                action: () => launchInTerminal("btop")
-            },
-            {
-                category: "Utilities",
-                name: "Audio Settings",
-                icon: "󰕾",
-                action: () => launchInTerminal("wiremix")
-            }
-        ]);
-        allItems = items;
+        allItems = SystemItems.buildSystemItems({
+            sessionActions: SystemActionRegistry.sessionActions,
+            shellEntryActions: SystemActionRegistry.shellEntryActions,
+            makeConfirmedSystemAction: makeConfirmedSystemAction,
+            makeDetachedSystemAction: makeDetachedSystemAction,
+            execDetached: function(cmd) { Quickshell.execDetached(cmd); },
+            resolveCommand: function(name, args) { return DependencyService.resolveCommand(name, args); },
+            launchInTerminal: launchInTerminal,
+            defaultAdapter: Bluetooth.defaultAdapter
+        });
         filterItems();
         completeModeLoad("system", true, "");
     }
 
     function loadNixos() {
         NixOS.refresh();
-        var items = [
-            {
-                category: "System",
-                name: "Rebuild Switch (flake)",
-                icon: "󰒓",
-                action: () => launchInTerminal("sudo nixos-rebuild switch --flake .#")
-            },
-            {
-                category: "System",
-                name: "Update Flake Locks",
-                icon: "󰚰",
-                action: () => launchInTerminal("nix flake update")
-            },
-            {
-                category: "System",
-                name: "Collect Garbage",
-                icon: "󰃢",
-                action: () => launchInTerminal("sudo nix-env --delete-generations old")
-            }
-        ];
-
-        var gens = NixOS.generations;
-        if (gens && gens.length > 0) {
-            for (var i = 0; i < gens.length; i++) {
-                var g = gens[i];
-                items.push({
-                    category: "Generations",
-                    name: "Generation " + g.id + (g.current ? " (current)" : ""),
-                    title: g.date + " • " + g.version,
-                    icon: g.current ? "󰄬" : "󰋚",
-                    action: (function (id) {
-                            return function () {
-                                NixOS.rollbackTo(id);
-                                close();
-                            };
-                        })(g.id)
-                });
-            }
-        }
-
-        allItems = items;
+        allItems = SystemItems.buildNixosItems({
+            launchInTerminal: launchInTerminal,
+            close: close,
+            generations: NixOS.generations,
+            rollbackTo: function(id) { NixOS.rollbackTo(id); }
+        });
         filterItems();
         completeModeLoad("nixos", true, "");
     }
@@ -3507,93 +3272,12 @@ PanelWindow {
                         }
                     }
 
-                    Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Escape) {
-                            if (launcherRoot.handleEscapeAction())
-                                event.accepted = true;
-                        } else if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && (event.key === Qt.Key_L || event.key === Qt.Key_U)) {
-                            launcherRoot.clearSearchQuery();
-                            event.accepted = true;
-                        } else if (Config.launcherWebNumberHotkeysEnabled && launcherRoot.mode === "web" && (event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ShiftModifier)) {
-                            var openSlot = launcherRoot.webProviderSlotFromKey(event.key);
-                            if (openSlot > 0 && launcherRoot.executeWebProviderBySlot(openSlot))
-                                event.accepted = true;
-                        } else if (Config.launcherWebNumberHotkeysEnabled && launcherRoot.mode === "web" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)) {
-                            var slot = launcherRoot.webProviderSlotFromKey(event.key);
-                            if (slot > 0 && launcherRoot.selectWebProviderBySlot(slot))
-                                event.accepted = true;
-                        } else if (launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)) {
-                            if (event.key === Qt.Key_Left) {
-                                if (launcherRoot.cycleDrunCategoryFilter(-1))
-                                    event.accepted = true;
-                            } else if (event.key === Qt.Key_Right) {
-                                if (launcherRoot.cycleDrunCategoryFilter(1))
-                                    event.accepted = true;
-                            } else if (event.key === Qt.Key_PageUp) {
-                                if (launcherRoot.cycleDrunCategoryFilter(-1))
-                                    event.accepted = true;
-                            } else if (event.key === Qt.Key_PageDown) {
-                                if (launcherRoot.cycleDrunCategoryFilter(1))
-                                    event.accepted = true;
-                            } else if (event.key === Qt.Key_Home) {
-                                if (launcherRoot.jumpDrunCategoryBoundary(false))
-                                    event.accepted = true;
-                            } else if (event.key === Qt.Key_End) {
-                                if (launcherRoot.jumpDrunCategoryBoundary(true))
-                                    event.accepted = true;
-                            } else if (event.key === Qt.Key_0 || event.key === Qt.Key_Backspace) {
-                                if (launcherRoot.setDrunCategoryFilter(""))
-                                    event.accepted = true;
-                            } else {
-                                var categorySlot = launcherRoot.webProviderSlotFromKey(event.key);
-                                if (categorySlot > 0 && launcherRoot.selectDrunCategorySlot(categorySlot))
-                                    event.accepted = true;
-                            }
-                        } else if (launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab) {
-                            var direction = (event.modifiers & Qt.ShiftModifier) ? -1 : 1;
-                            if (launcherRoot.cycleDrunCategoryFilter(direction))
-                                event.accepted = true;
-                        } else if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
-                            launcherRoot.cycleMode(1);
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Tab) {
-                            if (launcherRoot.launcherTabBehavior === "mode")
-                                launcherRoot.cycleMode(1);
-                            else if (launcherRoot.launcherTabBehavior === "results")
-                                launcherRoot.cycleSelection(1);
-                            else if (launcherRoot.filteredItems.length > 0)
-                                launcherRoot.cycleSelection(1);
-                            else
-                                launcherRoot.cycleMode(1);
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            launcherRoot.handleSearchAccepted(event.modifiers);
-                        } else if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && event.key === Qt.Key_P) {
-                            if (launcherRoot.moveSelectionRelative(-1))
-                                event.accepted = true;
-                        } else if ((event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier) && event.key === Qt.Key_N) {
-                            if (launcherRoot.moveSelectionRelative(1))
-                                event.accepted = true;
-                        } else if (event.key === Qt.Key_Up) {
-                            if (launcherRoot.moveSelectionRelative(-1))
-                                event.accepted = true;
-                        } else if (event.key === Qt.Key_Down) {
-                            if (launcherRoot.moveSelectionRelative(1))
-                                event.accepted = true;
-                        } else if (event.key === Qt.Key_PageUp) {
-                            if (launcherRoot.pageSelection(-1))
-                                event.accepted = true;
-                        } else if (event.key === Qt.Key_PageDown) {
-                            if (launcherRoot.pageSelection(1))
-                                event.accepted = true;
-                        } else if (event.key === Qt.Key_Home) {
-                            if (launcherRoot.jumpSelectionBoundary(false))
-                                event.accepted = true;
-                        } else if (event.key === Qt.Key_End) {
-                            if (launcherRoot.jumpSelectionBoundary(true))
-                                event.accepted = true;
-                        }
+                    LauncherKeyHandler {
+                        id: keyHandler
+                        launcher: launcherRoot
                     }
+
+                    Keys.onPressed: event => keyHandler.handleKeyPress(event)
                 }
 
                 LauncherActionLegend {

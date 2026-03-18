@@ -240,6 +240,6 @@ Item {
 
   Behavior on _swipeOffset {
     enabled: !root._isSwiping
-    NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic }
+    Anim {}
   }
 }

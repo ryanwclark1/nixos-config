@@ -131,6 +131,11 @@ QtObject {
                 kind: "panel",
                 focusPolicy: "focus-on-open",
                 legacyFlags: ["aiChatVisible"]
+            },
+            osk: {
+                kind: "panel",
+                focusPolicy: "preserve-app-focus",
+                legacyFlags: ["oskVisible"]
             }
         })
     readonly property var knownSurfaces: Object.keys(surfaceRegistry)

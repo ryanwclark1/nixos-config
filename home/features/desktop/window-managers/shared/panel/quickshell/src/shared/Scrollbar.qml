@@ -40,7 +40,7 @@ Item {
   // Only meaningful when there is overflow.
   visible: _overflow
   opacity: _visible ? 1.0 : 0.0
-  Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
+  Behavior on opacity { Anim { duration: Colors.durationFast } }
 
   // ── Show/hide state ───────────────────────────────────────────────────────
   property bool _visible: false
@@ -94,7 +94,7 @@ Item {
       if (thumbDrag.containsMouse) return Colors.textSecondary;
       return Colors.border;
     }
-    Behavior on color { ColorAnimation { duration: Colors.durationFast } }
+    Behavior on color { CAnim {} }
     // Smooth position updates while not dragging.
     Behavior on y {
       enabled: !thumbDrag.drag.active

@@ -11,6 +11,7 @@ import "../shared"
 Item {
     id: root
     property bool showBorders: false
+    readonly property bool _backgroundAutoHidden: Config.backgroundAutoHide && CompositorAdapter.hasFullscreenWindow
 
     Dock {
         id: dock
@@ -47,11 +48,11 @@ Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: parent.height * 0.4
-                    visible: Config.backgroundVisualizerEnabled
+                    visible: Config.backgroundVisualizerEnabled && !root._backgroundAutoHidden
                 }
 
                 BackgroundClock {
-                    visible: Config.backgroundClockEnabled
+                    visible: Config.backgroundClockEnabled && !root._backgroundAutoHidden
                 }
             }
         }

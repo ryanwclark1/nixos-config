@@ -105,9 +105,9 @@ PopupWindow {
       return Item.Top;
     }
 
-    Behavior on opacity { NumberAnimation { id: _opacAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on opacity { Anim { id: _opacAnim } }
     Behavior on scale { NumberAnimation { id: _scaleAnim; duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
-    Behavior on transform { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on transform { Anim {} }
 
     layer.enabled: (_opacAnim.running || _scaleAnim.running) && root.allowLayer(width, height)
 

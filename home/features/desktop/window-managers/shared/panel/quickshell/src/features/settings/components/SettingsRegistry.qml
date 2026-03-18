@@ -313,6 +313,20 @@ QtObject {
             }
         },
         {
+            id: "background",
+            label: "Background",
+            icon: "󰸉",
+            categoryId: "surfaces",
+            order: 45,
+            component: "BackgroundTab.qml",
+            searchTerms: ["background", "visualizer", "clock", "spectrum", "cava"],
+            owner: {
+                surface: "background",
+                service: "Config",
+                configDomain: "background"
+            }
+        },
+        {
             id: "lock-screen",
             legacyIndex: 10,
             label: "Lock Screen",
