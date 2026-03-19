@@ -668,6 +668,10 @@ QtObject {
         return results;
     }
 
+    function searchSettings(query) {
+        return SearchIndex.searchSettings(query);
+    }
+
     function validateRegistry() {
         var seenTabIds = {};
         var seenLegacy = {};
@@ -705,6 +709,8 @@ QtObject {
 
         if (!findTab(defaultTabId))
             Logger.w("SettingsRegistry", "defaultTabId '" + defaultTabId + "' not found");
+
+        SearchIndex.validateIndex(findTab);
     }
 
     Component.onCompleted: validateRegistry()
