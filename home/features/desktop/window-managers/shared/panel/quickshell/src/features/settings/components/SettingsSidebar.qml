@@ -24,29 +24,7 @@ Rectangle {
   readonly property var compactEntries: buildCompactEntries()
 
   Layout.fillHeight: true
-  color: Colors.withAlpha(Colors.background, 0.75)
-
-  Rectangle {
-    anchors.right: parent.right
-    anchors.top: parent.top
-    anchors.bottom: parent.bottom
-    width: 1
-    color: Colors.border
-    opacity: 0.85
-    z: 10
-  }
-
-  Rectangle {
-    anchors.right: parent.right
-    anchors.top: parent.top
-    anchors.bottom: parent.bottom
-    width: 12
-    color: "transparent"
-    gradient: SharedWidgets.SurfaceGradient {}
-    rotation: 90
-    opacity: 0.15
-    visible: !root.compactMode
-  }
+  color: "transparent"
 
   property var expandedCategories: ({})
 

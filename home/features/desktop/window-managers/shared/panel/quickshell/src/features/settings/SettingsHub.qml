@@ -20,6 +20,8 @@ PanelWindow {
   readonly property bool compactMode: isPortrait || usableWidth < 1024 || usableHeight < 760
   readonly property bool tightSpacing: usableWidth < 720 || usableHeight < 640
   readonly property int sidebarWidth: compactMode ? 72 : 256
+  readonly property real shellPadding: tightSpacing ? Colors.spacingS : Colors.spacingM
+  readonly property real paneGap: compactMode ? Colors.spacingS : Colors.spacingM
   readonly property int maxLayerTextureSize: 4096
   property string searchQuery: ""
 
@@ -248,8 +250,8 @@ PanelWindow {
     anchors.left: parent.left
     anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(settingsRoot.gutterY, (settingsRoot.usableHeight - height) / 2)
     anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(settingsRoot.gutterX, (settingsRoot.usableWidth - width) / 2)
-    color: Colors.withAlpha(Colors.surface, 0.4)
-    border.color: Colors.withAlpha(Colors.text, 0.12)
+    color: Colors.withAlpha(Colors.surface, 0.5)
+    border.color: Colors.withAlpha(Colors.text, 0.16)
     border.width: 1
     radius: Colors.radiusLarge
     clip: true
@@ -257,6 +259,7 @@ PanelWindow {
 
     // Inner highlight
     SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
+    SharedWidgets.SurfaceGradient {}
 
     focus: settingsRoot.isOpen
     onVisibleChanged: {
@@ -281,43 +284,68 @@ PanelWindow {
 
     RowLayout {
       anchors.fill: parent
-      spacing: 0
+      anchors.margins: settingsRoot.shellPadding
+      spacing: settingsRoot.paneGap
 
-      SettingsSidebar {
+      Rectangle {
         Layout.preferredWidth: settingsRoot.sidebarWidth
-        currentTabId: settingsRoot.currentTabId
-        searchQuery: settingsRoot.searchQuery
-        compactMode: settingsRoot.compactMode
-        onTabSelected: (tabId) => settingsRoot.setCurrentTab(tabId)
-        onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
-        onSettingHighlightRequested: (tabId, cardTitle, settingLabel) => {
-          settingsRoot.highlightCardTitle = cardTitle;
-          settingsRoot.highlightSettingLabel = settingLabel;
-          settingsRoot.setCurrentTab(tabId);
-          settingsRoot.searchQuery = "";
-        }
-        onSaveAndClose: {
-          Config.save();
-          settingsRoot.close();
+        Layout.fillHeight: true
+        radius: settingsRoot.compactMode ? Colors.radiusMedium : Colors.radiusLarge
+        color: Colors.withAlpha(Colors.background, settingsRoot.compactMode ? 0.82 : 0.86)
+        border.color: Colors.withAlpha(Colors.text, settingsRoot.compactMode ? 0.16 : 0.12)
+        border.width: 1
+        clip: true
+
+        SharedWidgets.InnerHighlight { highlightOpacity: 0.13 }
+
+        SettingsSidebar {
+          anchors.fill: parent
+          currentTabId: settingsRoot.currentTabId
+          searchQuery: settingsRoot.searchQuery
+          compactMode: settingsRoot.compactMode
+          onTabSelected: (tabId) => settingsRoot.setCurrentTab(tabId)
+          onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
+          onSettingHighlightRequested: (tabId, cardTitle, settingLabel) => {
+            settingsRoot.highlightCardTitle = cardTitle;
+            settingsRoot.highlightSettingLabel = settingLabel;
+            settingsRoot.setCurrentTab(tabId);
+            settingsRoot.searchQuery = "";
+          }
+          onSaveAndClose: {
+            Config.save();
+            settingsRoot.close();
+          }
         }
       }
 
-      SettingsContent {
-        id: settingsContent
+      Rectangle {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        currentTabId: settingsRoot.currentTabId
-        settingsRoot: settingsRoot
-        searchQuery: settingsRoot.searchQuery
-        compactMode: settingsRoot.compactMode
-        tightSpacing: settingsRoot.tightSpacing
-        highlightCardTitle: settingsRoot.highlightCardTitle
-        highlightSettingLabel: settingsRoot.highlightSettingLabel
-        onTabSelected: (tabId) => settingsRoot.setCurrentTab(tabId)
-        onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
-        onHighlightConsumed: {
-          settingsRoot.highlightCardTitle = "";
-          settingsRoot.highlightSettingLabel = "";
+        radius: Colors.radiusLarge
+        color: Colors.withAlpha(Colors.surface, settingsRoot.compactMode ? 0.72 : 0.78)
+        border.color: Colors.withAlpha(Colors.text, 0.12)
+        border.width: 1
+        clip: true
+
+        SharedWidgets.InnerHighlight { highlightOpacity: 0.14 }
+        SharedWidgets.SurfaceGradient {}
+
+        SettingsContent {
+          id: settingsContent
+          anchors.fill: parent
+          currentTabId: settingsRoot.currentTabId
+          settingsRoot: settingsRoot
+          searchQuery: settingsRoot.searchQuery
+          compactMode: settingsRoot.compactMode
+          tightSpacing: settingsRoot.tightSpacing
+          highlightCardTitle: settingsRoot.highlightCardTitle
+          highlightSettingLabel: settingsRoot.highlightSettingLabel
+          onTabSelected: (tabId) => settingsRoot.setCurrentTab(tabId)
+          onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
+          onHighlightConsumed: {
+            settingsRoot.highlightCardTitle = "";
+            settingsRoot.highlightSettingLabel = "";
+          }
         }
       }
     }

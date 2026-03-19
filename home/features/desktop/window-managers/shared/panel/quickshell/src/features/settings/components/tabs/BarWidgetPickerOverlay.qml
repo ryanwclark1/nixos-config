@@ -167,18 +167,12 @@ Rectangle {
                                 }
                             }
 
-                            Flow {
-                                Layout.fillWidth: true
-                                width: parent.width
-                                spacing: Colors.spacingS
-
-                                SettingsActionButton {
-                                    compact: true
-                                    emphasized: true
-                                    iconName: "󰐕"
-                                    label: "Add"
-                                    onClicked: root.widgetAdded(modelData.widgetType)
-                                }
+                            SettingsActionButton {
+                                compact: true
+                                emphasized: true
+                                iconName: "󰐕"
+                                label: "Add"
+                                onClicked: root.widgetAdded(modelData.widgetType)
                             }
                         }
                     }
