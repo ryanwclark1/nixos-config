@@ -16,6 +16,7 @@ Scope {
         PanelWindow {
             id: osdWindow
             property var modelData
+            property real windowOpacity: 1
             screen: modelData
 
             visible: root.active || fadeOut.running
@@ -27,12 +28,12 @@ Scope {
             exclusionMode: ExclusionMode.Ignore
 
             // Fade out when countdown finishes
-            NumberAnimation on opacity {
+            NumberAnimation on windowOpacity {
                 id: fadeOut
                 from: 1; to: 0
                 duration: 200
                 running: false
-                onFinished: osdWindow.opacity = 1
+                onFinished: osdWindow.windowOpacity = 1
             }
 
             Connections {
@@ -45,6 +46,7 @@ Scope {
 
             Item {
                 anchors.centerIn: parent
+                opacity: osdWindow.windowOpacity
 
                 ColumnLayout {
                     anchors.centerIn: parent
