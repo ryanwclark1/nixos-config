@@ -19,8 +19,8 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Colors.spacingL : 0)
     radius: Colors.radiusMedium
-    color: Colors.cardSurface
-    border.color: Colors.border
+    color: Colors.withAlpha(Colors.surface, 0.6)
+    border.color: Colors.withAlpha(Colors.text, 0.12)
     border.width: 1
     clip: true
 
@@ -40,7 +40,17 @@ Rectangle {
             top: parent.top
         }
         implicitHeight: headerColumn.implicitHeight + Colors.spacingM * 2
-        color: Colors.withAlpha(Colors.primary, 0.06)
+        color: Colors.withAlpha(Colors.primary, 0.08)
+        radius: Colors.radiusMedium
+
+        // Round only top corners
+        Rectangle {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: parent.radius
+            color: parent.color
+            visible: root.expanded
+        }
 
         ColumnLayout {
             id: headerColumn
