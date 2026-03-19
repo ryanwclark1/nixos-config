@@ -64,14 +64,27 @@ Flow {
       readonly property int windowCount: modelData.windows || 0
       property bool dropHighlight: false
 
-      radius: Colors.radiusXXS
+      readonly property bool isDots: Config.workspaceStyle === "dots"
+      readonly property bool isStrip: Config.workspaceStyle === "strip"
+      readonly property bool isIcons: Config.workspaceStyle === "icons"
+
+      radius: isDots ? width / 2 : Colors.radiusXXS
       height: root.pillHeight
       width: {
+        if (isDots) return root.pillHeight;
+        if (isStrip) return isActive ? root.pillMinWidth * 2 : root.pillMinWidth;
+        
         var base = Math.max(root.pillMinWidth, label.implicitWidth + 12);
-        if (windowCount > 0) return base + Math.min(windowCount * 8, 40);
+        // Fix for oddly large workspace 1: only add window padding if there are actually windows
+        if (windowCount > 0 && !isIcons) return base + Math.min(windowCount * 4, 24);
         return base;
       }
       color: dropHighlight ? Colors.accent : (isActive ? root.activeColor : root.inactiveColor)
+
+      Behavior on width {
+        enabled: !Colors.isTransitioning
+        NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic }
+      }
 
       Behavior on color {
         enabled: !wsPill.isUrgent && !Colors.isTransitioning
@@ -106,7 +119,13 @@ Flow {
         color: wsPill.isActive ? Colors.background : root.textColor
         font.pixelSize: root.pillFontSize
         font.weight: wsPill.isActive ? Font.Bold : Font.Normal
+        visible: !wsPill.isDots
         text: {
+            if (wsPill.isIcons) {
+                var icons = ["󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼", "󰽽"];
+                var idx = (modelData.id - 1) % 10;
+                return icons[idx] || String(modelData.id);
+            }
             var custom = WorkspaceIdentityService.getWorkspaceName(modelData.id);
             if (custom) return custom;
             return Config.workspaceShowNames && modelData.name ? modelData.name : String(modelData.id)

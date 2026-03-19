@@ -80,7 +80,7 @@ Item {
     signal contextMenuRequested(var actions, var triggerRect)
 
     implicitHeight: vertical ? 0 : thickness
-    implicitWidth: vertical ? Math.max(thickness, Math.max(leftColumn.implicitWidth, Math.max(centerColumn.implicitWidth, rightColumn.implicitWidth)) + outerPadding * 2) : 0
+    implicitWidth: vertical ? Math.max(thickness, Math.max(leftSection.implicitWidth, Math.max(centerSection.implicitWidth, rightSection.implicitWidth)) + outerPadding * 2) : 0
 
     function resetDiagnosticWarmup() {
         diagnosticsReady = false;
@@ -206,92 +206,55 @@ Item {
     function triggerWidgetIconOnly(wi) { return PanelHelpers.triggerWidgetIconOnly(wi); }
     function triggerWidgetLabel(wi, fallback) { return PanelHelpers.triggerWidgetLabel(wi, fallback); }
 
+    readonly property var _widgetComponents: ({
+        "logo": logoComponent,
+        "workspaces": workspacesComponent,
+        "specialWorkspaces": specialWorkspacesComponent,
+        "taskbar": taskbarComponent,
+        "windowTitle": windowTitleComponent,
+        "keyboardLayout": keyboardLayoutComponent,
+        "cpuStatus": cpuStatusComponent,
+        "ramStatus": ramStatusComponent,
+        "gpuStatus": gpuStatusComponent,
+        "diskStatus": diskStatusComponent,
+        "networkStatus": networkStatusComponent,
+        "systemMonitor": legacySystemMonitorComponent,
+        "dateTime": dateTimeComponent,
+        "mediaBar": mediaBarComponent,
+        "updates": updatesComponent,
+        "cava": cavaComponent,
+        "idleInhibitor": idleInhibitorComponent,
+        "modelUsage": modelUsageComponent,
+        "weather": weatherComponent,
+        "market": marketComponent,
+        "ssh": sshComponent,
+        "vpn": vpnComponent,
+        "network": networkComponent,
+        "bluetooth": bluetoothComponent,
+        "audio": audioComponent,
+        "music": musicComponent,
+        "privacy": privacyComponent,
+        "voxtype": voxtypeComponent,
+        "recording": recordingComponent,
+        "battery": batteryComponent,
+        "printer": printerComponent,
+        "aiChat": aiChatPillComponent,
+        "notepad": notepadComponent,
+        "controlCenter": controlCenterComponent,
+        "tray": trayComponent,
+        "clipboard": clipboardComponent,
+        "screenshot": screenshotComponent,
+        "notifications": notificationsComponent,
+        "personality": personalityComponent,
+        "spacer": spacerComponent,
+        "separator": separatorComponent
+    })
+
     function componentForWidget(widgetType) {
-        if (widgetType === "logo")
-            return logoComponent;
-        if (widgetType === "workspaces")
-            return workspacesComponent;
-        if (widgetType === "specialWorkspaces")
-            return specialWorkspacesComponent;
-        if (widgetType === "taskbar")
-            return taskbarComponent;
-        if (widgetType === "windowTitle")
-            return windowTitleComponent;
-        if (widgetType === "keyboardLayout")
-            return keyboardLayoutComponent;
-        if (widgetType === "cpuStatus")
-            return cpuStatusComponent;
-        if (widgetType === "ramStatus")
-            return ramStatusComponent;
-        if (widgetType === "gpuStatus")
-            return gpuStatusComponent;
-        if (widgetType === "diskStatus")
-            return diskStatusComponent;
-        if (widgetType === "networkStatus")
-            return networkStatusComponent;
-        if (widgetType === "systemMonitor")
-            return legacySystemMonitorComponent;
-        if (widgetType === "dateTime")
-            return dateTimeComponent;
-        if (widgetType === "mediaBar")
-            return mediaBarComponent;
-        if (widgetType === "updates")
-            return updatesComponent;
-        if (widgetType === "cava")
-            return cavaComponent;
-        if (widgetType === "idleInhibitor")
-            return idleInhibitorComponent;
-        if (widgetType === "modelUsage")
-            return modelUsageComponent;
-        if (widgetType === "weather")
-            return weatherComponent;
-        if (widgetType === "market")
-            return marketComponent;
-        if (widgetType === "ssh")
-            return sshComponent;
-        if (widgetType === "vpn")
-            return vpnComponent;
-        if (widgetType === "network")
-            return networkComponent;
-        if (widgetType === "bluetooth")
-            return bluetoothComponent;
-        if (widgetType === "audio")
-            return audioComponent;
-        if (widgetType === "music")
-            return musicComponent;
-        if (widgetType === "privacy")
-            return privacyComponent;
-        if (widgetType === "voxtype")
-            return voxtypeComponent;
-        if (widgetType === "recording")
-            return recordingComponent;
-        if (widgetType === "battery")
-            return batteryComponent;
-        if (widgetType === "printer")
-            return printerComponent;
-        if (widgetType === "aiChat")
-            return aiChatPillComponent;
-        if (widgetType === "notepad")
-            return notepadComponent;
-        if (widgetType === "controlCenter")
-            return controlCenterComponent;
-        if (widgetType === "tray")
-            return trayComponent;
-        if (widgetType === "clipboard")
-            return clipboardComponent;
-        if (widgetType === "screenshot")
-            return screenshotComponent;
-        if (widgetType === "notifications")
-            return notificationsComponent;
-        if (widgetType === "personality")
-            return personalityComponent;
-        if (widgetType === "spacer")
-            return spacerComponent;
-        if (widgetType === "separator")
-            return separatorComponent;
-        if (String(widgetType || "").indexOf("plugin:") === 0)
+        var type = String(widgetType || "");
+        if (type.indexOf("plugin:") === 0)
             return pluginComponent;
-        return unknownComponent;
+        return _widgetComponents[type] || unknownComponent;
     }
 
     // ── Auto-hide logic ─────────────────────────
@@ -477,122 +440,45 @@ Item {
         }
     }
 
-    Row {
+    BarSectionRepeater {
         id: leftSection
-        visible: !vertical
-        anchors.left: parent.left
-        anchors.leftMargin: outerPadding
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: runtimeSpacing + sectionSpacing
-
-        move: SharedWidgets.ListTransitions.move
-
-        Repeater {
-            model: root._leftLeading
-            delegate: widgetLoaderDelegate
-        }
-
-        Row {
-            visible: root._leftTrailing.length > 0
-            spacing: runtimeSpacing
-
-            move: SharedWidgets.ListTransitions.move
-
-            Repeater {
-                model: root._leftTrailing
-                delegate: widgetLoaderDelegate
-            }
-        }
+        vertical: root.vertical
+        sectionSpacing: runtimeSpacing + sectionSpacing
+        sectionModel: root._leftLeading
+        trailingModel: root._leftTrailing
+        trailingSpacing: runtimeSpacing
+        sectionDelegate: widgetLoaderDelegate
+        anchors.left: !root.vertical ? parent.left : undefined
+        anchors.leftMargin: !root.vertical ? outerPadding : 0
+        anchors.verticalCenter: !root.vertical ? parent.verticalCenter : undefined
+        anchors.top: root.vertical ? parent.top : undefined
+        anchors.topMargin: root.vertical ? outerPadding : 0
+        anchors.horizontalCenter: root.vertical ? parent.horizontalCenter : undefined
     }
 
-    Row {
+    BarSectionRepeater {
         id: centerSection
-        visible: !vertical
+        vertical: root.vertical
+        sectionSpacing: runtimeSpacing
+        sectionModel: root._centerItems
+        sectionDelegate: widgetLoaderDelegate
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: root.centerClampedOffset
+        anchors.horizontalCenterOffset: root.vertical ? 0 : root.centerClampedOffset
         anchors.verticalCenter: parent.verticalCenter
-        spacing: runtimeSpacing
-        
-        move: SharedWidgets.ListTransitions.move
-
-        Repeater {
-            model: root._centerItems
-            delegate: widgetLoaderDelegate
-        }
     }
 
-    Row {
+    BarSectionRepeater {
         id: rightSection
-        visible: !vertical
-        anchors.right: parent.right
-        anchors.rightMargin: outerPadding
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: runtimeSpacing
-
-        move: SharedWidgets.ListTransitions.move
-
-        Repeater {
-            model: root._rightItems
-            delegate: widgetLoaderDelegate
-        }
-    }
-
-    Column {
-        id: leftColumn
-        visible: vertical
-        anchors.top: parent.top
-        anchors.topMargin: outerPadding
-        anchors.horizontalCenter: parent.horizontalCenter
-        spacing: runtimeSpacing + sectionSpacing
-
-        move: SharedWidgets.ListTransitions.move
-
-        Repeater {
-            model: root._leftLeading
-            delegate: widgetLoaderDelegate
-        }
-
-        Column {
-            visible: root._leftTrailing.length > 0
-            spacing: runtimeSpacing
-
-            move: SharedWidgets.ListTransitions.move
-
-            Repeater {
-                model: root._leftTrailing
-                delegate: widgetLoaderDelegate
-            }
-        }
-    }
-
-    Column {
-        id: centerColumn
-        visible: vertical
-        anchors.centerIn: parent
-        spacing: runtimeSpacing
-
-        move: SharedWidgets.ListTransitions.move
-
-        Repeater {
-            model: root._centerItems
-            delegate: widgetLoaderDelegate
-        }
-    }
-
-    Column {
-        id: rightColumn
-        visible: vertical
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: outerPadding
-        anchors.horizontalCenter: parent.horizontalCenter
-        spacing: runtimeSpacing
-
-        move: SharedWidgets.ListTransitions.move
-
-        Repeater {
-            model: root._rightItems
-            delegate: widgetLoaderDelegate
-        }
+        vertical: root.vertical
+        sectionSpacing: runtimeSpacing
+        sectionModel: root._rightItems
+        sectionDelegate: widgetLoaderDelegate
+        anchors.right: !root.vertical ? parent.right : undefined
+        anchors.rightMargin: !root.vertical ? outerPadding : 0
+        anchors.verticalCenter: !root.vertical ? parent.verticalCenter : undefined
+        anchors.bottom: root.vertical ? parent.bottom : undefined
+        anchors.bottomMargin: root.vertical ? outerPadding : 0
+        anchors.horizontalCenter: root.vertical ? parent.horizontalCenter : undefined
     }
 
     Component {
