@@ -30,7 +30,20 @@ if [ "$provider" = "claude" ]; then
     exit 0
   fi
 
-  jq --arg today "$today" '
+  # Live today count from history.jsonl (stats-cache may be stale)
+  history_file="$HOME/.claude/history.jsonl"
+  live_today=0
+  if [ -f "$history_file" ]; then
+    today_start=$(date -d "$today 00:00:00" +%s)000
+    today_end=$(date -d "$today 23:59:59" +%s)999
+    live_today=$(jq -s \
+      "[.[] | select(.timestamp >= $today_start and .timestamp <= $today_end)] | length" \
+      "$history_file" 2>/dev/null || echo "0")
+    # Sanitize to integer
+    live_today="${live_today:-0}"
+  fi
+
+  jq --arg today "$today" --argjson liveToday "$live_today" '
     # Today stats from dailyActivity
     (.dailyActivity // []) as $daily |
     ($daily | map(select(.date == $today)) | first // {messageCount:0, sessionCount:0, toolCallCount:0}) as $todayStats |
@@ -48,8 +61,11 @@ if [ "$provider" = "claude" ]; then
     # Compute total tokens across all models
     ([$modelUsage | to_entries[] | .value.inputTokens + .value.outputTokens] | add // 0) as $totalTokens |
 
+    # Use whichever today count is higher (live vs cached)
+    ([($todayStats.messageCount // 0), $liveToday] | max) as $todayPrompts |
+
     {
-      todayPrompts: ($todayStats.messageCount // 0),
+      todayPrompts: $todayPrompts,
       todaySessions: ($todayStats.sessionCount // 0),
       todayToolCalls: ($todayStats.toolCallCount // 0),
       todayTokensByModel: ($todayTokens.tokensByModel // {}),

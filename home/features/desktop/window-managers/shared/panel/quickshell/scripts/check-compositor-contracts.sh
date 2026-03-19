@@ -44,6 +44,8 @@ require_literal "$adapter_qml" 'import Quickshell.Hyprland' "Hyprland adapter im
 forbid_literal "$adapter_qml" 'property var hyprlandCtlWindow' "Hyprland polling fallback property (removed in favor of reactive bindings)"
 forbid_literal "$adapter_qml" 'command: ["hyprctl", "-j", "activewindow"]' "Hyprland activewindow polling (removed in favor of reactive bindings)"
 forbid_literal "$adapter_qml" 'reportHyprctlFailureState' "Hyprland polling failure reporter (removed with polling)"
+forbid_literal "$adapter_qml" 'function focusWindowAddress(' "legacy focusWindowAddress (replaced by focusWindow)"
+forbid_literal "$adapter_qml" 'function logActiveWindowSourceTransition(' "dead log transition tracker (removed with polling)"
 require_literal "$adapter_qml" 'readonly property string activeWindowSource: {' "active window source property"
 require_literal "$adapter_qml" 'readonly property bool activeWindowReady: activeWindowSource !== "none"' "active window ready property"
 require_literal "$adapter_qml" 'readonly property string activeWindowDebugSummary: {' "active window debug summary"
