@@ -89,9 +89,9 @@ QtObject {
       }
     }
 
-    stdout: BinaryParser {
-      onRead: (data) => {
-        root._parseBinaryFrame(data);
+    stdout: SplitParser {
+      onRead: (line) => {
+        root._parseTextFrame(line);
       }
     }
   }
@@ -103,16 +103,19 @@ QtObject {
   }
 
   // ── Frame parsing ──────────────────────────────
-  function _parseBinaryFrame(data) {
-    var view = new DataView(data);
-    var count = Math.floor(data.byteLength / 2);
-    if (count === 0) return;
+  readonly property real _asciiMaxRange: 1000.0
+
+  function _parseTextFrame(line) {
+    var parts = line.split(";");
+    if (parts.length < 2) return;
 
     var buf = _bufToggle ? _buf1 : _buf0;
     var allZero = true;
+    var count = Math.min(barsCount, parts.length);
 
-    for (var i = 0; i < barsCount && i < count; i++) {
-      var v = view.getUint16(i * 2, true) / 65535.0;
+    for (var i = 0; i < count; i++) {
+      var v = parseInt(parts[i], 10) / _asciiMaxRange;
+      if (isNaN(v)) v = 0;
       buf[i] = Math.max(0, Math.min(1, v));
       if (buf[i] > 0.005) allZero = false;
     }

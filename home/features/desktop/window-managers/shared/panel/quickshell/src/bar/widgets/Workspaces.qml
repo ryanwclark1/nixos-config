@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
+import Quickshell.Hyprland
 import "../../services"
 
 Rectangle {
@@ -52,6 +52,63 @@ Rectangle {
       _applyFocusedWorkspaceFromNiriService()
       _updateStateFromNiriService()
     }
+    if (CompositorAdapter.isHyprland) {
+      _updateStateFromHyprland();
+      Hyprland.rawEvent.connect(_onHyprlandEvent);
+    }
+  }
+
+  Component.onDestruction: {
+    if (CompositorAdapter.isHyprland) {
+      Hyprland.rawEvent.disconnect(_onHyprlandEvent);
+    }
+  }
+
+  function _onHyprlandEvent(event) {
+    var n = event.name;
+    if (n === "workspace" || n === "workspacev2" || n === "createworkspace"
+        || n === "destroyworkspace" || n === "openwindow" || n === "closewindow"
+        || n === "movewindow" || n === "urgent" || n === "renameworkspace") {
+      Qt.callLater(_updateStateFromHyprland);
+    }
+  }
+
+  function _updateStateFromHyprland() {
+    var wsList = Hyprland.workspaces;
+    if (!wsList) {
+      state = { workspaces: [], activeWorkspace: -1 };
+      return;
+    }
+
+    var wsValues = wsList.values || wsList;
+    var workspaces = [];
+    var activeId = -1;
+
+    for (var i = 0; i < wsValues.length; i++) {
+      var ws = wsValues[i];
+      if (!ws || ws.id <= 0) continue;
+
+      var windowCount = 0;
+      if (ws.toplevels) {
+        var tlArr = ws.toplevels.values || ws.toplevels;
+        windowCount = tlArr.length || 0;
+      }
+
+      if (ws.focused) activeId = ws.id;
+
+      workspaces.push({
+        id: ws.id,
+        name: String(ws.name || ws.id),
+        urgent: !!ws.urgent,
+        windows: windowCount
+      });
+    }
+
+    workspaces.sort(function(a, b) { return a.id - b.id; });
+    state = {
+      workspaces: workspaces,
+      activeWorkspace: activeId
+    };
   }
 
   function _focusedWorkspaceIdFromNiriService() {
@@ -127,163 +184,6 @@ Rectangle {
       workspaces: workspaces,
       activeWorkspace: activeId
     };
-  }
-
-  // ── Hyprland polling path (unchanged) ───────────
-  function updateStateFromHypr(rawText) {
-    try {
-      var lines = (rawText || "").trim().split("\n");
-      if (lines.length < 2) return;
-      var workspacesRaw = JSON.parse(lines[0] || "[]");
-      var activeRaw = JSON.parse(lines[1] || "{}");
-
-      var workspaces = [];
-      for (var i = 0; i < workspacesRaw.length; i++) {
-        var ws = workspacesRaw[i];
-        if (!ws || ws.id <= 0) continue;
-        workspaces.push({
-          id: ws.id,
-          name: String(ws.name || ws.id),
-          urgent: !!ws.hasurgent
-        });
-      }
-      workspaces.sort(function(a, b) { return a.id - b.id; });
-
-      state = {
-        workspaces: workspaces,
-        activeWorkspace: activeRaw && activeRaw.id ? activeRaw.id : -1
-      };
-    } catch (e) {
-      state = ({ workspaces: [], activeWorkspace: -1 });
-    }
-  }
-
-  function updateActiveWorkspaceFromHypr(rawText) {
-    try {
-      var activeRaw = JSON.parse(rawText || "{}");
-      var activeId = activeRaw && activeRaw.id ? activeRaw.id : -1;
-      if (activeId < 0 || root.state.activeWorkspace === activeId)
-        return;
-
-      root.state = {
-        workspaces: root.state.workspaces,
-        activeWorkspace: activeId
-      };
-    } catch (e) {}
-  }
-
-  function updateStateFromNiri(rawText) {
-    try {
-      var parsed = JSON.parse(rawText || "[]");
-      var source = [];
-      if (Array.isArray(parsed)) source = parsed;
-      else if (parsed && Array.isArray(parsed.workspaces)) source = parsed.workspaces;
-
-      var workspaces = [];
-      var activeId = -1;
-
-      for (var i = 0; i < source.length; i++) {
-        var ws = source[i];
-        if (!ws) continue;
-
-        var id = ws.idx;
-        if (id === undefined || id === null) id = ws.id;
-        if (id === undefined || id === null) id = ws.index;
-        if (id === undefined || id === null) continue;
-
-        var intId = parseInt(id, 10);
-        if (isNaN(intId) || intId <= 0) continue;
-
-        var isActive = !!(ws.is_active || ws.active || ws.is_focused || ws.focused);
-        if (isActive) activeId = intId;
-
-        workspaces.push({
-          id: intId,
-          name: String(ws.name || intId),
-          urgent: !!(ws.is_urgent || ws.urgent)
-        });
-      }
-
-      workspaces.sort(function(a, b) { return a.id - b.id; });
-      state = {
-        workspaces: workspaces,
-        activeWorkspace: activeId
-      };
-    } catch (e) {
-      state = ({ workspaces: [], activeWorkspace: -1 });
-    }
-  }
-
-  function workspaceQueryCommand() {
-    return CompositorAdapter.workspaceListCommand();
-  }
-
-  // Only poll when NiriService is NOT available (Hyprland, or fallback)
-  readonly property int _workspaceListPollMs: 1200
-  readonly property int _activeWorkspacePollMs: 120
-
-  Timer {
-    id: workspacePollTimer
-    interval: root._workspaceListPollMs
-    running: root.workspaceApiAvailable && !CompositorAdapter.isNiri
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: {
-      workspaceProc.command = root.workspaceQueryCommand();
-      workspaceProc.running = true;
-    }
-  }
-
-  Timer {
-    id: activeWorkspacePollTimer
-    interval: root._activeWorkspacePollMs
-    running: CompositorAdapter.isHyprland
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: {
-      activeWorkspaceProc.command = ["hyprctl", "activeworkspace", "-j"];
-      activeWorkspaceProc.running = true;
-    }
-  }
-
-  Process {
-    id: workspaceProc
-    running: false
-    command: root.workspaceQueryCommand()
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var raw = String(this.text || "").trim();
-        if (raw === "") {
-          root.state = ({ workspaces: [], activeWorkspace: -1 });
-          return;
-        }
-
-        try {
-          JSON.parse(raw);
-          root.updateStateFromNiri(raw);
-          return;
-        } catch (e) {}
-
-        if (raw.indexOf("\n") !== -1) {
-          root.updateStateFromHypr(raw);
-          return;
-        }
-        root.state = ({ workspaces: [], activeWorkspace: -1 });
-      }
-    }
-  }
-
-  Process {
-    id: activeWorkspaceProc
-    running: false
-    command: ["hyprctl", "activeworkspace", "-j"]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var raw = String(this.text || "").trim();
-        if (raw !== "")
-          root.updateActiveWorkspaceFromHypr(raw);
-      }
-    }
   }
 
   WorkspaceStrip {

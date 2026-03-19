@@ -115,6 +115,26 @@ QtObject {
     return false;
   }
 
+  // ── MRU window tracking ─────────────────────────
+  property var _hyprlandMruIds: []
+
+  readonly property var mruWindowIds: {
+    if (isNiri) return NiriService.mruWindowIds;
+    if (isHyprland) return _hyprlandMruIds;
+    return [];
+  }
+
+  onActiveToplevelChanged: {
+    if (!isHyprland) return;
+    var tl = activeToplevel;
+    if (!tl) return;
+    var addr = String(tl.address || "");
+    if (addr === "") return;
+    var newOrder = _hyprlandMruIds.filter(function(id) { return id !== addr; });
+    newOrder.unshift(addr);
+    _hyprlandMruIds = newOrder;
+  }
+
   // ── Niri reactive state (delegated to NiriService) ──
   // These provide zero-latency access to Niri state without polling.
   readonly property var niriWorkspaces: isNiri ? NiriService.allWorkspaces : []
@@ -425,6 +445,17 @@ QtObject {
     }
     if (isNiri) {
       NiriService.moveWindowToWorkspace(addressOrId, parseInt(String(workspaceId), 10), false);
+      return;
+    }
+  }
+
+  function renameWorkspace(workspaceId, newName) {
+    if (!supportsWorkspaceRename) {
+      notifyUnsupported("Rename workspace");
+      return;
+    }
+    if (isHyprland) {
+      dispatchAction("renameworkspace", String(workspaceId) + " " + String(newName), "Rename workspace");
       return;
     }
   }
