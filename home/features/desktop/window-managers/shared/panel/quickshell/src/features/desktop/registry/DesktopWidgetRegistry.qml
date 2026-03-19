@@ -5,7 +5,7 @@ import "../../../services" as Services
 QtObject {
     id: root
 
-    property bool editMode: false
+    property bool editMode: Services.Config.desktopEditMode
 
     // Built-in widget catalog
     readonly property var builtInWidgetCatalog: [

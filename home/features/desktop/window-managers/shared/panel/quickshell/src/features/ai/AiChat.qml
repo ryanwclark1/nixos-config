@@ -270,6 +270,7 @@ PanelWindow {
                 }
             }
             Behavior on color {
+                enabled: !Colors.isTransitioning
                 CAnim {}
             }
 
@@ -766,6 +767,7 @@ PanelWindow {
                 radius: Colors.radiusMedium
                 clip: true
                 Behavior on border.color {
+                    enabled: !Colors.isTransitioning
                     CAnim {}
                 }
 

@@ -280,7 +280,7 @@ BasePopupMenu {
         icon: MediaService.isPlaying ? "󰏤" : "󰐊"
         size: root.compactMode ? 42 : 48; tint: Colors.background
         color: root.dominantColor
-        Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
+        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
         onClicked: MediaService.playPause()
       }
 
@@ -324,7 +324,7 @@ BasePopupMenu {
           width: root.player ? parent.width * Colors.clamp01(root.player.volume) : 0
           radius: Colors.radiusMicro
           color: root.dominantColor
-          Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
+          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
         }
 
         MouseArea {

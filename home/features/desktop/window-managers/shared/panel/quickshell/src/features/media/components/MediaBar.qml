@@ -93,7 +93,7 @@ Rectangle {
       value: MediaService.trackLength > 0 ? (MediaService.currentPosition / MediaService.trackLength) : 0
       thickness: 2
       color: MediaService.artAccentColor
-      Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
+      Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
       icon: MediaService.isPlaying ? "󰏤" : "󰐊"
     }
 

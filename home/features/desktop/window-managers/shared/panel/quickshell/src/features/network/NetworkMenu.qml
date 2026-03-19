@@ -385,7 +385,7 @@ BasePopupMenu {
           color: Colors.cardSurface
           border.color: detailsMouse.containsMouse ? Colors.primary : Colors.border
           border.width: 1
-          Behavior on border.color { CAnim {} }
+          Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
           RowLayout {
             anchors.fill: parent
@@ -395,7 +395,7 @@ BasePopupMenu {
             Text {
               text: root.showAdvanced ? "󰅂" : "󰅀"
               color: detailsMouse.containsMouse ? Colors.primary : Colors.textSecondary
-              Behavior on color { CAnim {} }
+              Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               font.family: Colors.fontMono
               font.pixelSize: Colors.fontSizeLarge
             }
@@ -403,7 +403,7 @@ BasePopupMenu {
             Text {
               text: root.showAdvanced ? "Hide technical details" : "Show technical details"
               color: detailsMouse.containsMouse ? Colors.primary : Colors.text
-              Behavior on color { CAnim {} }
+              Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               font.pixelSize: Colors.fontSizeSmall
               font.weight: Font.Medium
             }

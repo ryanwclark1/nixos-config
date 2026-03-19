@@ -147,8 +147,8 @@ RowLayout {
                         border.color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.25) : Colors.border)
                         border.width: isActive ? 1.5 : 1
 
-                        Behavior on color { CAnim {} }
-                        Behavior on border.color { CAnim {} }
+                        Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+                        Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
                         SharedWidgets.StateLayer {
                             id: tabStateLayer

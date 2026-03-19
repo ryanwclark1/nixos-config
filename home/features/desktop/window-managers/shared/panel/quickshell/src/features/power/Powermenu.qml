@@ -217,7 +217,7 @@ PanelWindow {
               color: Colors.cardSurface
               border.color: actionItem.isFocused ? actionItem.actionColor : Colors.border
               border.width: actionItem.isFocused ? 3 : 1
-              Behavior on border.color { CAnim {} }
+              Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
 
               SharedWidgets.InnerHighlight { highlightOpacity: actionItem.isFocused ? 0.25 : 0.12 }
@@ -245,7 +245,7 @@ PanelWindow {
                   font.family: isPending ? "" : Colors.fontMono
                   font.pixelSize: isPending ? 32 : 44
                   font.weight: isPending ? Font.Bold : Font.Normal
-                  Behavior on color { CAnim {} }
+                  Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                 }
               }
               Text {
@@ -254,7 +254,7 @@ PanelWindow {
                 font.pixelSize: Colors.fontSizeSmall
                 font.weight: actionItem.isFocused ? Font.Bold : Font.Medium
                 Layout.alignment: Qt.AlignHCenter
-                Behavior on color { CAnim {} }
+                Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               }
             }
 

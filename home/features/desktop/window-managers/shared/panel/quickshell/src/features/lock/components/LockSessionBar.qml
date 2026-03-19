@@ -38,7 +38,7 @@ RowLayout {
         color: Colors.withAlpha(Colors.text, 0.05)
         border.color: (root.timerActive && root.pendingAction === action) ? Colors.error : Colors.border
         border.width: 1
-        Behavior on border.color { CAnim {} }
+        Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
         StateLayer {
             id: sessionStateLayer
@@ -50,7 +50,7 @@ RowLayout {
             anchors.centerIn: parent
             text: parent.icon
             color: (root.timerActive && root.pendingAction === parent.action) ? Colors.error : Colors.textSecondary
-            Behavior on color { CAnim {} }
+            Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
             font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeLarge
         }
