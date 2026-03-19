@@ -14,7 +14,7 @@ BasePopupMenu {
   title: "Bluetooth"
 
   readonly property bool hasAdapter: !!Bluetooth.defaultAdapter
-  readonly property bool btEnabled: hasAdapter && Bluetooth.defaultAdapter.enabled
+  readonly property bool btEnabled: !!(Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled)
 
   // Optimistic UI: reflect the toggle immediately, lock out polling for 4s
   property bool _optimisticBtEnabled: false
@@ -30,7 +30,7 @@ BasePopupMenu {
   }
 
   function toggleBluetooth() {
-    if (!root.hasAdapter) return;
+    if (!root.hasAdapter || !Bluetooth.defaultAdapter) return;
     var next = !root.effectiveBtEnabled;
     root._optimisticBtEnabled = next;
     root._optimisticLocked = true;
@@ -88,7 +88,7 @@ BasePopupMenu {
   }
 
   function startScan() {
-    if (!hasAdapter || !effectiveBtEnabled) return;
+    if (!hasAdapter || !effectiveBtEnabled || !Bluetooth.defaultAdapter) return;
     Bluetooth.defaultAdapter.discovering = true;
     isScanning = true;
     scanElapsed = 0;
@@ -96,7 +96,7 @@ BasePopupMenu {
   }
 
   function stopScan() {
-    if (hasAdapter) Bluetooth.defaultAdapter.discovering = false;
+    if (hasAdapter && Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.discovering = false;
     isScanning = false;
     scanTimer.stop();
     scanElapsed = 0;

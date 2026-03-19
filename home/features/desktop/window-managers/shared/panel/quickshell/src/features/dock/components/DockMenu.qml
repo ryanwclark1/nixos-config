@@ -23,7 +23,7 @@ PopupWindow {
 
   visible: false
   implicitWidth: 200
-  implicitHeight: menuColumn.implicitHeight + 16
+  implicitHeight: Math.max(1, menuColumn.implicitHeight + 16)
   color: "transparent"
 
   readonly property string appId: appData ? (appData.appId || "") : ""

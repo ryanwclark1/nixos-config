@@ -380,6 +380,8 @@ EOF
       Unit = {
         Description = "Quickshell (QML shell)";
         ConditionEnvironment = "WAYLAND_DISPLAY";
+        StartLimitBurst = 5;
+        StartLimitIntervalSec = 30;
       };
 
       Service = {

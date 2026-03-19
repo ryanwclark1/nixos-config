@@ -108,8 +108,8 @@ Item {
                             }
 
                             color: "transparent"
-                            implicitWidth: vertical ? panel.implicitWidth : 0
-                            implicitHeight: vertical ? 0 : panel.implicitHeight
+                            implicitWidth: vertical ? Math.max(1, panel.implicitWidth) : 1
+                            implicitHeight: vertical ? 1 : Math.max(1, panel.implicitHeight)
 
                             WlrLayershell.layer: WlrLayer.Top
                             WlrLayershell.namespace: "quickshell-bar-" + barId

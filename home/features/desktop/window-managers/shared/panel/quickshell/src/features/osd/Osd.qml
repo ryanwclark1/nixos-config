@@ -280,8 +280,8 @@ Scope {
         WlrLayershell.namespace: "quickshell-osd"
 
         // Size depends on style
-        implicitWidth: root.isCriticalAlert ? criticalWidth : (Config.osdStyle === "pill" ? pillWidth : Config.osdSize)
-        implicitHeight: root.isCriticalAlert ? criticalHeight : (Config.osdStyle === "pill" ? pillHeight : Config.osdSize)
+        implicitWidth: Math.max(1, root.isCriticalAlert ? criticalWidth : (Config.osdStyle === "pill" ? pillWidth : Config.osdSize))
+        implicitHeight: Math.max(1, root.isCriticalAlert ? criticalHeight : (Config.osdStyle === "pill" ? pillHeight : Config.osdSize))
 
         readonly property int pillWidth: 280
         readonly property int pillHeight: 56
