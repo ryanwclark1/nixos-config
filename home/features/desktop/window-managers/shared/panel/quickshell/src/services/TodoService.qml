@@ -45,6 +45,7 @@ QtObject {
     path: root.statePath
     blockLoading: true
     printErrors: false
+    atomicWrites: true
     watchChanges: true
     onFileChanged: reload()
     onAdapterUpdated: writeAdapter()

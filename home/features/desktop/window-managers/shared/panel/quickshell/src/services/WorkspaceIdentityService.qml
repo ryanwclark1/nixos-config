@@ -9,8 +9,8 @@ QtObject {
 
     // id (string) → { name: string, project: string, lastActive: number }
     property var workspaceData: ({})
-    
-    readonly property string savePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/workspace-identity.json"
+
+    readonly property string savePath: Quickshell.statePath("workspace-identity.json")
     property bool _loading: false
 
     function getWorkspaceName(id) {
@@ -34,40 +34,29 @@ QtObject {
     }
 
     // ── Persistence ──────────────────────────────
-    function saveState() {
-        if (_loading) return;
-        var content = JSON.stringify(workspaceData);
-        _saveProc.command = ["sh", "-c", "mkdir -p \"$(dirname \"$1\")\" && cat > \"$1\"", "sh", savePath];
-        _saveProc.running = true;
+    readonly property FileView _stateFile: FileView {
+        path: root.savePath
+        blockLoading: true
+        printErrors: false
+        atomicWrites: true
     }
 
-    property Process _saveProc: Process {
-        stdinEnabled: true
-        onStarted: {
-            write(JSON.stringify(root.workspaceData));
-            stdinEnabled = false;
-        }
+    function saveState() {
+        if (_loading) return;
+        _stateFile.setText(JSON.stringify(workspaceData));
     }
 
     function loadState() {
         _loading = true;
-        _loadProc.running = true;
-    }
-
-    property Process _loadProc: Process {
-        command: ["cat", root.savePath]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    if (this.text.trim() !== "") {
-                        root.workspaceData = JSON.parse(this.text);
-                    }
-                } catch (e) {
-                    Logger.w("WorkspaceIdentityService", "Failed to load state:", e);
-                }
-                root._loading = false;
+        var raw = (_stateFile.text() || "").trim();
+        if (raw) {
+            try {
+                workspaceData = JSON.parse(raw);
+            } catch (e) {
+                Logger.w("WorkspaceIdentityService", "Failed to load state:", e);
             }
         }
+        _loading = false;
     }
 
     Component.onCompleted: loadState()

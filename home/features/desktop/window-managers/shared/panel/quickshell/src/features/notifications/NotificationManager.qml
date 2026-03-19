@@ -36,6 +36,7 @@ Item {
     path: root.statePath
     blockLoading: true
     printErrors: false
+    atomicWrites: true
   }
 
   Loader {
