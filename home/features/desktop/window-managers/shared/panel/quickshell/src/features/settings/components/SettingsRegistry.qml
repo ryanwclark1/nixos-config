@@ -13,6 +13,7 @@ QtObject {
         {
             id: "system-overview",
             label: "Overview",
+            icon: "󰕮",
             tabs: [
                 {
                     id: "dashboard",
@@ -89,6 +90,20 @@ QtObject {
     ]
 
     readonly property var tabs: [
+        {
+            id: "dashboard",
+            label: "Dashboard",
+            icon: "󰕮",
+            categoryId: "system-overview",
+            order: 0,
+            component: "DashboardTab.qml",
+            searchTerms: ["overview", "dashboard", "system", "status"],
+            owner: {
+                surface: "",
+                service: "SystemStatus",
+                configDomain: "overview"
+            }
+        },
         {
             id: "system",
             legacyIndex: 0,

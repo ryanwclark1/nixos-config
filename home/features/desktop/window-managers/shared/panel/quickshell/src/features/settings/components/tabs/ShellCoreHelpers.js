@@ -63,6 +63,8 @@ function isLauncherModeSupported(CompositorAdapter, modeKey) {
     return true;
 }
 
+var _launcherPrimaryDefaults = ["drun", "window", "files", "ai", "system"];
+
 function supportedLauncherModes(launcherModes, CompositorAdapter) {
     var out = [];
     for (var i = 0; i < launcherModes.length; i++) {
@@ -87,6 +89,39 @@ function defaultModeOptions(launcherModes, CompositorAdapter) {
             icon: modeMeta.icon || ""
         };
     });
+}
+
+function defaultPrimaryModes(launcherModes, CompositorAdapter) {
+    var supported = supportedLauncherModeKeys(launcherModes, CompositorAdapter);
+    var out = [];
+    for (var i = 0; i < _launcherPrimaryDefaults.length; ++i) {
+        if (supported.indexOf(_launcherPrimaryDefaults[i]) !== -1)
+            out.push(_launcherPrimaryDefaults[i]);
+    }
+    if (out.length === 0)
+        out = supported.length > 0 ? [supported[0]] : ["drun"];
+    return out;
+}
+
+function normalizePrimaryModes(Config, CompositorAdapter, launcherModes, nextModes) {
+    var enabled = Array.isArray(Config.launcherEnabledModes) ? Config.launcherEnabledModes.slice() : [];
+    var source = Array.isArray(nextModes) ? nextModes : defaultPrimaryModes(launcherModes, CompositorAdapter);
+    var out = [];
+    var seen = {};
+    for (var i = 0; i < source.length; ++i) {
+        var key = String(source[i] || "");
+        if (enabled.indexOf(key) === -1 || !isLauncherModeSupported(CompositorAdapter, key) || seen[key])
+            continue;
+        out.push(key);
+        seen[key] = true;
+    }
+    if (out.length === 0 && enabled.length > 0)
+        out.push(enabled[0]);
+    return out;
+}
+
+function setPrimaryModes(Config, CompositorAdapter, launcherModes, nextModes) {
+    Config.launcherPrimaryModes = normalizePrimaryModes(Config, CompositorAdapter, launcherModes, nextModes);
 }
 
 function setEnabledModes(Config, CompositorAdapter, launcherModes, nextModes) {
@@ -129,6 +164,7 @@ function setEnabledModes(Config, CompositorAdapter, launcherModes, nextModes) {
         }
     }
     Config.launcherModeOrder = newOrder;
+    Config.launcherPrimaryModes = normalizePrimaryModes(Config, CompositorAdapter, launcherModes, Config.launcherPrimaryModes);
 
     if (next.indexOf(Config.launcherDefaultMode) === -1)
         Config.launcherDefaultMode = next[0];
@@ -146,15 +182,16 @@ function toggleLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) {
 
 function applyModePreset(Config, CompositorAdapter, launcherModes, preset) {
     var presetModes = [];
-    if (preset === "minimal")
-        presetModes = ["drun", "window", "files", "run", "system", "media"];
-    else if (preset === "full")
+    if (preset === "all" || preset === "full")
         presetModes = supportedLauncherModeKeys(launcherModes, CompositorAdapter);
+    else if (preset === "extended" || preset === "core")
+        presetModes = ["drun", "window", "files", "ai", "system", "settings", "run", "ssh", "web"];
     else
-        presetModes = ["drun", "window", "files", "ai", "clip", "system", "media"];
+        presetModes = ["drun", "window", "files", "ai", "system"];
 
     setEnabledModes(Config, CompositorAdapter, launcherModes, presetModes);
     Config.launcherModeOrder = Array.isArray(Config.launcherEnabledModes) ? Config.launcherEnabledModes.slice() : ["drun"];
+    Config.launcherPrimaryModes = normalizePrimaryModes(Config, CompositorAdapter, launcherModes, defaultPrimaryModes(launcherModes, CompositorAdapter));
 }
 
 function launcherModeMeta(launcherModes, modeKey) {
@@ -196,6 +233,37 @@ function orderedEnabledModes(Config, CompositorAdapter, launcherModes) {
     return out;
 }
 
+function orderedPrimaryModes(Config, CompositorAdapter, launcherModes) {
+    var enabledOrder = orderedEnabledModes(Config, CompositorAdapter, launcherModes);
+    var primary = Array.isArray(Config.launcherPrimaryModes) ? Config.launcherPrimaryModes : [];
+    var out = [];
+    for (var i = 0; i < primary.length; ++i) {
+        var key = String(primary[i] || "");
+        if (enabledOrder.indexOf(key) !== -1 && out.indexOf(key) === -1)
+            out.push(key);
+    }
+    if (out.length === 0 && enabledOrder.length > 0)
+        out.push(enabledOrder[0]);
+    return out;
+}
+
+function orderedAdvancedModes(Config, CompositorAdapter, launcherModes) {
+    var enabledOrder = orderedEnabledModes(Config, CompositorAdapter, launcherModes);
+    var primary = orderedPrimaryModes(Config, CompositorAdapter, launcherModes);
+    return enabledOrder.filter(function(modeKey) {
+        return primary.indexOf(modeKey) === -1;
+    });
+}
+
+function disabledLauncherModes(Config, CompositorAdapter, launcherModes) {
+    var enabled = orderedEnabledModes(Config, CompositorAdapter, launcherModes);
+    return supportedLauncherModes(launcherModes, CompositorAdapter).filter(function(modeMeta) {
+        return enabled.indexOf(modeMeta.key) === -1;
+    }).map(function(modeMeta) {
+        return modeMeta.key;
+    });
+}
+
 function moveMode(Config, CompositorAdapter, launcherModes, modeKey, delta) {
     var current = orderedEnabledModes(Config, CompositorAdapter, launcherModes);
     var from = current.indexOf(modeKey);
@@ -208,6 +276,68 @@ function moveMode(Config, CompositorAdapter, launcherModes, modeKey, delta) {
     current.splice(from, 1);
     current.splice(to, 0, moved);
     Config.launcherModeOrder = current.slice();
+}
+
+function movePrimaryMode(Config, CompositorAdapter, launcherModes, modeKey, delta) {
+    var current = orderedPrimaryModes(Config, CompositorAdapter, launcherModes);
+    var from = current.indexOf(modeKey);
+    if (from < 0)
+        return;
+    var to = Math.max(0, Math.min(current.length - 1, from + delta));
+    if (to === from)
+        return;
+    var moved = current[from];
+    current.splice(from, 1);
+    current.splice(to, 0, moved);
+    setPrimaryModes(Config, CompositorAdapter, launcherModes, current);
+}
+
+function moveAdvancedMode(Config, CompositorAdapter, launcherModes, modeKey, delta) {
+    var advanced = orderedAdvancedModes(Config, CompositorAdapter, launcherModes);
+    var from = advanced.indexOf(modeKey);
+    if (from < 0)
+        return;
+    var to = Math.max(0, Math.min(advanced.length - 1, from + delta));
+    if (to === from)
+        return;
+    var moved = advanced[from];
+    advanced.splice(from, 1);
+    advanced.splice(to, 0, moved);
+    Config.launcherModeOrder = orderedPrimaryModes(Config, CompositorAdapter, launcherModes).concat(advanced);
+}
+
+function promoteLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) {
+    var enabled = orderedEnabledModes(Config, CompositorAdapter, launcherModes);
+    if (enabled.indexOf(modeKey) === -1)
+        enabled.push(modeKey);
+    setEnabledModes(Config, CompositorAdapter, launcherModes, enabled);
+    var primary = orderedPrimaryModes(Config, CompositorAdapter, launcherModes);
+    if (primary.indexOf(modeKey) === -1)
+        primary.push(modeKey);
+    setPrimaryModes(Config, CompositorAdapter, launcherModes, primary);
+}
+
+function enableLauncherMode(Config, CompositorAdapter, launcherModes, modeKey, asPrimary) {
+    var enabled = orderedEnabledModes(Config, CompositorAdapter, launcherModes);
+    if (enabled.indexOf(modeKey) === -1)
+        enabled.push(modeKey);
+    setEnabledModes(Config, CompositorAdapter, launcherModes, enabled);
+    if (asPrimary)
+        promoteLauncherMode(Config, CompositorAdapter, launcherModes, modeKey);
+}
+
+function demoteLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) {
+    var primary = orderedPrimaryModes(Config, CompositorAdapter, launcherModes).filter(function(key) {
+        return key !== modeKey;
+    });
+    setPrimaryModes(Config, CompositorAdapter, launcherModes, primary);
+}
+
+function disableLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) {
+    var enabled = orderedEnabledModes(Config, CompositorAdapter, launcherModes).filter(function(key) {
+        return key !== modeKey;
+    });
+    setEnabledModes(Config, CompositorAdapter, launcherModes, enabled);
 }
 
 // root must expose: dragModeKey, dragModeTargetIndex
@@ -461,6 +591,7 @@ function resetLauncherDefaults(Config, webAliasDefaults, webProviderDefaultOrder
         supportedDefaults = ["drun"];
     Config.launcherEnabledModes = supportedDefaults.slice();
     Config.launcherModeOrder = supportedDefaults.slice();
+    Config.launcherPrimaryModes = defaultPrimaryModes(launcherModes, CompositorAdapter);
     Config.launcherScoreNameWeight = 1.0;
     Config.launcherScoreTitleWeight = 0.92;
     Config.launcherScoreExecWeight = 0.88;

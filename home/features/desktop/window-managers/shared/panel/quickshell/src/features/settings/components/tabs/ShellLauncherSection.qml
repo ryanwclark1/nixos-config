@@ -17,6 +17,10 @@ Item {
     property int dragModeTargetIndex: -1
     property string dragWebProviderKey: ""
     property int dragWebProviderTargetIndex: -1
+    property string newEngineKey: ""
+    property string newEngineName: ""
+    property string newEngineUrl: ""
+    property string newEngineIcon: ""
 
     // Section visibility
     readonly property bool isLauncherSection: sectionMode === "launcher"
@@ -919,65 +923,60 @@ Item {
                 text: "ADD NEW ENGINE"
             }
 
-            property string newEngineKey: ""
-            property string newEngineName: ""
-            property string newEngineUrl: ""
-            property string newEngineIcon: ""
-
             SettingsTextInputRow {
                 label: "Key (short ID)"
                 placeholderText: "e.g. rustdoc"
-                text: parent.newEngineKey
-                onSubmitted: value => parent.newEngineKey = value
-                onTextEdited: value => parent.newEngineKey = value
+                text: root.newEngineKey
+                onSubmitted: value => root.newEngineKey = value
+                onTextEdited: value => root.newEngineKey = value
             }
 
             SettingsTextInputRow {
                 label: "Name"
                 placeholderText: "e.g. Rust Docs"
-                text: parent.newEngineName
-                onSubmitted: value => parent.newEngineName = value
-                onTextEdited: value => parent.newEngineName = value
+                text: root.newEngineName
+                onSubmitted: value => root.newEngineName = value
+                onTextEdited: value => root.newEngineName = value
             }
 
             SettingsTextInputRow {
                 label: "URL Template"
                 placeholderText: "https://example.com/search?q=%s"
-                text: parent.newEngineUrl
-                onSubmitted: value => parent.newEngineUrl = value
-                onTextEdited: value => parent.newEngineUrl = value
+                text: root.newEngineUrl
+                onSubmitted: value => root.newEngineUrl = value
+                onTextEdited: value => root.newEngineUrl = value
             }
 
             SettingsTextInputRow {
                 label: "Icon (optional)"
                 placeholderText: "Nerd Font icon"
-                text: parent.newEngineIcon
-                onSubmitted: value => parent.newEngineIcon = value
-                onTextEdited: value => parent.newEngineIcon = value
+                text: root.newEngineIcon
+                onSubmitted: value => root.newEngineIcon = value
+                onTextEdited: value => root.newEngineIcon = value
             }
 
             SettingsActionButton {
                 Layout.fillWidth: true
                 label: "Add Custom Engine"
                 iconName: "󰐕"
-                enabled: parent.newEngineKey.trim() !== "" && parent.newEngineName.trim() !== "" && parent.newEngineUrl.trim() !== ""
+                enabled: root.newEngineKey.trim() !== "" && root.newEngineName.trim() !== "" && root.newEngineUrl.trim() !== ""
                 onClicked: {
                     var engines = Array.isArray(Config.launcherWebCustomEngines) ? Config.launcherWebCustomEngines.slice() : [];
-                    var key = parent.newEngineKey.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+                    var key = root.newEngineKey.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
                     if (key === "")
                         return;
                     engines.push({
                         key: key,
-                        name: parent.newEngineName.trim(),
-                        exec: parent.newEngineUrl.trim(),
+                        name: root.newEngineName.trim(),
+                        exec: root.newEngineUrl.trim(),
                         home: "",
-                        icon: parent.newEngineIcon.trim() || "󰖟"
+                        icon: root.newEngineIcon.trim() || "󰖟"
                     });
                     Config.launcherWebCustomEngines = engines;
-                    parent.newEngineKey = "";
-                    parent.newEngineName = "";
-                    parent.newEngineUrl = "";
-                    parent.newEngineIcon = "";
+                    root.newEngineKey = "";
+                    root.newEngineName = "";
+                    root.newEngineUrl = "";
+                    root.newEngineIcon = "";
                 }
             }
         }

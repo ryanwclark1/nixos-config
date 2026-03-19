@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
+import "../../../background"
 import "WallpaperTabHelpers.js" as WTH
 
 Rectangle {
@@ -26,71 +27,22 @@ Rectangle {
     readonly property string solidHex: WallpaperService.solidColorForMonitor(_previewMonitor)
     readonly property bool solidPreview: solidHex.length > 0
 
-    property bool _previewFlip: false
-
     onPreviewPathChanged: {
         if (!previewPath || unsupportedImagePaths[previewPath]) {
-            previewA.source = "";
-            previewB.source = "";
+            wallpaperPreview.currentSource = "";
             return;
         }
-        var src = WTH.imageSource(previewPath, unsupportedImagePaths);
-        if (_previewFlip) {
-            previewA.previewPath = previewPath;
-            previewA.source = src;
-        } else {
-            previewB.previewPath = previewPath;
-            previewB.source = src;
-        }
+        wallpaperPreview.currentSource = WTH.imageSource(previewPath, unsupportedImagePaths);
     }
 
-    Image {
-        id: previewA
-        property string previewPath: ""
+    WallpaperLayer {
+        id: wallpaperPreview
         anchors.fill: parent
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        smooth: true
-        sourceSize: Qt.size(previewContainer.width * 2, previewContainer.height * 2)
-        opacity: previewContainer._previewFlip ? 0.0 : 1.0
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Colors.durationEmphasis
-                easing.type: Easing.InOutQuad
-            }
-        }
-        onStatusChanged: {
-            if (status === Image.Ready && previewContainer._previewFlip) {
-                previewContainer._previewFlip = false;
-            } else if (status === Image.Error && previewPath.length > 0) {
-                previewContainer.imageUnsupported(previewPath);
-                source = "";
-            }
-        }
-    }
-
-    Image {
-        id: previewB
-        property string previewPath: ""
-        anchors.fill: parent
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        smooth: true
-        sourceSize: Qt.size(previewContainer.width * 2, previewContainer.height * 2)
-        opacity: previewContainer._previewFlip ? 1.0 : 0.0
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Colors.durationEmphasis
-                easing.type: Easing.InOutQuad
-            }
-        }
-        onStatusChanged: {
-            if (status === Image.Ready && !previewContainer._previewFlip) {
-                previewContainer._previewFlip = true;
-            } else if (status === Image.Error && previewPath.length > 0) {
-                previewContainer.imageUnsupported(previewPath);
-                source = "";
-            }
+        transitionType: Config.wallpaperTransitionType
+        transitionDuration: 400
+        onImageLoadError: source => {
+            var path = source.toString().replace(/^file:\/\//, "");
+            previewContainer.imageUnsupported(path);
         }
     }
 
@@ -98,7 +50,7 @@ Rectangle {
         anchors.centerIn: parent
         spacing: Colors.spacingS
         visible: !previewContainer.solidPreview
-            && (previewContainer.previewPath === "" || (previewA.status !== Image.Ready && previewB.status !== Image.Ready))
+            && (previewContainer.previewPath === "" || wallpaperPreview.currentSource == "")
 
         Text {
             text: "󰸉"

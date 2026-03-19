@@ -55,9 +55,10 @@ Item {
 
             SettingsToggleRow {
                 label: "Use Modular Entries"
-                description: "Uses barLeftEntries, etc. from config.json"
                 icon: "󰕮"
                 configKey: "barUseModularEntries"
+                enabledText: "Uses barLeftEntries, etc. from config.json"
+                disabledText: "Uses legacy barLeftEntries, etc. from config.json"
             }
         }
 
