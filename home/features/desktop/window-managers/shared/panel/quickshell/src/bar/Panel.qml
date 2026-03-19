@@ -1304,6 +1304,36 @@ Item {
     }
 
     Component {
+        id: pomodoroComponent
+        PomodoroBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: todoComponent
+        TodoBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: gameModeComponent
+        GameModeBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
         id: unknownComponent
         SharedWidgets.BarPill {
             property var widgetInstance: null

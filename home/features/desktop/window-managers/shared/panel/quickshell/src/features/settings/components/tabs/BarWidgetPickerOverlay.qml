@@ -11,6 +11,7 @@ Rectangle {
     required property bool compactMode
     required property int overlayInset
     required property string addSection
+    required property bool verticalBar
     required property var sectionLabelFn
     required property string searchQuery
     required property var availableWidgets
@@ -132,6 +133,25 @@ Rectangle {
                                             anchors.centerIn: parent
                                             text: "Best in " + root.sectionLabelFn(String(modelData.section || "right"))
                                             color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.textSecondary
+                                            font.pixelSize: Colors.fontSizeXS
+                                            font.weight: Font.Medium
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        visible: root.verticalBar
+                                        radius: Colors.radiusSmall
+                                        color: Colors.cardSurface
+                                        border.color: Colors.border
+                                        border.width: 1
+                                        implicitWidth: verticalHintLabel.implicitWidth + Colors.spacingM
+                                        implicitHeight: verticalHintLabel.implicitHeight + Colors.spacingXS
+
+                                        Text {
+                                            id: verticalHintLabel
+                                            anchors.centerIn: parent
+                                            text: BarWidgetRegistry.verticalHintLabel(modelData.widgetType)
+                                            color: Colors.textSecondary
                                             font.pixelSize: Colors.fontSizeXS
                                             font.weight: Font.Medium
                                         }
