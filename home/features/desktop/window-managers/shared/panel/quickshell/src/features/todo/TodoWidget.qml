@@ -133,6 +133,7 @@ Item {
         readonly property bool taskDone: taskItem.done
 
         Behavior on color {
+          enabled: !Colors.isTransitioning
           ColorAnimation { duration: Colors.durationSnap }
         }
 

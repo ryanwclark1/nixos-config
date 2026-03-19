@@ -137,6 +137,10 @@ QtObject {
                 focusPolicy: "focus-on-open",
                 legacyFlags: ["aiChatVisible"]
             },
+            commandPalette: {
+                kind: "panel",
+                focusPolicy: "focus-on-open"
+            },
             osk: {
                 kind: "panel",
                 focusPolicy: "preserve-app-focus",
