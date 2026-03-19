@@ -6,12 +6,12 @@ import "../../services"
 
 Item {
   id: root
-  
+
   property bool dndEnabled: false
   readonly property bool notificationServerEnabled: (Quickshell.env("QS_DISABLE_NOTIFICATION_SERVER") || "") !== "1"
   readonly property var server: notificationServerLoader.item
   readonly property var notifications: server ? server.trackedNotifications : null
-  
+
   // Persistence State
   property var archivedNotifications: []
   property string statePath: Quickshell.statePath("notifications.json")
@@ -29,6 +29,13 @@ Item {
     id: saveDebounce
     interval: 500; repeat: false
     onTriggered: root._doSaveNotifications()
+  }
+
+  FileView {
+    id: archiveFile
+    path: root.statePath
+    blockLoading: true
+    printErrors: false
   }
 
   Loader {
@@ -85,19 +92,17 @@ Item {
        data.push(archivedNotifications[j]);
     }
 
-    var json = JSON.stringify(data);
-    Quickshell.execDetached([
-      "sh",
-      "-c",
-      "printf %s \"$1\" > \"$2\"",
-      "sh",
-      json,
-      root.statePath
-    ]);
+    archiveFile.setText(JSON.stringify(data));
   }
 
   function loadNotifications() {
-    if (!readArchive.running) readArchive.running = true;
+    var raw = (archiveFile.text() || "").trim();
+    if (!raw) return;
+    try {
+      archivedNotifications = JSON.parse(raw);
+    } catch (e) {
+      Logger.e("NotificationManager", "Failed to load notifications:", e);
+    }
   }
 
   function dismissAll(appName) {
@@ -109,32 +114,9 @@ Item {
       }
     }
   }
-  
+
   function clearArchive() {
      archivedNotifications = [];
-     Quickshell.execDetached([
-       "sh",
-       "-c",
-       "printf %s \"$1\" > \"$2\"",
-       "sh",
-       "[]",
-       root.statePath
-     ]);
-  }
-
-  Process {
-    id: readArchive
-    command: ["sh", "-c", "cat \"$1\" 2>/dev/null || true", "sh", root.statePath]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var raw = (this.text || "").trim();
-        if (!raw) return;
-        try {
-          archivedNotifications = JSON.parse(raw);
-        } catch (e) {
-          Logger.e("NotificationManager", "Failed to load notifications:", e);
-        }
-      }
-    }
+     archiveFile.setText("[]");
   }
 }
