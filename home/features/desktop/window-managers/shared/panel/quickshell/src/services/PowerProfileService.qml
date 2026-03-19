@@ -1,131 +1,37 @@
 pragma Singleton
 
 import QtQuick
-import Quickshell
-import Quickshell.Io
+import Quickshell.Services.UPower
 
 QtObject {
     id: root
 
-    // ── Public state ─────────────────────────────
-    property string currentProfile: "balanced"
-    property var availableProfiles: []
-    property bool available: false
-    property string backend: "none"   // "powerprofilesctl" | "tlp" | "none"
+    readonly property string currentProfile: _profileToString(PowerProfiles.profile)
+    readonly property bool available: true
+    readonly property bool hasPerformanceProfile: PowerProfiles.hasPerformanceProfile
+    readonly property var availableProfiles: {
+        var p = ["balanced", "power-saver"];
+        if (hasPerformanceProfile) p.push("performance");
+        return p;
+    }
 
-    // ── Subscriber-based polling ─────────────────
+    // Ref.qml compat (no-op — reactive now)
     property int subscriberCount: 0
 
-    // ── Backend detection ────────────────────────
-    Component.onCompleted: _detectBackend()
-
-    property Process _detectProc: Process {
-        running: false
-        command: ["sh", "-c",
-            "if command -v powerprofilesctl >/dev/null 2>&1; then echo ppd; "
-            + "elif command -v tlp >/dev/null 2>&1; then echo tlp; "
-            + "else echo none; fi"
-        ]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                var result = (this.text || "").trim();
-                root.backend = result;
-                root.available = result !== "none";
-                if (root.available)
-                    root._fetchProfiles();
-            }
-        }
-    }
-
-    function _detectBackend() {
-        if (!_detectProc.running)
-            _detectProc.running = true;
-    }
-
-    // ── Fetch available profiles ─────────────────
-    property Process _profilesProc: Process {
-        running: false
-        command: ["sh", "-c",
-            "powerprofilesctl list 2>/dev/null | grep -oP '(?<=^  )\\S+(?=:)' || echo 'balanced'"
-        ]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                var lines = (this.text || "").trim().split("\n");
-                var profiles = [];
-                for (var i = 0; i < lines.length; i++) {
-                    var p = lines[i].trim();
-                    if (p) profiles.push(p);
-                }
-                if (profiles.length === 0)
-                    profiles = ["balanced"];
-                root.availableProfiles = profiles;
-            }
-        }
-    }
-
-    function _fetchProfiles() {
-        if (!_profilesProc.running)
-            _profilesProc.running = true;
-    }
-
-    // ── Current profile polling ──────────────────
-    property Process _currentProc: Process {
-        running: false
-        command: ["powerprofilesctl", "get"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                var result = (this.text || "").trim();
-                if (result)
-                    root.currentProfile = result;
-            }
-        }
-    }
-
-    property Timer _pollTimer: Timer {
-        interval: 5000
-        running: root.subscriberCount > 0 && root.available
-        repeat: true
-        onTriggered: {
-            if (!root._currentProc.running)
-                root._currentProc.running = true;
-        }
-    }
-
-    // ── Persistence ──────────────────────────────
-    // Remember the last user-set profile across shell restarts.
-    readonly property string _persistPath: Quickshell.env("HOME") + "/.local/state/quickshell/power-profile"
-
-    property FileView _persistFile: FileView {
-        path: root._persistPath
-        blockLoading: true
-        printErrors: false
-        watchChanges: false
-
-        onLoaded: {
-            var saved = (text || "").trim();
-            if (saved && root.available && root.availableProfiles.indexOf(saved) !== -1) {
-                root.setProfile(saved);
-            }
-        }
-        onLoadFailed: {} // First run — no persisted profile yet
-    }
-
-    function _persistProfile(name) {
-        _persistFile.setText(name + "\n");
-    }
-
-    // ── Actions ──────────────────────────────────
     function setProfile(name) {
-        if (!root.available) return;
-        if (root.backend === "ppd") {
-            Quickshell.execDetached(["powerprofilesctl", "set", name]);
-        }
-        root.currentProfile = name;
-        _persistProfile(name);
+        if (name === "performance" && hasPerformanceProfile)
+            PowerProfiles.profile = PowerProfile.Performance;
+        else if (name === "power-saver")
+            PowerProfiles.profile = PowerProfile.PowerSaver;
+        else
+            PowerProfiles.profile = PowerProfile.Balanced;
     }
 
-    function refresh() {
-        if (root.available && !_currentProc.running)
-            _currentProc.running = true;
+    function refresh() {} // no-op, reactive now
+
+    function _profileToString(p) {
+        if (p === PowerProfile.Performance) return "performance";
+        if (p === PowerProfile.PowerSaver) return "power-saver";
+        return "balanced";
     }
 }
