@@ -37,92 +37,95 @@ Item {
                 WlrLayershell.layer: WlrLayer.Background
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-                opacity: root.startupComplete ? 1.0 : 0.0
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Colors.durationSlow
-                        easing.type: Easing.OutCubic
+                Item {
+                    anchors.fill: parent
+                    opacity: root.startupComplete ? 1.0 : 0.0
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Colors.durationSlow
+                            easing.type: Easing.OutCubic
+                        }
                     }
-                }
 
-                WallpaperLayer {
-                    id: wallpaperLayer
-                    visible: Config.wallpaperUseShellRenderer
-                    transitionType: Config.wallpaperTransitionType
-                    transitionDuration: Config.wallpaperTransitionDuration
+                    WallpaperLayer {
+                        id: wallpaperLayer
+                        visible: Config.wallpaperUseShellRenderer
+                        transitionType: Config.wallpaperTransitionType
+                        transitionDuration: Config.wallpaperTransitionDuration
 
-                    // Connect to WallpaperService signals
-                    Connections {
-                        target: WallpaperService
-                        function onWallpaperApplied(imagePath, monitorName, isCycled) {
-                            // Apply if this is for our monitor or for all monitors
-                            var screenName = modelData.name || "";
-                            if (monitorName === "" || monitorName === screenName) {
-                                wallpaperLayer.showSolid = false;
-                                // Use slower transition for auto-cycle
-                                if (isCycled) {
-                                    wallpaperLayer.transitionDuration = Math.round(Config.wallpaperTransitionDuration * 1.5);
-                                } else {
-                                    wallpaperLayer.transitionDuration = Config.wallpaperTransitionDuration;
+                        // Connect to WallpaperService signals
+                        Connections {
+                            target: WallpaperService
+                            function onWallpaperApplied(imagePath, monitorName, isCycled) {
+                                // Apply if this is for our monitor or for all monitors
+                                var screenName = modelData.name || "";
+                                if (monitorName === "" || monitorName === screenName) {
+                                    wallpaperLayer.showSolid = false;
+                                    // Use slower transition for auto-cycle
+                                    if (isCycled) {
+                                        wallpaperLayer.transitionDuration = Math.round(Config.wallpaperTransitionDuration * 1.5);
+                                    } else {
+                                        wallpaperLayer.transitionDuration = Config.wallpaperTransitionDuration;
+                                    }
+                                    wallpaperLayer.currentSource = "file://" + imagePath;
                                 }
-                                wallpaperLayer.currentSource = "file://" + imagePath;
+                            }
+                            function onSolidColorApplied(colorHex, monitorName) {
+                                var screenName = modelData.name || "";
+                                if (monitorName === "" || monitorName === screenName) {
+                                    wallpaperLayer.showSolid = true;
+                                    wallpaperLayer.solidColor = "#" + colorHex.slice(0, 6);
+                                }
                             }
                         }
-                        function onSolidColorApplied(colorHex, monitorName) {
+
+                        // Load initial wallpaper from persisted config
+                        Component.onCompleted: {
+                            if (!Config.wallpaperUseShellRenderer) return;
                             var screenName = modelData.name || "";
-                            if (monitorName === "" || monitorName === screenName) {
-                                wallpaperLayer.showSolid = true;
-                                wallpaperLayer.solidColor = "#" + colorHex.slice(0, 6);
+                            var path = WallpaperService.wallpapers[screenName]
+                                || WallpaperService.wallpapers["__all__"] || "";
+                            if (path) {
+                                currentSource = "file://" + path;
+                            }
+                            // Check if solid color is active
+                            var solidHex = WallpaperService.solidColorForMonitor(screenName);
+                            if (solidHex) {
+                                showSolid = true;
+                                solidColor = "#" + solidHex.slice(0, 6);
                             }
                         }
                     }
 
-                    // Load initial wallpaper from persisted config
-                    Component.onCompleted: {
-                        if (!Config.wallpaperUseShellRenderer) return;
-                        var screenName = modelData.name || "";
-                        var path = WallpaperService.wallpapers[screenName]
-                            || WallpaperService.wallpapers["__all__"] || "";
-                        if (path) {
-                            currentSource = "file://" + path;
-                        }
-                        // Check if solid color is active
-                        var solidHex = WallpaperService.solidColorForMonitor(screenName);
-                        if (solidHex) {
-                            showSolid = true;
-                            solidColor = "#" + solidHex.slice(0, 6);
-                        }
+                    DesktopWidgets {
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.leftMargin: 80
+                        anchors.topMargin: 120
                     }
-                }
 
-                DesktopWidgets {
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.leftMargin: 80
-                    anchors.topMargin: 120
-                }
+                    Loader {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: parent.height * 0.4
+                        visible: Config.backgroundVisualizerEnabled && !root._backgroundAutoHidden
+                        sourceComponent: Config.backgroundUseShaderVisualizer ? shaderVisualizerComponent : standardVisualizerComponent
+                    }
 
-                Loader {
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: parent.height * 0.4
-                    visible: Config.backgroundVisualizerEnabled && !root._backgroundAutoHidden
-                    sourceComponent: Config.backgroundUseShaderVisualizer ? shaderVisualizerComponent : standardVisualizerComponent
-                }
+                    Component {
+                        id: standardVisualizerComponent
+                        BackgroundVisualizer {}
+                    }
 
-                Component {
-                    id: standardVisualizerComponent
-                    BackgroundVisualizer {}
-                }
+                    Component {
+                        id: shaderVisualizerComponent
+                        BackgroundShaderVisualizer {}
+                    }
 
-                Component {
-                    id: shaderVisualizerComponent
-                    BackgroundShaderVisualizer {}
-                }
-
-                BackgroundClock {
-                    visible: Config.backgroundClockEnabled && !root._backgroundAutoHidden
+                    BackgroundClock {
+                        visible: Config.backgroundClockEnabled && !root._backgroundAutoHidden
+                    }
                 }
             }
         }
