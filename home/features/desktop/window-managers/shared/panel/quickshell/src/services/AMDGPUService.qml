@@ -35,7 +35,7 @@ QtObject {
 
     property Process _probeProc: Process {
         id: _probeProc
-        command: ["command", "-v", "amdgpu_top"]
+        command: ["sh", "-c", "command -v amdgpu_top >/dev/null 2>&1"]
         running: true
     }
 
