@@ -1078,6 +1078,31 @@ Item {
                                                     }
                                                 }
                                             }
+
+                                            // Remove button (only for stopped containers)
+                                            Rectangle {
+                                                visible: !containerCard.modelData.isRunning && !containerCard.modelData.isPaused
+                                                width: parent.width
+                                                height: 30
+                                                radius: 10
+                                                color: "#3f1d24"
+                                                border.width: 1
+                                                border.color: "#f87171"
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: "Remove Container"
+                                                    color: "#fca5a5"
+                                                    font.pixelSize: 10
+                                                    font.bold: true
+                                                }
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        if (root.daemon)
+                                                            root.daemon.removeContainer(containerCard.modelData.id || containerCard.modelData.name);
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
