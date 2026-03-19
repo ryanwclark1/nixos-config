@@ -75,6 +75,11 @@ let
     ${builtins.readFile ./scripts/inhibitor.py}
   '';
 
+  polkitAgentScript = pkgs.writeScriptBin "qs-polkit-agent" ''
+    #!${pkgs.python3.withPackages (ps: [ ps.dbus-python ps.pygobject3 ])}/bin/python3
+    ${builtins.readFile ./scripts/polkit-agent.py}
+  '';
+
   networkScript = pkgs.writeShellScriptBin "qs-network" ''
     PATH="${pkgs.networkmanager}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:$PATH"
     ${builtins.readFile ./scripts/network.sh}
@@ -276,6 +281,7 @@ let
       sleepMonitorScript
       screenshotScript
       inhibitorScript
+      polkitAgentScript
       networkScript
       iconResolverScript
       compositorGuardScript

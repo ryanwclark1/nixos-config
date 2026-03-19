@@ -16,6 +16,7 @@ import "../features/hot-corners"
 import "../features/osk"
 import "../features/notifications"
 import "../features/market"
+import "../features/polkit"
 import "../features/power"
 import "../features/region-selector"
 import "../features/system/surfaces"
@@ -396,6 +397,10 @@ Scope {
             }
             // bottomLeft / bottomRight: no default action — extend here
         }
+    }
+
+    PolkitAgent {
+        id: polkitAgent
     }
 
     NativeLock {
