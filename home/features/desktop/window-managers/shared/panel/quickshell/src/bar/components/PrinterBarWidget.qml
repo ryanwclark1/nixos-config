@@ -38,6 +38,7 @@ SharedWidgets.BarPill {
             font.pixelSize: Colors.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
             Behavior on color {
+                enabled: !Colors.isTransitioning
                 ColorAnimation {
                     duration: Colors.durationNormal
                 }

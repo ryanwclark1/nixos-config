@@ -38,7 +38,7 @@ Item {
            : SystemStatus.overallStatus === "warning" ? 0.18
            : 0.3
     visible: opacity > 0
-    Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
 
     SequentialAnimation on opacity {
         id: pulseAnim

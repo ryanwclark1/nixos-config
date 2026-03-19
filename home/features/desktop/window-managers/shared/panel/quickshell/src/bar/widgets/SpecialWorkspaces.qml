@@ -143,8 +143,8 @@ Item {
       color: mainMouse.containsMouse ? Colors.highlightLight : (root.isOnSpecial ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
       border.color: root.isOnSpecial ? Colors.primary : Colors.border
       border.width: 1
-      Behavior on color { CAnim {} }
-      Behavior on border.color { CAnim {} }
+      Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+      Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
       scale: mainMouse.containsMouse ? 1.08 : 1.0
       Behavior on scale { SpringAnimation { spring: 4; damping: 0.3 } }
@@ -190,8 +190,8 @@ Item {
         color: wsHover.containsMouse ? Colors.highlightLight : (isFocused ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
         border.color: isFocused ? Colors.primary : Colors.border
         border.width: isFocused ? 2 : 1
-        Behavior on color { CAnim {} }
-        Behavior on border.color { CAnim {} }
+        Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+        Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
         scale: wsHover.containsMouse ? 1.08 : 1.0
         Behavior on scale { SpringAnimation { spring: 4; damping: 0.3 } }
@@ -275,7 +275,7 @@ Item {
       color: mainMouseV.containsMouse ? Colors.highlightLight : (root.isOnSpecial ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
       border.color: root.isOnSpecial ? Colors.primary : Colors.border
       border.width: 1
-      Behavior on color { CAnim {} }
+      Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
       Text {
         anchors.centerIn: parent
@@ -316,7 +316,7 @@ Item {
         color: wsHoverV.containsMouse ? Colors.highlightLight : (isFocused ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
         border.color: isFocused ? Colors.primary : Colors.border
         border.width: isFocused ? 2 : 1
-        Behavior on color { CAnim {} }
+        Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
         Text {
           anchors.centerIn: parent

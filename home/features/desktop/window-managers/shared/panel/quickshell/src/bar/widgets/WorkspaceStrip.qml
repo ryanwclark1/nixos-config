@@ -74,7 +74,7 @@ Flow {
       color: dropHighlight ? Colors.accent : (isActive ? root.activeColor : root.inactiveColor)
 
       Behavior on color {
-        enabled: !wsPill.isUrgent
+        enabled: !wsPill.isUrgent && !Colors.isTransitioning
         CAnim {}
       }
 
@@ -174,7 +174,7 @@ Flow {
     border.width: 1
     visible: root.showAddButton && (Config.workspaceShowEmpty || root.state.workspaces.length < 10)
     
-    Behavior on color { CAnim {} }
+    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
     scale: addWsHover.containsMouse ? 1.1 : 1.0
     Behavior on scale { SpringAnimation { spring: 4; damping: 0.3 } }
 

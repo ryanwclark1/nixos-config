@@ -73,8 +73,8 @@ Item {
             border.color: Colors.withAlpha(MediaService.artAccentColor, 0.3)
             border.width: 1
             
-            Behavior on color { ColorAnimation { duration: Colors.durationEmphasis } }
-            Behavior on border.color { ColorAnimation { duration: Colors.durationEmphasis } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
+            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
 
             RowLayout {
                 id: mediaRow

@@ -42,7 +42,7 @@ Rectangle {
     return isPinned ? "Pinned app" : "Running app";
   }
 
-  Behavior on color { CAnim {} }
+  Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
   Behavior on scale { Anim { duration: Colors.durationFast } }
 
   // Running indicator dot
