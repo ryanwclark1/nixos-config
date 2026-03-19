@@ -75,6 +75,11 @@ let
     ${builtins.readFile ./scripts/screenshot.sh}
   '';
 
+  ttsSpeakScript = pkgs.writeShellScriptBin "qs-tts-speak" ''
+    PATH="${pkgs.espeak-ng}/bin:${pkgs.procps}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/tts-speak.sh}
+  '';
+
   ocrScript = pkgs.writeShellScriptBin "qs-ocr" ''
     PATH="${pkgs.tesseract}/bin:${pkgs.wl-clipboard}/bin:${pkgs.coreutils}/bin:$PATH"
     ${builtins.readFile ./scripts/ocr.sh}
@@ -296,6 +301,7 @@ let
       updatorScript
       sleepMonitorScript
       screenshotScript
+      ttsSpeakScript
       ocrScript
       inhibitorScript
       polkitAgentScript
@@ -370,7 +376,21 @@ EOF
 
     home.file.".config/quickshell" = {
       force = true;
-      source = ./src;
+      source = lib.cleanSourceWith {
+        src = ./src;
+        filter = path: type:
+          let baseName = builtins.baseNameOf path;
+          in type == "directory"
+            || lib.hasSuffix ".qml" baseName
+            || lib.hasSuffix ".js" baseName
+            || lib.hasSuffix ".json" baseName
+            || lib.hasSuffix ".svg" baseName
+            || lib.hasSuffix ".png" baseName
+            || lib.hasSuffix ".gif" baseName
+            || lib.hasSuffix ".frag" baseName
+            || lib.hasSuffix ".vert" baseName
+            || baseName == "qmldir";
+      };
       recursive = true;
     };
 
