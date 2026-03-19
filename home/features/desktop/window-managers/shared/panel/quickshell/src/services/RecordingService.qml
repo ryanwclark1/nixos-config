@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
 QtObject {
   id: root
@@ -14,15 +15,35 @@ QtObject {
   // Use Ref { service: RecordingService } for automatic lifecycle management.
   property int subscriberCount: 0
 
-  // ── Recording detection ──────────────────────
-  readonly property int _detectionPollMs: 2000
+  // ── Primary detection: file-based (reactive, zero polling cost) ──────────
+  // os-cmd-screenrecord writes /tmp/os-screenrecord-filename on start and
+  // removes it on stop, making FileView the ideal zero-cost detector for the
+  // gpu-screen-recorder path.
+  readonly property string _lockFile: "/tmp/os-screenrecord-filename"
 
-  property var recDetectPoll: CommandPoll {
-    interval: root._detectionPollMs
+  property FileView _lockFileView: FileView {
+    path: root._lockFile
+    watchChanges: true
+    printErrors: false
+    onTextChanged: root._updateRecordingState()
+    onLoaded: root._updateRecordingState()
+  }
+
+  function _updateRecordingState() {
+    var fileActive = String(_lockFileView.text() ?? "").trim().length > 0;
+    root.isRecording = fileActive || _legacyPoll.value === true;
+  }
+
+  // ── Fallback detection: legacy recorders (wl-screenrec / wf-recorder) ───
+  // These are only used via startLegacyRegionRecording() and leave no lock
+  // file. Poll at a reduced 5 s frequency; gate behind subscriberCount so
+  // the subprocess only runs when the UI is visible.
+  property var _legacyPoll: CommandPoll {
+    interval: 5000
     running: root.subscriberCount > 0
-    command: ["sh", "-c", "pgrep -x wl-screenrec || pgrep -x wf-recorder || pgrep -f '^gpu-screen-recorder'"]
+    command: ["sh", "-c", "pgrep -x wl-screenrec || pgrep -x wf-recorder"]
     parse: function(out) { return String(out || "").trim().length > 0 }
-    onUpdated: root.isRecording = recDetectPoll.value
+    onUpdated: root._updateRecordingState()
   }
 
   // ── Elapsed time tracking ────────────────────
