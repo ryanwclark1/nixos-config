@@ -24,7 +24,6 @@ SystemGraphs 1.0 SystemGraphs.qml
 SystemIoHistory 1.0 SystemIoHistory.qml
 SystemMonitor 1.0 SystemMonitor.qml
 SystemMonitorSummary 1.0 SystemMonitorSummary.qml
-SystemProcessTable 1.0 SystemProcessTable.qml
 SystemServiceTable 1.0 SystemServiceTable.qml
 UpdateWidget 1.0 UpdateWidget.qml
 UserWidget 1.0 UserWidget.qml
