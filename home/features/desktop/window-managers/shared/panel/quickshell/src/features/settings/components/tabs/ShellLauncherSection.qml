@@ -212,8 +212,12 @@ Item {
         }
     }
 
+    implicitHeight: launcherColumn.implicitHeight
+
     ColumnLayout {
-        anchors.fill: parent
+        id: launcherColumn
+        anchors.left: parent.left
+        anchors.right: parent.right
         spacing: Colors.spacingL
 
         // ----- Launcher Behavior (general) ----------------------------------
@@ -671,14 +675,14 @@ Item {
                                     SettingsActionButton {
                                         compact: true
                                         enabled: webProviderRow.index > 0
-                                        label: "↑"
+                                        iconName: "󰅃"
                                         onClicked: root.moveWebProvider(webProviderRow.modelData, -1)
                                     }
 
                                     SettingsActionButton {
                                         compact: true
                                         enabled: webProviderRow.index < (root.orderedWebProviders().length - 1)
-                                        label: "↓"
+                                        iconName: "󰅀"
                                         onClicked: root.moveWebProvider(webProviderRow.modelData, 1)
                                     }
                                 }
@@ -950,25 +954,24 @@ Item {
                                 }
 
                                 Flow {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: parent.width
-                                    spacing: Colors.spacingS
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: parent.width
+                                spacing: Colors.spacingS
 
-                                    SettingsActionButton {
-                                        label: "↑"
-                                        compact: true
-                                        enabled: modeRow.index > 0
-                                        onClicked: root.moveMode(modeRow.modelData, -1)
-                                    }
-
-                                    SettingsActionButton {
-                                        label: "↓"
-                                        compact: true
-                                        enabled: modeRow.index < (root.orderedEnabledModes().length - 1)
-                                        onClicked: root.moveMode(modeRow.modelData, 1)
-                                    }
+                                SettingsActionButton {
+                                    iconName: "󰅃"
+                                    compact: true
+                                    enabled: modeRow.index > 0
+                                    onClicked: root.moveMode(modeRow.modelData, -1)
                                 }
-                            }
+
+                                SettingsActionButton {
+                                    iconName: "󰅀"
+                                    compact: true
+                                    enabled: modeRow.index < (root.orderedEnabledModes().length - 1)
+                                    onClicked: root.moveMode(modeRow.modelData, 1)
+                                }
+                                }                            }
                         }
                     }
                 }

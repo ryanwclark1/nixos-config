@@ -100,7 +100,7 @@ SharedWidgets.CardBase {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 2
+                    anchors.bottomMargin: 8
                     text: root._primaryDrive ? root._primaryDrive.percent : "--"
                     color: root.usageColor
                     font.pixelSize: Colors.fontSizeXS

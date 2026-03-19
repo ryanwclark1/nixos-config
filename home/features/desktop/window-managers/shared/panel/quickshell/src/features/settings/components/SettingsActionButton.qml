@@ -50,10 +50,12 @@ Rectangle {
             color: root.emphasized ? Colors.text : Colors.textSecondary
             font.family: Colors.fontMono
             font.pixelSize: compact ? Colors.fontSizeMedium : Colors.fontSizeLarge
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            Layout.alignment: root.label === "" ? Qt.AlignHCenter | Qt.AlignVCenter : Qt.AlignVCenter
         }
 
         Text {
+            id: labelText
+            visible: root.label !== ""
             Layout.fillWidth: true
             text: root.label
             color: root.emphasized ? Colors.text : Colors.text

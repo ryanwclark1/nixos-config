@@ -91,7 +91,7 @@ BasePopupMenu {
                     spacing: Colors.spacingM
 
                     Text {
-                        text: "󰖂"
+                        text: "󰖩"
                         color: mainStatusCard._statusClr
                         font.family: Colors.fontMono
                         font.pixelSize: Colors.fontSizeHuge
@@ -99,7 +99,7 @@ BasePopupMenu {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 0
+                        spacing: 2
 
                         Text {
                             text: NetworkService.vpnPrimaryLabel
@@ -124,8 +124,8 @@ BasePopupMenu {
                         color: Colors.withAlpha(mainStatusCard._statusClr, 0.14)
                         border.color: Colors.withAlpha(mainStatusCard._statusClr, 0.38)
                         border.width: 1
-                        implicitHeight: 26
-                        implicitWidth: statusChipLabel.implicitWidth + 18
+                        implicitHeight: 28
+                        implicitWidth: statusChipLabel.implicitWidth + 20
 
                         Text {
                             id: statusChipLabel
@@ -178,7 +178,7 @@ BasePopupMenu {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 34
+                    implicitHeight: 40
                     radius: Colors.radiusMedium
                     color: NetworkService.vpnPrimaryStatus === "connected"
                         ? Colors.withAlpha(Colors.error, 0.14)
@@ -248,7 +248,7 @@ BasePopupMenu {
         Rectangle {
             Layout.fillWidth: true
             visible: !NetworkService.vpnHasSavedProfiles
-            implicitHeight: 72
+            implicitHeight: 76
             radius: Colors.radiusMedium
             color: Colors.cardSurface
             border.color: Colors.border
@@ -277,7 +277,7 @@ BasePopupMenu {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 40
+            implicitHeight: 56
             radius: Colors.radiusMedium
             color: Colors.cardSurface
             border.color: Colors.border
@@ -285,7 +285,8 @@ BasePopupMenu {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
+                anchors.leftMargin: Colors.spacingM
+                anchors.rightMargin: Colors.spacingM
                 spacing: Colors.spacingS
 
                 Text {

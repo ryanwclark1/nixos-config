@@ -12,7 +12,7 @@ Rectangle {
 
     signal actionClicked()
 
-    implicitHeight: 60
+    implicitHeight: 56
     radius: Colors.radiusMedium
     color: Colors.cardSurface
     border.color: Colors.border
@@ -20,7 +20,8 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
+        anchors.leftMargin: Colors.spacingM
+        anchors.rightMargin: Colors.spacingM
         spacing: Colors.spacingS
 
         Text {
@@ -32,7 +33,7 @@ Rectangle {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 0
+            spacing: 2
 
             Text {
                 text: root.modelData.name || "VPN"
@@ -62,8 +63,8 @@ Rectangle {
                 : (root.isActive ? Colors.withAlpha(Colors.error, 0.12) : Colors.primaryAccent)
             border.color: root.actionPending ? Colors.border : actionColor
             border.width: 1
-            implicitHeight: 24
-            implicitWidth: actionLabel.implicitWidth + 18
+            implicitHeight: 28
+            implicitWidth: actionLabel.implicitWidth + 20
 
             Text {
                 id: actionLabel

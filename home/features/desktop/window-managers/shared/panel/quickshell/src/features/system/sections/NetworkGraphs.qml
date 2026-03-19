@@ -148,7 +148,7 @@ SharedWidgets.CardBase {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 2
+                    anchors.bottomMargin: 8
                     text: root.activeInterface === "offline" ? "OFF" : "ON"
                     color: root.activeInterface === "offline" ? Colors.error : root.throughputColor
                     font.pixelSize: Colors.fontSizeXS

@@ -108,7 +108,7 @@ SharedWidgets.CardBase {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 2
+                    anchors.bottomMargin: 8
                     text: SystemStatus.gpuUsage
                     color: root.usageColor
                     font.pixelSize: Colors.fontSizeXS

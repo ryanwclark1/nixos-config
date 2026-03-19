@@ -95,7 +95,7 @@ SharedWidgets.CardBase {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 2
+                    anchors.bottomMargin: 8
                     text: Math.round(SystemStatus.ramPercent * 100) + "%"
                     color: root.usageColor
                     font.pixelSize: Colors.fontSizeXS

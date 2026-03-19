@@ -192,15 +192,25 @@ PanelWindow {
                         width: parent.width
                         spacing: Colors.spacingLG
 
+                        UserWidget {
+                            opacity: root.entranceOpacity(0)
+                            scale: root.entranceScale(0)
+                            transform: Translate { y: root.entranceY(0) }
+                            visible: opacity > 0
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutBack } } }
+                        }
+
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: Colors.spacingS
                             visible: Config.controlCenterShowQuickLinks
-                            opacity: root.entranceOpacity(0)
-                            scale: root.entranceScale(0)
-                            transform: Translate { y: root.entranceY(0) }
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutBack } } }
+                            opacity: root.entranceOpacity(1)
+                            scale: root.entranceScale(1)
+                            transform: Translate { y: root.entranceY(1) }
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(1) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(1) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutBack } } }
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
 
                             Repeater {
@@ -218,16 +228,6 @@ PanelWindow {
                                         : null
                                 }
                             }
-                        }
-
-                        UserWidget {
-                            opacity: root.entranceOpacity(1)
-                            scale: root.entranceScale(1)
-                            transform: Translate { y: root.entranceY(1) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(1) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(1) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutBack } } }
                         }
 
                         // Quick Toggles Grid

@@ -107,16 +107,14 @@ Item {
 
                         SettingsActionButton {
                             compact: true
-                            iconName: "󰁍"
-                            label: "Up"
+                            iconName: "󰅃"
                             enabled: rowIndex > 0
                             onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", modelData.id, -1)
                         }
 
                         SettingsActionButton {
                             compact: true
-                            iconName: "󰁔"
-                            label: "Down"
+                            iconName: "󰅀"
                             enabled: rowIndex >= 0 && rowIndex < Helpers.orderedControlCenterToggles(ControlCenterRegistry).length - 1
                             onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", modelData.id, 1)
                         }
@@ -202,16 +200,14 @@ Item {
 
                         SettingsActionButton {
                             compact: true
-                            iconName: "󰁍"
-                            label: "Up"
+                            iconName: "󰅃"
                             enabled: rowIndex > 0
                             onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", modelData.id, -1)
                         }
 
                         SettingsActionButton {
                             compact: true
-                            iconName: "󰁔"
-                            label: "Down"
+                            iconName: "󰅀"
                             enabled: rowIndex >= 0 && rowIndex < Helpers.orderedControlCenterPlugins(PluginService).length - 1
                             onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", modelData.id, 1)
                         }

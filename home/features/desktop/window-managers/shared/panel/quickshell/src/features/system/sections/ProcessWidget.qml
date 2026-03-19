@@ -308,15 +308,8 @@ SharedWidgets.CardBase {
                             Layout.alignment: Qt.AlignVCenter
 
                             Text {
-                                text: "CPU " + Number(modelData.cpu || 0).toFixed(1) + "%"
-                                color: ProcessService.sortBy === "cpu" ? Colors.primary : Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                font.family: Colors.fontMono
-                            }
-
-                            Text {
-                                text: "RAM " + Number(modelData.mem || 0).toFixed(1) + "%"
-                                color: ProcessService.sortBy === "mem" ? Colors.accent : Colors.textSecondary
+                                text: (ProcessService.sortBy === "cpu" ? "CPU " : "RAM ") + Number(ProcessService.sortBy === "cpu" ? (modelData.cpu || 0) : (modelData.mem || 0)).toFixed(1) + "%"
+                                color: ProcessService.sortBy === "cpu" ? Colors.primary : Colors.accent
                                 font.pixelSize: Colors.fontSizeXS
                                 font.family: Colors.fontMono
                             }
