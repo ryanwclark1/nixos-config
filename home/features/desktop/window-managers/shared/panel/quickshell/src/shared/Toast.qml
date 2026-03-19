@@ -4,8 +4,10 @@ import "../services"
 
 Item {
   id: root
-  width: 340
-  height: contentCol.height + Colors.paddingLarge
+  implicitWidth: 340
+  implicitHeight: contentCol.implicitHeight + Colors.paddingLarge
+  width: implicitWidth
+  height: implicitHeight
   visible: false
 
   property string title: ""

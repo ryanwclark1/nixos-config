@@ -131,6 +131,7 @@ BasePopupMenu {
         delegate: Rectangle {
           id: clipCard
           required property int index
+          required property var modelData
           Layout.fillWidth: true
           readonly property bool isSelected: clipMouse.containsMouse || root.selectedIndex === index
           implicitHeight: (clipCard.isImage && clipCard.imageSrc !== "") ? 140 : clipContentCol.implicitHeight + Colors.spacingM * 2
@@ -212,7 +213,7 @@ BasePopupMenu {
 
               Text {
                 text: clipCard.isImage ? "Image" : (clipCard.charCount + " chars")
-                color: Colors.textDisabled
+                color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXXS
                 Layout.fillWidth: true
               }

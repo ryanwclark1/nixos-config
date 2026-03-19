@@ -402,6 +402,20 @@ QtObject {
             }
         },
         {
+            id: "health",
+            label: "Health",
+            icon: "󰓅",
+            categoryId: "meta",
+            order: 5,
+            component: "HealthTab.qml",
+            searchTerms: ["health", "status", "incidents", "diagnostics", "vitals"],
+            owner: {
+                surface: "",
+                service: "SystemStatus",
+                configDomain: "health"
+            }
+        },
+        {
             id: "about",
             legacyIndex: 15,
             label: "About",

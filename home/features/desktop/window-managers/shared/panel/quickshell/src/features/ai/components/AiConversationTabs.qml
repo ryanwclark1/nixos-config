@@ -179,7 +179,7 @@ RowLayout {
                     RowLayout {
                         anchors.fill: parent
                         anchors.leftMargin: Colors.spacingS
-                        anchors.rightMargin: 6
+                        anchors.rightMargin: (closeTabBtn.visible ? closeTabBtn.width + 12 : 8)
                         spacing: Colors.spacingXS
 
                         Text {
@@ -262,6 +262,7 @@ RowLayout {
                         anchors.verticalCenter: parent.verticalCenter
                         color: "transparent"
                         opacity: !root.compactMode && (tabMouse.containsMouse || tabDelegate.isActive) ? 1 : 0
+                        visible: opacity > 0
                         Behavior on opacity {
                             NumberAnimation { duration: Colors.durationFast }
                         }

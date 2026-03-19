@@ -15,6 +15,8 @@ BasePopupMenu {
   subtitle: root.isOffline ? "Network inspector" : NetworkService.activePrimaryName
 
   readonly property bool isOffline: NetworkService.activePrimaryName === "Offline"
+  readonly property bool primaryIsWifi: NetworkService.activePrimaryType === "wifi" || NetworkService.activePrimaryType === "802-11-wireless"
+  readonly property bool primaryIsEthernet: NetworkService.activePrimaryType === "ethernet" || NetworkService.activePrimaryType === "802-3-ethernet"
   property string selectedSSID: ""
   property bool showAdvanced: false
 
@@ -45,7 +47,7 @@ BasePopupMenu {
       Text {
         id: wifiStatusLabel
         anchors.centerIn: parent
-        text: !NetworkService.wifiDeviceAvailable ? "No Wi-Fi" : (NetworkService.wifiRadioEnabled ? "Wi-Fi On" : "Wi-Fi Off")
+        text: !NetworkService.wifiDeviceAvailable ? "No Wi-Fi" : (NetworkService.wifiRadioEnabled ? "Wi-Fi Radio On" : "Wi-Fi Radio Off")
         color: NetworkService.wifiRadioEnabled ? Colors.primary : Colors.textSecondary
         font.pixelSize: Colors.fontSizeSmall
         font.weight: Font.Medium
@@ -161,7 +163,7 @@ BasePopupMenu {
               }
 
               Rectangle {
-                width: 96
+                implicitWidth: Math.max(96, disconnectLabel.implicitWidth + 24)
                 height: 32
                 radius: height / 2
                 color: root.isOffline
@@ -171,8 +173,13 @@ BasePopupMenu {
                 border.width: 1
 
                 Text {
+                  id: disconnectLabel
                   anchors.centerIn: parent
-                  text: root.isOffline ? "Refresh" : "Disconnect"
+                  text: root.isOffline
+                    ? "Refresh"
+                    : (root.primaryIsWifi
+                        ? "Disconnect Wi-Fi"
+                        : (root.primaryIsEthernet ? "Disconnect Ethernet" : "Disconnect"))
                   color: root.isOffline ? Colors.primary : Colors.error
                   font.pixelSize: Colors.fontSizeXS
                   font.weight: Font.Bold

@@ -23,7 +23,7 @@ Rectangle {
 
         Text {
             text: "󰍉"
-            color: Colors.textDisabled
+            color: Colors.textSecondary
             font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeMedium
         }
@@ -39,7 +39,7 @@ Rectangle {
 
         Text {
             text: root.placeholder
-            color: Colors.textDisabled
+            color: Colors.textSecondary
             font.pixelSize: Colors.fontSizeSmall
             visible: !searchInput.text && !searchInput.activeFocus
         }

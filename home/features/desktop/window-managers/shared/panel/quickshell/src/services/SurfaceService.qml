@@ -157,7 +157,9 @@ QtObject {
     property var menuScreen: null
     readonly property var activeScreen: (Quickshell.screens && Quickshell.screens.length > 0) ? (Quickshell.cursorScreen || Quickshell.screens[0]) : null
 
-    readonly property int popupSwitchDelay: 170
+    // Keep closing popup anchor context alive until the shared popup exit animation
+    // has finished, otherwise the window can jump to the default inset mid-fade.
+    readonly property int popupSwitchDelay: Colors.durationNormal + 40
 
     function currentSurfaceScreen() {
         if (root.activeSurfaceContext && root.activeSurfaceContext.screen)
