@@ -121,7 +121,7 @@ capture_window() {
   if command -v hyprctl >/dev/null 2>&1; then
     geometry=$(hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' 2>/dev/null)
   elif command -v niri >/dev/null 2>&1; then
-    geometry=$(niri msg --json focused-window | jq -r '"\(.geometry.x),\(.geometry.y) \(.geometry.width)x\(.geometry.height)"' 2>/dev/null)
+    geometry=$(niri msg --json focused-window | jq -r '"\(.layout.tile_pos_in_workspace_view[0]),\(.layout.tile_pos_in_workspace_view[1]) \(.layout.window_size[0])x\(.layout.window_size[1])"' 2>/dev/null)
   fi
   if [[ -z "$geometry" || "$geometry" == "null" || "$geometry" == *"null"* ]]; then
     emit_error "could not determine active window geometry"

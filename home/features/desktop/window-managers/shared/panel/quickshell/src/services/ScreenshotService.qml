@@ -74,9 +74,7 @@ QtObject {
         onTriggered: {
             root.delayRemaining--;
             root.delayTick(root.delayRemaining);
-            if (root.delayRemaining > 0) {
-                ToastService.showInfo("Screenshot", "Capturing in " + root.delayRemaining + "s...");
-            } else {
+            if (root.delayRemaining <= 0) {
                 delayTimer.stop();
                 root.delayActive = false;
                 root._capture(root._delayedMode, root._delayedMonitor);
@@ -129,6 +127,13 @@ QtObject {
                 root.lastRegionPath = path;
                 root.regionCaptured(path);
             }
+            // Push to history
+            var entry = { path: path, timestamp: Date.now(), mode: root._captureMode };
+            var hist = (Config.screenshotHistory || []).slice();
+            hist.unshift(entry);
+            if (hist.length > Config.screenshotHistoryMax)
+                hist = hist.slice(0, Config.screenshotHistoryMax);
+            Config.screenshotHistory = hist;
             root.captureCompleted(path);
             Quickshell.execDetached([
                 "notify-send", "-i", "camera-photo",
