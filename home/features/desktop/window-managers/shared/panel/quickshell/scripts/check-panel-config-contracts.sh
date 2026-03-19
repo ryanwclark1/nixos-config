@@ -328,6 +328,12 @@ main() {
     fail "VPN hub structural contracts stay wired across registry, shell, and popup layers"
   fi
 
+  if bash "${script_dir}/check-voxtype-contracts.sh"; then
+    pass "Voxtype bar widget contracts stay wired across registry and panel layers"
+  else
+    fail "Voxtype bar widget contracts stay wired across registry and panel layers"
+  fi
+
   printf '[INFO] Summary: %d pass, %d fail\n' "${pass_count}" "${fail_count}"
   if (( fail_count == 0 )); then
     return 0

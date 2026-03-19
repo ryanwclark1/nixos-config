@@ -6,14 +6,13 @@ config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 
 # Files intentionally compositor-scoped today.
 allow_hyprctl=(
-  "${config_dir}/bar/widgets/Workspaces.qml"
-  "${config_dir}/launcher/OverviewHyprland.qml"
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/DependencyService.qml"
   "${config_dir}/services/PowerService.qml"
 )
 
 allow_hyprland_import=(
+  "${config_dir}/bar/widgets/Workspaces.qml"
   "${config_dir}/launcher/OverviewHyprland.qml"
   "${config_dir}/services/CompositorAdapter.qml"
 )
