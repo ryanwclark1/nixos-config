@@ -3,14 +3,10 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Io
 import "."
 
 QtObject {
   id: root
-
-  // ── Named constants ────────────────────────────
-  readonly property int _hyprctlPollMs: 1500
 
   readonly property string desktopEnv: (Quickshell.env("XDG_CURRENT_DESKTOP") || "").toLowerCase()
   readonly property string sessionDesktop: (Quickshell.env("DESKTOP_SESSION") || "").toLowerCase()
@@ -109,8 +105,14 @@ QtObject {
       return false;
     }
     if (isHyprland) {
-      // hyprctl activewindow JSON includes fullscreen field
-      return !!(hyprlandCtlWindow && hyprlandCtlWindow.fullscreen);
+      // Check focused workspace's hasFullscreen (reactive via Hyprland QML module)
+      if (typeof Hyprland !== "undefined" && Hyprland.workspaces) {
+        var wsValues = Hyprland.workspaces.values || Hyprland.workspaces;
+        for (var j = 0; j < wsValues.length; j++) {
+          if (wsValues[j].focused && wsValues[j].hasFullscreen) return true;
+        }
+      }
+      return false;
     }
     return false;
   }

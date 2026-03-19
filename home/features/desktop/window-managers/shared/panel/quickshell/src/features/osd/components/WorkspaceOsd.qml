@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
+import Quickshell.Hyprland
 import "../../../services"
 import "../../../widgets"
 
@@ -14,7 +14,6 @@ Scope {
   property string _lastWorkspaceName: ""
 
   readonly property int _displayMs: 1500
-  readonly property int _hyprlandPollMs: 400
 
   Timer {
     id: hideTimer
@@ -37,23 +36,55 @@ Scope {
     hideTimer.restart();
   }
 
-  Timer {
-    id: pollTimer
-    interval: root._hyprlandPollMs
-    running: CompositorAdapter.supportsWorkspaceOsd
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: workspaceProc.running = true
+  // ── Hyprland reactive path ──────────────────────
+  Component.onCompleted: {
+    if (CompositorAdapter.isHyprland)
+      Hyprland.rawEvent.connect(_onHyprlandEvent);
+    // Read initial workspace name
+    _readFocusedWorkspaceName();
   }
 
-  Process {
-    id: workspaceProc
-    running: false
-    command: CompositorAdapter.activeWorkspaceNameCommand()
-    stdout: StdioCollector {
-      onStreamFinished: {
-        root.updateWorkspace((this.text || "").trim());
+  Component.onDestruction: {
+    if (CompositorAdapter.isHyprland)
+      Hyprland.rawEvent.disconnect(_onHyprlandEvent);
+  }
+
+  function _onHyprlandEvent(event) {
+    if (event.name === "workspace" || event.name === "workspacev2")
+      Qt.callLater(_readFocusedWorkspaceName);
+  }
+
+  function _readFocusedWorkspaceName() {
+    if (CompositorAdapter.isHyprland) {
+      var wsList = Hyprland.workspaces;
+      if (!wsList) return;
+      var wsValues = wsList.values || wsList;
+      for (var i = 0; i < wsValues.length; i++) {
+        if (wsValues[i].focused) {
+          updateWorkspace(String(wsValues[i].name || wsValues[i].id));
+          return;
+        }
       }
+      return;
+    }
+    if (CompositorAdapter.isNiri) {
+      var all = NiriService.allWorkspaces || [];
+      for (var j = 0; j < all.length; j++) {
+        if (all[j].is_focused) {
+          var ws = all[j];
+          updateWorkspace(String(ws.name || ws.idx || ws.id));
+          return;
+        }
+      }
+    }
+  }
+
+  // ── Niri reactive path ──────────────────────────
+  Connections {
+    target: NiriService
+    enabled: CompositorAdapter.isNiri && NiriService.available
+    function onFocusedWorkspaceIdChanged() {
+      root._readFocusedWorkspaceName();
     }
   }
 
