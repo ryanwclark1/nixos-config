@@ -20,7 +20,6 @@ SystemIoHistory 1.0 sections/SystemIoHistory.qml
 SystemMonitor 1.0 sections/SystemMonitor.qml
 SystemMonitorPanel 1.0 surfaces/SystemMonitorPanel.qml
 SystemMonitorSummary 1.0 sections/SystemMonitorSummary.qml
-SystemProcessTable 1.0 sections/SystemProcessTable.qml
 SystemStatsMenu 1.0 surfaces/SystemStatsMenu.qml
 SystemServiceTable 1.0 sections/SystemServiceTable.qml
 UpdateWidget 1.0 sections/UpdateWidget.qml
