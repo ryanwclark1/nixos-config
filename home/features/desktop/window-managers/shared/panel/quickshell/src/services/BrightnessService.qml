@@ -35,11 +35,13 @@ QtObject {
 
     // ── Internal state ───────────────────────────
     property bool _detected: false
+    property bool _hasInternalSysfs: false
+    property bool _hasDdc: false
 
     // ── Named constants ────────────────────────────
     readonly property int _wakeSettleMs: 3000
     readonly property int _ddcDebounceMs: 300
-    readonly property int _pollIntervalMs: 2000
+    readonly property int _ddcPollIntervalMs: 5000
 
     // ── Detection on startup + wake ──────────────
     Component.onCompleted: _detectMonitors()
@@ -53,19 +55,39 @@ QtObject {
     }
 
     property Timer _detectTimer: Timer {
-        interval: root._wakeSettleMs   // wait for hardware to settle after wake
+        interval: root._wakeSettleMs
         onTriggered: root._detectMonitors()
     }
 
+    // Detection extracts sysfs backlight device name (SYSFS|<device>) for FileView.
     property Process _detectProc: Process {
         running: false
         command: ["sh", "-c",
-            // Line 1: internal brightness (brightnessctl)
-            "int_avail=0; int_curr=0; int_max=100; int_name='eDP-1'; " + "if command -v brightnessctl >/dev/null 2>&1; then " + "if brightnessctl -m 2>/dev/null | head -n1 | grep -q .; then " + "int_avail=1; int_curr=$(brightnessctl g 2>/dev/null || echo 0); " + "int_max=$(brightnessctl m 2>/dev/null || echo 100); fi; fi; " + "printf 'INT|%s|%s|%s|%s\\n' \"$int_avail\" \"$int_name\" \"$int_curr\" \"$int_max\"; " +
-            // Line 2+: DDC external monitors
-            "if command -v ddcutil >/dev/null 2>&1; then " + "ddcutil detect --brief 2>/dev/null | awk '" + "/^Display [0-9]/ { bus=\"\"; name=\"\" } " + "/I2C bus:/ { gsub(/.*\\/dev\\/i2c-/, \"\"); bus=$0 } " + "/Monitor:/ { $1=\"\"; name=$0; gsub(/^[ \\t]+/, \"\", name) } " + "bus && name { printf \"DDC|%s|%s\\n\", bus, name; bus=\"\"; name=\"\" }'" + "; for bus in $(ddcutil detect --brief 2>/dev/null | awk '/I2C bus:/ {gsub(/.*i2c-/,\"\"); print}'); do " + "val=$(ddcutil getvcp 10 --bus \"$bus\" --brief 2>/dev/null | awk '{print $4, $5}'); " + "printf 'DDCVAL|%s|%s\\n' \"$bus\" \"$val\"; done; fi; " +
-            // Keyboard backlight
-            "for d in /sys/class/leds/*kbd_backlight*; do " + "if [ -e \"$d\" ]; then " + "dname=$(basename \"$d\"); " + "curr=$(brightnessctl -d \"$dname\" get 2>/dev/null || echo 0); " + "kmax=$(brightnessctl -d \"$dname\" max 2>/dev/null || echo 0); " + "printf 'KBD|%s|%s|%s\\n' \"$dname\" \"$curr\" \"$kmax\"; " + "break; fi; done"]
+            "int_avail=0; int_curr=0; int_max=100; int_name='eDP-1'; sysfs_dev=''; "
+            + "if command -v brightnessctl >/dev/null 2>&1; then "
+            + "bl_line=$(brightnessctl -m 2>/dev/null | head -n1); "
+            + "if [ -n \"$bl_line\" ]; then "
+            + "int_avail=1; sysfs_dev=$(printf '%s' \"$bl_line\" | cut -d, -f1); "
+            + "int_curr=$(brightnessctl g 2>/dev/null || echo 0); "
+            + "int_max=$(brightnessctl m 2>/dev/null || echo 100); fi; fi; "
+            + "printf 'INT|%s|%s|%s|%s\\n' \"$int_avail\" \"$int_name\" \"$int_curr\" \"$int_max\"; "
+            + "if [ -n \"$sysfs_dev\" ]; then printf 'SYSFS|%s\\n' \"$sysfs_dev\"; fi; "
+            + "if command -v ddcutil >/dev/null 2>&1; then "
+            + "ddcutil detect --brief 2>/dev/null | awk '"
+            + "/^Display [0-9]/ { bus=\"\"; name=\"\" } "
+            + "/I2C bus:/ { gsub(/.*\\/dev\\/i2c-/, \"\"); bus=$0 } "
+            + "/Monitor:/ { $1=\"\"; name=$0; gsub(/^[ \\t]+/, \"\", name) } "
+            + "bus && name { printf \"DDC|%s|%s\\n\", bus, name; bus=\"\"; name=\"\" }'"
+            + "; for bus in $(ddcutil detect --brief 2>/dev/null | awk '/I2C bus:/ {gsub(/.*i2c-/,\"\"); print}'); do "
+            + "val=$(ddcutil getvcp 10 --bus \"$bus\" --brief 2>/dev/null | awk '{print $4, $5}'); "
+            + "printf 'DDCVAL|%s|%s\\n' \"$bus\" \"$val\"; done; fi; "
+            + "for d in /sys/class/leds/*kbd_backlight*; do "
+            + "if [ -e \"$d\" ]; then "
+            + "dname=$(basename \"$d\"); "
+            + "kmax=$(cat \"$d/max_brightness\" 2>/dev/null || echo 0); "
+            + "kcurr=$(cat \"$d/brightness\" 2>/dev/null || echo 0); "
+            + "printf 'KBD|%s|%s|%s\\n' \"$dname\" \"$kcurr\" \"$kmax\"; "
+            + "break; fi; done"]
         stdout: StdioCollector {
             onStreamFinished: root._parseDetection(this.text || "")
         }
@@ -79,69 +101,163 @@ QtObject {
     function _parseDetection(text) {
         var lines = text.trim().split("\n");
         var result = [];
-        var ddcBuses = {};   // bus -> {name}
-        var ddcVals = {};    // bus -> {curr, max}
+        var ddcBuses = {};
+        var ddcVals = {};
 
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i].trim();
-            if (!line)
-                continue;
-
+            if (!line) continue;
             var parts = line.split("|");
+
             if (parts[0] === "INT") {
-                var avail = parts[1] === "1";
-                if (avail) {
+                if (parts[1] === "1") {
                     var curr = parseFloat(parts[3]) || 0;
                     var max = parseFloat(parts[4]) || 100;
                     result.push({
                         name: parts[2] || "Internal",
                         brightness: max > 0 ? Colors.clamp01(curr / max) : 0,
-                        isInternal: true,
-                        busNumber: -1,
-                        available: true
+                        isInternal: true, busNumber: -1, available: true
                     });
                 }
+            } else if (parts[0] === "SYSFS") {
+                var dev = (parts[1] || "").trim();
+                if (dev) {
+                    _intBrightFile.path = "/sys/class/backlight/" + dev + "/brightness";
+                    _intMaxFile.path = "/sys/class/backlight/" + dev + "/max_brightness";
+                    root._hasInternalSysfs = true;
+                }
             } else if (parts[0] === "DDC") {
-                ddcBuses[parts[1]] = {
-                    name: parts[2] || ("External " + parts[1])
-                };
+                ddcBuses[parts[1]] = { name: parts[2] || ("External " + parts[1]) };
             } else if (parts[0] === "DDCVAL") {
                 var vals = (parts[2] || "").trim().split(/\s+/);
-                ddcVals[parts[1]] = {
-                    curr: parseFloat(vals[0]) || 0,
-                    max: parseFloat(vals[1]) || 100
-                };
+                ddcVals[parts[1]] = { curr: parseFloat(vals[0]) || 0, max: parseFloat(vals[1]) || 100 };
             } else if (parts[0] === "KBD") {
+                var kbdName = (parts[1] || "kbd_backlight").trim();
                 var kbdCurr = parseFloat(parts[2]) || 0;
                 var kbdMax = parseFloat(parts[3]) || 0;
                 if (kbdMax > 0) {
                     root.kbdDevice = {
-                        name: parts[1] || "kbd_backlight",
-                        brightness: Colors.clamp01(kbdCurr / kbdMax),
-                        maxSteps: kbdMax,
-                        available: true
+                        name: kbdName, brightness: Colors.clamp01(kbdCurr / kbdMax),
+                        maxSteps: kbdMax, available: true
                     };
+                    _kbdBrightFile.path = "/sys/class/leds/" + kbdName + "/brightness";
+                    _kbdMaxFile.path = "/sys/class/leds/" + kbdName + "/max_brightness";
                 }
             }
         }
 
-        // Merge DDC entries
         for (var bus in ddcBuses) {
-            var val = ddcVals[bus] || {
-                curr: 50,
-                max: 100
-            };
+            var val = ddcVals[bus] || { curr: 50, max: 100 };
             result.push({
                 name: ddcBuses[bus].name,
                 brightness: val.max > 0 ? Colors.clamp01(val.curr / val.max) : 0,
-                isInternal: false,
-                busNumber: parseInt(bus, 10),
-                available: true
+                isInternal: false, busNumber: parseInt(bus, 10), available: true
             });
+            root._hasDdc = true;
         }
 
         root.monitors = result;
         root._detected = true;
+    }
+
+    // ── Sysfs FileView for internal display (zero-cost inotify reactive) ──
+    property FileView _intBrightFile: FileView {
+        path: ""; watchChanges: true; printErrors: false
+        onTextChanged: root._updateInternalBrightness()
+    }
+    property FileView _intMaxFile: FileView {
+        path: ""; watchChanges: true; printErrors: false
+        onTextChanged: root._updateInternalBrightness()
+    }
+
+    function _updateInternalBrightness() {
+        if (!_hasInternalSysfs || !_intBrightFile.text || !_intMaxFile.text) return;
+        var curr = parseFloat(_intBrightFile.text) || 0;
+        var max = parseFloat(_intMaxFile.text) || 100;
+        var brightness = max > 0 ? Colors.clamp01(curr / max) : 0;
+        var updated = [];
+        for (var i = 0; i < monitors.length; i++) {
+            var m = monitors[i];
+            if (m.isInternal)
+                updated.push({ name: m.name, brightness: brightness, isInternal: true, busNumber: -1, available: true });
+            else
+                updated.push(m);
+        }
+        if (updated.length > 0) monitors = updated;
+    }
+
+    // ── Sysfs FileView for keyboard backlight (zero-cost inotify reactive) ──
+    property FileView _kbdBrightFile: FileView {
+        path: ""; watchChanges: true; printErrors: false
+        onTextChanged: root._updateKbdBrightness()
+    }
+    property FileView _kbdMaxFile: FileView {
+        path: ""; watchChanges: true; printErrors: false
+        onTextChanged: root._updateKbdBrightness()
+    }
+
+    function _updateKbdBrightness() {
+        if (!kbdDevice.available || !_kbdBrightFile.text || !_kbdMaxFile.text) return;
+        var curr = parseFloat(_kbdBrightFile.text) || 0;
+        var max = parseFloat(_kbdMaxFile.text) || 0;
+        if (max > 0)
+            kbdDevice = { name: kbdDevice.name, brightness: Colors.clamp01(curr / max), maxSteps: max, available: true };
+    }
+
+    // ── DDC-only poll (only active when external DDC monitors exist) ──
+    property Process _ddcPollProc: Process {
+        running: false
+        command: ["sh", "-c", "true"]
+        stdout: StdioCollector {
+            onStreamFinished: root._parseDdcPoll(this.text || "")
+        }
+    }
+
+    property Timer _ddcPollTimer: Timer {
+        interval: root._ddcPollIntervalMs
+        running: root.subscriberCount > 0 && root._detected && root._hasDdc
+        repeat: true
+        onTriggered: {
+            var buses = [];
+            for (var i = 0; i < root.monitors.length; i++)
+                if (!root.monitors[i].isInternal && root.monitors[i].busNumber >= 0)
+                    buses.push(root.monitors[i].busNumber);
+            if (buses.length === 0) return;
+            var cmd = "";
+            for (var j = 0; j < buses.length; j++) {
+                if (j > 0) cmd += " ";
+                cmd += "val=$(ddcutil getvcp 10 --bus " + buses[j] + " --brief 2>/dev/null | awk '{print $4, $5}'); "
+                    + "printf 'DDCVAL|" + buses[j] + "|%s\\n' \"$val\"";
+            }
+            root._ddcPollProc.command = ["sh", "-c", cmd];
+            if (!root._ddcPollProc.running) root._ddcPollProc.running = true;
+        }
+    }
+
+    function _parseDdcPoll(text) {
+        var lines = text.trim().split("\n");
+        var ddcVals = {};
+        for (var i = 0; i < lines.length; i++) {
+            var parts = lines[i].trim().split("|");
+            if (parts[0] === "DDCVAL") {
+                var vals = (parts[2] || "").trim().split(/\s+/);
+                ddcVals[parts[1]] = { curr: parseFloat(vals[0]) || 0, max: parseFloat(vals[1]) || 100 };
+            }
+        }
+        var updated = [];
+        for (var j = 0; j < monitors.length; j++) {
+            var m = monitors[j];
+            if (!m.isInternal && m.busNumber >= 0 && ddcVals[m.busNumber]) {
+                var v = ddcVals[m.busNumber];
+                updated.push({
+                    name: m.name, brightness: v.max > 0 ? Colors.clamp01(v.curr / v.max) : m.brightness,
+                    isInternal: false, busNumber: m.busNumber, available: true
+                });
+            } else {
+                updated.push(m);
+            }
+        }
+        if (updated.length > 0) monitors = updated;
     }
 
     // ── Set brightness ───────────────────────────
@@ -149,9 +265,7 @@ QtObject {
         interval: root._ddcDebounceMs
         property string _pendingBus: ""
         property int _pendingValue: 0
-        onTriggered: {
-            Quickshell.execDetached(["ddcutil", "setvcp", "10", _pendingValue.toString(), "--bus", _pendingBus]);
-        }
+        onTriggered: Quickshell.execDetached(["ddcutil", "setvcp", "10", _pendingValue.toString(), "--bus", _pendingBus])
     }
 
     function setBrightness(monitorName, value) {
@@ -160,18 +274,10 @@ QtObject {
         for (var i = 0; i < monitors.length; i++) {
             var m = monitors[i];
             if (m.name === monitorName) {
-                var copy = {
-                    name: m.name,
-                    brightness: clamped,
-                    isInternal: m.isInternal,
-                    busNumber: m.busNumber,
-                    available: m.available
-                };
-                updated.push(copy);
-
-                if (m.isInternal) {
+                updated.push({ name: m.name, brightness: clamped, isInternal: m.isInternal, busNumber: m.busNumber, available: m.available });
+                if (m.isInternal)
                     Quickshell.execDetached(["brightnessctl", "s", Math.round(clamped * 100) + "%"]);
-                } else if (m.busNumber >= 0) {
+                else if (m.busNumber >= 0) {
                     _ddcDebounce._pendingBus = m.busNumber.toString();
                     _ddcDebounce._pendingValue = Math.round(clamped * 100);
                     _ddcDebounce.restart();
@@ -189,82 +295,6 @@ QtObject {
         var clamped = Colors.clamp01(value);
         var step = Math.round(clamped * kbdDevice.maxSteps);
         Quickshell.execDetached(["brightnessctl", "-d", kbdDevice.name, "set", step.toString()]);
-        kbdDevice = {
-            name: kbdDevice.name,
-            brightness: clamped,
-            maxSteps: kbdDevice.maxSteps,
-            available: true
-        };
-    }
-
-    // ── Polling for brightness changes (internal only) ──
-    property Process _internalPollProc: Process {
-        running: false
-        command: ["sh", "-c",
-            "curr=$(brightnessctl g 2>/dev/null || echo 0); " +
-            "max=$(brightnessctl m 2>/dev/null || echo 100); " +
-            "echo \"$curr $max\"; " +
-            // Keyboard backlight poll
-            "kbd_curr=0; kbd_max=0; kbd_name=''; " +
-            "for d in /sys/class/leds/*kbd_backlight*; do " +
-            "if [ -e \"$d\" ]; then " +
-            "kbd_name=$(basename \"$d\"); " +
-            "kbd_curr=$(brightnessctl -d \"$kbd_name\" get 2>/dev/null || echo 0); " +
-            "kbd_max=$(brightnessctl -d \"$kbd_name\" max 2>/dev/null || echo 0); " +
-            "break; fi; done; " +
-            "printf '%s %s %s\\n' \"$kbd_curr\" \"$kbd_max\" \"$kbd_name\""]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                var lines = (this.text || "").trim().split("\n");
-                // Line 1: display brightness
-                var parts = (lines[0] || "").trim().split(/\s+/);
-                var curr = parseFloat(parts[0]) || 0;
-                var max = parseFloat(parts[1]) || 100;
-                var brightness = max > 0 ? Colors.clamp01(curr / max) : 0;
-
-                var updated = [];
-                for (var i = 0; i < root.monitors.length; i++) {
-                    var m = root.monitors[i];
-                    if (m.isInternal) {
-                        updated.push({
-                            name: m.name,
-                            brightness: brightness,
-                            isInternal: true,
-                            busNumber: -1,
-                            available: true
-                        });
-                    } else {
-                        updated.push(m);
-                    }
-                }
-                if (updated.length > 0)
-                    root.monitors = updated;
-
-                // Line 2: keyboard backlight
-                if (lines.length >= 2 && root.kbdDevice.available) {
-                    var kp = (lines[1] || "").trim().split(/\s+/);
-                    var kCurr = parseFloat(kp[0]) || 0;
-                    var kMax = parseFloat(kp[1]) || 0;
-                    if (kMax > 0) {
-                        root.kbdDevice = {
-                            name: kp[2] || root.kbdDevice.name,
-                            brightness: Colors.clamp01(kCurr / kMax),
-                            maxSteps: kMax,
-                            available: true
-                        };
-                    }
-                }
-            }
-        }
-    }
-
-    property Timer _pollTimer: Timer {
-        interval: root._pollIntervalMs
-        running: root.subscriberCount > 0 && root._detected
-        repeat: true
-        onTriggered: {
-            if (!root._internalPollProc.running)
-                root._internalPollProc.running = true;
-        }
+        kbdDevice = { name: kbdDevice.name, brightness: clamped, maxSteps: kbdDevice.maxSteps, available: true };
     }
 }
