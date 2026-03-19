@@ -65,7 +65,11 @@ function normalizeModeList(list, fallbackList) {
         "media": true,
         "nixos": true,
         "wallpapers": true,
-        "bookmarks": true
+        "bookmarks": true,
+        "settings": true,
+        "devops": true,
+        "orchestrator": true,
+        "ssh": true
     };
     var source = Array.isArray(list) ? list : fallbackList;
     var out = [];
@@ -80,6 +84,25 @@ function normalizeModeList(list, fallbackList) {
     if (out.length === 0)
         return fallbackList.slice();
     return out;
+}
+
+function normalizePrimaryModeList(list, enabledModes, fallbackList) {
+    var enabled = Array.isArray(enabledModes) ? enabledModes : fallbackList;
+    var out = normalizeModeList(list, fallbackList);
+    out = out.filter(function(modeKey) {
+        return enabled.indexOf(modeKey) !== -1;
+    });
+    if (out.length > 0)
+        return out;
+
+    var fallback = normalizeModeList(fallbackList, enabled);
+    fallback = fallback.filter(function(modeKey) {
+        return enabled.indexOf(modeKey) !== -1;
+    });
+    if (fallback.length > 0)
+        return fallback;
+
+    return enabled.length > 0 ? [enabled[0]] : ["drun"];
 }
 
 function normalizeWebProviderOrder(list, fallbackList, catalogKeys) {
@@ -203,11 +226,13 @@ function normalizeCustomEngines(list) {
 
 function applyLauncherConfig(config, data) {
     var launcher = data && data.launcher ? data.launcher : {};
-    var fallbackModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"];
+    var fallbackModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
+    var fallbackPrimaryModes = ["drun", "window", "files", "ai", "system"];
     var fallbackWebProviders = ["duckduckgo", "google", "youtube", "nixos", "github"];
 
     config.launcherModeOrder = normalizeModeList(launcher.modeOrder, fallbackModes);
     config.launcherEnabledModes = normalizeModeList(launcher.enabledModes, fallbackModes);
+    config.launcherPrimaryModes = normalizePrimaryModeList(launcher.primaryModes, config.launcherEnabledModes, fallbackPrimaryModes);
     config.launcherDefaultMode = config.launcherEnabledModes.indexOf(String(launcher.defaultMode || "")) !== -1 ? launcher.defaultMode : "drun";
     if (config.launcherEnabledModes.indexOf(config.launcherDefaultMode) === -1)
         config.launcherDefaultMode = config.launcherEnabledModes[0] || "drun";

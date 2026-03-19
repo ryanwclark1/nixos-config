@@ -2,7 +2,6 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.Pipewire
 
 QtObject {
@@ -130,20 +129,12 @@ QtObject {
         return false;
     }
 
-    function _volumePercentText(value) {
-        return Math.round(Colors.clamp01(value) * 100) + "%";
-    }
-
     function _currentTargetVolume(target) {
         return target === "@DEFAULT_AUDIO_SINK@" ? root.outputVolume : root.inputVolume;
     }
 
     function _currentTargetMuted(target) {
         return target === "@DEFAULT_AUDIO_SINK@" ? root.outputMuted : root.inputMuted;
-    }
-
-    function _execWpctl(args) {
-        Quickshell.execDetached(["wpctl"].concat(args));
     }
 
     function _buildDeviceList(isSinkList) {
@@ -240,38 +231,37 @@ QtObject {
             ? root.protectedVolume(value, current)
             : Colors.clamp01(value);
         var isSink = target === "@DEFAULT_AUDIO_SINK@";
+        var node = isSink ? Pipewire.defaultAudioSink : Pipewire.defaultAudioSource;
 
-        if (clamped > 0)
-            root._execWpctl(["set-mute", target, "0"]);
-        root._execWpctl(["set-volume", target, root._volumePercentText(clamped)]);
+        if (node && node.audio) {
+            if (clamped > 0) node.audio.muted = false;
+            node.audio.volume = clamped;
+        }
 
         if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
             root._sendOsdIpc(isSink, clamped * 100, false);
     }
 
     function setAppVolume(nodeRef, value) {
-        if (!nodeRef) return;
+        if (!nodeRef || !nodeRef.audio) return;
         var clamped = Colors.clamp01(value);
-        var targetId = nodeRef.id !== undefined ? nodeRef.id.toString() : "";
-        if (!targetId) return;
-        if (clamped > 0)
-            root._execWpctl(["set-mute", targetId, "0"]);
-        root._execWpctl(["set-volume", targetId, root._volumePercentText(clamped)]);
+        if (clamped > 0) nodeRef.audio.muted = false;
+        nodeRef.audio.volume = clamped;
     }
 
     function toggleAppMute(nodeRef) {
-        if (!nodeRef) return;
-        var targetId = nodeRef.id !== undefined ? nodeRef.id.toString() : "";
-        if (!targetId) return;
-        var currentMuted = nodeRef.audio ? !!nodeRef.audio.muted : false;
-        root._execWpctl(["set-mute", targetId, currentMuted ? "0" : "1"]);
+        if (!nodeRef || !nodeRef.audio) return;
+        nodeRef.audio.muted = !nodeRef.audio.muted;
     }
 
     function toggleMute(target, currentlyMuted) {
         var isSink = target === "@DEFAULT_AUDIO_SINK@";
         if (currentlyMuted === undefined)
             currentlyMuted = root._currentTargetMuted(target);
-        root._execWpctl(["set-mute", target, currentlyMuted ? "0" : "1"]);
+        var node = isSink ? Pipewire.defaultAudioSink : Pipewire.defaultAudioSource;
+
+        if (node && node.audio)
+            node.audio.muted = !currentlyMuted;
 
         var vol = isSink ? root.outputVolume : root.inputVolume;
         if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
@@ -280,7 +270,18 @@ QtObject {
 
     function setDefaultDevice(id) {
         if (id < 0) return;
-        root._execWpctl(["set-default", id.toString()]);
+        var nodes = Pipewire.nodes?.values ?? [];
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i] && nodes[i].id === id) {
+                if (nodes[i].isSink)
+                    Pipewire.preferredDefaultAudioSink = nodes[i];
+                else
+                    Pipewire.preferredDefaultAudioSource = nodes[i];
+                return;
+            }
+        }
+        // Fallback to wpctl if node not found in tracker
+        Quickshell.execDetached(["wpctl", "set-default", id.toString()]);
     }
 
 }

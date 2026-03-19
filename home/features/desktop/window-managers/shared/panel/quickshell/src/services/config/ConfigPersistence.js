@@ -431,6 +431,7 @@ var _MAPS = {
         ["webProviderOrder", "launcherWebProviderOrder"],
         ["modeOrder", "launcherModeOrder"],
         ["enabledModes", "launcherEnabledModes"],
+        ["primaryModes", "launcherPrimaryModes"],
         ["scoreNameWeight", "launcherScoreNameWeight"],
         ["scoreTitleWeight", "launcherScoreTitleWeight"],
         ["scoreExecWeight", "launcherScoreExecWeight"],

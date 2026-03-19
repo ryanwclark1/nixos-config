@@ -123,8 +123,9 @@ QtObject {
     property bool launcherRememberWebProvider: true
     property string launcherWebLastProviderKey: "duckduckgo"
     property var launcherWebProviderOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
-    property var launcherModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
-    property var launcherEnabledModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+    property var launcherModeOrder: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"]
+    property var launcherEnabledModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"]
+    property var launcherPrimaryModes: ["drun", "window", "files", "ai", "system"]
     property real launcherScoreNameWeight: 1.0
     property real launcherScoreTitleWeight: 0.92
     property real launcherScoreExecWeight: 0.88
