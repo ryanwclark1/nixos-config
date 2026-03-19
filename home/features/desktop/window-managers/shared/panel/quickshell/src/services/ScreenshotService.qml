@@ -20,20 +20,70 @@ QtObject {
     property bool _captureStdoutFinished: false
     property bool _captureStderrFinished: false
 
+    // ── Delay state ──────────────────────────────
+    property int delayRemaining: 0
+    property bool delayActive: false
+    property string _delayedMode: ""
+    property string _delayedMonitor: ""
+
     // ── Signals ──────────────────────────────────
     signal captureCompleted(string path)
     signal regionCaptured(string path)
     signal captureFailed(string error)
     signal regionSelectionRequested()
+    signal analyzeSelectionRequested()
+    signal delayTick(int remaining)
 
     // ── Actions ──────────────────────────────────
     function captureRegion() { root.regionSelectionRequested(); }
-    function captureScreen(monitorName) { _capture("screen", monitorName || ""); }
-    function captureFullscreen() { _capture("fullscreen", ""); }
+    function captureWindow() { _startOrDelay("window", ""); }
+    function captureScreen(monitorName) { _startOrDelay("screen", monitorName || ""); }
+    function captureFullscreen() { _startOrDelay("fullscreen", ""); }
+    function analyzeRegion() { root.analyzeSelectionRequested(); }
 
     function captureArea(x, y, w, h) {
         var geometry = Math.round(x) + "," + Math.round(y) + " " + Math.round(w) + "x" + Math.round(h);
-        _capture("area", geometry);
+        _startOrDelay("area", geometry);
+    }
+
+    function cancelDelay() {
+        delayTimer.stop();
+        root.delayActive = false;
+        root.delayRemaining = 0;
+        root._delayedMode = "";
+        root._delayedMonitor = "";
+    }
+
+    // ── Delay mechanism ──────────────────────────
+    function _startOrDelay(mode, monitor) {
+        var delay = Config.screenshotDelay;
+        if (delay > 0) {
+            root._delayedMode = mode;
+            root._delayedMonitor = monitor;
+            root.delayRemaining = delay;
+            root.delayActive = true;
+            delayTimer.start();
+        } else {
+            _capture(mode, monitor);
+        }
+    }
+
+    property Timer delayTimer: Timer {
+        interval: 1000
+        repeat: true
+        onTriggered: {
+            root.delayRemaining--;
+            root.delayTick(root.delayRemaining);
+            if (root.delayRemaining > 0) {
+                ToastService.showInfo("Screenshot", "Capturing in " + root.delayRemaining + "s...");
+            } else {
+                delayTimer.stop();
+                root.delayActive = false;
+                root._capture(root._delayedMode, root._delayedMonitor);
+                root._delayedMode = "";
+                root._delayedMonitor = "";
+            }
+        }
     }
 
     function _capture(mode, monitor) {
@@ -47,6 +97,10 @@ QtObject {
         root._captureExitObserved = false;
         root._captureStdoutFinished = false;
         root._captureStderrFinished = false;
+
+        // Set editor environment for the capture process
+        var editorVal = Config.screenshotEditAfterCapture ? Config.screenshotEditor : "none";
+        _captureProc.environment = { "SCREENSHOT_EDITOR": editorVal };
 
         _captureProc.command = DependencyService.resolveCommand("qs-screenshot",
             root._captureMonitor !== ""

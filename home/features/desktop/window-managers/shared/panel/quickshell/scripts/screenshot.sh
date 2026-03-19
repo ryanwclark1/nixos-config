@@ -114,6 +114,20 @@ capture_fullscreen() {
   grim "$FILEPATH" 2>/dev/null || { emit_error "grim failed to capture fullscreen"; exit 1; }
 }
 
+capture_window() {
+  local geometry=""
+  if command -v hyprctl >/dev/null 2>&1; then
+    geometry=$(hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' 2>/dev/null)
+  elif command -v niri >/dev/null 2>&1; then
+    geometry=$(niri msg --json focused-window | jq -r '"\(.geometry.x),\(.geometry.y) \(.geometry.width)x\(.geometry.height)"' 2>/dev/null)
+  fi
+  if [[ -z "$geometry" || "$geometry" == "null" || "$geometry" == *"null"* ]]; then
+    emit_error "could not determine active window geometry"
+    exit 1
+  fi
+  grim -g "$geometry" "$FILEPATH" 2>/dev/null || { emit_error "grim failed to capture window"; exit 1; }
+}
+
 # Main execution
 if ! command -v grim >/dev/null 2>&1; then
   emit_error "missing dependency: grim"
@@ -135,6 +149,9 @@ case "$MODE" in
   fullscreen)
     capture_fullscreen
     ;;
+  window)
+    capture_window
+    ;;
   *)
     emit_error "unknown mode: ${MODE}"
     exit 1
@@ -143,6 +160,13 @@ esac
 
 if [[ -f "$FILEPATH" ]]; then
   copy_to_clipboard
+  # Launch editor if configured (detached so it doesn't block stdout)
+  if [[ -n "${SCREENSHOT_EDITOR:-}" && "$SCREENSHOT_EDITOR" != "none" ]]; then
+    case "$SCREENSHOT_EDITOR" in
+      swappy) command -v swappy >/dev/null 2>&1 && swappy -f "$FILEPATH" & ;;
+      satty)  command -v satty >/dev/null 2>&1 && satty --filename "$FILEPATH" & ;;
+    esac
+  fi
   echo "OK|${FILEPATH}"
 else
   emit_error "capture failed: file not created"
