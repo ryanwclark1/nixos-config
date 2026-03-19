@@ -352,10 +352,22 @@ QtObject {
         onLoaded: colors.reloadColors()
     }
 
+    function getLuminance(c) {
+        var r = c.r, g = c.g, b = c.b;
+        var R = (r <= 0.03928) ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+        var G = (g <= 0.03928) ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+        var B = (b <= 0.03928) ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+        return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+    }
+
+    function getContrastRatio(c1, c2) {
+        var l1 = getLuminance(c1);
+        var l2 = getLuminance(c2);
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    }
+
     function applyDynamicPalette() {
         if (!Config.useDynamicTheming) return;
-        isTransitioning = true;
-        _transitionTimer.restart();
         var c = _wallpaperQuant.colors;
         if (!c || c.length === 0) return;
 
@@ -364,13 +376,20 @@ QtObject {
         var s = c.length > 1 ? c[1].color : p;
         var a = c.length > 2 ? c[2].color : s;
 
-        // Dark background based on muted version of dominant color
         background = withAlpha(p, 1.0);
         surface = withAlpha(p, 0.95);
         primary = withAlpha(s, 1.0);
         accent = withAlpha(a, 1.0);
-        text = "#ffffff";
-        textSecondary = withAlpha("#ffffff", 0.7);
-        textDisabled = withAlpha("#ffffff", 0.4);
+
+        // Smart Contrast: Pick best text color
+        var whiteContrast = getContrastRatio(background, Qt.rgba(1,1,1,1));
+        var blackContrast = getContrastRatio(background, Qt.rgba(0,0,0,1));
+
+        var textColor = (whiteContrast > blackContrast) ? "#ffffff" : "#000000";
+        _isLight = (whiteContrast <= blackContrast);
+
+        text = textColor;
+        textSecondary = withAlpha(textColor, 0.7);
+        textDisabled = withAlpha(textColor, 0.4);
     }
 }
