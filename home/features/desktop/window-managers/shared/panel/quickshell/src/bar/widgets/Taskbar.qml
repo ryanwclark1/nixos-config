@@ -1,12 +1,11 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import "../../services"
 
-Flow {
+Item {
   id: root
-  spacing: Colors.spacingS
+  property int spacing: Colors.spacingS
   property bool vertical: false
   property var anchorWindow: null
   property int buttonSize: 32
@@ -36,14 +35,8 @@ Flow {
     return item ? (item.implicitHeight || item.height || 0) : 0;
   }
   visible: taskCount > 0
-  implicitWidth: visible
-    ? (vertical ? Math.max(buttonSize, contentWidth) : Math.max(estimatedSpan, contentWidth))
-    : 0
-  implicitHeight: visible
-    ? (vertical ? Math.max(estimatedSpan, contentHeight) : Math.max(buttonSize, contentHeight))
-    : 0
-  width: implicitWidth
-  height: implicitHeight
+  width: visible ? (vertical ? Math.max(buttonSize, contentWidth) : Math.max(estimatedSpan, contentWidth)) : 0
+  height: visible ? (vertical ? Math.max(estimatedSpan, contentHeight) : Math.max(buttonSize, contentHeight)) : 0
   readonly property var runningToplevels: {
     // Force re-evaluation when NiriService windows change
     var _niriVer = root._niriWindowsVersion;

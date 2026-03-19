@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import Quickshell.Io
 import "../../services"
 import "../../widgets" as SharedWidgets
 import "../PanelWidgetHelpers.js" as PanelHelpers
@@ -17,21 +19,32 @@ Item {
     implicitWidth: visible ? updatesPill.width : 0
     implicitHeight: visible ? updatesPill.height : 0
 
-    readonly property int _cacheReadIntervalMs: 600000  // 10 min
+    readonly property string _cacheDir: Quickshell.env("XDG_CACHE_HOME") !== ""
+        ? Quickshell.env("XDG_CACHE_HOME") + "/quickshell/updates"
+        : Quickshell.env("HOME") + "/.cache/quickshell/updates"
 
-    CommandPoll {
-        id: updatePoll
-        interval: root._cacheReadIntervalMs
-        running: true
-        command: ["sh", "-c", "nix=$(cat \"${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates/nixos\" 2>/dev/null || echo 0); " + "flat=$(cat \"${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/updates/flatpak\" 2>/dev/null || echo 0); " + "total=$(( (nix > 0 ? nix : 0) + (flat > 0 ? flat : 0) )); " + "echo $total"]
-        parse: function (out) {
-            return parseInt(String(out || "").trim(), 10) || 0;
-        }
-        onUpdated: {
-            var count = updatePoll.value || 0;
-            root.updatesCount = count > 0 ? count.toString() : "0";
-            root.updatesIcon = count > 0 ? "󰮯" : "󰚰";
-        }
+    FileView {
+        id: _nixCacheFile
+        path: root._cacheDir + "/nixos"
+        watchChanges: true
+        printErrors: false
+        onTextChanged: root._updateFromCache()
+    }
+
+    FileView {
+        id: _flatpakCacheFile
+        path: root._cacheDir + "/flatpak"
+        watchChanges: true
+        printErrors: false
+        onTextChanged: root._updateFromCache()
+    }
+
+    function _updateFromCache() {
+        var nix = parseInt(String(_nixCacheFile.text || "").trim(), 10) || 0;
+        var flat = parseInt(String(_flatpakCacheFile.text || "").trim(), 10) || 0;
+        var total = Math.max(0, nix) + Math.max(0, flat);
+        root.updatesCount = total > 0 ? total.toString() : "0";
+        root.updatesIcon = total > 0 ? "󰮯" : "󰚰";
     }
 
     SharedWidgets.BarPill {
