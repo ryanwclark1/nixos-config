@@ -67,7 +67,7 @@ ColumnLayout {
             Behavior on x {
                 NumberAnimation { duration: Colors.durationSnap }
             }
-            Behavior on color { CAnim {} }
+            Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
 
         MouseArea {

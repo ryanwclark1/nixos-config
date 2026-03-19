@@ -14,7 +14,6 @@ QtObject {
     property var presets: []
 
     readonly property string _presetsDir: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/presets"
-    readonly property string _configPath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/config.json"
 
     // ── Scan for presets ─────────────────────────
     Component.onCompleted: refresh()
@@ -139,11 +138,6 @@ QtObject {
                 Logger.e("PresetService", "failed to save preset:", safeName);
             root.refresh();
         });
-    }
-
-    property Timer _refreshDelay: Timer {
-        interval: 500
-        onTriggered: root.refresh()
     }
 
     // ── Load preset ──────────────────────────────
