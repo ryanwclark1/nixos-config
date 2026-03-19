@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
+launcher_content_panel_qml="${config_dir}/launcher/LauncherContentPanel.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 mode_data_js="${config_dir}/launcher/LauncherModeData.js"
@@ -36,7 +37,7 @@ require_literal "$launcher_qml" 'readonly property string webAliasHint: TextHelp
 require_literal "$launcher_qml" 'var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({})' "web alias hint source map"
 require_literal "$launcher_qml" 'function webAliasToProviderKey(token) {' "alias resolver function"
 require_literal "$launcher_qml" 'function parseWebQuery(text) {' "parseWebQuery function"
-require_literal "$launcher_qml" 'aliasHint: launcherRoot.webAliasHint' "web alias hint shown in UI"
+require_literal "$launcher_content_panel_qml" 'aliasHint: launcher.webAliasHint' "web alias hint shown in UI"
 
 # Settings: editable alias tokens and reset/default behavior.
 require_literal "$launcher_settings_qml" 'readonly property var webAliasDefaults: ({' "settings alias defaults"

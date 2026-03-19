@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
 launcher_key_handler_qml="${script_dir}/../src/launcher/LauncherKeyHandler.qml"
+launcher_content_panel_qml="${script_dir}/../src/launcher/LauncherContentPanel.qml"
 
 violations=()
 
@@ -23,8 +24,8 @@ require_literal "$launcher_qml" 'readonly property string tabControlHintText: {'
 require_literal "$launcher_qml" 'if (launcherTabBehavior === "mode")' "tab matrix mode hint branch"
 require_literal "$launcher_qml" 'if (launcherTabBehavior === "results")' "tab matrix results hint branch"
 require_literal "$launcher_qml" 'return hasResults ? "Tab: next result • Shift+Tab: next mode" : "Tab: next mode • Shift+Tab: next mode";' "tab matrix contextual hint branch"
-require_literal "$launcher_qml" 'LauncherKeyHandler {' "LauncherKeyHandler component wiring"
-require_literal "$launcher_qml" 'Keys.onPressed: event => keyHandler.handleKeyPress(event)' "LauncherKeyHandler key forwarding"
+require_literal "$launcher_content_panel_qml" 'LauncherKeyHandler {' "LauncherKeyHandler component wiring"
+require_literal "$launcher_content_panel_qml" 'Keys.onPressed: event => keyHandler.handleKeyPress(event)' "LauncherKeyHandler key forwarding"
 
 # Runtime key handling matrix.
 require_literal "$launcher_key_handler_qml" 'else if (launcher.drunCategoryFiltersEnabled && launcher.mode === "drun" && launcher.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab) {' "Ctrl+Tab drun category branch"

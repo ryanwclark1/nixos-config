@@ -391,6 +391,7 @@ main() {
 
   call_ipc Launcher diagnosticSetFileShowHidden "true" >/dev/null
   wait_for_probe "Launcher enables hidden-file override" "call_ipc Launcher launcherState" "state-hidden" "true"
+  call_ipc Launcher openFiles >/dev/null
   call_ipc Launcher diagnosticSetSearchText "hidden" >/dev/null
   wait_for_probe "Hidden files appear when override is on" "call_ipc Launcher launcherState" "state-query-results-at-least" "hidden" "1"
 
