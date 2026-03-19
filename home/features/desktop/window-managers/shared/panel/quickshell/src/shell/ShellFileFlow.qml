@@ -18,6 +18,8 @@ QtObject {
     property string wallpaperMonitor: ""
     property bool reopenSettingsHubAfterFileBrowser: false
 
+    Component.onDestruction: _destroyed = true
+
     function openFileBrowserForNotepad(mode) {
         reopenSettingsHubTimer.stop();
         fileBrowserCaller = mode === "save" ? "notepad-save" : "notepad-open";
