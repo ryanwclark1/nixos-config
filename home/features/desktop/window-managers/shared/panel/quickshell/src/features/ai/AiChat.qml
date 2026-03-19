@@ -38,9 +38,15 @@ PanelWindow {
 
     // --- State ---
     property bool showContent: false
-    property int panelWidth: 420
+    property int panelWidth: _persist.panelWidth
     readonly property int panelMinWidth: 320
     readonly property int panelMaxWidth: 600
+
+    PersistentProperties {
+        id: _persist
+        reloadableId: "aiChatState"
+        property int panelWidth: 420
+    }
     readonly property bool compactHeader: slidePanel.width < 420
     readonly property bool narrowHeader: slidePanel.width < 360
     readonly property bool compactFooter: slidePanel.width < 380
@@ -274,7 +280,7 @@ PanelWindow {
                     var globalX = mapToGlobal(mouse.x, mouse.y).x;
                     var delta = root._dragStartX - globalX;
                     var newW = Math.max(root.panelMinWidth, Math.min(root.panelMaxWidth, root._dragStartWidth + delta));
-                    root.panelWidth = Math.round(newW);
+                    _persist.panelWidth = Math.round(newW);
                 }
             }
         }

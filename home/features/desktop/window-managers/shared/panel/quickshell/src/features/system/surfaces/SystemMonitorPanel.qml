@@ -34,9 +34,15 @@ PanelWindow {
     property bool showContent: false
     readonly property int telemetryColumnMinWidth: 320
     readonly property int detailColumnMinWidth: 620
-    property int panelWidth: 1120
+    property int panelWidth: _persist.panelWidth
     readonly property int panelMinWidth: telemetryColumnMinWidth + detailColumnMinWidth + Colors.spacingM + (Colors.paddingLarge * 2)
     readonly property int panelMaxWidth: 1480
+
+    PersistentProperties {
+        id: _persist
+        reloadableId: "systemMonitorPanelState"
+        property int panelWidth: 1120
+    }
     property real _dragStartX: 0
     property real _dragStartWidth: 0
     property int keyboardSectionIndex: 0
@@ -221,7 +227,7 @@ PanelWindow {
                     var globalX = mapToGlobal(mouse.x, mouse.y).x;
                     var delta = root._dragStartX - globalX;
                     var nextWidth = Math.max(root.panelMinWidth, Math.min(root.panelMaxWidth, root._dragStartWidth + delta));
-                    root.panelWidth = Math.round(nextWidth);
+                    _persist.panelWidth = Math.round(nextWidth);
                 }
             }
         }
