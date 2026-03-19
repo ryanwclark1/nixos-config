@@ -143,6 +143,9 @@ Scope {
         containers: daemon.containers.length,
         runningContainers: daemon.runningContainers,
         composeProjects: daemon.composeProjects.length,
+        images: daemon.images.length,
+        volumes: daemon.volumes.length,
+        networks: daemon.networks.length,
         pluginState: status.state || ""
       };
       phase = 1;
@@ -271,6 +274,9 @@ main() {
       and .healthy.containers == $expectedTotal
       and .healthy.runningContainers == $expectedRunning
       and (.healthy.statusMessage | contains("Docker is available"))
+      and .healthy.images >= 0
+      and .healthy.volumes >= 0
+      and .healthy.networks >= 0
       and .degraded.runtimeAvailable == false
       and .degraded.pluginState == "degraded"
       and .degraded.pluginCode == "E_DOCKER_RUNTIME_UNAVAILABLE"
