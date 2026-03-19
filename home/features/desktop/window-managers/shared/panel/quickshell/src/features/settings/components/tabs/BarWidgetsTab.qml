@@ -41,6 +41,8 @@ Item {
         }
         return fallback;
     }
+    readonly property string selectedBarPosition: (selectedBar && selectedBar.position) ? String(selectedBar.position) : "top"
+    readonly property bool selectedBarVertical: Config.isVerticalBar(selectedBarPosition)
     readonly property var currentSectionWidgets: {
         var bar = selectedBar;
         var sections = (bar && bar.sectionWidgets) ? bar.sectionWidgets : {};
@@ -319,6 +321,12 @@ Item {
             }
         }
 
+        SettingsInfoCallout {
+            visible: root.selectedBarVertical
+            title: "Vertical bar mode"
+            body: "Left and right bars stay narrow. Text-heavy widgets are forced to icon or compact layouts, and unsupported widgets are hidden or collapsed if they are too wide."
+        }
+
         Repeater {
             model: ["left", "center", "right"]
             delegate: SettingsCard {
@@ -519,7 +527,7 @@ Item {
                                         }
 
                                         Repeater {
-                                            model: BarWidgetRegistry.summaryChips(widgetRow.widgetInstance)
+                                            model: BarWidgetRegistry.summaryChips(widgetRow.widgetInstance, root.selectedBarPosition)
 
                                             delegate: SharedWidgets.FilterChip {
                                                 required property var modelData
@@ -655,6 +663,7 @@ Item {
         compactMode: root.compactMode
         overlayInset: root.overlayInset
         addSection: root.addSection
+        verticalBar: root.selectedBarVertical
         sectionLabelFn: root.sectionLabel
         searchQuery: root.widgetSearchQuery
         availableWidgets: root.availablePickerWidgets
