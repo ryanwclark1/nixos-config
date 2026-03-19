@@ -26,7 +26,7 @@ Loader {
                             return Colors.primary;
                         return Colors.textSecondary;
                     }
-                    Behavior on color { CAnim {} }
+                    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                 }
             }
         }
@@ -48,7 +48,7 @@ Loader {
                             return Colors.primary;
                         return Colors.textSecondary;
                     }
-                    Behavior on color { CAnim {} }
+                    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                 }
             }
         }

@@ -461,7 +461,7 @@ PanelWindow {
           color: Colors.bgWidget
           border.color: hexInput.activeFocus ? Colors.primary : Colors.border
           border.width: 1
-          Behavior on border.color { CAnim {} }
+          Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
           RowLayout {
             anchors { fill: parent; leftMargin: Colors.spacingM; rightMargin: Colors.spacingM }

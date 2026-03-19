@@ -118,7 +118,7 @@ ColumnLayout {
       color: isDefault ? Colors.primaryStrong : (isHovered ? Colors.primarySubtle : Colors.cardSurface)
       border.color: isDefault ? Colors.primary : Colors.border
       border.width: 1
-      Behavior on color { CAnim {} }
+      Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
       InnerHighlight { highlightOpacity: 0.15; hoveredOpacity: 0.3; hovered: deviceCard.isDefault }
 
