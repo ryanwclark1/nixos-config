@@ -9,6 +9,7 @@ LauncherHome 1.0 LauncherHome.qml
 LauncherKeyHandler 1.0 LauncherKeyHandler.qml
 LauncherMediaView 1.0 LauncherMediaView.qml
 LauncherMetricsBox 1.0 LauncherMetricsBox.qml
+LauncherPrefixStrip 1.0 LauncherPrefixStrip.qml
 LauncherResultDelegate 1.0 LauncherResultDelegate.qml
 LauncherSearchField 1.0 LauncherSearchField.qml
 LauncherSectionHeader 1.0 LauncherSectionHeader.qml
