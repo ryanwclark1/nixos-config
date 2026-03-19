@@ -18,7 +18,8 @@ QtObject {
                     id: "dashboard",
                     label: "Dashboard",
                     icon: "󰕮",
-                    component: "DashboardTab.qml"
+                    component: "DashboardTab.qml",
+                    searchTerms: ["overview", "performance", "cpu", "ram", "vitals", "media"]
                 }
             ]
         },
@@ -197,7 +198,7 @@ QtObject {
             categoryId: "visuals",
             order: 30,
             component: "AppearanceTab.qml",
-            searchTerms: ["appearance", "glass", "blur"],
+            searchTerms: ["appearance", "glass", "blur", "density", "scale", "spacing", "speed", "animations", "eco", "power", "battery"],
             owner: {
                 surface: "bar",
                 service: "Config",
@@ -227,7 +228,7 @@ QtObject {
             categoryId: "visuals",
             order: 20,
             component: "WallpaperTab.qml",
-            searchTerms: ["wallpaper", "background", "pywal"],
+            searchTerms: ["wallpaper", "background", "pywal", "matugen", "dynamic", "theming"],
             owner: {
                 surface: "",
                 service: "WallpaperService",
@@ -332,7 +333,7 @@ QtObject {
             categoryId: "surfaces",
             order: 45,
             component: "BackgroundTab.qml",
-            searchTerms: ["background", "visualizer", "clock", "spectrum", "cava"],
+            searchTerms: ["background", "visualizer", "clock", "spectrum", "cava", "shader", "glsl", "personality", "cat", "gif"],
             owner: {
                 surface: "background",
                 service: "Config",
