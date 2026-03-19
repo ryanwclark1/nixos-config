@@ -13,4 +13,7 @@ RecordingBarWidget 1.0 RecordingBarWidget.qml
 PrinterBarWidget 1.0 PrinterBarWidget.qml
 NotificationsBarWidget 1.0 NotificationsBarWidget.qml
 VoxtypeBarWidget 1.0 VoxtypeBarWidget.qml
+PomodoroBarWidget 1.0 PomodoroBarWidget.qml
+TodoBarWidget 1.0 TodoBarWidget.qml
+GameModeBarWidget 1.0 GameModeBarWidget.qml
 BarSurfacePill 1.0 BarSurfacePill.qml
