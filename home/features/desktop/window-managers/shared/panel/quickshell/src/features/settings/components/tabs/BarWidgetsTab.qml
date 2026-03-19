@@ -19,10 +19,6 @@ Item {
     property bool widgetSettingsOpen: false
     property string pluginSettingsError: ""
     property string validationMessage: ""
-    property string dragSection: ""
-    property int dragSourceIndex: -1
-    property string dragTargetSection: ""
-    property int dragTargetIndex: -1
     property bool applyingPendingBarWidgetTarget: false
     property int pickerCatalogRevision: 0
     property var editingWidget: null
@@ -30,6 +26,10 @@ Item {
     readonly property int overlayInset: root.tightSpacing ? 20 : 40
     readonly property bool dragReorderEnabled: true
     readonly property var availablePickerWidgets: availableWidgetsForPicker()
+    readonly property string dragSection: widgetReorderState.sourceListId
+    readonly property int dragSourceIndex: widgetReorderState.sourceIndex
+    readonly property string dragTargetSection: widgetReorderState.targetListId
+    readonly property int dragTargetIndex: widgetReorderState.targetIndex
 
     readonly property var selectedBar: {
         var bars = Config.barConfigs || [];
@@ -87,6 +87,10 @@ Item {
         function onPluginRuntimeUpdated() {
             root.pickerCatalogRevision += 1;
         }
+    }
+
+    SettingsReorderState {
+        id: widgetReorderState
     }
 
     function sectionWidgets(section) {
@@ -217,18 +221,30 @@ Item {
     }
 
     function clearDragState() {
-        dragSection = "";
-        dragSourceIndex = -1;
-        dragTargetSection = "";
-        dragTargetIndex = -1;
+        widgetReorderState.clear();
+    }
+
+    function beginWidgetDrag(section, instanceId, index) {
+        widgetReorderState.begin(section, instanceId, index);
+    }
+
+    function setWidgetDropTarget(section, index) {
+        if (root.dragSourceIndex < 0)
+            return;
+        widgetReorderState.updateTarget(section, index);
+    }
+
+    function clearWidgetDropTarget(section, index) {
+        if (widgetReorderState.matchesTarget(section, index))
+            widgetReorderState.updateTarget("", -1);
     }
 
     function moveDraggedWidget(targetSection, targetIndex) {
-        if (!selectedBar || dragSection === "" || dragSourceIndex < 0)
+        if (!selectedBar || widgetReorderState.sourceListId === "" || widgetReorderState.sourceIndex < 0)
             return false;
         if (targetSection === "" || targetIndex < 0)
             return false;
-        var ok = Config.moveBarWidget(selectedBar.id, dragSection, dragSourceIndex, targetIndex, targetSection);
+        var ok = Config.moveBarWidget(selectedBar.id, widgetReorderState.sourceListId, widgetReorderState.sourceIndex, targetIndex, targetSection);
         clearDragState();
         return ok;
     }
@@ -429,16 +445,10 @@ Item {
                             enabled: root.dragReorderEnabled
                             keys: ["bar-widget"]
                             onEntered: function (drag) {
-                                if (root.dragSourceIndex < 0)
-                                    return;
-                                root.dragTargetSection = sectionKey;
-                                root.dragTargetIndex = 0;
+                                root.setWidgetDropTarget(sectionKey, 0);
                             }
                             onExited: {
-                                if (root.dragTargetSection === sectionKey && root.dragTargetIndex === 0) {
-                                    root.dragTargetSection = "";
-                                    root.dragTargetIndex = -1;
-                                }
+                                root.clearWidgetDropTarget(sectionKey, 0);
                             }
                             onDropped: function (drop) {
                                 root.moveDraggedWidget(sectionKey, 0);
@@ -480,18 +490,14 @@ Item {
                             readonly property var widgetInstance: root.sectionWidgets(sectionKey)[index]
                             readonly property bool dropBeforeActive: root.dragTargetSection === widgetRow.sectionKey && root.dragTargetIndex === widgetRow.index
 
-                            Rectangle {
+                            SettingsDropIndicator {
                                 anchors {
                                     left: parent.left
                                     right: parent.right
                                     top: parent.top
                                 }
+                                active: root.dragReorderEnabled && widgetRow.dropBeforeActive
                                 visible: root.dragReorderEnabled && widgetRow.dropBeforeActive
-                                height: 10
-                                radius: Colors.radiusXXS
-                                color: Colors.primaryMarked
-                                border.color: Colors.primary
-                                border.width: 1
                                 z: 3
                             }
 
@@ -500,16 +506,10 @@ Item {
                                 enabled: root.dragReorderEnabled
                                 keys: ["bar-widget"]
                                 onEntered: function (drag) {
-                                    if (root.dragSourceIndex < 0)
-                                        return;
-                                    root.dragTargetSection = widgetRow.sectionKey;
-                                    root.dragTargetIndex = widgetRow.index;
+                                    root.setWidgetDropTarget(widgetRow.sectionKey, widgetRow.index);
                                 }
                                 onExited: {
-                                    if (root.dragTargetSection === widgetRow.sectionKey && root.dragTargetIndex === widgetRow.index) {
-                                        root.dragTargetSection = "";
-                                        root.dragTargetIndex = -1;
-                                    }
+                                    root.clearWidgetDropTarget(widgetRow.sectionKey, widgetRow.index);
                                 }
                                 onDropped: function (drop) {
                                     root.moveDraggedWidget(widgetRow.sectionKey, widgetRow.index);
@@ -674,10 +674,8 @@ Item {
                                 visible: root.dragReorderEnabled
                                 dragTarget: root.dragReorderEnabled ? card : null
                                 onPressedChanged: {
-                                    root.dragSection = widgetRow.sectionKey;
-                                    root.dragSourceIndex = widgetRow.index;
-                                    root.dragTargetSection = widgetRow.sectionKey;
-                                    root.dragTargetIndex = widgetRow.index;
+                                    if (pressed)
+                                        root.beginWidgetDrag(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId, widgetRow.index);
                                 }
                                 onReleased: function (wasDragging) {
                                     card.x = 0;
@@ -697,14 +695,10 @@ Item {
                         }
                     }
 
-                    Rectangle {
+                    SettingsDropIndicator {
                         Layout.fillWidth: true
-                        height: 12
-                        radius: Colors.radiusXXS
-                        visible: root.sectionWidgets(sectionKey).length > 0 && root.dragReorderEnabled && root.dragSourceIndex >= 0 && root.dragTargetSection === sectionKey && root.dragTargetIndex === root.sectionWidgets(sectionKey).length
-                        color: Colors.primaryMarked
-                        border.color: Colors.primary
-                        border.width: 1
+                        active: root.sectionWidgets(sectionKey).length > 0 && root.dragReorderEnabled && root.dragSourceIndex >= 0 && root.dragTargetSection === sectionKey && root.dragTargetIndex === root.sectionWidgets(sectionKey).length
+                        visible: active
                     }
 
                     DropArea {
@@ -714,16 +708,10 @@ Item {
                         enabled: root.dragReorderEnabled
                         keys: ["bar-widget"]
                         onEntered: function (drag) {
-                            if (root.dragSourceIndex < 0)
-                                return;
-                            root.dragTargetSection = sectionKey;
-                            root.dragTargetIndex = root.sectionWidgets(sectionKey).length;
+                            root.setWidgetDropTarget(sectionKey, root.sectionWidgets(sectionKey).length);
                         }
                         onExited: {
-                            if (root.dragTargetSection === sectionKey && root.dragTargetIndex === root.sectionWidgets(sectionKey).length) {
-                                root.dragTargetSection = "";
-                                root.dragTargetIndex = -1;
-                            }
+                            root.clearWidgetDropTarget(sectionKey, root.sectionWidgets(sectionKey).length);
                         }
                         onDropped: function (drop) {
                             root.moveDraggedWidget(sectionKey, root.sectionWidgets(sectionKey).length);

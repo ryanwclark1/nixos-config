@@ -13,16 +13,19 @@ Rectangle {
     property int rowSpacing: Colors.spacingM
     property int minimumHeight: 0
     property bool highlighted: false
+    property bool dragging: false
+    property bool dropTargeted: false
     default property alias rowContent: contentRow.data
 
     Layout.fillWidth: true
     implicitHeight: Math.max(minimumHeight, contentRow.implicitHeight + contentInset * 2)
     radius: Colors.radiusXS
-    color: root.active ? Colors.primarySubtle : Colors.cardSurface
-    border.color: root.active ? Colors.primary : Colors.border
+    color: root.dragging ? Colors.withAlpha(Colors.primary, 0.12) : (root.active ? Colors.primarySubtle : Colors.cardSurface)
+    border.color: (root.dragging || root.dropTargeted) ? Colors.primary : (root.active ? Colors.primary : Colors.border)
     border.width: 1
+    opacity: root.dragging ? 0.82 : 1.0
 
-    SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: root.active }
+    SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: root.active || root.dragging || root.dropTargeted }
 
     Behavior on color {
         enabled: !Colors.isTransitioning

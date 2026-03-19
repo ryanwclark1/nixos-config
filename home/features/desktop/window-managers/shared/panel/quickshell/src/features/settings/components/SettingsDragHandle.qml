@@ -21,9 +21,9 @@ Rectangle {
     implicitWidth: handleSize
     implicitHeight: handleSize
     radius: Colors.radiusSmall
-    color: root.pressed ? Colors.primaryMid : (root.containsMouse ? Colors.textThin : "transparent")
-    border.color: root.containsMouse ? Colors.border : "transparent"
-    border.width: root.containsMouse ? 1 : 0
+    color: root.dragActive ? Colors.primaryStrong : (root.pressed ? Colors.primaryMid : (root.containsMouse ? Colors.withAlpha(Colors.primary, 0.18) : Colors.withAlpha(Colors.text, 0.05)))
+    border.color: root.dragActive ? Colors.primary : (root.containsMouse ? Colors.primaryRing : Colors.border)
+    border.width: root.dragActive || root.containsMouse ? 1 : 0
     opacity: root.enabled ? 1.0 : 0.45
 
     Behavior on color {
@@ -34,7 +34,7 @@ Rectangle {
     Text {
         anchors.centerIn: parent
         text: root.iconText
-        color: root.pressed ? Colors.primary : Colors.textSecondary
+        color: root.dragActive ? Colors.text : (root.pressed ? Colors.primary : Colors.textSecondary)
         font.family: Colors.fontMono
         font.pixelSize: Colors.fontSizeMedium
     }
