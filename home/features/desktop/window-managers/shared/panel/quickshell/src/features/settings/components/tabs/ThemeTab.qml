@@ -8,6 +8,11 @@ import ".."
 Item {
     id: root
     property var settingsRoot: null
+
+    SharedWidgets.Ref {
+        service: ThemeService
+    }
+
     property string tabId: ""
     property bool compactMode: false
     property bool tightSpacing: false

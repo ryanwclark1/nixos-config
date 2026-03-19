@@ -424,6 +424,8 @@ function resetLauncherDefaults(Config, webAliasDefaults, webProviderDefaultOrder
     Config.launcherShowModeHints = true;
     Config.launcherShowHomeSections = false;
     Config.launcherDrunCategoryFiltersEnabled = false;
+    Config.launcherCharacterTrigger = ":";
+    Config.launcherCharacterPasteOnSelect = false;
     Config.launcherEnablePreload = true;
     Config.launcherKeepSearchOnModeSwitch = true;
     Config.launcherEnableDebugTimings = false;

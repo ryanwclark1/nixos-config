@@ -55,7 +55,7 @@ Item {
         },
         {
             key: "emoji",
-            label: "Emoji",
+            label: "Characters",
             icon: "󰞅"
         },
         {
@@ -290,6 +290,11 @@ Item {
                     icon: "󰔟"
                     configKey: "launcherKeepSearchOnModeSwitch"
                 }
+                SettingsToggleRow {
+                    label: "Paste Characters on Select"
+                    icon: "󰆏"
+                    configKey: "launcherCharacterPasteOnSelect"
+                }
                 SettingsModeRow {
                     label: "Tab Behavior"
                     icon: "󰌌"
@@ -312,6 +317,14 @@ Item {
                         }
                     ]
                     onModeSelected: modeValue => Config.launcherTabBehavior = modeValue
+                }
+                SettingsTextInputRow {
+                    label: "Character Trigger"
+                    leadingIcon: "󰞅"
+                    placeholderText: ":"
+                    text: Config.launcherCharacterTrigger
+                    onSubmitted: value => Config.launcherCharacterTrigger = value.trim() === "" ? ":" : value.trim()
+                    onTextEdited: value => Config.launcherCharacterTrigger = value.trim() === "" ? ":" : value.trim()
                 }
             }
         }
