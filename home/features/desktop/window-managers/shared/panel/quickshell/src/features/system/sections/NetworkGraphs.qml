@@ -4,7 +4,6 @@ import Quickshell.Io
 import "../../../services"
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
-import "../models/GraphUtils.js" as GU
 
 SharedWidgets.CardBase {
     id: root
@@ -87,8 +86,8 @@ SharedWidgets.CardBase {
                     uHist.push(Math.min(1.0, diffTx / root.maxUp));
                     root.upHistory = uHist;
 
-                    downCanvas.requestPaint();
-                    upCanvas.requestPaint();
+                    downSparkline.requestRepaint();
+                    upSparkline.requestRepaint();
                 }
 
                 root.lastRx = rx;
@@ -130,31 +129,11 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             spacing: Colors.spacingL
 
-            // Circular gauge — combined throughput
-            Item {
-                Layout.preferredWidth: 72
-                Layout.preferredHeight: 72
-
-                CircularGauge {
-                    anchors.fill: parent
-                    value: root.throughputPercent
-                    color: root.throughputColor
-                    thickness: 4
-                    icon: "󰛳"
-                    width: 72
-                    height: 72
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 8
-                    text: root.activeInterface === "offline" ? "OFF" : "ON"
-                    color: root.activeInterface === "offline" ? Colors.error : root.throughputColor
-                    font.pixelSize: Colors.fontSizeXS
-                    font.weight: Font.Bold
-                    font.family: Colors.fontMono
-                }
+            ResourceGauge {
+                value: root.throughputPercent
+                color: root.activeInterface === "offline" ? Colors.error : root.throughputColor
+                icon: "󰛳"
+                label: root.activeInterface === "offline" ? "OFF" : "ON"
             }
 
             // Stats column
@@ -189,77 +168,28 @@ SharedWidgets.CardBase {
             }
         }
 
-        // Dual sparkline graphs
         RowLayout {
             Layout.fillWidth: true
             spacing: Colors.spacingL
 
-            // Download history
-            ColumnLayout {
+            SparklineSection {
+                id: downSparkline
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    Text {
-                        text: "DOWNLOAD"
-                        color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.weight: Font.Bold
-                        font.letterSpacing: Colors.letterSpacingWide
-                        Layout.fillWidth: true
-                    }
-                    Text {
-                        text: root.currentDown
-                        color: Colors.primary
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.weight: Font.Bold
-                        font.family: Colors.fontMono
-                    }
-                }
-
-                Canvas {
-                    id: downCanvas
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 52
-                    renderTarget: Canvas.FramebufferObject
-                    renderStrategy: Canvas.Threaded
-                    onPaint: GU.paintLineGraph(downCanvas, root.downHistory, Colors.primary, Colors.withAlpha, { fill: false })
-                }
+                label: "DOWNLOAD"
+                history: root.downHistory
+                accentColor: Colors.primary
+                currentText: root.currentDown
+                graphOptions: ({ fill: false })
             }
 
-            // Upload history
-            ColumnLayout {
+            SparklineSection {
+                id: upSparkline
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    Text {
-                        text: "UPLOAD"
-                        color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.weight: Font.Bold
-                        font.letterSpacing: Colors.letterSpacingWide
-                        Layout.fillWidth: true
-                    }
-                    Text {
-                        text: root.currentUp
-                        color: Colors.accent
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.weight: Font.Bold
-                        font.family: Colors.fontMono
-                    }
-                }
-
-                Canvas {
-                    id: upCanvas
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 52
-                    renderTarget: Canvas.FramebufferObject
-                    renderStrategy: Canvas.Threaded
-                    onPaint: GU.paintLineGraph(upCanvas, root.upHistory, Colors.accent, Colors.withAlpha, { fill: false })
-                }
+                label: "UPLOAD"
+                history: root.upHistory
+                accentColor: Colors.accent
+                currentText: root.currentUp
+                graphOptions: ({ fill: false })
             }
         }
     }

@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
-import "../models/GraphUtils.js" as GU
 
 SharedWidgets.CardBase {
     id: root
@@ -44,7 +43,7 @@ SharedWidgets.CardBase {
             hist.shift();
             hist.push(root.primaryPercent);
             root.diskHistory = hist;
-            diskCanvas.requestPaint();
+            diskSparkline.requestRepaint();
         }
     }
 
@@ -82,31 +81,11 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             spacing: Colors.spacingL
 
-            // Circular gauge — primary mount
-            Item {
-                Layout.preferredWidth: 72
-                Layout.preferredHeight: 72
-
-                CircularGauge {
-                    anchors.fill: parent
-                    value: root.primaryPercent
-                    color: root.usageColor
-                    thickness: 4
-                    icon: "󰋊"
-                    width: 72
-                    height: 72
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 8
-                    text: root._primaryDrive ? root._primaryDrive.percent : "--"
-                    color: root.usageColor
-                    font.pixelSize: Colors.fontSizeXS
-                    font.weight: Font.Bold
-                    font.family: Colors.fontMono
-                }
+            ResourceGauge {
+                value: root.primaryPercent
+                color: root.usageColor
+                icon: "󰋊"
+                label: root._primaryDrive ? root._primaryDrive.percent : "--"
             }
 
             // Stats column
@@ -142,39 +121,13 @@ SharedWidgets.CardBase {
             }
         }
 
-        // Sparkline graph (primary mount history)
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Colors.spacingXS
-
-            RowLayout {
-                Layout.fillWidth: true
-                Text {
-                    text: "HISTORY (ROOT)"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Bold
-                    font.letterSpacing: Colors.letterSpacingWide
-                    Layout.fillWidth: true
-                }
-                Text {
-                    visible: root.diskHistory.length > 0
-                    text: Math.round((root.diskHistory[root.diskHistory.length - 1] || 0) * 100) + "%"
-                    color: root.usageColor
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Bold
-                    font.family: Colors.fontMono
-                }
-            }
-
-            Canvas {
-                id: diskCanvas
-                Layout.fillWidth: true
-                Layout.preferredHeight: 52
-                renderTarget: Canvas.FramebufferObject
-                renderStrategy: Canvas.Threaded
-                onPaint: GU.paintLineGraph(diskCanvas, root.diskHistory, root.usageColor, Colors.withAlpha, { yScale: 0.9 })
-            }
+        SparklineSection {
+            id: diskSparkline
+            label: "HISTORY (ROOT)"
+            history: root.diskHistory
+            accentColor: root.usageColor
+            currentText: root.diskHistory.length > 0
+                ? Math.round((root.diskHistory[root.diskHistory.length - 1] || 0) * 100) + "%" : ""
         }
     }
 }

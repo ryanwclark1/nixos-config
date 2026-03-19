@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
-import "../models/GraphUtils.js" as GU
+import "../models/ModuleUtils.js" as MU
 
 SharedWidgets.CardBase {
     id: root
@@ -24,7 +24,7 @@ SharedWidgets.CardBase {
         target: SystemStatus
         function onGpuHistoryChanged() {
             root.gpuHistory = SystemStatus.gpuHistory.slice(-30);
-            gpuCanvas.requestPaint();
+            gpuSparkline.requestRepaint();
         }
     }
 
@@ -53,11 +53,6 @@ SharedWidgets.CardBase {
             root.vramUsage = vramPoll.value.usage;
             root.vramPercent = vramPoll.value.percent;
         }
-    }
-
-    function formatBytes(bytes) {
-        if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + " GB";
-        return (bytes / 1048576).toFixed(0) + " MB";
     }
 
     readonly property color usageColor: SystemStatus.gpuPercent >= 0.9 ? Colors.error
@@ -113,31 +108,11 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             spacing: Colors.spacingL
 
-            // Circular gauge
-            Item {
-                Layout.preferredWidth: 72
-                Layout.preferredHeight: 72
-
-                CircularGauge {
-                    anchors.fill: parent
-                    value: SystemStatus.gpuPercent
-                    color: root.usageColor
-                    thickness: 4
-                    icon: "󰢮"
-                    width: 72
-                    height: 72
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 8
-                    text: SystemStatus.gpuUsage
-                    color: root.usageColor
-                    font.pixelSize: Colors.fontSizeXS
-                    font.weight: Font.Bold
-                    font.family: Colors.fontMono
-                }
+            ResourceGauge {
+                value: SystemStatus.gpuPercent
+                color: root.usageColor
+                icon: "󰢮"
+                label: SystemStatus.gpuUsage
             }
 
             // Core stats column
@@ -155,7 +130,7 @@ SharedWidgets.CardBase {
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
                     label: "VRAM"
-                    value: AMDGPUService.available ? (root.formatBytes(AMDGPUService.vramUsageBytes) + " / " + root.formatBytes(AMDGPUService.vramTotalBytes)) : root.vramUsage
+                    value: AMDGPUService.available ? (MU.formatBytes(AMDGPUService.vramUsageBytes) + " / " + MU.formatBytes(AMDGPUService.vramTotalBytes)) : root.vramUsage
                 }
 
                 SharedWidgets.MiniProgressBar {
@@ -201,39 +176,13 @@ SharedWidgets.CardBase {
             }
         }
 
-        // GPU history graph
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Colors.spacingXS
-
-            RowLayout {
-                Layout.fillWidth: true
-                Text {
-                    text: "HISTORY"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Bold
-                    font.letterSpacing: Colors.letterSpacingWide
-                    Layout.fillWidth: true
-                }
-                Text {
-                    visible: root.gpuHistory.length > 0
-                    text: Math.round((root.gpuHistory[root.gpuHistory.length - 1] || 0) * 100) + "%"
-                    color: root.usageColor
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Bold
-                    font.family: Colors.fontMono
-                }
-            }
-
-            Canvas {
-                id: gpuCanvas
-                Layout.fillWidth: true
-                Layout.preferredHeight: 40
-                renderTarget: Canvas.FramebufferObject
-                renderStrategy: Canvas.Threaded
-                onPaint: GU.paintLineGraph(gpuCanvas, root.gpuHistory, root.usageColor, Colors.withAlpha, { yScale: 0.9 })
-            }
+        SparklineSection {
+            id: gpuSparkline
+            history: root.gpuHistory
+            accentColor: root.usageColor
+            canvasHeight: 40
+            currentText: root.gpuHistory.length > 0
+                ? Math.round((root.gpuHistory[root.gpuHistory.length - 1] || 0) * 100) + "%" : ""
         }
         
         // GPU Processes list (Top 3)
@@ -286,7 +235,7 @@ SharedWidgets.CardBase {
                     }
                     
                     Text {
-                        text: root.formatBytes(modelData.vram)
+                        text: MU.formatBytes(modelData.vram)
                         color: Colors.textSecondary
                         font.pixelSize: Colors.fontSizeXXS
                         font.family: Colors.fontMono

@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
-import "../models/GraphUtils.js" as GU
 
 SharedWidgets.CardBase {
     id: root
@@ -21,7 +20,7 @@ SharedWidgets.CardBase {
         target: SystemStatus
         function onCpuHistoryChanged() {
             root.cpuHistory = SystemStatus.cpuHistory.slice(-30);
-            cpuCanvas.requestPaint();
+            cpuSparkline.requestRepaint();
         }
     }
 
@@ -71,31 +70,11 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             spacing: Colors.spacingL
 
-            // Circular gauge
-            Item {
-                Layout.preferredWidth: 72
-                Layout.preferredHeight: 72
-
-                CircularGauge {
-                    anchors.fill: parent
-                    value: SystemStatus.cpuPercent
-                    color: root.usageColor
-                    thickness: 4
-                    icon: ""
-                    width: 72
-                    height: 72
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 8
-                    text: SystemStatus.cpuUsage
-                    color: root.usageColor
-                    font.pixelSize: Colors.fontSizeXS
-                    font.weight: Font.Bold
-                    font.family: Colors.fontMono
-                }
+            ResourceGauge {
+                value: SystemStatus.cpuPercent
+                color: root.usageColor
+                icon: ""
+                label: SystemStatus.cpuUsage
             }
 
             // Stats column
@@ -130,39 +109,12 @@ SharedWidgets.CardBase {
             }
         }
 
-        // Sparkline graph
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Colors.spacingXS
-
-            RowLayout {
-                Layout.fillWidth: true
-                Text {
-                    text: "HISTORY"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Bold
-                    font.letterSpacing: Colors.letterSpacingWide
-                    Layout.fillWidth: true
-                }
-                Text {
-                    visible: root.cpuHistory.length > 0
-                    text: Math.round((root.cpuHistory[root.cpuHistory.length - 1] || 0) * 100) + "%"
-                    color: root.usageColor
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Bold
-                    font.family: Colors.fontMono
-                }
-            }
-
-            Canvas {
-                id: cpuCanvas
-                Layout.fillWidth: true
-                Layout.preferredHeight: 52
-                renderTarget: Canvas.FramebufferObject
-                renderStrategy: Canvas.Threaded
-                onPaint: GU.paintLineGraph(cpuCanvas, root.cpuHistory, root.usageColor, Colors.withAlpha, { yScale: 0.9 })
-            }
+        SparklineSection {
+            id: cpuSparkline
+            history: root.cpuHistory
+            accentColor: root.usageColor
+            currentText: root.cpuHistory.length > 0
+                ? Math.round((root.cpuHistory[root.cpuHistory.length - 1] || 0) * 100) + "%" : ""
         }
     }
 }
