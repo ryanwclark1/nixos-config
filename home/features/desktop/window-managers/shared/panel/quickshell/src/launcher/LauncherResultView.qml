@@ -80,10 +80,6 @@ StackLayout {
                 Layout.preferredWidth: visible ? Math.min(400, root.width * 0.4) : 0
                 Layout.fillHeight: true
                 selectedItem: root.launcher.selectedItem
-
-                Behavior on Layout.preferredWidth {
-                    NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic }
-                }
             }
         }
 
