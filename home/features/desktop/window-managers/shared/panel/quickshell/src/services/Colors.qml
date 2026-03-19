@@ -339,7 +339,7 @@ QtObject {
                 text = data.special.foreground || text;
             }
         } catch (e) {
-            console.error("Colors: failed to reload wal colors: " + e);
+            Logger.e("Colors", "failed to reload wal colors:", e);
         }
     }
 

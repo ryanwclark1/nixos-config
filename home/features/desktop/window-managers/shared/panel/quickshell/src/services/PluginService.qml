@@ -229,7 +229,7 @@ QtObject {
     }
 
     function _rejectPermission(pluginId, permission, operation) {
-        console.warn("PluginService: Permission denied for", pluginId, "permission=", permission, "operation=", operation);
+        Logger.w("PluginService", "Permission denied for", pluginId, "permission=", permission, "operation=", operation);
         return false;
     }
 

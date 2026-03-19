@@ -63,7 +63,7 @@ QtObject {
                         root.workspaceData = JSON.parse(this.text);
                     }
                 } catch (e) {
-                    console.warn("[WorkspaceIdentity] Failed to load state:", e);
+                    Logger.w("WorkspaceIdentityService", "Failed to load state:", e);
                 }
                 root._loading = false;
             }

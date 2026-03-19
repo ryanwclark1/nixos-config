@@ -34,7 +34,7 @@ QtObject {
             onStreamFinished: {
                 const output = (stdoutCollector.text || "").trim()
                 if (bindParser.exitCode !== 0 || output.length === 0) {
-                    console.debug("[NiriBinds] Parser unavailable, using defaults")
+                    Logger.d("NiriBinds", "Parser unavailable, using defaults")
                     root.errorMessage = "Parser script failed"
                     return
                 }
@@ -42,7 +42,7 @@ QtObject {
                     const result = JSON.parse(output)
                     if (!result) return
                     if (result.error) {
-                        console.warn("[NiriBinds] Parser error:", result.error)
+                        Logger.w("NiriBinds", "Parser error:", result.error)
                         root.errorMessage = result.error
                     } else if (result.children && result.children.length > 0) {
                         root.binds = result
@@ -50,7 +50,7 @@ QtObject {
                         root.loaded = true
                     }
                 } catch (e) {
-                    console.warn("[NiriBinds] JSON parse error:", e)
+                    Logger.w("NiriBinds", "JSON parse error:", e)
                     root.errorMessage = "Failed to parse output"
                 }
             }

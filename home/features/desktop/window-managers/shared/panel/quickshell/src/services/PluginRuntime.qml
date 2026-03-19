@@ -60,7 +60,7 @@ QtObject {
       if (raw && String(raw).trim() !== "")
         envelope = _normalizeStateEnvelope(JSON.parse(raw));
     } catch (e) {
-      console.warn("PluginService: state parse error:", e);
+      Logger.w("PluginService", "state parse error:", e);
     }
     fv.destroy();
     return envelope;
@@ -198,7 +198,7 @@ QtObject {
 
     var component = Qt.createComponent("file://" + providerPath);
     if (component.status !== Component.Ready) {
-      console.warn("PluginService: Failed to load launcher provider", plugin.id, component.errorString());
+      Logger.w("PluginService", "Failed to load launcher provider", plugin.id, component.errorString());
       service._setPluginStatus(plugin.id, "failed", "E_LAUNCHER_COMPONENT_LOAD", component.errorString());
       return;
     }
@@ -210,7 +210,7 @@ QtObject {
       pluginService: service
     });
     if (!instance) {
-      console.warn("PluginService: Failed to instantiate launcher provider", plugin.id, component.errorString());
+      Logger.w("PluginService", "Failed to instantiate launcher provider", plugin.id, component.errorString());
       service._setPluginStatus(plugin.id, "failed", "E_LAUNCHER_INSTANCE_CREATE", component.errorString());
       return;
     }
@@ -235,7 +235,7 @@ QtObject {
         if (launcherProviderInstances[pid].shutdown)
           launcherProviderInstances[pid].shutdown();
       } catch (e) {
-        console.warn("PluginService: shutdown error:", pid, e);
+        Logger.w("PluginService", "shutdown error:", pid, e);
       }
       launcherProviderInstances[pid].destroy();
     }
@@ -265,7 +265,7 @@ QtObject {
 
     var component = Qt.createComponent("file://" + daemonPath);
     if (component.status !== Component.Ready) {
-      console.warn("PluginService: Failed to load daemon", plugin.id, component.errorString());
+      Logger.w("PluginService", "Failed to load daemon", plugin.id, component.errorString());
       service._setPluginStatus(plugin.id, "failed", "E_DAEMON_COMPONENT_LOAD", component.errorString());
       return;
     }
@@ -277,7 +277,7 @@ QtObject {
       pluginService: service
     });
     if (!instance) {
-      console.warn("PluginService: Failed to instantiate daemon", plugin.id, component.errorString());
+      Logger.w("PluginService", "Failed to instantiate daemon", plugin.id, component.errorString());
       service._setPluginStatus(plugin.id, "failed", "E_DAEMON_INSTANCE_CREATE", component.errorString());
       return;
     }
@@ -309,7 +309,7 @@ QtObject {
         if (daemonInstances[pid].stop)
           daemonInstances[pid].stop();
       } catch (e) {
-        console.warn("PluginService: daemon stop error:", pid, e);
+        Logger.w("PluginService", "daemon stop error:", pid, e);
       }
       daemonInstances[pid].destroy();
     }
@@ -502,7 +502,7 @@ QtObject {
           }
         }
       } catch (e) {
-        console.warn("PluginService: launcher provider error", providerId, e);
+        Logger.w("PluginService", "launcher provider error", providerId, e);
         service._setPluginStatus(providerId, "degraded", "E_LAUNCHER_QUERY", String(e));
       }
     }
@@ -532,7 +532,7 @@ QtObject {
           pluginId: item.pluginId
         }) !== false;
       } catch (e) {
-        console.warn("PluginService: launcher execute failed", item.pluginId, e);
+        Logger.w("PluginService", "launcher execute failed", item.pluginId, e);
         service._setPluginStatus(item.pluginId, "degraded", "E_LAUNCHER_EXECUTE", String(e));
         return false;
       }
@@ -548,7 +548,7 @@ QtObject {
         item.action();
         return true;
       } catch (err) {
-        console.warn("PluginService: launcher action failed", err);
+        Logger.w("PluginService", "launcher action failed", err);
         service._setPluginStatus(item.pluginId, "degraded", "E_LAUNCHER_ACTION", String(err));
       }
     }

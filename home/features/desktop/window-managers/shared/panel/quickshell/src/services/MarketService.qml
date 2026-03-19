@@ -39,9 +39,9 @@ QtObject {
     if (root._lastFailureKey !== failureKey) {
       root._lastFailureKey = failureKey;
       if (details)
-        console.warn("MarketService:", failureKey, details);
+        Logger.w("MarketService", failureKey, details);
       else
-        console.warn("MarketService:", failureKey);
+        Logger.w("MarketService", failureKey);
     }
   }
 

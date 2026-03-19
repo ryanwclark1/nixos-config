@@ -67,7 +67,7 @@ QtObject {
         try {
           root.items = JSON.parse(raw);
         } catch (e) {
-          console.error("TodoService: failed to load:", e);
+          Logger.e("TodoService", "failed to load:", e);
           root.items = [];
         }
       }

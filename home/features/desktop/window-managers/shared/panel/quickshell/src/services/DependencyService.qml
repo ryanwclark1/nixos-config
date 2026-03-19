@@ -45,6 +45,9 @@ QtObject {
       "qs-network": {
         requires: ["nmcli"]
       },
+      "qs-network-monitor": {
+        requires: []
+      },
       "qs-run": {
         requires: []
       },

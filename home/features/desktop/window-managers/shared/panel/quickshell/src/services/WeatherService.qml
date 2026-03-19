@@ -171,9 +171,9 @@ QtObject {
     if (root._lastFailureKey !== failureKey) {
       root._lastFailureKey = failureKey;
       if (details)
-        console.warn("WeatherService:", failureKey, details);
+        Logger.w("WeatherService", failureKey, details);
       else
-        console.warn("WeatherService:", failureKey);
+        Logger.w("WeatherService", failureKey);
     }
 
     // Preserve the last known-good snapshot for transient upstream/API failures.

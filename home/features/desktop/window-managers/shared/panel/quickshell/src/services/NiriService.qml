@@ -74,7 +74,7 @@ QtObject {
                     const event = JSON.parse(line)
                     root._handleEvent(event)
                 } catch (e) {
-                    console.warn("[NiriService] Failed to parse event:", e)
+                    Logger.w("NiriService", "Failed to parse event:", e)
                 }
             }
         }
@@ -98,7 +98,7 @@ QtObject {
                     if (root.windows.length > 0)
                         root.windows = root._sortWindowsByLayout(root.windows)
                 } catch (e) {
-                    console.warn("[NiriService] Failed to parse outputs:", e)
+                    Logger.w("NiriService", "Failed to parse outputs:", e)
                 }
             }
         }

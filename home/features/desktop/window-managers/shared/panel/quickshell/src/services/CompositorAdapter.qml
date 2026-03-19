@@ -400,7 +400,7 @@ QtObject {
     if (!supportsDispatcherActions) {
       // Allow Niri-specific actions through NiriService
       if (isNiri) {
-        console.warn("[CompositorAdapter] dispatchAction not supported on Niri. Use NiriService directly for:", action);
+        Logger.w("CompositorAdapter", "dispatchAction not supported on Niri. Use NiriService directly for:", action);
       } else {
         notifyUnsupported(unsupportedName || ("Dispatch " + String(action || "")));
       }

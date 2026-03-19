@@ -18,7 +18,7 @@ QtObject {
     printErrors: false
     onLoaded: root._loadManifest()
     onLoadFailed: (error) => {
-      console.warn("ThemeService: could not load themes.json (error " + error + ")");
+      Logger.w("ThemeService", "could not load themes.json (error " + error + ")");
     }
   }
 
@@ -43,7 +43,7 @@ QtObject {
         _applyById(Config.themeName);
       }
     } catch (e) {
-      console.error("ThemeService: failed to parse themes.json: " + e);
+      Logger.e("ThemeService", "failed to parse themes.json:", e);
     }
   }
 

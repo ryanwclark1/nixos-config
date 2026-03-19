@@ -82,7 +82,7 @@ QtObject {
     onExited: (code, status) => {
       if (root._shouldRun) {
         root._crashCount++;
-        console.warn("SpectrumService: cava exited (crash", root._crashCount, "of", root._maxCrashes + ")");
+        Logger.w("SpectrumService", "cava exited (crash", root._crashCount, "of", root._maxCrashes + ")");
         if (root._crashCount < root._maxCrashes) {
           root._restartTimer.restart();
         }

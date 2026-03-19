@@ -95,7 +95,7 @@ QtObject {
       details += " exitCode=" + exitCode;
     if (exitStatus !== undefined)
       details += " exitStatus=" + exitStatus;
-    console.warn("SystemStatus:", details);
+    Logger.w("SystemStatus", details);
   }
 
   function refreshHealth() {

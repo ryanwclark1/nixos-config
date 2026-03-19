@@ -37,7 +37,7 @@ QtObject {
                     }
                 `, root, "CaffeineInhibitorWindow");
             } catch (error) {
-                console.warn("CaffeineService: failed to create inhibitor window:", error);
+                Logger.w("CaffeineService", "failed to create inhibitor window:", error);
                 root._inhibitorWindow = null;
                 return;
             }
@@ -55,7 +55,7 @@ QtObject {
                     IdleInhibitor {}
                 `, root._inhibitorWindow, "CaffeineIdleInhibitor");
             } catch (error) {
-                console.warn("CaffeineService: failed to create IdleInhibitor:", error);
+                Logger.w("CaffeineService", "failed to create IdleInhibitor:", error);
                 root._idleInhibitor = null;
                 return;
             }

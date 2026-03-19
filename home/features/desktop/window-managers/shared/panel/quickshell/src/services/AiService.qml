@@ -234,9 +234,9 @@ QtObject {
                 root._saveData();
                 return;
             }
-            console.error("AiService: failed to load: " + error);
+            Logger.e("AiService", "failed to load:", error);
         }
-        onSaveFailed: error => console.error("AiService: failed to save: " + error)
+        onSaveFailed: error => Logger.e("AiService", "failed to save:", error)
     }
 
     property Timer _saveTimer: Timer {
@@ -342,7 +342,7 @@ QtObject {
                 activeConversationId = found ? data.activeConversationId : (conversations.length > 0 ? conversations[0].id : "");
             }
         } catch (e) {
-            console.error("AiService: failed to parse JSON: " + e);
+            Logger.e("AiService", "failed to parse JSON:", e);
         }
         _loading = false;
         if (conversations.length === 0) {
@@ -979,7 +979,7 @@ QtObject {
                     }
                     root.availableModels = names;
                 } catch (e) {
-                    console.error("AiService: failed to parse models: " + e);
+                    Logger.e("AiService", "failed to parse models:", e);
                 }
             }
         }
