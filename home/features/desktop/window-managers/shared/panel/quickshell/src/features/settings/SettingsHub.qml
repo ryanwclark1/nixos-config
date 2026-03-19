@@ -55,6 +55,7 @@ PanelWindow {
   property string pendingTabId: ""
   signal browseWallpaper(string monitorName)
   signal pickWallpaperFolder()
+  signal browseManifest()
 
   // Window-manager layout state (loaded from Hyprland options when supported).
   property real layoutGapsOut: 10
@@ -72,6 +73,19 @@ PanelWindow {
       _persist.currentTabId = SettingsRegistry.defaultTabId;
     isOpen = true;
     if (CompositorAdapter.supportsHyprctlSettings) refreshHyprlandSettings();
+  }
+
+  function clearSettingHighlight() {
+    highlightCardTitle = "";
+    highlightSettingLabel = "";
+  }
+
+  function openSetting(tabId, cardTitle, settingLabel) {
+    highlightCardTitle = String(cardTitle || "");
+    highlightSettingLabel = String(settingLabel || "");
+    pendingTabId = String(tabId || "");
+    setCaptureScrollY(0);
+    deferredOpenTimer.restart();
   }
 
   function clearInteractiveFocus() {
@@ -140,22 +154,35 @@ PanelWindow {
       Qt.callLater(() => { if (settingsRoot._destroyed) return; settingsRoot.toggle(); });
     }
     function open() {
-      Qt.callLater(() => { if (settingsRoot._destroyed) return; settingsRoot.open(); });
+      Qt.callLater(() => {
+        if (settingsRoot._destroyed) return;
+        settingsRoot.clearSettingHighlight();
+        settingsRoot.open();
+      });
     }
     function openTab(tabId: string) {
       Qt.callLater(() => {
         if (settingsRoot._destroyed) return;
+        settingsRoot.clearSettingHighlight();
         settingsRoot.pendingTabId = tabId;
         settingsRoot.setCaptureScrollY(0);
         deferredOpenTimer.restart();
       });
     }
     function openTabScrolled(tabId: string, scrollY: int) {
+      settingsRoot.clearSettingHighlight();
       settingsRoot.captureOpenTab(tabId, scrollY);
+    }
+    function openSetting(tabId: string, cardTitle: string, settingLabel: string) {
+      Qt.callLater(() => {
+        if (settingsRoot._destroyed) return;
+        settingsRoot.openSetting(tabId, cardTitle, settingLabel);
+      });
     }
     function openBarWidgetInstance(instanceId: string) {
       Qt.callLater(() => {
         if (settingsRoot._destroyed) return;
+        settingsRoot.clearSettingHighlight();
         var target = Config.findBarWidgetInstance(instanceId);
         settingsRoot.pendingBarWidgetTarget = target ? JSON.parse(JSON.stringify(target)) : null;
         settingsRoot.pendingTabId = "bar-widgets";

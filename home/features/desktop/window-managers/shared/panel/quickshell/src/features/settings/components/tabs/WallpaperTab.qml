@@ -651,6 +651,43 @@ Item {
                 unit: "ms"
                 onMoved: v => Config.wallpaperTransitionDuration = v
             }
+
+            SettingsToggleRow {
+                label: "Dynamic wallpaper"
+                icon: "󱎫"
+                configKey: "wallpaperDynamicEnabled"
+            }
+        }
+
+        // Dynamic wallpaper manifest
+        SettingsSectionLabel {
+            visible: Config.wallpaperDynamicEnabled
+            text: "DYNAMIC MANIFEST"
+        }
+
+        SettingsTextInputRow {
+            visible: Config.wallpaperDynamicEnabled
+            Layout.fillWidth: true
+            label: "Manifest path"
+            placeholderText: "/path/to/manifest.json"
+            leadingIcon: "󰈔"
+            text: Config.wallpaperDynamicManifest || ""
+            onTextEdited: value => Config.wallpaperDynamicManifest = value.trim()
+            onSubmitted: value => Config.wallpaperDynamicManifest = value.trim()
+
+            SettingsActionButton {
+                label: "Browse…"
+                compact: true
+                emphasized: true
+                onClicked: if (root.settingsRoot) root.settingsRoot.browseManifest()
+            }
+
+            SettingsActionButton {
+                label: "Clear"
+                compact: true
+                enabled: (Config.wallpaperDynamicManifest || "") !== ""
+                onClicked: Config.wallpaperDynamicManifest = ""
+            }
         }
 
         Flow {

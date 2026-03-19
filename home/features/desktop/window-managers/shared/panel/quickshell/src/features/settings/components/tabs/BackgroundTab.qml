@@ -44,6 +44,11 @@ Item {
                     icon: "󰘖"
                     configKey: "backgroundAutoHide"
                 }
+                SettingsToggleRow {
+                    label: "Weather overlay"
+                    icon: "󰖐"
+                    configKey: "weatherOverlayEnabled"
+                }
             }
 
             SettingsModeRow {
