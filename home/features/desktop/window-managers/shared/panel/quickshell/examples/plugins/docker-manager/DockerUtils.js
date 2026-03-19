@@ -149,6 +149,20 @@ function sortNetworks(a, b) {
     return String(a.name || "").localeCompare(String(b.name || ""));
 }
 
+function healthDot(status) {
+    var s = String(status || "");
+    if (s === "healthy" || s === "starting" || s === "unhealthy") return "\u25CF ";
+    return "";
+}
+
+function healthDotColor(status) {
+    var s = String(status || "");
+    if (s === "healthy") return "#5eead4";
+    if (s === "starting") return "#fcd34d";
+    if (s === "unhealthy") return "#f87171";
+    return "transparent";
+}
+
 function matchesFilter(item, query) {
     if (!item || typeof item !== "object")
         return false;
