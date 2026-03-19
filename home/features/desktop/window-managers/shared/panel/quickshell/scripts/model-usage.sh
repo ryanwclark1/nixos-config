@@ -200,59 +200,67 @@ elif [ "$provider" = "gemini" ]; then
   # Date threshold for 7-day window (ISO prefix comparison)
   seven_days_ago=$(date -d "$today -6 days" +%Y-%m-%d)
 
-  # Single jq -s pass: only extract fields we need (skip message content)
-  echo "$session_files" | xargs cat 2>/dev/null \
-    | jq -s --arg today "$today" --arg weekStart "$seven_days_ago" '
-      # Filter to sessions in last 7 days
-      [.[] | select(.startTime != null and (.startTime[:10] >= $weekStart))] as $recent |
+  # Extract lightweight metadata per file (skip content to avoid malformed Unicode)
+  # Each file → one JSON line with date, user count, gemini tokens, model
+  # Use xargs -P for parallel extraction across files
+  jq_filter='select(.startTime != null and (.startTime[:10] >= $ws)) |
+    {
+      date: .startTime[:10],
+      userCount: [.messages[]? | select(.type == "user")] | length,
+      geminiMsgs: [.messages[]? | select(.type == "gemini" and .tokens != null) |
+        { model: (.model // "unknown"), input: (.tokens.input // 0),
+          output: (.tokens.output // 0), cached: (.tokens.cached // 0),
+          thoughts: (.tokens.thoughts // 0), total: (.tokens.total // 0) }]
+    }'
+  extracted=$(echo "$session_files" | xargs -P4 -I{} jq -c --arg ws "$seven_days_ago" "$jq_filter" {} 2>/dev/null)
 
-      # Extract all gemini-type messages with tokens from recent sessions
-      [$recent[].messages[]? | select(.type == "gemini" and .tokens != null)] as $gmMsgs |
+  if [ -z "$extracted" ]; then
+    echo "$json_fallback"
+    exit 0
+  fi
 
-      # Today: count sessions and user messages
-      [$recent[] | select(.startTime[:10] == $today)] as $todaySessions |
-      [$todaySessions[].messages[]? | select(.type == "user")] as $todayUserMsgs |
-      [$todaySessions[].messages[]? | select(.type == "gemini" and .tokens != null)] as $todayGmMsgs |
+  echo "$extracted" | jq -s --arg today "$today" '
+    # Today sessions
+    [.[] | select(.date == $today)] as $todaySessions |
+    ([$todaySessions[].userCount] | add // 0) as $todayPrompts |
+    [$todaySessions[].geminiMsgs[]?] as $todayGmMsgs |
+    {
+      input: ([$todayGmMsgs[].input] | add // 0),
+      output: ([$todayGmMsgs[].output] | add // 0),
+      cached: ([$todayGmMsgs[].cached] | add // 0),
+      thoughts: ([$todayGmMsgs[].thoughts] | add // 0)
+    } as $todayTokens |
 
-      # Today token aggregation
-      {
-        input: ([$todayGmMsgs[].tokens.input // 0] | add // 0),
-        output: ([$todayGmMsgs[].tokens.output // 0] | add // 0),
-        cached: ([$todayGmMsgs[].tokens.cached // 0] | add // 0),
-        thoughts: ([$todayGmMsgs[].tokens.thoughts // 0] | add // 0)
-      } as $todayTokens |
+    # Recent days
+    (group_by(.date) | map({
+      date: .[0].date,
+      messageCount: ([.[].userCount] | add // 0)
+    }) | sort_by(.date) | .[-7:]) as $recentDays |
 
-      # Recent days: group user messages by date
-      [$recent[].messages[]? | select(.type == "user") |
-        { date: (.timestamp[:10] // "") }
-      ] | group_by(.date) | map(select(.[0].date != "") |
-        { date: .[0].date, messageCount: length }
-      ) | sort_by(.date) | .[-7:] as $recentDays |
+    # All gemini messages
+    [.[].geminiMsgs[]?] as $allGm |
+    ([$allGm[].total] | add // 0) as $totalTokens |
 
-      # All-time token aggregation
-      ([$gmMsgs[].tokens.total // 0] | add // 0) as $totalTokens |
+    # Per-model breakdown
+    ($allGm | group_by(.model) | map({
+      key: .[0].model,
+      value: { input: ([.[].input] | add), output: ([.[].output] | add) }
+    }) | from_entries) as $tokensByModel |
 
-      # Model names + per-model tokens
-      ([$gmMsgs[] | { model: (.model // "unknown"), input: (.tokens.input // 0), output: (.tokens.output // 0) }]
-        | group_by(.model)
-        | map({ key: .[0].model, value: { input: ([.[].input] | add), output: ([.[].output] | add) } })
-        | from_entries
-      ) as $tokensByModel |
+    ($tokensByModel | to_entries | sort_by(.value.input + .value.output) | reverse |
+      .[0].key // "unknown") as $model |
 
-      # Primary model (most used)
-      ($tokensByModel | to_entries | sort_by(.value.input + .value.output) | reverse | .[0].key // "unknown") as $model |
-
-      {
-        todayPrompts: ($todayUserMsgs | length),
-        todaySessions: ($todaySessions | length),
-        todayTokens: $todayTokens,
-        totalSessions: ($recent | length),
-        totalTokens: $totalTokens,
-        model: $model,
-        recentDays: $recentDays,
-        tokensByModel: $tokensByModel
-      }
-    ' 2>/dev/null || echo "$json_fallback"
+    {
+      todayPrompts: $todayPrompts,
+      todaySessions: ($todaySessions | length),
+      todayTokens: $todayTokens,
+      totalSessions: length,
+      totalTokens: $totalTokens,
+      model: $model,
+      recentDays: $recentDays,
+      tokensByModel: $tokensByModel
+    }
+  ' 2>/dev/null || echo "$json_fallback"
 
 else
   echo '{"error":"unknown provider: '"$provider"'"}'

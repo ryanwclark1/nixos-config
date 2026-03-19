@@ -10,24 +10,33 @@ BasePopupMenu {
   popupMinWidth: 340; popupMaxWidth: 420; compactThreshold: 380
   implicitHeight: Math.min(620, contentCol.implicitHeight + 100)
   title: "Model Usage"
-  subtitle: ModelUsageService.activeProvider === "claude" ? "Claude Code" : "Codex CLI"
+  subtitle: ModelUsageService.activeProvider === "claude" ? "Claude Code"
+         : ModelUsageService.activeProvider === "gemini" ? "Gemini CLI" : "Codex CLI"
 
   SharedWidgets.Ref { service: ModelUsageService }
 
   readonly property bool showClaude: ModelUsageService.activeProvider === "claude"
-  readonly property bool showBothTabs: ModelUsageService.claudeEnabled && ModelUsageService.codexEnabled
+  readonly property bool showCodex: ModelUsageService.activeProvider === "codex"
+  readonly property bool showGemini: ModelUsageService.activeProvider === "gemini"
+  readonly property int enabledCount: (ModelUsageService.claudeEnabled ? 1 : 0)
+    + (ModelUsageService.codexEnabled ? 1 : 0)
+    + (ModelUsageService.geminiEnabled ? 1 : 0)
+  readonly property bool showProviderTabs: enabledCount > 1
 
   // ── Provider tabs ──────────────────────────────────
   headerExtras: [
     Row {
-      visible: root.showBothTabs
+      visible: root.showProviderTabs
       spacing: Colors.spacingS
 
       Repeater {
-        model: [
-          { key: "claude", label: "Claude" },
-          { key: "codex", label: "Codex" }
-        ]
+        model: {
+          var tabs = [];
+          if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude" });
+          if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex" });
+          if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini" });
+          return tabs;
+        }
         delegate: SharedWidgets.FilterChip {
           required property var modelData
           label: modelData.label
@@ -153,13 +162,15 @@ BasePopupMenu {
         SharedWidgets.InfoRow {
           label: "Prompts"
           value: root.showClaude ? String(ModelUsageService.claudeTodayPrompts)
-                                 : String(ModelUsageService.codexTodayPrompts)
+               : root.showGemini ? String(ModelUsageService.geminiTodayPrompts)
+               : String(ModelUsageService.codexTodayPrompts)
         }
 
         SharedWidgets.InfoRow {
-          visible: root.showClaude
+          visible: root.showClaude || root.showGemini
           label: "Sessions"
-          value: String(ModelUsageService.claudeTodaySessions)
+          value: root.showClaude ? String(ModelUsageService.claudeTodaySessions)
+                                 : String(ModelUsageService.geminiTodaySessions)
         }
 
         SharedWidgets.InfoRow {
@@ -168,7 +179,7 @@ BasePopupMenu {
           value: String(ModelUsageService.claudeTodayToolCalls)
         }
 
-        // Today tokens by model
+        // Today tokens by model (Claude)
         Repeater {
           model: {
             if (!root.showClaude) return [];
@@ -188,13 +199,38 @@ BasePopupMenu {
             valueColor: Colors.accent
           }
         }
+
+        // Today token breakdown (Gemini)
+        SharedWidgets.InfoRow {
+          visible: root.showGemini && (ModelUsageService.geminiTodayTokens.input || 0) > 0
+          label: "Input Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.input || 0)
+          valueColor: Colors.accent
+        }
+        SharedWidgets.InfoRow {
+          visible: root.showGemini && (ModelUsageService.geminiTodayTokens.output || 0) > 0
+          label: "Output Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.output || 0)
+          valueColor: Colors.accent
+        }
+        SharedWidgets.InfoRow {
+          visible: root.showGemini && (ModelUsageService.geminiTodayTokens.cached || 0) > 0
+          label: "Cached Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.cached || 0)
+        }
+        SharedWidgets.InfoRow {
+          visible: root.showGemini && (ModelUsageService.geminiTodayTokens.thoughts || 0) > 0
+          label: "Thinking Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.thoughts || 0)
+        }
       }
     }
 
     // ── Last 7 Days Chart ────────────────────────────
     Rectangle {
       Layout.fillWidth: true
-      visible: root.showClaude && ModelUsageService.claudeRecentDays.length > 0
+      visible: (root.showClaude && ModelUsageService.claudeRecentDays.length > 0)
+              || (root.showGemini && ModelUsageService.geminiRecentDays.length > 0)
       implicitHeight: chartCol.implicitHeight + Colors.spacingL * 2
       radius: Colors.radiusCard
       color: Colors.cardSurface
@@ -218,7 +254,8 @@ BasePopupMenu {
 
         // Simple horizontal bar chart
         Repeater {
-          model: ModelUsageService.claudeRecentDays
+          model: root.showGemini ? ModelUsageService.geminiRecentDays
+                                 : ModelUsageService.claudeRecentDays
 
           RowLayout {
             Layout.fillWidth: true
@@ -227,7 +264,8 @@ BasePopupMenu {
             required property int index
 
             readonly property int maxCount: {
-              var days = ModelUsageService.claudeRecentDays;
+              var days = root.showGemini ? ModelUsageService.geminiRecentDays
+                                         : ModelUsageService.claudeRecentDays;
               var m = 1;
               for (var i = 0; i < days.length; i++)
                 if (days[i].messageCount > m) m = days[i].messageCount;
@@ -391,10 +429,105 @@ BasePopupMenu {
       }
     }
 
+    // ── Gemini All-Time Stats ─────────────────────
+    Rectangle {
+      Layout.fillWidth: true
+      visible: root.showGemini && ModelUsageService.geminiReady
+      implicitHeight: geminiAllTimeCol.implicitHeight + Colors.spacingL * 2
+      radius: Colors.radiusCard
+      color: Colors.cardSurface
+      border.color: Colors.border
+      border.width: 1
+
+      SharedWidgets.InnerHighlight { }
+
+      ColumnLayout {
+        id: geminiAllTimeCol
+        anchors.fill: parent
+        anchors.margins: Colors.spacingL
+        spacing: Colors.spacingS
+
+        Text {
+          text: "All-Time Stats"
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
+          font.weight: Font.Bold
+        }
+
+        SharedWidgets.InfoRow {
+          label: "Total Sessions"
+          value: String(ModelUsageService.geminiTotalSessions)
+        }
+
+        SharedWidgets.InfoRow {
+          label: "Total Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTotalTokens)
+          valueColor: Colors.accent
+        }
+
+        SharedWidgets.InfoRow {
+          label: "Primary Model"
+          value: ModelUsageService.geminiModel
+        }
+
+        // Per-model breakdown
+        Item { implicitHeight: Colors.spacingXS; Layout.fillWidth: true }
+
+        Text {
+          visible: Object.keys(ModelUsageService.geminiTokensByModel).length > 1
+          text: "Per-Model Breakdown"
+          color: Colors.textSecondary
+          font.pixelSize: Colors.fontSizeSmall
+          font.weight: Font.DemiBold
+        }
+
+        Repeater {
+          model: {
+            var usage = ModelUsageService.geminiTokensByModel;
+            var items = [];
+            for (var k in usage) {
+              if (usage.hasOwnProperty(k))
+                items.push({ model: k, input: usage[k].input || 0, output: usage[k].output || 0 });
+            }
+            items.sort(function(a, b) { return (b.input + b.output) - (a.input + a.output); });
+            return items;
+          }
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 2
+            required property var modelData
+
+            Text {
+              text: modelData.model
+              color: Colors.text
+              font.pixelSize: Colors.fontSizeSmall
+              font.weight: Font.DemiBold
+            }
+
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: Colors.spacingM
+              Text {
+                text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+              }
+              Text {
+                text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+              }
+            }
+          }
+        }
+      }
+    }
+
     // ── Codex Info Section ────────────────────────────
     Rectangle {
       Layout.fillWidth: true
-      visible: !root.showClaude && ModelUsageService.codexReady
+      visible: root.showCodex && ModelUsageService.codexReady
       implicitHeight: codexCol.implicitHeight + Colors.spacingL * 2
       radius: Colors.radiusCard
       color: Colors.cardSurface
@@ -439,9 +572,12 @@ BasePopupMenu {
     SharedWidgets.EmptyState {
       Layout.fillWidth: true
       visible: (root.showClaude && !ModelUsageService.claudeReady)
-              || (!root.showClaude && !ModelUsageService.codexReady)
+              || (root.showCodex && !ModelUsageService.codexReady)
+              || (root.showGemini && !ModelUsageService.geminiReady)
       icon: "󰊤"
-      message: root.showClaude ? "No Claude Code data found" : "No Codex CLI data found"
+      message: root.showClaude ? "No Claude Code data found"
+             : root.showGemini ? "No Gemini CLI data found"
+             : "No Codex CLI data found"
     }
   }
 }
