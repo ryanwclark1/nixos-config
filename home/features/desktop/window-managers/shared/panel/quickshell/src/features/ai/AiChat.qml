@@ -340,10 +340,9 @@ PanelWindow {
                         onClicked: providerDropdown.visible = !providerDropdown.visible
                     }
 
-                    SharedWidgets.BarTooltip {
+                    Tooltip {
                         text: "Change AI provider and model"
-                        hovered: providerPickerMouse.containsMouse
-                        anchorItem: providerPickerBtn
+                        shown: providerPickerMouse.containsMouse
                     }
                 }
 
@@ -383,10 +382,9 @@ PanelWindow {
                             ToastService.showNotice("Copied", "Full conversation copied to clipboard");
                         }
                     }
-                    SharedWidgets.BarTooltip {
+                    Tooltip {
                         text: "Copy full conversation"
-                        hovered: copyAllHover.containsMouse
-                        anchorItem: copyAllButton
+                        shown: copyAllHover.containsMouse
                     }
                 }
 
@@ -420,10 +418,9 @@ PanelWindow {
                             root._clearConversationWithNotice(AiService.activeConversationId);
                         }
                     }
-                    SharedWidgets.BarTooltip {
+                    Tooltip {
                         text: "Clear current chat messages"
-                        hovered: clearChatHover.containsMouse
-                        anchorItem: clearChatButton
+                        shown: clearChatHover.containsMouse
                     }
                 }
 
@@ -459,10 +456,9 @@ PanelWindow {
                             AiService.newConversation();
                         }
                     }
-                    SharedWidgets.BarTooltip {
+                    Tooltip {
                         text: "New Conversation (Ctrl+N)"
-                        hovered: newChatHover.containsMouse
-                        anchorItem: newChatButton
+                        shown: newChatHover.containsMouse
                     }
                 }
 
@@ -495,10 +491,9 @@ PanelWindow {
                             root.closeRequested();
                         }
                     }
-                    SharedWidgets.BarTooltip {
+                    Tooltip {
                         text: "Close AI Chat"
-                        hovered: closeHover.containsMouse
-                        anchorItem: closeBtn
+                        shown: closeHover.containsMouse
                     }
                 }
             }
@@ -917,10 +912,10 @@ PanelWindow {
                                 onClicked: root.includeWindowContext = !root.includeWindowContext
                             }
 
-                            SharedWidgets.BarTooltip {
+                            Tooltip {
                                 text: "Attach Active Window Title"
-                                hovered: winCtxHover.containsMouse
-                                anchorItem: windowContextToggle
+                                shown: winCtxHover.containsMouse
+                                preferredSide: Qt.TopEdge
                             }
                         }
 
@@ -956,10 +951,10 @@ PanelWindow {
                                 onDoubleClicked: ScreenshotService.captureRegion()
                             }
 
-                            SharedWidgets.BarTooltip {
+                            Tooltip {
                                 text: "Attach Latest Screen Crop (Double-click to capture new)"
-                                hovered: visualCtxHover.containsMouse
-                                anchorItem: visualContextToggle
+                                shown: visualCtxHover.containsMouse
+                                preferredSide: Qt.TopEdge
                             }
 
                             Connections {
@@ -999,10 +994,10 @@ PanelWindow {
                                 onClicked: root.includeSelectionContext = !root.includeSelectionContext
                             }
 
-                            SharedWidgets.BarTooltip {
+                            Tooltip {
                                 text: "Attach Current Selection (Middle-click/Primary)"
-                                hovered: selCtxHover.containsMouse
-                                anchorItem: selectionContextToggle
+                                shown: selCtxHover.containsMouse
+                                preferredSide: Qt.TopEdge
                             }
                         }
 
@@ -1031,10 +1026,10 @@ PanelWindow {
                                 onClicked: ScreenshotService.captureRegion()
                             }
 
-                            SharedWidgets.BarTooltip {
+                            Tooltip {
                                 text: "Extract Text from Screen (OCR)"
-                                hovered: ocrHover.containsMouse
-                                anchorItem: ocrToggle
+                                shown: ocrHover.containsMouse
+                                preferredSide: Qt.TopEdge
                             }
 
                             Connections {
@@ -1074,10 +1069,10 @@ PanelWindow {
                                 onClicked: Config.aiSystemContext = !Config.aiSystemContext
                             }
 
-                            SharedWidgets.BarTooltip {
+                            Tooltip {
                                 text: "Attach System Stats (CPU/RAM)"
-                                hovered: sysCtxHover.containsMouse
-                                anchorItem: systemContextToggle
+                                shown: sysCtxHover.containsMouse
+                                preferredSide: Qt.TopEdge
                             }
                         }
 

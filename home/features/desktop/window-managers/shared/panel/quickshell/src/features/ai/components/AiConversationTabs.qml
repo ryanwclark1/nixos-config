@@ -294,10 +294,9 @@ RowLayout {
                             }
                         }
 
-                        SharedWidgets.BarTooltip {
+                        Tooltip {
                             text: "Close conversation"
-                            hovered: closeTabMouse.containsMouse
-                            anchorItem: closeTabBtn
+                            shown: closeTabMouse.containsMouse
                         }
                     }
 
@@ -324,10 +323,9 @@ RowLayout {
                         }
                     }
 
-                    SharedWidgets.BarTooltip {
+                    Tooltip {
                         text: root._tabTooltip(modelData)
-                        hovered: tabMouse.containsMouse
-                        anchorItem: tabDelegate
+                        shown: tabMouse.containsMouse
                     }
                 }
             }
@@ -378,10 +376,9 @@ RowLayout {
             }
         }
 
-        SharedWidgets.BarTooltip {
+        Tooltip {
             text: "More chats"
-            hovered: overflowMouse.containsMouse
-            anchorItem: overflowButton
+            shown: overflowMouse.containsMouse
         }
     }
 
@@ -421,10 +418,9 @@ RowLayout {
             }
         }
 
-        SharedWidgets.BarTooltip {
+        Tooltip {
             text: "New conversation"
-            hovered: addConvMouse.containsMouse
-            anchorItem: addConvBtn
+            shown: addConvMouse.containsMouse
         }
     }
 
