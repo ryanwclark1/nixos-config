@@ -241,8 +241,6 @@ PanelWindow {
                                 QuickToggleGrid {
                                     manager: root.manager
                                     showContent: root.showContent
-                                    baseIndex: 2
-                                    staggerDelay: root.staggerDelay
                                 }
                             }
 
@@ -632,6 +630,7 @@ PanelWindow {
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutBack } } }
                         }
                     }
+                }
                 }
 
                 SharedWidgets.Scrollbar {
