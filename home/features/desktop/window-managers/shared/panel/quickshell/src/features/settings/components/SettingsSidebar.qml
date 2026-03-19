@@ -326,6 +326,79 @@ Rectangle {
             }
           }
 
+          // ── Per-setting search results ──────────────
+          Text {
+            visible: root.isSearching && root.settingResults.length > 0
+            text: "SETTINGS"
+            color: Colors.textDisabled
+            font.pixelSize: Colors.fontSizeXXS
+            font.weight: Font.Black
+            font.letterSpacing: Colors.letterSpacingExtraWide
+            Layout.topMargin: Colors.spacingM
+            Layout.bottomMargin: Colors.spacingXS
+            Layout.leftMargin: Colors.spacingM
+          }
+
+          Repeater {
+            model: root.isSearching ? root.settingResults : []
+
+            delegate: Rectangle {
+              required property var modelData
+              Layout.fillWidth: true
+              implicitHeight: settingResultCol.implicitHeight + Colors.spacingS * 2
+              radius: Colors.radiusSmall
+              color: "transparent"
+
+              SharedWidgets.StateLayer {
+                id: settingResultState
+                hovered: settingResultMouse.containsMouse
+                pressed: settingResultMouse.pressed
+              }
+
+              ColumnLayout {
+                id: settingResultCol
+                anchors.fill: parent
+                anchors.leftMargin: Colors.spacingL
+                anchors.rightMargin: Colors.spacingM
+                anchors.topMargin: Colors.spacingS
+                anchors.bottomMargin: Colors.spacingS
+                spacing: Colors.spacingXXS
+
+                Text {
+                  text: modelData.label
+                  color: Colors.text
+                  font.pixelSize: Colors.fontSizeSmall
+                  font.weight: Font.DemiBold
+                  Layout.fillWidth: true
+                  wrapMode: Text.WordWrap
+                }
+
+                Text {
+                  text: {
+                    var tab = SettingsRegistry.findTab(modelData.tabId);
+                    var tabLabel = tab ? tab.label : modelData.tabId;
+                    return tabLabel + " > " + modelData.cardTitle;
+                  }
+                  color: Colors.textDisabled
+                  font.pixelSize: Colors.fontSizeXS
+                  Layout.fillWidth: true
+                  wrapMode: Text.WordWrap
+                }
+              }
+
+              MouseArea {
+                id: settingResultMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                  settingResultState.burst(mouse.x, mouse.y);
+                  root.settingHighlightRequested(modelData.tabId, modelData.cardTitle, modelData.label);
+                }
+              }
+            }
+          }
+
           Repeater {
             model: root.isSearching ? [] : root.orderedCategories
 

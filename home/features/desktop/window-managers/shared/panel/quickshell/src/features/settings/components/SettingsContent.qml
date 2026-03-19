@@ -16,8 +16,11 @@ Item {
   property bool compactMode: false
   property bool tightSpacing: false
   property int requestedScrollY: 0
+  property string highlightCardTitle: ""
+  property string highlightSettingLabel: ""
   signal tabSelected(string tabId)
   signal searchQueryEdited(string query)
+  signal highlightConsumed()
 
   readonly property var currentTab: SettingsRegistry.findTab(currentTabId)
   readonly property var searchResults: SettingsRegistry.searchTabs(searchQuery)
@@ -60,6 +63,103 @@ Item {
     if (item.tightSpacing !== undefined)
       item.tightSpacing = root.tightSpacing;
     Qt.callLater(function() { if (_destroyed) return; root.applyRequestedScroll(); });
+  }
+
+  // ── Scroll-to-highlight logic ────────────────────
+  function scrollToHighlightedSetting() {
+    if (!highlightCardTitle || !highlightSettingLabel) return;
+    if (!tabLoader.item) return;
+
+    // Wait for the tab to finish layout, then walk the tree
+    Qt.callLater(function() {
+      if (_destroyed) return;
+      _doScrollToHighlight();
+    });
+  }
+
+  function _findChildByTitle(parent, title) {
+    if (!parent || !parent.children) return null;
+    for (var i = 0; i < parent.children.length; ++i) {
+      var child = parent.children[i];
+      if (child.title !== undefined && String(child.title) === title)
+        return child;
+      var deep = _findChildByTitle(child, title);
+      if (deep) return deep;
+    }
+    return null;
+  }
+
+  function _findSettingByLabel(parent, label) {
+    if (!parent || !parent.children) return null;
+    for (var i = 0; i < parent.children.length; ++i) {
+      var child = parent.children[i];
+      if (child.label !== undefined && String(child.label) === label) {
+        // Set highlighted if supported
+        if (child.highlighted !== undefined)
+          child.highlighted = true;
+        return child;
+      }
+      var deep = _findSettingByLabel(child, label);
+      if (deep) return deep;
+    }
+    return null;
+  }
+
+  function _doScrollToHighlight() {
+    var item = tabLoader.item;
+    if (!item) return;
+
+    var scrollable = findScrollable(item);
+    if (!scrollable || !scrollable.flickable) return;
+    var flick = scrollable.flickable;
+
+    // Find the card with matching title
+    var card = _findChildByTitle(item, highlightCardTitle);
+    if (!card) {
+      highlightConsumed();
+      return;
+    }
+
+    // Find the setting within the card
+    var setting = _findSettingByLabel(card, highlightSettingLabel);
+    var target = setting || card;
+
+    // Map target position to flickable coordinates
+    var mapped = target.mapToItem(flick.contentItem, 0, 0);
+    var targetY = mapped.y - flick.height / 4; // Center-ish in viewport
+    var maxY = Math.max(0, flick.contentHeight - flick.height);
+    flick.contentY = Math.max(0, Math.min(targetY, maxY));
+
+    // Clear highlight after animation
+    _highlightClearTimer.restart();
+    highlightConsumed();
+  }
+
+  Timer {
+    id: _highlightClearTimer
+    interval: 2400
+    repeat: false
+    onTriggered: {
+      // Walk tree to clear any highlighted properties
+      root._clearHighlights(tabLoader.item);
+    }
+  }
+
+  function _clearHighlights(node) {
+    if (!node) return;
+    if (node.highlighted !== undefined)
+      node.highlighted = false;
+    if (node.children) {
+      for (var i = 0; i < node.children.length; ++i)
+        _clearHighlights(node.children[i]);
+    }
+  }
+
+  onHighlightCardTitleChanged: {
+    if (highlightCardTitle && highlightSettingLabel && tabLoader.item) {
+      // Tab already loaded — scroll immediately
+      Qt.callLater(function() { if (!_destroyed) scrollToHighlightedSetting(); });
+    }
   }
 
   ColumnLayout {
@@ -138,7 +238,11 @@ Item {
       active: !!root.currentTab && !root.showCompactResults
       source: root.currentTab ? ("tabs/" + root.currentTab.component) : ""
 
-      onLoaded: root.applyLayoutProps(item)
+      onLoaded: {
+        root.applyLayoutProps(item);
+        if (root.highlightCardTitle && root.highlightSettingLabel)
+          root.scrollToHighlightedSetting();
+      }
     }
 
     Item {

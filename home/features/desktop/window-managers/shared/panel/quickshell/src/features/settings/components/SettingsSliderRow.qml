@@ -12,6 +12,7 @@ Rectangle {
     property real value
     property real step: 1
     property string unit: ""
+    property bool highlighted: false
     signal moved(real v)
 
     readonly property real _range: max - min
@@ -181,6 +182,23 @@ Rectangle {
                 font.pixelSize: Colors.fontSizeXS
                 font.family: Colors.fontMono
             }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: Colors.primary
+        opacity: sliderHighlightPulse.running ? sliderHighlightPulse._opacity : 0
+        visible: root.highlighted
+
+        SequentialAnimation {
+            id: sliderHighlightPulse
+            property real _opacity: 0
+            running: root.highlighted
+            loops: 2
+            NumberAnimation { target: sliderHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: 300; easing.type: Easing.OutCubic }
+            NumberAnimation { target: sliderHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: 300; easing.type: Easing.InCubic }
         }
     }
 }

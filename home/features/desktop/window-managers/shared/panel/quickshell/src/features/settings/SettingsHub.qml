@@ -43,6 +43,10 @@ PanelWindow {
   property string currentTabId: _persist.currentTabId
   property var pendingBarWidgetTarget: null
 
+  // Per-setting highlight (set by sidebar search, consumed by SettingsContent)
+  property string highlightCardTitle: ""
+  property string highlightSettingLabel: ""
+
   PersistentProperties {
     id: _persist
     reloadableId: "settingsHubState"
@@ -259,6 +263,12 @@ PanelWindow {
         compactMode: settingsRoot.compactMode
         onTabSelected: (tabId) => settingsRoot.setCurrentTab(tabId)
         onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
+        onSettingHighlightRequested: (tabId, cardTitle, settingLabel) => {
+          settingsRoot.highlightCardTitle = cardTitle;
+          settingsRoot.highlightSettingLabel = settingLabel;
+          settingsRoot.setCurrentTab(tabId);
+          settingsRoot.searchQuery = "";
+        }
         onSaveAndClose: {
           Config.save();
           settingsRoot.close();
@@ -274,8 +284,14 @@ PanelWindow {
         searchQuery: settingsRoot.searchQuery
         compactMode: settingsRoot.compactMode
         tightSpacing: settingsRoot.tightSpacing
+        highlightCardTitle: settingsRoot.highlightCardTitle
+        highlightSettingLabel: settingsRoot.highlightSettingLabel
         onTabSelected: (tabId) => settingsRoot.setCurrentTab(tabId)
         onSearchQueryEdited: (query) => settingsRoot.searchQuery = query
+        onHighlightConsumed: {
+          settingsRoot.highlightCardTitle = "";
+          settingsRoot.highlightSettingLabel = "";
+        }
       }
     }
   }

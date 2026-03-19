@@ -13,6 +13,7 @@ Rectangle {
     property bool checked: configKey ? Config[configKey] : false
     property string enabledText: "Enabled"
     property string disabledText: "Disabled"
+    property bool highlighted: false
     signal toggled
 
     readonly property bool _active: configKey ? Config[configKey] : root.checked
@@ -94,6 +95,23 @@ Rectangle {
         onClicked: mouse => {
             toggleStateLayer.burst(mouse.x, mouse.y);
             root.triggerToggle();
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: Colors.primary
+        opacity: highlightPulse.running ? highlightPulse._opacity : 0
+        visible: root.highlighted
+
+        SequentialAnimation {
+            id: highlightPulse
+            property real _opacity: 0
+            running: root.highlighted
+            loops: 2
+            NumberAnimation { target: highlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: 300; easing.type: Easing.OutCubic }
+            NumberAnimation { target: highlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: 300; easing.type: Easing.InCubic }
         }
     }
 }
