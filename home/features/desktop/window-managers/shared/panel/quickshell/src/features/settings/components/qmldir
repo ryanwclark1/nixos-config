@@ -13,6 +13,7 @@ singleton SettingsRegistry 1.0 SettingsRegistry.qml
 SettingsRemovableChip 1.0 SettingsRemovableChip.qml
 SettingsSectionLabel 1.0 SettingsSectionLabel.qml
 SettingsSelectRow 1.0 SettingsSelectRow.qml
+SettingsSecretInputRow 1.0 SettingsSecretInputRow.qml
 SettingsSidebar 1.0 SettingsSidebar.qml
 SettingsSliderRow 1.0 SettingsSliderRow.qml
 SettingsTabPage 1.0 SettingsTabPage.qml
