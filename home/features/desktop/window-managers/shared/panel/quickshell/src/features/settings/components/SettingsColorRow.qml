@@ -12,6 +12,7 @@ Rectangle {
     property string description: ""
     property string currentValue: ""
     property string placeholderText: "Theme default"
+    property bool highlighted: false
 
     // These presets will store HEX values so they are compatible with QML's color property
     property var presets: [
@@ -186,6 +187,23 @@ Rectangle {
                     }
                 }
             }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: Colors.primary
+        opacity: colorHighlightPulse.running ? colorHighlightPulse._opacity : 0
+        visible: root.highlighted
+
+        SequentialAnimation {
+            id: colorHighlightPulse
+            property real _opacity: 0
+            running: root.highlighted
+            loops: 2
+            NumberAnimation { target: colorHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: 300; easing.type: Easing.OutCubic }
+            NumberAnimation { target: colorHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: 300; easing.type: Easing.InCubic }
         }
     }
 }

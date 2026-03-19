@@ -12,6 +12,7 @@ Rectangle {
     property int contentInset: Colors.spacingM
     property int rowSpacing: Colors.spacingM
     property int minimumHeight: 0
+    property bool highlighted: false
     default property alias rowContent: contentRow.data
 
     Layout.fillWidth: true
@@ -39,5 +40,22 @@ Rectangle {
         anchors.topMargin: root.contentInset
         anchors.bottomMargin: root.contentInset
         spacing: root.rowSpacing
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: Colors.primary
+        opacity: listHighlightPulse.running ? listHighlightPulse._opacity : 0
+        visible: root.highlighted
+
+        SequentialAnimation {
+            id: listHighlightPulse
+            property real _opacity: 0
+            running: root.highlighted
+            loops: 2
+            NumberAnimation { target: listHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: 300; easing.type: Easing.OutCubic }
+            NumberAnimation { target: listHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: 300; easing.type: Easing.InCubic }
+        }
     }
 }

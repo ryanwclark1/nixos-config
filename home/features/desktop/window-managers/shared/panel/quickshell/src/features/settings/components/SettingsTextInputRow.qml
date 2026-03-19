@@ -37,15 +37,33 @@ ColumnLayout {
         spacing: Colors.spacingS
 
         Rectangle {
+            id: inputContainer
             Layout.fillWidth: true
             height: 38
             radius: Colors.radiusSmall
             color: Colors.modalFieldSurface
-            border.color: input.activeFocus ? Colors.primary : Colors.border
+            border.color: root.highlighted ? Colors.primary : input.activeFocus ? Colors.primary : Colors.border
             border.width: 1
 
             Behavior on border.color {
                 CAnim {}
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: parent.radius
+                color: Colors.primary
+                opacity: textHighlightPulse.running ? textHighlightPulse._opacity : 0
+                visible: root.highlighted
+
+                SequentialAnimation {
+                    id: textHighlightPulse
+                    property real _opacity: 0
+                    running: root.highlighted
+                    loops: 2
+                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: 300; easing.type: Easing.OutCubic }
+                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: 300; easing.type: Easing.InCubic }
+                }
             }
 
             RowLayout {
