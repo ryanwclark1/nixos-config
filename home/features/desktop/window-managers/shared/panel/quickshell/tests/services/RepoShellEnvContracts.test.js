@@ -15,10 +15,11 @@ describe("repo-shell environment contracts", () => {
     for (const scriptPath of [settingsResponsivePath, barWidgetsQaPath, runtimeWarningsPath]) {
       const source = readFileSync(scriptPath, "utf8");
 
-      expect(source).toContain("local found_session_env=0");
-      expect(source).toContain("found_session_env=1");
-      expect(source).toContain("if (( found_session_env == 1 )); then");
+      expect(source).toContain("local found_graphics_env=0");
+      expect(source).toContain("found_graphics_env=1");
+      expect(source).toContain("if (( found_graphics_env == 1 )); then");
       expect(source).toContain('repo_shell_env+=("QT_QPA_PLATFORM=wayland")');
+      expect(source).toContain("HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY");
     }
   });
 });

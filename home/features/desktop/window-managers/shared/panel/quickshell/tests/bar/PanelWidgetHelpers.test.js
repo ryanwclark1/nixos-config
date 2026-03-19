@@ -6,8 +6,13 @@ import {
   widgetValueStyle,
   statDisplayText,
   widgetDisplayMode,
+  verticalWidgetBehavior,
+  isWidgetHiddenInVertical,
+  shouldCollapseVerticalOverflow,
   isCompactStatWidget,
   isIconOnlyStatWidget,
+  isSummaryWidgetIconOnly,
+  effectiveKeyboardLabelMode,
   widgetIntegerSetting,
   widgetBooleanSetting,
   widgetStringSetting,
@@ -136,8 +141,70 @@ describe("isCompactStatWidget / isIconOnlyStatWidget", () => {
   });
 
   it("icon-only detection", () => {
-    expect(isIconOnlyStatWidget({ settings: { displayMode: "icon" } })).toBe(true);
-    expect(isIconOnlyStatWidget({})).toBe(false);
+    expect(isIconOnlyStatWidget({ settings: { displayMode: "icon" } }, false)).toBe(true);
+    expect(isIconOnlyStatWidget({}, false)).toBe(false);
+  });
+
+  it("forces vertical stats to compact unless explicitly icon-only", () => {
+    const fullCpu = { widgetType: "cpuStatus", settings: { displayMode: "full" } };
+    expect(isCompactStatWidget(fullCpu, true)).toBe(true);
+    expect(isIconOnlyStatWidget(fullCpu, true)).toBe(false);
+
+    const iconCpu = { widgetType: "cpuStatus", settings: { displayMode: "icon" } };
+    expect(isCompactStatWidget(iconCpu, true)).toBe(false);
+    expect(isIconOnlyStatWidget(iconCpu, true)).toBe(true);
+  });
+});
+
+describe("vertical widget policy", () => {
+  it("classifies built-in vertical behaviors", () => {
+    expect(verticalWidgetBehavior({ widgetType: "windowTitle" })).toBe("hidden");
+    expect(verticalWidgetBehavior({ widgetType: "keyboardLayout" })).toBe("short-label");
+    expect(verticalWidgetBehavior({ widgetType: "cpuStatus" })).toBe("compact");
+    expect(verticalWidgetBehavior({ widgetType: "weather" })).toBe("icon");
+    expect(verticalWidgetBehavior({ widgetType: "workspaces" })).toBe("native");
+  });
+
+  it("treats unrecognized widgets as unverified and collapsible when too wide", () => {
+    expect(verticalWidgetBehavior({ widgetType: "plugin:test.widget" })).toBe("unverified");
+    expect(shouldCollapseVerticalOverflow({ widgetType: "plugin:test.widget" })).toBe(true);
+    expect(shouldCollapseVerticalOverflow({ widgetType: "workspaces" })).toBe(false);
+  });
+
+  it("marks hidden widgets for vertical bars", () => {
+    expect(isWidgetHiddenInVertical({ widgetType: "ssh" })).toBe(true);
+    expect(isWidgetHiddenInVertical({ widgetType: "dateTime" })).toBe(false);
+  });
+});
+
+describe("summary and trigger overrides in vertical bars", () => {
+  it("forces icon-only summary widgets on vertical bars even when set to full", () => {
+    expect(
+      isSummaryWidgetIconOnly({ widgetType: "weather", settings: { displayMode: "full" } }, true)
+    ).toBe(true);
+    expect(
+      isSummaryWidgetIconOnly({ widgetType: "weather", settings: { displayMode: "full" } }, false)
+    ).toBe(false);
+  });
+
+  it("forces simple trigger widgets to icon-only on vertical bars", () => {
+    expect(
+      triggerWidgetIconOnly({ widgetType: "logo", settings: { displayMode: "full" } }, true)
+    ).toBe(true);
+    expect(
+      triggerWidgetIconOnly({ widgetType: "logo", settings: { displayMode: "full" } }, false)
+    ).toBe(false);
+  });
+});
+
+describe("effectiveKeyboardLabelMode", () => {
+  it("forces keyboard layout widgets to short labels on vertical bars", () => {
+    expect(
+      effectiveKeyboardLabelMode({ widgetType: "keyboardLayout", settings: { labelMode: "full" } }, true)
+    ).toBe("short");
+    expect(
+      effectiveKeyboardLabelMode({ widgetType: "keyboardLayout", settings: { labelMode: "full" } }, false)
+    ).toBe("full");
   });
 });
 
