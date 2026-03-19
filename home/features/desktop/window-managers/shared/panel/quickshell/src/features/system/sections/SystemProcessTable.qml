@@ -7,6 +7,7 @@ import "ProcessTableHelpers.js" as PTH
 
 SharedWidgets.CardBase {
     id: root
+    property bool _destroyed: false
 
     property string searchQuery: ""
     property string stateFilter: "all"
