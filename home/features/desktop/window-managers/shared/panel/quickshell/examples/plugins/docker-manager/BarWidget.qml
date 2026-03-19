@@ -121,18 +121,6 @@ Item {
         expandedImages = next;
     }
 
-    function healthDot(healthStatus) {
-        if (healthStatus === "healthy" || healthStatus === "starting" || healthStatus === "unhealthy") return "\u25CF ";
-        return "";
-    }
-
-    function healthDotColor(healthStatus) {
-        if (healthStatus === "healthy") return "#5eead4";
-        if (healthStatus === "starting") return "#fcd34d";
-        if (healthStatus === "unhealthy") return "#f87171";
-        return "transparent";
-    }
-
     function tabCountText(tabKey) {
         if (!daemon) return "";
         if (tabKey === "containers") return String(daemon.containers ? daemon.containers.length : 0);
