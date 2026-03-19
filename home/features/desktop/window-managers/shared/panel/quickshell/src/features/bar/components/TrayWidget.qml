@@ -16,6 +16,7 @@ Flow {
   property int itemSize: 24
   property int iconSize: 18
   property int itemSpacing: Colors.spacingS
+  visible: SystemTray.items.length > 0
 
   Repeater {
     model: SystemTray.items

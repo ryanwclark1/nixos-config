@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import "../../services"
 import "../../widgets" as SharedWidgets
 
@@ -7,24 +8,17 @@ Item {
     id: root
     property var widgetInstance: null
     required property var anchorWindow
-    property bool inhibitorActive: false
+    property bool inhibitorActive: _pidFile.text !== ""
     signal contextMenuRequested(var actions, rect triggerRect)
 
     implicitWidth: inhibitorPill.width
     implicitHeight: inhibitorPill.height
 
-    readonly property int _inhibitorPollMs: 5000
-    readonly property int _inhibitorRecheckMs: 500
-
-    CommandPoll {
-        id: inhibitorPoll
-        interval: root._inhibitorPollMs
-        running: root.visible
-        command: ["sh", "-c", "[ -f /tmp/wayland_idle_inhibitor.pid ] && echo true || echo false"]
-        parse: function (out) {
-            return String(out || "").trim() === "true";
-        }
-        onUpdated: root.inhibitorActive = inhibitorPoll.value
+    FileView {
+        id: _pidFile
+        path: "/tmp/wayland_idle_inhibitor.pid"
+        watchChanges: true
+        printErrors: false
     }
 
     SharedWidgets.BarPill {
@@ -40,14 +34,12 @@ Item {
                 icon: "󰒲",
                 action: () => {
                     Quickshell.execDetached(DependencyService.resolveCommand("qs-inhibitor"));
-                    inhibitorCheckTimer.restart();
                 }
             }
         ]
         onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         onClicked: {
             Quickshell.execDetached(DependencyService.resolveCommand("qs-inhibitor"));
-            inhibitorCheckTimer.restart();
         }
 
         Text {
@@ -57,12 +49,5 @@ Item {
             font.family: Colors.fontMono
         }
 
-        Timer {
-            id: inhibitorCheckTimer
-            interval: root._inhibitorRecheckMs
-            running: false
-            repeat: false
-            onTriggered: inhibitorPoll.triggerPoll()
-        }
     }
 }

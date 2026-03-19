@@ -20,6 +20,11 @@ Flow {
   property bool seedPinnedApps: false
   readonly property var allToplevels: CompositorAdapter.toplevels
   readonly property bool niriEnriched: CompositorAdapter.isNiri && NiriService.available
+  readonly property int taskCount: {
+    var tasks = taskModel.values;
+    return tasks ? tasks.length : 0;
+  }
+  visible: taskCount > 0
   readonly property var runningToplevels: {
     // Force re-evaluation when NiriService windows change
     var _niriVer = root._niriWindowsVersion;
