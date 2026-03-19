@@ -10,7 +10,6 @@ Rectangle {
     id: root
     property var itemData: null
     property int itemIndex: -1
-    property int selectedIndex: -1
     property string searchText: ""
     property string mode: "drun"
     property bool compactMode: false
@@ -26,7 +25,7 @@ Rectangle {
     width: parent ? parent.width : 0
     height: tightMode ? 48 : (compactMode ? 54 : 64)
 
-    readonly property bool highlighted: itemIndex === selectedIndex
+    readonly property bool highlighted: ListView.isCurrentItem
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
 
     color: highlighted ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
@@ -35,9 +34,9 @@ Rectangle {
     border.width: 1
     scale: highlighted ? 1.01 : 1.0
 
-    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-    Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
-    Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
+    Behavior on color { enabled: !Colors.isTransitioning && (highlighted || hovered); CAnim {} }
+    Behavior on border.color { enabled: !Colors.isTransitioning && (highlighted || hovered); CAnim {} }
+    Behavior on scale { enabled: highlighted || hovered; NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
     layer.enabled: highlighted && scale !== 1.0
 
     // Glow Effect
@@ -48,7 +47,7 @@ Rectangle {
         color: Colors.primary
         opacity: highlighted ? 0.08 : 0
         visible: highlighted
-        Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
+        Behavior on opacity { enabled: highlighted; NumberAnimation { duration: Colors.durationNormal } }
     }
 
     function highlightMatch(text, query) {
@@ -146,9 +145,9 @@ Rectangle {
         radius: Colors.radiusPill
         color: Colors.primary
         opacity: highlighted ? 1.0 : 0.0
-        Behavior on height { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
-        Behavior on width { NumberAnimation { duration: Colors.durationMedium } }
-        Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+        Behavior on height { enabled: highlighted; NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
+        Behavior on width { enabled: highlighted; NumberAnimation { duration: Colors.durationMedium } }
+        Behavior on opacity { enabled: highlighted; NumberAnimation { duration: Colors.durationFast } }
     }
 
     RowLayout {

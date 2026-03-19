@@ -3,7 +3,7 @@
 var allKnownModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
 var transientModes = ["dmenu"];
 var defaultModeOrder = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
-var defaultPrimaryModes = ["drun", "window", "files", "ai", "clip", "system", "media", "settings", "devops", "orchestrator", "ssh"];
+var defaultPrimaryModes = ["drun", "window", "files", "ai", "system"];
 var modePrefixes = "!/@?>=:;~";
 
 var modeMeta = {

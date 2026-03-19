@@ -51,6 +51,9 @@ function fuzzyMatchLower(s, p) {
         return 100;
     if (!s)
         return 0;
+    // Fast reject: skip expensive walk when first query char is absent
+    if (s.indexOf(p[0]) === -1)
+        return 0;
     if (s.startsWith(p))
         return 100 + (p.length / s.length);
     if (s.indexOf(p) !== -1)
@@ -126,8 +129,16 @@ function rankItem(item, clean, cleanLower, mode, weights) {
     if (mode === "files")
         return rankFileItem(item, cleanLower);
     ensureItemRankCache(item);
+    // Fast path: strong name match skips other field scoring
+    var nameScore = fuzzyMatchLower(item._nameLower, cleanLower);
+    if (nameScore >= 100) {
+        var fast = nameScore * weights.name;
+        if (mode === "drun")
+            fast += Number(item._drunUsageBoost || 0);
+        return fast;
+    }
     var categoryScore = mode === "drun" ? (fuzzyMatchLower(item._categoryKeywordsLower, cleanLower) * weights.category) : 0;
-    var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * weights.name, fuzzyMatchLower(item._titleLower, cleanLower) * weights.title, fuzzyMatchLower(item._execLower, cleanLower) * weights.exec, fuzzyMatchLower(item._bodyLower, cleanLower) * weights.body, categoryScore);
+    var bestScore = Math.max(nameScore * weights.name, fuzzyMatchLower(item._titleLower, cleanLower) * weights.title, fuzzyMatchLower(item._execLower, cleanLower) * weights.exec, fuzzyMatchLower(item._bodyLower, cleanLower) * weights.body, categoryScore);
     if (mode === "drun")
         bestScore += Number(item._drunUsageBoost || 0);
     return bestScore;
@@ -275,7 +286,7 @@ function compareByScoreThenDepth(a, b) {
         return aDepth - bDepth;
     var aPath = a.relativePath || a.fullPath || a.title || "";
     var bPath = b.relativePath || b.fullPath || b.title || "";
-    return aPath.localeCompare(bPath);
+    return aPath < bPath ? -1 : aPath > bPath ? 1 : 0;
 }
 
 // Sort comparator: score desc only. Used for ai/partial results.
@@ -308,15 +319,15 @@ function stripSearchPrefix(mode, searchText) {
 function compareLauncherItemsAlpha(a, b) {
     var aName = String(a && a.name ? a.name : "");
     var bName = String(b && b.name ? b.name : "");
-    var byName = aName.localeCompare(bName);
-    if (byName !== 0)
-        return byName;
+    if (aName < bName) return -1;
+    if (aName > bName) return 1;
     var aExec = String(a && a.exec ? a.exec : "");
     var bExec = String(b && b.exec ? b.exec : "");
-    var byExec = aExec.localeCompare(bExec);
-    if (byExec !== 0)
-        return byExec;
+    if (aExec < bExec) return -1;
+    if (aExec > bExec) return 1;
     var aTitle = String(a && a.title ? a.title : "");
     var bTitle = String(b && b.title ? b.title : "");
-    return aTitle.localeCompare(bTitle);
+    if (aTitle < bTitle) return -1;
+    if (aTitle > bTitle) return 1;
+    return 0;
 }

@@ -1,4 +1,5 @@
 .pragma library
+.import "LauncherEntryRegistry.js" as EntryRegistry
 
 /**
  * LauncherSystemItems.js
@@ -70,7 +71,7 @@
  * @returns {Array}
  */
 function buildSystemItems(actions) {
-    var items = [];
+    var items = EntryRegistry.buildSystemDestinationItems(actions);
 
     // --- Power / session actions (from SystemActionRegistry.sessionActions) ---
     var powerActions = actions.sessionActions || [];
@@ -92,107 +93,6 @@ function buildSystemItems(actions) {
         }
         items.push(item);
     }
-
-    // --- Capture items ---
-    items.push({
-        category: "Capture",
-        name:     "Screenshot (Area)",
-        icon:     "󰹑",
-        action:   (function(a) {
-            return function() {
-                a.execDetached(a.resolveCommand("qs-screenshot", ["area", "--satty"]));
-            };
-        })(actions)
-    });
-    items.push({
-        category: "Capture",
-        name:     "Screenshot (Display)",
-        icon:     "󰍹",
-        action:   (function(a) {
-            return function() {
-                a.execDetached(a.resolveCommand("qs-screenshot", ["screen", "--satty"]));
-            };
-        })(actions)
-    });
-    items.push({
-        category: "Capture",
-        name:     "Color Picker",
-        icon:     "󰏘",
-        action:   (function(a) {
-            return function() {
-                a.execDetached(["hyprpicker", "-a"]);
-            };
-        })(actions)
-    });
-
-    // --- Toggle items ---
-    items.push({
-        category: "Toggles",
-        name:     "Toggle Bluetooth",
-        icon:     "󰂯",
-        action:   (function(adapter) {
-            return function() {
-                if (adapter)
-                    adapter.enabled = !adapter.enabled;
-            };
-        })(actions.defaultAdapter)
-    });
-    items.push({
-        category: "Toggles",
-        name:     "Toggle Night Light",
-        icon:     "󰖔",
-        action:   (function(a) {
-            return function() {
-                a.execDetached(["os-toggle-nightlight"]);
-            };
-        })(actions)
-    });
-
-    // --- Shell entry / control actions (from SystemActionRegistry.shellEntryActions) ---
-    var controlActions = actions.shellEntryActions || [];
-    for (var j = 0; j < controlActions.length; ++j) {
-        var control = controlActions[j];
-        items.push({
-            category:  control.category,
-            name:      control.name,
-            title:     control.title,
-            icon:      control.icon,
-            ipcTarget: control.ipcTarget,
-            ipcAction: control.ipcAction
-        });
-    }
-
-    // --- Utility items ---
-    items.push({
-        category: "Utilities",
-        name:     "System Monitor",
-        icon:     "󰄨",
-        action:   (function(a) {
-            return function() {
-                a.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "systemMonitor"]);
-            };
-        })(actions)
-    });
-    items.push({
-        category: "Utilities",
-        name:     "System Monitor (terminal btop)",
-        icon:     "󱓞",
-        action:   (function(a) {
-            return function() {
-                a.launchInTerminal("btop");
-            };
-        })(actions)
-    });
-    items.push({
-        category: "Utilities",
-        name:     "Audio Settings",
-        icon:     "󰕾",
-        action:   (function(a) {
-            return function() {
-                a.launchInTerminal("wiremix");
-            };
-        })(actions)
-    });
 
     return items;
 }

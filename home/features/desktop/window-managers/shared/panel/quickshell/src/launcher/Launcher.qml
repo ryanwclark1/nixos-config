@@ -89,6 +89,7 @@ PanelWindow {
     property string searchText: ""
     property var allItems: []
     property var filteredItems: []
+    ScriptModel { id: resultsModel; values: launcherRoot.filteredItems }
     property int selectedIndex: 0
     property string mode: "drun"
 
@@ -547,7 +548,10 @@ PanelWindow {
     readonly property string freqPath: Quickshell.env("HOME") + "/.local/state/quickshell/app_frequency.json"
     readonly property string historyPath: Quickshell.env("HOME") + "/.local/state/quickshell/launcher_history.json"
 
+    property bool _skipOpenAnim: false
+
     Behavior on launcherOpacity {
+        enabled: !_skipOpenAnim
         NumberAnimation {
             duration: Colors.durationSlow
             easing.type: Easing.OutQuint
@@ -556,6 +560,7 @@ PanelWindow {
 
     property real scaleValue: 1.0
     Behavior on scaleValue {
+        enabled: !_skipOpenAnim
         SpringAnimation {
             spring: 4.5
             damping: 0.28
@@ -565,6 +570,7 @@ PanelWindow {
 
     property real yOffset: 0
     Behavior on yOffset {
+        enabled: !_skipOpenAnim
         SpringAnimation {
             spring: 4.0
             damping: 0.3
@@ -1457,10 +1463,14 @@ PanelWindow {
                 searchInputComp.searchInput.text = "";
         }
         selectedIndex = 0;
+        // Instant open: bypass spring animations for immediate show
+        _skipOpenAnim = true;
         launcherOpacity = 1;
         scaleValue = 1.0;
+        yOffset = 0;
         Qt.callLater(function () {
             if (_destroyed) return;
+            _skipOpenAnim = false;
             if (searchInputComp.searchInput)
                 searchInputComp.searchInput.forceActiveFocus();
         });
@@ -1747,15 +1757,10 @@ PanelWindow {
         if (shouldBackoffPreload("drun"))
             return;
 
-        depChecker.ensureModeDependencies("drun", function (ok, _missingCmd) {
-            if (!ok)
-                return;
-            if (getCached("drun"))
-                return;
-            AppCatalogService.ensureLoaded(function(items, errorText) {
-                if (!errorText)
-                    setCached("drun", prepareDrunItems(items));
-            });
+        // Skip dep check for prewarm — drun commands are Nix-wrapped, always present
+        AppCatalogService.ensureLoaded(function(items, errorText) {
+            if (!errorText)
+                setCached("drun", prepareDrunItems(items));
         });
     }
     function loadRun() {
@@ -2603,10 +2608,10 @@ PanelWindow {
             for (var i = 0; i < sourceItems.length; i++) {
                 var item = sourceItems[i];
                 if (mode === "web") {
-                    var webItem = Object.assign({}, item);
-                    webItem.title = "Search " + item.name + " for '" + clean + "'";
-                    webItem.query = clean;
-                    scoredItems.push(webItem);
+                    // Update in-place to preserve object identity for ScriptModel
+                    item.title = "Search " + item.name + " for '" + clean + "'";
+                    item.query = clean;
+                    scoredItems.push(item);
                     continue;
                 }
                 var bestScore = Search.rankItem(item, clean, cleanLower, mode, _rankWeights);
@@ -2638,7 +2643,7 @@ PanelWindow {
             _lastFilterMode = mode;
             _lastFilterQuery = cleanLower;
             _lastFilterCategory = drunCategoryFilter;
-            _lastFilterCandidates = scoredItems.slice();
+            _lastFilterCandidates = scoredItems;
             filteredItems = decorateResultSections(scoredItems.slice(0, Config.launcherMaxResults));
         }
         selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
@@ -2662,7 +2667,8 @@ PanelWindow {
             return;
         }
         fileSearchDebounceTimer.stop();
-        if (Config.launcherSearchDebounceMs <= 0 || mode === "calc") {
+        // Zero debounce for fast modes — drun/calc/emoji filter takes <5ms
+        if (Config.launcherSearchDebounceMs <= 0 || mode === "calc" || mode === "drun" || mode === "emoji") {
             applySearchRefresh(false);
             return;
         }
@@ -3399,8 +3405,9 @@ PanelWindow {
 
                         ListView {
                             id: resultsList
-                            model: launcherRoot.filteredItems
+                            model: resultsModel
                             clip: true
+                            cacheBuffer: 400
                             spacing: launcherRoot.compactMode ? Colors.spacingXS : Colors.spacingS
                             currentIndex: launcherRoot.selectedIndex
                             enabled: !launcherRoot.showingConfirm
@@ -3413,7 +3420,6 @@ PanelWindow {
                             delegate: LauncherResultDelegate {
                                 itemData: modelData
                                 itemIndex: index
-                                selectedIndex: launcherRoot.selectedIndex
                                 searchText: launcherRoot.searchText
                                 mode: launcherRoot.mode
                                 compactMode: launcherRoot.compactMode
