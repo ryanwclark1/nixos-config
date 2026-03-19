@@ -181,6 +181,79 @@ elif [ "$provider" = "codex" ]; then
       model: $model,
       latestSession: $tokens
     }'
+# ── Gemini ───────────────────────────────────────────────────────
+elif [ "$provider" = "gemini" ]; then
+  gemini_dir="$HOME/.gemini/tmp"
+
+  if [ ! -d "$gemini_dir" ]; then
+    echo "$json_fallback"
+    exit 0
+  fi
+
+  # Growth guard: cap at 200 session files (well over 7 days of data)
+  session_files=$(find "$gemini_dir" -name 'session-*.json' -type f 2>/dev/null | tail -200)
+  if [ -z "$session_files" ]; then
+    echo "$json_fallback"
+    exit 0
+  fi
+
+  # Date threshold for 7-day window (ISO prefix comparison)
+  seven_days_ago=$(date -d "$today -6 days" +%Y-%m-%d)
+
+  # Single jq -s pass: only extract fields we need (skip message content)
+  echo "$session_files" | xargs cat 2>/dev/null \
+    | jq -s --arg today "$today" --arg weekStart "$seven_days_ago" '
+      # Filter to sessions in last 7 days
+      [.[] | select(.startTime != null and (.startTime[:10] >= $weekStart))] as $recent |
+
+      # Extract all gemini-type messages with tokens from recent sessions
+      [$recent[].messages[]? | select(.type == "gemini" and .tokens != null)] as $gmMsgs |
+
+      # Today: count sessions and user messages
+      [$recent[] | select(.startTime[:10] == $today)] as $todaySessions |
+      [$todaySessions[].messages[]? | select(.type == "user")] as $todayUserMsgs |
+      [$todaySessions[].messages[]? | select(.type == "gemini" and .tokens != null)] as $todayGmMsgs |
+
+      # Today token aggregation
+      {
+        input: ([$todayGmMsgs[].tokens.input // 0] | add // 0),
+        output: ([$todayGmMsgs[].tokens.output // 0] | add // 0),
+        cached: ([$todayGmMsgs[].tokens.cached // 0] | add // 0),
+        thoughts: ([$todayGmMsgs[].tokens.thoughts // 0] | add // 0)
+      } as $todayTokens |
+
+      # Recent days: group user messages by date
+      [$recent[].messages[]? | select(.type == "user") |
+        { date: (.timestamp[:10] // "") }
+      ] | group_by(.date) | map(select(.[0].date != "") |
+        { date: .[0].date, messageCount: length }
+      ) | sort_by(.date) | .[-7:] as $recentDays |
+
+      # All-time token aggregation
+      ([$gmMsgs[].tokens.total // 0] | add // 0) as $totalTokens |
+
+      # Model names + per-model tokens
+      ([$gmMsgs[] | { model: (.model // "unknown"), input: (.tokens.input // 0), output: (.tokens.output // 0) }]
+        | group_by(.model)
+        | map({ key: .[0].model, value: { input: ([.[].input] | add), output: ([.[].output] | add) } })
+        | from_entries
+      ) as $tokensByModel |
+
+      # Primary model (most used)
+      ($tokensByModel | to_entries | sort_by(.value.input + .value.output) | reverse | .[0].key // "unknown") as $model |
+
+      {
+        todayPrompts: ($todayUserMsgs | length),
+        todaySessions: ($todaySessions | length),
+        todayTokens: $todayTokens,
+        totalSessions: ($recent | length),
+        totalTokens: $totalTokens,
+        model: $model,
+        recentDays: $recentDays,
+        tokensByModel: $tokensByModel
+      }
+    ' 2>/dev/null || echo "$json_fallback"
+
 else
   echo '{"error":"unknown provider: '"$provider"'"}'
   exit 1
