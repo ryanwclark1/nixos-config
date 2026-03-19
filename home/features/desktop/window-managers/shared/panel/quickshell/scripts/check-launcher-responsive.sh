@@ -274,6 +274,72 @@ call_ipc() {
   fi
 }
 
+wait_for_viewport_matrix() {
+  local label="$1"
+  local viewport_width="$2"
+  local viewport_height="$3"
+  local expected_compact="$4"
+  local expected_sidebar="$5"
+  local expected_tight="$6"
+  local deadline=$((SECONDS + 10))
+  local launcher_state=""
+
+  call_ipc Launcher diagnosticSetViewport "${viewport_width}" "${viewport_height}" >/dev/null 2>&1 || return 1
+
+  while (( SECONDS < deadline )); do
+    launcher_state="$(call_ipc Launcher launcherState 2>/dev/null || true)"
+    if [[ -n "${launcher_state}" ]] && printf '%s' "${launcher_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const viewportWidth = Number(payload.viewportWidth || 0);
+const viewportHeight = Number(payload.viewportHeight || 0);
+const usableWidth = Number(payload.usableWidth || 0);
+const usableHeight = Number(payload.usableHeight || 0);
+const hudWidth = Number(payload.hudWidth || 0);
+const hudHeight = Number(payload.hudHeight || 0);
+const actualViewportWidth = Number(payload.actualViewportWidth || 0);
+const actualViewportHeight = Number(payload.actualViewportHeight || 0);
+const actualUsableWidth = Number(payload.actualUsableWidth || 0);
+const actualUsableHeight = Number(payload.actualUsableHeight || 0);
+const expectedViewportWidth = Number(process.argv[1]);
+const expectedViewportHeight = Number(process.argv[2]);
+const expectedCompact = process.argv[3] === "true";
+const expectedSidebar = process.argv[4] === "true";
+const expectedTight = process.argv[5] === "true";
+const compact = usableWidth < 900 || usableHeight < 640;
+const sidebarCompact = usableWidth < 720;
+const tight = usableWidth < 560 || usableHeight < 500;
+const expectedHudWidth = Math.min(1120, Math.max(sidebarCompact ? 380 : 460, usableWidth - (tight ? 24 : 40)));
+const expectedHudHeight = Math.min(980, Math.max(520, usableHeight - (tight ? 24 : 28)));
+function nearlyEqual(a, b) {
+  return Math.abs(a - b) <= 1.5;
+}
+if (viewportWidth !== expectedViewportWidth) process.exit(1);
+if (viewportHeight !== expectedViewportHeight) process.exit(1);
+if (compact !== expectedCompact) process.exit(1);
+if (sidebarCompact !== expectedSidebar) process.exit(1);
+if (tight !== expectedTight) process.exit(1);
+if (!nearlyEqual(hudWidth, expectedHudWidth)) process.exit(1);
+if (!nearlyEqual(hudHeight, expectedHudHeight)) process.exit(1);
+if (!(actualViewportWidth >= viewportWidth && actualViewportHeight >= viewportHeight)) process.exit(1);
+if (!(actualUsableWidth >= usableWidth && actualUsableHeight >= usableHeight)) process.exit(1);
+if (!(hudWidth >= 380 && hudHeight >= 520)) process.exit(1);
+' "${viewport_width}" "${viewport_height}" "${expected_compact}" "${expected_sidebar}" "${expected_tight}" >/dev/null 2>&1; then
+      pass "${label}"
+      return 0
+    fi
+    sleep 0.25
+  done
+
+  fail "${label}"
+  if [[ -n "${launcher_state}" ]]; then
+    printf '%s\n' "${launcher_state}" >&2
+  fi
+  return 1
+}
+
 launcher_action_available() {
   local action="$1"
   local show_output=""
@@ -418,6 +484,16 @@ if (usableWidth >= 1400 && !(hudWidth >= 1000)) process.exit(1);
     if [[ -n "${launcher_state:-}" ]]; then
       printf '%s\n' "${launcher_state}" >&2
     fi
+  fi
+
+  if launcher_action_available "diagnosticSetViewport"; then
+    wait_for_viewport_matrix "Launcher wide viewport layout invariants" 1600 1000 false false false
+    wait_for_viewport_matrix "Launcher laptop viewport layout invariants" 1280 720 false false false
+    wait_for_viewport_matrix "Launcher narrow viewport layout invariants" 820 720 true false false
+    wait_for_viewport_matrix "Launcher portrait viewport layout invariants" 540 900 true true true
+    call_ipc Launcher diagnosticSetViewport 0 0 >/dev/null 2>&1 || true
+  else
+    warn "Launcher.diagnosticSetViewport not exposed by live instance; skipped responsive viewport matrix"
   fi
 
   if call_ipc Launcher openFiles >/dev/null 2>&1 && call_ipc Launcher diagnosticSetSearchText "/nixos" >/dev/null 2>&1; then
@@ -683,7 +759,6 @@ main() {
     runtime_checks
   fi
 
-  printf '[INFO] Manual visual QA still required for wide, laptop, and narrow/portrait layouts.\n'
   printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
   (( fail_count == 0 ))
 }
