@@ -584,7 +584,7 @@ QtObject {
             categoryId: "extensibility",
             order: 35,
             component: "ModelUsageTab.qml",
-            searchTerms: ["model", "usage", "claude", "codex", "tokens", "prompts", "rate limit"],
+            searchTerms: ["model", "usage", "claude", "codex", "gemini", "tokens", "prompts", "rate limit"],
             owner: {
                 surface: "modelUsageMenu",
                 service: "ModelUsageService",

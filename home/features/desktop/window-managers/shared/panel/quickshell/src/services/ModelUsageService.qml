@@ -44,6 +44,7 @@ QtObject {
   property int codexTodaySessions: 0
   property string codexModel: "unknown"
   property var codexLatestSession: ({})
+  property var codexRecentDays: []
 
   // ── Gemini state ─────────────────────────────────
   readonly property bool geminiEnabled: Config.modelUsageGeminiEnabled
@@ -161,6 +162,7 @@ QtObject {
       return String(root.geminiTodayPrompts);
     }
     if (!root.codexReady) return "--";
+    if (root.barMetric === "tokens") return "--";
     return String(root.codexTodayPrompts);
   }
 
@@ -175,7 +177,10 @@ QtObject {
     }
     if (p === "gemini") {
       if (!root.geminiReady) return "Gemini CLI · No data";
-      return "Gemini CLI · " + root.geminiTodayPrompts + " prompts today";
+      var gtip = "Gemini CLI · " + root.geminiTodayPrompts + " prompts today";
+      if (root.geminiTodaySessions > 0)
+        gtip += " · " + root.geminiTodaySessions + " sessions";
+      return gtip;
     }
     if (!root.codexReady) return "Codex CLI · No data";
     return "Codex CLI · " + root.codexTodayPrompts + " prompts today";
@@ -271,6 +276,7 @@ QtObject {
           root.codexTodaySessions = data.todaySessions || 0;
           root.codexModel = data.model || "unknown";
           root.codexLatestSession = data.latestSession || {};
+          root.codexRecentDays = data.recentDays || [];
           root.codexReady = true;
         } catch (e) {
           Logger.w("ModelUsageService", "codex parse error:", e);
