@@ -19,42 +19,11 @@ Item {
     readonly property bool isLauncherRuntimeSection: sectionMode === "launcher-runtime"
     readonly property bool isControlCenterSection: sectionMode === "control-center"
     readonly property bool isAnyLauncherSection: isLauncherSection || isLauncherGeneralSection || isLauncherSearchSection || isLauncherWebSection || isLauncherModesSection || isLauncherRuntimeSection
-    readonly property string pageTitle: {
-        if (isLauncherSearchSection)
-            return "Launcher Search";
-        if (isLauncherWebSection)
-            return "Launcher Web";
-        if (isLauncherModesSection)
-            return "Launcher Modes";
-        if (isLauncherRuntimeSection)
-            return "Launcher Runtime";
-        if (isLauncherGeneralSection)
-            return "Launcher";
-        if (isControlCenterSection)
-            return "Control Center";
-        return "Shell";
-    }
-    readonly property string pageIcon: {
-        if (isLauncherSearchSection)
-            return "󰍉";
-        if (isLauncherWebSection)
-            return "󰖟";
-        if (isLauncherModesSection)
-            return "󰌌";
-        if (isLauncherRuntimeSection)
-            return "󰔟";
-        if (isLauncherGeneralSection)
-            return "󰍉";
-        if (isControlCenterSection)
-            return "󰖲";
-        return "󰒓";
-    }
 
     SettingsTabPage {
         anchors.fill: parent
+        settingsRoot: root.settingsRoot
         tabId: root.tabId
-        title: root.pageTitle
-        iconName: root.pageIcon
 
         ShellSystemSection {
             visible: root.isSystemSection

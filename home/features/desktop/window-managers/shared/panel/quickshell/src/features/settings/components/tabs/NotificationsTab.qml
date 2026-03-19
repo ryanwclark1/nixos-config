@@ -14,6 +14,29 @@ Item {
     property string _newRuleAppName: ""
     property string _newRuleAction: "mute"
 
+    // Local state for the TTS excluded-app input
+    property string _newTtsExcludedApp: ""
+
+    function _addTtsExcludedApp() {
+        var name = root._newTtsExcludedApp.trim();
+        if (name === "") return;
+        var list = Config.notifTtsExcludedApps ? Config.notifTtsExcludedApps.slice() : [];
+        // Avoid duplicates (case-insensitive)
+        for (var i = 0; i < list.length; i++) {
+            if (String(list[i]).toLowerCase() === name.toLowerCase()) return;
+        }
+        list.push(name);
+        Config.notifTtsExcludedApps = list;
+        root._newTtsExcludedApp = "";
+        ttsExcludedAppInput.text = "";
+    }
+
+    function _removeTtsExcludedApp(index) {
+        var list = Config.notifTtsExcludedApps ? Config.notifTtsExcludedApps.slice() : [];
+        list.splice(index, 1);
+        Config.notifTtsExcludedApps = list;
+    }
+
     function _removeRule(index) {
         var rules = Config.notifRules ? Config.notifRules.slice() : [];
         rules.splice(index, 1);
@@ -235,7 +258,120 @@ Item {
             }
         }
 
-        // ── 5. Rules ───────────────────────────────────────────────────────
+        // ── 5. Text-to-Speech ─────────────────────────────────────────────
+        SettingsCard {
+            title: "Text-to-Speech"
+            iconName: "󰗆"
+            description: "Read incoming notifications aloud using a TTS engine."
+
+            SettingsToggleRow {
+                label: "Enable TTS"
+                icon: "󰗆"
+                checked: Config.notifTtsEnabled
+                enabledText: "Notifications are read aloud"
+                disabledText: "TTS is off"
+                onToggled: Config.notifTtsEnabled = !Config.notifTtsEnabled
+            }
+
+            SettingsModeRow {
+                label: "Engine"
+                icon: "󰓃"
+                currentValue: Config.notifTtsEngine
+                enabled: Config.notifTtsEnabled
+                options: [
+                    { value: "espeak-ng", label: "espeak-ng" },
+                    { value: "piper", label: "Piper" },
+                    { value: "speak", label: "speak" }
+                ]
+                onModeSelected: v => Config.notifTtsEngine = v
+            }
+
+            SettingsSliderRow {
+                label: "Speech Rate"
+                min: 50
+                max: 400
+                step: 25
+                value: Config.notifTtsRate
+                unit: "wpm"
+                enabled: Config.notifTtsEnabled
+                onMoved: v => Config.notifTtsRate = v
+            }
+
+            SettingsSliderRow {
+                label: "Volume"
+                min: 0
+                max: 200
+                step: 10
+                value: Config.notifTtsVolume
+                enabled: Config.notifTtsEnabled
+                onMoved: v => Config.notifTtsVolume = v
+            }
+
+            // Excluded apps
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+                enabled: Config.notifTtsEnabled
+                opacity: Config.notifTtsEnabled ? 1.0 : 0.5
+
+                Text {
+                    text: "Excluded Apps"
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.DemiBold
+                }
+
+                Text {
+                    text: "Notifications from these apps will not be read aloud."
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingS
+                    visible: Config.notifTtsExcludedApps && Config.notifTtsExcludedApps.length > 0
+
+                    Repeater {
+                        model: Config.notifTtsExcludedApps || []
+                        delegate: SettingsRemovableChip {
+                            required property var modelData
+                            required property int index
+                            onRemoved: root._removeTtsExcludedApp(index)
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingS
+
+                    SettingsTextInputRow {
+                        id: ttsExcludedAppInput
+                        Layout.fillWidth: true
+                        label: ""
+                        leadingIcon: "󰀻"
+                        placeholderText: "App name (e.g. Spotify)"
+                        showClearButton: true
+                        onTextEdited: value => root._newTtsExcludedApp = value
+                        onSubmitted: root._addTtsExcludedApp()
+                    }
+
+                    SettingsActionButton {
+                        label: "Add"
+                        iconName: "󰐕"
+                        compact: true
+                        emphasized: root._newTtsExcludedApp.trim() !== ""
+                        enabled: root._newTtsExcludedApp.trim() !== ""
+                        onClicked: root._addTtsExcludedApp()
+                    }
+                }
+            }
+        }
+
+        // ── 6. Rules ───────────────────────────────────────────────────────
         SettingsCard {
             title: "Rules"
             iconName: "󰑓"

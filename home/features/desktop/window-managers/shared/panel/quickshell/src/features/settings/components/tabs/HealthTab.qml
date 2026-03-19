@@ -34,8 +34,9 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
+        settingsRoot: root.settingsRoot
         tabId: root.tabId
-        title: "Health Dashboard"
+        title: "Diagnostics"
         iconName: "󰓅"
 
         // Overall Status

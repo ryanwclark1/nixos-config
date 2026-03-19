@@ -43,8 +43,9 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
+        settingsRoot: root.settingsRoot
         tabId: root.tabId
-        title: "Bars"
+        title: "Bar Layout"
         iconName: "󰕮"
         subtitle: "Manage independent bars, monitor assignment, and per-bar layout settings."
 

@@ -11,8 +11,9 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
+        settingsRoot: root.settingsRoot
         tabId: root.tabId
-        title: "UI Appearance"
+        title: "Style & Motion"
         iconName: "󰏘"
 
         SettingsCard {
