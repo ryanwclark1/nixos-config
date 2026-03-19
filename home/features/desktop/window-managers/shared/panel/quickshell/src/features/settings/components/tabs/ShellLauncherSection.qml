@@ -27,6 +27,10 @@ Item {
     readonly property bool isLauncherWebSection: sectionMode === "launcher-web"
     readonly property bool isLauncherModesSection: sectionMode === "launcher-modes"
     readonly property bool isLauncherRuntimeSection: sectionMode === "launcher-runtime"
+    readonly property string currentLauncherTabId: isLauncherSearchSection ? "launcher-search"
+        : (isLauncherWebSection ? "launcher-web"
+        : (isLauncherModesSection ? "launcher-modes"
+        : (isLauncherRuntimeSection ? "launcher-runtime" : "launcher")))
 
     // Static data arrays
     readonly property var launcherModes: ModeData.allKnownModes.map(function(modeKey) {
@@ -238,6 +242,14 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         spacing: Colors.spacingL
+
+        LauncherSettingsHero {
+            visible: root.isLauncherSection || root.isLauncherGeneralSection || root.isLauncherSearchSection || root.isLauncherWebSection || root.isLauncherModesSection || root.isLauncherRuntimeSection
+            Layout.fillWidth: true
+            settingsRoot: root.settingsRoot
+            tabId: root.currentLauncherTabId
+            compactMode: root.compactMode
+        }
 
         // ----- Launcher Behavior (general) ----------------------------------
         SettingsCard {
@@ -538,7 +550,7 @@ Item {
         }
 
         // ----- Web Search Behavior (web) ------------------------------------
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
             title: "Web Search Behavior"
@@ -568,7 +580,7 @@ Item {
         }
 
         // ----- Web Providers (web) ------------------------------------------
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
             title: "Web Providers"
@@ -765,7 +777,7 @@ Item {
         }
 
         // ----- Web Aliases (web) --------------------------------------------
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
             title: "Web Aliases"
@@ -1011,7 +1023,7 @@ Item {
         }
 
         // ----- Launcher Modes (modes) ---------------------------------------
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
             title: "Launcher Presets"
@@ -1054,7 +1066,7 @@ Item {
             }
         }
 
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
             title: "Primary Sidebar"
@@ -1256,7 +1268,7 @@ Item {
             }
         }
 
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
             title: "Advanced / Prefix"
@@ -1471,7 +1483,7 @@ Item {
             }
         }
 
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
             title: "Disabled Modes"
@@ -1504,7 +1516,7 @@ Item {
         }
 
         // ----- Runtime Behavior (runtime) -----------------------------------
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherRuntimeSection
             Layout.fillWidth: true
             title: "Runtime Behavior"
@@ -1556,7 +1568,7 @@ Item {
         }
 
         // ----- Diagnostics & Recovery (runtime) ----------------------------
-        SettingsCard {
+        LauncherSettingsPanel {
             visible: root.isLauncherRuntimeSection
             Layout.fillWidth: true
             title: "Diagnostics & Recovery"

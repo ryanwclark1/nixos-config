@@ -17,6 +17,7 @@ SharedWidgets.ScrollableContent {
     property bool tightSpacing: false
     readonly property var tabMeta: SettingsRegistry.findTab(tabId)
     readonly property var ownerMeta: tabMeta ? tabMeta.owner : null
+    readonly property string resolvedSubtitle: subtitle !== "" ? subtitle : (tabMeta && tabMeta.description ? String(tabMeta.description) : "")
     default property alias pageContent: contentColumn.data
 
     anchors.fill: parent
@@ -61,8 +62,8 @@ SharedWidgets.ScrollableContent {
             }
 
             Text {
-                visible: !!root.subtitle
-                text: root.subtitle
+                visible: !!root.resolvedSubtitle
+                text: root.resolvedSubtitle
                 color: Colors.textSecondary
                 font.pixelSize: Colors.fontSizeSmall
                 wrapMode: Text.WordWrap
