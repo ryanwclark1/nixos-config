@@ -7,6 +7,7 @@ import "ShellUtils.js" as SU
 
 QtObject {
   id: root
+  property bool _destroyed: false
 
   property var items: []
   property bool loaded: false
@@ -136,7 +137,7 @@ QtObject {
     if (line === "")
       return false;
     Quickshell.execDetached(["sh", "-c", "printf '%s\\n' \"$1\" | cliphist delete", "sh", line]);
-    Qt.callLater(function() { root.refresh(null); });
+    Qt.callLater(function() { if (root._destroyed) return; root.refresh(null); });
     return true;
   }
 
@@ -187,6 +188,8 @@ QtObject {
       root._imageGeneration += 1;
     }
   }
+
+  Component.onDestruction: _destroyed = true
 
   // Auto-refresh when clipboard content changes
   property Connections _clipboardConn: Connections {

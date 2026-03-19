@@ -5,6 +5,7 @@ import Quickshell.Io
 
 QtObject {
     id: root
+    property bool _destroyed: false
 
     readonly property string pluginsDir: Quickshell.env("HOME") + "/.config/quickshell/plugins"
 
@@ -556,8 +557,10 @@ QtObject {
 
     Component.onCompleted: {
         Qt.callLater(function () {
+            if (root._destroyed) return;
             root._refreshVisibleControlCenterPlugins();
             root.scanPlugins();
         });
     }
+    Component.onDestruction: _destroyed = true
 }

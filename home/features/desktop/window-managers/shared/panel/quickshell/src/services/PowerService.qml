@@ -6,6 +6,7 @@ import Quickshell.Services.UPower
 
 QtObject {
     id: root
+    property bool _destroyed: false
 
     // ── Public state ─────────────────────────────
     readonly property bool onBattery: _onBattery
@@ -173,7 +174,9 @@ QtObject {
     Component.onCompleted: {
         // Initial config write after a delay to let Config load
         Qt.callLater(function() {
+            if (root._destroyed) return;
             root._scheduleHypridle();
         });
     }
+    Component.onDestruction: _destroyed = true
 }

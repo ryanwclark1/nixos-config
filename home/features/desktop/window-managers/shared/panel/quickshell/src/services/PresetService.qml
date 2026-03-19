@@ -6,6 +6,7 @@ import Quickshell.Io
 
 QtObject {
     id: root
+    property bool _destroyed: false
 
     // ── Public state ─────────────────────────────
     property var presets: []
@@ -15,6 +16,7 @@ QtObject {
 
     // ── Scan for presets ─────────────────────────
     Component.onCompleted: refresh()
+    Component.onDestruction: _destroyed = true
 
     property Process _scanProc: Process {
         running: false
@@ -80,7 +82,7 @@ QtObject {
             "cp '" + _presetsDir + "/" + safeName + ".json' '" + _configPath + "' 2>/dev/null"
         ]);
         // Trigger config reload
-        Qt.callLater(function() { Config.load(); });
+        Qt.callLater(function() { if (root._destroyed) return; Config.load(); });
     }
 
     // ── Delete preset ────────────────────────────

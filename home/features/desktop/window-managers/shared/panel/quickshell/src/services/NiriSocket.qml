@@ -6,6 +6,7 @@ import Quickshell.Io
 // `connected` is true.  Emits `connectionStateChanged()` on transitions.
 Item {
     id: root
+    property bool _destroyed: false
 
     property alias path: socket.path
     property alias parser: socket.parser
@@ -39,13 +40,15 @@ Item {
         }
     }
 
+    Component.onDestruction: _destroyed = true
+
     Timer {
         id: reconnectTimer
         interval: 0
         repeat: false
         onTriggered: {
             socket.connected = false
-            Qt.callLater(() => socket.connected = true)
+            Qt.callLater(() => { if (root._destroyed) return; socket.connected = true; })
         }
     }
 
