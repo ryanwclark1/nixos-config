@@ -330,9 +330,45 @@ discover_reachable_instance() {
   return 1
 }
 
+refresh_instance_handle() {
+  local refreshed_id=""
+
+  if [[ -n "${instance_pid}" ]]; then
+    if timeout "${ipc_timeout_seconds}s" quickshell ipc --pid "${instance_pid}" show >/dev/null 2>&1; then
+      return 0
+    fi
+    printf 'QuickShell pid %s is not reachable.\n' "${instance_pid}" >&2
+    return 1
+  fi
+
+  if [[ -n "${instance_id}" ]] && timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
+    return 0
+  fi
+
+  refreshed_id="$(discover_reachable_instance || true)"
+  if [[ -z "${refreshed_id}" ]]; then
+    if [[ -n "${instance_id}" ]]; then
+      printf 'Unable to rediscover a live QuickShell launcher instance after %s became unavailable.\n' "${instance_id}" >&2
+    else
+      printf 'No live QuickShell launcher instances found under %s\n' "${runtime_root}" >&2
+    fi
+    return 1
+  fi
+
+  if [[ -z "${instance_id}" ]]; then
+    printf '[INFO] Using discovered QuickShell launcher instance %s\n' "${refreshed_id}" >&2
+  elif [[ "${refreshed_id}" != "${instance_id}" ]]; then
+    printf '[INFO] Refreshing stale QuickShell launcher instance %s -> %s\n' "${instance_id}" "${refreshed_id}" >&2
+  fi
+
+  instance_id="${refreshed_id}"
+  return 0
+}
+
 call_ipc() {
   local target="$1"
   shift
+  refresh_instance_handle || return 1
   if [[ -n "${instance_pid}" ]]; then
     run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "$@"
   else
@@ -574,12 +610,8 @@ main() {
     fi
   fi
 
-  if [[ -z "${instance_id}" && -z "${instance_pid}" ]]; then
-    instance_id="$(discover_reachable_instance || true)"
-    if [[ -z "${instance_id}" ]]; then
-      printf 'No live QuickShell launcher instances found under %s\n' "${runtime_root}" >&2
-      exit 1
-    fi
+  if [[ -z "${instance_pid}" ]]; then
+    refresh_instance_handle || exit 1
   fi
 
   if [[ -z "${output_path}" ]]; then
