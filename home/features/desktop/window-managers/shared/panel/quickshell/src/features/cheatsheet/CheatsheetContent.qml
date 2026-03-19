@@ -205,9 +205,10 @@ Item {
             }
         }
 
-        Scrollbar { flickable: flickable }
-        OverscrollGlow { flickable: flickable }
     }
+
+    Scrollbar { flickable: flickable }
+    OverscrollGlow { flickable: flickable }
 
     // Empty state
     ColumnLayout {
