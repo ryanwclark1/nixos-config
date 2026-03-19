@@ -21,11 +21,16 @@ printf '{"themes":[]}\n' > "${tmp_home}/.config/quickshell/themes.json"
 cat > "${tmp_qml}" <<'QML'
 import Quickshell
 import QtQuick
+import QtQuick.Window
 import "./src/services"
 import "./src/bar" as Bar
 
-Scope {
+Window {
   id: root
+  visible: true
+  color: "transparent"
+  width: Math.max(1, panel.implicitWidth)
+  height: 720
 
   property var results: ({})
 
@@ -97,11 +102,17 @@ Scope {
 
   Bar.Panel {
     id: panel
+    anchors.fill: parent
     barConfig: ({
       id: "vertical-test-bar",
       position: "left",
       sectionWidgets: { left: [], center: [], right: [] }
     })
+  }
+
+  Item {
+    id: widgetProbeHost
+    anchors.fill: parent
   }
 
   Timer {
@@ -138,11 +149,56 @@ Scope {
     interval: 80
     repeat: false
     onTriggered: {
-      snapshot("logo", "logo-full");
+      var logoProbe = panel.componentForWidget("logo").createObject(widgetProbeHost, {
+        widgetInstance: {
+          instanceId: "logo-probe",
+          widgetType: "logo",
+          enabled: true,
+          settings: { displayMode: "full", labelText: "Very Long Launcher Label" }
+        }
+      });
+      var dateTimeProbe = panel.componentForWidget("dateTime").createObject(widgetProbeHost, {
+        widgetInstance: {
+          instanceId: "clock-probe",
+          widgetType: "dateTime",
+          enabled: true,
+          settings: { displayMode: "full", showDate: true }
+        }
+      });
+      var cpuProbe = panel.componentForWidget("cpuStatus").createObject(widgetProbeHost, {
+        widgetInstance: {
+          instanceId: "cpu-probe",
+          widgetType: "cpuStatus",
+          enabled: true,
+          settings: { displayMode: "full", valueStyle: "usageTemp" }
+        }
+      });
+
+      results.logoProbe = {
+        found: !!logoProbe,
+        visible: logoProbe ? logoProbe.visible !== false : false,
+        width: logoProbe ? Number(logoProbe.width || 0) : -1,
+        implicitWidth: logoProbe ? Number(logoProbe.implicitWidth || 0) : -1,
+        iconOnly: logoProbe ? !!logoProbe.iconOnly : null
+      };
+      results.dateTimeProbe = {
+        found: !!dateTimeProbe,
+        visible: dateTimeProbe ? dateTimeProbe.visible !== false : false,
+        width: dateTimeProbe ? Number(dateTimeProbe.width || 0) : -1,
+        implicitWidth: dateTimeProbe ? Number(dateTimeProbe.implicitWidth || 0) : -1,
+        iconOnly: dateTimeProbe ? !!dateTimeProbe.iconOnly : null
+      };
+      results.cpuProbe = {
+        found: !!cpuProbe,
+        visible: cpuProbe ? cpuProbe.visible !== false : false,
+        width: cpuProbe ? Number(cpuProbe.width || 0) : -1,
+        implicitWidth: cpuProbe ? Number(cpuProbe.implicitWidth || 0) : -1,
+        compact: cpuProbe ? !!cpuProbe.compact : null,
+        iconOnly: cpuProbe ? !!cpuProbe.iconOnly : null
+      };
+
       snapshot("windowTitle", "title-full");
       snapshot("wideDummy", "wide-dummy");
-      snapshot("dateTime", "clock-full");
-      snapshot("cpu", "cpu-full");
       snapshot("ssh", "ssh-vertical");
       console.log("RESULT:" + JSON.stringify(results));
       Qt.quit();
@@ -196,25 +252,41 @@ def require(name):
         sys.exit(1)
     return entry
 
-logo = require("logo")
 window_title = require("windowTitle")
 wide_dummy = require("wideDummy")
-date_time = require("dateTime")
-cpu = require("cpu")
 ssh = require("ssh")
+logo_probe = require("logoProbe")
+date_time_probe = require("dateTimeProbe")
+cpu_probe = require("cpuProbe")
 
-panel_width = logo["panelWidth"]
-panel_width_cap = logo["panelWidthCap"]
-item_width_cap = logo["itemWidthCap"]
+panel_width = window_title["panelWidth"]
+panel_width_cap = window_title["panelWidthCap"]
+item_width_cap = window_title["itemWidthCap"]
 
 if panel_width <= 0 or panel_width > panel_width_cap:
     print("[FAIL] Vertical bar exceeded its width cap.", file=sys.stderr)
     sys.exit(1)
 
-for name, entry in [("logo", logo), ("dateTime", date_time), ("cpu", cpu)]:
-    if entry["width"] <= 0 or entry["width"] > item_width_cap:
+for name, entry in [("logo", logo_probe), ("dateTime", date_time_probe), ("cpu", cpu_probe)]:
+    width = entry["width"] if entry["width"] > 0 else entry["implicitWidth"]
+    if width <= 0 or width > item_width_cap:
         print(f"[FAIL] {name} did not stay within the vertical item width cap.", file=sys.stderr)
         sys.exit(1)
+    if not entry["visible"]:
+        print(f"[FAIL] {name} did not stay visible on the vertical bar.", file=sys.stderr)
+        sys.exit(1)
+
+if not logo_probe["iconOnly"]:
+    print("[FAIL] Logo widget did not collapse to icon-only mode on the vertical bar.", file=sys.stderr)
+    sys.exit(1)
+
+if not date_time_probe["iconOnly"]:
+    print("[FAIL] Date/time widget did not collapse to icon-only mode on the vertical bar.", file=sys.stderr)
+    sys.exit(1)
+
+if not cpu_probe["compact"] or cpu_probe["iconOnly"]:
+    print("[FAIL] CPU widget did not collapse to compact mode on the vertical bar.", file=sys.stderr)
+    sys.exit(1)
 
 if window_title["width"] != 0 or window_title["height"] != 0:
     print("[FAIL] Window title was not hidden on the vertical bar.", file=sys.stderr)
@@ -227,10 +299,11 @@ if ssh["width"] != 0 or ssh["height"] != 0:
 if wide_dummy["width"] != 0 or wide_dummy["height"] != 0:
     print("[FAIL] Unverified wide widget did not collapse on the vertical bar.", file=sys.stderr)
     sys.exit(1)
-
-if wide_dummy["diagnosticState"] != "vertical-overflow":
-    print("[FAIL] Unverified wide widget did not report a vertical overflow diagnostic.", file=sys.stderr)
-    sys.exit(1)
 PY
+
+grep -q 'widget=wideDummy instance=wide-dummy state=vertical-overflow' <<<"${output}" || {
+  printf '[FAIL] Unverified wide widget did not report a vertical overflow diagnostic.\n' >&2
+  exit 1
+}
 
 printf '[PASS] vertical bars stay within width limits and collapse unsupported wide widgets.\n'

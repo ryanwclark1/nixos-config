@@ -154,26 +154,54 @@ ipc_error_is_retryable() {
 
 populate_repo_shell_env() {
   local line key value
+  local has_wayland_session=0
+  local found_graphics_env=0
   repo_shell_env=()
   repo_shell_env+=("PATH=${script_dir}:${PATH}")
   repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
-  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
+  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE DISPLAY; do
     value="${!key:-}"
-    [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
+    if [[ -n "${value}" ]]; then
+      repo_shell_env+=("${key}=${value}")
+      case "${key}" in
+        HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
+          found_graphics_env=1
+          ;;&
+        WAYLAND_DISPLAY|NIRI_SOCKET)
+          has_wayland_session=1
+          ;;
+      esac
+    fi
   done
-  if (( ${#repo_shell_env[@]} > 0 )); then
-    return 0
+  if (( found_graphics_env == 0 )); then
+    while IFS= read -r line; do
+      [[ "${line}" == *=* ]] || continue
+      key="${line%%=*}"
+      value="${line#*=}"
+      case "${key}" in
+        HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE|DISPLAY)
+          if [[ -n "${value}" ]]; then
+            repo_shell_env+=("${key}=${value}")
+            case "${key}" in
+              HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
+                found_graphics_env=1
+                ;;&
+              WAYLAND_DISPLAY|NIRI_SOCKET)
+                has_wayland_session=1
+                ;;
+            esac
+          fi
+          ;;
+      esac
+    done < <(systemctl --user show-environment 2>/dev/null || true)
+  fi
+  if (( has_wayland_session == 1 )); then
+    repo_shell_env+=("QT_QPA_PLATFORM=wayland")
   fi
   while IFS= read -r line; do
-    [[ "${line}" == *=* ]] || continue
-    key="${line%%=*}"
-    value="${line#*=}"
-    case "${key}" in
-      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION)
-        [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
-        ;;
-    esac
-  done < <(systemctl --user show-environment 2>/dev/null || true)
+    [[ "${line}" == QS_VERIFY_LAUNCHER_*=* ]] || continue
+    repo_shell_env+=("${line}")
+  done < <(env)
 }
 
 start_repo_shell() {
@@ -552,6 +580,7 @@ if (usableWidth >= 1400 && !(hudWidth >= 1000)) process.exit(1);
   fi
 
   local files_mode_ready=0 files_mode_attempt
+  printf '[INFO] Responsive phase: files mode query probe\n'
   if call_ipc Launcher openFiles >/dev/null 2>&1; then
     for files_mode_attempt in $(seq 1 40); do
       data_state="$(call_ipc Launcher launcherState 2>/dev/null || true)"

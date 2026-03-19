@@ -82,14 +82,29 @@ handle_termination() {
 
 populate_repo_shell_env() {
   local line key value
+  local has_wayland_session=0
+  local found_graphics_env=0
   repo_shell_env=()
   repo_shell_env+=("PATH=${script_dir}:${PATH}")
   repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
-  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION; do
+  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE DISPLAY; do
     value="${!key:-}"
-    [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
+    if [[ -n "${value}" ]]; then
+      repo_shell_env+=("${key}=${value}")
+      case "${key}" in
+        HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
+          found_graphics_env=1
+          ;;&
+        WAYLAND_DISPLAY|NIRI_SOCKET)
+          has_wayland_session=1
+          ;;
+      esac
+    fi
   done
-  if (( ${#repo_shell_env[@]} > 0 )); then
+  if (( found_graphics_env == 1 )); then
+    if (( has_wayland_session == 1 )); then
+      repo_shell_env+=("QT_QPA_PLATFORM=wayland")
+    fi
     return 0
   fi
   while IFS= read -r line; do
@@ -97,11 +112,24 @@ populate_repo_shell_env() {
     key="${line%%=*}"
     value="${line#*=}"
     case "${key}" in
-      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION)
-        [[ -n "${value}" ]] && repo_shell_env+=("${key}=${value}")
+      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE|DISPLAY)
+        if [[ -n "${value}" ]]; then
+          repo_shell_env+=("${key}=${value}")
+          case "${key}" in
+            HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
+              found_graphics_env=1
+              ;;&
+            WAYLAND_DISPLAY|NIRI_SOCKET)
+              has_wayland_session=1
+              ;;
+          esac
+        fi
         ;;
     esac
   done < <(systemctl --user show-environment 2>/dev/null || true)
+  if (( has_wayland_session == 1 )); then
+    repo_shell_env+=("QT_QPA_PLATFORM=wayland")
+  fi
 }
 
 start_repo_shell() {

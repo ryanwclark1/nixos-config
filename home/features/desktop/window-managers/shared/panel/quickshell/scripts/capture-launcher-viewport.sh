@@ -187,8 +187,7 @@ resolve_hyprland_instance() {
 pick_capture_workspace() {
   local used
   local candidate
-  for candidate in $(seq 1 99); do
-    candidate="qs-launcher-capture-${candidate}"
+  for candidate in $(seq 9101 9199); do
     used="$(hypr workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
     if [[ "${used}" == "0" ]]; then
       printf '%s\n' "${candidate}"
@@ -219,11 +218,7 @@ wait_for_workspace() {
 
 dispatch_workspace() {
   local target="$1"
-  if [[ "${target}" =~ ^[0-9]+$ ]]; then
-    hypr dispatch workspace "${target}" >/dev/null
-  else
-    hypr dispatch workspace "name:${target}" >/dev/null
-  fi
+  hypr dispatch workspace "${target}" >/dev/null
 }
 
 switch_to_capture_workspace() {
@@ -384,7 +379,11 @@ process.stdout.write(parts.join("\u001f"));
       current_load_state=""
       current_result_count=""
     fi
-    if [[ "${current_mode}" == "${expected_mode}" && "${current_query}" == "${expected_query}" && "${current_category}" == "${expected_category}" && "${current_home}" == "${expect_home}" ]]; then
+    local home_matches=0
+    if [[ "${expect_home}" == "either" || "${current_home}" == "${expect_home}" ]]; then
+      home_matches=1
+    fi
+    if [[ "${current_mode}" == "${expected_mode}" && "${current_query}" == "${expected_query}" && "${current_category}" == "${expected_category}" && ${home_matches} -eq 1 ]]; then
       if [[ "${current_load_state}" == "loading" ]]; then
         sleep "${state_settle_interval}"
         continue
@@ -438,7 +437,7 @@ apply_launcher_state() {
 
   case "${state}" in
     home)
-      expect_home="true"
+      expect_home="either"
       ;;
     query)
       if [[ -z "${query}" ]]; then
