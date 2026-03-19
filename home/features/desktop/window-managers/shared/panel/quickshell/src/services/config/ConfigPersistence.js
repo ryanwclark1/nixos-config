@@ -297,14 +297,6 @@ var _MAPS = {
     power: [
         ["idleInhibit", "idleInhibitEnabled"],
         ["inhibitIdleWhenPlaying", "inhibitIdleWhenPlaying"],
-        ["acMonitorTimeout", "powerAcMonitorTimeout"],
-        ["acLockTimeout", "powerAcLockTimeout"],
-        ["acSuspendTimeout", "powerAcSuspendTimeout"],
-        ["acSuspendAction", "powerAcSuspendAction"],
-        ["batMonitorTimeout", "powerBatMonitorTimeout"],
-        ["batLockTimeout", "powerBatLockTimeout"],
-        ["batSuspendTimeout", "powerBatSuspendTimeout"],
-        ["batSuspendAction", "powerBatSuspendAction"],
         ["batteryAlertsEnabled", "batteryAlertsEnabled"],
         ["batteryWarningThreshold", "batteryWarningThreshold"],
         ["batteryCriticalThreshold", "batteryCriticalThreshold"]

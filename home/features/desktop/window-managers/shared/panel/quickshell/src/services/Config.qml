@@ -252,15 +252,6 @@ QtObject {
     property int batteryCriticalThreshold: 10
     property bool idleInhibitEnabled: false
     property bool inhibitIdleWhenPlaying: false
-    property int powerAcMonitorTimeout: 0
-    property int powerAcLockTimeout: 0
-    property int powerAcSuspendTimeout: 0
-    property string powerAcSuspendAction: "suspend"
-    property int powerBatMonitorTimeout: 5
-    property int powerBatLockTimeout: 10
-    property int powerBatSuspendTimeout: 30
-    property string powerBatSuspendAction: "suspend"
-
     // --- WORKSPACES ---
     property bool workspaceShowEmpty: true
     property bool workspaceShowNames: false
