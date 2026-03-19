@@ -6,9 +6,21 @@ import "../../../services"
 QtObject {
     id: root
 
-    readonly property string defaultTabId: "system"
+    readonly property string defaultTabId: "dashboard"
 
     readonly property var categories: [
+        {
+            id: "system-overview",
+            label: "Overview",
+            tabs: [
+                {
+                    id: "dashboard",
+                    label: "Dashboard",
+                    icon: "󰕮",
+                    component: "DashboardTab.qml"
+                }
+            ]
+        },
         {
             id: "shell-core",
             label: "Shell Core",
