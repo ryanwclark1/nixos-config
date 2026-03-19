@@ -35,7 +35,11 @@ Item {
             "shellPath",
             "showPorts",
             "autoScrollOnExpand",
-            "groupByCompose"
+            "groupByCompose",
+            "showImages",
+            "showVolumes",
+            "showNetworks",
+            "confirmPrune"
         ];
         for (var i = 0; i < keys.length; ++i)
             pluginApi.removeSetting(keys[i]);
@@ -55,6 +59,10 @@ Item {
         showPortsCheck.checked = pluginApi.loadSetting("showPorts", true) === true;
         autoScrollCheck.checked = pluginApi.loadSetting("autoScrollOnExpand", true) === true;
         composeViewCheck.checked = pluginApi.loadSetting("groupByCompose", false) === true;
+        showImagesCheck.checked = pluginApi.loadSetting("showImages", true) === true;
+        showVolumesCheck.checked = pluginApi.loadSetting("showVolumes", true) === true;
+        showNetworksCheck.checked = pluginApi.loadSetting("showNetworks", true) === true;
+        confirmPruneCheck.checked = pluginApi.loadSetting("confirmPrune", true) === true;
     }
 
     Component.onCompleted: loadValues()
@@ -198,6 +206,30 @@ Item {
                 id: composeViewCheck
                 text: "Default popup view to compose projects"
                 onToggled: root.saveSetting("groupByCompose", checked)
+            }
+
+            CheckBox {
+                id: showImagesCheck
+                text: "Show Images tab"
+                onToggled: root.saveSetting("showImages", checked)
+            }
+
+            CheckBox {
+                id: showVolumesCheck
+                text: "Show Volumes tab"
+                onToggled: root.saveSetting("showVolumes", checked)
+            }
+
+            CheckBox {
+                id: showNetworksCheck
+                text: "Show Networks tab"
+                onToggled: root.saveSetting("showNetworks", checked)
+            }
+
+            CheckBox {
+                id: confirmPruneCheck
+                text: "Confirm before prune actions"
+                onToggled: root.saveSetting("confirmPrune", checked)
             }
         }
 

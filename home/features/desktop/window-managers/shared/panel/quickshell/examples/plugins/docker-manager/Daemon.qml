@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "DockerUtils.js" as DU
 
 QtObject {
     id: root
@@ -18,7 +19,11 @@ QtObject {
             shellPath: "/bin/sh",
             showPorts: true,
             autoScrollOnExpand: true,
-            groupByCompose: false
+            groupByCompose: false,
+            showImages: true,
+            showVolumes: true,
+            showNetworks: true,
+            confirmPrune: true
         })
 
     property bool active: false
@@ -43,6 +48,16 @@ QtObject {
     property int runningContainers: 0
     property var containers: []
     property var composeProjects: []
+    property var images: []
+    property var volumes: []
+    property var networks: []
+    property int imageCount: 0
+    property int volumeCount: 0
+    property int networkCount: 0
+    property bool showImages: defaults.showImages
+    property bool showVolumes: defaults.showVolumes
+    property bool showNetworks: defaults.showNetworks
+    property bool confirmPrune: defaults.confirmPrune
 
     property bool _refreshQueued: false
     property int _refreshExitCode: 0
@@ -79,6 +94,10 @@ QtObject {
         showPorts = _boolSetting("showPorts", defaults.showPorts);
         autoScrollOnExpand = _boolSetting("autoScrollOnExpand", defaults.autoScrollOnExpand);
         groupByCompose = _boolSetting("groupByCompose", defaults.groupByCompose);
+        showImages = _boolSetting("showImages", defaults.showImages);
+        showVolumes = _boolSetting("showVolumes", defaults.showVolumes);
+        showNetworks = _boolSetting("showNetworks", defaults.showNetworks);
+        confirmPrune = _boolSetting("confirmPrune", defaults.confirmPrune);
     }
 
     function reloadFromSettings() {
@@ -186,16 +205,19 @@ QtObject {
             + "printf '{\"available\":false,\"message\":\"Unable to reach %s container runtime\"}\\n' \"$runtime\"; "
             + "exit 0; "
             + "fi; "
+            + "imgs=$(\"$runtime\" image ls --format json 2>/dev/null | jq -s . 2>/dev/null) || imgs='[]'; "
+            + "vols=$(\"$runtime\" volume ls --format json 2>/dev/null | jq -s . 2>/dev/null) || vols='[]'; "
+            + "nets=$(\"$runtime\" network ls --format json 2>/dev/null | jq -s . 2>/dev/null) || nets='[]'; "
             + "ids=$(\"$runtime\" container ls -aq 2>/dev/null | tr '\\n' ' '); "
             + "if [ -z \"${ids// }\" ]; then "
-            + "printf '{\"available\":true,\"containers\":[]}\\n'; "
+            + "printf '{\"available\":true,\"containers\":[],\"images\":%s,\"volumes\":%s,\"networks\":%s}\\n' \"$imgs\" \"$vols\" \"$nets\"; "
             + "exit 0; "
             + "fi; "
             + "json=$(\"$runtime\" container inspect $ids 2>/dev/null) || { "
             + "printf '{\"available\":false,\"message\":\"Failed to inspect containers\"}\\n'; "
             + "exit 0; "
             + "}; "
-            + "printf '{\"available\":true,\"containers\":%s}\\n' \"$json\""
+            + "printf '{\"available\":true,\"containers\":%s,\"images\":%s,\"volumes\":%s,\"networks\":%s}\\n' \"$json\" \"$imgs\" \"$vols\" \"$nets\""
         ];
     }
 
@@ -243,6 +265,12 @@ QtObject {
         containers = [];
         composeProjects = [];
         runningContainers = 0;
+        images = [];
+        volumes = [];
+        networks = [];
+        imageCount = 0;
+        volumeCount = 0;
+        networkCount = 0;
     }
 
     function _normalizePorts(rawPorts) {
@@ -293,7 +321,8 @@ QtObject {
             composeProject: String(labels["com.docker.compose.project"] || labels["io.podman.compose.project"] || ""),
             composeService: String(labels["com.docker.compose.service"] || labels["io.podman.compose.service"] || ""),
             composeWorkingDir: String(labels["com.docker.compose.project.working_dir"] || labels["io.podman.compose.project.working_dir"] || ""),
-            composeConfigFiles: String(labels["com.docker.compose.project.config_files"] || labels["io.podman.compose.project.config_files"] || "compose.yaml")
+            composeConfigFiles: String(labels["com.docker.compose.project.config_files"] || labels["io.podman.compose.project.config_files"] || "compose.yaml"),
+            healthStatus: String((raw.State && raw.State.Health && raw.State.Health.Status) || "")
         };
     }
 
@@ -366,9 +395,49 @@ QtObject {
             return String(left.name || "").localeCompare(String(right.name || ""));
         });
 
+        // Build set of running image references for cross-reference
+        var runningImageIds = {};
+        for (i = 0; i < normalized.length; i++) {
+            if (normalized[i].isRunning)
+                runningImageIds[normalized[i].image] = true;
+        }
+
+        // Normalize images
+        var rawImages = Array.isArray(payload.images) ? payload.images : [];
+        var normalizedImages = [];
+        for (i = 0; i < rawImages.length; i++) {
+            var img = DU.normalizeImage(rawImages[i], runningImageIds);
+            if (img) normalizedImages.push(img);
+        }
+        normalizedImages.sort(DU.sortImages);
+
+        // Normalize volumes
+        var rawVolumes = Array.isArray(payload.volumes) ? payload.volumes : [];
+        var normalizedVolumes = [];
+        for (i = 0; i < rawVolumes.length; i++) {
+            var vol = DU.normalizeVolume(rawVolumes[i]);
+            if (vol) normalizedVolumes.push(vol);
+        }
+        normalizedVolumes.sort(DU.sortVolumes);
+
+        // Normalize networks
+        var rawNetworks = Array.isArray(payload.networks) ? payload.networks : [];
+        var normalizedNetworks = [];
+        for (i = 0; i < rawNetworks.length; i++) {
+            var net = DU.normalizeNetwork(rawNetworks[i]);
+            if (net) normalizedNetworks.push(net);
+        }
+        normalizedNetworks.sort(DU.sortNetworks);
+
         containers = normalized;
         composeProjects = projects;
         runningContainers = running;
+        images = normalizedImages;
+        volumes = normalizedVolumes;
+        networks = normalizedNetworks;
+        imageCount = normalizedImages.length;
+        volumeCount = normalizedVolumes.length;
+        networkCount = normalizedNetworks.length;
         runtimeAvailable = true;
         lastError = "";
         lastRefreshAt = new Date().toISOString();
@@ -506,6 +575,106 @@ QtObject {
         return _openInTerminal("runtime=" + runtime + "; \"$runtime\" logs -f " + _shellQuote(identifier));
     }
 
+    function removeImage(imageId) {
+        var id = String(imageId || "").trim();
+        if (id === "") return false;
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" rmi " + _shellQuote(id) + "; else exit 1; fi"],
+            "Image " + id.slice(0, 12) + " removed.",
+            "Failed to remove image " + id.slice(0, 12) + "."
+        );
+    }
+
+    function removeVolume(volumeName) {
+        var name = String(volumeName || "").trim();
+        if (name === "") return false;
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" volume rm " + _shellQuote(name) + "; else exit 1; fi"],
+            "Volume " + name + " removed.",
+            "Failed to remove volume " + name + "."
+        );
+    }
+
+    function removeNetwork(networkName) {
+        var name = String(networkName || "").trim();
+        if (name === "") return false;
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" network rm " + _shellQuote(name) + "; else exit 1; fi"],
+            "Network " + name + " removed.",
+            "Failed to remove network " + name + "."
+        );
+    }
+
+    function pruneImages() {
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" image prune -f; else exit 1; fi"],
+            "Dangling images pruned.",
+            "Failed to prune images."
+        );
+    }
+
+    function pruneVolumes() {
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" volume prune -f; else exit 1; fi"],
+            "Unused volumes pruned.",
+            "Failed to prune volumes."
+        );
+    }
+
+    function pruneNetworks() {
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" network prune -f; else exit 1; fi"],
+            "Unused networks pruned.",
+            "Failed to prune networks."
+        );
+    }
+
+    function systemPrune() {
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" system prune -f; else exit 1; fi"],
+            "System prune completed.",
+            "System prune failed."
+        );
+    }
+
+    function runImage(imageName, containerName, hostPort, containerPort) {
+        var image = String(imageName || "").trim();
+        if (image === "") return false;
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        var args = "run -d";
+        var name = String(containerName || "").trim();
+        if (name !== "")
+            args += " --name " + _shellQuote(name);
+        var hp = String(hostPort || "").trim();
+        var cp = String(containerPort || "").trim();
+        if (hp !== "" && cp !== "")
+            args += " -p " + _shellQuote(hp + ":" + cp);
+        args += " " + _shellQuote(image);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" " + args + "; else exit 1; fi"],
+            "Container started from " + image + ".",
+            "Failed to run " + image + "."
+        );
+    }
+
+    function checkPortAvailable(port, callback) {
+        if (portCheckProc.running) {
+            if (callback) callback(false);
+            return;
+        }
+        _portCheckCallback = callback || null;
+        portCheckProc.command = ["sh", "-c", "ss -tlnH sport = :" + String(Number(port) || 0)];
+        portCheckProc.running = true;
+    }
+    property var _portCheckCallback: null
+
     function openShell(containerId) {
         var identifier = String(containerId || "").trim();
         if (identifier === "")
@@ -611,6 +780,28 @@ QtObject {
                 root._setRuntimeStatus("degraded", "E_DOCKER_ACTION_FAILED", root.actionFailureMessage);
             }
             root.scheduleRefresh(250);
+        }
+    }
+
+    property Process portCheckProc: Process {
+        id: portCheckProc
+        running: false
+        stdout: StdioCollector {
+            id: portCheckCollector
+            onStreamFinished: {
+                var output = String(text || "").trim();
+                var available = output === "";
+                if (root._portCheckCallback)
+                    root._portCheckCallback(available);
+                root._portCheckCallback = null;
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0) {
+                if (root._portCheckCallback)
+                    root._portCheckCallback(true);
+                root._portCheckCallback = null;
+            }
         }
     }
 }
