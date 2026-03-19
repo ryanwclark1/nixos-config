@@ -1,13 +1,13 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import "../../services"
 
-Flow {
+Item {
   id: root
-  spacing: Colors.spacingS
+  property int spacing: Colors.spacingS
   property bool vertical: false
-  flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   property var anchorWindow: null
   property int buttonSize: 32
   property int iconSize: 20
@@ -24,7 +24,26 @@ Flow {
     var tasks = taskModel.values;
     return tasks ? tasks.length : 0;
   }
+  readonly property real estimatedSpan: taskCount > 0
+    ? (taskCount * buttonSize) + (Math.max(0, taskCount - 1) * spacing)
+    : 0
+  readonly property real contentWidth: {
+    var item = layoutLoader.item;
+    return item ? (item.implicitWidth || item.width || 0) : 0;
+  }
+  readonly property real contentHeight: {
+    var item = layoutLoader.item;
+    return item ? (item.implicitHeight || item.height || 0) : 0;
+  }
   visible: taskCount > 0
+  implicitWidth: visible
+    ? (vertical ? Math.max(buttonSize, contentWidth) : Math.max(estimatedSpan, contentWidth))
+    : 0
+  implicitHeight: visible
+    ? (vertical ? Math.max(estimatedSpan, contentHeight) : Math.max(buttonSize, contentHeight))
+    : 0
+  width: implicitWidth
+  height: implicitHeight
   readonly property var runningToplevels: {
     // Force re-evaluation when NiriService windows change
     var _niriVer = root._niriWindowsVersion;
@@ -237,11 +256,40 @@ Flow {
     }
   }
 
-  Repeater {
-    model: taskModel
-    delegate: Loader {
-      required property var modelData
-      sourceComponent: modelData.isSeparator ? separatorComponent : taskButtonComponent
+  Loader {
+    id: layoutLoader
+    x: 0
+    y: 0
+    sourceComponent: root.vertical ? verticalLayoutComponent : horizontalLayoutComponent
+  }
+
+  Component {
+    id: horizontalLayoutComponent
+    Row {
+      spacing: root.spacing
+
+      Repeater {
+        model: taskModel
+        delegate: Loader {
+          required property var modelData
+          sourceComponent: modelData.isSeparator ? separatorComponent : taskButtonComponent
+        }
+      }
+    }
+  }
+
+  Component {
+    id: verticalLayoutComponent
+    Column {
+      spacing: root.spacing
+
+      Repeater {
+        model: taskModel
+        delegate: Loader {
+          required property var modelData
+          sourceComponent: modelData.isSeparator ? separatorComponent : taskButtonComponent
+        }
+      }
     }
   }
 

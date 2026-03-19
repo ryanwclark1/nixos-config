@@ -32,6 +32,7 @@ QtObject {
     signal captureFailed(string error)
     signal regionSelectionRequested()
     signal analyzeSelectionRequested()
+    signal screenshotNotificationRequested(string filePath)
     signal delayTick(int remaining)
 
     // ── Actions ──────────────────────────────────
@@ -135,11 +136,7 @@ QtObject {
                 hist = hist.slice(0, Config.screenshotHistoryMax);
             Config.screenshotHistory = hist;
             root.captureCompleted(path);
-            Quickshell.execDetached([
-                "notify-send", "-i", "camera-photo",
-                "Screenshot captured",
-                "Saved to " + parts[1] + " and copied to clipboard"
-            ]);
+            root.screenshotNotificationRequested(path);
         } else if (parts[0] === "ERROR" && parts[1] === "cancelled") {
             // User cancelled slurp — silent
         } else {
