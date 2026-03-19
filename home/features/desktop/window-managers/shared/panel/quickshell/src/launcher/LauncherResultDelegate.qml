@@ -24,7 +24,7 @@ Rectangle {
     signal entered
     signal secondaryActionRequested(var sourceItem, real localX, real localY)
 
-    width: parent ? parent.width : 0
+    width: ListView.view ? ListView.view.width : (parent ? parent.width : 0)
     height: tightMode ? 54 : (compactMode ? 60 : 70)
 
     readonly property bool highlighted: ListView.isCurrentItem

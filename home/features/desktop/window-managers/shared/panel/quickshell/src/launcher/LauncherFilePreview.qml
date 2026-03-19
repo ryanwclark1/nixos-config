@@ -160,7 +160,7 @@ Rectangle {
             }
 
             Rectangle {
-                visible: root.selectedItem && root.selectedItem.extension
+                visible: !!(root.selectedItem && root.selectedItem.extension)
                 color: Colors.withAlpha(Colors.primary, Colors.primarySubtle)
                 radius: Colors.radiusMicro
                 implicitWidth: extLabel.implicitWidth + Colors.spacingS * 2
