@@ -2,148 +2,150 @@ import QtQuick
 import Quickshell
 import "../../../services"
 import "../../../shared"
-import "../../../widgets"
 
-PopupWindow {
+Item {
   id: root
 
-  property Item anchorItem: null
-  property var anchorWindow: null
-  property string preferredEdge: ""
-  property bool hovered: false
   property string text: ""
   property string shortcut: ""
-  property int delay: 250
-  property real maxWidth: 280
+  property bool hovered: false
+  property Item anchorItem: null
+  property var anchorWindow: null
+  property int preferredSide: Qt.BottomEdge
+  property int showDelay: 500
 
-  readonly property string tooltipText: String(text || "").trim()
-  readonly property bool hasText: tooltipText.length > 0
-  property bool ready: false
+  readonly property var effectiveAnchorItem: anchorItem ? anchorItem : (parent || null)
+  readonly property bool usePopup: !!anchorWindow && !!effectiveAnchorItem
+  readonly property bool useInlineTooltip: !usePopup && !!effectiveAnchorItem
   readonly property string anchorEdge: {
-    if (preferredEdge !== "") return preferredEdge;
     if (anchorWindow && anchorWindow.tooltipEdge !== undefined && anchorWindow.tooltipEdge !== "")
       return String(anchorWindow.tooltipEdge);
     if (anchorWindow && anchorWindow.barConfig && anchorWindow.barConfig.position)
       return String(anchorWindow.barConfig.position);
-    return "top";
+    return "bottom";
   }
-
-  // Compute anchor rect from the item's position within the window,
-  // offset by Config.popupGap on the appropriate edge.
-  // This matches the pattern used by SurfaceService.popupAnchorX/Y
-  // and BarContextPopup for consistent popup positioning.
-  function _updateRect() {
-    if (!anchorItem || !anchorWindow) return;
-    var r = anchorWindow.itemRect(anchorItem);
-    var gap = Config.popupGap;
-    var tw = root.implicitWidth;
-    var th = root.implicitHeight;
-    var edge = anchorEdge;
-
-    if (edge === "left" || edge === "right") {
-      anchor.rect.y = r.y + r.height / 2 - th / 2;
-      anchor.rect.x = edge === "left" ? r.x + r.width + gap : r.x - tw - gap;
-    } else {
-      anchor.rect.x = r.x + r.width / 2 - tw / 2;
-      anchor.rect.y = edge === "bottom" ? r.y - th - gap : r.y + r.height + gap;
+  readonly property int popupEdge: {
+    switch (anchorEdge) {
+      case "top":
+        return Edges.Bottom;
+      case "bottom":
+        return Edges.Top;
+      case "left":
+        return Edges.Right;
+      case "right":
+        return Edges.Left;
+      default:
+        return Edges.Top;
     }
   }
 
-  onAnchorItemChanged: _updateRect()
-  onAnchorEdgeChanged: _updateRect()
-  onImplicitWidthChanged: _updateRect()
-  onImplicitHeightChanged: _updateRect()
-  onReadyChanged: if (ready) _updateRect()
+  property bool _shown: false
 
-  anchor.window: anchorWindow
-  anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
+  visible: useInlineTooltip
+  width: useInlineTooltip && effectiveAnchorItem ? effectiveAnchorItem.width : 0
+  height: useInlineTooltip && effectiveAnchorItem ? effectiveAnchorItem.height : 0
+  x: {
+    if (!useInlineTooltip || !effectiveAnchorItem || !parent || !effectiveAnchorItem.mapToItem)
+      return 0;
+    return effectiveAnchorItem.mapToItem(parent, 0, 0).x;
+  }
+  y: {
+    if (!useInlineTooltip || !effectiveAnchorItem || !parent || !effectiveAnchorItem.mapToItem)
+      return 0;
+    return effectiveAnchorItem.mapToItem(parent, 0, 0).y;
+  }
 
-  implicitWidth: tooltipBody.width
-  implicitHeight: tooltipBody.height
-  visible: ready && hasText && !!anchorItem
-  color: "transparent"
-
-  // Empty input mask: all mouse events pass through the tooltip surface
-  // to the underlying widgets, preventing hover/click interception
-  mask: Region { width: 0; height: 0 }
-
-  onHoveredChanged: {
-    if (hovered && hasText) {
-      ready = false;
+  function syncShownState() {
+    if (hovered && text !== "") {
       showTimer.restart();
     } else {
       showTimer.stop();
-      ready = false;
+      _shown = false;
     }
   }
 
-  onTextChanged: {
-    if (!hasText) {
-      showTimer.stop();
-      ready = false;
-    } else if (hovered) {
-      ready = false;
-      showTimer.restart();
-    }
-  }
+  onHoveredChanged: syncShownState()
+  onTextChanged: syncShownState()
+  Component.onCompleted: syncShownState()
 
   Timer {
     id: showTimer
-    interval: root.delay
-    repeat: false
-    onTriggered: root.ready = root.hovered && root.hasText
+    interval: root.showDelay
+    onTriggered: root._shown = root.hovered && root.text !== ""
   }
 
-  Rectangle {
-    id: tooltipBody
-    width: Math.min(tooltipRow.implicitWidth + 24, root.maxWidth)
-    height: tooltipRow.implicitHeight + 16
-    radius: Colors.radiusSmall
-    color: Colors.withAlpha(Colors.surface, 0.95)
-    border.color: Colors.border
-    border.width: 1
+  Tooltip {
+    anchors.fill: parent
+    text: root.text
+    shortcut: root.shortcut
+    shown: root.useInlineTooltip && root._shown
+    preferredSide: root.preferredSide
+  }
 
-    opacity: root.ready ? 1.0 : 0.0
-    scale: root.ready ? 1.0 : 0.92
-    Behavior on opacity { Anim { duration: Colors.durationFast } }
-    Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+  PopupWindow {
+    id: popupTooltip
+    anchor.window: root.anchorWindow
+    anchor.item: root.effectiveAnchorItem
+    anchor.edges: root.popupEdge
+    anchor.gravity: root.popupEdge
+    anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
+    anchor.margins {
+      top: Colors.spacingS
+      bottom: Colors.spacingS
+      left: Colors.spacingS
+      right: Colors.spacingS
+    }
 
-    // Subtly lighter inner border
-    InnerHighlight { }
+    visible: root.usePopup && root._shown && root.text !== ""
+    color: "transparent"
+    implicitWidth: bubble.implicitWidth
+    implicitHeight: bubble.implicitHeight
 
-    Row {
-      id: tooltipRow
-      anchors.centerIn: parent
-      spacing: Colors.spacingXS
+    Rectangle {
+      id: bubble
 
-      Text {
-        id: textItem
-        width: Math.min(implicitWidth, root.maxWidth - 24)
-        text: root.tooltipText
-        color: Colors.text
-        font.pixelSize: Colors.fontSizeSmall
-        font.weight: Font.Medium
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.NoWrap
-        elide: Text.ElideRight
-        anchors.verticalCenter: parent.verticalCenter
-      }
+      readonly property int paddingH: Colors.spacingM
+      readonly property int paddingV: Colors.spacingXS
 
-      Rectangle {
-        visible: root.shortcut !== ""
-        anchors.verticalCenter: parent.verticalCenter
-        radius: Colors.radiusMicro
-        color: Colors.withAlpha(Colors.text, 0.12)
-        width: shortcutLabel.implicitWidth + Colors.spacingXS * 2
-        height: shortcutLabel.implicitHeight + 4
+      implicitWidth: Math.min(280, tooltipRow.implicitWidth + paddingH * 2)
+      implicitHeight: tooltipRow.implicitHeight + paddingV * 2
+      width: implicitWidth
+      height: implicitHeight
+      radius: Colors.radiusXS
+      color: Colors.withAlpha(Colors.surface, 0.95)
+      border.color: Colors.border
+      border.width: 1
+
+      Row {
+        id: tooltipRow
+        anchors.centerIn: parent
+        spacing: Colors.spacingXS
 
         Text {
-          id: shortcutLabel
-          anchors.centerIn: parent
-          text: root.shortcut
-          color: Colors.textSecondary
-          font.pixelSize: Colors.fontSizeXS
-          font.family: Colors.fontMono
+          width: Math.min(200, implicitWidth)
+          text: root.text
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeSmall
+          wrapMode: Text.WordWrap
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Rectangle {
+          visible: root.shortcut !== ""
+          anchors.verticalCenter: parent.verticalCenter
+          radius: Colors.radiusMicro
+          color: Colors.withAlpha(Colors.text, 0.12)
+          width: shortcutLabel.implicitWidth + Colors.spacingXS * 2
+          height: shortcutLabel.implicitHeight + 4
+
+          Text {
+            id: shortcutLabel
+            anchors.centerIn: parent
+            text: root.shortcut
+            color: Colors.textSecondary
+            font.pixelSize: Colors.fontSizeXS
+            font.family: Colors.fontMono
+          }
         }
       }
     }
