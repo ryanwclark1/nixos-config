@@ -251,6 +251,9 @@ quickshell-checks:
 quickshell-checks-host:
 	PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/quickshell-verify.sh
 
+quickshell-test:
+	cd ./home/features/desktop/window-managers/shared/panel/quickshell && npx vitest run --config tests/vitest.config.js
+
 niri-vm-build:
 	bash ./scripts/vm/launch-niri-test-vm.sh --build-only
 

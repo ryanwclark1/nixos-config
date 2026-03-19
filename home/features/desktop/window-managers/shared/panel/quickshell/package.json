@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --config tests/vitest.config.js",
+    "test:watch": "vitest --config tests/vitest.config.js"
+  },
+  "devDependencies": {
+    "vitest": "^3.1.0"
+  }
+}

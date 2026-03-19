@@ -65,9 +65,8 @@ QtObject {
     "autosens = 1\n" +
     "\n" +
     "[output]\n" +
-    "method = raw\n" +
-    "raw_target = /dev/stdout\n" +
-    "bit_format = 16bit\n"
+    "method = noncurses\n" +
+    "ascii_max_range = 1000\n"
 
   // ── Cava process ───────────────────────────────
   property Process _cavaProc: Process {

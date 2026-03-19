@@ -13,8 +13,10 @@ SharedWidgets.CardBase {
     property string vramUsage: "0 / 0 MB"
     property real vramPercent: 0.0
     property var gpuHistory: []
+    property bool showProcesses: false
 
     SharedWidgets.Ref { service: SystemStatus }
+    SharedWidgets.Ref { service: AMDGPUService }
 
     Component.onCompleted: gpuHistory = SystemStatus.gpuHistory.slice(-30)
 
@@ -31,7 +33,7 @@ SharedWidgets.CardBase {
     CommandPoll {
         id: vramPoll
         interval: root._vramPollMs
-        running: root.visible
+        running: root.visible && !AMDGPUService.available
         command: ["sh", "-c",
             "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
             + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
@@ -53,6 +55,11 @@ SharedWidgets.CardBase {
         }
     }
 
+    function formatBytes(bytes) {
+        if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + " GB";
+        return (bytes / 1048576).toFixed(0) + " MB";
+    }
+
     readonly property color usageColor: SystemStatus.gpuPercent >= 0.9 ? Colors.error
         : (SystemStatus.gpuPercent >= 0.7 ? Colors.warning : Colors.secondary)
 
@@ -67,7 +74,7 @@ SharedWidgets.CardBase {
             spacing: Colors.spacingS
 
             Text {
-                text: "GPU"
+                text: AMDGPUService.available ? "AMD GPU" : "GPU"
                 color: Colors.textDisabled
                 font.pixelSize: Colors.fontSizeXS
                 font.weight: Font.Black
@@ -77,15 +84,30 @@ SharedWidgets.CardBase {
             Item { Layout.fillWidth: true }
 
             SharedWidgets.Chip {
+                visible: AMDGPUService.available ? AMDGPUService.powerWatts > 0 : false
+                icon: "󱐋"
+                text: AMDGPUService.powerWatts + "W"
+                textColor: Colors.textSecondary
+            }
+
+            SharedWidgets.Chip {
                 visible: SystemStatus.gpuTemp !== "--"
                 icon: "󰢮"
                 iconColor: SystemStatus.gpuTempNum > 85 ? Colors.error : Colors.textSecondary
                 text: SystemStatus.gpuTemp
                 textColor: SystemStatus.gpuTempNum > 85 ? Colors.error : Colors.textSecondary
             }
+            
+            SharedWidgets.IconButton {
+                visible: AMDGPUService.available
+                icon: root.showProcesses ? "󱗼" : "󱗻"
+                size: 24
+                iconSize: Colors.fontSizeSmall
+                onClicked: root.showProcesses = !root.showProcesses
+            }
         }
 
-        // Gauge + stats row
+        // Main stats row
         RowLayout {
             Layout.fillWidth: true
             spacing: Colors.spacingL
@@ -117,7 +139,7 @@ SharedWidgets.CardBase {
                 }
             }
 
-            // Stats column
+            // Core stats column
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: Colors.spacingXS
@@ -131,21 +153,50 @@ SharedWidgets.CardBase {
 
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
-                    label: "Temperature"
-                    value: SystemStatus.gpuTemp
-                    valueColor: SystemStatus.gpuTempNum > 85 ? Colors.error : Colors.text
-                }
-
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
                     label: "VRAM"
-                    value: root.vramUsage
+                    value: AMDGPUService.available ? (root.formatBytes(AMDGPUService.vramUsageBytes) + " / " + root.formatBytes(AMDGPUService.vramTotalBytes)) : root.vramUsage
                 }
 
                 SharedWidgets.MiniProgressBar {
-                    value: root.vramPercent
+                    value: AMDGPUService.available ? AMDGPUService.vramPercent : root.vramPercent
                     barColor: Colors.primary
                 }
+            }
+        }
+
+        // Advanced AMD Stats
+        GridLayout {
+            visible: AMDGPUService.available
+            Layout.fillWidth: true
+            columns: 2
+            columnSpacing: Colors.spacingM
+            rowSpacing: Colors.spacingXS
+            
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 2
+                Text { text: "Graphics Engine"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+                SharedWidgets.MiniProgressBar { value: AMDGPUService.gfxUsage; barColor: Colors.secondary }
+            }
+            
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 2
+                Text { text: "Memory Controller"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+                SharedWidgets.MiniProgressBar { value: AMDGPUService.memUsage; barColor: Colors.accent }
+            }
+            
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 2
+                Text { text: "Media Engine"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+                SharedWidgets.MiniProgressBar { value: AMDGPUService.mediaUsage; barColor: Colors.success }
+            }
+            
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+                SharedWidgets.InfoRow { label: "Fan"; value: AMDGPUService.fanRpm + " RPM"; Layout.fillWidth: true }
             }
         }
 
@@ -177,10 +228,77 @@ SharedWidgets.CardBase {
             Canvas {
                 id: gpuCanvas
                 Layout.fillWidth: true
-                Layout.preferredHeight: 52
+                Layout.preferredHeight: 40
                 renderTarget: Canvas.FramebufferObject
                 renderStrategy: Canvas.Threaded
                 onPaint: GU.paintLineGraph(gpuCanvas, root.gpuHistory, root.usageColor, Colors.withAlpha, { yScale: 0.9 })
+            }
+        }
+        
+        // GPU Processes list (Top 3)
+        ColumnLayout {
+            visible: root.showProcesses && AMDGPUService.available
+            Layout.fillWidth: true
+            spacing: Colors.spacingXS
+            
+            Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.3 }
+            
+            Text {
+                text: "TOP GPU PROCESSES"
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXXS
+                font.weight: Font.Bold
+                font.letterSpacing: Colors.letterSpacingWide
+            }
+            
+            Repeater {
+                model: {
+                    var items = [];
+                    for (var pid in AMDGPUService.processGpuUsage) {
+                        var p = AMDGPUService.processGpuUsage[pid];
+                        if (p.gfx > 0 || p.vram > 1024*1024) {
+                            items.push({ pid: pid, name: p.name, gfx: p.gfx, vram: p.vram });
+                        }
+                    }
+                    items.sort((a, b) => b.gfx - a.gfx || b.vram - a.vram);
+                    return items.slice(0, 3);
+                }
+                
+                delegate: RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingS
+                    
+                    Text {
+                        text: modelData.name
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeSmall
+                        elide: Text.ElideRight
+                        Layout.fillWidth: true
+                    }
+                    
+                    Text {
+                        text: modelData.gfx + "%"
+                        color: Colors.secondary
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.family: Colors.fontMono
+                        font.weight: Font.Bold
+                    }
+                    
+                    Text {
+                        text: root.formatBytes(modelData.vram)
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeXXS
+                        font.family: Colors.fontMono
+                    }
+                }
+            }
+            
+            Text {
+                visible: Object.keys(AMDGPUService.processGpuUsage).length === 0
+                text: "No GPU activity detected"
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXXS
+                font.italic: true
             }
         }
     }
