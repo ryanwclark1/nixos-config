@@ -292,7 +292,7 @@ population_score() {
   local visible_hits=0
   local pattern=""
   local patterns=(
-    'Bar[[:space:]]+Widgets'
+    'Bar[[:space:].]+Widgets'
     'Manage the widget composition'
     '(Main|Mlan)[[:space:]]+Bar'
     'Active[[:space:]]+Bar'
