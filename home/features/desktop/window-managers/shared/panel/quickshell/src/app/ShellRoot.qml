@@ -425,8 +425,11 @@ Scope {
                     root.toggleSurface("overview");
             } else if (corner === "topRight") {
                 root.toggleSurface("notifCenter");
+            } else if (corner === "bottomLeft") {
+                launcher.toggle();
+            } else if (corner === "bottomRight") {
+                root.toggleSurface("controlCenter");
             }
-            // bottomLeft / bottomRight: no default action — extend here
         }
     }
 

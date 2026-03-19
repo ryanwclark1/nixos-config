@@ -212,7 +212,7 @@ elif [ "$provider" = "gemini" ]; then
           output: (.tokens.output // 0), cached: (.tokens.cached // 0),
           thoughts: (.tokens.thoughts // 0), total: (.tokens.total // 0) }]
     }'
-  extracted=$(echo "$session_files" | xargs -P4 -I{} jq -c --arg ws "$seven_days_ago" "$jq_filter" {} 2>/dev/null)
+  extracted=$(echo "$session_files" | xargs -P4 -I{} jq -c --arg ws "$seven_days_ago" "$jq_filter" {} 2>/dev/null || true)
 
   if [ -z "$extracted" ]; then
     echo "$json_fallback"
