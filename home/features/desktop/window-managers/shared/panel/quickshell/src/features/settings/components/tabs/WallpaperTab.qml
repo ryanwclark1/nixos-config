@@ -186,7 +186,7 @@ Item {
                     if (names.length === 0)
                         root._loadFallbackMonitorNames();
                 } catch (e) {
-                    console.error("Failed to parse monitor list: " + e);
+                    Logger.e("WallpaperTab", "Failed to parse monitor list:", e);
                     root._loadFallbackMonitorNames();
                 }
             }

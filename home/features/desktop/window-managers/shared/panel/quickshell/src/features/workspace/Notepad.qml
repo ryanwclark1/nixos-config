@@ -104,7 +104,7 @@ PanelWindow {
         notepadWidth = Math.max(notepadMinWidth, Math.min(notepadMaxWidth, data.width));
       }
     } catch (e) {
-      console.error("Notepad: failed to parse JSON: " + e);
+      Logger.e("Notepad", "failed to parse JSON:", e);
     }
     _loading = false;
     // Trigger UI sync

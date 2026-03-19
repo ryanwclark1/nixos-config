@@ -19,7 +19,7 @@ Scope {
         interval: 1500
         onTriggered: {
             if (root.isVisible && root._escapeRequested) {
-                console.warn("Overview: compositor did not close overview within timeout, forcing local close");
+                Logger.w("Overview", "compositor did not close overview within timeout, forcing local close");
                 root.forceClose();
             }
             root._escapeRequested = false;

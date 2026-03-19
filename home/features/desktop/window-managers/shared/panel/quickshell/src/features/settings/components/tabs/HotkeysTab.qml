@@ -86,7 +86,7 @@ Item {
                     }
                     root.keybindsList = result;
                 } catch (e) {
-                    console.error("Failed to parse compositor binds: " + e);
+                    Logger.e("HotkeysTab", "Failed to parse compositor binds:", e);
                 }
             }
         }

@@ -140,7 +140,7 @@ PanelWindow {
           displayRoot._computeScaleFactor();
           if (result.length > 0) displayRoot.selectedIndex = 0;
         } catch (e) {
-          console.error("DisplayConfig: failed to parse monitors: " + e);
+          Logger.e("DisplayConfig", "failed to parse monitors:", e);
         }
       }
     }

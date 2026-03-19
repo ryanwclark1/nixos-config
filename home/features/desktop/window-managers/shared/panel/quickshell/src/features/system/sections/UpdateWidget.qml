@@ -107,7 +107,7 @@ SharedWidgets.CardBase {
     stderr: StdioCollector {
       onStreamFinished: {
         root.lastError = (this.text || "").trim();
-        if (root.lastError.length > 0) console.warn("UpdateWidget: qs-updator error:", root.lastError);
+        if (root.lastError.length > 0) Logger.w("UpdateWidget", "qs-updator error:", root.lastError);
       }
     }
   }
