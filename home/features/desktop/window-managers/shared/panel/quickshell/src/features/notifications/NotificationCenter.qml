@@ -194,7 +194,10 @@ PanelWindow {
 
       Item {
         Layout.fillWidth: true
-        Layout.fillHeight: true
+        // Shrink when empty so the archive history section gets more space
+        readonly property bool _hasTracked: notifList.count > 0
+        Layout.fillHeight: _hasTracked
+        Layout.preferredHeight: _hasTracked ? -1 : (_emptyState.visible ? _emptyState.implicitHeight + Colors.spacingL * 2 : 0)
 
         ListView {
           id: notifList
@@ -210,22 +213,23 @@ PanelWindow {
 
           // Empty state
           ColumnLayout {
+            id: _emptyState
             anchors.centerIn: parent
             visible: (notifList.count === 0 && root.searchQuery === "") || (root.searchQuery !== "" && notifList.visibleCount === 0)
-            spacing: Colors.spacingM
+            spacing: Colors.spacingS
             opacity: 0.6
             Text {
               Layout.alignment: Qt.AlignHCenter
               text: root.searchQuery === "" ? "󰂚" : "󰍉"
               color: Colors.textDisabled
-              font.pixelSize: 64
+              font.pixelSize: 36
               font.family: Colors.fontMono
             }
             Text {
               Layout.alignment: Qt.AlignHCenter
               text: root.searchQuery === "" ? "No new notifications" : "No matches found"
               color: Colors.textDisabled
-              font.pixelSize: Colors.fontSizeLarge
+              font.pixelSize: Colors.fontSizeMedium
               font.weight: Font.Medium
             }
           }
@@ -338,8 +342,10 @@ PanelWindow {
       }
 
       // Archive Section — shows dismissed notifications with relative timestamps
+      // Fills remaining space when no tracked notifications, otherwise fixed height
       ColumnLayout {
         Layout.fillWidth: true
+        Layout.fillHeight: notifList.count === 0
         spacing: Colors.spacingS
         visible: root.manager && root.manager.archivedNotifications.length > 0
 
@@ -368,7 +374,8 @@ PanelWindow {
         ListView {
           id: archiveList
           Layout.fillWidth: true
-          height: Math.min(contentHeight, 300)
+          Layout.fillHeight: notifList.count === 0
+          height: notifList.count === 0 ? -1 : Math.min(contentHeight, 300)
           clip: true
           model: root.manager ? root.manager.archivedNotifications : null
           spacing: Colors.spacingXS
