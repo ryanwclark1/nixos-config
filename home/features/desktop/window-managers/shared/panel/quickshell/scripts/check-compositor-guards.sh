@@ -13,6 +13,7 @@ allow_hyprctl=(
 
 allow_hyprland_import=(
   "${config_dir}/bar/widgets/Workspaces.qml"
+  "${config_dir}/features/osd/components/WorkspaceOsd.qml"
   "${config_dir}/launcher/OverviewHyprland.qml"
   "${config_dir}/services/CompositorAdapter.qml"
 )
@@ -22,6 +23,7 @@ allow_direct_compositor_checks=(
   "${config_dir}/bar/widgets/TaskButton.qml"
   "${config_dir}/bar/widgets/WindowTitle.qml"
   "${config_dir}/bar/widgets/Workspaces.qml"
+  "${config_dir}/features/osd/components/WorkspaceOsd.qml"
   "${config_dir}/launcher/AltTabSwitcher.qml"
   "${config_dir}/launcher/Overview.qml"
   "${config_dir}/features/settings/components/tabs/HotkeysTab.qml"
