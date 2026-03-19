@@ -55,6 +55,7 @@ Scope {
     readonly property bool batteryMenuVisible: root.isSurfaceOpen("batteryMenu")
     readonly property bool weatherMenuVisible: root.isSurfaceOpen("weatherMenu")
     readonly property bool marketMenuVisible: root.isSurfaceOpen("marketMenu")
+    readonly property bool modelUsageMenuVisible: root.isSurfaceOpen("modelUsageMenu")
     readonly property bool sshMenuVisible: root.isSurfaceOpen("sshMenu")
     readonly property bool dateTimeMenuVisible: root.isSurfaceOpen("dateTimeMenu")
     readonly property bool systemStatsMenuVisible: root.isSurfaceOpen("systemStatsMenu")

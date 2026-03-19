@@ -195,6 +195,8 @@ Item {
             return logoComponent;
         if (widgetType === "workspaces")
             return workspacesComponent;
+        if (widgetType === "specialWorkspaces")
+            return specialWorkspacesComponent;
         if (widgetType === "taskbar")
             return taskbarComponent;
         if (widgetType === "windowTitle")
@@ -223,6 +225,8 @@ Item {
             return cavaComponent;
         if (widgetType === "idleInhibitor")
             return idleInhibitorComponent;
+        if (widgetType === "modelUsage")
+            return modelUsageComponent;
         if (widgetType === "weather")
             return weatherComponent;
         if (widgetType === "market")
@@ -815,6 +819,18 @@ Item {
         IdleInhibitorBarWidget {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: modelUsageComponent
+        ModelUsageBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            isActive: root.isSurfaceActive("modelUsageMenu")
+            onTriggerRequested: triggerItem => root.requestSurface("modelUsageMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }

@@ -6,6 +6,7 @@ import "../features/audio"
 import "../features/clipboard"
 import "../features/media"
 import "../features/market"
+import "../features/model-usage"
 import "../features/network"
 import "../features/power"
 import "../features/screenshot"
@@ -153,6 +154,10 @@ Item {
                             MarketMenu {
                                 implicitHeight: Math.min(600, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 Component.onCompleted: barWindow.wirePopup(this, "marketMenu")
+                            }
+                            ModelUsageMenu {
+                                implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                Component.onCompleted: barWindow.wirePopup(this, "modelUsageMenu")
                             }
                             SshMenu {
                                 implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))

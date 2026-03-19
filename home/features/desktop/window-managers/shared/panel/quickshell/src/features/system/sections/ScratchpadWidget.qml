@@ -28,7 +28,7 @@ SharedWidgets.CardBase {
     if (!CompositorAdapter.supportsScratchpad) return;
     var targetWorkspace = "1";
     CompositorAdapter.moveWindowToWorkspace(address, targetWorkspace);
-    CompositorAdapter.focusWindowAddress(address);
+    CompositorAdapter.focusWindow(address);
   }
 
   ColumnLayout {

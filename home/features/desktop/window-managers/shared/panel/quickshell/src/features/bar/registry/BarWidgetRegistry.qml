@@ -15,6 +15,10 @@ QtObject {
       { type: "toggle", key: "showAddButton", label: "Add Button", icon: "󰐕", enabledText: "Show the quick add-workspace button at the end of the strip.", disabledText: "Hide the add-workspace button from this widget instance." },
       { type: "toggle", key: "showMiniMap", label: "Mini-map", icon: "󰍹", enabledText: "Show live mini-map window previews inside workspace pills.", disabledText: "Hide mini-map previews and keep the pills text-only." }
     ] },
+    { widgetType: "specialWorkspaces", label: "Special Workspaces", icon: "󰐃", section: "left", description: "Hyprland special workspace indicator and toggle (scratchpads).", hasSettings: true, defaultSettings: { mainIcon: "󰖲", showLabels: false }, settingsSchema: [
+      { type: "text", key: "mainIcon", label: "Main Icon", icon: "󰀻", placeholder: "󰖲" },
+      { type: "toggle", key: "showLabels", label: "Show Labels", icon: "󰉿", enabledText: "Show workspace names alongside icons in expanded pills.", disabledText: "Show only icons in the expanded workspace pills." }
+    ] },
     { widgetType: "windowTitle", label: "Active App Context", icon: "󰖯", section: "left", description: "Active window title and app-specific tools.", hasSettings: true, defaultSettings: { maxTitleWidth: 300, showAppIcon: true, showGitStatus: true, showMediaContext: true }, settingsSchema: [
       { type: "slider", key: "maxTitleWidth", label: "Title Width", icon: "󰨈", min: 120, max: 520, step: 1 },
       { type: "toggle", key: "showAppIcon", label: "App Icon", icon: "󰀻", enabledText: "Show the active app icon before the title.", disabledText: "Hide the app icon and show only textual context." },
@@ -69,6 +73,9 @@ QtObject {
       { type: "slider", key: "barCount", label: "Bar Count", icon: "󰎈", min: 4, max: 20, step: 1 }
     ] },
     { widgetType: "idleInhibitor", label: "Idle Inhibitor", icon: "󰒲", section: "center", description: "Toggle idle inhibit state." },
+    { widgetType: "modelUsage", label: "Model Usage", icon: "󰊤", section: "right", description: "AI coding assistant usage stats (Claude Code, Codex).", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
     { widgetType: "weather", label: "Weather", icon: "󰖙", section: "right", description: "Current weather and forecast popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
     ] },
@@ -325,7 +332,7 @@ QtObject {
       return chips;
     }
 
-    if (widgetType === "weather" || widgetType === "market" || widgetType === "network" || widgetType === "audio" || widgetType === "battery" || widgetType === "updates" || widgetType === "bluetooth") {
+    if (widgetType === "weather" || widgetType === "market" || widgetType === "modelUsage" || widgetType === "network" || widgetType === "audio" || widgetType === "battery" || widgetType === "updates" || widgetType === "bluetooth") {
       chips.push("Display: " + _modeLabel(settings.displayMode));
       return chips;
     }
@@ -395,6 +402,11 @@ QtObject {
     if (widgetType === "workspaces") {
       chips.push(settings.showAddButton !== false ? "Add On" : "Add Off");
       chips.push(settings.showMiniMap !== false ? "Mini-map On" : "Mini-map Off");
+      return chips;
+    }
+
+    if (widgetType === "specialWorkspaces") {
+      chips.push(settings.showLabels === true ? "Labels On" : "Labels Off");
       return chips;
     }
 
