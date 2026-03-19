@@ -42,6 +42,11 @@ QtObject {
     property int notifHistoryMaxCount: 50
     property int notifHistoryMaxAgeDays: 7
     property var notifRules: []
+    property bool notifTtsEnabled: false
+    property string notifTtsEngine: "espeak-ng"  // espeak-ng | piper | speak
+    property int notifTtsRate: 175               // words per minute
+    property int notifTtsVolume: 100             // 0-200 (espeak scale)
+    property var notifTtsExcludedApps: []        // app names to skip
 
     // --- TIME ---
     property bool timeUse24Hour: true

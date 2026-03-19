@@ -575,6 +575,21 @@ QtObject {
         function onNotifRulesChanged() {
             root.config.scheduleSave();
         }
+        function onNotifTtsEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifTtsEngineChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifTtsRateChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifTtsVolumeChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifTtsExcludedAppsChanged() {
+            root.config.scheduleSave();
+        }
         function onPowerAcMonitorTimeoutChanged() {
             root.config.scheduleSave();
         }

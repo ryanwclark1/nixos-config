@@ -182,7 +182,12 @@ var _MAPS = {
         ["historyEnabled", "notifHistoryEnabled"],
         ["historyMaxCount", "notifHistoryMaxCount"],
         ["historyMaxAgeDays", "notifHistoryMaxAgeDays"],
-        ["rules", "notifRules"]
+        ["rules", "notifRules"],
+        ["ttsEnabled", "notifTtsEnabled"],
+        ["ttsEngine", "notifTtsEngine"],
+        ["ttsRate", "notifTtsRate"],
+        ["ttsVolume", "notifTtsVolume"],
+        ["ttsExcludedApps", "notifTtsExcludedApps"]
     ],
     time: [
         ["use24Hour", "timeUse24Hour"],
