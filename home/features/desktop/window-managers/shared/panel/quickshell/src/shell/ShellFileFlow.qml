@@ -4,6 +4,7 @@ import "../services"
 
 QtObject {
     id: root
+    property bool _destroyed: false
 
     required property QtObject shellRoot
     required property QtObject fileBrowser
@@ -61,12 +62,14 @@ QtObject {
         if (fileBrowserCaller === "notepad-open") {
             shellRoot.openSurface("notepad");
             Qt.callLater(function () {
+                if (_destroyed) return;
                 if (notepad)
                     notepad.loadFile(filePath);
             });
         } else if (fileBrowserCaller === "notepad-save") {
             shellRoot.openSurface("notepad");
             Qt.callLater(function () {
+                if (_destroyed) return;
                 if (notepad)
                     notepad.saveToFile(filePath, pendingNotepadContent);
             });
