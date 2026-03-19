@@ -1,0 +1,191 @@
+import { describe, it, expect } from "vitest";
+import {
+  widgetSettings,
+  widgetDiagnosticId,
+  compactPercentText,
+  widgetValueStyle,
+  statDisplayText,
+  widgetDisplayMode,
+  isCompactStatWidget,
+  isIconOnlyStatWidget,
+  widgetIntegerSetting,
+  widgetBooleanSetting,
+  widgetStringSetting,
+  triggerWidgetIconOnly,
+  triggerWidgetLabel,
+} from "../../src/bar/PanelWidgetHelpers.js";
+
+describe("widgetSettings", () => {
+  it("returns settings from widget instance", () => {
+    expect(widgetSettings({ settings: { x: 1 } })).toEqual({ x: 1 });
+  });
+
+  it("returns empty object for null/missing", () => {
+    expect(widgetSettings(null)).toEqual({});
+    expect(widgetSettings({})).toEqual({});
+  });
+});
+
+describe("widgetDiagnosticId", () => {
+  it("formats diagnostic string", () => {
+    const result = widgetDiagnosticId(
+      { widgetType: "cpuStatus", instanceId: "cpu1" },
+      { id: "bar-main" }
+    );
+    expect(result).toBe("bar=bar-main widget=cpuStatus instance=cpu1");
+  });
+
+  it("handles missing instanceId", () => {
+    const result = widgetDiagnosticId({ widgetType: "logo" }, { id: "bar1" });
+    expect(result).toBe("bar=bar1 widget=logo");
+  });
+});
+
+describe("compactPercentText", () => {
+  it("formats 0-1 value as percentage", () => {
+    expect(compactPercentText(0.5)).toBe("50%");
+    expect(compactPercentText(1)).toBe("100%");
+    expect(compactPercentText(0)).toBe("0%");
+  });
+
+  it("clamps out-of-range values", () => {
+    expect(compactPercentText(1.5)).toBe("100%");
+    expect(compactPercentText(-0.5)).toBe("0%");
+  });
+});
+
+describe("widgetValueStyle", () => {
+  it("returns default style per widget type", () => {
+    expect(widgetValueStyle({}, "cpuStatus")).toBe("percent");
+    expect(widgetValueStyle({}, "ramStatus")).toBe("usage");
+    expect(widgetValueStyle({}, "diskStatus")).toBe("percent");
+    expect(widgetValueStyle({}, "networkStatus")).toBe("rate");
+  });
+
+  it("respects settings override", () => {
+    expect(
+      widgetValueStyle({ settings: { valueStyle: "usageTemp" } }, "cpuStatus")
+    ).toBe("usageTemp");
+  });
+
+  it("rejects invalid style values", () => {
+    expect(
+      widgetValueStyle({ settings: { valueStyle: "bogus" } }, "cpuStatus")
+    ).toBe("percent");
+  });
+});
+
+describe("statDisplayText", () => {
+  const ss = {
+    cpuUsage: "45%",
+    cpuTemp: "65°C",
+    ramUsage: "8.2 GiB",
+    ramPercent: 0.51,
+    gpuUsage: "30%",
+    gpuTemp: "55°C",
+    diskUsage: "120 GiB",
+    netDown: "5.2 MB/s",
+    netUp: "1.1 MB/s",
+  };
+
+  it("returns CPU usage", () => {
+    expect(statDisplayText("cpuStatus", {}, ss)).toBe("45%");
+  });
+
+  it("returns CPU+temp for usageTemp style", () => {
+    expect(
+      statDisplayText("cpuStatus", { settings: { valueStyle: "usageTemp" } }, ss)
+    ).toBe("45% • 65°C");
+  });
+
+  it("returns RAM usage or percent", () => {
+    expect(statDisplayText("ramStatus", {}, ss)).toBe("8.2 GiB");
+    expect(
+      statDisplayText("ramStatus", { settings: { valueStyle: "percent" } }, ss)
+    ).toBe("51%");
+  });
+
+  it("returns network down rate", () => {
+    expect(statDisplayText("networkStatus", {}, ss)).toBe("↓5.2 MB/s");
+  });
+});
+
+describe("widgetDisplayMode", () => {
+  it("defaults to auto", () => {
+    expect(widgetDisplayMode({})).toBe("auto");
+  });
+
+  it("accepts valid modes", () => {
+    expect(widgetDisplayMode({ settings: { displayMode: "icon" } })).toBe("icon");
+    expect(widgetDisplayMode({ settings: { displayMode: "full" } })).toBe("full");
+  });
+
+  it("rejects invalid modes", () => {
+    expect(widgetDisplayMode({ settings: { displayMode: "bogus" } })).toBe("auto");
+  });
+});
+
+describe("isCompactStatWidget / isIconOnlyStatWidget", () => {
+  it("returns true for compact mode", () => {
+    expect(isCompactStatWidget({ settings: { displayMode: "compact" } }, false)).toBe(true);
+  });
+
+  it("auto mode is compact when vertical", () => {
+    expect(isCompactStatWidget({}, true)).toBe(true);
+    expect(isCompactStatWidget({}, false)).toBe(false);
+  });
+
+  it("icon-only detection", () => {
+    expect(isIconOnlyStatWidget({ settings: { displayMode: "icon" } })).toBe(true);
+    expect(isIconOnlyStatWidget({})).toBe(false);
+  });
+});
+
+describe("widgetIntegerSetting", () => {
+  it("returns parsed integer with clamping", () => {
+    expect(widgetIntegerSetting({ settings: { size: "42" } }, "size", 10, 0, 100)).toBe(42);
+    expect(widgetIntegerSetting({ settings: { size: "200" } }, "size", 10, 0, 100)).toBe(100);
+    expect(widgetIntegerSetting({ settings: {} }, "size", 10, 0, 100)).toBe(10);
+  });
+});
+
+describe("widgetBooleanSetting", () => {
+  it("returns boolean from settings", () => {
+    expect(widgetBooleanSetting({ settings: { show: true } }, "show", false)).toBe(true);
+    expect(widgetBooleanSetting({ settings: { show: false } }, "show", true)).toBe(false);
+  });
+
+  it("returns fallback when undefined", () => {
+    expect(widgetBooleanSetting({ settings: {} }, "show", true)).toBe(true);
+  });
+});
+
+describe("widgetStringSetting", () => {
+  it("returns value from allowed list", () => {
+    expect(
+      widgetStringSetting({ settings: { mode: "full" } }, "mode", "auto", ["auto", "full"])
+    ).toBe("full");
+  });
+
+  it("returns fallback for invalid value", () => {
+    expect(
+      widgetStringSetting({ settings: { mode: "bogus" } }, "mode", "auto", ["auto", "full"])
+    ).toBe("auto");
+  });
+});
+
+describe("triggerWidgetIconOnly / triggerWidgetLabel", () => {
+  it("defaults to icon-only", () => {
+    expect(triggerWidgetIconOnly({})).toBe(true);
+  });
+
+  it("returns false for full mode", () => {
+    expect(triggerWidgetIconOnly({ settings: { displayMode: "full" } })).toBe(false);
+  });
+
+  it("returns custom label or fallback", () => {
+    expect(triggerWidgetLabel({ settings: { labelText: "My Label" } }, "Default")).toBe("My Label");
+    expect(triggerWidgetLabel({ settings: {} }, "Default")).toBe("Default");
+    expect(triggerWidgetLabel({ settings: { labelText: "  " } }, "Default")).toBe("Default");
+  });
+});

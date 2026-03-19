@@ -1,0 +1,138 @@
+import { describe, it, expect } from "vitest";
+import {
+  _sanitizeDisabledPlugins,
+  _sanitizePluginMap,
+  _applyMap,
+  _buildMap,
+  buildData,
+} from "../../src/services/config/ConfigPersistence.js";
+
+// ---------------------------------------------------------------------------
+// _sanitizeDisabledPlugins
+// ---------------------------------------------------------------------------
+
+describe("_sanitizeDisabledPlugins", () => {
+  it("removes known removed plugin IDs", () => {
+    const result = _sanitizeDisabledPlugins([
+      "my.plugin",
+      "quickshell.ssh.monitor",
+      "other.plugin",
+    ]);
+    expect(result).toEqual(["my.plugin", "other.plugin"]);
+  });
+
+  it("returns empty array for non-array input", () => {
+    expect(_sanitizeDisabledPlugins(null)).toEqual([]);
+    expect(_sanitizeDisabledPlugins("string")).toEqual([]);
+  });
+
+  it("passes through valid IDs", () => {
+    expect(_sanitizeDisabledPlugins(["a", "b"])).toEqual(["a", "b"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// _sanitizePluginMap
+// ---------------------------------------------------------------------------
+
+describe("_sanitizePluginMap", () => {
+  it("strips removed plugin keys from map", () => {
+    const result = _sanitizePluginMap({
+      "my.plugin": { foo: 1 },
+      "quickshell.ssh.monitor": { bar: 2 },
+    });
+    expect(result).toEqual({ "my.plugin": { foo: 1 } });
+  });
+
+  it("returns empty object for null/non-object", () => {
+    expect(_sanitizePluginMap(null)).toEqual({});
+    expect(_sanitizePluginMap("string")).toEqual({});
+  });
+});
+
+// ---------------------------------------------------------------------------
+// _applyMap / _buildMap
+// ---------------------------------------------------------------------------
+
+describe("_applyMap", () => {
+  it("applies section data to config via mapping table", () => {
+    const config = {};
+    const data = { height: 40, floating: true };
+    const entries = [
+      ["height", "barHeight"],
+      ["floating", "barFloating"],
+    ];
+    _applyMap(config, data, entries);
+    expect(config.barHeight).toBe(40);
+    expect(config.barFloating).toBe(true);
+  });
+
+  it("skips undefined keys in data", () => {
+    const config = { barHeight: 30 };
+    _applyMap(config, { floating: false }, [
+      ["height", "barHeight"],
+      ["floating", "barFloating"],
+    ]);
+    expect(config.barHeight).toBe(30); // unchanged
+    expect(config.barFloating).toBe(false);
+  });
+
+  it("applies transform functions", () => {
+    const config = {};
+    _applyMap(config, { lat: 42.5 }, [["lat", "latitude", String]]);
+    expect(config.latitude).toBe("42.5");
+  });
+
+  it("does nothing for null section data", () => {
+    const config = { x: 1 };
+    _applyMap(config, null, [["x", "x"]]);
+    expect(config.x).toBe(1);
+  });
+});
+
+describe("_buildMap", () => {
+  it("builds JSON-ready object from config via mapping table", () => {
+    const config = { barHeight: 40, barFloating: true };
+    const entries = [
+      ["height", "barHeight"],
+      ["floating", "barFloating"],
+    ];
+    const result = _buildMap(config, entries);
+    expect(result).toEqual({ height: 40, floating: true });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildData (integration — exercises _buildMap for all sections)
+// ---------------------------------------------------------------------------
+
+describe("buildData", () => {
+  it("builds data object with all sections", () => {
+    const config = {
+      barHeight: 40,
+      barFloating: false,
+      barMargin: 4,
+      barOpacity: 0.9,
+      blurEnabled: true,
+      glassOpacity: 0.8,
+      settingsBackdropOpacity: 0.5,
+      settingsSurfaceOpacity: 0.4,
+      autoTransparency: false,
+      selectedBarId: "bar1",
+      barConfigs: [],
+      controlCenterWidth: 400,
+      disabledPlugins: [],
+      pluginLauncherTriggers: {},
+      pluginLauncherNoTrigger: {},
+      pluginSettings: {},
+      pluginHotReload: false,
+    };
+    const data = buildData(config);
+    expect(data.bar).toBeDefined();
+    expect(data.bar.height).toBe(40);
+    expect(data.glass.blur).toBe(true);
+    expect(data.bars.selectedBarId).toBe("bar1");
+    expect(data.controlCenter.width).toBe(400);
+    expect(data.plugins.disabled).toEqual([]);
+  });
+});
