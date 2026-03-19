@@ -16,6 +16,9 @@ Item {
   property var archivedNotifications: []
   property string statePath: Quickshell.statePath("notifications.json")
 
+  // Screenshot notification tracking
+  property var _pendingScreenshotPaths: ({})
+
   // Rate limiting — prevent notification floods from misbehaving apps
   property int _ingressCount: 0
   readonly property int _maxIngressPerSecond: 20
@@ -59,8 +62,31 @@ Item {
           return;
         }
         notif.tracked = true;
+
+        // Detect screenshot notifications and tag them
+        if (notif.appName === "Screenshot" || (notif.summary || "").indexOf("Screenshot") !== -1) {
+          var bodyText = (notif.body || "").trim();
+          // Match "Saved to /path/..." pattern from ScreenshotService
+          var pathMatch = bodyText.match(/^Saved to (.+?) and copied/);
+          var bodyPath = pathMatch ? pathMatch[1] : bodyText;
+          if (root._pendingScreenshotPaths[bodyPath]) {
+            notif.screenshotPath = bodyPath;
+            var next = Object.assign({}, root._pendingScreenshotPaths);
+            delete next[bodyPath];
+            root._pendingScreenshotPaths = next;
+          }
+        }
+
+        root._maybeSpeakNotification(notif);
         root._scheduleSave();
       }
+    }
+  }
+
+  Connections {
+    target: ScreenshotService
+    function onScreenshotNotificationRequested(filePath) {
+      root._sendScreenshotNotification(filePath);
     }
   }
 
@@ -141,5 +167,42 @@ Item {
     } catch (e) {
       Logger.e("NotificationManager", "Failed to load notification archive:", e);
     }
+  }
+
+  // ── TTS Read-Aloud ─────────────────────────
+
+  function _maybeSpeakNotification(notif) {
+    if (!Config.notifTtsEnabled || root.dndEnabled) return;
+    var appName = (notif.appName || "").toLowerCase();
+    var excluded = Config.notifTtsExcludedApps || [];
+    for (var i = 0; i < excluded.length; i++) {
+      if (appName === String(excluded[i]).toLowerCase()) return;
+    }
+    var text = (notif.summary || "");
+    if (notif.body) text += ". " + notif.body;
+    text = text.replace(/<[^>]*>/g, "").trim();
+    if (!text) return;
+    if (text.length > 300) text = text.substring(0, 300);
+    Quickshell.execDetached([
+      "qs-tts-speak",
+      "--rate=" + Config.notifTtsRate,
+      "--volume=" + Config.notifTtsVolume,
+      "--engine=" + Config.notifTtsEngine,
+      text
+    ]);
+  }
+
+  // ── Screenshot Notification ────────────────
+
+  function _sendScreenshotNotification(filePath) {
+    Quickshell.execDetached([
+      "notify-send", "-i", "camera-photo",
+      "-a", "Screenshot",
+      "Screenshot captured",
+      "Saved to " + filePath + " and copied to clipboard"
+    ]);
+    var next = Object.assign({}, _pendingScreenshotPaths);
+    next[filePath] = { path: filePath, ts: Date.now() };
+    _pendingScreenshotPaths = next;
   }
 }

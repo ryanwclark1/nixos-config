@@ -260,6 +260,41 @@ Rectangle {
         }
       }
     }
+
+    // Screenshot-specific actions
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: Colors.spacingS
+      visible: !!(root.notification && root.notification.screenshotPath)
+
+      SharedWidgets.Button {
+        Layout.fillWidth: true
+        Layout.preferredHeight: 32
+        text: "󰏫  Edit in " + (Config.screenshotEditor === "satty" ? "Satty" : "Swappy")
+        fontSize: Colors.fontSizeSmall
+        onClicked: {
+          var editor = Config.screenshotEditor !== "none" ? Config.screenshotEditor : "swappy";
+          var path = root.notification.screenshotPath;
+          if (editor === "satty")
+            Quickshell.execDetached(["satty", "--filename", path]);
+          else
+            Quickshell.execDetached(["swappy", "-f", path]);
+          root.dismissRequested();
+        }
+      }
+
+      SharedWidgets.Button {
+        Layout.fillWidth: true
+        Layout.preferredHeight: 32
+        text: "󰉋  Open Folder"
+        fontSize: Colors.fontSizeSmall
+        onClicked: {
+          var dir = root.notification.screenshotPath.substring(0, root.notification.screenshotPath.lastIndexOf("/"));
+          Quickshell.execDetached(["xdg-open", dir]);
+          root.dismissRequested();
+        }
+      }
+    }
   }
 
   Item {
@@ -275,8 +310,17 @@ Rectangle {
     acceptedButtons: Qt.LeftButton | Qt.RightButton
     hoverEnabled: true
     onClicked: function(mouse) {
-      if (mouse.button === Qt.RightButton)
+      if (mouse.button === Qt.RightButton) {
         root.dismissRequested();
+      } else if (mouse.button === Qt.LeftButton && root.isPopup && root.notification && root.notification.screenshotPath) {
+        var editor = Config.screenshotEditor !== "none" ? Config.screenshotEditor : "swappy";
+        var path = root.notification.screenshotPath;
+        if (editor === "satty")
+          Quickshell.execDetached(["satty", "--filename", path]);
+        else
+          Quickshell.execDetached(["swappy", "-f", path]);
+        root.dismissRequested();
+      }
     }
     onPressed: function(mouse) {
       if (mouse.button === Qt.LeftButton && root.isPopup) {

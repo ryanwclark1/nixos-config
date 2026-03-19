@@ -128,6 +128,15 @@ PanelWindow {
           onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
         }
 
+        // TTS Toggle
+        SharedWidgets.IconButton {
+          size: 32
+          icon: Config.notifTtsEnabled ? "󰗆" : "󰗈"
+          iconColor: Config.notifTtsEnabled ? Colors.primary : Colors.textSecondary
+          tooltipText: Config.notifTtsEnabled ? "Disable read-aloud" : "Read notifications aloud"
+          onClicked: Config.notifTtsEnabled = !Config.notifTtsEnabled
+        }
+
         // Clear all
         SharedWidgets.IconButton {
           size: 32
