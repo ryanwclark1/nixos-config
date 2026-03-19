@@ -98,8 +98,8 @@ Item {
           border.width: monDelegate.isSelected ? 2 : 1
           radius: Colors.radiusSmall
 
-          Behavior on color        { CAnim {} }
-          Behavior on border.color { CAnim {} }
+          Behavior on color        { enabled: !Colors.isTransitioning; CAnim {} }
+          Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
           // Monitor name
           Text {

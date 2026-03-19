@@ -143,8 +143,8 @@ PanelWindow {
                     border.color: root.pinned ? Colors.primary : Colors.border
                     border.width: 1
 
-                    Behavior on color        { CAnim {} }
-                    Behavior on border.color { CAnim {} }
+                    Behavior on color        { enabled: !Colors.isTransitioning; CAnim {} }
+                    Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
                     Text {
                         anchors.centerIn: parent
@@ -152,7 +152,7 @@ PanelWindow {
                         font.family: Colors.fontMono
                         font.pixelSize: Colors.fontSizeMedium
                         color: root.pinned ? Colors.primary : Colors.textSecondary
-                        Behavior on color { CAnim {} }
+                        Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                     }
 
                     StateLayer {

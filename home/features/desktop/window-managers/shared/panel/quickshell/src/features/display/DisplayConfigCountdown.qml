@@ -66,7 +66,7 @@ Rectangle {
         color: root.seconds <= 5 ? Colors.error : Colors.text
         font.pixelSize: Colors.fontSizeIcon
         font.weight: Font.Bold
-        Behavior on color { ColorAnimation { duration: Colors.durationSlow } }
+        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSlow } }
       }
     }
 

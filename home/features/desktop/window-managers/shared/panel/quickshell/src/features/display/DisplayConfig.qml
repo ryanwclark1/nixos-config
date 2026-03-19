@@ -1006,7 +1006,7 @@ PanelWindow {
           color: displayRoot.applyInProgress
                  ? Colors.withAlpha(Colors.primary, 0.4)
                  : Colors.primary
-          Behavior on color { CAnim {} }
+          Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
           RowLayout {
             anchors.centerIn: parent
