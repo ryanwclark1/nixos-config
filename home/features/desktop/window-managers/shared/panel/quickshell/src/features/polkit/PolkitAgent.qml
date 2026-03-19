@@ -66,6 +66,25 @@ Scope {
         }
     }
 
+    // Public cancel — used by panicClose and IPC
+    function cancel() {
+        if (!_authActive) return;
+        _complete(_cookie, false);
+    }
+
+    // Central completion handler — sends response, shows toast, closes dialog
+    function _complete(cookie, authenticated) {
+        _sendResponse(cookie, authenticated);
+
+        if (authenticated) {
+            ToastService.showSuccess("Authenticated", _authMessage || _actionId);
+        } else {
+            ToastService.showError("Authentication cancelled", _actionId);
+        }
+
+        _authActive = false;
+    }
+
     function _sendResponse(cookie, authenticated) {
         if (!agentProc.running) return;
         var msg = JSON.stringify({
@@ -91,20 +110,17 @@ Scope {
             isVisible: root._authActive
 
             onAuthResult: (cookie, authenticated) => {
-                root._sendResponse(cookie, authenticated);
-                root._authActive = false;
-
-                if (authenticated) {
-                    ToastService.showSuccess("Authenticated", root._authMessage || root._actionId);
-                } else {
-                    ToastService.showError("Authentication cancelled", root._actionId);
-                }
+                root._complete(cookie, authenticated);
             }
         }
     }
 
     IpcHandler {
         target: "PolkitAgent"
+
+        function cancel() {
+            root.cancel();
+        }
 
         function status(): string {
             return JSON.stringify({
