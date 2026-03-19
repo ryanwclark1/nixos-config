@@ -11,6 +11,7 @@ Rectangle {
     property color accentColor: Colors.primary
     property bool compact: false
     property bool danger: false
+    property string tooltipText: ""
     signal clicked(real mouseX, real mouseY)
 
     readonly property color effectiveColor: danger ? Colors.error : accentColor
@@ -58,5 +59,10 @@ Rectangle {
             actionSL.burst(mouse.x, mouse.y);
             root.clicked(mouse.x, mouse.y);
         }
+    }
+
+    Tooltip {
+        text: root.tooltipText
+        shown: actionMouse.containsMouse && root.tooltipText !== ""
     }
 }

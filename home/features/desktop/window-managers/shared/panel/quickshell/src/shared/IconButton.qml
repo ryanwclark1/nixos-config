@@ -14,6 +14,8 @@ Rectangle {
   property color activeColor: hoverColor
   property color stateColor: Colors.text
 
+  property string tooltipText: ""
+
   signal clicked(real x, real y)
 
   width: size
@@ -42,5 +44,10 @@ Rectangle {
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
     onClicked: (mouse) => { stateLayer.burst(mouse.x, mouse.y); root.clicked(mouse.x, mouse.y); }
+  }
+
+  Tooltip {
+    text: root.tooltipText
+    shown: hoverArea.containsMouse && root.tooltipText !== ""
   }
 }
