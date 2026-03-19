@@ -147,9 +147,20 @@ elif [ "$provider" = "codex" ]; then
   # Count today's entries from history.jsonl (Codex uses Unix seconds in .ts)
   today_start_sec=$(date -d "$today 00:00:00" +%s)
   today_end_sec=$(date -d "$today 23:59:59" +%s)
-  today_count=$(tail -c 3000000 "$history_file" | tail -n +2 \
-    | jq -s "[.[] | select(.ts >= $today_start_sec and .ts <= $today_end_sec)] | length" 2>/dev/null || echo "0")
+  seven_days_ago_sec=$(date -d "$today -6 days" +%s)
+
+  codex_data=$(tail -c 3000000 "$history_file" | tail -n +2 \
+    | jq -s --argjson ts "$today_start_sec" --argjson te "$today_end_sec" --argjson week "$seven_days_ago_sec" '
+      {
+        today: [.[] | select(.ts >= $ts and .ts <= $te)] | length,
+        recent: [.[] | select(.ts >= $week) |
+          { date: (.ts | strftime("%Y-%m-%d")) }
+        ] | group_by(.date) | map({date: .[0].date, messageCount: length}) | sort_by(.date) | .[-7:]
+      }' 2>/dev/null || echo '{"today":0,"recent":[]}')
+
+  today_count=$(echo "$codex_data" | jq -r '.today // 0')
   today_count="${today_count:-0}"
+  codex_recent=$(echo "$codex_data" | jq -c '.recent // []')
 
   # Try to read latest session for token info
   sessions_dir="$codex_dir/sessions"
@@ -175,11 +186,13 @@ elif [ "$provider" = "codex" ]; then
   jq -n --argjson todayCount "$today_count" \
         --argjson tokens "$latest_tokens" \
         --arg model "$model" \
+        --argjson recentDays "$codex_recent" \
     '{
       todayPrompts: $todayCount,
       todaySessions: 0,
       model: $model,
-      latestSession: $tokens
+      latestSession: $tokens,
+      recentDays: $recentDays
     }'
 # ── Gemini ───────────────────────────────────────────────────────
 elif [ "$provider" = "gemini" ]; then
