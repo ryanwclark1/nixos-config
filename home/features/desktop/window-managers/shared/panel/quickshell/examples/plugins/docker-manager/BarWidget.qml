@@ -1087,7 +1087,7 @@ Item {
                             // ── COMPOSE TAB ──
                             // ════════════════════════════════
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" ? root._filteredCompose : []
+                                model: root._filteredCompose
                                 delegate: Rectangle {
                                     id: projectCard
                                     required property var modelData
@@ -1364,7 +1364,7 @@ Item {
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" ? root._filteredImages : []
+                                model: root._filteredImages
                                 delegate: Rectangle {
                                     id: imageCard
                                     required property var modelData
@@ -1609,7 +1609,7 @@ Item {
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" ? root._filteredVolumes : []
+                                model: root._filteredVolumes
                                 delegate: Rectangle {
                                     id: volumeCard
                                     required property var modelData
