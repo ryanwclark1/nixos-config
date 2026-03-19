@@ -6,6 +6,7 @@
 set -uo pipefail
 
 IMAGE_PATH="${1:-}"
+LANGUAGE="${2:-eng}"
 
 if [[ -z "$IMAGE_PATH" ]]; then
   echo "ERROR|no image path provided"
@@ -22,7 +23,7 @@ if ! command -v tesseract >/dev/null 2>&1; then
   exit 1
 fi
 
-TEXT=$(tesseract "$IMAGE_PATH" stdout -l eng 2>/dev/null)
+TEXT=$(tesseract "$IMAGE_PATH" stdout -l "$LANGUAGE" 2>/dev/null)
 
 if [[ -z "$TEXT" || "$TEXT" =~ ^[[:space:]]*$ ]]; then
   echo "ERROR|no text detected"

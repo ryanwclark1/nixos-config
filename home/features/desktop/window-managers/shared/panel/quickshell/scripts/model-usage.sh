@@ -30,20 +30,30 @@ if [ "$provider" = "claude" ]; then
     exit 0
   fi
 
-  # Live today count from history.jsonl (stats-cache may be stale)
+  # Live counts from history.jsonl (stats-cache may be stale)
   history_file="$HOME/.claude/history.jsonl"
   live_today=0
+  live_recent='[]'
   if [ -f "$history_file" ]; then
     today_start=$(date -d "$today 00:00:00" +%s)000
     today_end=$(date -d "$today 23:59:59" +%s)999
-    live_today=$(jq -s \
-      "[.[] | select(.timestamp >= $today_start and .timestamp <= $today_end)] | length" \
-      "$history_file" 2>/dev/null || echo "0")
-    # Sanitize to integer
+    seven_days_ago=$(date -d "$today -6 days" +%s)000
+
+    live_data=$(tail -c 3000000 "$history_file" | tail -n +2 \
+      | jq -s --argjson ts "$today_start" --argjson te "$today_end" --argjson week "$seven_days_ago" '
+        {
+          today: [.[] | select(.timestamp >= $ts and .timestamp <= $te)] | length,
+          recent: [.[] | select(.timestamp >= $week) |
+            { date: (.timestamp / 1000 | strftime("%Y-%m-%d")) }
+          ] | group_by(.date) | map({date: .[0].date, messageCount: length})
+        }' 2>/dev/null || echo '{"today":0,"recent":[]}')
+
+    live_today=$(echo "$live_data" | jq -r '.today // 0')
+    live_recent=$(echo "$live_data" | jq -c '.recent // []')
     live_today="${live_today:-0}"
   fi
 
-  jq --arg today "$today" --argjson liveToday "$live_today" '
+  jq --arg today "$today" --argjson liveToday "$live_today" --argjson liveRecent "$live_recent" '
     # Today stats from dailyActivity
     (.dailyActivity // []) as $daily |
     ($daily | map(select(.date == $today)) | first // {messageCount:0, sessionCount:0, toolCallCount:0}) as $todayStats |
@@ -52,8 +62,12 @@ if [ "$provider" = "claude" ]; then
     (.dailyModelTokens // []) as $dmt |
     ($dmt | map(select(.date == $today)) | first // {tokensByModel:{}}) as $todayTokens |
 
-    # Recent 7 days
-    ($daily | sort_by(.date) | reverse | .[0:7] | reverse) as $recentDays |
+    # Recent 7 days: merge cached + live, take max per date
+    ($daily | sort_by(.date) | reverse | .[0:7] | reverse) as $cachedDays |
+    ([$cachedDays[], $liveRecent[]] | group_by(.date) |
+      map({date: .[0].date, messageCount: [.[].messageCount] | max}) |
+      sort_by(.date) | .[-7:]
+    ) as $recentDays |
 
     # All-time model usage
     (.modelUsage // {}) as $modelUsage |
@@ -130,8 +144,11 @@ elif [ "$provider" = "codex" ]; then
     exit 0
   fi
 
-  # Count today's entries from history.jsonl
-  today_count="$(grep -c "\"$today\"" "$history_file" 2>/dev/null || true)"
+  # Count today's entries from history.jsonl (Codex uses Unix seconds in .ts)
+  today_start_sec=$(date -d "$today 00:00:00" +%s)
+  today_end_sec=$(date -d "$today 23:59:59" +%s)
+  today_count=$(tail -c 3000000 "$history_file" | tail -n +2 \
+    | jq -s "[.[] | select(.ts >= $today_start_sec and .ts <= $today_end_sec)] | length" 2>/dev/null || echo "0")
   today_count="${today_count:-0}"
 
   # Try to read latest session for token info

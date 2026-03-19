@@ -128,6 +128,8 @@ ACTION_MAP = {
     'screenshot': 'Screenshot',
     'screenshot-screen': 'Screenshot screen',
     'screenshot-window': 'Screenshot window',
+    'screenshot-ocr': 'OCR region',
+    'screenshot-analyze': 'Analyze with AI',
 }
 
 TERMINALS = ['foot', 'kitty', 'alacritty', 'wezterm', 'ghostty', 'konsole', 'gnome-terminal']
@@ -182,7 +184,7 @@ def categorize_bind(kb: dict) -> str:
         return 'Shell'
     if 'window' in comment and ('next' in comment or 'previous' in comment):
         return 'Window Switcher'
-    if any(x in comment for x in ['screenshot', 'ocr', 'image search']):
+    if any(x in comment for x in ['screenshot', 'ocr', 'image search', 'analyze with ai']):
         return 'Screenshots'
     if any(x in comment for x in ['terminal', 'file manager', 'browser']):
         return 'Applications'
