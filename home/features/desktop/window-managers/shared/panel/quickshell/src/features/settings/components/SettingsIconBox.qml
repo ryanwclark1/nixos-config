@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared" as Shared
 
 Rectangle {
     id: root
@@ -20,11 +21,21 @@ Rectangle {
     border.width: 1
     Layout.alignment: Qt.AlignTop
 
-    Text {
+    Loader {
         anchors.centerIn: parent
-        text: root.icon
-        color: root.active ? Colors.primary : Colors.textSecondary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeXL
+        sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
+    }
+    Component {
+        id: _svgIcon
+        Shared.SvgIcon { source: root.icon; color: root.active ? Colors.primary : Colors.textSecondary; size: Colors.fontSizeXL }
+    }
+    Component {
+        id: _nerdIcon
+        Text {
+            text: root.icon
+            color: root.active ? Colors.primary : Colors.textSecondary
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeXL
+        }
     }
 }
