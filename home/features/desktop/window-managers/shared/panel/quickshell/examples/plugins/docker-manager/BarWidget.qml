@@ -749,7 +749,7 @@ Item {
 
                             // ── Containers tab: empty state ──
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" && root._filteredContainers.length === 0
+                                visible: root.currentTab === "containers" && root.daemon && root.daemon.runtimeAvailable && root._filteredContainers.length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -1781,7 +1781,7 @@ Item {
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" ? root._filteredNetworks : []
+                                model: root._filteredNetworks
                                 delegate: Rectangle {
                                     id: networkCard
                                     required property var modelData
