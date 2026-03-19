@@ -1345,7 +1345,7 @@ Item {
 
                             // Images empty
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" && root.filteredList(root.daemon.images, root.searchQuery).length === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" && root._filteredImages.length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -1364,7 +1364,7 @@ Item {
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" ? root.filteredList(root.daemon.images, root.searchQuery) : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" ? root._filteredImages : []
                                 delegate: Rectangle {
                                     id: imageCard
                                     required property var modelData
@@ -1590,7 +1590,7 @@ Item {
                             }
 
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" && root.filteredList(root.daemon.volumes, root.searchQuery).length === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" && root._filteredVolumes.length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -1609,7 +1609,7 @@ Item {
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" ? root.filteredList(root.daemon.volumes, root.searchQuery) : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" ? root._filteredVolumes : []
                                 delegate: Rectangle {
                                     id: volumeCard
                                     required property var modelData
