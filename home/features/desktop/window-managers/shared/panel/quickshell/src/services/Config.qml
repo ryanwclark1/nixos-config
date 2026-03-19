@@ -204,6 +204,11 @@ QtObject {
     property var audioHiddenOutputs: []
     property var audioHiddenInputs: []
 
+    // --- SCREENSHOT ---
+    property string screenshotEditor: "none"        // none | swappy | satty
+    property bool screenshotEditAfterCapture: false
+    property int screenshotDelay: 0                 // 0, 3, 5, 10 seconds
+
     // --- RECORDING ---
     property string recordingCaptureSource: "portal"   // portal | screen
     property int recordingFps: 60

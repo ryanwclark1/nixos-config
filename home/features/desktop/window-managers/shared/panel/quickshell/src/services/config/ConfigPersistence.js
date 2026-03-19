@@ -166,6 +166,11 @@ var _MAPS = {
         ["hiddenOutputs", "audioHiddenOutputs"],
         ["hiddenInputs", "audioHiddenInputs"]
     ],
+    screenshot: [
+        ["editor", "screenshotEditor"],
+        ["editAfterCapture", "screenshotEditAfterCapture"],
+        ["delay", "screenshotDelay"]
+    ],
     recording: [
         ["captureSource", "recordingCaptureSource"],
         ["fps", "recordingFps"],
