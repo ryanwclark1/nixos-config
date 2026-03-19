@@ -291,6 +291,7 @@ let
       updatorScript
       sleepMonitorScript
       screenshotScript
+      ocrScript
       inhibitorScript
       polkitAgentScript
       networkScript
