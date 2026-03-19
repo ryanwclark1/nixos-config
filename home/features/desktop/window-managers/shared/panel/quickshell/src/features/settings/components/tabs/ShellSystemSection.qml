@@ -30,6 +30,11 @@ Item {
                 icon: "󰃠"
                 configKey: "blurEnabled"
             }
+            SettingsToggleRow {
+                label: "Debug Logging"
+                icon: "󰃤"
+                configKey: "debug"
+            }
         }
 
         SettingsSliderRow {

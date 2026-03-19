@@ -76,6 +76,7 @@ Item {
           iconSize: Colors.fontSizeSmall
           iconColor: inputField.text.trim() ? Colors.primary : Colors.textDisabled
           stateColor: Colors.primary
+          tooltipText: "Add task"
           onClicked: inputField._commit()
         }
       }
@@ -158,8 +159,8 @@ Item {
               : Colors.withAlpha(Colors.text, 0.35)
             border.width: 1.5
 
-            Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
-            Behavior on border.color { ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
             Text {
               anchors.centerIn: parent
@@ -190,7 +191,7 @@ Item {
             wrapMode: Text.WordWrap
             elide: Text.ElideNone
 
-            Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
           }
 
           // ── Delete button ─────────────────────────────────────────
@@ -200,6 +201,7 @@ Item {
             iconSize: Colors.fontSizeXS
             iconColor: Colors.textDisabled
             stateColor: Colors.error
+            tooltipText: "Delete task"
             visible: rowHover.containsMouse
             onClicked: TodoService.deleteItem(row.taskIndex)
           }
@@ -240,8 +242,8 @@ Item {
           : Colors.withAlpha(Colors.text, Colors.textThin)
         border.width: 1
 
-        Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
-        Behavior on border.color { ColorAnimation { duration: Colors.durationSnap } }
+        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+        Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
         Text {
           id: clearLabel
@@ -250,7 +252,7 @@ Item {
           color: clearHover.containsMouse ? Colors.error : Colors.textDisabled
           font.pixelSize: Colors.fontSizeXS
 
-          Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
         }
 
         MouseArea {

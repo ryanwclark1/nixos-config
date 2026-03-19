@@ -437,8 +437,8 @@ Item {
                 label: "Show Hidden Files"
                 icon: "󰘓"
                 configKey: "launcherFileShowHidden"
-                descriptionOn: "Include dotfiles and hidden directories in file mode."
-                descriptionOff: "Hide dotfiles and hidden directories in file mode."
+                enabledText: "Include dotfiles and hidden directories in file mode."
+                disabledText: "Hide dotfiles and hidden directories in file mode."
             }
 
             SettingsTextInputRow {

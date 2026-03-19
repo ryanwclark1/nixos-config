@@ -401,7 +401,7 @@ PanelWindow {
       anchors.verticalCenter: parent.verticalCenter
       opacity: dragArea.containsMouse || dragArea.pressed ? 1.0 : 0.4
       Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
-      Behavior on color { CAnim {} }
+      Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
       MouseArea {
         id: dragArea
@@ -470,6 +470,7 @@ PanelWindow {
           size: 28; radius: Colors.radiusXS
           icon: "󰍉"
           iconColor: root.isSearching ? Colors.primary : Colors.textDisabled
+          tooltipText: root.isSearching ? "Hide search" : "Search"
           onClicked: {
             root.isSearching = !root.isSearching;
             if (!root.isSearching) root.searchQuery = "";
@@ -493,6 +494,7 @@ PanelWindow {
         SharedWidgets.IconButton {
           size: 28; radius: Colors.radiusXS
           icon: "󰏗"
+          tooltipText: "Open file"
           onClicked: root.openFileRequested()
         }
 
@@ -500,6 +502,7 @@ PanelWindow {
         SharedWidgets.IconButton {
           size: 28; radius: Colors.radiusXS
           icon: "󰆓"
+          tooltipText: "Save as"
           onClicked: root.saveAsRequested(root.activeContent)
         }
 
@@ -507,6 +510,7 @@ PanelWindow {
         SharedWidgets.IconButton {
           size: 28; radius: Colors.radiusMedium
           icon: "󰅖"
+          tooltipText: "Close"
           onClicked: root.closeRequested()
         }
       }
@@ -564,8 +568,8 @@ PanelWindow {
                       : (hasSearchMatch ? Colors.withAlpha(Colors.accent, 0.12) : Colors.bgWidget)
                     border.color: isActive ? Colors.primary : (hasSearchMatch ? Colors.accent : Colors.border)
                     border.width: (isActive || hasSearchMatch) ? 1.5 : 1
-                    Behavior on color { CAnim {} }
-                    Behavior on border.color { CAnim {} }
+                    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+                    Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
                     SharedWidgets.StateLayer {
                       id: tabStateLayer
@@ -724,7 +728,7 @@ PanelWindow {
         border.color: notepadText.activeFocus ? Colors.primary : Colors.border
         border.width: notepadText.activeFocus ? 1.5 : 1
         radius: Colors.radiusMedium
-        Behavior on border.color { CAnim {} }
+        Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
         clip: true
 
         Flickable {
