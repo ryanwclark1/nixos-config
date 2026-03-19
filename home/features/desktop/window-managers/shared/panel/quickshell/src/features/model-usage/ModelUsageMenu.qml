@@ -66,10 +66,27 @@ BasePopupMenu {
     }
   ]
 
+  // ── Content cross-fade on provider switch ────
+  property string _prevProvider: ModelUsageService.activeProvider
+  onProviderAccentChanged: {
+    if (_prevProvider !== ModelUsageService.activeProvider) {
+      _prevProvider = ModelUsageService.activeProvider;
+      contentFade.restart();
+    }
+  }
+
+  SequentialAnimation {
+    id: contentFade
+    NumberAnimation { target: scrollContent; property: "opacity"; to: 0; duration: 80; easing.type: Easing.OutQuad }
+    NumberAnimation { target: scrollContent; property: "opacity"; to: 1; duration: 160; easing.type: Easing.InOutQuad }
+  }
+
   SharedWidgets.ScrollableContent {
+    id: scrollContent
     Layout.fillWidth: true
     Layout.fillHeight: true
     columnSpacing: Colors.spacingM
+    layer.enabled: contentFade.running
 
     // ── Hero Summary Card ───────────────────────────
     Rectangle {
@@ -327,6 +344,7 @@ BasePopupMenu {
       Layout.fillWidth: true
       visible: (root.showClaude && ModelUsageService.claudeRecentDays.length > 0)
               || (root.showGemini && ModelUsageService.geminiRecentDays.length > 0)
+              || (root.showCodex && ModelUsageService.codexRecentDays.length > 0)
       implicitHeight: chartCol.implicitHeight + Colors.spacingL * 2
       radius: Colors.radiusCard
       color: Colors.cardSurface
@@ -350,6 +368,7 @@ BasePopupMenu {
 
         Repeater {
           model: root.showGemini ? ModelUsageService.geminiRecentDays
+                               : root.showCodex ? ModelUsageService.codexRecentDays
                                  : ModelUsageService.claudeRecentDays
 
           RowLayout {
