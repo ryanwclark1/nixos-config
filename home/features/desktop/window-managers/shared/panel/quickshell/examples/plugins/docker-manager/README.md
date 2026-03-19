@@ -77,6 +77,10 @@ Settings keys:
 | `showVolumes` | bool | `true` | Show Volumes tab |
 | `showNetworks` | bool | `true` | Show Networks tab |
 | `confirmPrune` | bool | `true` | Require confirmation for prune |
+| `resourceRefreshInterval` | int | `60000` | Resource (images/volumes/networks) poll interval in ms |
+| `statsInterval` | int | `10000` | Container stats poll interval in ms |
+| `logPreviewLines` | int | `10` | Number of log lines in inline preview |
+| `toastEnabled` | bool | `true` | Emit toast signals for action results |
 
 Notes:
 
