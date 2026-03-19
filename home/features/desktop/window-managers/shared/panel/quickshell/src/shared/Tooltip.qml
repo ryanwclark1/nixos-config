@@ -5,6 +5,7 @@ Item {
     id: root
 
     property string text: ""
+    property string shortcut: ""
     property bool shown: false
     property int preferredSide: Qt.BottomEdge
     property int showDelay: 500
@@ -36,8 +37,8 @@ Item {
         readonly property int _paddingV: Colors.spacingXS
         readonly property int _gap: 4
 
-        width: Math.min(240, tooltipLabel.implicitWidth + _paddingH * 2)
-        height: tooltipLabel.implicitHeight + _paddingV * 2
+        width: Math.min(280, tooltipRow.implicitWidth + _paddingH * 2)
+        height: tooltipRow.implicitHeight + _paddingV * 2
 
         // Center horizontally (or vertically for left/right sides), offset past parent edge
         x: {
@@ -67,15 +68,38 @@ Item {
         Behavior on opacity { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
         Behavior on scale   { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutCubic } }
 
-        Text {
-            id: tooltipLabel
+        Row {
+            id: tooltipRow
             anchors.centerIn: parent
-            width: Math.min(220, implicitWidth)
-            text: root.text
-            color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
+            spacing: Colors.spacingXS
+
+            Text {
+                id: tooltipLabel
+                width: Math.min(200, implicitWidth)
+                text: root.text
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Rectangle {
+                visible: root.shortcut !== ""
+                anchors.verticalCenter: parent.verticalCenter
+                radius: Colors.radiusMicro
+                color: Colors.withAlpha(Colors.text, 0.12)
+                width: shortcutLabel.implicitWidth + Colors.spacingXS * 2
+                height: shortcutLabel.implicitHeight + 4
+
+                Text {
+                    id: shortcutLabel
+                    anchors.centerIn: parent
+                    text: root.shortcut
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Colors.fontMono
+                }
+            }
         }
     }
 }
