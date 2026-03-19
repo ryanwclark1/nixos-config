@@ -26,6 +26,7 @@ Item {
             color: Colors.withAlpha(Colors.surface, 0.78)
             border.color: Colors.withAlpha(root.accentColor, 0.26)
             border.width: 1
+            clip: true
             implicitHeight: deckColumn.implicitHeight + (launcher.tightMode ? Colors.spacingM * 2 : Colors.spacingL * 2)
 
             SharedWidgets.InnerHighlight {
@@ -34,14 +35,9 @@ Item {
 
             SharedWidgets.SurfaceGradient {}
 
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                height: 4
-                radius: Colors.radiusPill
-                color: Colors.withAlpha(root.accentColor, 0.9)
-                opacity: 0.78
+            SharedWidgets.AdaptiveAccentStrip {
+                accentColor: root.accentColor
+                parentRadius: parent.radius
             }
 
             ColumnLayout {
