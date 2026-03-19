@@ -346,6 +346,7 @@ QtObject {
     property var hookPaths: ({})
 
     // --- INTERNAL ---
+    property bool debug: false
     property bool _loading: false
     property bool _syncingLegacyBarSettings: false
 

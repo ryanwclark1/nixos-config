@@ -2,6 +2,35 @@
 
 var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
 
+var CURRENT_VERSION = 1;
+
+// Migration functions: each takes `data` and mutates it in place.
+// Index corresponds to the version being migrated FROM (0 → 1, 1 → 2, etc.).
+var _MIGRATIONS = [
+    // v0 → v1: Baseline. Move REMOVED_PLUGIN_IDS sanitization into migration.
+    function(data) {
+        if (data.plugins) {
+            if (data.plugins.disabled)
+                data.plugins.disabled = _sanitizeDisabledPlugins(data.plugins.disabled);
+            if (data.plugins.launcherTriggers)
+                data.plugins.launcherTriggers = _sanitizePluginMap(data.plugins.launcherTriggers);
+            if (data.plugins.launcherNoTrigger)
+                data.plugins.launcherNoTrigger = _sanitizePluginMap(data.plugins.launcherNoTrigger);
+            if (data.plugins.settings)
+                data.plugins.settings = _sanitizePluginMap(data.plugins.settings);
+        }
+    }
+];
+
+function _migrateData(data) {
+    var version = (typeof data._version === "number") ? data._version : 0;
+    while (version < CURRENT_VERSION && version < _MIGRATIONS.length) {
+        _MIGRATIONS[version](data);
+        version++;
+    }
+    data._version = CURRENT_VERSION;
+}
+
 function _sanitizeDisabledPlugins(list) {
     if (!Array.isArray(list))
         return [];
@@ -242,7 +271,8 @@ var _MAPS = {
         ["timeout", "aiTimeout"]
     ],
     state: [
-        ["activeSurfaceId", "activeSurfaceId"]
+        ["activeSurfaceId", "activeSurfaceId"],
+        ["debug", "debug"]
     ],
     theme: [
         ["name", "themeName"],
@@ -369,6 +399,8 @@ function _buildMap(config, entries) {
 // ── Public API ───────────────────────────────────────────────────
 
 function applyData(config, data) {
+    _migrateData(data);
+
     // Plugins first — migrated bar widgets may depend on plugin state.
     _applyPluginData(config, data.plugins, { preserveRemovedSettings: true });
 
@@ -422,5 +454,6 @@ function buildData(config) {
         hotReload: config.pluginHotReload
     };
 
+    data._version = CURRENT_VERSION;
     return data;
 }
