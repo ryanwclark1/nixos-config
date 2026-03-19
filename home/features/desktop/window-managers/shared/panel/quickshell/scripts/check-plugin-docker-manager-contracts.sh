@@ -115,7 +115,8 @@ require_pattern "$bar_widget_qml" 'selectionMode' "docker-manager widget support
 require_pattern "$bar_widget_qml" 'searchQuery' "docker-manager widget supports search filtering"
 require_pattern "$bar_widget_qml" 'focusedCardIndex' "docker-manager widget supports keyboard navigation"
 require_pattern "$bar_widget_qml" '_filteredContainers' "docker-manager widget caches filtered container list"
-require_pattern "$bar_widget_qml" 'removeContainer' "docker-manager widget exposes container removal action"
+container_card_qml="${plugin_dir}/ContainerCard.qml"
+require_pattern "$container_card_qml" 'removeContainer' "docker-manager container card exposes container removal action"
 
 require_pattern "$settings_qml" 'dockerBinary' "docker-manager settings expose runtime binary"
 require_pattern "$settings_qml" 'debounceDelay' "docker-manager settings expose debounce delay"
