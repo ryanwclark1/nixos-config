@@ -6,4 +6,5 @@ Taskbar 1.0 Taskbar.qml
 TaskButton 1.0 TaskButton.qml
 WindowTitle 1.0 WindowTitle.qml
 Workspaces 1.0 Workspaces.qml
+SpecialWorkspaces 1.0 SpecialWorkspaces.qml
 WorkspaceStrip 1.0 WorkspaceStrip.qml

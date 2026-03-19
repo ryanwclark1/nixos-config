@@ -636,6 +636,15 @@ Item {
     }
 
     Component {
+        id: specialWorkspacesComponent
+        SpecialWorkspaces {
+            property var widgetInstance: null
+            vertical: root.vertical
+            anchorWindow: root.anchorWindow
+        }
+    }
+
+    Component {
         id: taskbarComponent
         Taskbar {
             property var widgetInstance: null
