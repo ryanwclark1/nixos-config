@@ -280,7 +280,8 @@ BasePopupMenu {
         }
 
         SharedWidgets.InfoRow {
-          visible: root.showClaude || root.showGemini
+          visible: (root.showClaude || root.showGemini)
+                   && (root.showClaude ? ModelUsageService.claudeTodaySessions : ModelUsageService.geminiTodaySessions) > 0
           label: "Sessions"
           value: root.showClaude ? String(ModelUsageService.claudeTodaySessions)
                                  : String(ModelUsageService.geminiTodaySessions)
