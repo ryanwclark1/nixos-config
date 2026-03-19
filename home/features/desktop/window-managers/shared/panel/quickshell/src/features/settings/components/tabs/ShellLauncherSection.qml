@@ -13,15 +13,12 @@ Item {
     required property var settingsRoot
     required property string sectionMode
 
-    // Drag state owned here
-    property string dragModeKey: ""
-    property int dragModeTargetIndex: -1
-    property string dragWebProviderKey: ""
-    property int dragWebProviderTargetIndex: -1
     property string newEngineKey: ""
     property string newEngineName: ""
     property string newEngineUrl: ""
     property string newEngineIcon: ""
+    readonly property string dragWebProviderKey: webProviderReorderState.sourceItemId
+    readonly property int dragWebProviderTargetIndex: webProviderReorderState.targetIndex
 
     // Section visibility
     readonly property bool isLauncherSection: sectionMode === "launcher"
@@ -111,6 +108,18 @@ Item {
             "images": ["img"]
         })
 
+    SettingsReorderState {
+        id: webProviderReorderState
+    }
+
+    SettingsReorderState {
+        id: primaryModeReorderState
+    }
+
+    SettingsReorderState {
+        id: advancedModeReorderState
+    }
+
     // Thin wrappers so UI bindings stay readable
     function defaultModeOptions() {
         return Helpers.defaultModeOptions(launcherModes, CompositorAdapter);
@@ -173,13 +182,26 @@ Item {
         Helpers.disableLauncherMode(Config, CompositorAdapter, launcherModes, modeKey);
     }
     function clearModeDragState() {
-        Helpers.clearModeDragState(root);
+        Helpers.clearModeDragState(primaryModeReorderState);
+        Helpers.clearModeDragState(advancedModeReorderState);
     }
     function currentModeDropIndex(cardItem, rowIndex, listItem) {
         return Helpers.currentModeDropIndex(cardItem, rowIndex, listItem, Config, CompositorAdapter, launcherModes);
     }
-    function moveDraggedMode(targetIndex) {
-        return Helpers.moveDraggedMode(Config, CompositorAdapter, launcherModes, root, targetIndex);
+    function beginPrimaryModeDrag(modeKey, index) {
+        primaryModeReorderState.begin("launcher-primary-mode", modeKey, index);
+    }
+    function beginAdvancedModeDrag(modeKey, index) {
+        advancedModeReorderState.begin("launcher-advanced-mode", modeKey, index);
+    }
+    function moveDraggedPrimaryMode(targetIndex) {
+        return Helpers.moveDraggedPrimaryMode(Config, CompositorAdapter, launcherModes, primaryModeReorderState, targetIndex);
+    }
+    function moveDraggedAdvancedMode(targetIndex) {
+        return Helpers.moveDraggedAdvancedMode(Config, CompositorAdapter, launcherModes, advancedModeReorderState, targetIndex);
+    }
+    function beginWebProviderDrag(providerKey, index) {
+        webProviderReorderState.begin("launcher-web-provider", providerKey, index);
     }
     function toggleWebProvider(providerKey) {
         Helpers.toggleWebProvider(Config, webProviders, webProviderDefaultOrder, providerKey);
@@ -188,13 +210,13 @@ Item {
         Helpers.moveWebProvider(Config, webProviders, webProviderDefaultOrder, providerKey, delta);
     }
     function clearWebProviderDragState() {
-        Helpers.clearWebProviderDragState(root);
+        Helpers.clearWebProviderDragState(webProviderReorderState);
     }
     function currentWebProviderDropIndex(cardItem, rowIndex, listItem) {
         return Helpers.currentWebProviderDropIndex(cardItem, rowIndex, listItem, Config, webProviders, webProviderDefaultOrder);
     }
     function moveDraggedWebProvider(targetIndex) {
-        return Helpers.moveDraggedWebProvider(Config, webProviders, webProviderDefaultOrder, root, targetIndex);
+        return Helpers.moveDraggedWebProvider(Config, webProviders, webProviderDefaultOrder, webProviderReorderState, targetIndex);
     }
     function resetLauncherDefaults() {
         Helpers.resetLauncherDefaults(Config, webAliasDefaults, webProviderDefaultOrder, launcherDefaultModes, CompositorAdapter, launcherModes);
@@ -589,19 +611,15 @@ Item {
                         required property var modelData
                         readonly property bool dropBeforeActive: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === index
 
-                        Rectangle {
+                        SettingsDropIndicator {
                             id: webDropBeforeIndicator
                             anchors {
                                 left: parent.left
                                 right: parent.right
                                 top: parent.top
                             }
+                            active: webProviderRow.dropBeforeActive
                             visible: webProviderRow.dropBeforeActive
-                            height: 10
-                            radius: Colors.radiusXXS
-                            color: Colors.primaryMarked
-                            border.color: Colors.primary
-                            border.width: 1
                         }
 
                         SettingsListRow {
@@ -614,7 +632,8 @@ Item {
                             }
                             minimumHeight: root.compactMode ? 76 : 44
                             active: webDragHandle.dragActive
-                            opacity: webDragHandle.dragActive ? 0.74 : 1.0
+                            dragging: webDragHandle.dragActive
+                            dropTargeted: webProviderRow.dropBeforeActive
                             onYChanged: {
                                 if (webDragHandle.dragActive)
                                     root.dragWebProviderTargetIndex = root.currentWebProviderDropIndex(webProviderCard, webProviderRow.index, webProviderOrderList);
@@ -633,8 +652,8 @@ Item {
                                 Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
                                 dragTarget: webProviderCard
                                 onPressedChanged: {
-                                    root.dragWebProviderKey = webProviderRow.modelData;
-                                    root.dragWebProviderTargetIndex = webProviderRow.index;
+                                    if (pressed)
+                                        root.beginWebProviderDrag(webProviderRow.modelData, webProviderRow.index);
                                 }
                                 onReleased: function (wasDragging) {
                                     var targetIndex = root.dragWebProviderTargetIndex;
@@ -729,14 +748,10 @@ Item {
                     }
                 }
 
-                Rectangle {
+                SettingsDropIndicator {
                     width: parent ? parent.width : 0
-                    height: 12
-                    radius: Colors.radiusXXS
-                    visible: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
-                    color: Colors.primaryMarked
-                    border.color: Colors.primary
-                    border.width: 1
+                    active: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
+                    visible: active
                 }
 
                 Text {

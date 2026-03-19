@@ -1,4 +1,5 @@
 .pragma library
+.import "../SettingsReorderHelpers.js" as SettingsReorderHelpers
 
 // ---------------------------------------------------------------------------
 // Web alias helpers
@@ -292,6 +293,16 @@ function movePrimaryMode(Config, CompositorAdapter, launcherModes, modeKey, delt
     setPrimaryModes(Config, CompositorAdapter, launcherModes, current);
 }
 
+function moveDraggedPrimaryMode(Config, CompositorAdapter, launcherModes, state, targetIndex) {
+    var current = orderedPrimaryModes(Config, CompositorAdapter, launcherModes);
+    var result = SettingsReorderHelpers.moveValueToTarget(current, String(state && state.sourceItemId || ""), targetIndex);
+    clearModeDragState(state);
+    if (!result.changed)
+        return false;
+    setPrimaryModes(Config, CompositorAdapter, launcherModes, result.items);
+    return true;
+}
+
 function moveAdvancedMode(Config, CompositorAdapter, launcherModes, modeKey, delta) {
     var advanced = orderedAdvancedModes(Config, CompositorAdapter, launcherModes);
     var from = advanced.indexOf(modeKey);
@@ -304,6 +315,16 @@ function moveAdvancedMode(Config, CompositorAdapter, launcherModes, modeKey, del
     advanced.splice(from, 1);
     advanced.splice(to, 0, moved);
     Config.launcherModeOrder = orderedPrimaryModes(Config, CompositorAdapter, launcherModes).concat(advanced);
+}
+
+function moveDraggedAdvancedMode(Config, CompositorAdapter, launcherModes, state, targetIndex) {
+    var advanced = orderedAdvancedModes(Config, CompositorAdapter, launcherModes);
+    var result = SettingsReorderHelpers.moveValueToTarget(advanced, String(state && state.sourceItemId || ""), targetIndex);
+    clearModeDragState(state);
+    if (!result.changed)
+        return false;
+    Config.launcherModeOrder = orderedPrimaryModes(Config, CompositorAdapter, launcherModes).concat(result.items);
+    return true;
 }
 
 function promoteLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) {
@@ -340,22 +361,12 @@ function disableLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) 
     setEnabledModes(Config, CompositorAdapter, launcherModes, enabled);
 }
 
-// root must expose: dragModeKey, dragModeTargetIndex
-function clearModeDragState(root) {
-    root.dragModeKey = "";
-    root.dragModeTargetIndex = -1;
+function clearModeDragState(state) {
+    SettingsReorderHelpers.clearState(state);
 }
 
-// targetIndexFromMappedY is inlined to avoid cross-JS-file imports
 function _targetIndexFromMappedY(mappedY, itemExtent, spacing, count) {
-    var extent = Math.max(1, Math.round(Number(itemExtent) || 0) + Math.round(Number(spacing) || 0));
-    var upperBound = Math.max(0, Number(count) || 0);
-    var value = Math.round((Number(mappedY) || 0) / extent);
-    if (value < 0)
-        return 0;
-    if (value > upperBound)
-        return upperBound;
-    return value;
+    return SettingsReorderHelpers.targetIndexFromMappedY(mappedY, itemExtent, spacing, count);
 }
 
 function currentModeDropIndex(cardItem, rowIndex, listItem, Config, CompositorAdapter, launcherModes) {
@@ -365,25 +376,13 @@ function currentModeDropIndex(cardItem, rowIndex, listItem, Config, CompositorAd
     return _targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, modes.length);
 }
 
-function moveDraggedMode(Config, CompositorAdapter, launcherModes, root, targetIndex) {
+function moveDraggedMode(Config, CompositorAdapter, launcherModes, state, targetIndex) {
     var current = orderedEnabledModes(Config, CompositorAdapter, launcherModes);
-    var from = current.indexOf(root.dragModeKey);
-    if (from < 0)
+    var result = SettingsReorderHelpers.moveValueToTarget(current, String(state && state.sourceItemId || ""), targetIndex);
+    clearModeDragState(state);
+    if (!result.changed)
         return false;
-
-    var boundedTarget = Math.max(0, Math.min(current.length, targetIndex));
-    if (from < boundedTarget)
-        boundedTarget -= 1;
-    if (boundedTarget === from) {
-        clearModeDragState(root);
-        return false;
-    }
-
-    var moved = current[from];
-    current.splice(from, 1);
-    current.splice(boundedTarget, 0, moved);
-    Config.launcherModeOrder = current.slice();
-    clearModeDragState(root);
+    Config.launcherModeOrder = result.items.slice();
     return true;
 }
 
@@ -465,10 +464,8 @@ function moveWebProvider(Config, webProviders, webProviderDefaultOrder, provider
     setWebProviderOrder(Config, webProviders, webProviderDefaultOrder, current);
 }
 
-// root must expose: dragWebProviderKey, dragWebProviderTargetIndex
-function clearWebProviderDragState(root) {
-    root.dragWebProviderKey = "";
-    root.dragWebProviderTargetIndex = -1;
+function clearWebProviderDragState(state) {
+    SettingsReorderHelpers.clearState(state);
 }
 
 function currentWebProviderDropIndex(cardItem, rowIndex, listItem, Config, webProviders, webProviderDefaultOrder) {
@@ -478,25 +475,13 @@ function currentWebProviderDropIndex(cardItem, rowIndex, listItem, Config, webPr
     return _targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, providers.length);
 }
 
-function moveDraggedWebProvider(Config, webProviders, webProviderDefaultOrder, root, targetIndex) {
+function moveDraggedWebProvider(Config, webProviders, webProviderDefaultOrder, state, targetIndex) {
     var current = orderedWebProviders(Config, webProviders, webProviderDefaultOrder);
-    var from = current.indexOf(root.dragWebProviderKey);
-    if (from < 0)
+    var result = SettingsReorderHelpers.moveValueToTarget(current, String(state && state.sourceItemId || ""), targetIndex);
+    clearWebProviderDragState(state);
+    if (!result.changed)
         return false;
-
-    var boundedTarget = Math.max(0, Math.min(current.length, targetIndex));
-    if (from < boundedTarget)
-        boundedTarget -= 1;
-    if (boundedTarget === from) {
-        clearWebProviderDragState(root);
-        return false;
-    }
-
-    var moved = current[from];
-    current.splice(from, 1);
-    current.splice(boundedTarget, 0, moved);
-    setWebProviderOrder(Config, webProviders, webProviderDefaultOrder, current);
-    clearWebProviderDragState(root);
+    setWebProviderOrder(Config, webProviders, webProviderDefaultOrder, result.items);
     return true;
 }
 
@@ -504,35 +489,54 @@ function moveDraggedWebProvider(Config, webProviders, webProviderDefaultOrder, r
 // Control Center helpers
 // ---------------------------------------------------------------------------
 
-function orderedControlCenterToggles(ControlCenterRegistry) {
-    return ControlCenterRegistry.orderedQuickToggleItems();
+function orderedControlCenterToggles(ControlCenterRegistry, Config) {
+    var order = Config && Array.isArray(Config.controlCenterToggleOrder) ? Config.controlCenterToggleOrder : [];
+    return SettingsReorderHelpers.orderCatalogItems(ControlCenterRegistry ? ControlCenterRegistry.quickToggleItems : [], order, function(item) {
+        return String(item && item.id || "");
+    });
 }
 
-function orderedControlCenterPlugins(PluginService) {
-    return PluginService.visibleControlCenterPlugins.slice();
+function orderedControlCenterPlugins(PluginService, Config) {
+    var order = Config && Array.isArray(Config.controlCenterPluginOrder) ? Config.controlCenterPluginOrder : [];
+    return SettingsReorderHelpers.orderCatalogItems(PluginService ? PluginService.controlCenterPlugins : [], order, function(item) {
+        return String(item && item.id || "");
+    });
 }
 
 function moveOrderedValue(Config, ControlCenterRegistry, PluginService, configKey, value, delta) {
     var current = [];
     if (configKey === "controlCenterToggleOrder")
-        current = orderedControlCenterToggles(ControlCenterRegistry).map(function (item) {
+        current = orderedControlCenterToggles(ControlCenterRegistry, Config).map(function (item) {
             return item.id;
         });
     else if (configKey === "controlCenterPluginOrder")
-        current = orderedControlCenterPlugins(PluginService).map(function (item) {
+        current = orderedControlCenterPlugins(PluginService, Config).map(function (item) {
             return item.id;
         });
 
-    var from = current.indexOf(value);
-    if (from < 0)
+    var result = SettingsReorderHelpers.moveValueByDelta(current, value, delta);
+    if (!result.changed)
         return;
-    var to = Math.max(0, Math.min(current.length - 1, from + delta));
-    if (to === from)
-        return;
+    Config[configKey] = result.items.slice();
+}
 
-    current.splice(from, 1);
-    current.splice(to, 0, value);
-    Config[configKey] = current.slice();
+function moveDraggedOrderedValue(Config, ControlCenterRegistry, PluginService, configKey, state, targetIndex) {
+    var current = [];
+    if (configKey === "controlCenterToggleOrder")
+        current = orderedControlCenterToggles(ControlCenterRegistry, Config).map(function(item) {
+            return item.id;
+        });
+    else if (configKey === "controlCenterPluginOrder")
+        current = orderedControlCenterPlugins(PluginService, Config).map(function(item) {
+            return item.id;
+        });
+
+    var result = SettingsReorderHelpers.moveValueToTarget(current, String(state && state.sourceItemId || ""), targetIndex);
+    SettingsReorderHelpers.clearState(state);
+    if (!result.changed)
+        return false;
+    Config[configKey] = result.items.slice();
+    return true;
 }
 
 function toggleHiddenListValue(Config, configKey, value) {
