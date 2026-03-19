@@ -239,6 +239,9 @@ QtObject {
         function onBackgroundVisualizerEnabledChanged() {
             root.config.scheduleSave();
         }
+        function onWeatherOverlayEnabledChanged() {
+            root.config.scheduleSave();
+        }
         function onBackgroundClockEnabledChanged() {
             root.config.scheduleSave();
         }
@@ -441,6 +444,12 @@ QtObject {
             root.config.scheduleSave();
         }
         function onWallpaperRecentSolidColorsChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallpaperDynamicEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallpaperDynamicManifestChanged() {
             root.config.scheduleSave();
         }
         function onGlassOpacityBaseChanged() {
