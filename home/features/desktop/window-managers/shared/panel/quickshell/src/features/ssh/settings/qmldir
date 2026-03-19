@@ -1,0 +1,5 @@
+SshHostEditor 1.0 SshHostEditor.qml
+SshHostList 1.0 SshHostList.qml
+SshImportDiagnostics 1.0 SshImportDiagnostics.qml
+SshSettingsOverview 1.0 SshSettingsOverview.qml
+SshWidgetSettings 1.0 SshWidgetSettings.qml
