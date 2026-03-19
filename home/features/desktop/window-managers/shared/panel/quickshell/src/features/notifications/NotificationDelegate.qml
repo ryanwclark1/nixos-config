@@ -88,7 +88,7 @@ Rectangle {
         appName: notification ? notification.appName : ""
         iconSize: 38
         fallbackIcon: "󰂚"
-        visible: notification && notification.appIcon !== ""
+        visible: !!notification && notification.appIcon !== ""
       }
 
       ColumnLayout {
@@ -115,7 +115,7 @@ Rectangle {
       }
 
       Text {
-        visible: !root.isPopup && notification && notification.time
+        visible: !root.isPopup && !!notification && !!notification.time
         text: notification && notification.time ? Qt.formatDateTime(notification.time, "HH:mm") : ""
         color: Colors.textDisabled
         font.pixelSize: Colors.fontSizeXS
@@ -138,7 +138,7 @@ Rectangle {
       color: Colors.textSecondary
       font.pixelSize: Colors.fontSizeSmall
       wrapMode: Text.Wrap
-      visible: notification && notification.body !== ""
+      visible: !!notification && notification.body !== ""
       maximumLineCount: root.isPopup ? 3 : 10
       elide: Text.ElideRight
     }
@@ -238,7 +238,7 @@ Rectangle {
     RowLayout {
       Layout.fillWidth: true
       spacing: Colors.spacingS
-      visible: !root.isReplying && notification && notification.actions && notification.actions.count > 0
+      visible: !root.isReplying && !!notification && !!notification.actions && notification.actions.count > 0
 
       Repeater {
         model: notification ? notification.actions : null
