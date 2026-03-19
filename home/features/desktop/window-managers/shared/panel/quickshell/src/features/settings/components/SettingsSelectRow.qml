@@ -53,6 +53,7 @@ Rectangle {
     border.width: 1
 
     Behavior on border.color {
+        enabled: !Colors.isTransitioning
         CAnim {}
     }
 

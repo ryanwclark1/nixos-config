@@ -25,10 +25,12 @@ Rectangle {
     SharedWidgets.InnerHighlight { hoveredOpacity: 0.3; hovered: root.active }
 
     Behavior on color {
+        enabled: !Colors.isTransitioning
         CAnim {}
     }
 
     Behavior on border.color {
+        enabled: !Colors.isTransitioning
         CAnim {}
     }
 
