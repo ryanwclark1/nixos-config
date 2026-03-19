@@ -196,6 +196,7 @@ Scope {
     // Ensure ThemeService and HookService initialize early, then defer
     // non-critical service init until after the first frame.
     Component.onCompleted: {
+        var done = Logger.perf("ShellRoot", "startup");
         void ThemeService.activeThemeId;
         void HookService;
         Qt.callLater(function() {
@@ -205,6 +206,7 @@ Scope {
             _ = PomodoroService.progress;
             _ = GameModeService.gameRunning;
         });
+        done();
     }
 
     NotificationManager {
@@ -383,6 +385,7 @@ Scope {
         interactionBlocked: root.fileBrowserVisible
         onBrowseWallpaper: monitorName => fileFlow.browseWallpaper(monitorName)
         onPickWallpaperFolder: fileFlow.pickWallpaperFolder()
+        onBrowseManifest: fileFlow.browseManifest()
     }
 
     LazyLoader {

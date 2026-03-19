@@ -51,6 +51,17 @@ QtObject {
         fileBrowserOpenTimer.restart();
     }
 
+    function browseManifest() {
+        reopenSettingsHubTimer.stop();
+        fileBrowserCaller = "manifest";
+        reopenSettingsHubAfterFileBrowser = settingsHub.isOpen;
+        if (settingsHub.isOpen)
+            settingsHub.close();
+        shellRoot.openSurface("fileBrowser");
+        fileBrowserOpenTimer.opMode = "__manifest__";
+        fileBrowserOpenTimer.restart();
+    }
+
     function handleFileBrowserOpenChanged(isOpen) {
         if (!isOpen) {
             shellRoot.closeSurface("fileBrowser");
@@ -77,6 +88,8 @@ QtObject {
             });
         } else if (fileBrowserCaller === "wallpaper") {
             WallpaperService.setWallpaper(filePath, wallpaperMonitor);
+        } else if (fileBrowserCaller === "manifest") {
+            Config.wallpaperDynamicManifest = filePath;
         }
         _resetState();
     }
@@ -114,6 +127,13 @@ QtObject {
                 ], "open");
             } else if (opMode === "__wallpaper_folder__") {
                 root.fileBrowser.open(wallpaperDir, [], "folder");
+            } else if (opMode === "__manifest__") {
+                root.fileBrowser.open(home, [
+                    {
+                        label: "JSON files",
+                        extensions: ["json"]
+                    }
+                ], "open");
             } else if (opMode === "open") {
                 root.fileBrowser.open(home, [
                     {

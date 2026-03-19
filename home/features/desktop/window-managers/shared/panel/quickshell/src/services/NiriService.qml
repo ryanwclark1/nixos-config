@@ -125,7 +125,9 @@ QtObject {
     }
 
     Component.onCompleted: {
+        var done = Logger.perf("NiriService", "init");
         if (available) _fetchOutputs()
+        done();
     }
 
     // ═══════════════════════════════════════════════

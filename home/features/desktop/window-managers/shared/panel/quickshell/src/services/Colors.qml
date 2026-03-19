@@ -324,10 +324,14 @@ QtObject {
 
     function reloadColors() {
         if (_themeActive) return;
+        var done = Logger.perf("Colors", "reloadColors");
         isTransitioning = true;
         _transitionTimer.restart();
         var raw = walColorsFile.text();
-        if (!raw) return;
+        if (!raw) {
+            done();
+            return;
+        }
         try {
             var data = JSON.parse(raw);
             if (data.special) {
@@ -341,6 +345,7 @@ QtObject {
         } catch (e) {
             Logger.e("Colors", "failed to reload wal colors:", e);
         }
+        done();
     }
 
     property FileView walColorsFile: FileView {
