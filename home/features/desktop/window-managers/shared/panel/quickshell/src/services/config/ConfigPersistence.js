@@ -4,6 +4,12 @@ var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
 
 var CURRENT_VERSION = 2;
 
+var _EXTRA_SECTION_KEYS = {
+    controlCenter: {
+        width: true
+    }
+};
+
 // Migration functions: each takes `data` and mutates it in place.
 // Index corresponds to the version being migrated FROM (0 → 1, 1 → 2, etc.).
 var _MIGRATIONS = [
@@ -39,6 +45,47 @@ function _migrateData(data) {
         version++;
     }
     data._version = CURRENT_VERSION;
+}
+
+// Warn about unknown keys in config data — helps catch typos in manual edits.
+function _validateData(data) {
+    if (!data) return [];
+    var warnings = [];
+    var knownSections = {};
+    for (var section in _MAPS)
+        knownSections[section] = true;
+    // Also known: _version, bars, plugins (handled specially)
+    knownSections["_version"] = true;
+    knownSections["bars"] = true;
+    knownSections["plugins"] = true;
+
+    for (var key in data) {
+        if (!knownSections[key]) {
+            var msg = "ConfigPersistence: unknown top-level key '" + key + "'";
+            console.warn(msg);
+            warnings.push(msg);
+        }
+    }
+
+    // Check keys within known sections
+    for (var sect in _MAPS) {
+        if (!data[sect] || typeof data[sect] !== "object") continue;
+        var knownKeys = {};
+        var entries = _MAPS[sect];
+        for (var i = 0; i < entries.length; i++)
+            knownKeys[entries[i][0]] = true;
+        var extraKeys = _EXTRA_SECTION_KEYS[sect] || {};
+        for (var extraKey in extraKeys)
+            knownKeys[extraKey] = true;
+        for (var sKey in data[sect]) {
+            if (!knownKeys[sKey]) {
+                var sMsg = "ConfigPersistence: unknown key '" + sKey + "' in section '" + sect + "'";
+                console.warn(sMsg);
+                warnings.push(sMsg);
+            }
+        }
+    }
+    return warnings;
 }
 
 function _sanitizeDisabledPlugins(list) {
@@ -141,6 +188,9 @@ var _MAPS = {
         ["latitude", "weatherLatitude", _str],
         ["longitude", "weatherLongitude", _str],
         ["locationPriority", "weatherLocationPriority"]
+    ],
+    market: [
+        ["tickers", "marketTickers"]
     ],
     modelUsage: [
         ["claudeEnabled", "modelUsageClaudeEnabled"],
@@ -414,6 +464,7 @@ function _buildMap(config, entries) {
 
 function applyData(config, data) {
     _migrateData(data);
+    _validateData(data);
 
     // Plugins first — migrated bar widgets may depend on plugin state.
     _applyPluginData(config, data.plugins, { preserveRemovedSettings: true });
