@@ -95,6 +95,11 @@ let
     ${builtins.readFile ./scripts/network.sh}
   '';
 
+  networkMonitorScript = pkgs.writeScriptBin "qs-network-monitor" ''
+    #!${pkgs.python3.withPackages (ps: [ ps.dbus-python ps.pygobject3 ])}/bin/python3
+    ${builtins.readFile ./scripts/network-monitor.py}
+  '';
+
   iconResolverScript = pkgs.writeShellScriptBin "qs-icon-resolver" ''
     PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:$PATH"
     ${builtins.readFile ./scripts/icon-resolver.sh}
@@ -295,6 +300,7 @@ let
       inhibitorScript
       polkitAgentScript
       networkScript
+      networkMonitorScript
       iconResolverScript
       compositorGuardScript
       compositorSmokeScript
