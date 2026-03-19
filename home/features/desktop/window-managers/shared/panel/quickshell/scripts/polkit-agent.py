@@ -5,7 +5,7 @@ requests from polkitd, and forwards them to the QML UI via stdout JSON lines.
 Reads authentication responses from stdin.
 
 Protocol (newline-delimited JSON):
-  stdout -> QML:  {"type":"begin","cookie":"...","action_id":"...","message":"...","icon_name":"...","identities":["unix-user:admin"]}
+  stdout -> QML:  {"type":"begin","cookie":"...","action_id":"...","message":"...","icon_name":"...","details":{...},"identities":["unix-user:admin"]}
   stdout -> QML:  {"type":"cancel","cookie":"..."}
   stdin  <- QML:  {"type":"response","cookie":"...","authenticated":true/false}
 """
@@ -13,6 +13,7 @@ Protocol (newline-delimited JSON):
 import json
 import os
 import signal
+import subprocess
 import sys
 import threading
 
@@ -30,16 +31,43 @@ POLKIT_AGENT_IFACE = "org.freedesktop.PolicyKit1.AuthenticationAgent"
 # Pending cookies awaiting QML response
 _pending = {}  # cookie -> threading.Event
 _results = {}  # cookie -> bool
+_write_lock = threading.Lock()
 
 
 def write_json(obj):
     """Write a JSON line to stdout (thread-safe)."""
     line = json.dumps(obj, separators=(",", ":"))
+    with _write_lock:
+        try:
+            sys.stdout.write(line + "\n")
+            sys.stdout.flush()
+        except (BrokenPipeError, OSError):
+            pass
+
+
+def _get_session_id():
+    """Get the current session ID, falling back to loginctl if env var is empty."""
+    session_id = os.environ.get("XDG_SESSION_ID", "")
+    if session_id:
+        return session_id
+
+    # Fallback: ask loginctl for the session of the current user
     try:
-        sys.stdout.write(line + "\n")
-        sys.stdout.flush()
-    except (BrokenPipeError, OSError):
+        result = subprocess.run(
+            ["loginctl", "show-user", str(os.getuid()), "--property=Sessions", "--value"],
+            capture_output=True, text=True, timeout=5,
+        )
+        sessions = result.stdout.strip().split()
+        if sessions:
+            session_id = sessions[0]
+            print(f"polkit-agent: resolved session via loginctl: {session_id}", file=sys.stderr)
+            return session_id
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
         pass
+
+    # Last resort: try 'auto' which some polkit versions accept
+    print("polkit-agent: WARNING: no session ID found, trying empty string", file=sys.stderr)
+    return ""
 
 
 class PolkitAgent(dbus.service.Object):
@@ -74,12 +102,25 @@ class PolkitAgent(dbus.service.Object):
                 if gid is not None:
                     id_list.append(f"unix-group:{gid}")
 
+        # Convert details to a plain dict for JSON serialization
+        details_dict = {}
+        if details:
+            try:
+                # details is a D-Bus string, but polkitd sends it as empty string
+                # In practice, details come through the identities structure
+                # Some implementations send a{ss} dict
+                if hasattr(details, 'items'):
+                    details_dict = {str(k): str(v) for k, v in details.items()}
+            except (TypeError, AttributeError):
+                pass
+
         write_json({
             "type": "begin",
             "cookie": str(cookie),
             "action_id": str(action_id),
             "message": str(message),
             "icon_name": str(icon_name),
+            "details": details_dict,
             "identities": id_list,
         })
 
@@ -135,10 +176,8 @@ def stdin_reader():
                 event.set()
 
 
-def register_agent(bus):
+def register_agent(bus, session_id):
     """Register this process as a polkit authentication agent."""
-    session_id = os.environ.get("XDG_SESSION_ID", "")
-
     authority = bus.get_object(POLKIT_BUS_NAME, POLKIT_AUTHORITY_PATH)
     authority_iface = dbus.Interface(authority, POLKIT_AUTHORITY_IFACE)
 
@@ -146,12 +185,11 @@ def register_agent(bus):
     authority_iface.RegisterAuthenticationAgent(
         subject, os.environ.get("LANG", "en_US.UTF-8"), AGENT_OBJECT_PATH
     )
-    print("polkit-agent: registered for session", session_id, file=sys.stderr)
+    print(f"polkit-agent: registered for session {session_id}", file=sys.stderr)
 
 
-def unregister_agent(bus):
+def unregister_agent(bus, session_id):
     """Unregister the polkit authentication agent."""
-    session_id = os.environ.get("XDG_SESSION_ID", "")
     try:
         authority = bus.get_object(POLKIT_BUS_NAME, POLKIT_AUTHORITY_PATH)
         authority_iface = dbus.Interface(authority, POLKIT_AUTHORITY_IFACE)
@@ -168,16 +206,18 @@ def main():
     bus = dbus.SystemBus()
     loop = GLib.MainLoop()
 
+    session_id = _get_session_id()
+
     _agent = PolkitAgent(bus, loop)  # noqa: F841 — prevent GC
 
-    register_agent(bus)
+    register_agent(bus, session_id)
 
     # Read stdin in a background thread
     reader = threading.Thread(target=stdin_reader, daemon=True)
     reader.start()
 
     def shutdown(_sig=None, _frame=None):
-        unregister_agent(bus)
+        unregister_agent(bus, session_id)
         loop.quit()
 
     signal.signal(signal.SIGTERM, shutdown)
