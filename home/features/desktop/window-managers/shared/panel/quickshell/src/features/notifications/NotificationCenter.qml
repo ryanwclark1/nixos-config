@@ -8,6 +8,7 @@ import "../../widgets" as SharedWidgets
 
 PanelWindow {
   id: root
+  property bool _destroyed: false
 
   property int panelWidth: Config.controlCenterWidth
   readonly property var edgeMargins: Config.reservedEdgesForScreen(screen, "")
@@ -44,9 +45,12 @@ PanelWindow {
       && height <= maxLayerTextureSize;
   }
 
+  Component.onDestruction: _destroyed = true
+
   onShowContentChanged: {
     if (showContent) {
       Qt.callLater(function() {
+        if (_destroyed) return;
         if (root.showContent && searchInput)
           searchInput.forceActiveFocus();
       });

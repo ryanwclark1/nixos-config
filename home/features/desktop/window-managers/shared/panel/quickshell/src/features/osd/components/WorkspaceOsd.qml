@@ -7,6 +7,7 @@ import "../../../widgets"
 
 Scope {
   id: root
+  property bool _destroyed: false
   property bool shouldShowOsd: false
   property string workspaceName: ""
   property bool isSpecial: false
@@ -64,13 +65,14 @@ Scope {
   }
 
   Component.onDestruction: {
+    _destroyed = true;
     if (CompositorAdapter.isHyprland)
       Hyprland.rawEvent.disconnect(_onHyprlandEvent);
   }
 
   function _onHyprlandEvent(event) {
     if (event.name === "workspace" || event.name === "workspacev2")
-      Qt.callLater(_readFocusedWorkspaceName);
+      Qt.callLater(function() { if (root._destroyed) return; _readFocusedWorkspaceName(); });
     if (event.name === "activespecial") {
       var wsName = String(event.data || "").split(",")[0] || "";
       if (wsName.startsWith("special:"))
