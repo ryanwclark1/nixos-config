@@ -424,6 +424,32 @@ Item {
                 onMoved: v => Config.launcherFileMaxResults = v
             }
 
+            SettingsTextInputRow {
+                label: "File Search Root"
+                leadingIcon: "󰉋"
+                placeholderText: "~"
+                text: Config.launcherFileSearchRoot
+                onSubmitted: value => Config.launcherFileSearchRoot = value.trim() === "" ? "~" : value.trim()
+                onTextEdited: value => Config.launcherFileSearchRoot = value.trim() === "" ? "~" : value.trim()
+            }
+
+            SettingsToggleRow {
+                label: "Show Hidden Files"
+                icon: "󰘓"
+                configKey: "launcherFileShowHidden"
+                descriptionOn: "Include dotfiles and hidden directories in file mode."
+                descriptionOff: "Hide dotfiles and hidden directories in file mode."
+            }
+
+            SettingsTextInputRow {
+                label: "File Opener"
+                leadingIcon: "󰈔"
+                placeholderText: "xdg-open"
+                text: Config.launcherFileOpener
+                onSubmitted: value => Config.launcherFileOpener = value.trim() === "" ? "xdg-open" : value.trim()
+                onTextEdited: value => Config.launcherFileOpener = value.trim() === "" ? "xdg-open" : value.trim()
+            }
+
             SettingsSliderRow {
                 label: "Cache TTL"
                 icon: "󰔟"

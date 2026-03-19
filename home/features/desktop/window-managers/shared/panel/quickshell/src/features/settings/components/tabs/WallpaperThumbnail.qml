@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../../services"
+import "../../../../shared"
 import "../../../../widgets" as SharedWidgets
 import "WallpaperTabHelpers.js" as WTH
 

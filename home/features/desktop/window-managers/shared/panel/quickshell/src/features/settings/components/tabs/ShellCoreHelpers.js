@@ -435,6 +435,9 @@ function resetLauncherDefaults(Config, webAliasDefaults, webProviderDefaultOrder
     Config.launcherMaxResults = 80;
     Config.launcherFileMinQueryLength = 2;
     Config.launcherFileMaxResults = 100;
+    Config.launcherFileSearchRoot = "~";
+    Config.launcherFileShowHidden = false;
+    Config.launcherFileOpener = "xdg-open";
     Config.launcherRecentsLimit = 12;
     Config.launcherRecentAppsLimit = 6;
     Config.launcherSuggestionsLimit = 4;
