@@ -185,8 +185,8 @@ Item {
         Helpers.clearModeDragState(primaryModeReorderState);
         Helpers.clearModeDragState(advancedModeReorderState);
     }
-    function currentModeDropIndex(cardItem, rowIndex, listItem) {
-        return Helpers.currentModeDropIndex(cardItem, rowIndex, listItem, Config, CompositorAdapter, launcherModes);
+    function currentModeDropIndex(cardItem, rowIndex, listItem, count) {
+        return Helpers.currentModeDropIndex(cardItem, rowIndex, listItem, count);
     }
     function beginPrimaryModeDrag(modeKey, index) {
         primaryModeReorderState.begin("launcher-primary-mode", modeKey, index);
@@ -636,7 +636,7 @@ Item {
                             dropTargeted: webProviderRow.dropBeforeActive
                             onYChanged: {
                                 if (webDragHandle.dragActive)
-                                    root.dragWebProviderTargetIndex = root.currentWebProviderDropIndex(webProviderCard, webProviderRow.index, webProviderOrderList);
+                                    webProviderReorderState.updateTarget("launcher-web-provider", root.currentWebProviderDropIndex(webProviderCard, webProviderRow.index, webProviderOrderList));
                             }
 
                             Behavior on y {
@@ -1061,107 +1061,197 @@ Item {
             iconName: "󰍉"
             description: "These modes stay pinned in the launcher sidebar."
 
-            Repeater {
-                model: root.orderedPrimaryModes()
+            Column {
+                id: primaryModeOrderList
+                Layout.fillWidth: true
+                spacing: Colors.spacingXS
 
-                delegate: SettingsListRow {
-                    required property int index
-                    required property var modelData
+                Repeater {
+                    model: root.orderedPrimaryModes()
 
-                    minimumHeight: root.compactMode ? 82 : 54
+                    delegate: Item {
+                        id: primaryModeRow
+                        width: parent ? parent.width : 0
+                        implicitHeight: primaryModeCard.implicitHeight + (primaryDropBeforeIndicator.visible ? primaryDropBeforeIndicator.height + Colors.spacingXS : 0)
+                        height: implicitHeight
+                        required property int index
+                        required property var modelData
+                        readonly property bool dropBeforeActive: primaryModeReorderState.active && primaryModeReorderState.targetListId === "launcher-primary-mode" && primaryModeReorderState.targetIndex === index
 
-                    Rectangle {
-                        implicitWidth: 28
-                        implicitHeight: 28
-                        radius: Colors.radiusCard
-                        color: Colors.surface
-                        border.color: Colors.border
-                        border.width: 1
-                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: root.launcherModeMeta(modelData).icon
-                            color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
+                        SettingsDropIndicator {
+                            id: primaryDropBeforeIndicator
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: parent.top
+                            }
+                            active: primaryModeRow.dropBeforeActive
+                            visible: primaryModeRow.dropBeforeActive
                         }
-                    }
 
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Colors.spacingXS
+                        SettingsListRow {
+                            id: primaryModeCard
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: primaryDropBeforeIndicator.bottom
+                                topMargin: primaryDropBeforeIndicator.visible ? Colors.spacingXS : 0
+                            }
+                            minimumHeight: root.compactMode ? 82 : 54
+                            dragging: primaryDragHandle.dragActive
+                            dropTargeted: primaryModeRow.dropBeforeActive
+                            onYChanged: {
+                                if (primaryDragHandle.dragActive)
+                                    primaryModeReorderState.updateTarget("launcher-primary-mode", root.currentModeDropIndex(primaryModeCard, primaryModeRow.index, primaryModeOrderList, root.orderedPrimaryModes().length));
+                            }
 
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: Colors.spacingS
+                            Behavior on y {
+                                enabled: !primaryDragHandle.dragActive
 
-                            Text {
-                                text: root.launcherModeMeta(modelData).label
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.weight: Font.DemiBold
+                                NumberAnimation {
+                                    duration: Colors.durationFast
+                                }
+                            }
+
+                            SettingsDragHandle {
+                                id: primaryDragHandle
+                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+                                dragTarget: primaryModeCard
+                                onPressedChanged: {
+                                    if (pressed)
+                                        root.beginPrimaryModeDrag(primaryModeRow.modelData, primaryModeRow.index);
+                                }
+                                onReleased: function (wasDragging) {
+                                    var targetIndex = primaryModeReorderState.targetIndex;
+                                    if (wasDragging)
+                                        targetIndex = root.currentModeDropIndex(primaryModeCard, primaryModeRow.index, primaryModeOrderList, root.orderedPrimaryModes().length);
+                                    primaryModeCard.x = 0;
+                                    primaryModeCard.y = 0;
+                                    if (wasDragging) {
+                                        if (!root.moveDraggedPrimaryMode(targetIndex))
+                                            root.clearModeDragState();
+                                    } else {
+                                        root.clearModeDragState();
+                                    }
+                                }
                             }
 
                             Rectangle {
-                                visible: String(ModeData.modeInfo(modelData).prefix || "") !== ""
-                                radius: Colors.radiusPill
-                                color: Colors.primarySubtle
-                                border.color: Colors.primaryRing
+                                implicitWidth: 28
+                                implicitHeight: 28
+                                radius: Colors.radiusCard
+                                color: Colors.surface
+                                border.color: Colors.border
                                 border.width: 1
-                                implicitHeight: 22
-                                implicitWidth: prefixLabel.implicitWidth + 12
+                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
                                 Text {
-                                    id: prefixLabel
                                     anchors.centerIn: parent
-                                    text: (ModeData.modeInfo(modelData).prefix || "") + " prefix"
+                                    text: root.launcherModeMeta(primaryModeRow.modelData).icon
                                     color: Colors.primary
+                                    font.family: Colors.fontMono
+                                    font.pixelSize: Colors.fontSizeSmall
+                                }
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: Colors.spacingXS
+
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: Colors.spacingS
+
+                                    Text {
+                                        text: root.launcherModeMeta(primaryModeRow.modelData).label
+                                        color: Colors.text
+                                        font.pixelSize: Colors.fontSizeSmall
+                                        font.weight: Font.DemiBold
+                                    }
+
+                                    Rectangle {
+                                        visible: String(ModeData.modeInfo(primaryModeRow.modelData).prefix || "") !== ""
+                                        radius: Colors.radiusPill
+                                        color: Colors.primarySubtle
+                                        border.color: Colors.primaryRing
+                                        border.width: 1
+                                        implicitHeight: 22
+                                        implicitWidth: prefixLabel.implicitWidth + 12
+
+                                        Text {
+                                            id: prefixLabel
+                                            anchors.centerIn: parent
+                                            text: (ModeData.modeInfo(primaryModeRow.modelData).prefix || "") + " prefix"
+                                            color: Colors.primary
+                                            font.pixelSize: Colors.fontSizeXS
+                                            font.weight: Font.DemiBold
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: ModeData.modeInfo(primaryModeRow.modelData).hint || "Launcher mode"
+                                    color: Colors.textSecondary
                                     font.pixelSize: Colors.fontSizeXS
-                                    font.weight: Font.DemiBold
+                                    wrapMode: Text.WordWrap
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: "Drag to reorder within the primary sidebar, or use the arrow buttons."
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Colors.fontSizeXS
+                                    wrapMode: Text.WordWrap
+                                }
+                            }
+
+                            Flow {
+                                spacing: Colors.spacingS
+                                Layout.alignment: Qt.AlignTop
+
+                                SettingsActionButton {
+                                    compact: true
+                                    iconName: "󰅃"
+                                    enabled: primaryModeRow.index > 0
+                                    onClicked: root.movePrimaryMode(primaryModeRow.modelData, -1)
+                                }
+
+                                SettingsActionButton {
+                                    compact: true
+                                    iconName: "󰅀"
+                                    enabled: primaryModeRow.index < (root.orderedPrimaryModes().length - 1)
+                                    onClicked: root.movePrimaryMode(primaryModeRow.modelData, 1)
+                                }
+
+                                SettingsActionButton {
+                                    compact: true
+                                    label: "Advanced"
+                                    onClicked: root.demoteLauncherMode(primaryModeRow.modelData)
+                                }
+
+                                SettingsActionButton {
+                                    compact: true
+                                    label: "Disable"
+                                    onClicked: root.disableLauncherMode(primaryModeRow.modelData)
                                 }
                             }
                         }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: ModeData.modeInfo(modelData).hint || "Launcher mode"
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            wrapMode: Text.WordWrap
-                        }
                     }
+                }
 
-                    Flow {
-                        spacing: Colors.spacingS
-                        Layout.alignment: Qt.AlignTop
+                SettingsDropIndicator {
+                    width: parent ? parent.width : 0
+                    active: primaryModeReorderState.active && primaryModeReorderState.targetListId === "launcher-primary-mode" && primaryModeReorderState.targetIndex === root.orderedPrimaryModes().length
+                    visible: active
+                }
 
-                        SettingsActionButton {
-                            compact: true
-                            iconName: "󰅃"
-                            enabled: index > 0
-                            onClicked: root.movePrimaryMode(modelData, -1)
-                        }
-
-                        SettingsActionButton {
-                            compact: true
-                            iconName: "󰅀"
-                            enabled: index < (root.orderedPrimaryModes().length - 1)
-                            onClicked: root.movePrimaryMode(modelData, 1)
-                        }
-
-                        SettingsActionButton {
-                            compact: true
-                            label: "Advanced"
-                            onClicked: root.demoteLauncherMode(modelData)
-                        }
-
-                        SettingsActionButton {
-                            compact: true
-                            label: "Disable"
-                            onClicked: root.disableLauncherMode(modelData)
-                        }
-                    }
+                Text {
+                    width: parent ? parent.width : 0
+                    visible: primaryModeReorderState.active && primaryModeReorderState.targetListId === "launcher-primary-mode" && primaryModeReorderState.targetIndex === root.orderedPrimaryModes().length
+                    text: "Drop at end of primary sidebar"
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
                 }
             }
         }
@@ -1179,107 +1269,197 @@ Item {
                 body: "Settings, Run, SSH, and Web stay visible under the search field as prefix shortcuts even when they are not pinned in the sidebar."
             }
 
-            Repeater {
-                model: root.orderedAdvancedModes()
+            Column {
+                id: advancedModeOrderList
+                Layout.fillWidth: true
+                spacing: Colors.spacingXS
 
-                delegate: SettingsListRow {
-                    required property int index
-                    required property var modelData
+                Repeater {
+                    model: root.orderedAdvancedModes()
 
-                    minimumHeight: root.compactMode ? 84 : 56
+                    delegate: Item {
+                        id: advancedModeRow
+                        width: parent ? parent.width : 0
+                        implicitHeight: advancedModeCard.implicitHeight + (advancedDropBeforeIndicator.visible ? advancedDropBeforeIndicator.height + Colors.spacingXS : 0)
+                        height: implicitHeight
+                        required property int index
+                        required property var modelData
+                        readonly property bool dropBeforeActive: advancedModeReorderState.active && advancedModeReorderState.targetListId === "launcher-advanced-mode" && advancedModeReorderState.targetIndex === index
 
-                    Rectangle {
-                        implicitWidth: 28
-                        implicitHeight: 28
-                        radius: Colors.radiusCard
-                        color: Colors.surface
-                        border.color: Colors.border
-                        border.width: 1
-                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: root.launcherModeMeta(modelData).icon
-                            color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
+                        SettingsDropIndicator {
+                            id: advancedDropBeforeIndicator
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: parent.top
+                            }
+                            active: advancedModeRow.dropBeforeActive
+                            visible: advancedModeRow.dropBeforeActive
                         }
-                    }
 
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Colors.spacingXS
+                        SettingsListRow {
+                            id: advancedModeCard
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: advancedDropBeforeIndicator.bottom
+                                topMargin: advancedDropBeforeIndicator.visible ? Colors.spacingXS : 0
+                            }
+                            minimumHeight: root.compactMode ? 84 : 56
+                            dragging: advancedDragHandle.dragActive
+                            dropTargeted: advancedModeRow.dropBeforeActive
+                            onYChanged: {
+                                if (advancedDragHandle.dragActive)
+                                    advancedModeReorderState.updateTarget("launcher-advanced-mode", root.currentModeDropIndex(advancedModeCard, advancedModeRow.index, advancedModeOrderList, root.orderedAdvancedModes().length));
+                            }
 
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: Colors.spacingS
+                            Behavior on y {
+                                enabled: !advancedDragHandle.dragActive
 
-                            Text {
-                                text: root.launcherModeMeta(modelData).label
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.weight: Font.DemiBold
+                                NumberAnimation {
+                                    duration: Colors.durationFast
+                                }
+                            }
+
+                            SettingsDragHandle {
+                                id: advancedDragHandle
+                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+                                dragTarget: advancedModeCard
+                                onPressedChanged: {
+                                    if (pressed)
+                                        root.beginAdvancedModeDrag(advancedModeRow.modelData, advancedModeRow.index);
+                                }
+                                onReleased: function (wasDragging) {
+                                    var targetIndex = advancedModeReorderState.targetIndex;
+                                    if (wasDragging)
+                                        targetIndex = root.currentModeDropIndex(advancedModeCard, advancedModeRow.index, advancedModeOrderList, root.orderedAdvancedModes().length);
+                                    advancedModeCard.x = 0;
+                                    advancedModeCard.y = 0;
+                                    if (wasDragging) {
+                                        if (!root.moveDraggedAdvancedMode(targetIndex))
+                                            root.clearModeDragState();
+                                    } else {
+                                        root.clearModeDragState();
+                                    }
+                                }
                             }
 
                             Rectangle {
-                                visible: String(ModeData.modeInfo(modelData).prefix || "") !== ""
-                                radius: Colors.radiusPill
-                                color: Colors.primarySubtle
-                                border.color: Colors.primaryRing
+                                implicitWidth: 28
+                                implicitHeight: 28
+                                radius: Colors.radiusCard
+                                color: Colors.surface
+                                border.color: Colors.border
                                 border.width: 1
-                                implicitHeight: 22
-                                implicitWidth: advancedPrefixLabel.implicitWidth + 12
+                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
                                 Text {
-                                    id: advancedPrefixLabel
                                     anchors.centerIn: parent
-                                    text: (ModeData.modeInfo(modelData).prefix || "") + " prefix"
+                                    text: root.launcherModeMeta(advancedModeRow.modelData).icon
                                     color: Colors.primary
+                                    font.family: Colors.fontMono
+                                    font.pixelSize: Colors.fontSizeSmall
+                                }
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: Colors.spacingXS
+
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: Colors.spacingS
+
+                                    Text {
+                                        text: root.launcherModeMeta(advancedModeRow.modelData).label
+                                        color: Colors.text
+                                        font.pixelSize: Colors.fontSizeSmall
+                                        font.weight: Font.DemiBold
+                                    }
+
+                                    Rectangle {
+                                        visible: String(ModeData.modeInfo(advancedModeRow.modelData).prefix || "") !== ""
+                                        radius: Colors.radiusPill
+                                        color: Colors.primarySubtle
+                                        border.color: Colors.primaryRing
+                                        border.width: 1
+                                        implicitHeight: 22
+                                        implicitWidth: advancedPrefixLabel.implicitWidth + 12
+
+                                        Text {
+                                            id: advancedPrefixLabel
+                                            anchors.centerIn: parent
+                                            text: (ModeData.modeInfo(advancedModeRow.modelData).prefix || "") + " prefix"
+                                            color: Colors.primary
+                                            font.pixelSize: Colors.fontSizeXS
+                                            font.weight: Font.DemiBold
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: ModeData.modeInfo(advancedModeRow.modelData).hint || "Advanced launcher mode"
+                                    color: Colors.textSecondary
                                     font.pixelSize: Colors.fontSizeXS
-                                    font.weight: Font.DemiBold
+                                    wrapMode: Text.WordWrap
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: "Drag to reorder within advanced modes, or use the arrow buttons."
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Colors.fontSizeXS
+                                    wrapMode: Text.WordWrap
+                                }
+                            }
+
+                            Flow {
+                                spacing: Colors.spacingS
+                                Layout.alignment: Qt.AlignTop
+
+                                SettingsActionButton {
+                                    compact: true
+                                    iconName: "󰅃"
+                                    enabled: advancedModeRow.index > 0
+                                    onClicked: root.moveAdvancedMode(advancedModeRow.modelData, -1)
+                                }
+
+                                SettingsActionButton {
+                                    compact: true
+                                    iconName: "󰅀"
+                                    enabled: advancedModeRow.index < (root.orderedAdvancedModes().length - 1)
+                                    onClicked: root.moveAdvancedMode(advancedModeRow.modelData, 1)
+                                }
+
+                                SettingsActionButton {
+                                    compact: true
+                                    label: "Pin"
+                                    onClicked: root.promoteLauncherMode(advancedModeRow.modelData)
+                                }
+
+                                SettingsActionButton {
+                                    compact: true
+                                    label: "Disable"
+                                    onClicked: root.disableLauncherMode(advancedModeRow.modelData)
                                 }
                             }
                         }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: ModeData.modeInfo(modelData).hint || "Advanced launcher mode"
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            wrapMode: Text.WordWrap
-                        }
                     }
+                }
 
-                    Flow {
-                        spacing: Colors.spacingS
-                        Layout.alignment: Qt.AlignTop
+                SettingsDropIndicator {
+                    width: parent ? parent.width : 0
+                    active: advancedModeReorderState.active && advancedModeReorderState.targetListId === "launcher-advanced-mode" && advancedModeReorderState.targetIndex === root.orderedAdvancedModes().length
+                    visible: active
+                }
 
-                        SettingsActionButton {
-                            compact: true
-                            iconName: "󰅃"
-                            enabled: index > 0
-                            onClicked: root.moveAdvancedMode(modelData, -1)
-                        }
-
-                        SettingsActionButton {
-                            compact: true
-                            iconName: "󰅀"
-                            enabled: index < (root.orderedAdvancedModes().length - 1)
-                            onClicked: root.moveAdvancedMode(modelData, 1)
-                        }
-
-                        SettingsActionButton {
-                            compact: true
-                            label: "Pin"
-                            onClicked: root.promoteLauncherMode(modelData)
-                        }
-
-                        SettingsActionButton {
-                            compact: true
-                            label: "Disable"
-                            onClicked: root.disableLauncherMode(modelData)
-                        }
-                    }
+                Text {
+                    width: parent ? parent.width : 0
+                    visible: advancedModeReorderState.active && advancedModeReorderState.targetListId === "launcher-advanced-mode" && advancedModeReorderState.targetIndex === root.orderedAdvancedModes().length
+                    text: "Drop at end of advanced modes"
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
                 }
             }
 

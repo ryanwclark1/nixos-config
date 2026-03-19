@@ -369,11 +369,10 @@ function _targetIndexFromMappedY(mappedY, itemExtent, spacing, count) {
     return SettingsReorderHelpers.targetIndexFromMappedY(mappedY, itemExtent, spacing, count);
 }
 
-function currentModeDropIndex(cardItem, rowIndex, listItem, Config, CompositorAdapter, launcherModes) {
+function currentModeDropIndex(cardItem, rowIndex, listItem, count) {
     if (!cardItem || !listItem)
         return rowIndex;
-    var modes = orderedEnabledModes(Config, CompositorAdapter, launcherModes);
-    return _targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, modes.length);
+    return _targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, count);
 }
 
 function moveDraggedMode(Config, CompositorAdapter, launcherModes, state, targetIndex) {
@@ -537,6 +536,12 @@ function moveDraggedOrderedValue(Config, ControlCenterRegistry, PluginService, c
         return false;
     Config[configKey] = result.items.slice();
     return true;
+}
+
+function currentOrderedDropIndex(cardItem, rowIndex, listItem, count) {
+    if (!cardItem || !listItem)
+        return rowIndex;
+    return _targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, count);
 }
 
 function toggleHiddenListValue(Config, configKey, value) {
