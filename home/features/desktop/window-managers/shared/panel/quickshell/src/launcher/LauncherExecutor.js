@@ -141,7 +141,11 @@ function executeSelection(mode, item, actions) {
         if (!actions.showingConfirm)
             actions.close();
     } else if (mode === "wallpapers") {
-        actions.execDetached(["swww", "img", item.path, "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "1.5"]);
+        if (actions.setWallpaper) {
+            actions.setWallpaper(item.path, "");
+        } else {
+            actions.execDetached(["swww", "img", item.path, "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "1.5"]);
+        }
         actions.execDetached(["wallust", "run", item.path]);
         actions.close();
     } else if (mode === "keybinds") {

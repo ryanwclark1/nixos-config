@@ -247,13 +247,19 @@ PanelWindow {
     function resolveFileSearchRoot(rawValue) {
         var raw = String(rawValue || "~").trim();
         var home = String(Quickshell.env("HOME") || "/");
-        if (raw === "" || raw === "~")
-            return home;
-        if (raw.indexOf("~/") === 0)
-            return home + raw.substring(1);
-        if (raw.charAt(0) === "/")
-            return raw;
-        return home;
+        var resolved = home;
+        if (raw === "" || raw === "~") {
+            resolved = home;
+        } else if (raw.indexOf("~/") === 0) {
+            resolved = home + raw.substring(1);
+        } else if (raw.charAt(0) === "/") {
+            resolved = raw;
+        } else {
+            resolved = home + "/" + raw;
+        }
+        if (resolved.length > 1 && resolved.charAt(resolved.length - 1) === "/")
+            resolved = resolved.substring(0, resolved.length - 1);
+        return resolved;
     }
 
     function formatFileSearchRootLabel(rootPath) {
@@ -653,7 +659,7 @@ PanelWindow {
             if (errorCb) {
                 errorCb(stderrText !== "" ? stderrText : stdoutText, exitCode, exitStatus);
             } else {
-                console.warn("Launcher command failed:", exitCode, stderrText !== "" ? stderrText : stdoutText);
+                Logger.w("Launcher", "command failed:", exitCode, stderrText !== "" ? stderrText : stdoutText);
             }
         }
     }
@@ -666,7 +672,7 @@ PanelWindow {
                 try {
                     launcherRoot.launcherIconMap = JSON.parse(this.text || "{}");
                 } catch (e) {
-                    console.warn("Launcher: icon map parse error:", e);
+                    Logger.w("Launcher", "icon map parse error:", e);
                 }
             }
         }
@@ -729,7 +735,7 @@ PanelWindow {
         onTriggered: {
             if (!commandProc.running)
                 return;
-            console.warn("Launcher: command timed out after 10s");
+            Logger.w("Launcher", "command timed out after 10s");
             launcherRoot.suppressNextCommandExit = true;
             commandProc.running = false;
             if (!launcherRoot.pendingCommand && launcherRoot.modeLoadState === "loading")
@@ -745,7 +751,7 @@ PanelWindow {
         onTriggered: {
             if (!fileIndexProc.running)
                 return;
-            console.warn("Launcher: file index build timed out after 30s");
+            Logger.w("Launcher", "file index build timed out after 30s");
             fileIndexProc.running = false;
             launcherRoot.fileIndexBuilding = false;
             if (launcherRoot.modeLoadState === "loading" && launcherRoot.mode === "files")
@@ -990,7 +996,7 @@ PanelWindow {
         if (!Config.launcherEnableDebugTimings)
             return;
         var took = Math.max(0, Date.now() - startedAt);
-        console.debug("Launcher timing:", label, took + "ms");
+        Logger.d("Launcher", "timing:", label, took + "ms");
     }
 
     function beginRequest(modeKey) {
@@ -2940,6 +2946,7 @@ PanelWindow {
             shouldPasteCharacter: shouldPasteCharacter,
             restoreClipboardHistoryItem: restoreClipboardHistoryItem,
             execDetached: Quickshell.execDetached,
+            setWallpaper: function(path, monitor) { WallpaperService.setWallpaper(path, monitor); },
             focusWindow: function(id) { CompositorAdapter.focusWindow(id); },
             supportsDispatcherActions: CompositorAdapter.supportsDispatcherActions,
             dispatchAction: CompositorAdapter.dispatchAction,

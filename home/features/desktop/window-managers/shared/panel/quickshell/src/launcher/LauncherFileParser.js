@@ -34,6 +34,16 @@ function iconForFile(name, extension, kind) {
     return "󰈔";
 }
 
+function joinDisplayPath(rootLabel, parentPath) {
+    var base = String(rootLabel || "~");
+    var parent = String(parentPath || "");
+    if (parent === "")
+        return base;
+    if (base === "/")
+        return "/" + parent;
+    return base + "/" + parent;
+}
+
 function _buildFileItem(path, rootDir, rootPrefix, rootLabel) {
     var raw = String(path || "");
     var kind = "file";
@@ -52,7 +62,7 @@ function _buildFileItem(path, rootDir, rootPrefix, rootLabel) {
     if (name === "")
         name = raw;
     var parentPath = slash >= 0 ? relativePath.substring(0, slash) : "";
-    var displayPath = parentPath !== "" ? (rootLabel + "/" + parentPath) : rootLabel;
+    var displayPath = joinDisplayPath(rootLabel, parentPath);
     var extension = "";
     var extIndex = name.lastIndexOf(".");
     if (extIndex > 0 && extIndex < (name.length - 1))
