@@ -64,55 +64,33 @@ Item {
     property var anchorWindow: root.anchorWindow
     property bool isOpen: visible
     property real gap: 8
-    property real inset: 8
     readonly property string anchorEdge: {
       if (anchorWindow && anchorWindow.barConfig && anchorWindow.barConfig.position)
         return String(anchorWindow.barConfig.position);
       return "top";
     }
 
+    // Map bar position to popup edge/gravity: popup appears on the opposite side
+    readonly property int _edgeFlag: {
+      switch (anchorEdge) {
+        case "top": return Edges.Bottom;
+        case "bottom": return Edges.Top;
+        case "left": return Edges.Right;
+        case "right": return Edges.Left;
+        default: return Edges.Bottom;
+      }
+    }
+
     anchor.window: anchorWindow
+    anchor.item: anchorItem
+    anchor.edges: _edgeFlag
+    anchor.gravity: _edgeFlag
+    anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
+    anchor.margins { top: gap; bottom: gap; left: gap; right: gap }
     visible: false
     color: "transparent"
     implicitWidth: popupBody.implicitWidth
     implicitHeight: popupBody.implicitHeight
-
-    function _windowX(item) {
-      var x = 0;
-      for (var it = item; it; it = it.parent) x += it.x;
-      return x;
-    }
-
-    function _windowY(item) {
-      var y = 0;
-      for (var it = item; it; it = it.parent) y += it.y;
-      return y;
-    }
-
-    anchor.rect.x: {
-      if (!anchorItem) return 0;
-      var x = 0;
-      if (anchorEdge === "left")
-        x = _windowX(anchorItem) + anchorItem.width + gap;
-      else if (anchorEdge === "right")
-        x = _windowX(anchorItem) - implicitWidth - gap;
-      else
-        x = _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
-      if (anchorWindow && anchorWindow.screen) {
-        var maxX = Math.max(inset, anchorWindow.screen.width - implicitWidth - inset);
-        x = Math.min(Math.max(inset, x), maxX);
-      }
-      return x;
-    }
-
-    anchor.rect.y: {
-      if (!anchorItem) return 0;
-      if (anchorEdge === "bottom")
-        return _windowY(anchorItem) - implicitHeight - gap;
-      if (anchorEdge === "left" || anchorEdge === "right")
-        return _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
-      return _windowY(anchorItem) + anchorItem.height + gap;
-    }
 
     function toggle() {
       if (!visible && (implicitWidth <= 0 || implicitHeight <= 0))
