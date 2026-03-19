@@ -52,4 +52,13 @@ QtObject {
         var args = Array.prototype.slice.call(arguments, 1);
         console.error(_fmt("E", module, args));
     }
+
+    // Performance timing — returns a function that logs elapsed ms when called
+    function perf(module, label) {
+        var start = Date.now();
+        return function() {
+            var elapsed = Date.now() - start;
+            console.log(_fmt("P", module, [label, elapsed + "ms"]));
+        };
+    }
 }
