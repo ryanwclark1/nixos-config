@@ -398,7 +398,7 @@ PanelWindow {
                             width: detailFlick.width
                             spacing: Colors.spacingM
 
-                            SystemProcessTable {
+                            ProcessWidget {
                                 id: processTable
                                 maxRows: 26
                                 viewportFlickable: detailFlick

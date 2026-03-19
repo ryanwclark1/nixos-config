@@ -65,13 +65,11 @@ QtObject {
         }
     }
 
-    // ── Schedule ────────────────────────────────
-    property Timer scheduleTimer: Timer {
-        interval: 60000
-        running: Config.nightLightAutoSchedule
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root._evaluateSchedule()
+    // ── Schedule (fires once per minute via SystemClock) ──
+    property Connections _scheduleClock: Connections {
+        target: SystemClock
+        enabled: Config.nightLightAutoSchedule
+        function onMinutesChanged() { root._evaluateSchedule(); }
     }
 
     function _evaluateSchedule() {
@@ -154,8 +152,7 @@ QtObject {
     }
 
     // ── Wake recovery ────────────────────────────
-    property Connections suspendConn: Connections {
-        id: suspendConn
+    property Connections _suspendConn: Connections {
         target: SuspendManager
         function onWakingUp() {
             // Re-check process state after wake
