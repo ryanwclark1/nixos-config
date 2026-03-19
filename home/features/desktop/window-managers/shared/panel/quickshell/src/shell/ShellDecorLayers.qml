@@ -47,6 +47,8 @@ Item {
                         }
                     }
 
+                    Ref { service: WeatherService; active: Config.weatherOverlayEnabled }
+
                     WallpaperLayer {
                         id: wallpaperLayer
                         visible: Config.wallpaperUseShellRenderer
@@ -95,6 +97,142 @@ Item {
                                 solidColor = "#" + solidHex.slice(0, 6);
                             }
                         }
+                    }
+
+                    // Weather overlay — animated rain/snow/fog
+                    ShaderEffect {
+                        id: weatherOverlay
+                        anchors.fill: parent
+                        visible: Config.weatherOverlayEnabled && _weatherType !== "none"
+                        layer.enabled: visible
+
+                        readonly property string _weatherType: {
+                            if (!Config.weatherOverlayEnabled) return "none";
+                            var c = (WeatherService.condition || "").toLowerCase();
+                            if (c.indexOf("rain") !== -1 || c.indexOf("drizzle") !== -1) return "rain";
+                            if (c.indexOf("snow") !== -1 || c.indexOf("sleet") !== -1) return "snow";
+                            if (c.indexOf("fog") !== -1 || c.indexOf("mist") !== -1) return "fog";
+                            return "none";
+                        }
+
+                        property real time: 0
+                        NumberAnimation on time {
+                            from: 0; to: 1000
+                            duration: 1000000
+                            loops: Animation.Infinite
+                            running: weatherOverlay.visible
+                        }
+
+                        property real intensity: {
+                            var c = (WeatherService.condition || "").toLowerCase();
+                            if (c.indexOf("heavy") !== -1 || c.indexOf("thunder") !== -1) return 1.0;
+                            if (c.indexOf("light") !== -1 || c.indexOf("drizzle") !== -1) return 0.3;
+                            return 0.6;
+                        }
+
+                        fragmentShader: {
+                            if (_weatherType === "rain") return _rainShader;
+                            if (_weatherType === "snow") return _snowShader;
+                            if (_weatherType === "fog") return _fogShader;
+                            return "";
+                        }
+
+                        readonly property string _rainShader: "
+                            varying highp vec2 qt_TexCoord0;
+                            uniform lowp float qt_Opacity;
+                            uniform highp float time;
+                            uniform highp float intensity;
+
+                            highp float rand(highp vec2 co) {
+                                return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+                            }
+
+                            void main() {
+                                highp vec2 uv = qt_TexCoord0;
+                                highp float t = time * 0.5;
+
+                                // Rain streaks — multiple layers for depth
+                                highp float rain = 0.0;
+                                for (int i = 0; i < 3; i++) {
+                                    highp float fi = float(i);
+                                    highp float speed = 2.0 + fi * 0.8;
+                                    highp float scale = 40.0 + fi * 20.0;
+                                    highp vec2 ruv = vec2(uv.x * scale, (uv.y + t * speed) * scale * 0.3);
+                                    highp float drop = rand(floor(ruv));
+                                    highp float streak = smoothstep(0.97 - intensity * 0.04, 1.0, drop);
+                                    rain += streak * (0.15 - fi * 0.03);
+                                }
+
+                                gl_FragColor = vec4(0.7, 0.75, 0.85, rain * intensity * 0.4) * qt_Opacity;
+                            }
+                        "
+
+                        readonly property string _snowShader: "
+                            varying highp vec2 qt_TexCoord0;
+                            uniform lowp float qt_Opacity;
+                            uniform highp float time;
+                            uniform highp float intensity;
+
+                            highp float rand(highp vec2 co) {
+                                return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+                            }
+
+                            void main() {
+                                highp vec2 uv = qt_TexCoord0;
+                                highp float t = time * 0.15;
+
+                                highp float snow = 0.0;
+                                for (int i = 0; i < 4; i++) {
+                                    highp float fi = float(i);
+                                    highp float speed = 0.3 + fi * 0.15;
+                                    highp float scale = 15.0 + fi * 10.0;
+                                    highp float drift = sin(t * (0.5 + fi * 0.3) + uv.y * 3.0) * 0.02;
+                                    highp vec2 suv = vec2((uv.x + drift) * scale, (uv.y + t * speed) * scale);
+                                    highp float flake = rand(floor(suv));
+                                    highp float size = smoothstep(0.96 - intensity * 0.03, 1.0, flake);
+                                    snow += size * (0.12 - fi * 0.02);
+                                }
+
+                                gl_FragColor = vec4(1.0, 1.0, 1.0, snow * intensity * 0.5) * qt_Opacity;
+                            }
+                        "
+
+                        readonly property string _fogShader: "
+                            varying highp vec2 qt_TexCoord0;
+                            uniform lowp float qt_Opacity;
+                            uniform highp float time;
+                            uniform highp float intensity;
+
+                            highp float hash(highp vec2 p) {
+                                return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+                            }
+
+                            highp float noise(highp vec2 p) {
+                                highp vec2 i = floor(p);
+                                highp vec2 f = fract(p);
+                                f = f * f * (3.0 - 2.0 * f);
+                                highp float a = hash(i);
+                                highp float b = hash(i + vec2(1.0, 0.0));
+                                highp float c = hash(i + vec2(0.0, 1.0));
+                                highp float d = hash(i + vec2(1.0, 1.0));
+                                return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+                            }
+
+                            void main() {
+                                highp vec2 uv = qt_TexCoord0;
+                                highp float t = time * 0.05;
+
+                                highp float fog = 0.0;
+                                fog += noise(uv * 3.0 + vec2(t, 0.0)) * 0.5;
+                                fog += noise(uv * 6.0 + vec2(-t * 0.7, t * 0.3)) * 0.3;
+                                fog += noise(uv * 12.0 + vec2(t * 0.5, -t * 0.2)) * 0.2;
+
+                                // Denser at bottom
+                                fog *= (0.5 + uv.y * 0.5);
+
+                                gl_FragColor = vec4(0.85, 0.87, 0.9, fog * intensity * 0.25) * qt_Opacity;
+                            }
+                        "
                     }
 
                     DesktopWidgets {

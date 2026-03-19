@@ -186,6 +186,7 @@ QtObject {
     property bool backgroundClockEnabled: false
     property bool backgroundAutoHide: true
     property string backgroundClockPosition: "center"
+    property bool weatherOverlayEnabled: false
 
     // --- SCREEN BORDERS ---
     property bool showScreenBorders: false
@@ -290,6 +291,8 @@ QtObject {
     property string wallpaperTransitionType: "fade"     // fade | pixelate | wipe | none
     property int wallpaperTransitionDuration: 1500       // ms
     property bool wallpaperUseShellRenderer: false       // true = shell renders wallpaper, false = use swww/external
+    property bool wallpaperDynamicEnabled: false
+    property string wallpaperDynamicManifest: ""         // path to manifest.json
 
     // --- THEME ---
     property string themeName: ""
@@ -743,9 +746,11 @@ QtObject {
     }
 
     function load() {
+        var done = Logger.perf("Config", "load");
         var raw = configFile.text();
         if (!raw) {
             ConfigPersistence.initializeDefaults(root);
+            done();
             return;
         }
 
@@ -763,6 +768,7 @@ QtObject {
         syncLegacyBarSettingsFromPrimary();
         _loading = false;
         applyRuntimeSettings();
+        done();
     }
 
     property FileView configFile: FileView {
