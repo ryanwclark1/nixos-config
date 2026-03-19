@@ -63,7 +63,7 @@ Item {
 
                     Behavior on height {
                         NumberAnimation {
-                            duration: 80
+                            duration: Colors.durationFlash
                             easing.type: Easing.OutCubic
                         }
                     }

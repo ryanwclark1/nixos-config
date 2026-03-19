@@ -20,7 +20,6 @@ PopupWindow {
   readonly property string tooltipText: String(text || "").trim()
   readonly property bool hasText: tooltipText.length > 0
   property bool ready: false
-  readonly property real inset: 8
   readonly property string anchorEdge: {
     if (preferredEdge !== "") return preferredEdge;
     if (anchorWindow && anchorWindow.tooltipEdge !== undefined && anchorWindow.tooltipEdge !== "")
@@ -30,50 +29,27 @@ PopupWindow {
     return "top";
   }
 
+  // Map bar position to popup edge/gravity: tooltip appears on the opposite side
+  readonly property int _edgeFlag: {
+    switch (anchorEdge) {
+      case "top": return Edges.Bottom;
+      case "bottom": return Edges.Top;
+      case "left": return Edges.Right;
+      case "right": return Edges.Left;
+      default: return Edges.Bottom;
+    }
+  }
+
   anchor.window: anchorWindow
-  // Compute window-relative coordinates by walking the parent chain.
-  // Unlike mapToItem(), direct property access IS reactive — QML tracks
-  // each ancestor's x/y as binding dependencies and re-evaluates on change.
-  function _windowX(item) {
-    var x = 0;
-    for (var it = item; it; it = it.parent) x += it.x;
-    return x;
-  }
-  function _windowY(item) {
-    var y = 0;
-    for (var it = item; it; it = it.parent) y += it.y;
-    return y;
-  }
-
-  anchor.rect.x: {
-    if (!anchorItem || !anchorItem.width) return 0;
-    var x = 0;
-    if (anchorEdge === "left")
-      x = _windowX(anchorItem) + anchorItem.width + gap;
-    else if (anchorEdge === "right")
-      x = _windowX(anchorItem) - implicitWidth - gap;
-    else
-      x = _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
-    
-    // Clamp to screen width if possible, otherwise bar window width.
-    var fullWidth = (anchorWindow && anchorWindow.screen) ? anchorWindow.screen.width : (anchorWindow ? anchorWindow.width : 1920);
-    var maxX = Math.max(inset, fullWidth - implicitWidth - inset);
-    return Math.min(Math.max(inset, x), maxX);
-  }
-  anchor.rect.y: {
-    if (!anchorItem || !anchorItem.height) return 0;
-    var y = 0;
-    if (anchorEdge === "bottom")
-      y = _windowY(anchorItem) - implicitHeight - gap;
-    else if (anchorEdge === "left" || anchorEdge === "right")
-      y = _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
-    else
-      y = _windowY(anchorItem) + anchorItem.height + gap;
-
-    // We don't clamp Y against the bar window height because tooltips usually 
-    // need to appear OUTSIDE the bar (e.g. below it). 
-    // Quickshell's PopupWindow will handle the actual screen placement.
-    return y;
+  anchor.item: anchorItem
+  anchor.edges: _edgeFlag
+  anchor.gravity: _edgeFlag
+  anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
+  anchor.margins {
+    top: gap
+    bottom: gap
+    left: gap
+    right: gap
   }
 
   implicitWidth: tooltipBody.width

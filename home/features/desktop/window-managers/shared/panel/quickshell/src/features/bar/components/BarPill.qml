@@ -69,7 +69,7 @@ MouseArea {
 
   // Multiplicative scale: hover lifts, press pushes back toward normal
   scale: (containsMouse ? hoverScale : 1.0) * (pressed ? 0.94 : 1.0)
-  Behavior on scale { NumberAnimation { duration: 240; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
+  Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
 
   // Y-offset physics: hover lifts, press pushes down
   property real _yOffset: pressed ? 1.5 : (containsMouse ? -0.5 : 0)

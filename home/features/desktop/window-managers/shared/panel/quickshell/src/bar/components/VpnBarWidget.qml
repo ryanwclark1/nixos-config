@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import "../../services"
 import "../../widgets" as SharedWidgets
 import "../PanelWidgetHelpers.js" as PanelHelpers
@@ -12,7 +13,7 @@ SharedWidgets.BarPill {
 
     readonly property string labelMode: PanelHelpers.widgetStringSetting(widgetInstance, "labelMode", "status", ["status", "ip"])
     readonly property bool showOtherVpnCount: PanelHelpers.widgetBooleanSetting(widgetInstance, "showOtherVpnCount", true)
-    readonly property string tooltipTextValue: vpnWidgetLoader.status === Loader.Ready && vpnWidgetLoader.item && vpnWidgetLoader.item.tooltipText ? vpnWidgetLoader.item.tooltipText : "VPN"
+    readonly property string tooltipTextValue: vpnWidgetLoader.item && vpnWidgetLoader.item.tooltipText ? vpnWidgetLoader.item.tooltipText : "VPN"
 
     tooltipText: tooltipTextValue
     onClicked: root.triggerRequested(this)
@@ -30,35 +31,16 @@ SharedWidgets.BarPill {
     ]
     Row {
         spacing: Colors.spacingS
-        Loader {
+        BoundComponent {
             id: vpnWidgetLoader
             source: Qt.resolvedUrl("../../features/network/components/VpnWidget.qml")
-            asynchronous: false
-        }
-
-        Binding {
-            when: vpnWidgetLoader.status === Loader.Ready && !!vpnWidgetLoader.item
-            target: vpnWidgetLoader.item
-            property: "iconOnly"
-            value: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
-        }
-
-        Binding {
-            when: vpnWidgetLoader.status === Loader.Ready && !!vpnWidgetLoader.item
-            target: vpnWidgetLoader.item
-            property: "labelMode"
-            value: root.labelMode
-        }
-
-        Binding {
-            when: vpnWidgetLoader.status === Loader.Ready && !!vpnWidgetLoader.item
-            target: vpnWidgetLoader.item
-            property: "showOtherVpnCount"
-            value: root.showOtherVpnCount
+            property bool iconOnly: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
+            property string labelMode: root.labelMode
+            property bool showOtherVpnCount: root.showOtherVpnCount
         }
 
         Row {
-            visible: vpnWidgetLoader.status === Loader.Error
+            visible: !vpnWidgetLoader.item
             spacing: Colors.spacingS
 
             Text {

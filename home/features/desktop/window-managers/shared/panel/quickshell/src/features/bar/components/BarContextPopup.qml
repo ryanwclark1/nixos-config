@@ -23,6 +23,7 @@ PopupWindow {
     visible: false
     implicitWidth: menuWidth + 2
     implicitHeight: menuPadding * 2 + contentColumn.implicitHeight + 2
+    anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
 
     function allowLayer(width, height) {
         return width > 0 && height > 0
@@ -50,27 +51,14 @@ PopupWindow {
 
         if (pos === "left" || pos === "right") {
             // Side bars: popup beside the bar, vertically centered on trigger
-            var anchorY = ty + th / 2 - root.implicitHeight / 2;
-            if (anchorWin && anchorWin.screen) {
-                var screenH = anchorWin.screen.height;
-                if (anchorY + root.implicitHeight > screenH - 8) anchorY = screenH - root.implicitHeight - 8;
-                if (anchorY < 8) anchorY = 8;
-            }
-            root.anchor.rect.y = anchorY;
+            root.anchor.rect.y = ty + th / 2 - root.implicitHeight / 2;
             if (pos === "left")
                 root.anchor.rect.x = tx + tw + gap;
             else
                 root.anchor.rect.x = tx - menuWidth - gap;
         } else {
             // Top / bottom bars: popup centered horizontally on trigger
-            var anchorX = tx + tw / 2 - menuWidth / 2;
-            // Clamp to screen bounds
-            if (anchorWin && anchorWin.screen) {
-                var screenW = anchorWin.screen.width;
-                if (anchorX + menuWidth > screenW - 8) anchorX = screenW - menuWidth - 8;
-                if (anchorX < 8) anchorX = 8;
-            }
-            root.anchor.rect.x = anchorX;
+            root.anchor.rect.x = tx + tw / 2 - menuWidth / 2;
 
             if (pos === "bottom")
                 root.anchor.rect.y = ty - root.implicitHeight - gap;
