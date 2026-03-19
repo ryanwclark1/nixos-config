@@ -30,6 +30,20 @@ PanelWindow {
   property var manager: null
   readonly property int maxLayerTextureSize: 4096
 
+  // Track which notification IDs have auto-expired from popup (timed out)
+  // but should remain visible in the notification center
+  property var _expiredPopupIds: ({})
+
+  function markPopupExpired(notifId) {
+    var next = Object.assign({}, _expiredPopupIds);
+    next[notifId] = true;
+    _expiredPopupIds = next;
+  }
+
+  function isPopupExpired(notifId) {
+    return _expiredPopupIds[notifId] === true;
+  }
+
   function allowLayer(width, height) {
     return width > 0 && height > 0
       && width <= maxLayerTextureSize
@@ -47,7 +61,8 @@ PanelWindow {
       delegate: Item {
         id: notifWrapper
         property var notification: modelData || null
-        visible: notification && !notification.dismissed && (!root.manager || !root.manager.dndEnabled || isUrgent) && !_isMuted
+        readonly property bool _popupExpired: notification ? (root._expiredPopupIds[notification.id] === true) : false
+        visible: notification && !notification.dismissed && !_popupExpired && (!root.manager || !root.manager.dndEnabled || isUrgent) && !_isMuted
         Layout.preferredWidth: Config.notifWidth
         Layout.preferredHeight: visible ? delegate.height : 0
 
@@ -71,6 +86,9 @@ PanelWindow {
         property real entranceProgress: 0
         property real exitProgress: 1.0
         property bool isDismissing: false
+        // true when the popup expires by timeout (should NOT dismiss from center)
+        // false when user explicitly dismisses (click X, swipe, right-click)
+        property bool _isAutoExpiry: false
 
         opacity: entranceProgress * exitProgress
         scale: 0.95 + (0.05 * entranceProgress)
@@ -86,8 +104,20 @@ PanelWindow {
         Timer { id: entranceTimer; onTriggered: entranceAnim.start() }
         NumberAnimation { id: entranceAnim; target: notifWrapper; property: "entranceProgress"; to: 1.0; duration: Colors.durationEmphasis; easing.type: Easing.OutQuint }
 
+        // User-initiated dismiss: removes from both popup and notification center
         function animatedDismiss() {
           if (isDismissing) return;
+          _isAutoExpiry = false;
+          isDismissing = true;
+          dismissTimer.stop();
+          dismissTimer.dismissProgress = 0;
+          dismissAnim.start();
+        }
+
+        // Auto-expiry: hides popup but keeps notification in center
+        function autoExpirePopup() {
+          if (isDismissing) return;
+          _isAutoExpiry = true;
           isDismissing = true;
           dismissTimer.stop();
           dismissTimer.dismissProgress = 0;
@@ -106,7 +136,17 @@ PanelWindow {
           id: dismissAnim
           NumberAnimation { target: notifWrapper; property: "exitProgress"; to: 0; duration: Colors.durationPanelOpen; easing.type: Easing.InCubic }
           NumberAnimation { target: notifWrapper; property: "x"; to: notifWrapper.width + 40; duration: Colors.durationPanelOpen; easing.type: Easing.InCubic }
-          onFinished: if (notification) notification.dismiss()
+          onFinished: {
+            if (!notification) return;
+            if (notifWrapper._isAutoExpiry) {
+              // Auto-expired: keep in trackedNotifications for the center,
+              // just mark as popup-expired so the popup stays hidden
+              root.markPopupExpired(notification.id);
+            } else {
+              // User-initiated: fully dismiss from everywhere
+              notification.dismiss();
+            }
+          }
         }
 
         NotificationDelegate {
@@ -153,7 +193,7 @@ PanelWindow {
             dismissProgress += 50 / notifWrapper._urgencyTimeout;
             if (dismissProgress >= 1.0) {
               stop();
-              notifWrapper.animatedDismiss();
+              notifWrapper.autoExpirePopup();
             }
           }
         }
