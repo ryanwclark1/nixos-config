@@ -12,6 +12,7 @@ import {
   webProviderKeys,
   allKnownModes,
   defaultModeOrder,
+  defaultPrimaryModes,
   modePrefixes,
 } from "../../src/launcher/LauncherModeData.js";
 
@@ -127,6 +128,7 @@ describe("stripModePrefix", () => {
     expect(stripModePrefix(">cmd")).toBe("cmd");
     expect(stripModePrefix(":emoji")).toBe("emoji");
     expect(stripModePrefix(";ssh")).toBe("ssh");
+    expect(stripModePrefix(",settings")).toBe("settings");
     expect(stripModePrefix("@bookmark")).toBe("bookmark");
     expect(stripModePrefix("=2+3")).toBe("2+3");
   });
@@ -221,11 +223,16 @@ describe("data exports", () => {
     }
   });
 
+  it("defaultPrimaryModes stays on the focused sidebar set", () => {
+    expect(defaultPrimaryModes).toEqual(["drun", "window", "files", "ai", "system"]);
+  });
+
   it("modePrefixes contains all known prefix chars", () => {
     expect(modePrefixes).toContain("!");
     expect(modePrefixes).toContain(">");
     expect(modePrefixes).toContain(";");
     expect(modePrefixes).toContain(":");
+    expect(modePrefixes).toContain(",");
   });
 
   it("webProviderKeys returns catalog keys", () => {

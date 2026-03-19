@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   itemActionLabel,
   itemProviderLabel,
   buildRecentEntry,
+  executeEmptyPrimary,
 } from "../../src/launcher/LauncherExecutor.js";
 
 // ---------------------------------------------------------------------------
@@ -16,6 +17,13 @@ describe("itemActionLabel", () => {
     expect(itemActionLabel("web", { name: "Y" })).toBe("Open");
     expect(itemActionLabel("ssh", { name: "Z" })).toBe("Connect");
     expect(itemActionLabel("window", { name: "W" })).toBe("Focus");
+    expect(itemActionLabel("settings", { name: "Search Debounce" })).toBe("Jump");
+  });
+
+  it("prefers entry-kind overrides for destination items", () => {
+    expect(
+      itemActionLabel("system", { name: "Control Center", entryKind: "destination" })
+    ).toBe("Open");
   });
 
   it("returns empty for hint items", () => {
@@ -115,5 +123,30 @@ describe("buildRecentEntry", () => {
     });
     expect(entry.name).toBe("Reboot");
     expect(entry.title).toBe("Power");
+  });
+
+  it("builds settings mode recent entry", () => {
+    const entry = buildRecentEntry("settings", {
+      name: "Search Debounce",
+      breadcrumb: "Launcher > Search",
+      icon: "󰒓",
+    });
+    expect(entry).toMatchObject({
+      name: "Search Debounce",
+      title: "Launcher > Search",
+      openMode: "settings",
+    });
+  });
+});
+
+describe("executeEmptyPrimary", () => {
+  it("opens full Settings when settings mode has no result", () => {
+    const actions = {
+      openSettings: vi.fn(),
+      close: vi.fn(),
+    };
+    executeEmptyPrimary("settings", "", "", actions);
+    expect(actions.openSettings).toHaveBeenCalledTimes(1);
+    expect(actions.close).toHaveBeenCalledTimes(1);
   });
 });

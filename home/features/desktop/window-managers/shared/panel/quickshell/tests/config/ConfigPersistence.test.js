@@ -121,6 +121,7 @@ describe("buildData", () => {
       selectedBarId: "bar1",
       barConfigs: [],
       controlCenterWidth: 400,
+      launcherPrimaryModes: ["drun", "files", "system"],
       disabledPlugins: [],
       pluginLauncherTriggers: {},
       pluginLauncherNoTrigger: {},
@@ -133,6 +134,7 @@ describe("buildData", () => {
     expect(data.glass.blur).toBe(true);
     expect(data.bars.selectedBarId).toBe("bar1");
     expect(data.controlCenter.width).toBe(400);
+    expect(data.launcher.primaryModes).toEqual(["drun", "files", "system"]);
     expect(data.plugins.disabled).toEqual([]);
   });
 });

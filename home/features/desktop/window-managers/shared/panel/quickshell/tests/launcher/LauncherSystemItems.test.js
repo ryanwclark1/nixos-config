@@ -1,10 +1,34 @@
 import { describe, it, expect } from "vitest";
 import {
+  buildSystemItems,
   parseAdHocTarget,
   buildSshItems,
   buildAdHocSshItem,
   resultSectionLabel,
 } from "../../src/launcher/LauncherSystemItems.js";
+
+describe("buildSystemItems", () => {
+  it("keeps system mode focused on destinations and session actions", () => {
+    const items = buildSystemItems({
+      sessionActions: [
+        { id: "lock", category: "Power", name: "Lock Screen", title: "", icon: "󰌾" },
+      ],
+      makeConfirmedSystemAction: () => () => {},
+      makeDetachedSystemAction: () => () => {},
+      openDashboard: () => {},
+      openSettings: () => {},
+      openNotifications: () => {},
+      openControlCenter: () => {},
+      openScreenshotMenu: () => {},
+      openPowerMenu: () => {},
+    });
+
+    expect(items.map((item) => item.name)).toContain("Dashboard");
+    expect(items.map((item) => item.name)).toContain("Settings");
+    expect(items.map((item) => item.name)).toContain("Lock Screen");
+    expect(items.map((item) => item.name)).not.toContain("Open Audio Controls");
+  });
+});
 
 // ---------------------------------------------------------------------------
 // parseAdHocTarget

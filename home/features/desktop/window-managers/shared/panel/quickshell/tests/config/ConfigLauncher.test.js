@@ -6,6 +6,7 @@ import {
   clampReal,
   asBool,
   normalizeModeList,
+  normalizePrimaryModeList,
   normalizeWebProviderOrder,
   normalizeWebAliases,
   normalizeCustomEngines,
@@ -110,8 +111,33 @@ describe("normalizeModeList", () => {
 
   it("accepts all valid mode keys", () => {
     const valid = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web",
-      "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"];
+      "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks",
+      "settings", "devops", "orchestrator", "ssh"];
     expect(normalizeModeList(valid, fallback)).toEqual(valid);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizePrimaryModeList
+// ---------------------------------------------------------------------------
+
+describe("normalizePrimaryModeList", () => {
+  const fallback = ["drun", "window", "files", "ai", "system"];
+
+  it("filters primary modes to enabled modes", () => {
+    expect(
+      normalizePrimaryModeList(
+        ["drun", "settings", "web"],
+        ["drun", "web", "ssh"],
+        fallback
+      )
+    ).toEqual(["drun", "web"]);
+  });
+
+  it("falls back to supported defaults when primaries are invalid", () => {
+    expect(
+      normalizePrimaryModeList(["bogus"], ["files", "ssh"], fallback)
+    ).toEqual(["files"]);
   });
 });
 
@@ -305,11 +331,13 @@ describe("applyLauncherConfig", () => {
         showModeHints: false,
         defaultMode: "files",
         enabledModes: ["drun", "files", "web"],
+        primaryModes: ["drun", "web", "settings"],
       },
     });
     expect(config.launcherMaxResults).toBe(200);
     expect(config.launcherShowModeHints).toBe(false);
     expect(config.launcherDefaultMode).toBe("files");
+    expect(config.launcherPrimaryModes).toEqual(["drun", "web"]);
   });
 
   it("clamps out-of-range values", () => {

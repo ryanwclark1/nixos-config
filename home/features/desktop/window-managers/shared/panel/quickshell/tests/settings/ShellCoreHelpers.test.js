@@ -7,6 +7,10 @@ import {
   setWebAliasString,
   isLauncherModeSupported,
   supportedLauncherModeKeys,
+  orderedPrimaryModes,
+  orderedAdvancedModes,
+  promoteLauncherMode,
+  demoteLauncherMode,
   toggleLauncherMode,
   applyModePreset,
   launcherModeMeta,
@@ -148,30 +152,38 @@ describe("toggleLauncherMode", () => {
 });
 
 describe("applyModePreset", () => {
-  it("applies minimal preset (filtered by available modes)", () => {
+  it("applies focused preset (filtered by available modes)", () => {
     const config = {
       launcherEnabledModes: [],
       launcherModeOrder: [],
       launcherDefaultMode: "drun",
     };
-    // minimal preset is ["drun", "window", "files", "run", "system", "media"]
-    // but setEnabledModes filters against supportedLauncherModeKeys,
-    // so only modes present in our mock launcherModes survive
-    applyModePreset(config, fullAdapter, launcherModes, "minimal");
+    applyModePreset(config, fullAdapter, launcherModes, "focused");
     expect(config.launcherEnabledModes).toContain("drun");
     expect(config.launcherEnabledModes).toContain("window");
     expect(config.launcherEnabledModes).toContain("files");
-    // "run", "system", "media" not in mock launcherModes, so filtered out
     expect(config.launcherEnabledModes).not.toContain("ssh");
   });
 
-  it("applies full preset (all supported modes)", () => {
+  it("applies extended preset (filtered by available modes)", () => {
     const config = {
       launcherEnabledModes: [],
       launcherModeOrder: [],
       launcherDefaultMode: "drun",
     };
-    applyModePreset(config, fullAdapter, launcherModes, "full");
+    applyModePreset(config, fullAdapter, launcherModes, "extended");
+    expect(config.launcherEnabledModes).toEqual(
+      expect.arrayContaining(["drun", "window", "files", "ssh"])
+    );
+  });
+
+  it("applies all preset (all supported modes)", () => {
+    const config = {
+      launcherEnabledModes: [],
+      launcherModeOrder: [],
+      launcherDefaultMode: "drun",
+    };
+    applyModePreset(config, fullAdapter, launcherModes, "all");
     expect(config.launcherEnabledModes.length).toBe(launcherModes.length);
   });
 });
@@ -210,6 +222,48 @@ describe("orderedEnabledModes", () => {
     };
     const result = orderedEnabledModes(config, limitedAdapter, launcherModes);
     expect(result).toEqual(["drun"]);
+  });
+});
+
+describe("orderedPrimaryModes / orderedAdvancedModes", () => {
+  it("splits enabled modes into primary and advanced groups", () => {
+    const config = {
+      launcherEnabledModes: ["drun", "files", "ssh"],
+      launcherModeOrder: ["drun", "files", "ssh"],
+      launcherPrimaryModes: ["drun", "files"],
+    };
+
+    expect(orderedPrimaryModes(config, fullAdapter, launcherModes)).toEqual([
+      "drun",
+      "files",
+    ]);
+    expect(orderedAdvancedModes(config, fullAdapter, launcherModes)).toEqual([
+      "ssh",
+    ]);
+  });
+});
+
+describe("promoteLauncherMode / demoteLauncherMode", () => {
+  it("promotes an advanced mode into the primary sidebar list", () => {
+    const config = {
+      launcherEnabledModes: ["drun", "files", "ssh"],
+      launcherModeOrder: ["drun", "files", "ssh"],
+      launcherPrimaryModes: ["drun", "files"],
+      launcherDefaultMode: "drun",
+    };
+    promoteLauncherMode(config, fullAdapter, launcherModes, "ssh");
+    expect(config.launcherPrimaryModes).toContain("ssh");
+  });
+
+  it("demotes a primary mode out of the sidebar list", () => {
+    const config = {
+      launcherEnabledModes: ["drun", "files", "ssh"],
+      launcherModeOrder: ["drun", "files", "ssh"],
+      launcherPrimaryModes: ["drun", "files"],
+      launcherDefaultMode: "drun",
+    };
+    demoteLauncherMode(config, fullAdapter, launcherModes, "files");
+    expect(config.launcherPrimaryModes).toEqual(["drun"]);
   });
 });
 
@@ -272,6 +326,7 @@ describe("resetLauncherDefaults", () => {
       launcherDefaultMode: "ssh",
       launcherEnabledModes: [],
       launcherModeOrder: [],
+      launcherPrimaryModes: [],
     };
     const defaults = { google: ["g"] };
     const defaultOrder = ["duckduckgo", "google"];
@@ -280,6 +335,7 @@ describe("resetLauncherDefaults", () => {
     expect(config.launcherDefaultMode).toBe("drun");
     expect(config.launcherMaxResults).toBe(80);
     expect(config.launcherEnabledModes).toContain("drun");
+    expect(config.launcherPrimaryModes).toContain("drun");
     expect(config.launcherWebProviderOrder).toEqual(defaultOrder);
   });
 });
