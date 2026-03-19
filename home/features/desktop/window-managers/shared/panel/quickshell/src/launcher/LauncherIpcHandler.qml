@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 
 IpcHandler {
     required property var launcher
