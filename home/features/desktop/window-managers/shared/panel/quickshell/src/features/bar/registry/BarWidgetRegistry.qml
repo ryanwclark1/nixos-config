@@ -72,6 +72,9 @@ QtObject {
     { widgetType: "weather", label: "Weather", icon: "󰖙", section: "right", description: "Current weather and forecast popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
     ] },
+    { widgetType: "market", label: "Markets", icon: "󱓗", section: "right", description: "Market quotes and indices.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
     {
       widgetType: "ssh",
       label: "SSH",
@@ -84,6 +87,7 @@ QtObject {
         enableSshConfigImport: true,
         displayMode: "count",
         defaultAction: "connect",
+        sshCommand: "ssh",
         showWhenEmpty: false,
         emptyClickAction: "menu",
         emptyLabel: "SSH",
@@ -96,6 +100,7 @@ QtObject {
       },
       settingsSchema: [
         { type: "toggle", key: "enableSshConfigImport", label: "SSH Config Import", icon: "󰣀", enabledText: "Import aliases from ~/.ssh/config and include files.", disabledText: "Only manual hosts are shown." },
+        { type: "text", key: "sshCommand", label: "SSH Command", icon: "󰆍", placeholder: "ssh", description: "Command for connections (e.g. ssh, kitten ssh, mosh)." },
         { type: "mode", key: "displayMode", label: "Bar Label", description: "Choose whether the widget shows the total host count or the most recent host label.", options: [ { value: "count", label: "Count" }, { value: "recent", label: "Recent" } ] },
         { type: "mode", key: "defaultAction", label: "Primary Click", description: "Choose the action used when the widget has exactly one host.", options: [ { value: "connect", label: "Connect" }, { value: "copy", label: "Copy Command" } ] },
         { type: "toggle", key: "showWhenEmpty", label: "Show When Empty", icon: "󰖰", enabledText: "Keep the SSH pill visible even when no hosts or import results are available yet.", disabledText: "Hide the SSH pill until hosts, import activity, or import errors exist." },
@@ -315,7 +320,7 @@ QtObject {
       return chips;
     }
 
-    if (widgetType === "weather" || widgetType === "network" || widgetType === "audio" || widgetType === "battery" || widgetType === "updates" || widgetType === "bluetooth") {
+    if (widgetType === "weather" || widgetType === "market" || widgetType === "network" || widgetType === "audio" || widgetType === "battery" || widgetType === "updates" || widgetType === "bluetooth") {
       chips.push("Display: " + _modeLabel(settings.displayMode));
       return chips;
     }
@@ -446,8 +451,11 @@ QtObject {
       var defaultAction = String(settings.defaultAction || "connect") === "copy" ? "Copy" : "Connect";
       var emptyClickAction = String(settings.emptyClickAction || "menu") === "refresh" ? "Refresh" : "Menu";
       var lastConnected = String(state.lastConnectedLabel || "").trim();
+      var sshCmd = String(settings.sshCommand || "ssh").trim();
       chips.push("Label: " + displayMode);
       chips.push("Click: " + defaultAction);
+      if (sshCmd !== "" && sshCmd !== "ssh")
+        chips.push("Cmd: " + sshCmd);
       chips.push("Manual: " + manualHosts.length);
       chips.push(settings.enableSshConfigImport !== false ? "Import On" : "Import Off");
       chips.push(settings.showWhenEmpty === true ? "Pinned Empty" : "Hide Empty");

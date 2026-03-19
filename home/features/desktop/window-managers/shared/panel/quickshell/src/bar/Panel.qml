@@ -33,6 +33,9 @@ Item {
     SharedWidgets.Ref {
         service: WeatherService
     }
+    SharedWidgets.Ref {
+        service: MarketService
+    }
 
     property var manager: null
     property var anchorWindow: null
@@ -222,6 +225,8 @@ Item {
             return idleInhibitorComponent;
         if (widgetType === "weather")
             return weatherComponent;
+        if (widgetType === "market")
+            return marketComponent;
         if (widgetType === "ssh")
             return sshComponent;
         if (widgetType === "vpn")
@@ -820,6 +825,18 @@ Item {
             vertical: root.vertical
             isActive: root.isSurfaceActive("weatherMenu")
             onTriggerRequested: triggerItem => root.requestSurface("weatherMenu", triggerItem)
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: marketComponent
+        MarketBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            isActive: root.isSurfaceActive("marketMenu")
+            onTriggerRequested: triggerItem => root.requestSurface("marketMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }

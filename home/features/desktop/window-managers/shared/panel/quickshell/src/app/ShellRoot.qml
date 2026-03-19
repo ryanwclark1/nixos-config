@@ -15,6 +15,7 @@ import "../features/cheatsheet"
 import "../features/hot-corners"
 import "../features/osk"
 import "../features/notifications"
+import "../features/market"
 import "../features/power"
 import "../features/region-selector"
 import "../features/system/surfaces"
@@ -52,6 +53,7 @@ Scope {
     readonly property bool musicMenuVisible: root.isSurfaceOpen("musicMenu")
     readonly property bool batteryMenuVisible: root.isSurfaceOpen("batteryMenu")
     readonly property bool weatherMenuVisible: root.isSurfaceOpen("weatherMenu")
+    readonly property bool marketMenuVisible: root.isSurfaceOpen("marketMenu")
     readonly property bool sshMenuVisible: root.isSurfaceOpen("sshMenu")
     readonly property bool dateTimeMenuVisible: root.isSurfaceOpen("dateTimeMenu")
     readonly property bool systemStatsMenuVisible: root.isSurfaceOpen("systemStatsMenu")
