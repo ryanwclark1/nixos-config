@@ -482,9 +482,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: runtimeSpacing + sectionSpacing
 
-        move: Transition {
-            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-        }
+        move: SharedWidgets.ListTransitions.move
 
         Repeater {
             model: root._leftLeading
@@ -495,9 +493,7 @@ Item {
             visible: root._leftTrailing.length > 0
             spacing: runtimeSpacing
 
-            move: Transition {
-                NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-            }
+            move: SharedWidgets.ListTransitions.move
 
             Repeater {
                 model: root._leftTrailing
@@ -514,9 +510,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: runtimeSpacing
         
-        move: Transition {
-            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-        }
+        move: SharedWidgets.ListTransitions.move
 
         Repeater {
             model: root._centerItems
@@ -532,9 +526,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: runtimeSpacing
 
-        move: Transition {
-            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-        }
+        move: SharedWidgets.ListTransitions.move
 
         Repeater {
             model: root._rightItems
@@ -550,9 +542,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: runtimeSpacing + sectionSpacing
 
-        move: Transition {
-            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-        }
+        move: SharedWidgets.ListTransitions.move
 
         Repeater {
             model: root._leftLeading
@@ -563,9 +553,7 @@ Item {
             visible: root._leftTrailing.length > 0
             spacing: runtimeSpacing
 
-            move: Transition {
-                NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-            }
+            move: SharedWidgets.ListTransitions.move
 
             Repeater {
                 model: root._leftTrailing
@@ -580,9 +568,7 @@ Item {
         anchors.centerIn: parent
         spacing: runtimeSpacing
 
-        move: Transition {
-            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-        }
+        move: SharedWidgets.ListTransitions.move
 
         Repeater {
             model: root._centerItems
@@ -598,9 +584,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: runtimeSpacing
 
-        move: Transition {
-            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-        }
+        move: SharedWidgets.ListTransitions.move
 
         Repeater {
             model: root._rightItems
