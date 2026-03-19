@@ -130,11 +130,12 @@ ColumnLayout {
                                     anchors.margins: 5
                                     spacing: 5
 
-                                    ClippingWrapperRectangle {
+                                    Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         color: Colors.surface
                                         radius: Colors.radiusXS
+                                        clip: true
 
                                         ScreencopyView {
                                             anchors.fill: parent
