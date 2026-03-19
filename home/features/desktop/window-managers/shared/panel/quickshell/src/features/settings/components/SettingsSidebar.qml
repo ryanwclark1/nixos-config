@@ -15,10 +15,12 @@ Rectangle {
   signal tabSelected(string tabId)
   signal saveAndClose()
   signal searchQueryEdited(string query)
+  signal settingHighlightRequested(string tabId, string cardTitle, string settingLabel)
 
   readonly property bool isSearching: searchQuery.length > 0
   readonly property var orderedCategories: SettingsRegistry.sortedCategories()
   readonly property var searchResults: SettingsRegistry.searchTabs(searchQuery)
+  readonly property var settingResults: SettingsRegistry.searchSettings(searchQuery)
   readonly property var compactEntries: buildCompactEntries()
 
   Layout.fillHeight: true
