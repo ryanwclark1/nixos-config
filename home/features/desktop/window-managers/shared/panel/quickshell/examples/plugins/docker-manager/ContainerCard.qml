@@ -150,6 +150,31 @@ Rectangle {
             }
         }
 
+        // Environment variables (collapsed by default)
+        Column {
+            visible: root.expanded && root.modelData.env && root.modelData.env.length > 0
+            width: parent.width; spacing: 2
+
+            Rectangle {
+                id: envToggle
+                property bool envExpanded: false
+                width: parent.width; height: 22; radius: 6; color: "#0f172a"; border.width: 1; border.color: "#1e293b"
+                Text { anchors.centerIn: parent; text: (envToggle.envExpanded ? "\u25BC" : "\u25B6") + " Env (" + (root.modelData.env ? root.modelData.env.length : 0) + ")"; color: "#64748b"; font.pixelSize: 9 }
+                MouseArea { anchors.fill: parent; onClicked: envToggle.envExpanded = !envToggle.envExpanded }
+            }
+            Column {
+                visible: envToggle.envExpanded; width: parent.width; spacing: 1
+                Repeater {
+                    model: root.modelData.env || []
+                    delegate: Text {
+                        required property var modelData
+                        text: modelData; color: "#94a3b8"; font.pixelSize: 8; font.family: "monospace"
+                        elide: Text.ElideRight; width: parent.width
+                    }
+                }
+            }
+        }
+
         Column {
             visible: root.expanded; width: parent.width; spacing: 6
 
