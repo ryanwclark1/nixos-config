@@ -51,7 +51,7 @@ Rectangle {
     }
 
     function highlightMatch(text, query) {
-        return Search.highlightMatch(text, query, ModeData.stripModePrefix);
+        return Search.highlightMatch(text, query, ModeData.stripModePrefix, root.mode === "files");
     }
 
     function itemActionLabel(it) {

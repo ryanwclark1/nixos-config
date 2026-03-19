@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
 import "ProcessTableHelpers.js" as PTH
@@ -636,18 +637,24 @@ SharedWidgets.CardBase {
                         message: root.trimmedSearch === "" ? "No processes matched the current filter." : "No processes matched the current search."
                     }
 
-                    ColumnLayout {
+                    ListView {
+                        id: processListView
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
+                        implicitHeight: contentHeight
+                        interactive: false
+                        clip: true
                         visible: root.visibleProcesses.length > 0
+                        model: root.visibleProcesses
+                        spacing: Colors.spacingXXS
 
-                        Repeater {
-                            model: root.visibleProcesses
+                        add: ListTransitions.addFadeHeight
+                        remove: ListTransitions.removeFadeHeight
+                        displaced: ListTransitions.displaced
 
-                            delegate: Rectangle {
+                        delegate: Rectangle {
                                 required property var modelData
                                 readonly property bool selected: (modelData.pid || 0) === root.selectedPid
-                                Layout.fillWidth: true
+                                width: ListView.view.width
                                 radius: Colors.radiusSmall
                                 color: selected ? Colors.highlight : "transparent"
                                 border.color: selected ? Colors.primary : "transparent"
@@ -780,7 +787,6 @@ SharedWidgets.CardBase {
                                         root.selectedRowItem = this;
                                 }
                             }
-                        }
                     }
                 }
             }
