@@ -312,7 +312,6 @@ Item {
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
                 enabled: Config.notifTtsEnabled
-                opacity: Config.notifTtsEnabled ? 1.0 : 0.5
 
                 Text {
                     text: "Excluded Apps"
