@@ -42,8 +42,6 @@ QtObject {
   // ── Toplevel abstraction ───────────────────
   readonly property bool hasHyprlandToplevels: isHyprland && typeof Hyprland !== "undefined"
   readonly property bool hasToplevelManager: hasHyprlandToplevels || typeof ToplevelManager !== "undefined"
-  property var hyprlandCtlWindow: ({})
-  property string _lastHyprctlFailureState: ""
   property string _lastActiveWindowSourceLog: ""
   readonly property var toplevels: {
     if (hasHyprlandToplevels)
@@ -64,8 +62,6 @@ QtObject {
       return niriActiveWindow;
     if (activeToplevel)
       return activeToplevel;
-    if (isHyprland && windowHasData(hyprlandCtlWindow))
-      return hyprlandCtlWindow;
     return null;
   }
   readonly property string activeWindowSource: {
@@ -75,8 +71,6 @@ QtObject {
       return "hyprland-qml";
     if (!hasHyprlandToplevels && activeToplevel)
       return "toplevel-manager";
-    if (isHyprland && windowHasData(hyprlandCtlWindow))
-      return "hyprctl-fallback";
     return "none";
   }
   readonly property bool activeWindowReady: activeWindowSource !== "none"
@@ -157,48 +151,6 @@ QtObject {
 
   onActiveWindowSourceChanged: logActiveWindowSourceTransition()
 
-  property Process hyprctlActiveWindowProc: Process {
-    id: hyprctlActiveWindowProc
-    command: ["hyprctl", "-j", "activewindow"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var raw = (this.text || "").trim();
-        if (raw === "") {
-          root.hyprlandCtlWindow = ({});
-          root.reportHyprctlFailureState("command-failed", "empty output");
-          return;
-        }
-        try {
-          var parsed = JSON.parse(raw);
-          root.hyprlandCtlWindow = parsed && typeof parsed === "object" ? parsed : ({});
-          root.reportHyprctlFailureState("ok");
-        } catch (e) {
-          root.hyprlandCtlWindow = ({});
-          root.reportHyprctlFailureState("command-failed", String(e));
-        }
-      }
-    }
-    onExited: (exitCode, exitStatus) => {
-      if (exitCode !== 0) {
-        root.hyprlandCtlWindow = ({});
-        root.reportHyprctlFailureState("command-failed", "exitCode=" + exitCode + " status=" + exitStatus);
-      }
-    }
-  }
-
-  property Timer hyprctlActiveWindowTimer: Timer {
-    interval: root._hyprctlPollMs
-    repeat: true
-    running: root.isHyprland && root.hasHyprSig && root.hasWaylandDisplay
-    triggeredOnStart: true
-    onTriggered: {
-      if (hyprctlActiveWindowProc.running)
-        return;
-      hyprctlActiveWindowProc.running = true;
-    }
-  }
-
   function windowTitle(windowRef) {
     return windowRef ? String(windowRef.title || "") : "";
   }
@@ -247,18 +199,20 @@ QtObject {
     _lastActiveWindowSourceLog = activeWindowSource;
   }
 
-  function reportHyprctlFailureState(state, details) {
-    var nextState = String(state || "unknown");
-    if (_lastHyprctlFailureState === nextState)
-      return;
-
-    if (nextState === "ok") {
-      _lastHyprctlFailureState = nextState;
-      return;
+  function workspaceNameById(wsId) {
+    if (wsId === undefined) return "";
+    if (isHyprland && typeof Hyprland !== "undefined" && Hyprland.workspaces) {
+      var wsValues = Hyprland.workspaces.values || Hyprland.workspaces;
+      for (var i = 0; i < wsValues.length; i++) {
+        if (wsValues[i].id === wsId)
+          return String(wsValues[i].name || wsId);
+      }
     }
-
-    _lastHyprctlFailureState = nextState;
-    console.warn("[CompositorAdapter] hyprctl activewindow failure:", nextState, details || "");
+    if (isNiri && NiriService.workspaces) {
+      var ws = NiriService.workspaces[wsId];
+      if (ws) return String(ws.name || ws.idx || wsId);
+    }
+    return String(wsId);
   }
 
   function matchesCompositorTag(tag) {
@@ -280,31 +234,6 @@ QtObject {
   // ═══════════════════════════════════════════════
   //  Command factories (for polling-based consumers)
   // ═══════════════════════════════════════════════
-
-  function workspaceListCommand() {
-    if (isHyprland) {
-      return [
-        "sh",
-        "-c",
-        "hyprctl workspaces -j 2>/dev/null | tr '\\n' ' '; printf '\\n'; hyprctl activeworkspace -j 2>/dev/null | tr '\\n' ' '"
-      ];
-    }
-    if (isNiri) return ["niri", "msg", "-j", "workspaces"];
-    return ["sh", "-c", "echo '[]'"];
-  }
-
-  function activeWorkspaceNameCommand() {
-    if (isHyprland)
-      return ["sh", "-c", "hyprctl activeworkspace -j 2>/dev/null | jq -r '.name // empty'"];
-    if (isNiri) {
-      return [
-        "sh",
-        "-c",
-        "niri msg -j workspaces 2>/dev/null | jq -r '(if type == \"array\" then . else (.workspaces // []) end)[] | select(.is_active == true or .active == true or .is_focused == true or .focused == true) | (.name // .idx // .id // .index // empty)' | head -n1"
-      ];
-    }
-    return ["sh", "-c", "echo ''"];
-  }
 
   function hotkeysCommand() {
     if (isHyprland) return ["hyprctl", "binds", "-j"];
