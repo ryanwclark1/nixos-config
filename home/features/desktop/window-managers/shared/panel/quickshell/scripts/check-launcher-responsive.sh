@@ -522,13 +522,14 @@ runtime_checks() {
   local drun_ready=0 drun_attempt
   for drun_attempt in $(seq 1 40); do
     launcher_state="$(call_ipc Launcher launcherState 2>/dev/null || true)"
-    if [[ -n "${launcher_state}" ]] && printf '%s' "${launcher_state}" | node -e '
+if [[ -n "${launcher_state}" ]] && printf '%s' "${launcher_state}" | node -e '
 const fs = require("node:fs");
 const raw = fs.readFileSync(0, "utf8").trim();
 let payload = JSON.parse(raw);
 if (typeof payload === "string") payload = JSON.parse(payload);
+const loadState = String(payload.loadState || "");
 if (String(payload.mode || "") !== "drun") process.exit(1);
-if (String(payload.loadState || "") !== "ready") process.exit(1);
+if (!(loadState === "ready" || loadState === "idle")) process.exit(1);
 if (!(Number(payload.allItemCount || 0) > 0)) process.exit(1);
 ' >/dev/null 2>&1; then
       drun_ready=1

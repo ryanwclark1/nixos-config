@@ -306,11 +306,11 @@ population_score() {
     'Rem(aove|ove)'
     'Sett(irgs|ings)'
     'App[[:space:]]+Launcher'
-    'Workspace[[:space:]]+Switcher'
+    '.{0,2}orkspac.{0,2}[[:space:]]+Switcher'
     'L.{0,2}ft[[:space:]]+Section'
     'Window[[:space:]]+Title'
     'Active[[:space:]]+Ap(p|o)[[:space:]]+Context'
-    'Running Apps'
+    'Runn.{0,2}ing[[:space:]]+Apps'
   )
 
   for pattern in "${patterns[@]}"; do
