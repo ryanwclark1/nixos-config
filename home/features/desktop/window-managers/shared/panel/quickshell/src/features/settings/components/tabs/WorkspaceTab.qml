@@ -35,6 +35,18 @@ Item {
             }
 
             SettingsModeRow {
+                label: "Visual Style"
+                currentValue: Config.workspaceStyle
+                options: [
+                    { value: "pill",  label: "Pill"  },
+                    { value: "strip", label: "Strip" },
+                    { value: "dots",  label: "Dots"  },
+                    { value: "icons", label: "Icons" }
+                ]
+                onModeSelected: value => Config.workspaceStyle = value
+            }
+
+            SettingsModeRow {
                 label: "Pill Size"
                 currentValue: Config.workspacePillSize
                 options: [

@@ -211,104 +211,112 @@ SharedWidgets.CardBase {
             font.pixelSize: Colors.fontSizeXS
         }
 
-        ColumnLayout {
+        ListView {
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
             visible: ServiceUnitService.userStatus === "ready" && visibleUserUnits.length > 0
+            implicitHeight: contentHeight
+            interactive: false
+            clip: true
+            spacing: Colors.spacingXS
+            model: root.visibleUserUnits
 
-            Repeater {
-                model: root.visibleUserUnits
+            add: Transition {
+                NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: Colors.durationFast }
+            }
+            remove: Transition {
+                NumberAnimation { properties: "opacity"; from: 1; to: 0; duration: Colors.durationFast }
+            }
 
-                delegate: Rectangle {
-                    required property var modelData
-                    readonly property bool selected: root.selectedUnitScope === "user" && root.selectedUnitName === String(modelData.name || "")
-                    Layout.fillWidth: true
-                    radius: Colors.radiusSmall
-                    color: selected ? Colors.highlight : Colors.highlightLight
-                    border.color: selected ? Colors.primary : Colors.withAlpha(root.stateColor(modelData), 0.65)
-                    border.width: 1
-                    implicitHeight: unitColumn.implicitHeight + Colors.spacingS * 2
+            delegate: Rectangle {
+                required property var modelData
+                required property int index
+                readonly property bool selected: root.selectedUnitScope === "user" && root.selectedUnitName === String(modelData.name || "")
+                width: ListView.view.width
+                radius: Colors.radiusSmall
+                color: selected ? Colors.highlight : Colors.highlightLight
+                border.color: selected ? Colors.primary : Colors.withAlpha(root.stateColor(modelData), 0.65)
+                border.width: 1
+                implicitHeight: unitColumn.implicitHeight + Colors.spacingS * 2
 
-                    ColumnLayout {
-                        id: unitColumn
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        spacing: Colors.spacingXS
+                ColumnLayout {
+                    id: unitColumn
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingS
+                    spacing: Colors.spacingXS
 
-                        RowLayout {
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingS
+
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingS
+                            spacing: Colors.spacingXXS
 
-                            ColumnLayout {
+                            Text {
+                                text: modelData.name || "service"
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.weight: Font.DemiBold
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingXXS
-
-                                Text {
-                                    text: modelData.name || "service"
-                                    color: Colors.text
-                                    font.pixelSize: Colors.fontSizeSmall
-                                    font.weight: Font.DemiBold
-                                    Layout.fillWidth: true
-                                    elide: Text.ElideRight
-                                }
-
-                                Text {
-                                    text: modelData.description || modelData.sub || ""
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    Layout.fillWidth: true
-                                    elide: Text.ElideRight
-                                }
+                                elide: Text.ElideRight
                             }
 
                             Text {
-                                text: String(modelData.active || "unknown").toUpperCase()
-                                color: selected ? Colors.primary : root.stateColor(modelData)
+                                text: modelData.description || modelData.sub || ""
+                                color: Colors.textSecondary
                                 font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.Bold
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
                             }
                         }
 
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: Colors.spacingS
-
-                            SharedWidgets.FilterChip {
-                                label: root.running(modelData) ? "Stop" : "Start"
-                                icon: root.running(modelData) ? "󰓛" : "󰐊"
-                                enabled: !ServiceUnitService.isUnitPending("user", modelData.name)
-                                selected: false
-                                onClicked: {
-                                    if (root.running(modelData))
-                                        ServiceUnitService.stopUnit("user", modelData.name);
-                                    else
-                                        ServiceUnitService.startUnit("user", modelData.name);
-                                }
-                            }
-
-                            SharedWidgets.FilterChip {
-                                label: "Restart"
-                                icon: "󰑐"
-                                enabled: !ServiceUnitService.isUnitPending("user", modelData.name)
-                                selected: false
-                                onClicked: ServiceUnitService.restartUnit("user", modelData.name)
-                            }
-
-                            Text {
-                                text: ServiceUnitService.pendingActionForUnit("user", modelData.name).toUpperCase()
-                                color: Colors.warning
-                                font.pixelSize: Colors.fontSizeXS
-                                visible: ServiceUnitService.isUnitPending("user", modelData.name)
-                            }
+                        Text {
+                            text: String(modelData.active || "unknown").toUpperCase()
+                            color: selected ? Colors.primary : root.stateColor(modelData)
+                            font.pixelSize: Colors.fontSizeXS
+                            font.weight: Font.Bold
                         }
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.LeftButton
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.selectUnit("user", modelData.name || "")
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingS
+
+                        SharedWidgets.FilterChip {
+                            label: root.running(modelData) ? "Stop" : "Start"
+                            icon: root.running(modelData) ? "󰓛" : "󰐊"
+                            enabled: !ServiceUnitService.isUnitPending("user", modelData.name)
+                            selected: false
+                            onClicked: {
+                                if (root.running(modelData))
+                                    ServiceUnitService.stopUnit("user", modelData.name);
+                                else
+                                    ServiceUnitService.startUnit("user", modelData.name);
+                            }
+                        }
+
+                        SharedWidgets.FilterChip {
+                            label: "Restart"
+                            icon: "󰑐"
+                            enabled: !ServiceUnitService.isUnitPending("user", modelData.name)
+                            selected: false
+                            onClicked: ServiceUnitService.restartUnit("user", modelData.name)
+                        }
+
+                        Text {
+                            text: ServiceUnitService.pendingActionForUnit("user", modelData.name).toUpperCase()
+                            color: Colors.warning
+                            font.pixelSize: Colors.fontSizeXS
+                            visible: ServiceUnitService.isUnitPending("user", modelData.name)
+                        }
                     }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.selectUnit("user", modelData.name || "")
                 }
             }
         }
@@ -377,80 +385,88 @@ SharedWidgets.CardBase {
             }
         }
 
-        ColumnLayout {
+        ListView {
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
             visible: root.showSystemUnits && root.systemAvailable && visibleSystemUnits.length > 0
+            implicitHeight: contentHeight
+            interactive: false
+            clip: true
+            spacing: Colors.spacingXS
+            model: root.visibleSystemUnits
 
-            Repeater {
-                model: root.visibleSystemUnits
+            add: Transition {
+                NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: Colors.durationFast }
+            }
+            remove: Transition {
+                NumberAnimation { properties: "opacity"; from: 1; to: 0; duration: Colors.durationFast }
+            }
 
-                delegate: Rectangle {
-                    required property var modelData
-                    readonly property bool selected: root.selectedUnitScope === "system" && root.selectedUnitName === String(modelData.name || "")
-                    Layout.fillWidth: true
-                    radius: Colors.radiusSmall
-                    color: selected ? Colors.highlight : Colors.bgWidget
-                    border.color: selected ? Colors.primary : Colors.withAlpha(root.stateColor(modelData), 0.55)
-                    border.width: 1
-                    implicitHeight: systemUnitColumn.implicitHeight + Colors.spacingS * 2
+            delegate: Rectangle {
+                required property var modelData
+                required property int index
+                readonly property bool selected: root.selectedUnitScope === "system" && root.selectedUnitName === String(modelData.name || "")
+                width: ListView.view.width
+                radius: Colors.radiusSmall
+                color: selected ? Colors.highlight : Colors.bgWidget
+                border.color: selected ? Colors.primary : Colors.withAlpha(root.stateColor(modelData), 0.55)
+                border.width: 1
+                implicitHeight: systemUnitColumn.implicitHeight + Colors.spacingS * 2
 
-                    ColumnLayout {
-                        id: systemUnitColumn
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        spacing: Colors.spacingXS
+                ColumnLayout {
+                    id: systemUnitColumn
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingS
+                    spacing: Colors.spacingXS
 
-                        Text {
-                            text: modelData.name || "service"
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.weight: Font.Medium
-                            Layout.fillWidth: true
-                            elide: Text.ElideRight
+                    Text {
+                        text: modelData.name || "service"
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.Medium
+                        Layout.fillWidth: true
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        text: (modelData.description || "") + "  •  " + String(modelData.active || "unknown")
+                        color: root.stateColor(modelData)
+                        font.pixelSize: Colors.fontSizeXS
+                        Layout.fillWidth: true
+                        elide: Text.ElideRight
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingS
+
+                        SharedWidgets.FilterChip {
+                            label: "Restart"
+                            icon: "󰑐"
+                            enabled: !ServiceUnitService.isUnitPending("system", modelData.name)
+                            selected: false
+                            onClicked: ServiceUnitService.restartUnit("system", modelData.name)
                         }
 
-                        Text {
-                            text: (modelData.description || "") + "  •  " + String(modelData.active || "unknown")
-                            color: root.stateColor(modelData)
-                            font.pixelSize: Colors.fontSizeXS
-                            Layout.fillWidth: true
-                            elide: Text.ElideRight
-                        }
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: Colors.spacingS
-
-                            SharedWidgets.FilterChip {
-                                label: "Restart"
-                                icon: "󰑐"
-                                enabled: !ServiceUnitService.isUnitPending("system", modelData.name)
-                                selected: false
-                                onClicked: ServiceUnitService.restartUnit("system", modelData.name)
-                            }
-
-                            SharedWidgets.FilterChip {
-                                label: root.running(modelData) ? "Stop" : "Start"
-                                icon: root.running(modelData) ? "󰓛" : "󰐊"
-                                enabled: !ServiceUnitService.isUnitPending("system", modelData.name)
-                                selected: false
-                                onClicked: {
-                                    if (root.running(modelData))
-                                        ServiceUnitService.stopUnit("system", modelData.name);
-                                    else
-                                        ServiceUnitService.startUnit("system", modelData.name);
-                                }
+                        SharedWidgets.FilterChip {
+                            label: root.running(modelData) ? "Stop" : "Start"
+                            icon: root.running(modelData) ? "󰓛" : "󰐊"
+                            enabled: !ServiceUnitService.isUnitPending("system", modelData.name)
+                            selected: false
+                            onClicked: {
+                                if (root.running(modelData))
+                                    ServiceUnitService.stopUnit("system", modelData.name);
+                                else
+                                    ServiceUnitService.startUnit("system", modelData.name);
                             }
                         }
                     }
+                }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.LeftButton
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.selectUnit("system", modelData.name || "")
-                    }
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.selectUnit("system", modelData.name || "")
                 }
             }
         }
