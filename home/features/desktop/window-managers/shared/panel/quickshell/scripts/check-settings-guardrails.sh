@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 quickshell_root="$(CDPATH= cd -- "${script_dir}/.." >/dev/null && pwd)"
 config_root="${quickshell_root}/src"
+skip_responsive=0
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -23,7 +24,20 @@ require_pattern() {
 }
 
 main() {
-  local runtime_args=("$@")
+  local runtime_args=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --skip-responsive)
+        skip_responsive=1
+        shift
+        ;;
+      *)
+        runtime_args+=("$1")
+        shift
+        ;;
+    esac
+  done
 
   require_cmd qmlformat
   require_cmd rg
@@ -42,7 +56,9 @@ main() {
   require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'label:\s*"↑"' "shell-core tab up-arrow fallback"
   require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'label:\s*"↓"' "shell-core tab down-arrow fallback"
 
-  "${script_dir}/check-settings-responsive.sh" "$@"
+  if (( skip_responsive == 0 )); then
+    "${script_dir}/check-settings-responsive.sh" "${runtime_args[@]}"
+  fi
   if (( ${#runtime_args[@]} == 0 )); then
     runtime_args=(--repo-shell)
   fi

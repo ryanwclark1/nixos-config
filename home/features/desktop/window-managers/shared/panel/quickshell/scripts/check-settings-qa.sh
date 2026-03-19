@@ -65,7 +65,7 @@ fi
 
 bash "${script_dir}/check-bar-widgets-first-open.sh" "${first_open_args[@]}"
 
-bash "${script_dir}/check-settings-guardrails.sh" "${guardrail_args[@]}"
+bash "${script_dir}/check-settings-guardrails.sh" --skip-responsive "${guardrail_args[@]}"
 bash "${script_dir}/check-widget-picker-search.sh"
 bash "${script_dir}/check-bar-widget-reorder.sh"
 

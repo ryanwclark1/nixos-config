@@ -124,9 +124,17 @@ handle_termination() {
 
 wait_for_instance_ready() {
   local deadline=$((SECONDS + 15))
+  local discovered=""
   while (( SECONDS < deadline )); do
     if quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
       return 0
+    fi
+    discovered="$(discover_reachable_instance || true)"
+    if [[ -n "${discovered}" ]]; then
+      instance_id="${discovered}"
+      if quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
+        return 0
+      fi
     fi
     sleep 0.2
   done
@@ -269,10 +277,31 @@ call_ipc() {
   local target="$1"
   local action="$2"
   shift 2
+  local output=""
+
+  wait_for_instance_ready >/dev/null 2>&1 || true
   if (( ${#ipc_timeout_cmd[@]} > 0 )); then
-    "${ipc_timeout_cmd[@]}" quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
+    output="$("${ipc_timeout_cmd[@]}" quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@" 2>&1)" || {
+      if printf '%s' "${output}" | rg -q 'No running instances start with'; then
+        wait_for_instance_ready >/dev/null 2>&1 || true
+        "${ipc_timeout_cmd[@]}" quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
+        return
+      fi
+      printf '%s\n' "${output}" >&2
+      return 1
+    }
+    printf '%s\n' "${output}"
   else
-    quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
+    output="$(quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@" 2>&1)" || {
+      if printf '%s' "${output}" | rg -q 'No running instances start with'; then
+        wait_for_instance_ready >/dev/null 2>&1 || true
+        quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
+        return
+      fi
+      printf '%s\n' "${output}" >&2
+      return 1
+    }
+    printf '%s\n' "${output}"
   fi
 }
 
@@ -348,6 +377,7 @@ launcher_action_available() {
   local attempt
 
   for attempt in $(seq 1 20); do
+    wait_for_instance_ready >/dev/null 2>&1 || true
     show_output="$(quickshell ipc --id "${instance_id}" show 2>/dev/null || true)"
     if [[ -n "${show_output}" ]]; then
       printf '%s' "${show_output}" | rg -q "function ${action}\\("

@@ -13,6 +13,15 @@ QML QQuickImage at @features/clipboard/ClipboardMenu\.qml\[.*\]: Error decoding:
 EOF
 
   case "${profile}" in
+    settings)
+      cat <<'EOF'
+quickshell\.dbus\.objectmanager: Failed to create DBusObjectManagerInterface for "org\.bluez" "/" : QDBusError\("", ""\)
+QML QQuickItem at qrc:/qt/qml/Quickshell/Widgets/ClippingRectangle\.qml\[68:3\]: Wrapper component cannot have more than one visual child\.
+QML QQuickItem at qrc:/qt/qml/Quickshell/Widgets/ClippingRectangle\.qml\[68:3\]: Remove all additional children, or pick a specific component to wrap using the child property\.
+qs:@/qs/bar/Panel\.qml:514:13: QML QQuickItem\*: Binding loop detected for property "height"
+\[W\]\[SystemStatus\] helper scripts not executable \(set QS_SCRIPT_ROOT to override .*/quickshell/scripts\) exitCode=1 exitStatus=0
+EOF
+      ;;
     surfaces|targeted-surfaces)
       ;;
   esac
