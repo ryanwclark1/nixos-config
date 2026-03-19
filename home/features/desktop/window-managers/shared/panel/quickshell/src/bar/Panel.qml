@@ -55,6 +55,8 @@ Item {
     readonly property int outerPadding: Colors.spacingM
     readonly property int sectionSpacing: Colors.spacingS
     readonly property int runtimeSpacing: Colors.spacingM
+    readonly property int verticalItemWidthCap: vertical ? Math.max(24, thickness) : 0
+    readonly property int verticalBarWidthCap: vertical ? (verticalItemWidthCap + outerPadding * 2) : 0
     readonly property real centerTargetOffset: 0
     readonly property real centerMinOffset: outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0) - width / 2 + centerSection.width / 2
     readonly property real centerMaxOffset: width / 2 - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width / 2
@@ -80,7 +82,7 @@ Item {
     signal contextMenuRequested(var actions, var triggerRect)
 
     implicitHeight: vertical ? 0 : thickness
-    implicitWidth: vertical ? Math.max(thickness, Math.max(leftSection.implicitWidth, Math.max(centerSection.implicitWidth, rightSection.implicitWidth)) + outerPadding * 2) : 0
+    implicitWidth: vertical ? verticalBarWidthCap : 0
 
     function resetDiagnosticWarmup() {
         diagnosticsReady = false;
@@ -136,6 +138,8 @@ Item {
     function widgetDiagnosticId(wi) { return PanelHelpers.widgetDiagnosticId(wi, root.barConfig); }
     function itemLayoutFootprint(item) { return PanelHelpers.itemLayoutFootprint(item, root.vertical); }
     function itemOccupiesSpace(item) { return PanelHelpers.itemOccupiesSpace(item, root.vertical); }
+    function isWidgetHiddenInVertical(wi) { return PanelHelpers.isWidgetHiddenInVertical(wi); }
+    function shouldCollapseVerticalOverflow(wi) { return PanelHelpers.shouldCollapseVerticalOverflow(wi); }
 
     function reportWidgetDiagnostic(widgetId, state, details) {
         var previous = _widgetDiagnosticStates[widgetId] || "";
@@ -199,11 +203,12 @@ Item {
     function compactStatDisplayText(widgetType, wi) { return PanelHelpers.compactStatDisplayText(widgetType, wi, SystemStatus); }
     function statTooltipText(widgetType, wi) { return PanelHelpers.statTooltipText(widgetType, wi, SystemStatus); }
     function isCompactStatWidget(wi) { return PanelHelpers.isCompactStatWidget(wi, root.vertical); }
-    function isIconOnlyStatWidget(wi) { return PanelHelpers.isIconOnlyStatWidget(wi); }
+    function isIconOnlyStatWidget(wi) { return PanelHelpers.isIconOnlyStatWidget(wi, root.vertical); }
     function isSummaryWidgetIconOnly(wi) { return PanelHelpers.isSummaryWidgetIconOnly(wi, root.vertical); }
     function widgetIntegerSetting(wi, key, fallback, minValue, maxValue) { return PanelHelpers.widgetIntegerSetting(wi, key, fallback, minValue, maxValue); }
     function widgetBooleanSetting(wi, key, fallback) { return PanelHelpers.widgetBooleanSetting(wi, key, fallback); }
-    function triggerWidgetIconOnly(wi) { return PanelHelpers.triggerWidgetIconOnly(wi); }
+    function effectiveKeyboardLabelMode(wi) { return PanelHelpers.effectiveKeyboardLabelMode(wi, root.vertical); }
+    function triggerWidgetIconOnly(wi) { return PanelHelpers.triggerWidgetIconOnly(wi, root.vertical); }
     function triggerWidgetLabel(wi, fallback) { return PanelHelpers.triggerWidgetLabel(wi, fallback); }
 
     readonly property var _widgetComponents: ({
@@ -246,6 +251,9 @@ Item {
         "screenshot": screenshotComponent,
         "notifications": notificationsComponent,
         "personality": personalityComponent,
+        "pomodoro": pomodoroComponent,
+        "todo": todoComponent,
+        "gameMode": gameModeComponent,
         "spacer": spacerComponent,
         "separator": separatorComponent
     })
@@ -491,7 +499,17 @@ Item {
             property string deferredDiagnosticDetail: ""
             readonly property bool occupiesSpace: root.itemOccupiesSpace(widgetLoader.item)
             readonly property bool diagnosticsReady: root.diagnosticsReady
-            readonly property bool widgetEnabled: !!widgetInstance && widgetInstance.enabled !== false
+            readonly property bool hiddenInVertical: root.vertical && root.isWidgetHiddenInVertical(widgetInstance)
+            readonly property real rawWidgetWidth: Number(widgetLoader.implicitWidth || 0)
+            readonly property bool collapseForVerticalOverflow: root.vertical
+                && root.shouldCollapseVerticalOverflow(widgetInstance)
+                && widgetLoader.item
+                && widgetLoader.item.visible !== false
+                && rawWidgetWidth > root.verticalItemWidthCap
+            readonly property bool contributesLayout: occupiesSpace && !collapseForVerticalOverflow
+            readonly property bool widgetEnabled: !!widgetInstance
+                && widgetInstance.enabled !== false
+                && !hiddenInVertical
             readonly property string widgetId: root.widgetDiagnosticId(widgetInstance)
             readonly property string diagnosticState: {
                 if (!widgetEnabled)
@@ -504,19 +522,24 @@ Item {
                     return "inactive";
                 if (widgetLoader.item.visible === false)
                     return "ok";
+                if (collapseForVerticalOverflow)
+                    return "vertical-overflow";
                 if (!occupiesSpace)
                     return "zero-footprint";
                 return "ok";
             }
-            implicitWidth: occupiesSpace ? widgetLoader.implicitWidth : 0
-            implicitHeight: occupiesSpace ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
-            width: occupiesSpace ? (root.vertical ? Math.max(root.thickness, widgetLoader.implicitWidth) : widgetLoader.implicitWidth) : 0
-            height: occupiesSpace ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
+            clip: root.vertical
+            implicitWidth: contributesLayout ? (root.vertical ? Math.min(root.verticalItemWidthCap, Math.max(root.thickness, rawWidgetWidth)) : rawWidgetWidth) : 0
+            implicitHeight: contributesLayout ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
+            width: contributesLayout ? (root.vertical ? Math.min(root.verticalItemWidthCap, Math.max(root.thickness, rawWidgetWidth)) : rawWidgetWidth) : 0
+            height: contributesLayout ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
 
             function refreshDiagnosticState() {
                 var detail = "";
                 if (diagnosticState === "load-error")
                     detail = "component failed to load";
+                else if (diagnosticState === "vertical-overflow")
+                    detail = "widget exceeded the vertical width cap and was collapsed";
                 else if (diagnosticState === "zero-footprint")
                     detail = "widget is enabled but reports zero layout footprint";
                 if (diagnosticState === "zero-footprint") {
@@ -556,7 +579,7 @@ Item {
             Loader {
                 id: widgetLoader
                 anchors.centerIn: parent
-                active: !!parent.widgetInstance && parent.widgetInstance.enabled !== false
+                active: parent.widgetEnabled
                 sourceComponent: root.componentForWidget(parent.widgetInstance ? parent.widgetInstance.widgetType : "")
                 onStatusChanged: diagnosticWrapper.refreshDiagnosticState()
                 onLoaded: {
@@ -714,6 +737,7 @@ Item {
         id: keyboardLayoutComponent
         KeyboardLayout {
             property var widgetInstance: null
+            vertical: root.vertical
             anchorWindow: root.anchorWindow
         }
     }

@@ -1,5 +1,91 @@
 .pragma library
 
+var VERTICAL_HIDE_WIDGETS = [
+    "windowTitle",
+    "ssh"
+];
+
+var VERTICAL_SHORT_LABEL_WIDGETS = [
+    "keyboardLayout"
+];
+
+var VERTICAL_COMPACT_WIDGETS = [
+    "cpuStatus",
+    "ramStatus",
+    "gpuStatus",
+    "diskStatus",
+    "networkStatus"
+];
+
+var VERTICAL_ICON_WIDGETS = [
+    "logo",
+    "dateTime",
+    "updates",
+    "modelUsage",
+    "weather",
+    "market",
+    "vpn",
+    "network",
+    "bluetooth",
+    "audio",
+    "music",
+    "privacy",
+    "voxtype",
+    "recording",
+    "battery",
+    "printer",
+    "notifications",
+    "aiChat",
+    "notepad",
+    "controlCenter",
+    "clipboard",
+    "screenshot"
+];
+
+var VERTICAL_NATIVE_WIDGETS = [
+    "workspaces",
+    "specialWorkspaces",
+    "taskbar",
+    "tray",
+    "cava",
+    "idleInhibitor",
+    "mediaBar",
+    "spacer",
+    "separator"
+];
+
+function widgetTypeName(widgetInstance) {
+    return widgetInstance ? String(widgetInstance.widgetType || "") : "";
+}
+
+function _typeInList(widgetType, values) {
+    return values.indexOf(widgetType) !== -1;
+}
+
+function verticalWidgetBehavior(widgetInstance) {
+    var widgetType = widgetTypeName(widgetInstance);
+
+    if (_typeInList(widgetType, VERTICAL_HIDE_WIDGETS))
+        return "hidden";
+    if (_typeInList(widgetType, VERTICAL_SHORT_LABEL_WIDGETS))
+        return "short-label";
+    if (_typeInList(widgetType, VERTICAL_COMPACT_WIDGETS))
+        return "compact";
+    if (_typeInList(widgetType, VERTICAL_ICON_WIDGETS))
+        return "icon";
+    if (_typeInList(widgetType, VERTICAL_NATIVE_WIDGETS))
+        return "native";
+    return "unverified";
+}
+
+function isWidgetHiddenInVertical(widgetInstance) {
+    return verticalWidgetBehavior(widgetInstance) === "hidden";
+}
+
+function shouldCollapseVerticalOverflow(widgetInstance) {
+    return verticalWidgetBehavior(widgetInstance) === "unverified";
+}
+
 function widgetSettings(widgetInstance) {
     return widgetInstance && widgetInstance.settings ? widgetInstance.settings : {};
 }
@@ -128,6 +214,8 @@ function widgetSummaryDisplayMode(widgetInstance) {
 
 function isCompactStatWidget(widgetInstance, vertical) {
     var mode = widgetDisplayMode(widgetInstance);
+    if (vertical && verticalWidgetBehavior(widgetInstance) === "compact")
+        return mode !== "icon";
     if (mode === "compact")
         return true;
     if (mode === "icon" || mode === "full")
@@ -135,11 +223,16 @@ function isCompactStatWidget(widgetInstance, vertical) {
     return vertical;
 }
 
-function isIconOnlyStatWidget(widgetInstance) {
+function isIconOnlyStatWidget(widgetInstance, vertical) {
+    if (vertical && verticalWidgetBehavior(widgetInstance) === "compact")
+        return widgetDisplayMode(widgetInstance) === "icon";
     return widgetDisplayMode(widgetInstance) === "icon";
 }
 
 function isSummaryWidgetIconOnly(widgetInstance, vertical) {
+    if (vertical && verticalWidgetBehavior(widgetInstance) === "icon")
+        return true;
+
     var mode = widgetSummaryDisplayMode(widgetInstance);
     if (mode === "icon")
         return true;
@@ -179,7 +272,15 @@ function widgetStringSetting(widgetInstance, key, fallback, allowedValues) {
     return value;
 }
 
-function triggerWidgetIconOnly(widgetInstance) {
+function effectiveKeyboardLabelMode(widgetInstance, vertical) {
+    if (vertical && verticalWidgetBehavior(widgetInstance) === "short-label")
+        return "short";
+    return widgetStringSetting(widgetInstance, "labelMode", "short", ["short", "full"]);
+}
+
+function triggerWidgetIconOnly(widgetInstance, vertical) {
+    if (vertical && verticalWidgetBehavior(widgetInstance) === "icon")
+        return true;
     var mode = widgetStringSetting(widgetInstance, "displayMode", "icon", ["icon", "full"]);
     return mode !== "full";
 }
