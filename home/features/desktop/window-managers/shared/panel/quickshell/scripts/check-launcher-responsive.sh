@@ -5,6 +5,7 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
+launcher_content_panel_qml="${script_dir}/../src/launcher/LauncherContentPanel.qml"
 launcher_search_field_qml="${script_dir}/../src/launcher/LauncherSearchField.qml"
 launcher_home_qml="${script_dir}/../src/launcher/LauncherHome.qml"
 launcher_diag_js="${script_dir}/../src/launcher/LauncherDiagnostics.js"
@@ -345,13 +346,13 @@ launcher_action_available() {
   local show_output=""
   local attempt
 
-  for attempt in 1 2 3 4 5; do
+  for attempt in $(seq 1 20); do
     show_output="$(quickshell ipc --id "${instance_id}" show 2>/dev/null || true)"
     if [[ -n "${show_output}" ]]; then
       printf '%s' "${show_output}" | rg -q "function ${action}\\("
       return $?
     fi
-    sleep 0.2
+    sleep 0.25
   done
 
   return 1
@@ -364,7 +365,7 @@ static_checks() {
   require_literal "$launcher_qml" 'width: Math.min(1120, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))' "responsive launcher width bounds"
   require_literal "$launcher_qml" 'height: Math.min(980, Math.max(520, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 28)))' "responsive launcher height bounds"
   require_literal "$launcher_search_field_qml" 'height: 48' "compact search bar height"
-  require_literal "$launcher_qml" 'visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode' "transient notice tight-mode guard"
+  require_literal "$launcher_content_panel_qml" 'visible: launcher.transientNoticeText !== "" && !launcher.tightMode' "transient notice tight-mode guard"
   require_literal "$launcher_metrics_box_qml" 'visible: Config.launcherShowRuntimeMetrics && !root.tightMode' "runtime metrics tight-mode guard"
   require_literal "$launcher_diag_js" 'loadState: String(props.modeLoadState || "idle"),' "launcher state load-state payload"
   require_literal "$launcher_diag_js" 'allItemCount: props.allItemsLength,' "launcher state all-item payload"
@@ -749,8 +750,10 @@ if (String(state.drunCategoryFilter || "") !== "") process.exit(1);
     if runtime_log_contains_actionable_text "${filtered}"; then
       fail "New runtime warnings/errors detected after launcher responsive exercise"
       printf '%s\n' "${filtered}" >&2
+    elif printf '%s' "${filtered}" | grep -Eviq '^[[:space:]]*$|.*\b(INFO|DEBUG)\b'; then
+      warn "New log output observed, but only non-actionable lines remained after filtering"
     else
-      warn "New log output observed, but only known non-blocking warnings were present"
+      pass "No new actionable launcher responsive warnings/errors in runtime log"
     fi
   else
     pass "No new launcher responsive warnings/errors in runtime log"

@@ -134,6 +134,10 @@ done
 
 require_pattern "$container_card_qml" 'removeContainer' "docker-manager container card exposes container removal action"
 require_pattern "$container_card_qml" 'modelData\.env' "docker-manager container card displays environment variables"
+require_pattern "$container_card_qml" 'DU\.healthDot' "docker-manager container card uses shared health dot utility"
+require_pattern "$container_card_qml" 'Refresh' "docker-manager container card has log refresh button"
+
+require_pattern "$daemon_qml" 'action === .edit.' "docker-manager daemon supports compose edit action"
 
 require_pattern "$settings_qml" 'dockerBinary' "docker-manager settings expose runtime binary"
 require_pattern "$settings_qml" 'debounceDelay' "docker-manager settings expose debounce delay"
@@ -156,9 +160,9 @@ require_pattern "$settings_qml" 'toastEnabled' "docker-manager settings expose t
 
 require_pattern "$utils_js" 'function guessDefaultPort' "docker-manager utils expose port heuristics"
 require_pattern "$utils_js" 'function normalizeImage' "docker-manager utils expose image normalization"
-
-# Round 2 utils assertions
 require_pattern "$utils_js" 'function matchesFilter' "docker-manager utils expose search filter function"
+require_pattern "$utils_js" 'function healthDot' "docker-manager utils expose shared health dot function"
+require_pattern "$utils_js" 'function healthDotColor' "docker-manager utils expose shared health dot color function"
 
 require_pattern "$readme" 'Docker or Podman' "docker-manager README documents runtime support"
 require_pattern "$readme" '~/.config/quickshell/plugins/docker-manager' "docker-manager README documents install location"
