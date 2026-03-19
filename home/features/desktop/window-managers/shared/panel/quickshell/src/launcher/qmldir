@@ -3,6 +3,7 @@ CommandPalette 1.0 CommandPalette.qml
 Launcher 1.0 Launcher.qml
 LauncherActionLegend 1.0 LauncherActionLegend.qml
 LauncherConfirmDialog 1.0 LauncherConfirmDialog.qml
+LauncherContentPanel 1.0 LauncherContentPanel.qml
 LauncherDependencyChecker 1.0 LauncherDependencyChecker.qml
 LauncherEmptyState 1.0 LauncherEmptyState.qml
 LauncherHome 1.0 LauncherHome.qml
@@ -11,6 +12,7 @@ LauncherMediaView 1.0 LauncherMediaView.qml
 LauncherMetricsBox 1.0 LauncherMetricsBox.qml
 LauncherPrefixStrip 1.0 LauncherPrefixStrip.qml
 LauncherResultDelegate 1.0 LauncherResultDelegate.qml
+LauncherResultView 1.0 LauncherResultView.qml
 LauncherSearchField 1.0 LauncherSearchField.qml
 LauncherSectionHeader 1.0 LauncherSectionHeader.qml
 LauncherSidebar 1.0 LauncherSidebar.qml
