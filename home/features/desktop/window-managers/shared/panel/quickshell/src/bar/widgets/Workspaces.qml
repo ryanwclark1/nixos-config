@@ -14,6 +14,7 @@ Rectangle {
   color: Colors.bgWidget
 
   property bool vertical: false
+  property var settings: ({})
   property var anchorWindow: null
   property bool showAddButton: true
   property bool showMiniMap: true
@@ -193,6 +194,7 @@ Rectangle {
     anchors.centerIn: parent
     vertical: root.vertical
     state: root.state
+    settings: root.settings
     showAddButton: root.showAddButton
     showMiniMap: root.showMiniMap
   }

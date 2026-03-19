@@ -11,9 +11,17 @@ QtObject {
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
       { type: "text", key: "labelText", label: "Label Text", icon: "󰉿", placeholder: "Apps" }
     ] },
-    { widgetType: "workspaces", label: "Workspace Switcher", icon: "󰍺", section: "left", description: "Current workspaces and switching.", hasSettings: true, defaultSettings: { showAddButton: true, showMiniMap: true }, settingsSchema: [
+    { widgetType: "workspaces", label: "Workspace Switcher", icon: "󰍺", section: "left", description: "Current workspaces and switching.", hasSettings: true, defaultSettings: { showAddButton: true, showMiniMap: true, showEmpty: true, showNames: false, showAppIcons: false, showWindowCount: false, pillSize: "normal", style: "pill", layout: "horizontal", clickBehavior: "focus" }, settingsSchema: [
       { type: "toggle", key: "showAddButton", label: "Add Button", icon: "󰐕", enabledText: "Show the quick add-workspace button at the end of the strip.", disabledText: "Hide the add-workspace button from this widget instance." },
-      { type: "toggle", key: "showMiniMap", label: "Mini-map", icon: "󰍹", enabledText: "Show live mini-map window previews inside workspace pills.", disabledText: "Hide mini-map previews and keep the pills text-only." }
+      { type: "toggle", key: "showMiniMap", label: "Mini-map", icon: "󰍹", enabledText: "Show live mini-map window previews inside workspace pills.", disabledText: "Hide mini-map previews and keep the pills text-only." },
+      { type: "toggle", key: "showEmpty", label: "Show Empty", icon: "󱗝", enabledText: "Show all workspaces including empty ones.", disabledText: "Hide empty workspaces from the strip." },
+      { type: "toggle", key: "showNames", label: "Show Names", icon: "󰑭", enabledText: "Show workspace names or custom labels.", disabledText: "Show only workspace numbers or icons." },
+      { type: "toggle", key: "showAppIcons", label: "App Icons", icon: "󰀻", enabledText: "Show application icons inside workspace pills.", disabledText: "Hide application icons." },
+      { type: "toggle", key: "showWindowCount", label: "Window Count", icon: "󰇄", enabledText: "Show a badge with the number of windows in the workspace.", disabledText: "Hide the window count badge." },
+      { type: "mode", key: "pillSize", label: "Pill Size", description: "Choose the size of the workspace pills.", options: [ { value: "compact", label: "Compact" }, { value: "normal", label: "Normal" }, { value: "large", label: "Large" } ] },
+      { type: "mode", key: "style", label: "Visual Style", description: "Choose the visual style for workspaces.", options: [ { value: "pill", label: "Pill" }, { value: "strip", label: "Strip" }, { value: "dots", label: "Dots" }, { value: "icons", label: "Icons" } ] },
+      { type: "mode", key: "layout", label: "Layout", description: "Choose the layout for the workspace selector.", options: [ { value: "horizontal", label: "Horizontal" }, { value: "vertical", label: "Vertical" }, { value: "grid", label: "Grid" } ] },
+      { type: "mode", key: "clickBehavior", label: "Click Behavior", description: "Choose what happens when you click a workspace pill.", options: [ { value: "focus", label: "Focus Workspace" }, { value: "last_window", label: "Last Active Window" } ] }
     ] },
     { widgetType: "specialWorkspaces", label: "Special Workspaces", icon: "󰐃", section: "left", description: "Hyprland special workspace indicator and toggle (scratchpads).", hasSettings: true, defaultSettings: { mainIcon: "󰖲", showLabels: false }, settingsSchema: [
       { type: "text", key: "mainIcon", label: "Main Icon", icon: "󰀻", placeholder: "󰖲" },

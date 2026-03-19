@@ -674,6 +674,7 @@ Item {
             property var widgetInstance: null
             vertical: root.vertical
             anchorWindow: root.anchorWindow
+            settings: root.widgetSettings(widgetInstance)
             showAddButton: root.widgetSettings(widgetInstance).showAddButton !== false
             showMiniMap: root.widgetSettings(widgetInstance).showMiniMap !== false
         }

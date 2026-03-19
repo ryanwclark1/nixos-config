@@ -10,6 +10,7 @@ Flow {
   property var settings: ({})
   property bool vertical: false
 
+  readonly property bool showEmpty: settings.hasOwnProperty("showEmpty") ? settings.showEmpty : Config.workspaceShowEmpty
   readonly property bool showAddButton: settings.hasOwnProperty("showAddButton") ? settings.showAddButton : Config.workspaceShowAddButton
   readonly property bool showMiniMap: settings.hasOwnProperty("showMiniMap") ? settings.showMiniMap : Config.workspaceShowMiniMap
   readonly property bool showNames: settings.hasOwnProperty("showNames") ? settings.showNames : Config.workspaceShowNames
@@ -81,7 +82,7 @@ Flow {
     id: _wsModel
     values: {
       var workspaces = root.state ? root.state.workspaces : [];
-      if (!Config.workspaceShowEmpty) {
+      if (!root.showEmpty) {
         var filtered = [];
         for (var i = 0; i < workspaces.length; i++) {
           var ws = workspaces[i];
