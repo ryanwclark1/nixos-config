@@ -7,10 +7,6 @@
 }:
 
 {
-  imports = [
-    inputs.niri.homeModules.niri
-  ];
-
   programs = {
     # Configure niriswitcher
     niriswitcher = {
