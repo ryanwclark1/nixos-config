@@ -770,7 +770,7 @@ Item {
 
                             // ── Compose tab: empty state ──
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" && root._filteredCompose.length === 0
+                                visible: root.currentTab === "compose" && root.daemon && root.daemon.runtimeAvailable && root._filteredCompose.length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
