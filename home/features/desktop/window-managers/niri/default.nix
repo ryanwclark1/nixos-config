@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   lib,
   pkgs,
@@ -13,9 +12,9 @@
       enable = true;
     };
 
-    # Niri configuration using structured settings
+    # Home Manager exposes `programs.niri.settings`/`package` here; the NixOS
+    # module owns session enablement.
     niri = {
-      enable = true;
       settings = {
         environment."NIXOS_OZONE_WL" = "1";
         input = {

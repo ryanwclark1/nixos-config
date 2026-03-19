@@ -173,6 +173,98 @@ QtObject {
         return type === "vpn" || type === "wireguard" || type === "tun";
     }
 
+    function parseVpnCatalog(text) {
+        var lines = String(text || "").trim().split("\n");
+        var entries = [];
+        for (var i = 0; i < lines.length; ++i) {
+            var line = String(lines[i] || "").trim();
+            if (line === "")
+                continue;
+            var parts = line.split(":");
+            if (parts.length < 3)
+                continue;
+            if (!isVpnConnectionType(parts[2]))
+                continue;
+            entries.push({
+                uuid: String(parts[0] || ""),
+                name: String(parts[1] || ""),
+                type: String(parts[2] || ""),
+                device: "",
+                state: "",
+                active: false
+            });
+        }
+        return entries;
+    }
+
+    function parseActiveVpnSessions(text) {
+        var lines = String(text || "").trim().split("\n");
+        var entries = [];
+        for (var i = 0; i < lines.length; ++i) {
+            var line = String(lines[i] || "").trim();
+            if (line === "")
+                continue;
+            var parts = line.split(":");
+            if (parts.length < 5)
+                continue;
+            if (!isVpnConnectionType(parts[2]))
+                continue;
+            entries.push({
+                uuid: String(parts[0] || ""),
+                name: String(parts[1] || ""),
+                type: String(parts[2] || ""),
+                device: String(parts[3] || ""),
+                state: String(parts[4] || ""),
+                active: true
+            });
+        }
+        return entries;
+    }
+
+    function sortVpnProfiles(profiles) {
+        return (profiles || []).sort(function(a, b) {
+            if (!!a.active !== !!b.active)
+                return a.active ? -1 : 1;
+            return String(a.name || "").localeCompare(String(b.name || ""));
+        });
+    }
+
+    // Compatibility helper used by contract checks and older callers while the
+    // runtime source of truth remains the daemon-provided `vpnProfiles` snapshot.
+    function buildVpnProfiles(catalogText, activeText) {
+        var catalog = parseVpnCatalog(catalogText);
+        var activeEntries = parseActiveVpnSessions(activeText);
+        var activeByUuid = ({});
+        var merged = [];
+        var seen = ({});
+        var i;
+
+        for (i = 0; i < activeEntries.length; ++i) {
+            var activeEntry = activeEntries[i];
+            if (activeEntry.uuid !== "")
+                activeByUuid[activeEntry.uuid] = activeEntry;
+        }
+
+        for (i = 0; i < catalog.length; ++i) {
+            var entry = catalog[i];
+            var mergedEntry = entry.uuid !== "" && activeByUuid[entry.uuid]
+                ? Object.assign({}, entry, activeByUuid[entry.uuid], { active: true })
+                : Object.assign({}, entry);
+            merged.push(mergedEntry);
+            if (mergedEntry.uuid !== "")
+                seen[mergedEntry.uuid] = true;
+        }
+
+        for (i = 0; i < activeEntries.length; ++i) {
+            var extraActive = activeEntries[i];
+            if (extraActive.uuid !== "" && seen[extraActive.uuid])
+                continue;
+            merged.push(Object.assign({}, extraActive));
+        }
+
+        return sortVpnProfiles(merged);
+    }
+
     function vpnProfileByUuid(uuidValue) {
         var uuid = String(uuidValue || "");
         var profiles = vpnProfiles || [];

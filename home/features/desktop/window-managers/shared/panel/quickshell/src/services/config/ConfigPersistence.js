@@ -295,6 +295,14 @@ var _MAPS = {
         ["longitude", "nightLightLongitude", _str]
     ],
     power: [
+        ["acMonitorTimeout", "powerAcMonitorTimeout"],
+        ["acLockTimeout", "powerAcLockTimeout"],
+        ["acSuspendTimeout", "powerAcSuspendTimeout"],
+        ["acSuspendAction", "powerAcSuspendAction"],
+        ["batMonitorTimeout", "powerBatMonitorTimeout"],
+        ["batLockTimeout", "powerBatLockTimeout"],
+        ["batSuspendTimeout", "powerBatSuspendTimeout"],
+        ["batSuspendAction", "powerBatSuspendAction"],
         ["idleInhibit", "idleInhibitEnabled"],
         ["inhibitIdleWhenPlaying", "inhibitIdleWhenPlaying"],
         ["batteryAlertsEnabled", "batteryAlertsEnabled"],

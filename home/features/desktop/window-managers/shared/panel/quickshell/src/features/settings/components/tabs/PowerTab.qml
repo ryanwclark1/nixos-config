@@ -100,5 +100,107 @@ Item {
             }
         }
 
+        SettingsCard {
+            title: "AC Power Profile"
+            iconName: "󰚥"
+            description: "Preferred idle timings while external power is connected."
+
+            SettingsSliderRow {
+                label: "Monitor Off"
+                icon: "󰍹"
+                min: 1
+                max: 180
+                step: 1
+                value: Config.powerAcMonitorTimeout
+                unit: "min"
+                onMoved: v => Config.powerAcMonitorTimeout = v
+            }
+
+            SettingsSliderRow {
+                label: "Lock Screen"
+                icon: "󰌾"
+                min: 1
+                max: 240
+                step: 1
+                value: Config.powerAcLockTimeout
+                unit: "min"
+                onMoved: v => Config.powerAcLockTimeout = v
+            }
+
+            SettingsSliderRow {
+                label: "Suspend"
+                icon: "󰤄"
+                min: 1
+                max: 360
+                step: 1
+                value: Config.powerAcSuspendTimeout
+                unit: "min"
+                onMoved: v => Config.powerAcSuspendTimeout = v
+            }
+
+            SettingsModeRow {
+                label: "Suspend Action"
+                icon: "󰒲"
+                currentValue: Config.powerAcSuspendAction
+                options: [
+                    { value: "suspend", label: "Suspend", icon: "󰤄" },
+                    { value: "hibernate", label: "Hibernate", icon: "󰒲" },
+                    { value: "poweroff", label: "Power Off", icon: "󰐥" }
+                ]
+                onModeSelected: value => Config.powerAcSuspendAction = value
+            }
+        }
+
+        SettingsCard {
+            title: "Battery Power Profile"
+            iconName: "󱟤"
+            description: "Preferred idle timings while running on battery."
+
+            SettingsSliderRow {
+                label: "Monitor Off"
+                icon: "󰍹"
+                min: 1
+                max: 120
+                step: 1
+                value: Config.powerBatMonitorTimeout
+                unit: "min"
+                onMoved: v => Config.powerBatMonitorTimeout = v
+            }
+
+            SettingsSliderRow {
+                label: "Lock Screen"
+                icon: "󰌾"
+                min: 1
+                max: 180
+                step: 1
+                value: Config.powerBatLockTimeout
+                unit: "min"
+                onMoved: v => Config.powerBatLockTimeout = v
+            }
+
+            SettingsSliderRow {
+                label: "Suspend"
+                icon: "󰤄"
+                min: 1
+                max: 240
+                step: 1
+                value: Config.powerBatSuspendTimeout
+                unit: "min"
+                onMoved: v => Config.powerBatSuspendTimeout = v
+            }
+
+            SettingsModeRow {
+                label: "Suspend Action"
+                icon: "󰒲"
+                currentValue: Config.powerBatSuspendAction
+                options: [
+                    { value: "suspend", label: "Suspend", icon: "󰤄" },
+                    { value: "hibernate", label: "Hibernate", icon: "󰒲" },
+                    { value: "poweroff", label: "Power Off", icon: "󰐥" }
+                ]
+                onModeSelected: value => Config.powerBatSuspendAction = value
+            }
+        }
+
     }
 }

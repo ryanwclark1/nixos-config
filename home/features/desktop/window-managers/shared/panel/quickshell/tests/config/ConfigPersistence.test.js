@@ -4,6 +4,7 @@ import {
   _sanitizePluginMap,
   _applyMap,
   _buildMap,
+  applyData,
   buildData,
 } from "../../src/services/config/ConfigPersistence.js";
 
@@ -136,5 +137,38 @@ describe("buildData", () => {
     expect(data.controlCenter.width).toBe(400);
     expect(data.launcher.primaryModes).toEqual(["drun", "files", "system"]);
     expect(data.plugins.disabled).toEqual([]);
+  });
+});
+
+describe("power profile persistence", () => {
+  it("applies mapped AC and battery power profile settings", () => {
+    const config = {
+      controlCenterWidthMin: 440,
+      controlCenterWidthMax: 560,
+      normalizeBarConfigs() {
+        return [];
+      },
+      normalizeLauncherConfig() {},
+    };
+    const data = {
+      _version: 2,
+      power: {
+        acMonitorTimeout: 15,
+        acLockTimeout: 20,
+        acSuspendTimeout: 45,
+        acSuspendAction: "hibernate",
+        batMonitorTimeout: 5,
+        batLockTimeout: 7,
+        batSuspendTimeout: 10,
+        batSuspendAction: "poweroff",
+      },
+    };
+
+    applyData(config, data);
+
+    expect(config.powerAcMonitorTimeout).toBe(15);
+    expect(config.powerAcSuspendAction).toBe("hibernate");
+    expect(config.powerBatMonitorTimeout).toBe(5);
+    expect(config.powerBatSuspendAction).toBe("poweroff");
   });
 });

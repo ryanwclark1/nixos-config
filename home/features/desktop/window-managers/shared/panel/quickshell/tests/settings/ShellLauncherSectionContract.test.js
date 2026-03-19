@@ -25,4 +25,11 @@ describe("ShellLauncherSection contract", () => {
     expect(source).not.toContain("parent.newEngineUrl");
     expect(source).not.toContain("parent.newEngineIcon");
   });
+
+  it("uses SettingsCard for launcher settings panels", () => {
+    const source = readFileSync(launcherSectionPath, "utf8");
+
+    expect(source).toContain("SettingsCard {");
+    expect(source).not.toContain("LauncherSettingsPanel {");
+  });
 });

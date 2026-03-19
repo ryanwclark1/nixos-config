@@ -15,6 +15,7 @@ LauncherTab 1.0 LauncherTab.qml
 ModelUsageTab 1.0 ModelUsageTab.qml
 LauncherSearchTab 1.0 LauncherSearchTab.qml
 LauncherWebTab 1.0 LauncherWebTab.qml
+LauncherModeList 1.0 LauncherModeList.qml
 LauncherModesTab 1.0 LauncherModesTab.qml
 LauncherRuntimeTab 1.0 LauncherRuntimeTab.qml
 LockScreenTab 1.0 LockScreenTab.qml

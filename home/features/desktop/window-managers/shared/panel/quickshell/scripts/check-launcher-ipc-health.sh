@@ -5,6 +5,7 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
+launcher_ipc_handler_qml="${script_dir}/../src/launcher/LauncherIpcHandler.qml"
 launcher_diag_js="${script_dir}/../src/launcher/LauncherDiagnostics.js"
 expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
 
@@ -25,7 +26,7 @@ Usage: check-launcher-ipc-health.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 Runs a launcher IPC health probe:
   - validates Launcher IPC methods are discoverable,
   - exercises clearMetrics/redetectFilesBackend/diagnosticReset/filesBackendStatus/drunCategoryState/escapeActionState/diagnosticSetSearchText/diagnosticSetDrunCategoryFilter/invokeEscapeAction,
-  - verifies launcher diagnostics payload contract literals in Launcher.qml and LauncherDiagnostics.js.
+  - verifies launcher IPC contract literals in LauncherIpcHandler.qml and payload helpers in Launcher.qml/LauncherDiagnostics.js.
 In --ci mode, only static contract checks are executed.
 EOF
 }
@@ -301,15 +302,15 @@ main() {
     checked_actions+=("${action}")
   done
 
-  require_literal "$launcher_qml" 'function clearMetrics() {' "Launcher.clearMetrics IPC mapping"
-  require_literal "$launcher_qml" 'function redetectFilesBackend() {' "Launcher.redetectFilesBackend IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticReset() {' "Launcher.diagnosticReset IPC mapping"
-  require_pattern "$launcher_qml" 'function filesBackendStatus\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.filesBackendStatusObject\(\)\);\s*\}' "Launcher.filesBackendStatus IPC mapping"
-  require_pattern "$launcher_qml" 'function drunCategoryState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\);\s*\}' "Launcher.drunCategoryState IPC mapping"
-  require_pattern "$launcher_qml" 'function escapeActionState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\);\s*\}' "Launcher.escapeActionState IPC mapping"
-  require_pattern "$launcher_qml" 'function diagnosticSetSearchText\(text: string\)(?:: string)? \{\s*return launcherRoot\.diagnosticSetSearchText\(text\);\s*\}' "Launcher.diagnosticSetSearchText IPC mapping"
-  require_pattern "$launcher_qml" 'function diagnosticSetDrunCategoryFilter\(categoryKey: string\)(?:: string)? \{\s*return launcherRoot\.diagnosticSetDrunCategoryFilter\(categoryKey\);\s*\}' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
-  require_pattern "$launcher_qml" 'function invokeEscapeAction\(\)(?:: string)? \{' "Launcher.invokeEscapeAction IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function clearMetrics() {' "Launcher.clearMetrics IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function redetectFilesBackend() {' "Launcher.redetectFilesBackend IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function diagnosticReset() {' "Launcher.diagnosticReset IPC mapping"
+  require_pattern "$launcher_ipc_handler_qml" 'function filesBackendStatus\(\)(?:: string)? \{\s*return JSON\.stringify\(launcher\.filesBackendStatusObject\(\)\);\s*\}' "Launcher.filesBackendStatus IPC mapping"
+  require_pattern "$launcher_ipc_handler_qml" 'function drunCategoryState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcher\.drunCategoryStateObject\(\)\);\s*\}' "Launcher.drunCategoryState IPC mapping"
+  require_pattern "$launcher_ipc_handler_qml" 'function escapeActionState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcher\.escapeActionStateObject\(\)\);\s*\}' "Launcher.escapeActionState IPC mapping"
+  require_pattern "$launcher_ipc_handler_qml" 'function diagnosticSetSearchText\(text: string\)(?:: string)? \{\s*return launcher\.diagnosticSetSearchText\(text\);\s*\}' "Launcher.diagnosticSetSearchText IPC mapping"
+  require_pattern "$launcher_ipc_handler_qml" 'function diagnosticSetDrunCategoryFilter\(categoryKey: string\)(?:: string)? \{\s*return launcher\.diagnosticSetDrunCategoryFilter\(categoryKey\);\s*\}' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
+  require_pattern "$launcher_ipc_handler_qml" 'function invokeEscapeAction\(\)(?:: string)? \{' "Launcher.invokeEscapeAction IPC mapping"
   require_literal "$launcher_qml" 'function drunCategoryStateObject() {' "drunCategoryState payload helper"
   require_literal "$launcher_qml" 'function escapeActionStateObject() {' "escapeActionState payload helper"
   require_literal "$launcher_diag_js" 'action = "resetQuery";' "escapeActionState resetQuery branch"
