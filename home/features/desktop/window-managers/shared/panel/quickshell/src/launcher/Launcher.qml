@@ -457,6 +457,16 @@ PanelWindow {
         return launcherRoot.supportsMode(modeKey);
     })
     readonly property var modeIcons: ModeData.modeIcons
+    readonly property var currentModeMeta: modeMeta(mode)
+    readonly property string modeToneKey: String(currentModeMeta.tone || "primary")
+    readonly property color modeAccentColor: toneColor(modeToneKey)
+    readonly property color modeAccentSoft: Colors.withAlpha(modeAccentColor, compactMode ? 0.12 : 0.16)
+    readonly property color modeAccentStrong: Colors.withAlpha(modeAccentColor, 0.24)
+    readonly property color modeAccentBorder: Colors.withAlpha(modeAccentColor, 0.48)
+    readonly property string modeHeroLabel: String(currentModeMeta.heroLabel || currentModeMeta.label || "Launcher")
+    readonly property string modeShortLabel: String(currentModeMeta.shortLabel || currentModeMeta.label || "Launcher")
+    readonly property string modeHeroIcon: String(currentModeMeta.heroIcon || modeIcons[mode] || "󰍉")
+    readonly property string modePrefixText: String(currentModeMeta.prefix || "")
     readonly property string emptyStateTitle: TextHelpers.emptyStateTitle(mode, _cleanSearch, Config.launcherFileMinQueryLength, fileSearchRootLabel)
     readonly property string emptyStateSubtitle: TextHelpers.emptyStateSubtitle(mode, _cleanSearch, Config.launcherFileMinQueryLength, fileSearchRootLabel)
     readonly property string emptyPrimaryCta: TextHelpers.emptyPrimaryCta(mode, _cleanSearch, _webPrimaryName, fileSearchRootLabel)
@@ -998,6 +1008,21 @@ PanelWindow {
 
     function modeMeta(modeKey) {
         return ModeData.modeInfo(modeKey);
+    }
+
+    function toneColor(toneKey) {
+        var key = String(toneKey || "primary");
+        if (key === "accent")
+            return Colors.accent;
+        if (key === "info")
+            return Colors.info;
+        if (key === "success")
+            return Colors.success;
+        if (key === "warning")
+            return Colors.warning;
+        if (key === "secondary")
+            return Colors.secondary;
+        return Colors.primary;
     }
 
     function isModeAllowedByCompositor(modeKey) {
@@ -3326,6 +3351,14 @@ PanelWindow {
             tightMode: launcherRoot.tightMode
             mode: launcherRoot.mode
             parentRadius: hudBox.radius
+            accentColor: launcherRoot.modeAccentColor
+            modeLabel: launcherRoot.currentModeMeta.label || "Launcher"
+            heroLabel: launcherRoot.modeHeroLabel
+            summaryText: launcherRoot.modeSummaryText
+            statusText: launcherRoot.escapeStatusText
+            statusIcon: launcherRoot.escapeStatusIcon
+            modePrefix: launcherRoot.modePrefixText
+            modeIcon: launcherRoot.modeHeroIcon
         }
 
         // Anti-flicker: track mouse movement after open to enable hover-select
@@ -3372,12 +3405,11 @@ PanelWindow {
         }
     }
 
-        LauncherConfirmDialog {
-            anchors.fill: parent
-            showingConfirm: launcherRoot.showingConfirm
-            confirmTitle: launcherRoot.confirmTitle
-            onConfirmed: launcherRoot.doConfirm()
-            onCancelled: launcherRoot.cancelConfirm()
-        }
+    LauncherConfirmDialog {
+        anchors.fill: parent
+        showingConfirm: launcherRoot.showingConfirm
+        confirmTitle: launcherRoot.confirmTitle
+        onConfirmed: launcherRoot.doConfirm()
+        onCancelled: launcherRoot.cancelConfirm()
     }
 }

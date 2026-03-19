@@ -7,26 +7,26 @@ var defaultPrimaryModes = ["drun", "window", "files", "ai", "system"];
 var modePrefixes = "!/@?>=,:;~";
 
 var modeMeta = {
-    "drun": { label: "Apps", hint: "Launch applications", prefix: "" },
-    "window": { label: "Windows", hint: "Jump to an open window with ~", prefix: "~" },
-    "files": { label: "Files", hint: "Search home with /", prefix: "/" },
-    "ai": { label: "AI", hint: "Ask with !", prefix: "!" },
-    "clip": { label: "Clipboard", hint: "Recent clipboard history", prefix: "" },
-    "emoji": { label: "Characters", hint: "Search characters with :", prefix: ":" },
-    "calc": { label: "Calculator", hint: "Evaluate with =", prefix: "=" },
-    "web": { label: "Web", hint: "Search with ?", prefix: "?" },
-    "plugins": { label: "Plugins", hint: "Search plugin providers", prefix: "" },
-    "run": { label: "Run", hint: "Run commands with >", prefix: ">" },
-    "system": { label: "System", hint: "Shell and session destinations", prefix: "" },
-    "keybinds": { label: "Keybinds", hint: "Inspect and trigger binds", prefix: "" },
-    "media": { label: "Media", hint: "Control active players", prefix: "" },
-    "nixos": { label: "NixOS", hint: "Nix maintenance actions", prefix: "" },
-    "wallpapers": { label: "Wallpapers", hint: "Pick and apply wallpapers", prefix: "" },
-    "bookmarks": { label: "Bookmarks", hint: "Open bookmarked destinations", prefix: "@" },
-    "settings": { label: "Settings", hint: "Jump to a settings tab with ,", prefix: "," },
-    "devops": { label: "DevOps", hint: "Control containers & services", prefix: "" },
-    "orchestrator": { label: "Orchestrator", hint: "Full system dashboard", prefix: "" },
-    "ssh": { label: "SSH", hint: "Connect with ;", prefix: ";" }
+    "drun": { label: "Apps", shortLabel: "Apps", heroLabel: "Application Launch", heroIcon: "󰀻", hint: "Launch applications", prefix: "", tone: "primary" },
+    "window": { label: "Windows", shortLabel: "Windows", heroLabel: "Window Switch", heroIcon: "󰖯", hint: "Jump to an open window with ~", prefix: "~", tone: "info" },
+    "files": { label: "Files", shortLabel: "Files", heroLabel: "File Search", heroIcon: "󰈔", hint: "Search home with /", prefix: "/", tone: "warning" },
+    "ai": { label: "AI", shortLabel: "AI", heroLabel: "AI Prompt", heroIcon: "󰚩", hint: "Ask with !", prefix: "!", tone: "accent" },
+    "clip": { label: "Clipboard", shortLabel: "Clipboard", heroLabel: "Clipboard History", heroIcon: "󰅍", hint: "Recent clipboard history", prefix: "", tone: "secondary" },
+    "emoji": { label: "Characters", shortLabel: "Chars", heroLabel: "Character Search", heroIcon: "󰞅", hint: "Search characters with :", prefix: ":", tone: "warning" },
+    "calc": { label: "Calculator", shortLabel: "Calc", heroLabel: "Inline Calculation", heroIcon: "󰪚", hint: "Evaluate with =", prefix: "=", tone: "warning" },
+    "web": { label: "Web", shortLabel: "Web", heroLabel: "Web Search", heroIcon: "󰖟", hint: "Search with ?", prefix: "?", tone: "info" },
+    "plugins": { label: "Plugins", shortLabel: "Plugins", heroLabel: "Plugin Search", heroIcon: "󰏗", hint: "Search plugin providers", prefix: "", tone: "secondary" },
+    "run": { label: "Run", shortLabel: "Run", heroLabel: "Command Execution", heroIcon: "󰆍", hint: "Run commands with >", prefix: ">", tone: "accent" },
+    "system": { label: "System", shortLabel: "System", heroLabel: "Shell Destinations", heroIcon: "󰒓", hint: "Shell and session destinations", prefix: "", tone: "secondary" },
+    "keybinds": { label: "Keybinds", shortLabel: "Keys", heroLabel: "Keybind Browser", heroIcon: "󰌌", hint: "Inspect and trigger binds", prefix: "", tone: "secondary" },
+    "media": { label: "Media", shortLabel: "Media", heroLabel: "Media Control", heroIcon: "󰝚", hint: "Control active players", prefix: "", tone: "success" },
+    "nixos": { label: "NixOS", shortLabel: "NixOS", heroLabel: "NixOS Actions", heroIcon: "", hint: "Nix maintenance actions", prefix: "", tone: "success" },
+    "wallpapers": { label: "Wallpapers", shortLabel: "Walls", heroLabel: "Wallpaper Picker", heroIcon: "󰸉", hint: "Pick and apply wallpapers", prefix: "", tone: "accent" },
+    "bookmarks": { label: "Bookmarks", shortLabel: "Marks", heroLabel: "Bookmark Search", heroIcon: "󰃭", hint: "Open bookmarked destinations", prefix: "@", tone: "primary" },
+    "settings": { label: "Settings", shortLabel: "Settings", heroLabel: "Settings Jump", heroIcon: "󰒓", hint: "Jump to a settings tab with ,", prefix: ",", tone: "secondary" },
+    "devops": { label: "DevOps", shortLabel: "DevOps", heroLabel: "Ops Controls", heroIcon: "󰒍", hint: "Control containers & services", prefix: "", tone: "warning" },
+    "orchestrator": { label: "Orchestrator", shortLabel: "Ops", heroLabel: "System Orchestrator", heroIcon: "󰓅", hint: "Full system dashboard", prefix: "", tone: "success" },
+    "ssh": { label: "SSH", shortLabel: "SSH", heroLabel: "Remote Connect", heroIcon: "󰣀", hint: "Connect with ;", prefix: ";", tone: "info" }
 };
 
 var modeIcons = {
