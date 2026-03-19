@@ -6,6 +6,8 @@ port="${NIRI_VM_SMOKE_SSH_PORT:-2232}"
 boot_timeout="${NIRI_VM_SMOKE_BOOT_TIMEOUT:-300}"
 poll_delay="${NIRI_VM_SMOKE_POLL_DELAY:-2}"
 poll_attempts="${NIRI_VM_SMOKE_POLL_ATTEMPTS:-}"
+niri_unit_timeout="${NIRI_VM_SMOKE_NIRI_UNIT_TIMEOUT:-120}"
+niri_session_timeout="${NIRI_VM_SMOKE_SESSION_TIMEOUT:-120}"
 launcher="${repo_root}/scripts/vm/launch-niri-test-vm.sh"
 log_file="${NIRI_VM_SMOKE_LOG:-/tmp/niri-test-vm-smoke.log}"
 vm_password="${NIRI_VM_PASSWORD:-niri}"
@@ -119,6 +121,40 @@ vm_ssh() {
   "${ssh_password_base[@]}" "$@"
 }
 
+wait_for_niri_unit() {
+  local deadline=$((SECONDS + niri_unit_timeout))
+
+  while (( SECONDS < deadline )); do
+    if vm_ssh '
+      loginctl list-sessions --no-legend 2>/dev/null | grep -Eq "tty1|ttyS0" &&
+      systemctl --user list-unit-files --no-legend niri.service 2>/dev/null | grep -qE "^niri\\.service[[:space:]]"
+    ' >/dev/null 2>&1; then
+      return 0
+    fi
+
+    sleep 2
+  done
+  return 1
+}
+
+ensure_niri_running() {
+  local deadline=$((SECONDS + niri_session_timeout))
+
+  while (( SECONDS < deadline )); do
+    if vm_ssh 'pgrep -fa "niri --session" >/dev/null 2>&1'; then
+      return 0
+    fi
+
+    vm_ssh '
+      systemctl --user reset-failed niri.service >/dev/null 2>&1 || true
+      timeout 15s systemctl --user start niri.service >/dev/null 2>&1 || true
+    ' >/dev/null 2>&1 || true
+    sleep 2
+  done
+
+  return 1
+}
+
 install_host_pubkey() {
   local pubkey=""
 
@@ -163,11 +199,23 @@ install_host_pubkey
 
 echo "[INFO] SSH is ready; validating session"
 
-if ! vm_ssh '
-  pgrep -fa "niri --session" >/dev/null 2>&1 ||
-  systemctl --user start niri.service >/dev/null 2>&1
-' ; then
+if ! wait_for_niri_unit; then
+  echo "[ERROR] Timed out waiting for niri.service to be registered in the user manager" >&2
+  vm_ssh '
+    echo "--- sessions ---"
+    loginctl list-sessions --no-legend || true
+    echo "--- user units ---"
+    systemctl --user list-unit-files "niri*" || true
+  ' >&2 || true
+  exit 1
+fi
+
+if ! ensure_niri_running; then
   echo "[ERROR] Failed to start niri.service inside the VM" >&2
+  vm_ssh '
+    systemctl --user status --no-pager niri.service 2>/dev/null || true
+    journalctl --user --no-pager -u niri.service -n 120 2>/dev/null || true
+  ' >&2 || true
   exit 1
 fi
 

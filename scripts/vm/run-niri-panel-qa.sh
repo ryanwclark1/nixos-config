@@ -9,6 +9,8 @@ ssh_identity_file="${NIRI_VM_SSH_IDENTITY:-}"
 boot_timeout="${NIRI_VM_QA_BOOT_TIMEOUT:-300}"
 poll_delay="${NIRI_VM_QA_POLL_DELAY:-2}"
 poll_attempts="${NIRI_VM_QA_POLL_ATTEMPTS:-}"
+niri_unit_timeout="${NIRI_VM_QA_NIRI_UNIT_TIMEOUT:-120}"
+niri_session_timeout="${NIRI_VM_QA_SESSION_TIMEOUT:-120}"
 output_dir="${NIRI_VM_QA_OUTPUT_DIR:-/tmp/panel-qa-matrix-niri-host}"
 capture_mode="panel"
 reset_disk=0
@@ -233,6 +235,22 @@ vm_scp() {
   "${scp_password_base[@]}" "$@"
 }
 
+wait_for_niri_unit() {
+  local deadline=$((SECONDS + niri_unit_timeout))
+
+  while (( SECONDS < deadline )); do
+    if vm_ssh '
+      loginctl list-sessions --no-legend 2>/dev/null | grep -Eq "tty1|ttyS0" &&
+      systemctl --user list-unit-files --no-legend niri.service 2>/dev/null | grep -qE "^niri\\.service[[:space:]]"
+    ' >/dev/null 2>&1; then
+      return 0
+    fi
+
+    sleep 2
+  done
+  return 1
+}
+
 cleanup() {
   if (( keep_vm_running == 0 )) && [[ -n "${launcher_pid:-}" ]] && kill -0 "${launcher_pid}" 2>/dev/null; then
     kill "${launcher_pid}" 2>/dev/null || true
@@ -271,7 +289,19 @@ install_host_pubkey() {
 
 wait_for_niri() {
   local i
-  for ((i = 1; i <= 60; i++)); do
+  if ! wait_for_niri_unit; then
+    echo "[ERROR] Timed out waiting for niri.service to be registered in the VM user manager" >&2
+    vm_ssh '
+      echo "--- sessions ---"
+      loginctl list-sessions --no-legend || true
+      echo "--- user units ---"
+      systemctl --user list-unit-files "niri*" || true
+    ' >&2 || true
+    return 1
+  fi
+
+  local deadline=$((SECONDS + niri_session_timeout))
+  while (( SECONDS < deadline )); do
     if vm_ssh '
       pgrep -fa "niri --session" >/dev/null 2>&1 &&
       systemctl --user show-environment 2>/dev/null | grep -q "^NIRI_SOCKET=" &&
@@ -281,7 +311,7 @@ wait_for_niri() {
     fi
     vm_ssh '
       systemctl --user reset-failed niri.service >/dev/null 2>&1 || true
-      systemctl --user start niri.service >/dev/null 2>&1 || true
+      timeout 15s systemctl --user start niri.service >/dev/null 2>&1 || true
     ' >/dev/null 2>&1 || true
     sleep 2
   done
