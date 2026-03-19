@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Screenshot capture script for ScreenshotService
-# Usage: qs-screenshot <mode> [monitor]
-# Modes: region, screen, fullscreen
+# Usage: qs-screenshot <mode> [monitor] [editor]
+# Modes: region, screen, fullscreen, window, area
+# Editor: none | swappy | satty
 
 set -uo pipefail
 
 MODE="${1:-region}"
 MONITOR="${2:-}"
+SCREENSHOT_EDITOR="${3:-none}"
 DEFAULT_PICTURES_DIR="${HOME}/Pictures"
 
 if [[ -f "${HOME}/.config/user-dirs.dirs" ]]; then

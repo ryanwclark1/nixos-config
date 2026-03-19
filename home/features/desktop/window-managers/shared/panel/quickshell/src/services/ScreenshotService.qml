@@ -98,15 +98,11 @@ QtObject {
         root._captureStdoutFinished = false;
         root._captureStderrFinished = false;
 
-        // Set editor environment for the capture process
         var editorVal = Config.screenshotEditAfterCapture ? Config.screenshotEditor : "none";
-        _captureProc.environment = { "SCREENSHOT_EDITOR": editorVal };
-
-        _captureProc.command = DependencyService.resolveCommand("qs-screenshot",
-            root._captureMonitor !== ""
-                ? [root._captureMode, root._captureMonitor]
-                : [root._captureMode]
-        );
+        var args = root._captureMonitor !== ""
+            ? [root._captureMode, root._captureMonitor, editorVal]
+            : [root._captureMode, "", editorVal];
+        _captureProc.command = DependencyService.resolveCommand("qs-screenshot", args);
         _captureProc.running = true;
     }
 
