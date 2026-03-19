@@ -36,10 +36,13 @@ QtObject {
 
     // ── Internal ─────────────────────────────────
     property var _data: ({})
-    readonly property string _filePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/usage.json"
+    readonly property string _filePath: Quickshell.statePath("usage.json")
 
     property FileView _file: FileView {
         path: root._filePath
+        blockLoading: true
+        printErrors: false
+        atomicWrites: true
     }
 
     Component.onCompleted: _load()

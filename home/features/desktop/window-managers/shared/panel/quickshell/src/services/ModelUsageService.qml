@@ -124,6 +124,41 @@ QtObject {
     return mins + "m";
   }
 
+  function _resetClaudeUsage() {
+    root.claudeReady = false;
+    root.claudeTodayPrompts = 0;
+    root.claudeTodaySessions = 0;
+    root.claudeTodayToolCalls = 0;
+    root.claudeTodayTokensByModel = ({});
+    root.claudeTotalPrompts = 0;
+    root.claudeTotalSessions = 0;
+    root.claudeTotalTokens = 0;
+    root.claudeModelUsage = ({});
+    root.claudeRecentDays = [];
+    root.claudeFirstSessionDate = "";
+  }
+
+  function _resetCodexUsage() {
+    root.codexReady = false;
+    root.codexTodayPrompts = 0;
+    root.codexTodaySessions = 0;
+    root.codexModel = "unknown";
+    root.codexLatestSession = ({});
+    root.codexRecentDays = [];
+  }
+
+  function _resetGeminiUsage() {
+    root.geminiReady = false;
+    root.geminiTodayPrompts = 0;
+    root.geminiTodaySessions = 0;
+    root.geminiTodayTokens = ({});
+    root.geminiTotalSessions = 0;
+    root.geminiTotalTokens = 0;
+    root.geminiModel = "unknown";
+    root.geminiRecentDays = [];
+    root.geminiTokensByModel = ({});
+  }
+
   function refresh() {
     if (root.claudeEnabled && !claudeProc.running)
       claudeProc.running = true;
@@ -196,6 +231,10 @@ QtObject {
           var raw = String(this.text || "").trim();
           if (!raw || raw.indexOf("{") !== 0) throw new Error("invalid response");
           var data = JSON.parse(raw);
+          if (data.error === "no data") {
+            root._resetClaudeUsage();
+            return;
+          }
           if (data.error) throw new Error(data.error);
 
           root.claudeTodayPrompts = data.todayPrompts || 0;
@@ -211,7 +250,7 @@ QtObject {
           root.claudeReady = true;
         } catch (e) {
           Logger.w("ModelUsageService", "claude parse error:", e);
-          if (!root.claudeReady) root.claudeTodayPrompts = 0;
+          if (!root.claudeReady) root._resetClaudeUsage();
         }
       }
     }
@@ -270,6 +309,10 @@ QtObject {
           var raw = String(this.text || "").trim();
           if (!raw || raw.indexOf("{") !== 0) throw new Error("invalid response");
           var data = JSON.parse(raw);
+          if (data.error === "no data") {
+            root._resetCodexUsage();
+            return;
+          }
           if (data.error) throw new Error(data.error);
 
           root.codexTodayPrompts = data.todayPrompts || 0;
@@ -280,7 +323,7 @@ QtObject {
           root.codexReady = true;
         } catch (e) {
           Logger.w("ModelUsageService", "codex parse error:", e);
-          if (!root.codexReady) root.codexTodayPrompts = 0;
+          if (!root.codexReady) root._resetCodexUsage();
         }
       }
     }
@@ -296,6 +339,10 @@ QtObject {
           var raw = String(this.text || "").trim();
           if (!raw || raw.indexOf("{") !== 0) throw new Error("invalid response");
           var data = JSON.parse(raw);
+          if (data.error === "no data") {
+            root._resetGeminiUsage();
+            return;
+          }
           if (data.error) throw new Error(data.error);
 
           root.geminiTodayPrompts = data.todayPrompts || 0;
@@ -309,7 +356,7 @@ QtObject {
           root.geminiReady = true;
         } catch (e) {
           Logger.w("ModelUsageService", "gemini parse error:", e);
-          if (!root.geminiReady) root.geminiTodayPrompts = 0;
+          if (!root.geminiReady) root._resetGeminiUsage();
         }
       }
     }
