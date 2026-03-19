@@ -375,7 +375,6 @@ Scope {
                                         Drag.source: ({
                                                 type: "window",
                                                 windowId: modelData.id,
-                                                windowAddress: modelData.address,
                                                 appId: modelData.app_id
                                             })
                                         Drag.hotSpot.x: width / 2

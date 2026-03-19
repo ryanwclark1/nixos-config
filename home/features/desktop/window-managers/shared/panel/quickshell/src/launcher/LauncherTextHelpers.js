@@ -3,10 +3,10 @@
 
 // ── Empty state text ─────────────────────────────
 
-function emptyStateTitle(mode, clean, fileMinQueryLength) {
+function emptyStateTitle(mode, clean, fileMinQueryLength, fileRootLabel) {
     if (mode === "files") {
         if (clean.length < fileMinQueryLength)
-            return "Start typing to search Home";
+            return "Start typing to search " + String(fileRootLabel || "Files");
         return "No files match '" + clean + "'";
     }
     if (mode === "ai")
@@ -20,11 +20,11 @@ function emptyStateTitle(mode, clean, fileMinQueryLength) {
     return "No results";
 }
 
-function emptyStateSubtitle(mode, clean, fileMinQueryLength) {
+function emptyStateSubtitle(mode, clean, fileMinQueryLength, fileRootLabel) {
     if (mode === "files") {
         if (clean.length < fileMinQueryLength)
-            return "Filename-first search across your home directory. Prefix with / to jump here from any mode.";
-        return "Try a shorter filename fragment or browse Home directly.";
+            return "Filename-first search across " + String(fileRootLabel || "the current root") + ". Prefix with / to jump here from any mode.";
+        return "Try a shorter filename fragment or browse " + String(fileRootLabel || "the current root") + " directly.";
     }
     if (mode === "ai")
         return "The response will be copied to your clipboard";
@@ -37,9 +37,9 @@ function emptyStateSubtitle(mode, clean, fileMinQueryLength) {
     return "Try another query or switch modes";
 }
 
-function emptyPrimaryCta(mode, clean, webPrimaryName) {
+function emptyPrimaryCta(mode, clean, webPrimaryName, fileRootLabel) {
     if (mode === "files")
-        return "Open Home";
+        return "Open " + String(fileRootLabel || "Root");
     if (mode === "web")
         return clean !== "" ? "Search " + webPrimaryName : "Open " + webPrimaryName;
     if (mode === "ai")
@@ -71,10 +71,10 @@ function emptySecondaryCta(mode, clean, searchText, webSecondaryName) {
     return searchText !== "" ? "Clear Query" : "";
 }
 
-function emptyPrimaryHint(mode, clean, webPrimaryName, webPrimaryHintName) {
+function emptyPrimaryHint(mode, clean, webPrimaryName, webPrimaryHintName, fileRootLabel) {
     var hintName = webPrimaryHintName || webPrimaryName;
     if (mode === "files")
-        return "Open your home directory in the default file manager.";
+        return "Open " + String(fileRootLabel || "the configured search root") + " in the configured file opener.";
     if (mode === "web")
         return clean !== "" ? "Search " + hintName + " using the current query." : "Open " + hintName + " homepage.";
     if (mode === "ai")

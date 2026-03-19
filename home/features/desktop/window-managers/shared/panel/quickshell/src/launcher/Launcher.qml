@@ -239,6 +239,98 @@ PanelWindow {
         _lastFilterCandidates = [];
     }
 
+    function resolveFileSearchRoot(rawValue) {
+        var raw = String(rawValue || "~").trim();
+        var home = String(Quickshell.env("HOME") || "/");
+        if (raw === "" || raw === "~")
+            return home;
+        if (raw.indexOf("~/") === 0)
+            return home + raw.substring(1);
+        if (raw.charAt(0) === "/")
+            return raw;
+        return home;
+    }
+
+    function formatFileSearchRootLabel(rootPath) {
+        var path = String(rootPath || "");
+        var home = String(Quickshell.env("HOME") || "");
+        if (path === home)
+            return "~";
+        if (home !== "" && path.indexOf(home + "/") === 0)
+            return "~/" + path.substring(home.length + 1);
+        return path !== "" ? path : "~";
+    }
+
+    function openWithConfiguredOpener(targetPath) {
+        var target = String(targetPath || "");
+        if (target === "")
+            return;
+        Quickshell.execDetached(["sh", "-c", "exec " + fileOpenerCommand + " \"$1\"", "sh", target]);
+    }
+
+    function openDirectoryPath(targetPath) {
+        openWithConfiguredOpener(targetPath);
+    }
+
+    function openFileItem(item) {
+        if (!item || !item.fullPath)
+            return;
+        openWithConfiguredOpener(item.fullPath);
+    }
+
+    function fileItemParentPath(item) {
+        if (!item || !item.fullPath)
+            return fileSearchRootResolved;
+        var fullPath = String(item.fullPath || "");
+        var slash = fullPath.lastIndexOf("/");
+        if (slash <= 0)
+            return fileSearchRootResolved;
+        return fullPath.substring(0, slash);
+    }
+
+    function openFileParent(item) {
+        openDirectoryPath(fileItemParentPath(item));
+        if (item && item.fullPath)
+            showTransientNotice("Opened parent folder for " + String(item.name || item.fullPath), 2200);
+    }
+
+    function revealFileInManager(item) {
+        if (!item || !item.fullPath)
+            return;
+        var target = String(item.fullPath || "");
+        var parent = fileItemParentPath(item);
+        Quickshell.execDetached(["sh", "-c",
+            "target=\"$1\"; parent=\"$2\"; " +
+            "if command -v dbus-send >/dev/null 2>&1; then " +
+            "  uri=$(printf 'file://%s' \"$target\" | sed 's/ /%20/g'); " +
+            "  if dbus-send --session --dest=org.freedesktop.FileManager1 --type=method_call --print-reply " +
+            "    /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"$uri\" string:\"\" >/dev/null 2>&1; then exit 0; fi; " +
+            "fi; " +
+            "exec " + fileOpenerCommand + " \"$parent\"",
+            "sh", target, parent
+        ]);
+        showTransientNotice("Revealed " + String(item.name || target), 2200);
+    }
+
+    function copyFilePath(item) {
+        if (!item || !item.fullPath)
+            return;
+        copyToClipboard(String(item.fullPath || ""));
+        showTransientNotice("Copied path for " + String(item.name || item.fullPath), 2200);
+    }
+
+    function fileContextMenuModel(item) {
+        if (!item || !item.fullPath)
+            return [];
+        return [
+            { label: "Open", icon: "󰈔", action: function() { openFileItem(item); close(); } },
+            { label: "Open Parent Folder", icon: "󰉋", action: function() { openFileParent(item); close(); } },
+            { label: "Reveal in File Manager", icon: "󰙅", action: function() { revealFileInManager(item); close(); } },
+            { separator: true },
+            { label: "Copy Full Path", icon: "󰅍", action: function() { copyFilePath(item); } }
+        ];
+    }
+
     function updateDrunUsageCache(item) {
         if (!item)
             return;
@@ -278,6 +370,17 @@ PanelWindow {
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
     readonly property string selectedHomeItemKey: ""
+    readonly property string fileSearchRootSetting: {
+        var raw = String(Config.launcherFileSearchRoot || "~").trim();
+        return raw !== "" ? raw : "~";
+    }
+    readonly property string fileSearchRootResolved: resolveFileSearchRoot(fileSearchRootSetting)
+    readonly property string fileSearchRootLabel: formatFileSearchRootLabel(fileSearchRootResolved)
+    readonly property bool fileSearchShowHidden: Config.launcherFileShowHidden === true
+    readonly property string fileOpenerCommand: {
+        var raw = String(Config.launcherFileOpener || "xdg-open").trim();
+        return raw !== "" ? raw : "xdg-open";
+    }
     readonly property string characterTrigger: {
         var trigger = String(Config.launcherCharacterTrigger || ":").trim();
         return trigger !== "" ? trigger : ":";
@@ -298,11 +401,11 @@ PanelWindow {
         return launcherRoot.isModeAllowedByCompositor(modeKey);
     })
     readonly property var modeIcons: ModeData.modeIcons
-    readonly property string emptyStateTitle: TextHelpers.emptyStateTitle(mode, _cleanSearch, Config.launcherFileMinQueryLength)
-    readonly property string emptyStateSubtitle: TextHelpers.emptyStateSubtitle(mode, _cleanSearch, Config.launcherFileMinQueryLength)
-    readonly property string emptyPrimaryCta: TextHelpers.emptyPrimaryCta(mode, _cleanSearch, _webPrimaryName)
+    readonly property string emptyStateTitle: TextHelpers.emptyStateTitle(mode, _cleanSearch, Config.launcherFileMinQueryLength, fileSearchRootLabel)
+    readonly property string emptyStateSubtitle: TextHelpers.emptyStateSubtitle(mode, _cleanSearch, Config.launcherFileMinQueryLength, fileSearchRootLabel)
+    readonly property string emptyPrimaryCta: TextHelpers.emptyPrimaryCta(mode, _cleanSearch, _webPrimaryName, fileSearchRootLabel)
     readonly property string emptySecondaryCta: TextHelpers.emptySecondaryCta(mode, _cleanSearch, searchText, _webSecondaryName)
-    readonly property string emptyPrimaryHint: TextHelpers.emptyPrimaryHint(mode, _cleanSearch, _webPrimaryName, _webPrimaryProvider ? _webPrimaryName : "default provider")
+    readonly property string emptyPrimaryHint: TextHelpers.emptyPrimaryHint(mode, _cleanSearch, _webPrimaryName, _webPrimaryProvider ? _webPrimaryName : "default provider", fileSearchRootLabel)
     readonly property string emptyPrimaryHintIcon: TextHelpers.emptyPrimaryHintIcon(mode)
     readonly property string emptySecondaryHint: TextHelpers.emptySecondaryHint(mode, _cleanSearch, searchText, _webSecondaryName)
     readonly property string emptySecondaryHintIcon: TextHelpers.emptySecondaryHintIcon(mode, searchText)
@@ -937,6 +1040,9 @@ PanelWindow {
         fileIndexBuiltAt = 0;
     }
 
+    onFileSearchRootResolvedChanged: clearCaches()
+    onFileSearchShowHiddenChanged: clearCaches()
+
     function getFileQueryCached(queryKey) {
         var items = fileQueryCache[queryKey];
         if (!items)
@@ -979,7 +1085,7 @@ PanelWindow {
         return (Date.now() - fileIndexBuiltAt) > ttlMs;
     }
 
-    function buildFileIndex(homeDir) {
+    function buildFileIndex(rootDir) {
         if (fileIndexBuilding)
             return;
         fileIndexBuilding = true;
@@ -987,12 +1093,14 @@ PanelWindow {
         if (mode === "files" && fileIndexItems.length === 0)
             beginModeLoad("files", "Building file index");
         fileIndexProc._startedAt = Date.now();
-        fileIndexProc.command = ["fd", "--hidden", "--base-directory", homeDir, "--max-depth", "8",
+        fileIndexProc.command = ["fd", "--base-directory", rootDir, "--max-depth", "8",
             "--max-results", "50000",
             "--exclude", ".git", "--exclude", ".cache", "--exclude", "node_modules",
             "--exclude", ".local/share/Trash", "--exclude", ".local/share/Steam",
             "--exclude", ".cargo", "--exclude", ".npm", "--exclude", ".mozilla",
             "."];
+        if (fileSearchShowHidden)
+            fileIndexProc.command.splice(1, 0, "--hidden");
         fileIndexProc.running = true;
         fileIndexTimeoutTimer.restart();
     }
@@ -1001,7 +1109,7 @@ PanelWindow {
         fileIndexTimeoutTimer.stop();
         var tookMs = Math.max(0, Date.now() - startedAt);
         fileIndexBuilding = false;
-        var homeDir = Quickshell.env("HOME") || "/";
+        var rootDir = fileSearchRootResolved;
         function _finishIndex(items) {
             fileIndexItems = items;
             fileIndexReady = true;
@@ -1014,9 +1122,9 @@ PanelWindow {
         }
         // Estimate line count cheaply: raw length > ~500KB likely means >10k lines
         if (raw && raw.length > 500000) {
-            _startChunkedParse(raw, homeDir, _finishIndex);
+            _startChunkedParse(raw, rootDir, fileSearchRootLabel, _finishIndex);
         } else {
-            _finishIndex(FileParser.buildFileItemsFromRaw(raw, homeDir));
+            _finishIndex(FileParser.buildFileItemsFromRaw(raw, rootDir, fileSearchRootLabel));
         }
     }
 
@@ -1771,15 +1879,16 @@ PanelWindow {
         preloadWaitTimer.restart();
     }
 
-    function _startChunkedParse(raw, homeDir, callback) {
+    function _startChunkedParse(raw, rootDir, rootLabel, callback) {
         _parseChunkToken++;
         var lines = raw ? raw.split("\n") : [];
-        var homePrefix = homeDir.endsWith("/") ? homeDir : (homeDir + "/");
+        var rootPrefix = rootDir.endsWith("/") ? rootDir : (rootDir + "/");
         _parseChunkState = {
             token: _parseChunkToken,
             lines: lines,
-            homeDir: homeDir,
-            homePrefix: homePrefix,
+            rootDir: rootDir,
+            rootPrefix: rootPrefix,
+            rootLabel: rootLabel,
             items: new Array(lines.length),
             idx: 0,
             count: 0,
@@ -1808,7 +1917,7 @@ PanelWindow {
         resolveFileSearchBackend(function (backend) {
             if (backend !== "fd" || !fileIndexStale())
                 return;
-            buildFileIndex(Quickshell.env("HOME") || "/");
+            buildFileIndex(fileSearchRootResolved);
         });
     }
 
@@ -1990,7 +2099,7 @@ PanelWindow {
         }
         var cacheKey = String(searchQuery).toLowerCase();
         var startedAt = Date.now();
-        var homeDir = Quickshell.env("HOME") || "/";
+        var rootDir = fileSearchRootResolved;
         var maxResults = Math.max(20, Config.launcherFileMaxResults);
 
         // Fast path: index already loaded — filter in-memory, skip backend resolution
@@ -2009,7 +2118,7 @@ PanelWindow {
             completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
             recordLoadMetric("files", Date.now() - startedAt, false, true);
             if (fileIndexStale() && !fileIndexBuilding)
-                buildFileIndex(homeDir);
+                buildFileIndex(rootDir);
             return;
         }
 
@@ -2027,7 +2136,7 @@ PanelWindow {
 
             if (backend === "fd") {
                 if (fileIndexStale() && !fileIndexBuilding)
-                    buildFileIndex(homeDir);
+                    buildFileIndex(rootDir);
 
                 if (fileIndexItems.length > 0) {
                     allItems = fileIndexItems;
@@ -2038,12 +2147,15 @@ PanelWindow {
                     return;
                 }
 
-                runCommand(["fd", "--base-directory", homeDir, "--max-results", String(maxResults), searchQuery], function (raw) {
+                var fdCommand = ["fd", "--base-directory", rootDir, "--max-results", String(maxResults), searchQuery];
+                if (fileSearchShowHidden)
+                    fdCommand.splice(1, 0, "--hidden");
+                runCommand(fdCommand, function (raw) {
                     if (!isRequestCurrent("files", token))
                         return;
                     var tookMs = Date.now() - startedAt;
                     recordFilesBackendLoad("fd", tookMs);
-                    var items = FileParser.buildFileItemsFromRaw(raw, homeDir);
+                    var items = FileParser.buildFileItemsFromRaw(raw, rootDir, fileSearchRootLabel);
                     allItems = items;
                     setFileQueryCached(cacheKey, items);
                     filterItems();
@@ -2053,14 +2165,27 @@ PanelWindow {
                 return;
             }
 
-            runCommand(["find", homeDir, "-mindepth", "1", "-maxdepth", "6", "-iname", "*" + searchQuery + "*"], function (raw) {
+            var findCommand = [
+                "sh",
+                "-c",
+                "root=\"$1\"; query=\"$2\"; hidden=\"$3\"; " +
+                "if [ \"$hidden\" = \"1\" ]; then " +
+                "  exec find \"$root\" -mindepth 1 -maxdepth 6 -iname \"*$query*\"; " +
+                "fi; " +
+                "exec find \"$root\" -mindepth 1 -maxdepth 6 \\( ! -path '*/.*' -a ! -name '.*' \\) -iname \"*$query*\"",
+                "sh",
+                rootDir,
+                searchQuery,
+                fileSearchShowHidden ? "1" : "0"
+            ];
+            runCommand(findCommand, function (raw) {
                 if (!isRequestCurrent("files", token))
                     return;
                 var tookMs = Date.now() - startedAt;
                 recordFilesBackendLoad("find", tookMs);
                 var lines = raw ? raw.split("\n") : [];
                 if (lines.length > maxResults) lines.length = maxResults;
-                var items = FileParser.buildFileItemsFromRaw(lines.join("\n"), homeDir);
+                var items = FileParser.buildFileItemsFromRaw(lines.join("\n"), rootDir, fileSearchRootLabel);
                 allItems = items;
                 setFileQueryCached(cacheKey, items);
                 filterItems();
@@ -2579,10 +2704,11 @@ PanelWindow {
             loadAi: loadAi,
             launchExecString: launchExecString,
             execDetached: Quickshell.execDetached,
+            openDirectoryPath: openDirectoryPath,
             parseWebQuery: parseWebQuery,
             configuredWebProviderByKey: configuredWebProviderByKey,
             primaryWebProvider: primaryWebProvider,
-            homeDir: Quickshell.env("HOME") || "/",
+            fileSearchRootResolved: fileSearchRootResolved,
             parseAdHocTarget: SystemItems.parseAdHocTarget,
             connectAdHocSsh: function(user, host, port) {
                 var target = user ? (user + "@" + host) : host;
@@ -2593,7 +2719,8 @@ PanelWindow {
             },
             openSshSettings: function() {
                 Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "settingsHub"]);
-            }
+            },
+            toggleOverview: function() { CompositorAdapter.toggleOverview(); }
         });
     }
 
@@ -2606,8 +2733,10 @@ PanelWindow {
             launchExecString: launchExecString,
             runShellEntryAction: runShellEntryAction,
             execDetached: Quickshell.execDetached,
+            openDirectoryPath: openDirectoryPath,
             secondaryWebProvider: secondaryWebProvider,
             homeDir: Quickshell.env("HOME") || "/",
+            fileSearchRootResolved: fileSearchRootResolved,
             refreshSshImport: function() { launcherSshData.refreshImport(); }
         });
     }
@@ -2799,6 +2928,8 @@ PanelWindow {
             close: close,
             rememberRecent: rememberRecent,
             copyToClipboard: copyToClipboard,
+            openFileItem: openFileItem,
+            openDirectoryPath: openDirectoryPath,
             selectCharacter: selectCharacter,
             shouldPasteCharacter: shouldPasteCharacter,
             restoreClipboardHistoryItem: restoreClipboardHistoryItem,
@@ -2809,6 +2940,7 @@ PanelWindow {
             executeLauncherItem: PluginService.executeLauncherItem,
             showingConfirm: showingConfirm,
             searchText: searchText,
+            fileSearchRootResolved: fileSearchRootResolved,
             modifiers: modifiers || Qt.NoModifier,
             connectSshHost: function(host) { launcherSshData.connectHost(host); },
             connectAdHocSsh: function(user, host, port) {
@@ -3193,6 +3325,13 @@ PanelWindow {
                                 modeIcons: launcherRoot.modeIcons
                                 iconMap: launcherRoot.launcherIconMap
                                 onClicked: launcherRoot.executeSelection()
+                                onSecondaryActionRequested: function(globalX, globalY) {
+                                    if (launcherRoot.mode !== "files" || !modelData || !modelData.fullPath)
+                                        return;
+                                    launcherRoot.selectedIndex = index;
+                                    fileResultContextMenu.model = launcherRoot.fileContextMenuModel(modelData);
+                                    fileResultContextMenu.popup(globalX, globalY);
+                                }
                                 onEntered: if (!launcherRoot.ignoreMouseHover)
                                     launcherRoot.selectedIndex = index
                             }
@@ -3247,10 +3386,15 @@ PanelWindow {
                         mediaPlayers: launcherRoot.mediaPlayers
                         compactMode: launcherRoot.compactMode
                         tightMode: launcherRoot.tightMode
-                    }
                 }
             }
         }
+    }
+
+    ContextMenu {
+        id: fileResultContextMenu
+        parent: launcherRoot.contentItem
+    }
 
         LauncherConfirmDialog {
             anchors.fill: parent

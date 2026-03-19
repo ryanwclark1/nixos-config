@@ -63,7 +63,7 @@ function buildRecentEntry(mode, item) {
             return {
                 name: item.name || item.fullPath,
                 title: item.fullPath,
-                icon: "󰈔",
+                icon: item.icon || "󰈔",
                 fullPath: item.fullPath
             };
         }
@@ -130,7 +130,7 @@ function executeSelection(mode, item, actions) {
         }
     } else if (mode === "files") {
         if (!item.isHint && item.fullPath) {
-            actions.execDetached(["xdg-open", item.fullPath]);
+            actions.openFileItem(item);
             actions.close();
         }
     } else if (mode === "system" || mode === "nixos") {
@@ -166,7 +166,7 @@ function executeSelection(mode, item, actions) {
 //            parseWebQuery, configuredWebProviderByKey, primaryWebProvider }
 function executeEmptyPrimary(mode, clean, searchText, actions) {
     if (mode === "files") {
-        actions.execDetached(["xdg-open", actions.homeDir]);
+        actions.openDirectoryPath(actions.fileSearchRootResolved);
         actions.close();
         return;
     }
@@ -206,6 +206,12 @@ function executeEmptyPrimary(mode, clean, searchText, actions) {
         }
         return;
     }
+    if (mode === "window") {
+        if (actions.toggleOverview)
+            actions.toggleOverview();
+        actions.close();
+        return;
+    }
     if (mode === "bookmarks") {
         actions.open("web", true);
         return;
@@ -226,13 +232,14 @@ function executeEmptySecondary(mode, clean, actions) {
             actions.clearSearchQuery();
             return;
         }
-        var target = actions.homeDir;
+        var target = actions.fileSearchRootResolved;
         if (clean.startsWith("~")) {
-            target = actions.homeDir + clean.substring(1);
+            var homeRoot = actions.homeDir || actions.fileSearchRootResolved;
+            target = homeRoot + clean.substring(1);
         } else if (clean.startsWith("/")) {
             target = clean;
         }
-        actions.execDetached(["xdg-open", target]);
+        actions.openDirectoryPath(target);
         actions.close();
         return;
     }
