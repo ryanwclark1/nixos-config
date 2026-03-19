@@ -2803,6 +2803,7 @@ PanelWindow {
             shouldPasteCharacter: shouldPasteCharacter,
             restoreClipboardHistoryItem: restoreClipboardHistoryItem,
             execDetached: Quickshell.execDetached,
+            focusWindow: function(id) { CompositorAdapter.focusWindow(id); },
             supportsDispatcherActions: CompositorAdapter.supportsDispatcherActions,
             dispatchAction: CompositorAdapter.dispatchAction,
             executeLauncherItem: PluginService.executeLauncherItem,
@@ -3063,6 +3064,8 @@ PanelWindow {
                             launcherRoot.open("settings", true);
                         else if (text.startsWith(";") && launcherRoot.mode !== "ssh")
                             launcherRoot.open("ssh", true);
+                        else if (text.startsWith("~") && launcherRoot.mode !== "window")
+                            launcherRoot.open("window", true);
                         else if (PluginService.shouldOpenPluginsModeForQuery(text) && launcherRoot.mode !== "plugins")
                             launcherRoot.open("plugins", true);
                         if (launcherRoot.searchText !== text) {

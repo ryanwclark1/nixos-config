@@ -99,7 +99,9 @@ function executeSelection(mode, item, actions) {
             actions.execDetached(["bash", "-c", item.exec]);
         actions.close();
     } else if (mode === "window") {
-        if (item.toplevel && item.toplevel.activate)
+        if (item.address && actions.focusWindow)
+            actions.focusWindow(item.address);
+        else if (item.toplevel && item.toplevel.activate)
             item.toplevel.activate();
         actions.close();
     } else if (mode === "dmenu") {

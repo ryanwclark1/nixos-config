@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Wayland
 import "../services"
 import "../shared"
@@ -86,6 +85,15 @@ Scope {
             CompositorAdapter.focusWindow(win.id);
         }
         hide();
+    }
+
+    function closeSelected() {
+        if (selectedIndex >= 0 && selectedIndex < windowList.length) {
+            var win = windowList[selectedIndex];
+            CompositorAdapter.closeWindow(win.id);
+        }
+        if (windowList.length <= 1)
+            hide();
     }
 
     function cycleNext() {
@@ -177,6 +185,9 @@ Scope {
                                     event.accepted = true;
                                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                                     root.confirm();
+                                    event.accepted = true;
+                                } else if (event.key === Qt.Key_Delete || event.key === Qt.Key_W && (event.modifiers & Qt.ControlModifier)) {
+                                    root.closeSelected();
                                     event.accepted = true;
                                 }
                             }
@@ -277,6 +288,17 @@ Scope {
                                                 horizontalAlignment: Text.AlignHCenter
                                                 elide: Text.ElideRight
                                             }
+
+                                            Text {
+                                                anchors.horizontalCenter: parent.horizontalCenter
+                                                width: card.width - Colors.spacingM * 2
+                                                text: modelData.title || ""
+                                                visible: text !== "" && text !== (modelData.app_id || "")
+                                                color: Colors.textSecondary
+                                                font.pixelSize: Colors.fontSizeXXS
+                                                horizontalAlignment: Text.AlignHCenter
+                                                elide: Text.ElideRight
+                                            }
                                         }
 
                                         // Workspace badge
@@ -293,17 +315,43 @@ Scope {
                                             Text {
                                                 id: wsBadgeText
                                                 anchors.centerIn: parent
-                                                text: {
-                                                    if (modelData.workspace_id === undefined)
-                                                        return "";
-                                                    if (CompositorAdapter.isNiri) {
-                                                        var ws = NiriService.workspaces ? NiriService.workspaces[modelData.workspace_id] : null;
-                                                        return ws ? String(ws.name || ws.idx || modelData.workspace_id) : String(modelData.workspace_id);
-                                                    }
-                                                    return String(modelData.workspace_id);
-                                                }
+                                                text: CompositorAdapter.workspaceNameById(modelData.workspace_id)
                                                 color: Colors.textSecondary
                                                 font.pixelSize: Colors.fontSizeXXS
+                                            }
+                                        }
+
+                                        // Close button
+                                        Rectangle {
+                                            width: 20
+                                            height: 20
+                                            radius: Colors.radiusCard
+                                            color: Colors.error
+                                            opacity: cardMouse.containsMouse ? 0.9 : 0.0
+                                            visible: opacity > 0
+                                            anchors.top: parent.top
+                                            anchors.left: parent.left
+                                            anchors.margins: Colors.spacingXS
+                                            z: 1
+                                            Behavior on opacity {
+                                                NumberAnimation { duration: Colors.durationFast }
+                                            }
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "󰅖"
+                                                color: Colors.text
+                                                font.family: Colors.fontMono
+                                                font.pixelSize: Colors.fontSizeXS
+                                            }
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: {
+                                                    root.selectedIndex = index;
+                                                    root.closeSelected();
+                                                }
                                             }
                                         }
 

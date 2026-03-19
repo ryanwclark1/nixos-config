@@ -4,11 +4,11 @@ var allKnownModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "
 var transientModes = ["dmenu"];
 var defaultModeOrder = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
 var defaultPrimaryModes = ["drun", "window", "files", "ai", "clip", "system", "media", "settings", "devops", "orchestrator", "ssh"];
-var modePrefixes = "!/@?>=:;";
+var modePrefixes = "!/@?>=:;~";
 
 var modeMeta = {
     "drun": { label: "Apps", hint: "Launch applications", prefix: "" },
-    "window": { label: "Windows", hint: "Jump to an open window", prefix: "" },
+    "window": { label: "Windows", hint: "Jump to an open window with ~", prefix: "~" },
     "files": { label: "Files", hint: "Search home with /", prefix: "/" },
     "ai": { label: "AI", hint: "Ask with !", prefix: "!" },
     "clip": { label: "Clipboard", hint: "Recent clipboard history", prefix: "" },

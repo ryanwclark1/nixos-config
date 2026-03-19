@@ -97,13 +97,12 @@ ColumnLayout {
                         spacing: Colors.paddingSmall
 
                         Repeater {
-                            model: Hyprland.toplevels
+                            model: workspaceRect.workspaceData.toplevels
 
                             delegate: Rectangle {
                                 id: windowCard
-                                visible: modelData.workspace && modelData.workspace.id === workspaceRect.workspaceData.id
-                                width: visible ? 155 : 0
-                                height: visible ? 120 : 0
+                                width: 155
+                                height: 120
                                 color: hoverArea.containsMouse ? Colors.primarySubtle : Colors.highlightLight
                                 radius: Colors.radiusSmall
                                 border.color: hoverArea.containsMouse ? Colors.primary : Colors.border
