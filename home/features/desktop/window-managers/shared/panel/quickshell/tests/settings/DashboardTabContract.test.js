@@ -12,7 +12,7 @@ describe("DashboardTab contract", () => {
   it("coerces media visibility to a real boolean before MediaService initializes", () => {
     const source = readFileSync(dashboardTabPath, "utf8");
 
-    expect(source).toContain("visible: !!MediaService.playing || !!MediaService.hasPlayer");
+    expect(source).toMatch(/visible:\s*MediaService\.isPlaying\s*\|\|\s*!!MediaService\.currentPlayer/);
     expect(source).not.toContain("visible: MediaService.playing || MediaService.hasPlayer");
   });
 });

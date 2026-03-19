@@ -14,6 +14,9 @@ describe("WorkspaceStrip contract", () => {
 
     expect(source).not.toContain("Layout.preferredWidth:");
     expect(source).not.toContain("import QtQuick.Layouts");
-    expect(source).toContain("flow: vertical ? TopToBottom : LeftToRight");
+    expect(source).toContain("property bool showAddButton:");
+    expect(source).not.toContain("readonly property bool showAddButton:");
+    expect(source).toContain("property bool showMiniMap:");
+    expect(source).not.toContain("readonly property bool showMiniMap:");
   });
 });
