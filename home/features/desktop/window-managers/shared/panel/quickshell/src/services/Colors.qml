@@ -22,6 +22,25 @@ QtObject {
     property color textSecondary: "#b9bbbe"
     property color textDisabled: "#72767d"
 
+    // ── Color transition control ───────────────
+    property bool skipTransition: true
+    property bool isTransitioning: false
+    readonly property int _colorTransitionMs: Math.round(400 * _animScale)
+
+    // ── Color transition behaviors ─────────────
+    Behavior on background { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on surface { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on primary { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on secondary { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on accent { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on error { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on warning { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on success { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on info { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on text { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on textSecondary { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on textDisabled { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+
     // --- DERIVED PROPERTIES (Auto-updating) ---
     readonly property string fontMono: Config.monoFontFamily || "JetBrainsMono Nerd Font"
     readonly property real _fontScale: clampScale(Config.fontScale, 1.0)
@@ -124,6 +143,11 @@ QtObject {
         }
     }
 
+    property Timer _transitionTimer: Timer {
+        interval: colors._colorTransitionMs + 50
+        onTriggered: colors.isTransitioning = false
+    }
+
     property Connections _wallpaperConn: Connections {
         target: WallpaperService
         function onWallpapersChanged() {
@@ -137,6 +161,7 @@ QtObject {
             colors.applyDynamicPalette();
         else
             colors.reloadColors();
+        Qt.callLater(function() { colors.skipTransition = false; });
     }
 
 
@@ -280,6 +305,8 @@ QtObject {
 
     function applyBase24(palette, variant) {
         if (!palette) return;
+        isTransitioning = true;
+        _transitionTimer.restart();
         _themeActive = true;
         _isLight = (variant === "light");
         background = palette.base00 || background;
@@ -297,6 +324,8 @@ QtObject {
 
     function reloadColors() {
         if (_themeActive) return;
+        isTransitioning = true;
+        _transitionTimer.restart();
         var raw = walColorsFile.text();
         if (!raw) return;
         try {
@@ -325,6 +354,8 @@ QtObject {
 
     function applyDynamicPalette() {
         if (!Config.useDynamicTheming) return;
+        isTransitioning = true;
+        _transitionTimer.restart();
         var c = _wallpaperQuant.colors;
         if (!c || c.length === 0) return;
 
