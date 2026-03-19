@@ -13,6 +13,7 @@ launcher_diag_js="${script_dir}/../src/launcher/LauncherDiagnostics.js"
 launcher_metrics_box_qml="${script_dir}/../src/launcher/LauncherMetricsBox.qml"
 launcher_settings_qml="${script_dir}/../src/features/settings/components/tabs/ShellLauncherSection.qml"
 expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
+repo_shell_log="/tmp/quickshell-repo-launcher-responsive.log"
 
 source "${script_dir}/runtime-warning-filter.sh"
 
@@ -23,6 +24,8 @@ repo_shell_pid=""
 repo_shell_service_was_active=0
 repo_shell_env=()
 ipc_timeout_cmd=()
+initial_instance_id=""
+instance_restart_detected=0
 violations=()
 pass_count=0
 warn_count=0
@@ -131,6 +134,9 @@ wait_for_instance_ready() {
     fi
     discovered="$(discover_reachable_instance || true)"
     if [[ -n "${discovered}" ]]; then
+      if [[ -n "${initial_instance_id}" && "${discovered}" != "${initial_instance_id}" ]]; then
+        instance_restart_detected=1
+      fi
       instance_id="${discovered}"
       if quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
         return 0
@@ -182,7 +188,7 @@ start_repo_shell() {
     sleep 1
   fi
   populate_repo_shell_env
-  env "${repo_shell_env[@]}" quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-launcher-responsive.log 2>&1 &
+  env "${repo_shell_env[@]}" quickshell -p "${config_root}/shell.qml" >"${repo_shell_log}" 2>&1 &
   repo_shell_pid="$!"
   deadline=$((SECONDS + 20))
   while (( SECONDS < deadline )); do
@@ -190,6 +196,7 @@ start_repo_shell() {
       sleep 1
       runtime_dir="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
       instance_id="$(basename "${runtime_dir}")"
+      initial_instance_id="${instance_id}"
       printf '[INFO] Repo shell instance ready: pid %s\n' "${repo_shell_pid}"
       return 0
     fi
@@ -433,6 +440,9 @@ runtime_checks() {
   local instance_dir log_file start_bytes=0 delta_file filtered
   instance_dir="${runtime_root}/${instance_id}"
   log_file="${instance_dir}/log.log"
+  if (( repo_shell_mode == 1 )); then
+    log_file="${repo_shell_log}"
+  fi
   delta_file="$(mktemp)"
   trap "rm -f '${delta_file}'" EXIT
 
@@ -794,6 +804,10 @@ if (String(state.drunCategoryFilter || "") !== "") process.exit(1);
   else
     pass "No new launcher responsive warnings/errors in runtime log"
   fi
+
+  if (( instance_restart_detected == 1 )); then
+    fail "QuickShell instance restarted during responsive probe"
+  fi
 }
 
 main() {
@@ -832,6 +846,9 @@ main() {
   if [[ -z "${instance_id}" ]]; then
     fail "No reachable QuickShell instances found under ${runtime_root}"
   else
+    if [[ -z "${initial_instance_id}" ]]; then
+      initial_instance_id="${instance_id}"
+    fi
     runtime_checks
   fi
 
