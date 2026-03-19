@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import "../../../services"
 import "../../../services/ShellUtils.js" as ShellUtils
+import "../../settings/components/SettingsReorderHelpers.js" as SettingsReorderHelpers
 import "SshConfigParser.js" as SshConfigParser
 
 QtObject {
@@ -181,6 +182,26 @@ QtObject {
             };
         });
         return _persistSettings(next);
+    }
+
+    function moveManualHost(hostId, targetIndex) {
+        var normalizedId = String(hostId || "");
+        if (normalizedId === "")
+            return false;
+
+        var next = _clone(manualHosts);
+        var fromIndex = -1;
+        for (var i = 0; i < next.length; ++i) {
+            if (String(next[i].id || "") === normalizedId) {
+                fromIndex = i;
+                break;
+            }
+        }
+
+        var result = SettingsReorderHelpers.moveArrayItem(next, fromIndex, targetIndex);
+        if (!result.changed)
+            return false;
+        return saveManualHosts(result.items);
     }
 
     function setImportEnabled(enabled) {

@@ -155,14 +155,11 @@ ColumnLayout {
     }
 
     function moveHost(index, delta) {
-        var next = JSON.parse(JSON.stringify(sshData.manualHosts || []));
+        var host = sshData.manualHosts[index];
         var target = index + delta;
-        if (index < 0 || index >= next.length || target < 0 || target >= next.length)
+        if (!host || target < 0 || target >= sshData.manualHosts.length)
             return;
-        var item = next[index];
-        next.splice(index, 1);
-        next.splice(target, 0, item);
-        sshData.saveManualHosts(next);
+        sshData.moveManualHost(host.id, target);
     }
 
     Component.onCompleted: resetForm()
