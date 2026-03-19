@@ -28,7 +28,7 @@ Item {
   Timer {
     id: saveDebounce
     interval: 500; repeat: false
-    onTriggered: root._doSaveNotifications()
+    onTriggered: root._doSave()
   }
 
   FileView {
@@ -59,65 +59,87 @@ Item {
           return;
         }
         notif.tracked = true;
-        root.saveNotifications();
+        root._scheduleSave();
       }
     }
   }
 
-  Component.onCompleted: loadNotifications()
+  Component.onCompleted: _loadArchive()
 
-  function saveNotifications() {
-    saveDebounce.restart();
+  // ── Public API ───────────────────────────────
+
+  // Archive a notification's data then dismiss it from tracked list
+  function dismissNotification(notification) {
+    if (!notification) return;
+    _archiveNotification(notification);
+    notification.dismiss();
+    _scheduleSave();
   }
 
-  function _doSaveNotifications() {
-    var data = [];
-    if (!server) {
-      return;
-    }
-    // Combine current tracked + archive (avoiding duplicates)
-    for (var i = 0; i < server.trackedNotifications.count; i++) {
-      var n = server.trackedNotifications.get(i);
-      data.push({
-        appName: n.appName,
-        summary: n.summary,
-        body: n.body,
-        appIcon: n.appIcon,
-        image: n.image,
-        timestamp: Date.now()
-      });
-    }
-
-    // Add existing archived ones (limit to 50 total for performance)
-    for (var j = 0; j < Math.min(archivedNotifications.length, 50 - data.length); j++) {
-       data.push(archivedNotifications[j]);
-    }
-
-    archiveFile.setText(JSON.stringify(data));
-  }
-
-  function loadNotifications() {
-    var raw = (archiveFile.text() || "").trim();
-    if (!raw) return;
-    try {
-      archivedNotifications = JSON.parse(raw);
-    } catch (e) {
-      Logger.e("NotificationManager", "Failed to load notifications:", e);
-    }
-  }
-
+  // Dismiss all tracked notifications (optionally filtered by app name)
   function dismissAll(appName) {
     if (!server || !server.trackedNotifications) return;
+    // Archive all before dismissing
     for (var i = server.trackedNotifications.count - 1; i >= 0; i--) {
       var n = server.trackedNotifications.get(i);
       if (n && (!appName || n.appName === appName)) {
+        _archiveNotification(n);
         n.dismiss();
       }
     }
+    _scheduleSave();
   }
 
   function clearArchive() {
-     archivedNotifications = [];
-     archiveFile.setText("[]");
+    archivedNotifications = [];
+    archiveFile.setText("[]");
+  }
+
+  // ── Internal ─────────────────────────────────
+
+  function _archiveNotification(n) {
+    if (!n) return;
+    var entry = {
+      appName: n.appName || "",
+      summary: n.summary || "",
+      body: n.body || "",
+      appIcon: n.appIcon || "",
+      image: n.image || "",
+      timestamp: Date.now()
+    };
+    // Prepend to archive (newest first), limit to 100 entries
+    var next = [entry];
+    for (var i = 0; i < Math.min(archivedNotifications.length, 99); i++)
+      next.push(archivedNotifications[i]);
+    archivedNotifications = next;
+  }
+
+  function _scheduleSave() {
+    saveDebounce.restart();
+  }
+
+  function _doSave() {
+    // Save just the archive — tracked notifications are live D-Bus objects
+    // that don't survive restarts; the archive is our persistent history
+    archiveFile.setText(JSON.stringify(archivedNotifications));
+  }
+
+  function _loadArchive() {
+    var raw = (archiveFile.text() || "").trim();
+    if (!raw) return;
+    try {
+      var parsed = JSON.parse(raw);
+      // Prune entries older than 7 days
+      var now = Date.now();
+      var cutoff = now - (7 * 86400000);
+      var pruned = [];
+      for (var i = 0; i < parsed.length; i++) {
+        if ((parsed[i].timestamp || 0) > cutoff)
+          pruned.push(parsed[i]);
+      }
+      archivedNotifications = pruned;
+    } catch (e) {
+      Logger.e("NotificationManager", "Failed to load notification archive:", e);
+    }
   }
 }

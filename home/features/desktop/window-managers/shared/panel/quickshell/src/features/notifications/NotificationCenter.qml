@@ -321,14 +321,14 @@ PanelWindow {
                       (modelData.body && modelData.body.toLowerCase().includes(q));
             }
 
-            onDismissRequested: notification.dismiss()
+            onDismissRequested: if (root.manager) root.manager.dismissNotification(notification)
             onActionInvoked: function(action) {
               action.invoke();
-              notification.dismiss();
+              if (root.manager) root.manager.dismissNotification(notification);
             }
             onReplySent: function(text) {
               notification.invoke(text);
-              notification.dismiss();
+              if (root.manager) root.manager.dismissNotification(notification);
             }
           }
 
@@ -337,44 +337,65 @@ PanelWindow {
         }
       }
 
-      // Archive Section
+      // Archive Section — shows dismissed notifications with relative timestamps
       ColumnLayout {
         Layout.fillWidth: true
         spacing: Colors.spacingS
-        visible: root.manager && root.manager.archivedNotifications.length > 0 && root.searchQuery === ""
+        visible: root.manager && root.manager.archivedNotifications.length > 0
 
         RowLayout {
           Layout.fillWidth: true
           Text {
-            text: "RECENTLY DISMISSED"
+            text: "HISTORY"
             color: Colors.textDisabled
             font.pixelSize: Colors.fontSizeXXS
             font.weight: Font.Black
             font.letterSpacing: Colors.letterSpacingWide
           }
-          Item { Layout.fillWidth: true }
-          SharedWidgets.Button {
-            text: "Clear Archive"
-            fontSize: Colors.fontSizeXXS
-            Layout.preferredHeight: 22
+          Rectangle {
+            Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.4
+          }
+          SharedWidgets.IconButton {
+            size: 24
+            icon: "󰎟"
+            iconColor: Colors.textDisabled
+            stateColor: Colors.error
+            tooltipText: "Clear history"
             onClicked: if (root.manager) root.manager.clearArchive()
           }
         }
 
         ListView {
+          id: archiveList
           Layout.fillWidth: true
-          height: Math.min(contentHeight, 240)
+          height: Math.min(contentHeight, 300)
           clip: true
           model: root.manager ? root.manager.archivedNotifications : null
-          spacing: Colors.spacingS
+          spacing: Colors.spacingXS
+
           delegate: Rectangle {
-            width: ListView.view.width; height: 54; color: Colors.cardSurface; radius: Colors.radiusMedium; opacity: 0.7
-            border.color: Colors.border; border.width: 1
+            id: archiveDelegate
+            width: ListView.view.width
+            height: archiveMatchesSearch ? 54 : 0
+            visible: archiveMatchesSearch
+            color: Colors.cardSurface
+            radius: Colors.radiusMedium
+            opacity: 0.7
+            border.color: Colors.border
+            border.width: 1
+
+            property bool archiveMatchesSearch: {
+              if (root.searchQuery === "") return true;
+              var q = root.searchQuery.toLowerCase();
+              return (modelData.appName && modelData.appName.toLowerCase().includes(q)) ||
+                     (modelData.summary && modelData.summary.toLowerCase().includes(q)) ||
+                     (modelData.body && modelData.body.toLowerCase().includes(q));
+            }
 
             SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
 
             RowLayout {
-              anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingMedium
+              anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.spacingM
               SharedWidgets.AppIcon {
                 iconName: modelData.appIcon || ""
                 appName: modelData.appName || ""
@@ -383,9 +404,40 @@ PanelWindow {
               }
               ColumnLayout {
                 Layout.fillWidth: true; spacing: 0
-                Text { text: modelData.summary; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold; elide: Text.ElideRight; Layout.fillWidth: true }
-                Text { text: modelData.body; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; elide: Text.ElideRight; Layout.fillWidth: true; visible: modelData.body !== "" }
+                RowLayout {
+                  Layout.fillWidth: true; spacing: Colors.spacingS
+                  Text {
+                    Layout.fillWidth: true
+                    text: modelData.summary || modelData.appName || "Notification"
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: Font.Bold
+                    elide: Text.ElideRight
+                  }
+                  Text {
+                    text: archiveDelegate._relativeTime(modelData.timestamp)
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXXS
+                  }
+                }
+                Text {
+                  text: modelData.body || ""
+                  color: Colors.textDisabled
+                  font.pixelSize: Colors.fontSizeXXS
+                  elide: Text.ElideRight
+                  Layout.fillWidth: true
+                  visible: (modelData.body || "") !== ""
+                }
               }
+            }
+
+            function _relativeTime(ts) {
+              if (!ts) return "";
+              var diff = (Date.now() - ts) / 1000;
+              if (diff < 60) return "just now";
+              if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+              if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+              return Math.floor(diff / 86400) + "d ago";
             }
           }
         }

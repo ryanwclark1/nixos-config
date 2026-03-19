@@ -130,8 +130,11 @@ PanelWindow {
               // so it remains visible in the NotificationCenter
               notifWrapper._expired = true;
             } else {
-              // User-initiated: fully dismiss from everywhere
-              notification.dismiss();
+              // User-initiated: archive then fully dismiss
+              if (root.manager)
+                root.manager.dismissNotification(notification);
+              else
+                notification.dismiss();
             }
           }
         }
