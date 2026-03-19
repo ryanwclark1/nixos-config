@@ -615,6 +615,37 @@ Item {
                 icon: "󰏘"
                 configKey: "wallpaperRunPywal"
             }
+
+            SettingsToggleRow {
+                label: "Shell-rendered wallpaper"
+                icon: "󰸉"
+                configKey: "wallpaperUseShellRenderer"
+            }
+
+            SettingsSelectRow {
+                visible: Config.wallpaperUseShellRenderer
+                label: "Transition effect"
+                icon: "󰾆"
+                configKey: "wallpaperTransitionType"
+                options: [
+                    { label: "Fade", value: "fade" },
+                    { label: "Pixelate", value: "pixelate" },
+                    { label: "Wipe", value: "wipe" },
+                    { label: "None", value: "none" }
+                ]
+            }
+
+            SettingsSliderRow {
+                visible: Config.wallpaperUseShellRenderer && Config.wallpaperTransitionType !== "none"
+                label: "Transition duration"
+                icon: "󱎫"
+                value: Config.wallpaperTransitionDuration
+                min: 300
+                max: 4000
+                step: 100
+                unit: "ms"
+                onMoved: v => Config.wallpaperTransitionDuration = v
+            }
         }
 
         Flow {

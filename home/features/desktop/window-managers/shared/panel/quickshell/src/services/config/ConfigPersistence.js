@@ -2,7 +2,7 @@
 
 var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
 
-var CURRENT_VERSION = 1;
+var CURRENT_VERSION = 2;
 
 // Migration functions: each takes `data` and mutates it in place.
 // Index corresponds to the version being migrated FROM (0 → 1, 1 → 2, etc.).
@@ -19,6 +19,16 @@ var _MIGRATIONS = [
             if (data.plugins.settings)
                 data.plugins.settings = _sanitizePluginMap(data.plugins.settings);
         }
+    },
+    // v1 → v2: Ensure wallpaper transition defaults exist.
+    function(data) {
+        if (!data.wallpaper) data.wallpaper = {};
+        if (data.wallpaper.transitionType === undefined)
+            data.wallpaper.transitionType = "fade";
+        if (data.wallpaper.transitionDuration === undefined)
+            data.wallpaper.transitionDuration = 1500;
+        if (data.wallpaper.useShellRenderer === undefined)
+            data.wallpaper.useShellRenderer = false;
     }
 ];
 

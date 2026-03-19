@@ -42,9 +42,10 @@ QtObject {
   property string _colorApplyStderr: ""
   property bool _colorNotify: true
   property var _queuedSolidApplies: []
+  property bool _isCycleApply: false
 
   // Signal emitted when wallpaper should change — WallpaperLayer listens to this
-  signal wallpaperApplied(string imagePath, string monitorName)
+  signal wallpaperApplied(string imagePath, string monitorName, bool isCycled)
   signal solidColorApplied(string colorHex, string monitorName)
 
   // Primary wallpaper directory shown in the UI (default: Pictures).
@@ -106,6 +107,8 @@ QtObject {
   function _startApply(request) {
     _applyImagePath = request.imagePath;
     _applyMonitorName = request.monitorName;
+    var cycled = _isCycleApply;
+    _isCycleApply = false;
 
     // Shell-rendered mode: update state and emit signal, skip external tool
     if (Config.wallpaperUseShellRenderer) {
@@ -127,7 +130,7 @@ QtObject {
         ]);
       }
 
-      wallpaperApplied(_applyImagePath, _applyMonitorName || "");
+      wallpaperApplied(_applyImagePath, _applyMonitorName || "", cycled);
 
       if (_queuedApply) {
         var next = _queuedApply;
@@ -140,6 +143,7 @@ QtObject {
     // External tool mode (existing code below)
     _applyStdout = "";
     _applyStderr = "";
+    applyProc._cycledFlag = cycled;
     applyProc.command = _buildSetterCommand(_applyImagePath, _applyMonitorName);
     applyProc.running = true;
   }
@@ -150,6 +154,7 @@ QtObject {
     var current = wallpapers[monitorName || "__all__"] || "";
     var idx = _indexOfPath(current);
     var next = (idx + 1) % availableWallpapers.length;
+    _isCycleApply = true;
     setWallpaper(availableWallpapers[next].path, monitorName);
   }
 
@@ -157,6 +162,7 @@ QtObject {
   function randomWallpaper(monitorName) {
     if (availableWallpapers.length === 0) return;
     var idx = Math.floor(Math.random() * availableWallpapers.length);
+    _isCycleApply = true;
     setWallpaper(availableWallpapers[idx].path, monitorName);
   }
 
@@ -316,8 +322,11 @@ QtObject {
   property Process applyProc: Process {
     id: applyProc
     running: false
+    property bool _cycledFlag: false
     onExited: (exitCode, exitStatus) => {
       var key = root._applyMonitorName || "__all__";
+      var wasCycled = _cycledFlag;
+      _cycledFlag = false;
       if (exitCode === 0) {
         var clearedSolid = Object.assign({}, root.solidColorsByMonitor);
         if (key === "__all__") {
@@ -346,6 +355,8 @@ QtObject {
             break;
           }
         }
+
+        root.wallpaperApplied(root._applyImagePath, root._applyMonitorName || "", wasCycled);
       } else {
         var err = (root._applyStderr || "").trim();
         if (!err.length) err = "All wallpaper backends failed";
