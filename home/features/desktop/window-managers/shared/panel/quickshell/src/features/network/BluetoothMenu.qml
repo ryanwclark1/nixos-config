@@ -137,6 +137,7 @@ BasePopupMenu {
     property color chipColor: Colors.textSecondary
     property bool chipInteractive: false
     property string actionIcon: ""
+    property string actionTooltip: ""
     property bool showAction: actionIcon !== ""
     signal chipClicked()
     signal actionClicked()
@@ -192,6 +193,7 @@ BasePopupMenu {
       SharedWidgets.IconButton {
         size: 28; radius: Colors.radiusMedium
         icon: _btCard.actionIcon; stateColor: Colors.error
+        tooltipText: _btCard.actionTooltip
         visible: _btCard.showAction
         onClicked: _btCard.actionClicked()
       }
@@ -241,6 +243,11 @@ BasePopupMenu {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: (mouse) => { scanBtnStateLayer.burst(mouse.x, mouse.y); root.isScanning ? root.stopScan() : root.startScan(); }
+      }
+
+      Tooltip {
+        text: root.isScanning ? "Stop scan" : "Scan for devices"
+        shown: scanBtnHover.containsMouse
       }
     }
   ]
@@ -326,6 +333,7 @@ BasePopupMenu {
           chipText: "Connected"
           chipColor: Colors.primary
           actionIcon: "󰅖"
+          actionTooltip: "Disconnect"
           onChipClicked: {}
           onActionClicked: modelData.disconnect()
         }
@@ -342,6 +350,7 @@ BasePopupMenu {
           chipText: "Connect"
           chipInteractive: true
           actionIcon: "󰆴"
+          actionTooltip: "Remove"
           onChipClicked: root.connectDevice(modelData)
           onActionClicked: Quickshell.execDetached(["bluetoothctl", "remove", modelData.address])
         }

@@ -54,10 +54,12 @@ BasePopupMenu {
     headerExtras: [
         SharedWidgets.IconButton {
             icon: "󰑐"
+            tooltipText: "Refresh"
             onClicked: NetworkService.refreshData()
         },
         SharedWidgets.IconButton {
             icon: "󰖩"
+            tooltipText: "VPN settings"
             onClicked: root.openNetworkMenu()
         }
     ]

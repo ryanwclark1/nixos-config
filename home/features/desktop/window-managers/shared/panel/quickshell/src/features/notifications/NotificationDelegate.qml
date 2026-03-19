@@ -156,6 +156,7 @@ Rectangle {
         iconSize: Colors.fontSizeLarge
         iconColor: Colors.textDisabled
         stateColor: Colors.error
+        tooltipText: "Dismiss"
         onClicked: root.dismissRequested()
       }
     }

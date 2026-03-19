@@ -61,6 +61,7 @@ BasePopupMenu {
     },
     SharedWidgets.IconButton {
       icon: NetworkService.isRefreshing ? "󰇚" : "󰑐"
+      tooltipText: "Refresh"
       onClicked: NetworkService.refreshData()
     }
   ]
