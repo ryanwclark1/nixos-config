@@ -11,6 +11,7 @@ ColumnLayout {
     property string leadingIcon: ""
     property string errorText: ""
     property bool showClearButton: true
+    property bool highlighted: false
     property alias text: input.text
     property alias inputActiveFocus: input.activeFocus
 
