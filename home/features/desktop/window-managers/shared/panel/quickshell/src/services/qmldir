@@ -34,6 +34,7 @@ singleton PrinterService 1.0 PrinterService.qml
 singleton PrivacyService 1.0 PrivacyService.qml
 singleton ProcessService 1.0 ProcessService.qml
 singleton RecordingService 1.0 RecordingService.qml
+singleton OcrService 1.0 OcrService.qml
 singleton ScreenshotService 1.0 ScreenshotService.qml
 singleton ServiceUnitService 1.0 ServiceUnitService.qml
 singleton SpectrumService 1.0 SpectrumService.qml
