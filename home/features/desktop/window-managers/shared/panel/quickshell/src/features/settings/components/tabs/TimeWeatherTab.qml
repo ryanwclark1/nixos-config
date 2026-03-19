@@ -352,5 +352,34 @@ Item {
                 }
             }
         }
+
+        SettingsCard {
+            title: "Markets"
+            iconName: "󱓗"
+            description: "Configure the tickers for your market widget."
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingM
+
+                SettingsTextInputRow {
+                    label: "Tickers"
+                    placeholderText: "^SPX ^DJI ^NDQ AAPL.US"
+                    leadingIcon: "󱓗"
+                    text: Config.marketTickers
+                    onSubmitted: value => Config.marketTickers = value.trim()
+                    onTextEdited: value => {
+                        if (Config.marketTickers !== value)
+                            Config.marketTickers = value;
+                    }
+                }
+
+                SettingsInfoCallout {
+                    iconName: "󰋗"
+                    title: "Data Provider"
+                    body: "Market data is fetched from Stooq. Use space or comma to separate multiple tickers. Use .US suffix for US stocks (e.g. AAPL.US) and ^ for indices."
+                }
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ SharedWidgets.BarPill {
 
     SharedWidgets.Ref { service: WeatherService }
 
-    tooltipText: WeatherService.condition || "Weather"
+    tooltipText: (WeatherService.condition || "Weather") + (WeatherService.aqi !== "--" ? " · AQI " + WeatherService.aqi : "")
     onClicked: root.triggerRequested(this)
     contextActions: [
         {

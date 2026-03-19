@@ -167,6 +167,65 @@ BasePopupMenu {
       }
     }
 
+    // ── Air Quality card ──────────────────────────
+    Rectangle {
+      Layout.fillWidth: true
+      visible: WeatherService.aqi !== "--"
+      implicitHeight: aqiContent.implicitHeight + Colors.spacingM * 2
+      radius: Colors.radiusMedium
+      color: Colors.cardSurface
+      border.color: Colors.border
+      border.width: 1
+
+      SharedWidgets.InnerHighlight { }
+
+      ColumnLayout {
+        id: aqiContent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: Colors.spacingM
+        spacing: Colors.spacingS
+
+        RowLayout {
+          spacing: Colors.spacingS
+
+          Rectangle {
+            width: 10; height: 10; radius: 5
+            color: Colors.aqiColor(WeatherService.aqi, Config.weatherUnits === "imperial")
+          }
+
+          Text {
+            text: "AQI " + WeatherService.aqi
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeMedium
+            font.weight: Font.DemiBold
+          }
+
+          Text {
+            text: WeatherService.aqiCategory
+            color: Colors.aqiColor(WeatherService.aqi, Config.weatherUnits === "imperial")
+            font.pixelSize: Colors.fontSizeSmall
+            font.weight: Font.Medium
+          }
+        }
+
+        GridLayout {
+          Layout.fillWidth: true
+          columns: root.compactMode ? 2 : 3
+          columnSpacing: Colors.spacingL
+          rowSpacing: Colors.spacingXS
+
+          SharedWidgets.InfoRow { label: "PM2.5"; value: WeatherService.pm25 }
+          SharedWidgets.InfoRow { label: "PM10"; value: WeatherService.pm10 }
+          SharedWidgets.InfoRow { label: "O\u2083"; value: WeatherService.o3 }
+          SharedWidgets.InfoRow { label: "NO\u2082"; value: WeatherService.no2 }
+          SharedWidgets.InfoRow { label: "SO\u2082"; value: WeatherService.so2 }
+          SharedWidgets.InfoRow { label: "CO"; value: WeatherService.co }
+        }
+      }
+    }
+
     // ── Hourly forecast ──────────────────────────
     SharedWidgets.SectionLabel {
       label: "HOURLY"

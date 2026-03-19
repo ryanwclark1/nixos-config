@@ -28,6 +28,18 @@ QtObject {
   property bool _hasSuccessfulFetch: false
   property string _lastFailureKey: ""
 
+  // ── Air Quality (Open-Meteo) ──────────────────
+  property string aqi: "--"
+  property string aqiCategory: ""
+  property string pm25: "--"
+  property string pm10: "--"
+  property string no2: "--"
+  property string o3: "--"
+  property string so2: "--"
+  property string co: "--"
+  property string _resolvedLat: ""
+  property string _resolvedLon: ""
+
   readonly property string _unitMode: Config.weatherUnits === "imperial" ? "imperial" : "metric"
   readonly property string _tempSuffix: _unitMode === "imperial" ? "°F" : "°C"
   readonly property string _windSuffix: _unitMode === "imperial" ? " mph" : " km/h"
@@ -98,6 +110,41 @@ QtObject {
     return _tempValue(item, baseKey) + _tempSuffix;
   }
 
+  function _resetAqiState() {
+    root.aqi = "--"; root.aqiCategory = "";
+    root.pm25 = "--"; root.pm10 = "--";
+    root.no2 = "--"; root.o3 = "--";
+    root.so2 = "--"; root.co = "--";
+  }
+
+  function _aqiCategoryUS(v) {
+    if (v <= 50) return "Good";
+    if (v <= 100) return "Moderate";
+    if (v <= 150) return "Unhealthy for Sensitive";
+    if (v <= 200) return "Unhealthy";
+    if (v <= 300) return "Very Unhealthy";
+    return "Hazardous";
+  }
+
+  function _aqiCategoryEU(v) {
+    if (v <= 20) return "Good";
+    if (v <= 40) return "Fair";
+    if (v <= 60) return "Moderate";
+    if (v <= 80) return "Poor";
+    if (v <= 100) return "Very Poor";
+    return "Extremely Poor";
+  }
+
+  function _fetchAqi() {
+    if (!root._resolvedLat || !root._resolvedLon) { _resetAqiState(); return; }
+    var url = "https://air-quality-api.open-meteo.com/v1/air-quality"
+      + "?latitude=" + root._resolvedLat
+      + "&longitude=" + root._resolvedLon
+      + "&current=european_aqi,us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone";
+    aqiProc.command = ["curl", "-s", "--max-time", "10", url];
+    if (!aqiProc.running) aqiProc.running = true;
+  }
+
   function _setUnavailableState() {
     root.temp = "--";
     root.feelsLike = "--";
@@ -114,6 +161,9 @@ QtObject {
     root.precipitation = "--";
     root.sunrise = "--";
     root.sunset = "--";
+    root._resolvedLat = "";
+    root._resolvedLon = "";
+    root._resetAqiState();
   }
 
   function _reportFailure(key, details) {
@@ -149,6 +199,9 @@ QtObject {
       root.precipitation = "--";
       root.sunrise = "--";
       root.sunset = "--";
+      root._resolvedLat = "";
+      root._resolvedLon = "";
+      root._resetAqiState();
       return;
     }
 
@@ -259,8 +312,52 @@ QtObject {
           root.hourlyForecast = hourly;
           root._hasSuccessfulFetch = true;
           root._lastFailureKey = "";
+
+          // Extract lat/lon for AQI fetch
+          var source = root._sourceByPriority();
+          if (source.kind === "latlon") {
+            var parts = source.target.split(",");
+            root._resolvedLat = parts[0];
+            root._resolvedLon = parts[1];
+          } else if (data.nearest_area && data.nearest_area[0]) {
+            root._resolvedLat = data.nearest_area[0].latitude || "";
+            root._resolvedLon = data.nearest_area[0].longitude || "";
+          }
+          root._fetchAqi();
         } catch (e) {
           root._reportFailure(String(e || "parse error"));
+        }
+      }
+    }
+  }
+
+  property Process aqiProc: Process {
+    command: ["sh", "-c", "echo"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          var raw = String(this.text || "").trim();
+          if (!raw || raw.indexOf("{") !== 0) throw new Error("invalid AQI response");
+          var json = JSON.parse(raw);
+          var cur = json.current;
+          if (!cur) throw new Error("missing current AQI data");
+
+          var useUS = root._unitMode === "imperial";
+          var aqiVal = useUS ? cur.us_aqi : cur.european_aqi;
+          var v = parseInt(aqiVal);
+          if (isNaN(v)) throw new Error("invalid AQI value");
+
+          root.aqi = String(v);
+          root.aqiCategory = useUS ? root._aqiCategoryUS(v) : root._aqiCategoryEU(v);
+          root.pm25 = (cur.pm2_5 !== undefined && cur.pm2_5 !== null) ? String(Math.round(cur.pm2_5 * 10) / 10) : "--";
+          root.pm10 = (cur.pm10 !== undefined && cur.pm10 !== null) ? String(Math.round(cur.pm10 * 10) / 10) : "--";
+          root.no2 = (cur.nitrogen_dioxide !== undefined && cur.nitrogen_dioxide !== null) ? String(Math.round(cur.nitrogen_dioxide * 10) / 10) : "--";
+          root.o3 = (cur.ozone !== undefined && cur.ozone !== null) ? String(Math.round(cur.ozone * 10) / 10) : "--";
+          root.so2 = (cur.sulphur_dioxide !== undefined && cur.sulphur_dioxide !== null) ? String(Math.round(cur.sulphur_dioxide * 10) / 10) : "--";
+          root.co = (cur.carbon_monoxide !== undefined && cur.carbon_monoxide !== null) ? String(Math.round(cur.carbon_monoxide * 10) / 10) : "--";
+        } catch (e) {
+          root._resetAqiState();
         }
       }
     }
