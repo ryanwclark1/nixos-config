@@ -25,8 +25,7 @@ Rectangle {
     height: tightMode ? 46 : 64
     radius: parentRadius
     color: Colors.withAlpha(Colors.surface, 0.98)
-    border.color: Colors.withAlpha(root.accentColor, 0.28)
-    border.width: 1
+    border.width: 0
 
     Rectangle {
         anchors.left: parent.left

@@ -3200,7 +3200,7 @@ PanelWindow {
         
         color: Colors.cardSurface
         radius: Colors.radiusLarge
-        border.color: Colors.border
+        border.color: Colors.withAlpha(launcherRoot.modeAccentColor, launcherRoot.tightMode ? 0.34 : 0.4)
         border.width: 1
         scale: launcherRoot.scaleValue
         transform: Translate {
