@@ -18,6 +18,17 @@ What it provides:
 - network management: list with driver/scope, default network protection, prune unused
 - system prune with confirmation safety (double-click required by default)
 - run image dialog with automatic port detection for common images (nginx, postgres, redis, etc.)
+- container resource stats (CPU/memory) visible when popup is open
+- inline log preview (configurable line count) in expanded container cards
+- volume and network cross-reference showing which containers use each resource
+- bulk selection mode for batch stop/restart/remove across containers, images, volumes, networks
+- search/filter bar within each tab for quick item lookup
+- image pull progress streaming in the run dialog
+- split polling tiers: fast container refresh via events, slow resource refresh on a separate timer
+- ScriptModel-backed lists for efficient delegate diffing and scroll preservation
+- Podman-aware event stream supporting image/volume/network event types
+- toast notification bridge signal (`toastRequested`) for host-level integration
+- keyboard navigation: Tab/Shift-Tab cycles tabs, Up/Down navigates cards, Enter expands, `/` focuses search, Escape clears/closes
 - configurable runtime binary (`docker` or `podman`)
 - settings for refresh, terminal command, shell path, port visibility, tab visibility, and prune confirmation
 
