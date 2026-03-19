@@ -2224,18 +2224,26 @@ PanelWindow {
                 var appId = CompositorAdapter.windowAppId(win);
                 var title = CompositorAdapter.windowTitle(win);
                 var address = CompositorAdapter.windowIdentifier(win);
+                var wsId = win.workspace ? win.workspace.id : (win.workspace_id !== undefined ? win.workspace_id : undefined);
                 items.push({
                     name: title || appId || "Window",
-                    title: title || "",
+                    title: appId || "",
                     appId: appId,
                     icon: appId || "",
                     address: address,
-                    toplevel: win
+                    toplevel: win,
+                    category: wsId !== undefined ? "Workspace " + wsId : "Windows"
                 });
             }
         } catch (e) {
             console.error("Error loading windows: " + e);
         }
+        // Sort by workspace for grouped display
+        items.sort(function(a, b) {
+            var wsA = a.toplevel && a.toplevel.workspace ? a.toplevel.workspace.id : 999;
+            var wsB = b.toplevel && b.toplevel.workspace ? b.toplevel.workspace.id : 999;
+            return wsA - wsB;
+        });
         allItems = items;
         filterItems();
         completeModeLoad("window", true, "");

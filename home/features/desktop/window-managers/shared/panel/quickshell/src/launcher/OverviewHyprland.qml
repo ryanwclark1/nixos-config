@@ -52,7 +52,7 @@ ColumnLayout {
                 anchors.fill: parent
                 onDropped: drop => {
                     if (drop.source && drop.source.windowAddress) {
-                        Quickshell.execDetached(["hyprctl", "dispatch", "movetoworkspace", workspaceData.id + ",address:" + drop.source.windowAddress]);
+                        CompositorAdapter.moveWindowToWorkspace(drop.source.windowAddress, workspaceData.id);
                     }
                 }
             }
@@ -76,7 +76,7 @@ ColumnLayout {
                     onEditingFinished: {
                         var newName = text.replace("Workspace ", "").trim();
                         if (newName !== workspaceData.name && newName !== "") {
-                            Quickshell.execDetached(["hyprctl", "dispatch", "renameworkspace", workspaceData.id + " " + newName]);
+                            CompositorAdapter.renameWorkspace(workspaceData.id, newName);
                         }
                         focus = false;
                     }
@@ -173,7 +173,7 @@ ColumnLayout {
                                                 hoverEnabled: true
                                                 cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
-                                                    Quickshell.execDetached(["hyprctl", "dispatch", "closewindow", "address:" + modelData.address]);
+                                                    CompositorAdapter.closeWindow(modelData.address);
                                                 }
                                             }
                                         }
@@ -196,7 +196,7 @@ ColumnLayout {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         content.closeRequested();
-                                        Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + modelData.address]);
+                                        CompositorAdapter.focusWindow(modelData.address);
                                     }
                                 }
 

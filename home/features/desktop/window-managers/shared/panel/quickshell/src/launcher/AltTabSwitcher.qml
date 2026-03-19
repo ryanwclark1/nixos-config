@@ -11,16 +11,40 @@ Scope {
 
     property bool isVisible: false
 
-    // Resolved MRU window list from NiriService
+    // Compositor-agnostic MRU window list
     readonly property var windowList: {
-        if (!CompositorAdapter.isNiri || !NiriService.available)
+        var mru = CompositorAdapter.mruWindowIds;
+        if (mru.length === 0)
             return [];
-        var mru = NiriService.mruWindowIds;
-        var allWindows = NiriService.windows;
-        // Build id → window map for O(1) lookups
+
         var windowMap = {};
-        for (var j = 0; j < allWindows.length; j++)
-            windowMap[allWindows[j].id] = allWindows[j];
+
+        if (CompositorAdapter.isNiri && NiriService.available) {
+            var niriWindows = NiriService.windows;
+            for (var j = 0; j < niriWindows.length; j++) {
+                var nw = niriWindows[j];
+                windowMap[nw.id] = {
+                    id: nw.id,
+                    app_id: nw.app_id || "",
+                    title: nw.title || "",
+                    workspace_id: nw.workspace_id
+                };
+            }
+        } else if (CompositorAdapter.isHyprland) {
+            var toplevels = CompositorAdapter.toplevels || [];
+            for (var k = 0; k < toplevels.length; k++) {
+                var tl = toplevels[k];
+                var addr = String(tl.address || "");
+                if (addr === "") continue;
+                windowMap[addr] = {
+                    id: addr,
+                    app_id: String(tl["class"] || ""),
+                    title: String(tl.title || ""),
+                    workspace_id: tl.workspace ? tl.workspace.id : undefined
+                };
+            }
+        }
+
         var result = [];
         for (var i = 0; i < mru.length; i++) {
             var win = windowMap[mru[i]];
@@ -272,8 +296,11 @@ Scope {
                                                 text: {
                                                     if (modelData.workspace_id === undefined)
                                                         return "";
-                                                    var ws = NiriService.workspaces ? NiriService.workspaces[modelData.workspace_id] : null;
-                                                    return ws ? String(ws.name || ws.idx || modelData.workspace_id) : String(modelData.workspace_id);
+                                                    if (CompositorAdapter.isNiri) {
+                                                        var ws = NiriService.workspaces ? NiriService.workspaces[modelData.workspace_id] : null;
+                                                        return ws ? String(ws.name || ws.idx || modelData.workspace_id) : String(modelData.workspace_id);
+                                                    }
+                                                    return String(modelData.workspace_id);
                                                 }
                                                 color: Colors.textSecondary
                                                 font.pixelSize: Colors.fontSizeXXS
