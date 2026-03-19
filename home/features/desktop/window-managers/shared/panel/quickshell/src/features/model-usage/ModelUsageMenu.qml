@@ -77,8 +77,8 @@ BasePopupMenu {
 
   SequentialAnimation {
     id: contentFade
-    NumberAnimation { target: scrollContent; property: "opacity"; to: 0; duration: 80; easing.type: Easing.OutQuad }
-    NumberAnimation { target: scrollContent; property: "opacity"; to: 1; duration: 160; easing.type: Easing.InOutQuad }
+    NumberAnimation { target: scrollContent; property: "opacity"; to: 0; duration: Colors.durationFlash; easing.type: Easing.OutQuad }
+    NumberAnimation { target: scrollContent; property: "opacity"; to: 1; duration: Colors.durationFast; easing.type: Easing.InOutQuad }
   }
 
   SharedWidgets.ScrollableContent {

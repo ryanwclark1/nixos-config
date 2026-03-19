@@ -155,42 +155,6 @@ PanelWindow {
     // =========================================================
     //  Keyboard shortcuts
     // =========================================================
-    Shortcut {
-        sequence: "Escape"
-        enabled: root.showContent
-        onActivated: root.closeRequested()
-    }
-
-    Shortcut {
-        sequence: "Ctrl+N"
-        enabled: root.showContent
-        onActivated: AiService.newConversation()
-    }
-
-    Shortcut {
-        sequence: "Ctrl+W"
-        enabled: root.showContent
-        onActivated: root._closeConversationWithUndo(AiService.activeConversationId)
-    }
-
-    Shortcut {
-        sequence: "Ctrl+Shift+T"
-        enabled: root.showContent && AiService.hasRestorableClosedConversation
-        onActivated: AiService.restoreLastClosedConversation()
-    }
-
-    Shortcut {
-        sequence: "Ctrl+Tab"
-        enabled: root.showContent
-        onActivated: root._activateConversationOffset(1)
-    }
-
-    Shortcut {
-        sequence: "Ctrl+Shift+Tab"
-        enabled: root.showContent
-        onActivated: root._activateConversationOffset(-1)
-    }
-
     // =========================================================
     //  Main panel rectangle — slides in from right
     // =========================================================
@@ -228,6 +192,26 @@ PanelWindow {
         layer.enabled: slideAnim.running || fadeAnim.running
 
         Keys.onEscapePressed: root.closeRequested()
+        Keys.onPressed: event => {
+            if (!root.showContent || !(event.modifiers & Qt.ControlModifier))
+                return;
+
+            if (event.key === Qt.Key_N) {
+                AiService.newConversation();
+                event.accepted = true;
+            } else if (event.key === Qt.Key_W) {
+                root._closeConversationWithUndo(AiService.activeConversationId);
+                event.accepted = true;
+            } else if ((event.modifiers & Qt.ShiftModifier) && event.key === Qt.Key_T) {
+                if (AiService.hasRestorableClosedConversation) {
+                    AiService.restoreLastClosedConversation();
+                    event.accepted = true;
+                }
+            } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
+                root._activateConversationOffset((event.modifiers & Qt.ShiftModifier) || event.key === Qt.Key_Backtab ? -1 : 1);
+                event.accepted = true;
+            }
+        }
 
         DropArea {
             anchors.fill: parent

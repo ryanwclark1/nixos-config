@@ -31,7 +31,7 @@ Scope {
             NumberAnimation on windowOpacity {
                 id: fadeOut
                 from: 1; to: 0
-                duration: 200
+                duration: Colors.durationMedium
                 running: false
                 onFinished: osdWindow.windowOpacity = 1
             }

@@ -21,6 +21,23 @@ PopupWindow {
     return "bottom";
   }
 
+  // Map dock position to popup edge/gravity: menu appears on the opposite side
+  readonly property int _edgeFlag: {
+    switch (anchorEdge) {
+      case "top": return Edges.Bottom;
+      case "bottom": return Edges.Top;
+      case "left": return Edges.Right;
+      case "right": return Edges.Left;
+      default: return Edges.Top;
+    }
+  }
+
+  anchor.item: anchorItem
+  anchor.edges: _edgeFlag
+  anchor.gravity: _edgeFlag
+  anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
+  anchor.margins { top: 8; bottom: 8; left: 8; right: 8 }
+
   visible: false
   implicitWidth: 200
   implicitHeight: Math.max(1, menuColumn.implicitHeight + 16)
@@ -33,51 +50,6 @@ PopupWindow {
   readonly property bool isGrouped: toplevels.length > 1
   property bool showWorkspaceList: false
   readonly property var desktopActions: dockRoot ? dockRoot.getAppActions(appId) : []
-  readonly property real inset: 8
-
-  function _windowX(item) {
-    var x = 0;
-    for (var it = item; it; it = it.parent) x += it.x;
-    return x;
-  }
-
-  function _windowY(item) {
-    var y = 0;
-    for (var it = item; it; it = it.parent) y += it.y;
-    return y;
-  }
-
-  anchor.rect.x: {
-    if (!anchorItem) return 0;
-    var x = 0;
-    if (anchorEdge === "left")
-      x = _windowX(anchorItem) + anchorItem.width + 8;
-    else if (anchorEdge === "right")
-      x = _windowX(anchorItem) - implicitWidth - 8;
-    else
-      x = _windowX(anchorItem) + (anchorItem.width - implicitWidth) / 2;
-    if (anchorWindow && anchorWindow.width !== undefined) {
-      var maxX = Math.max(inset, anchorWindow.width - implicitWidth - inset);
-      x = Math.min(Math.max(inset, x), maxX);
-    }
-    return x;
-  }
-
-  anchor.rect.y: {
-    if (!anchorItem) return 0;
-    var y = 0;
-    if (anchorEdge === "top")
-      y = _windowY(anchorItem) + anchorItem.height + 8;
-    else if (anchorEdge === "bottom")
-      y = _windowY(anchorItem) - implicitHeight - 8;
-    else
-      y = _windowY(anchorItem) + (anchorItem.height - implicitHeight) / 2;
-    if (anchorWindow && anchorWindow.height !== undefined) {
-      var maxY = Math.max(inset, anchorWindow.height - implicitHeight - inset);
-      y = Math.min(Math.max(inset, y), maxY);
-    }
-    return y;
-  }
 
   function open() {
     visible = true;

@@ -120,7 +120,7 @@ Rectangle {
             color: Colors.withAlpha(MediaService.artAccentColor, 0.9)
 
             Behavior on height {
-              NumberAnimation { duration: 90; easing.type: Easing.OutCubic }
+              NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutCubic }
             }
           }
         }

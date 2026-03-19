@@ -120,7 +120,7 @@ PanelWindow {
             border.color: Colors.border
             border.width: 1
             scale: root.isVisible ? 1.0 : 0.92
-            Behavior on scale { NumberAnimation { id: scaleAnim; duration: 500; easing.type: Easing.OutBack; easing.overshoot: 1.05 } }
+            Behavior on scale { NumberAnimation { id: scaleAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutBack; easing.overshoot: 1.05 } }
             opacity: root.isVisible ? 1.0 : 0.0
             Behavior on opacity { NumberAnimation { id: fadeAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } }
             layer.enabled: scaleAnim.running || fadeAnim.running

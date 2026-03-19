@@ -107,7 +107,7 @@ PopupWindow {
 
               Behavior on height {
                 NumberAnimation {
-                  duration: 100
+                  duration: Colors.durationSnap
                   easing.type: Easing.OutCubic
                 }
               }

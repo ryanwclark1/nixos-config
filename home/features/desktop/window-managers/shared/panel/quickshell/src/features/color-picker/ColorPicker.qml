@@ -154,7 +154,7 @@ PanelWindow {
     opacity: root.isOpen ? 1.0 : 0.0
     scale:   root.isOpen ? 1.0 : 0.94
     Behavior on opacity { NumberAnimation { id: cpFadeAnim;  duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
-    Behavior on scale   { NumberAnimation { id: cpScaleAnim; duration: 280; easing.type: Easing.OutBack  } }
+    Behavior on scale   { NumberAnimation { id: cpScaleAnim; duration: Colors.durationNormal; easing.type: Easing.OutBack  } }
     layer.enabled: cpFadeAnim.running || cpScaleAnim.running
 
     // Block background click-through

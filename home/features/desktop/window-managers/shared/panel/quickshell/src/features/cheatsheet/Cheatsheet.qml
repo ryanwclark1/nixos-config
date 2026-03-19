@@ -34,12 +34,6 @@ PanelWindow {
         function close():  void { root.close(); }
     }
 
-    Shortcut {
-        enabled: root.isVisible
-        sequence: "Escape"
-        onActivated: root.close()
-    }
-
     // Scrim background
     Rectangle {
         anchors.fill: parent
@@ -66,6 +60,8 @@ PanelWindow {
 
         opacity: root.isVisible ? 1.0 : 0.0
         scale: root.isVisible ? 1.0 : 0.95
+        focus: root.isVisible
+        Keys.onEscapePressed: root.close()
         Behavior on opacity { NumberAnimation { id: _fadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: Colors.durationPanelOpen; easing.type: Easing.OutBack; easing.overshoot: 1.3 } }
         layer.enabled: _fadeAnim.running

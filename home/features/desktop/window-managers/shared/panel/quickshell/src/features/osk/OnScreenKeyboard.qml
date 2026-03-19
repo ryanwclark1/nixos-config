@@ -50,13 +50,6 @@ PanelWindow {
         function close():  void { root.close();  }
     }
 
-    // ── Escape to close ──────────────────────────────────────────────────────
-    Shortcut {
-        enabled: root.isVisible
-        sequence: "Escape"
-        onActivated: root.close()
-    }
-
     // ── Shadow behind background ─────────────────────────────────────────────
     ElevationShadow {
         elevation:    12
@@ -88,6 +81,8 @@ PanelWindow {
         border.color: Colors.border
         border.width: 1
         radius:       Colors.radiusLarge
+        focus:        root.isVisible
+        Keys.onEscapePressed: root.close()
 
         implicitWidth:  oskRow.implicitWidth  + Colors.paddingMedium * 2
         implicitHeight: oskRow.implicitHeight + Colors.paddingMedium * 2
