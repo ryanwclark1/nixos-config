@@ -38,6 +38,63 @@ function cloneMonitor(m) {
     };
 }
 
+// ── Quick-layout presets ──────────────────────────────────────────
+// Each returns a new monitors array with updated x/y positions.
+// The caller is responsible for re-syncing drag positions + scale.
+
+// Mirror: stack all monitors at (0,0)
+function arrangeMirror(monitors) {
+    var result = [];
+    for (var i = 0; i < monitors.length; i++) {
+        var m = cloneMonitor(monitors[i]);
+        m.x = 0;
+        m.y = 0;
+        result.push(m);
+    }
+    return result;
+}
+
+// Extend: tile monitors left-to-right, vertically centered
+function arrangeExtend(monitors) {
+    if (monitors.length === 0) return [];
+    var result = [];
+    var xCursor = 0;
+    // Find max height for vertical centering
+    var maxH = 0;
+    for (var i = 0; i < monitors.length; i++) {
+        var h = monitors[i].height / monitors[i].scale;
+        if (h > maxH) maxH = h;
+    }
+    for (var j = 0; j < monitors.length; j++) {
+        var m = cloneMonitor(monitors[j]);
+        var scaledH = m.height / m.scale;
+        m.x = Math.round(xCursor);
+        m.y = Math.round((maxH - scaledH) / 2);
+        xCursor += m.width / m.scale;
+        result.push(m);
+    }
+    return result;
+}
+
+// Primary only: keep first monitor at (0,0), move others far off-screen
+// The compositor will effectively disable the off-screen ones on Apply
+function arrangePrimaryOnly(monitors) {
+    if (monitors.length === 0) return [];
+    var result = [];
+    var primary = cloneMonitor(monitors[0]);
+    primary.x = 0;
+    primary.y = 0;
+    result.push(primary);
+    for (var i = 1; i < monitors.length; i++) {
+        var m = cloneMonitor(monitors[i]);
+        // Mirror primary position — compositor handles disable
+        m.x = -99999;
+        m.y = 0;
+        result.push(m);
+    }
+    return result;
+}
+
 // Compute scale factor and offsets for fitting monitors in canvas
 function computeScaleFactor(monitors, canvasW, canvasH) {
     if (monitors.length === 0) return { scale: 1.0, offsetX: 0, offsetY: 0 };

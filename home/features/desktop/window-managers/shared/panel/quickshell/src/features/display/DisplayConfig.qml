@@ -352,6 +352,14 @@ PanelWindow {
     }
   }
 
+  // ── Quick-layout presets ──────────────────────────────────────────
+  function _applyPreset(arrangeFn) {
+    if (monitors.length < 2) return;
+    monitors = arrangeFn(monitors);
+    _computeScaleFactor();
+    _syncDragPositions();
+  }
+
   // ── Helper: unique resolutions / rates for selector ──────────────
   function _uniqueResolutions(modes)              { return Helpers.uniqueResolutions(modes); }
   function _ratesForResolution(modes, resolution) { return Helpers.ratesForResolution(modes, resolution); }
@@ -505,6 +513,86 @@ PanelWindow {
 
       // Separator
       Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border }
+
+      // ── Quick-layout presets ─────────────────────────────────────
+      RowLayout {
+        Layout.fillWidth: true
+        Layout.leftMargin: Colors.spacingLG
+        Layout.rightMargin: Colors.spacingLG
+        Layout.topMargin: Colors.spacingS
+        Layout.bottomMargin: Colors.spacingXS
+        spacing: Colors.spacingS
+        visible: displayRoot.monitors.length >= 2
+
+        Text {
+          text: "LAYOUT"
+          color: Colors.textDisabled
+          font.pixelSize: Colors.fontSizeXS
+          font.weight: Font.Black
+          font.letterSpacing: Colors.letterSpacingExtraWide
+        }
+
+        Item { Layout.fillWidth: true }
+
+        Repeater {
+          model: [
+            { icon: "󰍹", label: "Primary Only", preset: "primary" },
+            { icon: "󰹑", label: "Mirror",       preset: "mirror"  },
+            { icon: "󰕭", label: "Extend",       preset: "extend"  }
+          ]
+
+          delegate: Rectangle {
+            required property var modelData
+            required property int index
+
+            height: 30
+            width: presetRow.implicitWidth + 18
+            radius: Colors.radiusXS
+            color: Colors.bgWidget
+            border.color: Colors.border
+            border.width: 1
+
+            RowLayout {
+              id: presetRow
+              anchors.centerIn: parent
+              spacing: Colors.spacingXS
+              Text {
+                text: modelData.icon
+                color: Colors.primary
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeSmall
+              }
+              Text {
+                text: modelData.label
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeXS
+                font.weight: Font.Medium
+              }
+            }
+
+            SharedWidgets.StateLayer {
+              id: presetSL
+              hovered: presetMA.containsMouse
+              pressed: presetMA.containsPress
+            }
+            MouseArea {
+              id: presetMA
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: (mouse) => {
+                presetSL.burst(mouse.x, mouse.y);
+                if (modelData.preset === "primary")
+                  displayRoot._applyPreset(Helpers.arrangePrimaryOnly);
+                else if (modelData.preset === "mirror")
+                  displayRoot._applyPreset(Helpers.arrangeMirror);
+                else
+                  displayRoot._applyPreset(Helpers.arrangeExtend);
+              }
+            }
+          }
+        }
+      }
 
       // ── Selected monitor settings ──────────────────────────────
       Item {
