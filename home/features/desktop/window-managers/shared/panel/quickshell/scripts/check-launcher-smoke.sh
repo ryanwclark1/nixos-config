@@ -9,14 +9,15 @@ expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || prin
 responsive_timeout_seconds="${QS_VERIFY_LAUNCHER_RESPONSIVE_TIMEOUT_SECONDS:-120}"
 ipc_timeout_seconds="${QS_VERIFY_LAUNCHER_IPC_TIMEOUT_SECONDS:-120}"
 benchmarks_timeout_seconds="${QS_VERIFY_LAUNCHER_BENCHMARKS_TIMEOUT_SECONDS:-90}"
+surface_timeout_seconds="${QS_VERIFY_LAUNCHER_SURFACE_TIMEOUT_SECONDS:-120}"
 
 usage() {
   cat <<'EOF'
 Usage: check-launcher-smoke.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 
 Runs launcher validation gates.
-  default: guardrails + responsive/runtime + files-runtime + ipc-health + benchmarks
-  --ci: guardrails + static runtime contracts + benchmarks
+  default: guardrails + responsive/runtime + files-runtime + ipc-health + notification/system surfaces + benchmarks
+  --ci: guardrails + static runtime contracts + notification/system surface contracts + benchmarks
 EOF
 }
 
@@ -128,20 +129,24 @@ if (( ci_mode == 0 )); then
     run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --repo-shell
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-files-runtime.sh" --repo-shell
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --repo-shell
+    run_subcheck "${surface_timeout_seconds}" "${script_dir}/check-system-notification-surfaces.sh" --repo-shell
   elif [[ -n "${instance_id}" ]]; then
     run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --id "${instance_id}"
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-files-runtime.sh" --id "${instance_id}"
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --id "${instance_id}"
+    run_subcheck "${surface_timeout_seconds}" "${script_dir}/check-system-notification-surfaces.sh" --id "${instance_id}"
   else
     printf '%s\n' "[WARN] No reachable launcher instance found; falling back to static launcher probes and skipping live category/Esc diagnostics." >&2
     run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --ci
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-files-runtime.sh" --ci
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --ci
+    run_subcheck "${surface_timeout_seconds}" "${script_dir}/check-system-notification-surfaces.sh" --ci
   fi
 else
   run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --ci
   run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-files-runtime.sh" --ci
   run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --ci
+  run_subcheck "${surface_timeout_seconds}" "${script_dir}/check-system-notification-surfaces.sh" --ci
 fi
 run_subcheck "${benchmarks_timeout_seconds}" "${script_dir}/check-launcher-benchmarks.sh"
 
