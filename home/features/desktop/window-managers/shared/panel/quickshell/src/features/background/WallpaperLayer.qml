@@ -32,6 +32,12 @@ Item {
         cache: false
         visible: !root._transitioning && !root._flip
         sourceSize: Qt.size(root.width, root.height)
+        onStatusChanged: {
+            if (status === Image.Error && source !== "") {
+                Logger.w("WallpaperLayer", "Failed to load image A:", source);
+                source = "";
+            }
+        }
     }
 
     Image {
@@ -42,6 +48,12 @@ Item {
         cache: false
         visible: !root._transitioning && root._flip
         sourceSize: Qt.size(root.width, root.height)
+        onStatusChanged: {
+            if (status === Image.Error && source !== "") {
+                Logger.w("WallpaperLayer", "Failed to load image B:", source);
+                source = "";
+            }
+        }
     }
 
     // ShaderEffect for transitions — visible only during transition
@@ -74,13 +86,9 @@ Item {
     }
 
     function _startTransition(source) {
-        if (transitionType === "none" || !imageA.source || imageA.source === "") {
+        if (transitionType === "none" || (!imageA.source && !imageB.source)) {
             // First load or no transition — just set directly
-            if (_flip) {
-                imageA.source = source;
-            } else {
-                imageA.source = source;
-            }
+            imageA.source = source;
             _flip = false;
             return;
         }
@@ -107,6 +115,9 @@ Item {
     function _shaderSource() {
         if (transitionType === "pixelate") return _pixelateShader;
         if (transitionType === "wipe") return _wipeShader;
+        if (transitionType === "dissolve") return _dissolveShader;
+        if (transitionType === "zoom") return _zoomShader;
+        if (transitionType === "radial") return _radialShader;
         return _fadeShader;
     }
 
@@ -171,6 +182,86 @@ Item {
             // Directional wipe from left to right with soft edge
             highp float edge = smoothstep(progress - 0.05, progress + 0.05, qt_TexCoord0.x);
             gl_FragColor = mix(toCol, fromCol, edge) * qt_Opacity;
+        }
+    "
+
+    readonly property string _dissolveShader: "
+        varying highp vec2 qt_TexCoord0;
+        uniform lowp float qt_Opacity;
+        uniform sampler2D textureA;
+        uniform sampler2D textureB;
+        uniform highp float progress;
+        uniform bool flipDirection;
+
+        // Pseudo-random noise
+        highp float rand(highp vec2 co) {
+            return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+        }
+
+        void main() {
+            lowp vec4 colA = texture2D(textureA, qt_TexCoord0);
+            lowp vec4 colB = texture2D(textureB, qt_TexCoord0);
+            lowp vec4 fromCol = flipDirection ? colB : colA;
+            lowp vec4 toCol = flipDirection ? colA : colB;
+
+            highp float noise = rand(qt_TexCoord0);
+            highp float threshold = smoothstep(0.0, 1.0, progress);
+            highp float alpha = step(noise, threshold);
+            gl_FragColor = mix(fromCol, toCol, alpha) * qt_Opacity;
+        }
+    "
+
+    readonly property string _zoomShader: "
+        varying highp vec2 qt_TexCoord0;
+        uniform lowp float qt_Opacity;
+        uniform sampler2D textureA;
+        uniform sampler2D textureB;
+        uniform highp float progress;
+        uniform bool flipDirection;
+
+        void main() {
+            // Zoom out from center on the old image, zoom in on the new
+            highp float zoomOld = 1.0 + progress * 0.3;
+            highp float zoomNew = 1.3 - progress * 0.3;
+            highp vec2 center = vec2(0.5, 0.5);
+
+            highp vec2 uvOld = (qt_TexCoord0 - center) * zoomOld + center;
+            highp vec2 uvNew = (qt_TexCoord0 - center) * zoomNew + center;
+
+            lowp vec4 colOld = texture2D(flipDirection ? textureB : textureA, uvOld);
+            lowp vec4 colNew = texture2D(flipDirection ? textureA : textureB, uvNew);
+
+            // Clamp UV to avoid edge artifacts
+            highp float maskOld = step(0.0, uvOld.x) * step(uvOld.x, 1.0) * step(0.0, uvOld.y) * step(uvOld.y, 1.0);
+            highp float maskNew = step(0.0, uvNew.x) * step(uvNew.x, 1.0) * step(0.0, uvNew.y) * step(uvNew.y, 1.0);
+
+            colOld *= maskOld;
+            colNew *= maskNew;
+
+            highp float fade = smoothstep(0.2, 0.8, progress);
+            gl_FragColor = mix(colOld, colNew, fade) * qt_Opacity;
+        }
+    "
+
+    readonly property string _radialShader: "
+        varying highp vec2 qt_TexCoord0;
+        uniform lowp float qt_Opacity;
+        uniform sampler2D textureA;
+        uniform sampler2D textureB;
+        uniform highp float progress;
+        uniform bool flipDirection;
+
+        void main() {
+            lowp vec4 colA = texture2D(textureA, qt_TexCoord0);
+            lowp vec4 colB = texture2D(textureB, qt_TexCoord0);
+            lowp vec4 fromCol = flipDirection ? colB : colA;
+            lowp vec4 toCol = flipDirection ? colA : colB;
+
+            // Circular reveal from center
+            highp float dist = distance(qt_TexCoord0, vec2(0.5, 0.5));
+            highp float maxDist = 0.7071; // sqrt(0.5^2 + 0.5^2)
+            highp float reveal = smoothstep(progress * maxDist - 0.05, progress * maxDist + 0.05, dist);
+            gl_FragColor = mix(toCol, fromCol, reveal) * qt_Opacity;
         }
     "
 }
