@@ -67,7 +67,7 @@ Item {
 
   // ── Scroll-to-highlight logic ────────────────────
   function scrollToHighlightedSetting() {
-    if (!highlightCardTitle || !highlightSettingLabel) return;
+    if (!highlightSettingLabel) return;
     if (!tabLoader.item) return;
 
     // Wait for the tab to finish layout, then walk the tree
@@ -113,15 +113,16 @@ Item {
     if (!scrollable || !scrollable.flickable) return;
     var flick = scrollable.flickable;
 
-    // Find the card with matching title
-    var card = _findChildByTitle(item, highlightCardTitle);
-    if (!card) {
+    // Find the card with matching title, or fall back to searching the whole tab
+    var card = highlightCardTitle ? _findChildByTitle(item, highlightCardTitle) : null;
+    var searchRoot = card || item;
+
+    // Find the setting within the card (or whole tab if no card)
+    var setting = _findSettingByLabel(searchRoot, highlightSettingLabel);
+    if (!setting && !card) {
       highlightConsumed();
       return;
     }
-
-    // Find the setting within the card
-    var setting = _findSettingByLabel(card, highlightSettingLabel);
     var target = setting || card;
 
     // Map target position to flickable coordinates
@@ -156,7 +157,7 @@ Item {
   }
 
   onHighlightCardTitleChanged: {
-    if (highlightCardTitle && highlightSettingLabel && tabLoader.item) {
+    if (highlightSettingLabel && tabLoader.item) {
       // Tab already loaded — scroll immediately
       Qt.callLater(function() { if (!_destroyed) scrollToHighlightedSetting(); });
     }

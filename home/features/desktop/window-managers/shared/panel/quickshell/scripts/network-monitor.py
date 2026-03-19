@@ -549,7 +549,15 @@ def on_nm_props_changed(iface, changed, invalidated):
     schedule_snapshot()
 
 
-def on_device_props_changed(iface, changed, invalidated):
+_RELEVANT_DEVICE_IFACES = frozenset([
+    NM_DEVICE_IFACE, NM_WIRELESS_IFACE, NM_AP_IFACE,
+    NM_ACTIVE_IFACE, NM_IP4_IFACE,
+])
+
+
+def on_device_props_changed(iface, changed, invalidated, path=None):
+    if iface not in _RELEVANT_DEVICE_IFACES:
+        return
     schedule_snapshot()
 
 

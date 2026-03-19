@@ -30,6 +30,7 @@ var entries = [
     // ── Shell ────────────────────────────────────────
     { tabId: "system", cardTitle: "Shell", label: "Floating Bar", keywords: "bar floating dock", type: "toggle" },
     { tabId: "system", cardTitle: "Shell", label: "Blur Effects", keywords: "blur glass", type: "toggle" },
+    { tabId: "system", cardTitle: "Shell", label: "Debug Logging", keywords: "debug log verbose", type: "toggle" },
     { tabId: "system", cardTitle: "Shell", label: "Notification Width", keywords: "notification popup width", type: "slider" },
     { tabId: "system", cardTitle: "Shell", label: "Popup Duration", keywords: "notification popup timeout duration", type: "slider" },
 
@@ -141,6 +142,13 @@ var entries = [
     // ── AI ────────────────────────────────────────────
     { tabId: "ai", cardTitle: "Provider", label: "Provider", keywords: "ai provider ollama anthropic openai gemini", type: "select" },
     { tabId: "ai", cardTitle: "Provider", label: "Model", keywords: "ai model llm", type: "text" },
+    { tabId: "ai", cardTitle: "Provider", label: "Detected Models", keywords: "ai ollama models available", type: "select" },
+    { tabId: "ai", cardTitle: "Provider", label: "Model Override", keywords: "ai ollama model override custom", type: "text" },
+    { tabId: "ai", cardTitle: "Provider", label: "Custom Endpoint", keywords: "ai custom endpoint url api", type: "text" },
+    { tabId: "ai", cardTitle: "API Keys", label: "Anthropic API Key", keywords: "ai anthropic claude key", type: "text" },
+    { tabId: "ai", cardTitle: "API Keys", label: "OpenAI API Key", keywords: "ai openai gpt key", type: "text" },
+    { tabId: "ai", cardTitle: "API Keys", label: "Gemini API Key", keywords: "ai gemini google key", type: "text" },
+    { tabId: "ai", cardTitle: "Endpoint Override", label: "Base URL", keywords: "ai endpoint base url override proxy", type: "text" },
     { tabId: "ai", cardTitle: "Generation", label: "Temperature", keywords: "ai temperature creativity", type: "slider" },
     { tabId: "ai", cardTitle: "Generation", label: "Max Tokens", keywords: "ai tokens limit output", type: "slider" },
     { tabId: "ai", cardTitle: "Generation", label: "Timeout (seconds)", keywords: "ai timeout request", type: "slider" },
@@ -151,6 +159,23 @@ var entries = [
 
     // ── Bars ─────────────────────────────────────────
     { tabId: "bars", cardTitle: "Modular Layout", label: "Use Modular Entries", keywords: "bar modular layout sections", type: "toggle" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Bar Name", keywords: "bar name label rename", type: "text" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Position", keywords: "bar position top bottom", type: "mode" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Enabled", keywords: "bar enabled disabled active", type: "mode" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Display Mode", keywords: "bar display monitor screen", type: "mode" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Thickness", keywords: "bar thickness height size", type: "slider" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Margin", keywords: "bar margin gap edge", type: "slider" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Opacity", keywords: "bar opacity transparency alpha", type: "slider" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Window Mode", keywords: "bar window layer overlay", type: "mode" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Auto-Hide", keywords: "bar autohide hide show", type: "toggle" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Auto-Hide Delay", keywords: "bar autohide delay timeout", type: "slider" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "No Background", keywords: "bar background transparent", type: "toggle" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Hide on Fullscreen", keywords: "bar fullscreen hide", type: "toggle" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Scroll Behavior", keywords: "bar scroll workspace switch", type: "mode" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Shadow", keywords: "bar shadow drop elevation", type: "toggle" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Shadow Opacity", keywords: "bar shadow opacity intensity", type: "slider" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Font Scale", keywords: "bar font size scale text", type: "slider" },
+    { tabId: "bars", cardTitle: "Selected Bar", label: "Icon Scale", keywords: "bar icon size scale", type: "slider" },
 
     // ── Time & Weather ───────────────────────────────
     { tabId: "time-weather", cardTitle: "Time Format", label: "24-Hour Clock", keywords: "clock 24 hour format", type: "toggle" },
@@ -163,6 +188,7 @@ var entries = [
     { tabId: "time-weather", cardTitle: "Weather & Location", label: "City", keywords: "weather city name", type: "text" },
     { tabId: "time-weather", cardTitle: "Weather & Location", label: "Latitude", keywords: "weather latitude location", type: "text" },
     { tabId: "time-weather", cardTitle: "Weather & Location", label: "Longitude", keywords: "weather longitude location", type: "text" },
+    { tabId: "time-weather", cardTitle: "Markets", label: "Tickers", keywords: "stock market ticker symbols", type: "text" },
 
     // ── Background ───────────────────────────────────
     { tabId: "background", cardTitle: "Desktop Background", label: "Spectrum Visualizer", keywords: "visualizer cava spectrum audio", type: "toggle" },
@@ -190,8 +216,13 @@ var entries = [
     { tabId: "theme", cardTitle: "Location", label: "Longitude", keywords: "theme location longitude", type: "text" },
 
     // ── Wallpaper ────────────────────────────────────
-    { tabId: "wallpaper", cardTitle: "Wallpaper", label: "Use solid color on startup", keywords: "wallpaper solid startup", type: "toggle" },
-    { tabId: "wallpaper", cardTitle: "Wallpaper", label: "Run pywal on change", keywords: "wallpaper pywal theme colors", type: "toggle" },
+    { tabId: "wallpaper", cardTitle: "", label: "Default wallpaper folder", keywords: "wallpaper folder directory path", type: "text" },
+    { tabId: "wallpaper", cardTitle: "", label: "Solid color", keywords: "wallpaper solid color hex", type: "text" },
+    { tabId: "wallpaper", cardTitle: "", label: "Use solid color on startup", keywords: "wallpaper solid startup", type: "toggle" },
+    { tabId: "wallpaper", cardTitle: "", label: "Run pywal on change", keywords: "wallpaper pywal theme colors", type: "toggle" },
+    { tabId: "wallpaper", cardTitle: "", label: "Shell-rendered wallpaper", keywords: "wallpaper shell renderer quickshell", type: "toggle" },
+    { tabId: "wallpaper", cardTitle: "", label: "Transition effect", keywords: "wallpaper transition fade pixelate wipe", type: "select" },
+    { tabId: "wallpaper", cardTitle: "", label: "Transition duration", keywords: "wallpaper transition duration speed", type: "slider" },
 
     // ── Desktop Widgets ──────────────────────────────
     { tabId: "widgets", cardTitle: "Widgets", label: "Desktop Widgets", keywords: "desktop widgets enable", type: "toggle" },
@@ -262,7 +293,7 @@ function searchSettings(query) {
             score = 80;
         } else if (labelLower.indexOf(q) !== -1) {
             score = 60;
-        } else if (e.cardTitle.toLowerCase().indexOf(q) !== -1) {
+        } else if (e.cardTitle && e.cardTitle.toLowerCase().indexOf(q) !== -1) {
             score = 40;
         } else {
             // Check keywords
@@ -284,7 +315,7 @@ function searchSettings(query) {
     }
 
     results.sort(function(a, b) { return b.score - a.score; });
-    return results;
+    return results.slice(0, 15);
 }
 
 
