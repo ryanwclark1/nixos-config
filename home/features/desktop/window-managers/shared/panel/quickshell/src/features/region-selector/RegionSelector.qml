@@ -9,8 +9,12 @@ Scope {
     property bool _isOpen: false
 
     // ── Action to perform after selection ───────
-    // "screenshot" = capture region, "ocr" = OCR the region
+    // "screenshot" = capture region, "ocr" = OCR the region, "analyze" = AI visual search
     property string _pendingAction: "screenshot"
+
+    // ── Analyze flow state ──────────────────────
+    property bool _waitingForAnalyze: false
+    signal analyzeRegionCaptured(string path)
 
     function open(action) {
         if (root._isOpen) return;
@@ -27,7 +31,9 @@ Scope {
         if (root._pendingAction === "screenshot") {
             ScreenshotService.captureArea(x, y, w, h);
         } else if (root._pendingAction === "ocr") {
-            // Future: OCR support
+            OcrService.ocrArea(x, y, w, h);
+        } else if (root._pendingAction === "analyze") {
+            root._waitingForAnalyze = true;
             ScreenshotService.captureArea(x, y, w, h);
         }
     }
@@ -59,15 +65,35 @@ Scope {
         function ocr() {
             root.open("ocr");
         }
+        function analyze() {
+            root.open("analyze");
+        }
     }
 
     // Region screenshot accessible via IPC: quickshell ipc call region screenshot
 
-    // ── Wire up ScreenshotService signal ────────
+    // ── Wire up ScreenshotService signals ───────
     Connections {
         target: ScreenshotService
         function onRegionSelectionRequested() {
             root.open("screenshot");
+        }
+        function onAnalyzeSelectionRequested() {
+            root.open("analyze");
+        }
+        function onRegionCaptured(path) {
+            if (root._waitingForAnalyze) {
+                root._waitingForAnalyze = false;
+                root.analyzeRegionCaptured(path);
+            }
+        }
+    }
+
+    // ── Wire up OcrService signal ───────────────
+    Connections {
+        target: OcrService
+        function onOcrSelectionRequested() {
+            root.open("ocr");
         }
     }
 }

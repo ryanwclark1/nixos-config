@@ -71,8 +71,13 @@ let
   '';
 
   screenshotScript = pkgs.writeShellScriptBin "qs-screenshot" ''
-    PATH="${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.wl-clipboard}/bin:${pkgs.coreutils}/bin:${pkgs.jq}/bin:${pkgs.hyprpicker}/bin:${pkgs.hyprland}/bin:$PATH"
+    PATH="${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.wl-clipboard}/bin:${pkgs.coreutils}/bin:${pkgs.jq}/bin:${pkgs.hyprpicker}/bin:${pkgs.hyprland}/bin:${pkgs.niri}/bin:${pkgs.swappy}/bin:${pkgs.satty}/bin:$PATH"
     ${builtins.readFile ./scripts/screenshot.sh}
+  '';
+
+  ocrScript = pkgs.writeShellScriptBin "qs-ocr" ''
+    PATH="${pkgs.tesseract}/bin:${pkgs.wl-clipboard}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/ocr.sh}
   '';
 
   inhibitorScript = pkgs.writeScriptBin "qs-inhibitor" ''
