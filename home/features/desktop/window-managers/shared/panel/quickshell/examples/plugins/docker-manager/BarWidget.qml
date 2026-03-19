@@ -20,6 +20,19 @@ Item {
     property var expandedProjects: ({})
     property var expandedImages: ({})
 
+    // F6: Search/filter
+    property string searchQuery: ""
+
+    // F5: Bulk selection
+    property bool selectionMode: false
+    property var selectedContainers: ({})
+    property var selectedImages: ({})
+    property var selectedVolumes: ({})
+    property var selectedNetworks: ({})
+
+    // F11: Keyboard navigation
+    property int focusedCardIndex: -1
+
     // RunImageDialog state
     property bool runDialogVisible: false
     property string runDialogImage: ""
@@ -147,6 +160,136 @@ Item {
         runDialogVisible = true;
     }
 
+    // F6: Filter a list by search query
+    function filteredList(sourceList, query) {
+        if (!sourceList || !Array.isArray(sourceList))
+            return [];
+        var q = String(query || "").trim();
+        if (q === "")
+            return sourceList;
+        var result = [];
+        for (var i = 0; i < sourceList.length; i++) {
+            if (DU.matchesFilter(sourceList[i], q))
+                result.push(sourceList[i]);
+        }
+        return result;
+    }
+
+    // F5: Selection helpers
+    function _selectedCount() {
+        var map;
+        if (currentTab === "containers") map = selectedContainers;
+        else if (currentTab === "images") map = selectedImages;
+        else if (currentTab === "volumes") map = selectedVolumes;
+        else if (currentTab === "networks") map = selectedNetworks;
+        else return 0;
+        var count = 0;
+        for (var k in map)
+            if (map[k]) count++;
+        return count;
+    }
+
+    function _toggleSelection(key) {
+        var map, setter;
+        if (currentTab === "containers") { map = selectedContainers; setter = function(m) { selectedContainers = m; }; }
+        else if (currentTab === "images") { map = selectedImages; setter = function(m) { selectedImages = m; }; }
+        else if (currentTab === "volumes") { map = selectedVolumes; setter = function(m) { selectedVolumes = m; }; }
+        else if (currentTab === "networks") { map = selectedNetworks; setter = function(m) { selectedNetworks = m; }; }
+        else return;
+        var next = Object.assign({}, map);
+        next[key] = !next[key];
+        setter(next);
+    }
+
+    function _clearSelection() {
+        selectedContainers = ({});
+        selectedImages = ({});
+        selectedVolumes = ({});
+        selectedNetworks = ({});
+    }
+
+    function _executeBulkAction(action) {
+        if (!daemon) return;
+        var map, keys, i;
+        if (currentTab === "containers") {
+            map = selectedContainers;
+            keys = Object.keys(map).filter(function(k) { return map[k]; });
+            for (i = 0; i < keys.length; i++)
+                daemon.executeContainerAction(keys[i], action);
+        } else if (currentTab === "images") {
+            map = selectedImages;
+            keys = Object.keys(map).filter(function(k) { return map[k]; });
+            for (i = 0; i < keys.length; i++)
+                daemon.removeImage(keys[i]);
+        } else if (currentTab === "volumes") {
+            map = selectedVolumes;
+            keys = Object.keys(map).filter(function(k) { return map[k]; });
+            for (i = 0; i < keys.length; i++)
+                daemon.removeVolume(keys[i]);
+        } else if (currentTab === "networks") {
+            map = selectedNetworks;
+            keys = Object.keys(map).filter(function(k) { return map[k]; });
+            for (i = 0; i < keys.length; i++)
+                daemon.removeNetwork(keys[i]);
+        }
+        _clearSelection();
+    }
+
+    // F11: Keyboard helpers
+    function _currentListLength() {
+        if (!daemon || !daemon.runtimeAvailable) return 0;
+        var list;
+        if (currentTab === "containers") list = filteredList(daemon.containers, searchQuery);
+        else if (currentTab === "compose") list = filteredList(daemon.composeProjects, searchQuery);
+        else if (currentTab === "images") list = filteredList(daemon.images, searchQuery);
+        else if (currentTab === "volumes") list = filteredList(daemon.volumes, searchQuery);
+        else if (currentTab === "networks") list = filteredList(daemon.networks, searchQuery);
+        else return 0;
+        return list ? list.length : 0;
+    }
+
+    function _nextTab() {
+        var keys = tabModel.map(function(t) { return t.key; });
+        var idx = keys.indexOf(currentTab);
+        if (idx >= 0 && idx < keys.length - 1) currentTab = keys[idx + 1];
+        else if (keys.length > 0) currentTab = keys[0];
+    }
+
+    function _prevTab() {
+        var keys = tabModel.map(function(t) { return t.key; });
+        var idx = keys.indexOf(currentTab);
+        if (idx > 0) currentTab = keys[idx - 1];
+        else if (keys.length > 0) currentTab = keys[keys.length - 1];
+    }
+
+    function _activateFocusedCard() {
+        if (focusedCardIndex < 0) return;
+        var list;
+        if (currentTab === "containers") {
+            list = filteredList(daemon.containers, searchQuery);
+            if (focusedCardIndex < list.length) toggleContainer(list[focusedCardIndex].id);
+        } else if (currentTab === "compose") {
+            list = filteredList(daemon.composeProjects, searchQuery);
+            if (focusedCardIndex < list.length) toggleProject(list[focusedCardIndex].name);
+        } else if (currentTab === "images") {
+            list = filteredList(daemon.images, searchQuery);
+            if (focusedCardIndex < list.length) toggleImage(list[focusedCardIndex].id);
+        }
+    }
+
+    onCurrentTabChanged: {
+        searchQuery = "";
+        focusedCardIndex = -1;
+        if (selectionMode)
+            _clearSelection();
+    }
+
+    // F1: Toggle stats polling on popup open/close
+    onPopupOpenChanged: {
+        if (daemon)
+            daemon.statsPollingActive = popupOpen;
+    }
+
     property var tabModel: {
         var tabs = [
             { key: "containers", label: "CTR", icon: "\uf489" },
@@ -242,7 +385,44 @@ Item {
                 anchors.fill: parent
                 focus: true
 
-                Keys.onEscapePressed: root.popupOpen = false
+                Keys.onPressed: event => {
+                    // F11: Keyboard navigation
+                    if (event.key === Qt.Key_Escape) {
+                        if (root.searchQuery !== "") {
+                            root.searchQuery = "";
+                            event.accepted = true;
+                        } else {
+                            root.popupOpen = false;
+                            event.accepted = true;
+                        }
+                    } else if (event.key === Qt.Key_Tab && !event.modifiers) {
+                        root._nextTab();
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)) {
+                        root._prevTab();
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Backtab) {
+                        root._prevTab();
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Down) {
+                        var maxLen = root._currentListLength();
+                        if (root.focusedCardIndex < maxLen - 1)
+                            root.focusedCardIndex++;
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Up) {
+                        if (root.focusedCardIndex > 0)
+                            root.focusedCardIndex--;
+                        else
+                            root.focusedCardIndex = -1;
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        root._activateFocusedCard();
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Slash) {
+                        searchInput.forceActiveFocus();
+                        event.accepted = true;
+                    }
+                }
 
                 Column {
                     id: contentColumn
@@ -278,6 +458,31 @@ Item {
                         Row {
                             id: actionButtons
                             spacing: 6
+
+                            // F5: Selection mode toggle
+                            Rectangle {
+                                width: 34
+                                height: 30
+                                radius: 10
+                                color: root.selectionMode ? "#1d4ed8" : "#1e293b"
+                                border.width: 1
+                                border.color: root.selectionMode ? "#93c5fd" : "#475569"
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "\u2611"
+                                    color: root.selectionMode ? "#93c5fd" : "#e2e8f0"
+                                    font.pixelSize: 14
+                                    font.bold: true
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        root.selectionMode = !root.selectionMode;
+                                        if (!root.selectionMode)
+                                            root._clearSelection();
+                                    }
+                                }
+                            }
 
                             // System Prune button
                             Rectangle {
@@ -431,6 +636,56 @@ Item {
                         }
                     }
 
+                    // F6: Search bar
+                    Rectangle {
+                        visible: root.daemon && root.daemon.runtimeAvailable
+                        width: parent.width
+                        height: 30
+                        radius: 10
+                        color: "#0f172a"
+                        border.width: searchInput.activeFocus ? 2 : 1
+                        border.color: searchInput.activeFocus ? "#93c5fd" : "#334155"
+
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: 6
+                            spacing: 6
+
+                            Text {
+                                text: "/"
+                                color: "#64748b"
+                                font.pixelSize: 12
+                                font.bold: true
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            TextInput {
+                                id: searchInput
+                                width: parent.width - 20
+                                anchors.verticalCenter: parent.verticalCenter
+                                color: "#f8fafc"
+                                font.pixelSize: 11
+                                text: root.searchQuery
+                                onTextChanged: root.searchQuery = text
+                                Keys.onEscapePressed: {
+                                    root.searchQuery = "";
+                                    text = "";
+                                    popupFocus.forceActiveFocus();
+                                }
+                            }
+                        }
+
+                        Text {
+                            visible: root.searchQuery === ""
+                            text: "Search..."
+                            color: "#475569"
+                            font.pixelSize: 11
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 26
+                        }
+                    }
+
                     // Ports toggle (only on containers tab)
                     Rectangle {
                         visible: root.currentTab === "containers"
@@ -460,7 +715,7 @@ Item {
                     Flickable {
                         id: scroller
                         width: parent.width
-                        height: 430
+                        height: 390
                         clip: true
                         contentHeight: listColumn.implicitHeight
 
@@ -492,7 +747,7 @@ Item {
 
                             // ── Containers tab: empty state ──
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" && root.daemon.containers.length === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" && root.filteredList(root.daemon.containers, root.searchQuery).length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -505,7 +760,7 @@ Item {
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     wrapMode: Text.WordWrap
-                                    text: "No containers were found."
+                                    text: root.searchQuery !== "" ? "No containers match the filter." : "No containers were found."
                                     color: "#cbd5e1"
                                     font.pixelSize: 12
                                 }
@@ -513,7 +768,7 @@ Item {
 
                             // ── Compose tab: empty state ──
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" && root.daemon.composeProjects.length === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" && root.filteredList(root.daemon.composeProjects, root.searchQuery).length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -526,7 +781,7 @@ Item {
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     wrapMode: Text.WordWrap
-                                    text: "No compose-labelled projects were found for the current runtime."
+                                    text: root.searchQuery !== "" ? "No compose projects match the filter." : "No compose-labelled projects were found for the current runtime."
                                     color: "#cbd5e1"
                                     font.pixelSize: 12
                                 }
@@ -536,16 +791,18 @@ Item {
                             // ── CONTAINERS TAB ──
                             // ════════════════════════════════
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" ? root.daemon.containers : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" ? root.filteredList(root.daemon.containers, root.searchQuery) : []
                                 delegate: Rectangle {
                                     id: containerCard
                                     required property var modelData
+                                    required property int index
                                     readonly property bool expanded: root.expandedContainers[modelData.id] === true
+                                    readonly property bool isFocused: root.focusedCardIndex === index
                                     width: listColumn.width
                                     radius: 14
                                     color: "#111827"
-                                    border.width: 1
-                                    border.color: expanded ? "#38bdf8" : "#334155"
+                                    border.width: isFocused ? 2 : 1
+                                    border.color: isFocused ? "#93c5fd" : (expanded ? "#38bdf8" : "#334155")
                                     implicitHeight: bodyColumn.implicitHeight + 18
 
                                     Column {
@@ -558,8 +815,32 @@ Item {
                                             width: parent.width
                                             spacing: 8
 
+                                            // F5: Selection checkbox
+                                            Rectangle {
+                                                visible: root.selectionMode
+                                                width: 20
+                                                height: 20
+                                                radius: 4
+                                                color: root.selectedContainers[containerCard.modelData.id] ? "#1d4ed8" : "#1e293b"
+                                                border.width: 1
+                                                border.color: root.selectedContainers[containerCard.modelData.id] ? "#93c5fd" : "#475569"
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                Text {
+                                                    visible: root.selectedContainers[containerCard.modelData.id] === true
+                                                    anchors.centerIn: parent
+                                                    text: "\u2713"
+                                                    color: "#f8fafc"
+                                                    font.pixelSize: 12
+                                                    font.bold: true
+                                                }
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: root._toggleSelection(containerCard.modelData.id)
+                                                }
+                                            }
+
                                             Column {
-                                                width: Math.max(120, parent.width - 76)
+                                                width: Math.max(120, parent.width - 76 - (root.selectionMode ? 28 : 0))
                                                 spacing: 2
 
                                                 Text {
@@ -593,6 +874,22 @@ Item {
                                                         font.pixelSize: 11
                                                     }
                                                 }
+
+                                                // F1: Container stats (CPU/Mem) inline
+                                                Row {
+                                                    visible: containerCard.modelData.isRunning && root.daemon && root.daemon.containerStats[containerCard.modelData.id] !== undefined
+                                                    spacing: 10
+                                                    Text {
+                                                        text: "CPU: " + (root.daemon && root.daemon.containerStats[containerCard.modelData.id] ? root.daemon.containerStats[containerCard.modelData.id].cpuPercent : "")
+                                                        color: "#94a3b8"
+                                                        font.pixelSize: 10
+                                                    }
+                                                    Text {
+                                                        text: "Mem: " + (root.daemon && root.daemon.containerStats[containerCard.modelData.id] ? root.daemon.containerStats[containerCard.modelData.id].memUsage : "")
+                                                        color: "#94a3b8"
+                                                        font.pixelSize: 10
+                                                    }
+                                                }
                                             }
 
                                             Rectangle {
@@ -613,8 +910,11 @@ Item {
                                                     anchors.fill: parent
                                                     onClicked: {
                                                         root.toggleContainer(containerCard.modelData.id);
-                                                        if (!containerCard.expanded)
+                                                        if (!containerCard.expanded) {
                                                             root.ensureVisible(containerCard.y, containerCard.height + 120);
+                                                            if (root.daemon && root.daemon.fetchLogs)
+                                                                root.daemon.fetchLogs(containerCard.modelData.id);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -645,6 +945,29 @@ Item {
                                                         font.pixelSize: 10
                                                     }
                                                 }
+                                            }
+                                        }
+
+                                        // F3: Inline log preview
+                                        Rectangle {
+                                            visible: containerCard.expanded && root.daemon && root.daemon.containerLogs[containerCard.modelData.id] !== undefined
+                                            width: parent.width
+                                            radius: 8
+                                            color: "#020617"
+                                            border.width: 1
+                                            border.color: "#1e293b"
+                                            implicitHeight: Math.min(logPreviewText.implicitHeight + 12, 160)
+                                            clip: true
+
+                                            Text {
+                                                id: logPreviewText
+                                                anchors.fill: parent
+                                                anchors.margins: 6
+                                                wrapMode: Text.WrapAnywhere
+                                                text: root.daemon && root.daemon.containerLogs[containerCard.modelData.id] ? root.daemon.containerLogs[containerCard.modelData.id] : ""
+                                                color: "#94a3b8"
+                                                font.pixelSize: 9
+                                                font.family: "monospace"
                                             }
                                         }
 
@@ -742,7 +1065,7 @@ Item {
                                                     border.color: "#475569"
                                                     Text {
                                                         anchors.centerIn: parent
-                                                        text: "Logs"
+                                                        text: "Full Logs"
                                                         color: "#f8fafc"
                                                         font.pixelSize: 10
                                                         font.bold: true
@@ -762,16 +1085,18 @@ Item {
                             // ── COMPOSE TAB ──
                             // ════════════════════════════════
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" ? root.daemon.composeProjects : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" ? root.filteredList(root.daemon.composeProjects, root.searchQuery) : []
                                 delegate: Rectangle {
                                     id: projectCard
                                     required property var modelData
+                                    required property int index
                                     readonly property bool expanded: root.expandedProjects[modelData.name] === true
+                                    readonly property bool isFocused: root.focusedCardIndex === index
                                     width: listColumn.width
                                     radius: 14
                                     color: "#111827"
-                                    border.width: 1
-                                    border.color: expanded ? "#38bdf8" : "#334155"
+                                    border.width: isFocused ? 2 : 1
+                                    border.color: isFocused ? "#93c5fd" : (expanded ? "#38bdf8" : "#334155")
                                     implicitHeight: projectColumn.implicitHeight + 18
 
                                     Column {
@@ -1018,7 +1343,7 @@ Item {
 
                             // Images empty
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" && root.daemon.imageCount === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" && root.filteredList(root.daemon.images, root.searchQuery).length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -1030,23 +1355,25 @@ Item {
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     wrapMode: Text.WordWrap
-                                    text: "No images found."
+                                    text: root.searchQuery !== "" ? "No images match the filter." : "No images found."
                                     color: "#cbd5e1"
                                     font.pixelSize: 12
                                 }
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" ? root.daemon.images : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "images" ? root.filteredList(root.daemon.images, root.searchQuery) : []
                                 delegate: Rectangle {
                                     id: imageCard
                                     required property var modelData
+                                    required property int index
                                     readonly property bool expanded: root.expandedImages[modelData.id] === true
+                                    readonly property bool isFocused: root.focusedCardIndex === index
                                     width: listColumn.width
                                     radius: 14
                                     color: "#111827"
-                                    border.width: 1
-                                    border.color: expanded ? "#38bdf8" : "#334155"
+                                    border.width: isFocused ? 2 : 1
+                                    border.color: isFocused ? "#93c5fd" : (expanded ? "#38bdf8" : "#334155")
                                     implicitHeight: imageBodyColumn.implicitHeight + 18
 
                                     Column {
@@ -1059,8 +1386,32 @@ Item {
                                             width: parent.width
                                             spacing: 8
 
+                                            // F5: Selection checkbox
+                                            Rectangle {
+                                                visible: root.selectionMode
+                                                width: 20
+                                                height: 20
+                                                radius: 4
+                                                color: root.selectedImages[imageCard.modelData.id] ? "#1d4ed8" : "#1e293b"
+                                                border.width: 1
+                                                border.color: root.selectedImages[imageCard.modelData.id] ? "#93c5fd" : "#475569"
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                Text {
+                                                    visible: root.selectedImages[imageCard.modelData.id] === true
+                                                    anchors.centerIn: parent
+                                                    text: "\u2713"
+                                                    color: "#f8fafc"
+                                                    font.pixelSize: 12
+                                                    font.bold: true
+                                                }
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: root._toggleSelection(imageCard.modelData.id)
+                                                }
+                                            }
+
                                             Column {
-                                                width: Math.max(120, parent.width - 76)
+                                                width: Math.max(120, parent.width - 76 - (root.selectionMode ? 28 : 0))
                                                 spacing: 2
 
                                                 Text {
@@ -1237,7 +1588,7 @@ Item {
                             }
 
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" && root.daemon.volumeCount === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" && root.filteredList(root.daemon.volumes, root.searchQuery).length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -1249,22 +1600,25 @@ Item {
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     wrapMode: Text.WordWrap
-                                    text: "No volumes found."
+                                    text: root.searchQuery !== "" ? "No volumes match the filter." : "No volumes found."
                                     color: "#cbd5e1"
                                     font.pixelSize: 12
                                 }
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" ? root.daemon.volumes : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "volumes" ? root.filteredList(root.daemon.volumes, root.searchQuery) : []
                                 delegate: Rectangle {
                                     id: volumeCard
                                     required property var modelData
+                                    required property int index
+                                    readonly property bool isFocused: root.focusedCardIndex === index
+                                    readonly property var usedBy: root.daemon && root.daemon.volumeUsageMap[modelData.name] ? root.daemon.volumeUsageMap[modelData.name] : []
                                     width: listColumn.width
                                     radius: 14
                                     color: "#111827"
-                                    border.width: 1
-                                    border.color: "#334155"
+                                    border.width: isFocused ? 2 : 1
+                                    border.color: isFocused ? "#93c5fd" : "#334155"
                                     implicitHeight: volumeBodyColumn.implicitHeight + 18
 
                                     Column {
@@ -1277,8 +1631,32 @@ Item {
                                             width: parent.width
                                             spacing: 8
 
+                                            // F5: Selection checkbox
+                                            Rectangle {
+                                                visible: root.selectionMode
+                                                width: 20
+                                                height: 20
+                                                radius: 4
+                                                color: root.selectedVolumes[volumeCard.modelData.name] ? "#1d4ed8" : "#1e293b"
+                                                border.width: 1
+                                                border.color: root.selectedVolumes[volumeCard.modelData.name] ? "#93c5fd" : "#475569"
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                Text {
+                                                    visible: root.selectedVolumes[volumeCard.modelData.name] === true
+                                                    anchors.centerIn: parent
+                                                    text: "\u2713"
+                                                    color: "#f8fafc"
+                                                    font.pixelSize: 12
+                                                    font.bold: true
+                                                }
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: root._toggleSelection(volumeCard.modelData.name)
+                                                }
+                                            }
+
                                             Column {
-                                                width: Math.max(120, parent.width - 76)
+                                                width: Math.max(120, parent.width - 76 - (root.selectionMode ? 28 : 0))
                                                 spacing: 2
 
                                                 Text {
@@ -1304,24 +1682,36 @@ Item {
                                                     elide: Text.ElideMiddle
                                                     width: parent.width
                                                 }
+
+                                                // F4: Volume cross-reference
+                                                Text {
+                                                    visible: volumeCard.usedBy.length > 0
+                                                    text: "Used by: " + volumeCard.usedBy.join(", ")
+                                                    color: "#93c5fd"
+                                                    font.pixelSize: 10
+                                                    elide: Text.ElideRight
+                                                    width: parent.width
+                                                }
                                             }
 
                                             Rectangle {
                                                 width: 58
                                                 height: 28
                                                 radius: 10
-                                                color: "#3f1d24"
+                                                color: volumeCard.usedBy.length > 0 ? "#111827" : "#3f1d24"
+                                                opacity: volumeCard.usedBy.length > 0 ? 0.45 : 1
                                                 border.width: 1
-                                                border.color: "#f87171"
+                                                border.color: volumeCard.usedBy.length > 0 ? "#475569" : "#f87171"
                                                 Text {
                                                     anchors.centerIn: parent
                                                     text: "Del"
-                                                    color: "#fca5a5"
+                                                    color: volumeCard.usedBy.length > 0 ? "#94a3b8" : "#fca5a5"
                                                     font.pixelSize: 10
                                                     font.bold: true
                                                 }
                                                 MouseArea {
                                                     anchors.fill: parent
+                                                    enabled: volumeCard.usedBy.length === 0
                                                     onClicked: { if (root.daemon) root.daemon.removeVolume(volumeCard.modelData.name); }
                                                 }
                                             }
@@ -1370,7 +1760,7 @@ Item {
                             }
 
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" && root.daemon.networkCount === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" && root.filteredList(root.daemon.networks, root.searchQuery).length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -1382,22 +1772,26 @@ Item {
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     wrapMode: Text.WordWrap
-                                    text: "No networks found."
+                                    text: root.searchQuery !== "" ? "No networks match the filter." : "No networks found."
                                     color: "#cbd5e1"
                                     font.pixelSize: 12
                                 }
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" ? root.daemon.networks : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" ? root.filteredList(root.daemon.networks, root.searchQuery) : []
                                 delegate: Rectangle {
                                     id: networkCard
                                     required property var modelData
+                                    required property int index
+                                    readonly property bool isFocused: root.focusedCardIndex === index
+                                    readonly property var usedBy: root.daemon && root.daemon.networkUsageMap[modelData.name] ? root.daemon.networkUsageMap[modelData.name] : []
+                                    readonly property bool isProtected: modelData.isDefault || usedBy.length > 0
                                     width: listColumn.width
                                     radius: 14
                                     color: "#111827"
-                                    border.width: 1
-                                    border.color: "#334155"
+                                    border.width: isFocused ? 2 : 1
+                                    border.color: isFocused ? "#93c5fd" : "#334155"
                                     implicitHeight: networkBodyColumn.implicitHeight + 18
 
                                     Column {
@@ -1410,8 +1804,32 @@ Item {
                                             width: parent.width
                                             spacing: 8
 
+                                            // F5: Selection checkbox
+                                            Rectangle {
+                                                visible: root.selectionMode
+                                                width: 20
+                                                height: 20
+                                                radius: 4
+                                                color: root.selectedNetworks[networkCard.modelData.name] ? "#1d4ed8" : "#1e293b"
+                                                border.width: 1
+                                                border.color: root.selectedNetworks[networkCard.modelData.name] ? "#93c5fd" : "#475569"
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                Text {
+                                                    visible: root.selectedNetworks[networkCard.modelData.name] === true
+                                                    anchors.centerIn: parent
+                                                    text: "\u2713"
+                                                    color: "#f8fafc"
+                                                    font.pixelSize: 12
+                                                    font.bold: true
+                                                }
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: root._toggleSelection(networkCard.modelData.name)
+                                                }
+                                            }
+
                                             Column {
-                                                width: Math.max(120, parent.width - 76)
+                                                width: Math.max(120, parent.width - 76 - (root.selectionMode ? 28 : 0))
                                                 spacing: 2
 
                                                 Text {
@@ -1454,30 +1872,99 @@ Item {
                                                         font.pixelSize: 9
                                                     }
                                                 }
+
+                                                // F4: Network cross-reference
+                                                Text {
+                                                    visible: networkCard.usedBy.length > 0
+                                                    text: "Used by: " + networkCard.usedBy.join(", ")
+                                                    color: "#93c5fd"
+                                                    font.pixelSize: 10
+                                                    elide: Text.ElideRight
+                                                    width: parent.width
+                                                }
                                             }
 
                                             Rectangle {
                                                 width: 58
                                                 height: 28
                                                 radius: 10
-                                                color: networkCard.modelData.isDefault ? "#111827" : "#3f1d24"
-                                                opacity: networkCard.modelData.isDefault ? 0.45 : 1
+                                                color: networkCard.isProtected ? "#111827" : "#3f1d24"
+                                                opacity: networkCard.isProtected ? 0.45 : 1
                                                 border.width: 1
-                                                border.color: networkCard.modelData.isDefault ? "#475569" : "#f87171"
+                                                border.color: networkCard.isProtected ? "#475569" : "#f87171"
                                                 Text {
                                                     anchors.centerIn: parent
                                                     text: "Del"
-                                                    color: networkCard.modelData.isDefault ? "#94a3b8" : "#fca5a5"
+                                                    color: networkCard.isProtected ? "#94a3b8" : "#fca5a5"
                                                     font.pixelSize: 10
                                                     font.bold: true
                                                 }
                                                 MouseArea {
                                                     anchors.fill: parent
-                                                    enabled: !networkCard.modelData.isDefault
+                                                    enabled: !networkCard.isProtected
                                                     onClicked: { if (root.daemon) root.daemon.removeNetwork(networkCard.modelData.name); }
                                                 }
                                             }
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // F5: Bulk action bar
+                    Rectangle {
+                        visible: root.selectionMode && root._selectedCount() > 0
+                        width: parent.width
+                        height: 36
+                        radius: 10
+                        color: "#1e293b"
+                        border.width: 1
+                        border.color: "#475569"
+
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: 8
+
+                            Text {
+                                text: root._selectedCount() + " selected"
+                                color: "#94a3b8"
+                                font.pixelSize: 11
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Repeater {
+                                model: {
+                                    if (root.currentTab === "containers")
+                                        return [{ label: "Stop Selected", action: "stop" }, { label: "Restart Selected", action: "restart" }];
+                                    if (root.currentTab === "images")
+                                        return [{ label: "Remove Selected", action: "remove" }];
+                                    if (root.currentTab === "volumes")
+                                        return [{ label: "Remove Selected", action: "remove" }];
+                                    if (root.currentTab === "networks")
+                                        return [{ label: "Remove Selected", action: "remove" }];
+                                    return [];
+                                }
+                                delegate: Rectangle {
+                                    id: bulkActionBtn
+                                    required property var modelData
+                                    width: bulkLabel.implicitWidth + 16
+                                    height: 26
+                                    radius: 8
+                                    color: "#3f1d24"
+                                    border.width: 1
+                                    border.color: "#f87171"
+                                    Text {
+                                        id: bulkLabel
+                                        anchors.centerIn: parent
+                                        text: bulkActionBtn.modelData.label
+                                        color: "#fca5a5"
+                                        font.pixelSize: 10
+                                        font.bold: true
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: root._executeBulkAction(bulkActionBtn.modelData.action)
                                     }
                                 }
                             }
@@ -1517,6 +2004,16 @@ Item {
                                 width: parent.width
                             }
 
+                            // F2: Pull progress status
+                            Text {
+                                visible: root.daemon && root.daemon.pullInProgress
+                                text: root.daemon ? root.daemon.pullStatus : ""
+                                color: "#38bdf8"
+                                font.pixelSize: 10
+                                wrapMode: Text.WrapAnywhere
+                                width: parent.width
+                            }
+
                             Row {
                                 width: parent.width
                                 spacing: 6
@@ -1542,6 +2039,8 @@ Item {
                                         font.pixelSize: 11
                                         text: root.runDialogContainerName
                                         onTextChanged: root.runDialogContainerName = text
+                                        activeFocusOnTab: true
+                                        KeyNavigation.tab: runHostPortInput
                                     }
                                 }
                             }
@@ -1571,6 +2070,9 @@ Item {
                                         font.pixelSize: 11
                                         text: root.runDialogHostPort
                                         onTextChanged: root.runDialogHostPort = text
+                                        activeFocusOnTab: true
+                                        KeyNavigation.tab: runContainerPortInput
+                                        KeyNavigation.backtab: runNameInput
                                     }
                                 }
                                 Text {
@@ -1594,6 +2096,8 @@ Item {
                                         font.pixelSize: 11
                                         text: root.runDialogContainerPort
                                         onTextChanged: root.runDialogContainerPort = text
+                                        activeFocusOnTab: true
+                                        KeyNavigation.backtab: runHostPortInput
                                     }
                                 }
 
@@ -1640,22 +2144,23 @@ Item {
                                     width: Math.floor((parent.width - 6) / 2)
                                     height: 30
                                     radius: 10
-                                    color: "#1d4ed8"
+                                    color: (root.daemon && root.daemon.pullInProgress) ? "#334155" : "#1d4ed8"
+                                    opacity: (root.daemon && root.daemon.pullInProgress) ? 0.6 : 1
                                     border.width: 1
                                     border.color: "#93c5fd"
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "Run"
+                                        text: (root.daemon && root.daemon.pullInProgress) ? "Pulling..." : "Run"
                                         color: "#f8fafc"
                                         font.pixelSize: 11
                                         font.bold: true
                                     }
                                     MouseArea {
                                         anchors.fill: parent
+                                        enabled: !(root.daemon && root.daemon.pullInProgress)
                                         onClicked: {
                                             if (root.daemon)
                                                 root.daemon.runImage(root.runDialogImage, root.runDialogContainerName, root.runDialogHostPort, root.runDialogContainerPort);
-                                            root.runDialogVisible = false;
                                         }
                                     }
                                 }

@@ -31,6 +31,9 @@ Item {
             "dockerBinary",
             "debounceDelay",
             "fallbackRefreshInterval",
+            "resourceRefreshInterval",
+            "statsInterval",
+            "logPreviewLines",
             "terminalCommand",
             "shellPath",
             "showPorts",
@@ -39,7 +42,8 @@ Item {
             "showImages",
             "showVolumes",
             "showNetworks",
-            "confirmPrune"
+            "confirmPrune",
+            "toastEnabled"
         ];
         for (var i = 0; i < keys.length; ++i)
             pluginApi.removeSetting(keys[i]);
@@ -63,6 +67,10 @@ Item {
         showVolumesCheck.checked = pluginApi.loadSetting("showVolumes", true) === true;
         showNetworksCheck.checked = pluginApi.loadSetting("showNetworks", true) === true;
         confirmPruneCheck.checked = pluginApi.loadSetting("confirmPrune", true) === true;
+        resourceRefreshValue.value = Number(pluginApi.loadSetting("resourceRefreshInterval", 60000));
+        statsIntervalValue.value = Number(pluginApi.loadSetting("statsInterval", 10000));
+        logPreviewLinesValue.value = Number(pluginApi.loadSetting("logPreviewLines", 10));
+        toastEnabledCheck.checked = pluginApi.loadSetting("toastEnabled", true) === true;
     }
 
     Component.onCompleted: loadValues()
@@ -160,6 +168,54 @@ Item {
             }
 
             Text {
+                text: "Resource Refresh (ms)"
+                color: "#e2e8f0"
+                font.pixelSize: 12
+            }
+
+            SpinBox {
+                id: resourceRefreshValue
+                Layout.fillWidth: true
+                from: 10000
+                to: 600000
+                stepSize: 5000
+                editable: true
+                onValueModified: root.saveSetting("resourceRefreshInterval", value)
+            }
+
+            Text {
+                text: "Stats Interval (ms)"
+                color: "#e2e8f0"
+                font.pixelSize: 12
+            }
+
+            SpinBox {
+                id: statsIntervalValue
+                Layout.fillWidth: true
+                from: 5000
+                to: 60000
+                stepSize: 1000
+                editable: true
+                onValueModified: root.saveSetting("statsInterval", value)
+            }
+
+            Text {
+                text: "Log Preview Lines"
+                color: "#e2e8f0"
+                font.pixelSize: 12
+            }
+
+            SpinBox {
+                id: logPreviewLinesValue
+                Layout.fillWidth: true
+                from: 5
+                to: 50
+                stepSize: 5
+                editable: true
+                onValueModified: root.saveSetting("logPreviewLines", value)
+            }
+
+            Text {
                 text: "Terminal Command"
                 color: "#e2e8f0"
                 font.pixelSize: 12
@@ -230,6 +286,12 @@ Item {
                 id: confirmPruneCheck
                 text: "Confirm before prune actions"
                 onToggled: root.saveSetting("confirmPrune", checked)
+            }
+
+            CheckBox {
+                id: toastEnabledCheck
+                text: "Show toast notifications for actions"
+                onToggled: root.saveSetting("toastEnabled", checked)
             }
         }
 

@@ -15,6 +15,9 @@ QtObject {
             dockerBinary: "auto",
             debounceDelay: 300,
             fallbackRefreshInterval: 30000,
+            resourceRefreshInterval: 60000,
+            statsInterval: 10000,
+            logPreviewLines: 10,
             terminalCommand: "auto",
             shellPath: "/bin/sh",
             showPorts: true,
@@ -23,7 +26,8 @@ QtObject {
             showImages: true,
             showVolumes: true,
             showNetworks: true,
-            confirmPrune: true
+            confirmPrune: true,
+            toastEnabled: true
         })
 
     property bool active: false
@@ -40,17 +44,20 @@ QtObject {
     property string dockerBinary: defaults.dockerBinary
     property int debounceDelay: defaults.debounceDelay
     property int fallbackRefreshInterval: defaults.fallbackRefreshInterval
+    property int resourceRefreshInterval: defaults.resourceRefreshInterval
+    property int statsInterval: defaults.statsInterval
+    property int logPreviewLines: defaults.logPreviewLines
     property string terminalCommand: defaults.terminalCommand
     property string shellPath: defaults.shellPath
     property bool showPorts: defaults.showPorts
     property bool autoScrollOnExpand: defaults.autoScrollOnExpand
     property bool groupByCompose: defaults.groupByCompose
     property int runningContainers: 0
-    property var containers: []
-    property var composeProjects: []
-    property var images: []
-    property var volumes: []
-    property var networks: []
+    property alias containers: _containerModel.values
+    property alias composeProjects: _composeModel.values
+    property alias images: _imageModel.values
+    property alias volumes: _volumeModel.values
+    property alias networks: _networkModel.values
     property int imageCount: 0
     property int volumeCount: 0
     property int networkCount: 0
@@ -58,10 +65,42 @@ QtObject {
     property bool showVolumes: defaults.showVolumes
     property bool showNetworks: defaults.showNetworks
     property bool confirmPrune: defaults.confirmPrune
+    property bool toastEnabled: defaults.toastEnabled
+
+    // F4: Volume/Network cross-reference maps
+    property var volumeUsageMap: ({})
+    property var networkUsageMap: ({})
+
+    // F1: Container resource stats
+    property var containerStats: ({})
+    property bool statsPollingActive: false
+
+    // F3: Inline log preview
+    property var containerLogs: ({})
+    property string _logRequestId: ""
+
+    // F2: Image pull progress
+    property string pullStatus: ""
+    property bool pullInProgress: false
+    property var _pendingRunArgs: null
+
+    // F10: Toast bridge signal
+    signal toastRequested(string kind, string title, string description)
 
     property bool _refreshQueued: false
+    property bool _resourceRefreshQueued: false
     property int _refreshExitCode: 0
     property int _refreshOutputOffset: 0
+    property int _resourceRefreshExitCode: 0
+    property int _resourceRefreshOutputOffset: 0
+    property bool _isPodman: runtimeName === "Podman"
+
+    // F8: ScriptModel instances for efficient list diffing
+    property ScriptModel _containerModel: ScriptModel { id: _containerModel; values: [] }
+    property ScriptModel _composeModel: ScriptModel { id: _composeModel; values: [] }
+    property ScriptModel _imageModel: ScriptModel { id: _imageModel; values: [] }
+    property ScriptModel _volumeModel: ScriptModel { id: _volumeModel; values: [] }
+    property ScriptModel _networkModel: ScriptModel { id: _networkModel; values: [] }
 
     function _stringSetting(key, fallback) {
         if (!pluginApi || !pluginApi.loadSetting)
@@ -89,6 +128,9 @@ QtObject {
         dockerBinary = _stringSetting("dockerBinary", defaults.dockerBinary).trim() || defaults.dockerBinary;
         debounceDelay = _intSetting("debounceDelay", defaults.debounceDelay, 100, 5000);
         fallbackRefreshInterval = _intSetting("fallbackRefreshInterval", defaults.fallbackRefreshInterval, 5000, 300000);
+        resourceRefreshInterval = _intSetting("resourceRefreshInterval", defaults.resourceRefreshInterval, 10000, 600000);
+        statsInterval = _intSetting("statsInterval", defaults.statsInterval, 5000, 60000);
+        logPreviewLines = _intSetting("logPreviewLines", defaults.logPreviewLines, 5, 50);
         terminalCommand = _stringSetting("terminalCommand", defaults.terminalCommand).trim() || defaults.terminalCommand;
         shellPath = _stringSetting("shellPath", defaults.shellPath).trim() || defaults.shellPath;
         showPorts = _boolSetting("showPorts", defaults.showPorts);
@@ -98,12 +140,14 @@ QtObject {
         showVolumes = _boolSetting("showVolumes", defaults.showVolumes);
         showNetworks = _boolSetting("showNetworks", defaults.showNetworks);
         confirmPrune = _boolSetting("confirmPrune", defaults.confirmPrune);
+        toastEnabled = _boolSetting("toastEnabled", defaults.toastEnabled);
     }
 
     function reloadFromSettings() {
         loadSettings();
         _restartEventStream();
         scheduleRefresh(0);
+        scheduleResourceRefresh(0);
         _emitRuntimeUpdated();
     }
 
@@ -114,7 +158,9 @@ QtObject {
         loadSettings();
         fallbackTimer.interval = fallbackRefreshInterval;
         debounceTimer.interval = debounceDelay;
+        resourceFallbackTimer.interval = resourceRefreshInterval;
         fallbackTimer.restart();
+        resourceFallbackTimer.restart();
         scheduleRefresh(0);
     }
 
@@ -122,16 +168,30 @@ QtObject {
         active = false;
         busy = false;
         _refreshQueued = false;
+        _resourceRefreshQueued = false;
+        statsPollingActive = false;
+        pullInProgress = false;
         debounceTimer.stop();
         fallbackTimer.stop();
+        resourceFallbackTimer.stop();
+        resourceDebounceTimer.stop();
+        statsTimer.stop();
         eventRestartTimer.stop();
         noticeTimer.stop();
         if (refreshProc.running)
             refreshProc.running = false;
+        if (resourceRefreshProc.running)
+            resourceRefreshProc.running = false;
         if (eventProc.running)
             eventProc.running = false;
         if (actionProc.running)
             actionProc.running = false;
+        if (statsProc.running)
+            statsProc.running = false;
+        if (logProc.running)
+            logProc.running = false;
+        if (pullProc.running)
+            pullProc.running = false;
         eventStreamRunning = false;
     }
 
@@ -153,6 +213,8 @@ QtObject {
             noticeTimer.restart();
         else
             noticeTimer.stop();
+        if (toastEnabled && noticeMessage !== "")
+            root.toastRequested(noticeKind, runtimeName, noticeMessage);
         _emitRuntimeUpdated();
     }
 
@@ -193,6 +255,46 @@ QtObject {
         return out.join(" ");
     }
 
+    // F7: Split polling — container-only refresh
+    function _containerRefreshCommand() {
+        var runtime = dockerBinary === "auto" ? "" : _shellQuote(dockerBinary);
+        return ["sh", "-lc",
+            (runtime !== "" ? "runtime=" + runtime + "; " : "if command -v docker >/dev/null 2>&1; then runtime='docker'; elif command -v podman >/dev/null 2>&1; then runtime='podman'; else runtime=''; fi; ")
+            + "if [ -z \"$runtime\" ]; then "
+            + "printf '{\"available\":false,\"message\":\"Runtime binary not found\"}\\n'; "
+            + "exit 0; "
+            + "fi; "
+            + "if ! \"$runtime\" info >/dev/null 2>&1; then "
+            + "printf '{\"available\":false,\"message\":\"Unable to reach %s container runtime\"}\\n' \"$runtime\"; "
+            + "exit 0; "
+            + "fi; "
+            + "ids=$(\"$runtime\" container ls -aq 2>/dev/null | tr '\\n' ' '); "
+            + "if [ -z \"${ids// }\" ]; then "
+            + "printf '{\"available\":true,\"containers\":[]}\\n'; "
+            + "exit 0; "
+            + "fi; "
+            + "json=$(\"$runtime\" container inspect $ids 2>/dev/null) || { "
+            + "printf '{\"available\":false,\"message\":\"Failed to inspect containers\"}\\n'; "
+            + "exit 0; "
+            + "}; "
+            + "printf '{\"available\":true,\"containers\":%s}\\n' \"$json\""
+        ];
+    }
+
+    // F7: Split polling — resource-only refresh (images, volumes, networks)
+    function _resourceRefreshCommand() {
+        var runtime = dockerBinary === "auto" ? "" : _shellQuote(dockerBinary);
+        return ["sh", "-lc",
+            (runtime !== "" ? "runtime=" + runtime + "; " : "if command -v docker >/dev/null 2>&1; then runtime='docker'; elif command -v podman >/dev/null 2>&1; then runtime='podman'; else runtime=''; fi; ")
+            + "if [ -z \"$runtime\" ]; then exit 0; fi; "
+            + "imgs=$(\"$runtime\" image ls --format json 2>/dev/null | jq -s . 2>/dev/null) || imgs='[]'; "
+            + "vols=$(\"$runtime\" volume ls --format json 2>/dev/null | jq -s . 2>/dev/null) || vols='[]'; "
+            + "nets=$(\"$runtime\" network ls --format json 2>/dev/null | jq -s . 2>/dev/null) || nets='[]'; "
+            + "printf '{\"images\":%s,\"volumes\":%s,\"networks\":%s}\\n' \"$imgs\" \"$vols\" \"$nets\""
+        ];
+    }
+
+    // Keep legacy combined command for initial bootstrap
     function _refreshCommand() {
         var runtime = dockerBinary === "auto" ? "" : _shellQuote(dockerBinary);
         return ["sh", "-lc",
@@ -222,9 +324,18 @@ QtObject {
     }
 
     function _eventCommand() {
+        var filters = "--filter type=container";
+        if (_isPodman)
+            filters += " --filter type=image --filter type=volume --filter type=network";
         if (dockerBinary !== "auto")
-            return [dockerBinary, "events", "--format", "json", "--filter", "type=container"];
-        return ["sh", "-c", "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then exec \"$runtime\" events --format json --filter type=container; else exit 1; fi"];
+            return [dockerBinary, "events", "--format", "json"].concat(filters.split(" "));
+        return ["sh", "-c", "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then exec \"$runtime\" events --format json " + filters + "; else exit 1; fi"];
+    }
+
+    // F1: Stats command
+    function _statsCommand() {
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return ["sh", "-c", "runtime=" + runtime + "; \"$runtime\" stats --no-stream --format '{{json .}}' 2>/dev/null | jq -s . 2>/dev/null || echo '[]'"];
     }
 
     function scheduleRefresh(delayMs) {
@@ -241,6 +352,22 @@ QtObject {
         }
         debounceTimer.interval = delay;
         debounceTimer.restart();
+    }
+
+    function scheduleResourceRefresh(delayMs) {
+        if (!active)
+            return;
+        if (resourceRefreshProc.running) {
+            _resourceRefreshQueued = true;
+            return;
+        }
+        var delay = Math.max(0, Number(delayMs) || 0);
+        if (delay === 0) {
+            Qt.callLater(_refreshResources);
+            return;
+        }
+        resourceDebounceTimer.interval = delay;
+        resourceDebounceTimer.restart();
     }
 
     function refresh() {
@@ -261,16 +388,36 @@ QtObject {
         _emitRuntimeUpdated();
     }
 
+    function _refreshResources() {
+        if (!active || !runtimeAvailable) {
+            _resourceRefreshQueued = false;
+            return;
+        }
+        if (resourceRefreshProc.running) {
+            _resourceRefreshQueued = true;
+            return;
+        }
+        _resourceRefreshQueued = false;
+        _resourceRefreshExitCode = 0;
+        _resourceRefreshOutputOffset = String(resourceRefreshCollector.text || "").length;
+        resourceRefreshProc.command = _resourceRefreshCommand();
+        resourceRefreshProc.running = true;
+    }
+
     function _clearSnapshot() {
-        containers = [];
-        composeProjects = [];
+        _containerModel.values = [];
+        _composeModel.values = [];
         runningContainers = 0;
-        images = [];
-        volumes = [];
-        networks = [];
+        _imageModel.values = [];
+        _volumeModel.values = [];
+        _networkModel.values = [];
         imageCount = 0;
         volumeCount = 0;
         networkCount = 0;
+        volumeUsageMap = ({});
+        networkUsageMap = ({});
+        containerStats = ({});
+        containerLogs = ({});
     }
 
     function _normalizePorts(rawPorts) {
@@ -302,6 +449,26 @@ QtObject {
         return isFinite(value) ? value : 0;
     }
 
+    // F4: Extract volume mounts from container inspect
+    function _normalizeMounts(rawMounts) {
+        var output = [];
+        if (!rawMounts || !Array.isArray(rawMounts))
+            return output;
+        for (var i = 0; i < rawMounts.length; ++i) {
+            var m = rawMounts[i];
+            if (m && String(m.Type || "") === "volume" && m.Name)
+                output.push({ name: String(m.Name), destination: String(m.Destination || "") });
+        }
+        return output;
+    }
+
+    // F4: Extract network names from container inspect
+    function _extractNetworkNames(networkSettings) {
+        if (!networkSettings || !networkSettings.Networks || typeof networkSettings.Networks !== "object")
+            return [];
+        return Object.keys(networkSettings.Networks);
+    }
+
     function _normalizeContainer(raw) {
         if (!raw || typeof raw !== "object")
             return null;
@@ -322,7 +489,9 @@ QtObject {
             composeService: String(labels["com.docker.compose.service"] || labels["io.podman.compose.service"] || ""),
             composeWorkingDir: String(labels["com.docker.compose.project.working_dir"] || labels["io.podman.compose.project.working_dir"] || ""),
             composeConfigFiles: String(labels["com.docker.compose.project.config_files"] || labels["io.podman.compose.project.config_files"] || "compose.yaml"),
-            healthStatus: String((raw.State && raw.State.Health && raw.State.Health.Status) || "")
+            healthStatus: String((raw.State && raw.State.Health && raw.State.Health.Status) || ""),
+            mounts: _normalizeMounts(raw.Mounts),
+            networkNames: _extractNetworkNames(raw.NetworkSettings)
         };
     }
 
@@ -337,7 +506,8 @@ QtObject {
         return String(left.name || "").localeCompare(String(right.name || ""));
     }
 
-    function _applySnapshot(payload) {
+    // F7: Split container snapshot application
+    function _applyContainerSnapshot(payload) {
         var available = payload && payload.available === true;
         runtimeName = _runtimeNameForBinary(dockerBinary === "auto" ? "docker" : dockerBinary);
         if (!available) {
@@ -395,49 +565,32 @@ QtObject {
             return String(left.name || "").localeCompare(String(right.name || ""));
         });
 
-        // Build set of running image references for cross-reference
-        var runningImageIds = {};
+        // F4: Build volume and network usage reverse maps
+        var volMap = ({});
+        var netMap = ({});
         for (i = 0; i < normalized.length; i++) {
-            if (normalized[i].isRunning)
-                runningImageIds[normalized[i].image] = true;
+            var c = normalized[i];
+            if (c.mounts) {
+                for (var mi = 0; mi < c.mounts.length; mi++) {
+                    var volName = c.mounts[mi].name;
+                    if (!volMap[volName]) volMap[volName] = [];
+                    volMap[volName].push(c.name);
+                }
+            }
+            if (c.networkNames) {
+                for (var ni = 0; ni < c.networkNames.length; ni++) {
+                    var netName = c.networkNames[ni];
+                    if (!netMap[netName]) netMap[netName] = [];
+                    netMap[netName].push(c.name);
+                }
+            }
         }
+        volumeUsageMap = volMap;
+        networkUsageMap = netMap;
 
-        // Normalize images
-        var rawImages = Array.isArray(payload.images) ? payload.images : [];
-        var normalizedImages = [];
-        for (i = 0; i < rawImages.length; i++) {
-            var img = DU.normalizeImage(rawImages[i], runningImageIds);
-            if (img) normalizedImages.push(img);
-        }
-        normalizedImages.sort(DU.sortImages);
-
-        // Normalize volumes
-        var rawVolumes = Array.isArray(payload.volumes) ? payload.volumes : [];
-        var normalizedVolumes = [];
-        for (i = 0; i < rawVolumes.length; i++) {
-            var vol = DU.normalizeVolume(rawVolumes[i]);
-            if (vol) normalizedVolumes.push(vol);
-        }
-        normalizedVolumes.sort(DU.sortVolumes);
-
-        // Normalize networks
-        var rawNetworks = Array.isArray(payload.networks) ? payload.networks : [];
-        var normalizedNetworks = [];
-        for (i = 0; i < rawNetworks.length; i++) {
-            var net = DU.normalizeNetwork(rawNetworks[i]);
-            if (net) normalizedNetworks.push(net);
-        }
-        normalizedNetworks.sort(DU.sortNetworks);
-
-        containers = normalized;
-        composeProjects = projects;
+        _containerModel.values = normalized;
+        _composeModel.values = projects;
         runningContainers = running;
-        images = normalizedImages;
-        volumes = normalizedVolumes;
-        networks = normalizedNetworks;
-        imageCount = normalizedImages.length;
-        volumeCount = normalizedVolumes.length;
-        networkCount = normalizedNetworks.length;
         runtimeAvailable = true;
         lastError = "";
         lastRefreshAt = new Date().toISOString();
@@ -446,6 +599,58 @@ QtObject {
             : runtimeName + " is available with " + running + " running container" + (running === 1 ? "" : "s") + ".";
         _restartEventStream();
         _setRuntimeStatus("active", "", "");
+    }
+
+    // F7: Split resource snapshot application
+    function _applyResourceSnapshot(payload) {
+        if (!payload || typeof payload !== "object")
+            return;
+
+        // Build set of running image references for cross-reference
+        var runningImageIds = {};
+        var currentContainers = _containerModel.values;
+        for (var ci = 0; ci < currentContainers.length; ci++) {
+            if (currentContainers[ci].isRunning)
+                runningImageIds[currentContainers[ci].image] = true;
+        }
+
+        var i;
+        var rawImages = Array.isArray(payload.images) ? payload.images : [];
+        var normalizedImages = [];
+        for (i = 0; i < rawImages.length; i++) {
+            var img = DU.normalizeImage(rawImages[i], runningImageIds);
+            if (img) normalizedImages.push(img);
+        }
+        normalizedImages.sort(DU.sortImages);
+
+        var rawVolumes = Array.isArray(payload.volumes) ? payload.volumes : [];
+        var normalizedVolumes = [];
+        for (i = 0; i < rawVolumes.length; i++) {
+            var vol = DU.normalizeVolume(rawVolumes[i]);
+            if (vol) normalizedVolumes.push(vol);
+        }
+        normalizedVolumes.sort(DU.sortVolumes);
+
+        var rawNetworks = Array.isArray(payload.networks) ? payload.networks : [];
+        var normalizedNetworks = [];
+        for (i = 0; i < rawNetworks.length; i++) {
+            var net = DU.normalizeNetwork(rawNetworks[i]);
+            if (net) normalizedNetworks.push(net);
+        }
+        normalizedNetworks.sort(DU.sortNetworks);
+
+        _imageModel.values = normalizedImages;
+        _volumeModel.values = normalizedVolumes;
+        _networkModel.values = normalizedNetworks;
+        imageCount = normalizedImages.length;
+        volumeCount = normalizedVolumes.length;
+        networkCount = normalizedNetworks.length;
+    }
+
+    function _applySnapshot(payload) {
+        _applyContainerSnapshot(payload);
+        if (payload && payload.available === true)
+            _applyResourceSnapshot(payload);
     }
 
     function _restartEventStream() {
@@ -488,6 +693,60 @@ QtObject {
         _emitRuntimeUpdated();
     }
 
+    function _handleResourceRefreshFinished(stdoutText, exitCode) {
+        if (!active || !runtimeAvailable)
+            return;
+        if (exitCode === 0) {
+            try {
+                var payload = JSON.parse(String(stdoutText || "").trim() || "{}");
+                _applyResourceSnapshot(payload);
+            } catch (e) {
+                // silently ignore resource parse errors
+            }
+        }
+        if (_resourceRefreshQueued) {
+            _resourceRefreshQueued = false;
+            scheduleResourceRefresh(0);
+        }
+        _emitRuntimeUpdated();
+    }
+
+    // F1: Handle stats response
+    function _handleStatsFinished(stdoutText) {
+        if (!active || !runtimeAvailable)
+            return;
+        try {
+            var arr = JSON.parse(String(stdoutText || "").trim() || "[]");
+            var map = ({});
+            for (var i = 0; i < arr.length; i++) {
+                var entry = arr[i];
+                var id = String(entry.ID || entry.Container || "");
+                if (id !== "") {
+                    map[id] = {
+                        cpuPercent: String(entry.CPUPerc || "0%"),
+                        memUsage: String(entry.MemUsage || ""),
+                        memPercent: String(entry.MemPerc || "0%")
+                    };
+                }
+            }
+            containerStats = map;
+        } catch (e) {
+            // silently ignore stats parse errors
+        }
+        _emitRuntimeUpdated();
+    }
+
+    // F3: Fetch inline log preview
+    function fetchLogs(containerId) {
+        var id = String(containerId || "").trim();
+        if (id === "" || logProc.running)
+            return;
+        _logRequestId = id;
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        logProc.command = ["sh", "-c", "runtime=" + runtime + "; \"$runtime\" logs --tail " + logPreviewLines + " " + _shellQuote(id) + " 2>&1"];
+        logProc.running = true;
+    }
+
     function _runAction(command, successMessage, failureMessage) {
         if (!Array.isArray(command) || command.length === 0)
             return false;
@@ -506,10 +765,10 @@ QtObject {
         var identifier = String(containerId || "").trim();
         if (identifier === "")
             return false;
-            
+
         var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
         var cmd = ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" " + action + " " + _shellQuote(identifier) + "; else exit 1; fi"];
-        
+
         return _runAction(
             cmd,
             _capitalize(action) + " requested for " + identifier + ".",
@@ -556,7 +815,7 @@ QtObject {
         var command = String(innerCommand || "").trim();
         if (command === "")
             return false;
-            
+
         var termCmd = terminalCommand;
         if (termCmd === "auto") {
             termCmd = "for t in ghostty kitty foot alacritty wezterm; do if command -v $t >/dev/null 2>&1; then exec $t -e bash -lc " + _shellQuote(command) + "; fi; done";
@@ -644,23 +903,41 @@ QtObject {
         );
     }
 
+    // F2: Image pull + run with progress
     function runImage(imageName, containerName, hostPort, containerPort) {
         var image = String(imageName || "").trim();
         if (image === "") return false;
+        if (pullInProgress) return false;
+
+        _pendingRunArgs = {
+            image: image,
+            containerName: String(containerName || "").trim(),
+            hostPort: String(hostPort || "").trim(),
+            containerPort: String(containerPort || "").trim()
+        };
+        pullStatus = "Pulling " + image + "...";
+        pullInProgress = true;
+        _emitRuntimeUpdated();
+
         var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
-        var args = "run -d";
-        var name = String(containerName || "").trim();
-        if (name !== "")
-            args += " --name " + _shellQuote(name);
-        var hp = String(hostPort || "").trim();
-        var cp = String(containerPort || "").trim();
-        if (hp !== "" && cp !== "")
-            args += " -p " + _shellQuote(hp + ":" + cp);
-        args += " " + _shellQuote(image);
+        pullProc.command = ["sh", "-c", "runtime=" + runtime + "; \"$runtime\" pull " + _shellQuote(image) + " 2>&1"];
+        pullProc.running = true;
+        return true;
+    }
+
+    function _executeRun(args) {
+        if (!args) return false;
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        var cmdArgs = "run -d";
+        if (args.containerName !== "")
+            cmdArgs += " --name " + _shellQuote(args.containerName);
+        if (args.hostPort !== "" && args.containerPort !== "")
+            cmdArgs += " -p " + _shellQuote(args.hostPort + ":" + args.containerPort);
+        cmdArgs += " " + _shellQuote(args.image);
         return _runAction(
-            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" " + args + "; else exit 1; fi"],
-            "Container started from " + image + ".",
-            "Failed to run " + image + "."
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" " + cmdArgs + "; else exit 1; fi"],
+            "Container started from " + args.image + ".",
+            "Failed to run " + args.image + "."
         );
     }
 
@@ -693,6 +970,21 @@ QtObject {
 
     onDebounceDelayChanged: debounceTimer.interval = debounceDelay
     onFallbackRefreshIntervalChanged: fallbackTimer.interval = fallbackRefreshInterval
+    onResourceRefreshIntervalChanged: resourceFallbackTimer.interval = resourceRefreshInterval
+
+    // F1: Start/stop stats polling based on active flag
+    onStatsPollingActiveChanged: {
+        if (statsPollingActive && runtimeAvailable) {
+            statsTimer.restart();
+            // Fetch immediately
+            if (!statsProc.running) {
+                statsProc.command = _statsCommand();
+                statsProc.running = true;
+            }
+        } else {
+            statsTimer.stop();
+        }
+    }
 
     property string actionSuccessMessage: ""
     property string actionFailureMessage: ""
@@ -709,6 +1001,35 @@ QtObject {
         interval: root.fallbackRefreshInterval
         repeat: true
         onTriggered: root.scheduleRefresh(0)
+    }
+
+    // F7: Resource-tier debounce timer
+    property Timer resourceDebounceTimer: Timer {
+        id: resourceDebounceTimer
+        interval: root.debounceDelay
+        repeat: false
+        onTriggered: root._refreshResources()
+    }
+
+    // F7: Resource-tier fallback timer
+    property Timer resourceFallbackTimer: Timer {
+        id: resourceFallbackTimer
+        interval: root.resourceRefreshInterval
+        repeat: true
+        onTriggered: root.scheduleResourceRefresh(0)
+    }
+
+    // F1: Stats polling timer
+    property Timer statsTimer: Timer {
+        id: statsTimer
+        interval: root.statsInterval
+        repeat: true
+        onTriggered: {
+            if (root.statsPollingActive && root.runtimeAvailable && !statsProc.running) {
+                statsProc.command = root._statsCommand();
+                statsProc.running = true;
+            }
+        }
     }
 
     property Timer eventRestartTimer: Timer {
@@ -745,6 +1066,24 @@ QtObject {
         }
     }
 
+    // F7: Resource-tier refresh process
+    property Process resourceRefreshProc: Process {
+        id: resourceRefreshProc
+        running: false
+        stdout: StdioCollector {
+            id: resourceRefreshCollector
+            onStreamFinished: {
+                var fullText = String(text || "");
+                root._handleResourceRefreshFinished(fullText.slice(root._resourceRefreshOutputOffset), root._resourceRefreshExitCode);
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            root._resourceRefreshExitCode = exitCode;
+            if (exitCode !== 0 && String(resourceRefreshCollector.text || "").slice(root._resourceRefreshOutputOffset) === "")
+                root._handleResourceRefreshFinished("", exitCode);
+        }
+    }
+
     property Process eventProc: Process {
         id: eventProc
         running: false
@@ -753,8 +1092,14 @@ QtObject {
                 try {
                     var payload = JSON.parse(String(data || ""));
                     var action = String(payload.status || payload.Status || payload.Action || "");
-                    if (action !== "")
-                        root.scheduleRefresh(root.debounceDelay);
+                    var eventType = String(payload.Type || payload.type || "container");
+                    if (action !== "") {
+                        // F9: Route Podman event types to appropriate refresh tier
+                        if (eventType === "container")
+                            root.scheduleRefresh(root.debounceDelay);
+                        else
+                            root.scheduleResourceRefresh(root.debounceDelay);
+                    }
                 } catch (e) {
                     root.scheduleRefresh(root.debounceDelay);
                 }
@@ -780,6 +1125,62 @@ QtObject {
                 root._setRuntimeStatus("degraded", "E_DOCKER_ACTION_FAILED", root.actionFailureMessage);
             }
             root.scheduleRefresh(250);
+            root.scheduleResourceRefresh(250);
+        }
+    }
+
+    // F1: Stats polling process
+    property Process statsProc: Process {
+        id: statsProc
+        running: false
+        stdout: StdioCollector {
+            id: statsCollector
+            onStreamFinished: {
+                root._handleStatsFinished(String(text || ""));
+            }
+        }
+    }
+
+    // F3: Log preview process
+    property Process logProc: Process {
+        id: logProc
+        running: false
+        stdout: StdioCollector {
+            id: logCollector
+            onStreamFinished: {
+                var logText = String(text || "");
+                if (root._logRequestId !== "") {
+                    var next = Object.assign({}, root.containerLogs);
+                    next[root._logRequestId] = logText;
+                    root.containerLogs = next;
+                }
+                root._emitRuntimeUpdated();
+            }
+        }
+    }
+
+    // F2: Image pull process with streaming progress
+    property Process pullProc: Process {
+        id: pullProc
+        running: false
+        stdout: SplitParser {
+            onRead: data => {
+                var line = String(data || "").trim();
+                if (line !== "")
+                    root.pullStatus = line;
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            root.pullInProgress = false;
+            if (exitCode === 0) {
+                root.pullStatus = "Pull complete. Starting container...";
+                root._executeRun(root._pendingRunArgs);
+            } else {
+                root.pullStatus = "Pull failed (exit " + exitCode + ").";
+                root._setNotice("error", "Failed to pull image.");
+            }
+            root._pendingRunArgs = null;
+            root._emitRuntimeUpdated();
         }
     }
 
