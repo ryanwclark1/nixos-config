@@ -136,6 +136,7 @@ QtObject {
     // --- MODEL USAGE ---
     property bool modelUsageClaudeEnabled: true
     property bool modelUsageCodexEnabled: false
+    property bool modelUsageGeminiEnabled: false
     property string modelUsageActiveProvider: "claude"
     property string modelUsageBarMetric: "prompts" // prompts | tokens
     property int modelUsageRefreshSec: 30

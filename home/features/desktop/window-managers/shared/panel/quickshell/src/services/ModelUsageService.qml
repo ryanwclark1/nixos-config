@@ -254,6 +254,35 @@ QtObject {
     }
   }
 
+  // ── Gemini data process ───────────────────────
+  property Process geminiProc: Process {
+    command: ["qs-model-usage", "gemini"]
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          var raw = String(this.text || "").trim();
+          if (!raw || raw.indexOf("{") !== 0) throw new Error("invalid response");
+          var data = JSON.parse(raw);
+          if (data.error) throw new Error(data.error);
+
+          root.geminiTodayPrompts = data.todayPrompts || 0;
+          root.geminiTodaySessions = data.todaySessions || 0;
+          root.geminiTodayTokens = data.todayTokens || {};
+          root.geminiTotalSessions = data.totalSessions || 0;
+          root.geminiTotalTokens = data.totalTokens || 0;
+          root.geminiModel = data.model || "unknown";
+          root.geminiRecentDays = data.recentDays || [];
+          root.geminiTokensByModel = data.tokensByModel || {};
+          root.geminiReady = true;
+        } catch (e) {
+          console.warn("ModelUsageService: gemini parse error:", e);
+          if (!root.geminiReady) root.geminiTodayPrompts = 0;
+        }
+      }
+    }
+  }
+
   // ── Polling timers ─────────────────────────────────
   property Timer dataTimer: Timer {
     interval: root._refreshMs
