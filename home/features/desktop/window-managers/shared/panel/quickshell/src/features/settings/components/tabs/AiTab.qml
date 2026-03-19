@@ -11,6 +11,52 @@ Item {
     property bool compactMode: false
     property bool tightSpacing: false
 
+    function persistedKey(provider) {
+        switch (provider) {
+            case "anthropic": return Config.aiAnthropicKey || "";
+            case "openai": return Config.aiOpenaiKey || "";
+            case "gemini": return Config.aiGeminiKey || "";
+            default: return "";
+        }
+    }
+
+    function setPersistedKey(provider, value) {
+        var nextValue = String(value || "");
+        switch (provider) {
+            case "anthropic":
+                Config.aiAnthropicKey = nextValue;
+                break;
+            case "openai":
+                Config.aiOpenaiKey = nextValue;
+                break;
+            case "gemini":
+                Config.aiGeminiKey = nextValue;
+                break;
+        }
+    }
+
+    function effectiveKey(provider) {
+        var persisted = persistedKey(provider);
+        return persisted !== "" ? persisted : AiService.sessionKey(provider);
+    }
+
+    function setRememberedKey(provider, remember, value) {
+        var nextValue = String(value || "");
+        if (remember) {
+            setPersistedKey(provider, nextValue);
+            AiService.setSessionKey(provider, "");
+        } else {
+            setPersistedKey(provider, "");
+            AiService.setSessionKey(provider, nextValue);
+        }
+    }
+
+    function toggleRemember(provider, currentRemember) {
+        var nextRemember = !currentRemember;
+        setRememberedKey(provider, nextRemember, effectiveKey(provider));
+        return nextRemember;
+    }
+
     SettingsTabPage {
         anchors.fill: parent
         tabId: root.tabId
@@ -123,31 +169,28 @@ Item {
             expanded: Config.aiProvider !== "ollama"
 
             SettingsInfoCallout {
-                body: "Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY environment variables for automatic detection. These fields are fallbacks. Toggle \"Remember\" off to keep the key in memory only (cleared on restart)."
+                body: "Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY environment variables for automatic detection. These fields are fallbacks. Keys stay session-only by default; enable \"Remember\" only when you want the current provider key written to disk."
             }
 
             ColumnLayout {
                 visible: Config.aiProvider === "anthropic"
                 Layout.fillWidth: true
                 spacing: Colors.spacingXS
-                property bool _remember: true
-                SettingsTextInputRow {
+                property bool _remember: Config.aiAnthropicKey !== ""
+                SettingsSecretInputRow {
                     label: "Anthropic API Key"
                     leadingIcon: "󰌋"
                     placeholderText: "sk-ant-..."
-                    text: Config.aiAnthropicKey || AiService.sessionKey("anthropic")
-                    onTextEdited: value => {
-                        if (parent._remember) Config.aiAnthropicKey = value;
-                        else AiService.setSessionKey("anthropic", value);
-                    }
+                    text: root.effectiveKey("anthropic")
+                    onTextEdited: value => root.setRememberedKey("anthropic", parent._remember, value)
                 }
                 SettingsToggleRow {
                     label: "Remember key"
                     icon: "󰆓"
                     checked: parent._remember
                     enabledText: "Key is persisted to disk."
-                    disabledText: "Key is session-only (cleared on restart)."
-                    onToggled: parent._remember = !parent._remember
+                    disabledText: "Key is session-only (default, cleared on restart)."
+                    onToggled: parent._remember = root.toggleRemember("anthropic", parent._remember)
                 }
             }
 
@@ -155,24 +198,21 @@ Item {
                 visible: Config.aiProvider === "openai" || Config.aiProvider === "custom"
                 Layout.fillWidth: true
                 spacing: Colors.spacingXS
-                property bool _remember: true
-                SettingsTextInputRow {
+                property bool _remember: Config.aiOpenaiKey !== ""
+                SettingsSecretInputRow {
                     label: "OpenAI API Key"
                     leadingIcon: "󰌋"
                     placeholderText: "sk-..."
-                    text: Config.aiOpenaiKey || AiService.sessionKey("openai")
-                    onTextEdited: value => {
-                        if (parent._remember) Config.aiOpenaiKey = value;
-                        else AiService.setSessionKey("openai", value);
-                    }
+                    text: root.effectiveKey("openai")
+                    onTextEdited: value => root.setRememberedKey("openai", parent._remember, value)
                 }
                 SettingsToggleRow {
                     label: "Remember key"
                     icon: "󰆓"
                     checked: parent._remember
                     enabledText: "Key is persisted to disk."
-                    disabledText: "Key is session-only (cleared on restart)."
-                    onToggled: parent._remember = !parent._remember
+                    disabledText: "Key is session-only (default, cleared on restart)."
+                    onToggled: parent._remember = root.toggleRemember("openai", parent._remember)
                 }
             }
 
@@ -180,24 +220,21 @@ Item {
                 visible: Config.aiProvider === "gemini"
                 Layout.fillWidth: true
                 spacing: Colors.spacingXS
-                property bool _remember: true
-                SettingsTextInputRow {
+                property bool _remember: Config.aiGeminiKey !== ""
+                SettingsSecretInputRow {
                     label: "Gemini API Key"
                     leadingIcon: "󰌋"
                     placeholderText: "AIza..."
-                    text: Config.aiGeminiKey || AiService.sessionKey("gemini")
-                    onTextEdited: value => {
-                        if (parent._remember) Config.aiGeminiKey = value;
-                        else AiService.setSessionKey("gemini", value);
-                    }
+                    text: root.effectiveKey("gemini")
+                    onTextEdited: value => root.setRememberedKey("gemini", parent._remember, value)
                 }
                 SettingsToggleRow {
                     label: "Remember key"
                     icon: "󰆓"
                     checked: parent._remember
                     enabledText: "Key is persisted to disk."
-                    disabledText: "Key is session-only (cleared on restart)."
-                    onToggled: parent._remember = !parent._remember
+                    disabledText: "Key is session-only (default, cleared on restart)."
+                    onToggled: parent._remember = root.toggleRemember("gemini", parent._remember)
                 }
             }
         }
