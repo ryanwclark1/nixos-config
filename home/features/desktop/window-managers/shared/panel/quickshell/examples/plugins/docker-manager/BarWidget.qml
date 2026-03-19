@@ -475,89 +475,16 @@ Item {
                             // ── COMPOSE TAB ──
                             Repeater {
                                 model: root._filteredCompose
-                                delegate: Rectangle {
-                                    id: projectCard
+                                delegate: ComposeCard {
                                     required property var modelData
                                     required property int index
-                                    readonly property bool expanded: root.expandedProjects[modelData.name] === true
-                                    readonly property bool isFocused: root.focusedCardIndex === index
-                                    width: listColumn.width; radius: 14; color: "#111827"
-                                    border.width: isFocused ? 2 : 1; border.color: isFocused ? "#93c5fd" : (expanded ? "#38bdf8" : "#334155")
-                                    implicitHeight: projectColumn.implicitHeight + 18
-
-                                    Column {
-                                        id: projectColumn; anchors.fill: parent; anchors.margins: 9; spacing: 8
-
-                                        Row {
-                                            width: parent.width; spacing: 8
-                                            Column {
-                                                width: Math.max(120, parent.width - 76); spacing: 2
-                                                Text { text: projectCard.modelData.name; color: "#f8fafc"; font.pixelSize: 13; font.bold: true; elide: Text.ElideRight; width: parent.width }
-                                                Text { text: projectCard.modelData.runningCount + " / " + projectCard.modelData.totalCount + " running"; color: "#94a3b8"; font.pixelSize: 11 }
-                                            }
-                                            Rectangle {
-                                                width: 58; height: 28; radius: 10; color: projectCard.expanded ? "#0f172a" : "#1e293b"; border.width: 1; border.color: "#475569"
-                                                Text { anchors.centerIn: parent; text: projectCard.expanded ? "Hide" : "Show"; color: "#f8fafc"; font.pixelSize: 10; font.bold: true }
-                                                MouseArea { anchors.fill: parent; onClicked: { root.toggleProject(projectCard.modelData.name); if (!projectCard.expanded) root.ensureVisible(projectCard.y, projectCard.height + 160); } }
-                                            }
-                                        }
-
-                                        Column {
-                                            visible: projectCard.expanded; width: parent.width; spacing: 6
-                                            Row {
-                                                width: parent.width; spacing: 6
-                                                Repeater {
-                                                    model: [
-                                                        { label: "Start", enabled: projectCard.modelData.runningCount < projectCard.modelData.totalCount, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "start"); } },
-                                                        { label: "Restart", enabled: projectCard.modelData.runningCount > 0, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "restart"); } },
-                                                        { label: "Stop", enabled: projectCard.modelData.runningCount > 0, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "stop"); } }
-                                                    ]
-                                                    delegate: Rectangle {
-                                                        id: projectActionBtn; required property var modelData
-                                                        width: Math.floor((parent.width - 12) / 3); height: 30; radius: 10
-                                                        color: projectActionBtn.modelData.enabled ? "#1e293b" : "#111827"; opacity: projectActionBtn.modelData.enabled ? 1 : 0.45
-                                                        border.width: 1; border.color: "#475569"
-                                                        Text { anchors.centerIn: parent; text: projectActionBtn.modelData.label; color: "#f8fafc"; font.pixelSize: 10; font.bold: true }
-                                                        MouseArea { anchors.fill: parent; enabled: parent.opacity >= 1; onClicked: projectActionBtn.modelData.action() }
-                                                    }
-                                                }
-                                            }
-                                            Row {
-                                                width: parent.width; spacing: 6
-                                                Repeater {
-                                                    model: [
-                                                        { label: "Pull", enabled: true, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "pull"); } },
-                                                        { label: "Logs", enabled: true, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "logs"); } },
-                                                        { label: "Edit", enabled: true, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "edit"); } }
-                                                    ]
-                                                    delegate: Rectangle {
-                                                        id: projectSecBtn; required property var modelData
-                                                        width: Math.floor((parent.width - 12) / 3); height: 30; radius: 10; color: "#1e293b"; border.width: 1; border.color: "#475569"
-                                                        Text { anchors.centerIn: parent; text: projectSecBtn.modelData.label; color: "#f8fafc"; font.pixelSize: 10; font.bold: true }
-                                                        MouseArea { anchors.fill: parent; onClicked: projectSecBtn.modelData.action() }
-                                                    }
-                                                }
-                                            }
-                                            Rectangle { width: parent.width; height: 1; color: "#1e293b" }
-                                            Repeater {
-                                                model: projectCard.modelData.containers
-                                                delegate: Rectangle {
-                                                    id: childCard; required property var modelData
-                                                    width: parent.width; radius: 12; color: "#0f172a"; border.width: 1; border.color: "#1e293b"
-                                                    implicitHeight: childCol.implicitHeight + 14
-                                                    Column {
-                                                        id: childCol; anchors.fill: parent; anchors.margins: 7; spacing: 4
-                                                        Text { text: childCard.modelData.composeService || childCard.modelData.name || childCard.modelData.id; color: "#f8fafc"; font.pixelSize: 12; font.bold: true }
-                                                        Row {
-                                                            spacing: 2
-                                                            Text { visible: childCard.modelData.healthStatus !== ""; text: DU.healthDot(childCard.modelData.healthStatus); color: DU.healthDotColor(childCard.modelData.healthStatus); font.pixelSize: 10 }
-                                                            Text { text: childCard.modelData.status || childCard.modelData.state || ""; color: childCard.modelData.isRunning ? "#5eead4" : (childCard.modelData.isPaused ? "#fcd34d" : "#cbd5e1"); font.pixelSize: 10 }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    modelData: modelData; index: index
+                                    daemon: root.daemon
+                                    isFocused: root.focusedCardIndex === index
+                                    _expandedMap: root.expandedProjects
+                                    width: listColumn.width
+                                    onToggleExpanded: key => root.toggleProject(key)
+                                    onEnsureVisibleRequested: (itemY, itemHeight) => root.ensureVisible(itemY, itemHeight)
                                 }
                             }
 
