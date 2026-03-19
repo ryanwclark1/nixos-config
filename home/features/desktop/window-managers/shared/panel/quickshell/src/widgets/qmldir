@@ -1,4 +1,5 @@
 ActionCard 1.0 ../shared/ActionCard.qml
+AdaptiveAccentStrip 1.0 AdaptiveAccentStrip.qml
 AppIcon 1.0 ../shared/AppIcon.qml
 AppVolumeEntry 1.0 ../features/audio/components/AppVolumeEntry.qml
 AudioDeviceSection 1.0 ../features/audio/components/AudioDeviceSection.qml
