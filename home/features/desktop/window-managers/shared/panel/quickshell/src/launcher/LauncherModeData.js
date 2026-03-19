@@ -1,10 +1,10 @@
 .pragma library
 
-var allKnownModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
+var allKnownModes = ["drun", "window", "files", "ai", "system", "settings", "run", "ssh", "web", "clip", "emoji", "calc", "bookmarks", "media", "nixos", "wallpapers", "plugins", "devops", "orchestrator", "keybinds"];
 var transientModes = ["dmenu"];
-var defaultModeOrder = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
+var defaultModeOrder = ["drun", "window", "files", "ai", "system", "settings", "run", "ssh", "web", "clip", "emoji", "calc", "bookmarks", "media", "nixos", "wallpapers", "plugins", "devops", "orchestrator", "keybinds"];
 var defaultPrimaryModes = ["drun", "window", "files", "ai", "system"];
-var modePrefixes = "!/@?>=:;~";
+var modePrefixes = "!/@?>=,:;~";
 
 var modeMeta = {
     "drun": { label: "Apps", hint: "Launch applications", prefix: "" },
@@ -17,7 +17,7 @@ var modeMeta = {
     "web": { label: "Web", hint: "Search with ?", prefix: "?" },
     "plugins": { label: "Plugins", hint: "Search plugin providers", prefix: "" },
     "run": { label: "Run", hint: "Run commands with >", prefix: ">" },
-    "system": { label: "System", hint: "Session and utility actions", prefix: "" },
+    "system": { label: "System", hint: "Shell and session destinations", prefix: "" },
     "keybinds": { label: "Keybinds", hint: "Inspect and trigger binds", prefix: "" },
     "media": { label: "Media", hint: "Control active players", prefix: "" },
     "nixos": { label: "NixOS", hint: "Nix maintenance actions", prefix: "" },

@@ -107,6 +107,10 @@ function escapeActionStateObject(props) {
     var action = "close";
     if (props.showingConfirm)
         action = "cancelConfirm";
+    else if (props.sidebarOverflowExpanded)
+        action = "closeMore";
+    else if (props.shortcutHelpExpanded)
+        action = "hideHelp";
     else if (props.searchText !== "")
         action = "resetQuery";
     else if (props.drunCategoryFiltersEnabled && props.mode === "drun" && props.drunCategoryFilter !== "")
@@ -118,6 +122,8 @@ function escapeActionStateObject(props) {
             action: action,
             mode: String(props.mode || ""),
             showingConfirm: props.showingConfirm === true,
+            sidebarOverflowExpanded: props.sidebarOverflowExpanded === true,
+            shortcutHelpExpanded: props.shortcutHelpExpanded === true,
             hasQuery: props.searchText !== "",
             searchText: String(props.searchText || ""),
             hasCategoryFilter: props.drunCategoryFiltersEnabled && props.mode === "drun" && props.drunCategoryFilter !== "",
@@ -135,6 +141,8 @@ function launcherStateObject(props) {
             fileSearchShowHidden: props.fileSearchShowHidden === true,
             fileOpenerCommand: String(props.fileOpenerCommand || ""),
             showLauncherHome: props.showLauncherHome === true,
+            sidebarOverflowExpanded: props.sidebarOverflowExpanded === true,
+            shortcutHelpExpanded: props.shortcutHelpExpanded === true,
             drunCategoryFilter: String(props.drunCategoryFilter || ""),
             drunCategorySectionExpanded: props.drunCategorySectionExpanded === true,
             hasResults: props.filteredItemsLength > 0,

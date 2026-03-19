@@ -1,21 +1,34 @@
 .pragma library
 
-function highlightMatch(fullText, query, stripPrefixFn) {
+function highlightMatch(fullText, query, stripPrefixFn, multiToken) {
     if (!query || !fullText)
         return fullText;
-    
+
     var cleanQuery = stripPrefixFn ? stripPrefixFn(query) : query;
     if (!cleanQuery || cleanQuery.trim() === "")
         return fullText;
 
+    // Multi-token mode: highlight each space-separated token independently
+    if (multiToken && cleanQuery.indexOf(" ") !== -1) {
+        var tokens = cleanQuery.toLowerCase().split(/\s+/).filter(function(t) { return t !== ""; });
+        if (tokens.length === 0) return fullText;
+        // Build a set of character positions to highlight
+        var highlights = {};
+        var t = fullText.toLowerCase();
+        for (var ti = 0; ti < tokens.length; ti++) {
+            _markTokenPositions(t, tokens[ti], highlights);
+        }
+        return _buildHighlightedString(fullText, highlights);
+    }
+
     var q = cleanQuery.toLowerCase();
     var t = fullText.toLowerCase();
-    
+
     // Direct substring match (preferred)
     var directIdx = t.indexOf(q);
     if (directIdx !== -1) {
-        return fullText.substring(0, directIdx) + 
-               "<b>" + fullText.substring(directIdx, directIdx + q.length) + "</b>" + 
+        return fullText.substring(0, directIdx) +
+               "<b>" + fullText.substring(directIdx, directIdx + q.length) + "</b>" +
                fullText.substring(directIdx + q.length);
     }
 
@@ -41,7 +54,43 @@ function highlightMatch(fullText, query, stripPrefixFn) {
             result += char;
         }
     }
-    
+
+    if (inBold) result += "</b>";
+    return result;
+}
+
+// Mark character positions for a single token (substring or fuzzy)
+function _markTokenPositions(textLower, token, positions) {
+    // Try substring first
+    var subIdx = textLower.indexOf(token);
+    if (subIdx !== -1) {
+        for (var i = subIdx; i < subIdx + token.length; i++)
+            positions[i] = true;
+        return;
+    }
+    // Fuzzy: mark matched characters
+    var tIdx = 0;
+    for (var sIdx = 0; sIdx < textLower.length && tIdx < token.length; sIdx++) {
+        if (textLower[sIdx] === token[tIdx]) {
+            positions[sIdx] = true;
+            tIdx++;
+        }
+    }
+}
+
+// Build highlighted string from position set
+function _buildHighlightedString(fullText, positions) {
+    var result = "";
+    var inBold = false;
+    for (var i = 0; i < fullText.length; i++) {
+        if (positions[i]) {
+            if (!inBold) { result += "<b>"; inBold = true; }
+            result += fullText[i];
+        } else {
+            if (inBold) { result += "</b>"; inBold = false; }
+            result += fullText[i];
+        }
+    }
     if (inBold) result += "</b>";
     return result;
 }
@@ -205,29 +254,113 @@ function rankCharacterItem(item, clean, cleanLower) {
     return total;
 }
 
+// fzf-style single-token scoring against a string.
+// Returns 0 for no match, higher = better match quality.
+// Rewards: consecutive runs, word boundary matches, start-of-string.
+function fzfScoreToken(str, token) {
+    if (!token) return 100;
+    if (!str) return 0;
+    var sLen = str.length;
+    var tLen = token.length;
+    if (tLen > sLen) return 0;
+
+    // Exact match
+    if (str === token) return 2000 + 100;
+
+    // Substring match — score by position and length
+    var subIdx = str.indexOf(token);
+    if (subIdx !== -1) {
+        var score = 800;
+        // Bonus for match at start
+        if (subIdx === 0) score += 200;
+        // Bonus for match at word boundary (after / . _ - space or uppercase)
+        else if (_isWordBoundary(str, subIdx)) score += 150;
+        // Coverage bonus: longer match relative to string
+        score += Math.round((tLen / sLen) * 100);
+        return score;
+    }
+
+    // Fuzzy match — walk string matching chars, score consecutive runs and boundaries
+    var tIdx = 0;
+    var score = 0;
+    var consecutive = 0;
+    var firstMatchIdx = -1;
+    var lastMatchIdx = -1;
+    var boundaryMatches = 0;
+
+    for (var sIdx = 0; sIdx < sLen && tIdx < tLen; sIdx++) {
+        if (str[sIdx] === token[tIdx]) {
+            if (firstMatchIdx === -1) firstMatchIdx = sIdx;
+            lastMatchIdx = sIdx;
+            consecutive++;
+            // Consecutive run bonus: 1+2+3+4... = n*(n+1)/2 growth
+            score += consecutive * 3;
+            // Word boundary bonus
+            if (_isWordBoundary(str, sIdx)) {
+                boundaryMatches++;
+                score += 20;
+            }
+            // Start-of-string bonus
+            if (sIdx === 0) score += 30;
+            tIdx++;
+        } else {
+            consecutive = 0;
+        }
+    }
+
+    if (tIdx < tLen) return 0; // Not all chars matched
+
+    // Base score for completing the match
+    score += 50;
+    // Coverage: how compact is the match span?
+    var span = lastMatchIdx - firstMatchIdx + 1;
+    score += Math.max(0, Math.round((tLen / span) * 60));
+    // Penalize very sparse matches
+    if (span > tLen * 4) score -= 20;
+    return score;
+}
+
+// Check if position i in str is a word boundary start
+function _isWordBoundary(str, i) {
+    if (i === 0) return true;
+    var prev = str.charCodeAt(i - 1);
+    // After / . _ - space
+    return prev === 47 || prev === 46 || prev === 95 || prev === 45 || prev === 32;
+}
+
 function rankFileItem(item, cleanLower) {
     ensureItemRankCache(item);
-    // Fast reject: skip expensive fuzzy scoring when first query char absent
-    if (cleanLower !== ""
-        && item._relativePathLower.indexOf(cleanLower[0]) === -1
-        && item._extensionLower.indexOf(cleanLower[0]) === -1)
+    if (cleanLower === "") return 1;
+
+    // Multi-token: split on spaces, require ALL tokens match (fzf AND semantics)
+    var tokens = cleanLower.indexOf(" ") === -1 ? [cleanLower] : cleanLower.split(/\s+/).filter(function(t) { return t !== ""; });
+    if (tokens.length === 0) return 1;
+
+    // Fast reject on first char of first token
+    var firstChar = tokens[0][0];
+    if (item._relativePathLower.indexOf(firstChar) === -1
+        && item._nameLower.indexOf(firstChar) === -1)
         return 0;
-    var exactName = item._nameLower === cleanLower;
-    var namePrefix = cleanLower !== "" && item._nameLower.startsWith(cleanLower);
-    var relPrefix = cleanLower !== "" && item._relativePathLower.startsWith(cleanLower);
-    var parentPrefix = cleanLower !== "" && item._parentPathLower.startsWith(cleanLower);
-    var bestScore = Math.max(fuzzyMatchLower(item._nameLower, cleanLower) * 2.2, fuzzyMatchLower(item._relativePathLower, cleanLower) * 1.2, fuzzyMatchLower(item._parentPathLower, cleanLower) * 0.75, fuzzyMatchLower(item._titleLower, cleanLower) * 0.65, fuzzyMatchLower(item._extensionLower, cleanLower) * 0.35);
-    if (exactName)
-        bestScore += 220;
-    else if (namePrefix)
-        bestScore += 160;
-    else if (relPrefix)
-        bestScore += 90;
-    else if (parentPrefix)
-        bestScore += 30;
-    bestScore -= Math.min(20, item._pathDepth * 2);
-    bestScore -= Math.min(16, Math.floor(item._relativePathLower.length / 24));
-    return bestScore;
+
+    var minScore = Infinity;
+    for (var t = 0; t < tokens.length; t++) {
+        var tok = tokens[t];
+        // Score each token against name (2.5x weight) and relative path (1.2x weight)
+        var nameScore = fzfScoreToken(item._nameLower, tok) * 2.5;
+        var pathScore = fzfScoreToken(item._relativePathLower, tok) * 1.2;
+        var bestTok = Math.max(nameScore, pathScore);
+        if (bestTok <= 0) return 0; // AND semantics: all tokens must match
+        if (bestTok < minScore) minScore = bestTok;
+    }
+
+    var score = minScore;
+    // Multi-token bonus: reward queries that use multiple tokens
+    if (tokens.length > 1) score += 50;
+    // Depth penalty: prefer shallower files
+    score -= Math.min(20, item._pathDepth * 2);
+    // Length penalty: prefer shorter paths
+    score -= Math.min(16, Math.floor(item._relativePathLower.length / 24));
+    return score;
 }
 
 // Safe arithmetic evaluator — handles +, -, *, /, parentheses, decimals.

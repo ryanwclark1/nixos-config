@@ -207,6 +207,12 @@ function executeEmptyPrimary(mode, clean, searchText, actions) {
         actions.loadAi();
         return;
     }
+    if (mode === "settings") {
+        if (actions.openSettings)
+            actions.openSettings();
+        actions.close();
+        return;
+    }
     if (mode === "run" && clean !== "") {
         actions.launchExecString(clean, false);
         actions.close();

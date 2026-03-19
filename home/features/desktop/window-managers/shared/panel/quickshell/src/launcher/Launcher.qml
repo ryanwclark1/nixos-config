@@ -19,7 +19,6 @@ import "LauncherSystemItems.js" as SystemItems
 import "LauncherHomeBuilder.js" as HomeBuilder
 import "LauncherCategoryHelpers.js" as CategoryHelpers
 import "LauncherTextHelpers.js" as TextHelpers
-import "LauncherEntryRegistry.js" as EntryRegistry
 import "LauncherWebProviders.js" as WebProviders
 import "CharacterData.js" as CharacterData
 import "../features/ssh" as SshFeature
@@ -80,8 +79,7 @@ PanelWindow {
             });
     }
 
-    // Safety-net Escape: works even if focus falls to an unexpected item
-    // (Shortcut doesn't depend on the QML focus chain)
+    // Safety-net Escape: works even if focus falls to an unexpected item.
     Shortcut {
         enabled: launcherRoot.launcherOpacity > 0
         sequence: "Escape"
@@ -533,6 +531,10 @@ PanelWindow {
     readonly property string legendTertiaryAction: {
         if (showingConfirm)
             return "Esc: Cancel";
+        if (sidebarOverflowExpanded)
+            return "Esc: Close More";
+        if (shortcutHelpExpanded)
+            return "Esc: Hide Help";
         if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded)))
             return "Esc: Reset";
         return "Shift+Tab: Next Mode";
@@ -2105,6 +2107,8 @@ PanelWindow {
     function escapeActionStateObject() {
         return Diag.escapeActionStateObject({
             showingConfirm: showingConfirm,
+            sidebarOverflowExpanded: sidebarOverflowExpanded,
+            shortcutHelpExpanded: shortcutHelpExpanded,
             searchText: searchText,
             drunCategoryFiltersEnabled: drunCategoryFiltersEnabled,
             mode: mode,
@@ -2123,6 +2127,8 @@ PanelWindow {
             fileSearchShowHidden: fileSearchShowHidden,
             fileOpenerCommand: fileOpenerCommand,
             showLauncherHome: showLauncherHome,
+            sidebarOverflowExpanded: sidebarOverflowExpanded,
+            shortcutHelpExpanded: shortcutHelpExpanded,
             drunCategoryFilter: drunCategoryFilter,
             drunCategorySectionExpanded: drunCategorySectionExpanded,
             filteredItemsLength: filteredItems.length,
@@ -2210,30 +2216,13 @@ PanelWindow {
 
     function loadFiles() {
         var searchQuery = searchText.startsWith("/") ? searchText.substring(1).trim() : searchText;
-        if (searchQuery.length < Config.launcherFileMinQueryLength) {
-            allItems = [];
-            filterItems();
-            completeModeLoad("files", true, "");
-            return;
-        }
-        var cacheKey = String(searchQuery).toLowerCase();
         var startedAt = Date.now();
         var rootDir = fileSearchRootResolved;
-        var maxResults = Math.max(20, Config.launcherFileMaxResults);
 
-        // Fast path: index already loaded — filter in-memory, skip backend resolution
+        // Index-first: always use in-memory index when available
         if (fileIndexReady && fileIndexItems.length > 0) {
             allItems = fileIndexItems;
-            var cachedItems = getFileQueryCached(cacheKey);
-            if (cachedItems) {
-                filteredItems = decorateResultSections(cachedItems.slice(0, Config.launcherMaxResults));
-                selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
-                completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
-                recordLoadMetric("files", 0, true, true);
-                return;
-            }
             filterItems();
-            setFileQueryCached(cacheKey, filteredItems.slice());
             completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
             recordLoadMetric("files", Date.now() - startedAt, false, true);
             if (fileIndexStale() && !fileIndexBuilding)
@@ -2242,7 +2231,7 @@ PanelWindow {
         }
 
         var token = beginRequest("files");
-        beginModeLoad("files", "Searching files");
+        beginModeLoad("files", "Building file index");
         resolveFileSearchBackend(function (backend) {
             if (!isRequestCurrent("files", token))
                 return;
@@ -2254,38 +2243,18 @@ PanelWindow {
             }
 
             if (backend === "fd") {
-                if (fileIndexStale() && !fileIndexBuilding)
+                // Always build full index — never do one-shot fd queries
+                if (!fileIndexBuilding)
                     buildFileIndex(rootDir);
 
                 if (fileIndexItems.length > 0) {
                     allItems = fileIndexItems;
                     filterItems();
-                    setFileQueryCached(cacheKey, filteredItems.slice());
                     completeModeLoad("files", true, fileIndexBuilding ? "Refreshing index in background" : "");
                     recordLoadMetric("files", Date.now() - startedAt, false, true);
                     return;
                 }
-
-                var fdCommand = ["fd", "--base-directory", rootDir, "--max-results", String(maxResults), searchQuery];
-                if (fileSearchShowHidden)
-                    fdCommand.splice(1, 0, "--hidden");
-                runCommand(fdCommand, function (raw) {
-                    if (!isRequestCurrent("files", token))
-                        return;
-                    var tookMs = Date.now() - startedAt;
-                    recordFilesBackendLoad("fd", tookMs);
-                    var items = FileParser.buildFileItemsFromRaw(raw, rootDir, fileSearchRootLabel);
-                    allItems = items;
-                    setFileQueryCached(cacheKey, items);
-                    filterItems();
-                    completeModeLoad("files", true, fileIndexBuilding ? "Indexing in background" : "");
-                    recordLoadMetric("files", tookMs, false, true);
-                }, function (errorText, _exitCode, _exitStatus) {
-                    if (!isRequestCurrent("files", token))
-                        return;
-                    applyFileSearchFailure(errorText, "File search failed");
-                    recordLoadMetric("files", Date.now() - startedAt, false, false);
-                });
+                // Index is building — completeModeLoad will fire from _handleFileIndexBuilt
                 return;
             }
 
@@ -2772,7 +2741,10 @@ PanelWindow {
         }
         if (mode === "files") {
             searchDebounceTimer.stop();
-            if (Config.launcherFileSearchDebounceMs <= 50) {
+            // Zero debounce when index is warm — pure in-memory filter takes <5ms
+            if (fileIndexReady && fileIndexItems.length > 0) {
+                applySearchRefresh(true);
+            } else if (Config.launcherFileSearchDebounceMs <= 50) {
                 applySearchRefresh(true);
             } else {
                 fileSearchDebounceTimer.restart();
@@ -2880,6 +2852,9 @@ PanelWindow {
             configuredWebProviderByKey: configuredWebProviderByKey,
             primaryWebProvider: primaryWebProvider,
             fileSearchRootResolved: fileSearchRootResolved,
+            openSettings: function() {
+                Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "open"]);
+            },
             parseAdHocTarget: SystemItems.parseAdHocTarget,
             connectAdHocSsh: function(user, host, port) {
                 var target = user ? (user + "@" + host) : host;
