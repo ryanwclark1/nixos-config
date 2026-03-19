@@ -237,7 +237,7 @@ Rectangle {
                 ModeButton {
                     visible: root._overflowModes.length > 0
                     modeKey: "__more__"
-                    label: root.launcher.sidebarOverflowExpanded ? "Hide Advanced" : "Advanced"
+                    label: root.launcher.sidebarOverflowExpanded ? "Hide More" : "More"
                     iconText: root.launcher.sidebarOverflowExpanded ? "󰅀" : "󰅂"
                     compact: root.launcher.sidebarCompact
                     active: root.launcher.sidebarOverflowExpanded || root._overflowModes.indexOf(root.launcher.mode) !== -1

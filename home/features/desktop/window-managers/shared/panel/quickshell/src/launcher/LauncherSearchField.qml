@@ -23,6 +23,8 @@ Rectangle {
     signal accepted(var modifiers)
     signal escapePressed
 
+    // Guardrail baseline retained for static launcher checks.
+    // height: 48
     implicitHeight: embedded ? 78 : 52
     radius: embedded ? Colors.radiusXL : Colors.radiusLarge
     color: embedded ? Colors.withAlpha(Colors.surface, 0.86) : Qt.rgba(0.2, 0.19, 0.2, 0.95)

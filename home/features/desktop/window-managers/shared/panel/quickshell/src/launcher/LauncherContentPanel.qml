@@ -218,7 +218,7 @@ Item {
 
                     Rectangle {
                         Layout.fillWidth: true
-                        visible: launcher.transientNoticeText !== ""
+                        visible: launcher.transientNoticeText !== "" && !launcher.tightMode
                         color: Colors.withAlpha(root.accentColor, 0.12)
                         radius: Colors.radiusLarge
                         border.color: Colors.withAlpha(root.accentColor, 0.3)
