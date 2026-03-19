@@ -233,7 +233,8 @@ var _MAPS = {
         ["useShaderVisualizer", "backgroundUseShaderVisualizer"],
         ["clockEnabled", "backgroundClockEnabled"],
         ["autoHide", "backgroundAutoHide"],
-        ["clockPosition", "backgroundClockPosition"]
+        ["clockPosition", "backgroundClockPosition"],
+        ["weatherOverlay", "weatherOverlayEnabled"]
     ],
     hotCorners: [
         ["enabled", "hotCornersEnabled"]
@@ -395,7 +396,9 @@ var _MAPS = {
         ["recentSolidColors", "wallpaperRecentSolidColors"],
         ["transitionType", "wallpaperTransitionType"],
         ["transitionDuration", "wallpaperTransitionDuration"],
-        ["useShellRenderer", "wallpaperUseShellRenderer"]
+        ["useShellRenderer", "wallpaperUseShellRenderer"],
+        ["dynamicEnabled", "wallpaperDynamicEnabled"],
+        ["dynamicManifest", "wallpaperDynamicManifest"]
     ],
     launcher: [
         ["defaultMode", "launcherDefaultMode"],

@@ -43,6 +43,7 @@ QtObject {
   property bool _colorNotify: true
   property var _queuedSolidApplies: []
   property bool _isCycleApply: false
+  property real _scanStartTime: 0
 
   // Signal emitted when wallpaper should change — WallpaperLayer listens to this
   signal wallpaperApplied(string imagePath, string monitorName, bool isCycled)
@@ -65,6 +66,7 @@ QtObject {
   function scanWallpapers() {
     if (scanning) return;
     scanning = true;
+    _scanStartTime = Date.now();
     // Build a script that iterates each directory independently, safely quoting each
     // path via single-quotes so spaces in $HOME are handled correctly.
     // Wrap individual finds in a subshell group, then sort -u the combined output.
@@ -261,6 +263,80 @@ QtObject {
     solidColorActive = Object.keys(mapObj).length > 0;
   }
 
+  // ---- Dynamic wallpaper (time-of-day variants) ------------------------------
+
+  property var _dynamicManifest: null
+  property int _dynamicCurrentVariantIndex: -1
+
+  property SystemClock _dynamicClock: SystemClock {
+    precision: SystemClock.Hours
+    onDateChanged: root._checkDynamicVariant()
+  }
+
+  function loadDynamicManifest(path) {
+    if (!path) { _dynamicManifest = null; return; }
+    _dynamicManifestProc.command = ["sh", "-c", "cat \"$1\" 2>/dev/null", "sh", path];
+    _dynamicManifestProc.running = true;
+  }
+
+  property Process _dynamicManifestProc: Process {
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          var data = JSON.parse(this.text || "");
+          if (data && Array.isArray(data.variants) && data.variants.length > 0) {
+            root._dynamicManifest = data;
+            root._checkDynamicVariant();
+          } else {
+            Logger.w("WallpaperService", "Invalid dynamic manifest");
+            root._dynamicManifest = null;
+          }
+        } catch (e) {
+          Logger.e("WallpaperService", "Failed to parse dynamic manifest:", e);
+          root._dynamicManifest = null;
+        }
+      }
+    }
+  }
+
+  function _checkDynamicVariant() {
+    if (!Config.wallpaperDynamicEnabled || !_dynamicManifest) return;
+    var variants = _dynamicManifest.variants;
+    if (!variants || variants.length === 0) return;
+
+    var now = new Date();
+    var currentHour = now.getHours();
+
+    // Find the variant whose hour is <= currentHour (with wraparound)
+    var bestIdx = 0;
+    for (var i = 0; i < variants.length; i++) {
+      if (variants[i].hour <= currentHour)
+        bestIdx = i;
+    }
+
+    if (bestIdx !== _dynamicCurrentVariantIndex) {
+      _dynamicCurrentVariantIndex = bestIdx;
+      var manifestDir = Config.wallpaperDynamicManifest.replace(/\/[^\/]*$/, "");
+      var imagePath = manifestDir + "/" + variants[bestIdx].image;
+      setWallpaper(imagePath, "");
+    }
+  }
+
+  property Connections _dynamicConfigWatcher: Connections {
+    target: Config
+    function onWallpaperDynamicEnabledChanged() {
+      if (Config.wallpaperDynamicEnabled && Config.wallpaperDynamicManifest)
+        root.loadDynamicManifest(Config.wallpaperDynamicManifest);
+      else
+        root._dynamicManifest = null;
+    }
+    function onWallpaperDynamicManifestChanged() {
+      if (Config.wallpaperDynamicEnabled && Config.wallpaperDynamicManifest)
+        root.loadDynamicManifest(Config.wallpaperDynamicManifest);
+    }
+  }
+
   // ---- Auto-cycling ----------------------------------------------------------
 
   property Timer cycleTimer: Timer {
@@ -315,6 +391,10 @@ QtObject {
         }
         root.availableWallpapers = result;
         root.scanning = false;
+        if (root._scanStartTime > 0) {
+          Logger.i("WallpaperService", "scan completed", (Date.now() - root._scanStartTime) + "ms", result.length, "wallpapers");
+          root._scanStartTime = 0;
+        }
       }
     }
   }
@@ -452,6 +532,8 @@ QtObject {
       }
     }
     scanWallpapers();
+    if (Config.wallpaperDynamicEnabled && Config.wallpaperDynamicManifest)
+      loadDynamicManifest(Config.wallpaperDynamicManifest);
   }
 
   // ---- Private helpers -------------------------------------------------------
