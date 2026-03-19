@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import "../../../services"
+import "SettingsSearchIndex.js" as SearchIndex
 
 QtObject {
     id: root
