@@ -63,30 +63,37 @@ Item {
     property Item anchorItem: pill
     property var anchorWindow: root.anchorWindow
     property bool isOpen: visible
-    property real gap: 8
     readonly property string anchorEdge: {
       if (anchorWindow && anchorWindow.barConfig && anchorWindow.barConfig.position)
         return String(anchorWindow.barConfig.position);
       return "top";
     }
 
-    // Map bar position to popup edge/gravity: popup appears on the opposite side
-    readonly property int _edgeFlag: {
-      switch (anchorEdge) {
-        case "top": return Edges.Bottom;
-        case "bottom": return Edges.Top;
-        case "left": return Edges.Right;
-        case "right": return Edges.Left;
-        default: return Edges.Bottom;
+    function _updateRect() {
+      if (!anchorItem || !anchorWindow) return;
+      var r = anchorWindow.itemRect(anchorItem);
+      var gap = Config.popupGap;
+      var tw = reaperPopup.implicitWidth;
+      var th = reaperPopup.implicitHeight;
+      var edge = anchorEdge;
+
+      if (edge === "left" || edge === "right") {
+        anchor.rect.y = r.y + r.height / 2 - th / 2;
+        anchor.rect.x = edge === "left" ? r.x + r.width + gap : r.x - tw - gap;
+      } else {
+        anchor.rect.x = r.x + r.width / 2 - tw / 2;
+        anchor.rect.y = edge === "bottom" ? r.y - th - gap : r.y + r.height + gap;
       }
     }
 
+    onAnchorItemChanged: _updateRect()
+    onAnchorEdgeChanged: _updateRect()
+    onImplicitWidthChanged: _updateRect()
+    onImplicitHeightChanged: _updateRect()
+    onVisibleChanged: if (visible) _updateRect()
+
     anchor.window: anchorWindow
-    anchor.item: anchorItem
-    anchor.edges: _edgeFlag
-    anchor.gravity: _edgeFlag
     anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
-    anchor.margins { top: gap; bottom: gap; left: gap; right: gap }
     visible: false
     color: "transparent"
     implicitWidth: popupBody.implicitWidth

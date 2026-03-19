@@ -14,7 +14,6 @@ PopupWindow {
   property string text: ""
   property string shortcut: ""
   property int delay: 250
-  property real gap: 12
   property real maxWidth: 280
 
   readonly property string tooltipText: String(text || "").trim()
@@ -29,28 +28,35 @@ PopupWindow {
     return "top";
   }
 
-  // Map bar position to popup edge/gravity: tooltip appears on the opposite side
-  readonly property int _edgeFlag: {
-    switch (anchorEdge) {
-      case "top": return Edges.Bottom;
-      case "bottom": return Edges.Top;
-      case "left": return Edges.Right;
-      case "right": return Edges.Left;
-      default: return Edges.Bottom;
+  // Compute anchor rect from the item's position within the window,
+  // offset by Config.popupGap on the appropriate edge.
+  // This matches the pattern used by SurfaceService.popupAnchorX/Y
+  // and BarContextPopup for consistent popup positioning.
+  function _updateRect() {
+    if (!anchorItem || !anchorWindow) return;
+    var r = anchorWindow.itemRect(anchorItem);
+    var gap = Config.popupGap;
+    var tw = root.implicitWidth;
+    var th = root.implicitHeight;
+    var edge = anchorEdge;
+
+    if (edge === "left" || edge === "right") {
+      anchor.rect.y = r.y + r.height / 2 - th / 2;
+      anchor.rect.x = edge === "left" ? r.x + r.width + gap : r.x - tw - gap;
+    } else {
+      anchor.rect.x = r.x + r.width / 2 - tw / 2;
+      anchor.rect.y = edge === "bottom" ? r.y - th - gap : r.y + r.height + gap;
     }
   }
 
+  onAnchorItemChanged: _updateRect()
+  onAnchorEdgeChanged: _updateRect()
+  onImplicitWidthChanged: _updateRect()
+  onImplicitHeightChanged: _updateRect()
+  onReadyChanged: if (ready) _updateRect()
+
   anchor.window: anchorWindow
-  anchor.item: anchorItem
-  anchor.edges: _edgeFlag
-  anchor.gravity: _edgeFlag
   anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
-  anchor.margins {
-    top: gap
-    bottom: gap
-    left: gap
-    right: gap
-  }
 
   implicitWidth: tooltipBody.width
   implicitHeight: tooltipBody.height
