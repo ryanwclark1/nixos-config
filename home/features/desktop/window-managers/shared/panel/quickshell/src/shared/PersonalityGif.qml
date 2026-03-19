@@ -1,0 +1,49 @@
+import QtQuick
+import "../services"
+
+Item {
+    id: root
+    implicitWidth: 32
+    implicitHeight: 32
+
+    property var widgetInstance: null
+
+    readonly property bool isMediaMode: Config.personalityGifReactionMode === "media"
+    readonly property bool isCpuMode: Config.personalityGifReactionMode === "cpu"
+    readonly property bool isBeatMode: Config.personalityGifReactionMode === "beat"
+
+    readonly property bool shouldPlay: {
+        if (!Config.personalityGifEnabled) return false;
+        if (isMediaMode) return MediaService.isPlaying;
+        if (isCpuMode) return SystemStatus.cpuPercent > 0.1;
+        if (isBeatMode) return !SpectrumService.isIdle;
+        return true;
+    }
+
+    readonly property real speedMult: {
+        if (isCpuMode) return 0.5 + (SystemStatus.cpuPercent * 1.5);
+        if (isBeatMode) return 1.0; // could scale with volume
+        return 1.0;
+    }
+
+    AnimatedImage {
+        id: img
+        anchors.fill: parent
+        source: Config.personalityGifPath ? "file://" + Config.personalityGifPath : ""
+        playing: root.shouldPlay
+        speed: root.speedMult
+        fillMode: Image.PreserveAspectFit
+        opacity: root.shouldPlay ? 1.0 : 0.4
+
+        Behavior on opacity { Anim {} }
+
+        // Placeholder if no path set
+        Text {
+            visible: !img.source
+            anchors.centerIn: parent
+            text: "󰄛"
+            font.pixelSize: 20
+            color: root.shouldPlay ? Colors.primary : Colors.textDisabled
+        }
+    }
+}

@@ -21,6 +21,7 @@ LiveLogOverlay 1.0 LiveLogOverlay.qml
 MenuCloseButton 1.0 MenuCloseButton.qml
 MiniProgressBar 1.0 MiniProgressBar.qml
 OverscrollGlow 1.0 OverscrollGlow.qml
+PersonalityGif 1.0 PersonalityGif.qml
 PulseButton 1.0 PulseButton.qml
 Ref 1.0 Ref.qml
 Revealer 1.0 Revealer.qml
