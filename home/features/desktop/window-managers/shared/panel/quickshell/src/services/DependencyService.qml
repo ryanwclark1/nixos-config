@@ -17,8 +17,8 @@ QtObject {
   readonly property var _systemDependencies: [
     "amixer", "awk", "bluetoothctl", "brightnessctl", "cliphist", "ffmpeg", "grim",
     "htop", "hyprctl", "ip", "jq", "light", "magick", "nmcli", "niri", "pactl",
-    "playerctl", "sed", "slurp", "swww", "tailscale", "waypaper", "wf-recorder",
-    "wl-copy", "wl-paste", "wpctl"
+    "playerctl", "sed", "slurp", "swww", "tailscale", "tesseract", "waypaper",
+    "wf-recorder", "wl-copy", "wl-paste", "wpctl"
   ]
   readonly property var _managedCommandSpecs: ({
       "qs-ai": {
@@ -47,6 +47,9 @@ QtObject {
       },
       "qs-run": {
         requires: []
+      },
+      "qs-ocr": {
+        requires: ["tesseract", "wl-copy"]
       },
       "qs-screenshot": {
         requires: ["grim", "slurp", "wl-copy"]

@@ -27,7 +27,11 @@ QtObject {
     readonly property real _fontScale: clampScale(Config.fontScale, 1.0)
     readonly property real _radiusScale: clampScale(Config.radiusScale, 1.0)
     readonly property real _spacingScale: clampScale(Config.spacingScale * Config.uiDensityScale, 1.0)
-    readonly property real _animScale: Config.animationSpeedScale
+    
+    // Eco Mode: Auto-downscale animations on battery
+    readonly property bool _isEcoMode: Config.autoEcoMode && SystemStatus.isBatteryPowered
+    readonly property real _powerAnimScale: _isEcoMode ? 0.6 : 1.0
+    readonly property real _animScale: Config.animationSpeedScale * _powerAnimScale
 
     readonly property color border: withAlpha(text, 0.15)
     readonly property color highlight: withAlpha(primary, 0.25)

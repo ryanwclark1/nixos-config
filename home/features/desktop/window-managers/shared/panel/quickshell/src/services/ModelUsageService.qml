@@ -36,6 +36,7 @@ QtObject {
   property real claudeRateLimitPercent: -1
   property string claudeRateLimitLabel: ""
   property string claudeRateLimitResetAt: ""
+  property int _lastRateLimitNotifiedTier: 0  // 0=none, 1=warning, 2=critical
 
   // ── Codex state ────────────────────────────────────
   property bool codexReady: false
@@ -174,6 +175,21 @@ QtObject {
             root.claudeRateLimitPercent = Math.round(pct * 10) / 10;
             root.claudeRateLimitLabel = data.daily_usage + " / " + data.daily_limit;
             root.claudeRateLimitResetAt = data.reset_at || "";
+
+            // Proactive rate limit toast
+            var tier = pct >= 95 ? 2 : pct >= 80 ? 1 : 0;
+            if (tier > root._lastRateLimitNotifiedTier) {
+              root._lastRateLimitNotifiedTier = tier;
+              var resetStr = root.formatResetTime(data.reset_at || "");
+              if (tier === 2)
+                ToastService.showError("Rate Limit Critical",
+                  "Claude usage at " + pct.toFixed(0) + "%" + (resetStr ? ". Resets " + resetStr : ""));
+              else
+                ToastService.showNotice("Rate Limit Warning",
+                  "Claude usage at " + pct.toFixed(0) + "%" + (resetStr ? ". Resets " + resetStr : ""));
+            } else if (tier === 0) {
+              root._lastRateLimitNotifiedTier = 0;
+            }
           } else {
             root.claudeRateLimitPercent = -1;
             root.claudeRateLimitLabel = "";

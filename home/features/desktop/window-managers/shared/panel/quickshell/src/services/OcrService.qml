@@ -38,7 +38,7 @@ QtObject {
         root._ocrStdoutFinished = false;
         root._ocrStderrFinished = false;
 
-        _ocrProc.command = DependencyService.resolveCommand("qs-ocr", [imagePath]);
+        _ocrProc.command = DependencyService.resolveCommand("qs-ocr", [imagePath, Config.ocrLanguage]);
         _ocrProc.running = true;
     }
 

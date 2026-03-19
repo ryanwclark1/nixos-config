@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
+import Quickshell.Services.UPower
 
 QtObject {
   id: root
@@ -34,6 +35,14 @@ QtObject {
   readonly property int _ramUsageHighThreshold: 90
   readonly property int _cpuTempHighThreshold: 85
   readonly property int _gpuTempHighThreshold: 80
+
+  readonly property bool isBatteryPowered: {
+    var d = UPower.displayDevice;
+    if (!d || !d.isPresent) return false;
+    return d.state === UPower.DeviceStateDischarging 
+        || d.state === UPower.DeviceStatePendingDischarge
+        || (d.state !== UPower.DeviceStateCharging && d.state !== UPower.DeviceStateFullyCharged);
+  }
 
   property Process _helperScriptProbe: Process {
     command: ["sh", "-c", "test -f \"$1\" && test -f \"$2\"", "qs-system-status-probe", root.healthCheckScript, root.pluginDoctorScript]
