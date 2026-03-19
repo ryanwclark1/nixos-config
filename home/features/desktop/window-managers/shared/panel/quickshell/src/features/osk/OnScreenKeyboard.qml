@@ -51,7 +51,11 @@ PanelWindow {
     }
 
     // ── Escape to close ──────────────────────────────────────────────────────
-    Keys.onEscapePressed: root.close()
+    Shortcut {
+        enabled: root.isVisible
+        sequence: "Escape"
+        onActivated: root.close()
+    }
 
     // ── Shadow behind background ─────────────────────────────────────────────
     ElevationShadow {

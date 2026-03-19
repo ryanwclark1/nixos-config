@@ -241,7 +241,11 @@ PanelWindow {
         focus = false
       }
     }
-    Keys.onEscapePressed: settingsRoot.isOpen = false
+    Shortcut {
+      enabled: settingsRoot.isOpen
+      sequence: "Escape"
+      onActivated: settingsRoot.isOpen = false
+    }
 
     opacity: settingsRoot.isOpen ? 1.0 : 0.0
     scale: settingsRoot.isOpen ? 1.0 : 0.95

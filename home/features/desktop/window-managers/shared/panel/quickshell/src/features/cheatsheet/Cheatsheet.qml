@@ -34,7 +34,11 @@ PanelWindow {
         function close():  void { root.close(); }
     }
 
-    Keys.onEscapePressed: root.close()
+    Shortcut {
+        enabled: root.isVisible
+        sequence: "Escape"
+        onActivated: root.close()
+    }
 
     // Scrim background
     Rectangle {
