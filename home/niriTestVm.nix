@@ -62,7 +62,7 @@
       command = [
         "sh"
         "-c"
-        "systemctl --user reset-failed quickshell.service >/dev/null 2>&1 || true"
+        "systemctl --user reset-failed quickshell.service niri-vm-kitty.service >/dev/null 2>&1 || true"
       ];
     }
     {
@@ -72,12 +72,31 @@
         "start"
         "--no-block"
         "quickshell.service"
+        "niri-vm-kitty.service"
       ];
     }
-    {
-      command = [ "kitty" ];
-    }
   ];
+
+  systemd.user.services.niri-vm-kitty = {
+    Unit = {
+      Description = "Kitty terminal for the Niri VM session";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+      StartLimitBurst = 10;
+      StartLimitIntervalSec = 60;
+    };
+
+    Service = {
+      ExecStart = "${pkgs.kitty}/bin/kitty";
+      Restart = "on-failure";
+      RestartSec = 2;
+    };
+
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
+  };
 
   home.packages = with pkgs; [
     cava
