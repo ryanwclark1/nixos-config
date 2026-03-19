@@ -45,11 +45,17 @@ Item {
                     // Connect to WallpaperService signals
                     Connections {
                         target: WallpaperService
-                        function onWallpaperApplied(imagePath, monitorName) {
+                        function onWallpaperApplied(imagePath, monitorName, isCycled) {
                             // Apply if this is for our monitor or for all monitors
                             var screenName = modelData.name || "";
                             if (monitorName === "" || monitorName === screenName) {
                                 wallpaperLayer.showSolid = false;
+                                // Use slower transition for auto-cycle
+                                if (isCycled) {
+                                    wallpaperLayer.transitionDuration = Math.round(Config.wallpaperTransitionDuration * 1.5);
+                                } else {
+                                    wallpaperLayer.transitionDuration = Config.wallpaperTransitionDuration;
+                                }
                                 wallpaperLayer.currentSource = "file://" + imagePath;
                             }
                         }

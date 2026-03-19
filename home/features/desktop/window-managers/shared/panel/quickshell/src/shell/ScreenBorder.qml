@@ -23,7 +23,7 @@ PanelWindow {
     height: win.thickness
     anchors { top: parent.top; left: parent.left; right: parent.right }
     color: win.frameColor
-    Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
   }
 
   // Bottom Bar
@@ -31,7 +31,7 @@ PanelWindow {
     height: win.thickness
     anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
     color: win.frameColor
-    Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
   }
 
   // Left Bar
@@ -40,7 +40,7 @@ PanelWindow {
     anchors { top: parent.top; bottom: parent.bottom; left: parent.left }
     anchors.topMargin: win.thickness; anchors.bottomMargin: win.thickness
     color: win.frameColor
-    Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
   }
 
   // Right Bar
@@ -49,7 +49,7 @@ PanelWindow {
     anchors { top: parent.top; bottom: parent.bottom; right: parent.right }
     anchors.topMargin: win.thickness; anchors.bottomMargin: win.thickness
     color: win.frameColor
-    Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
   }
 
   // Corner canvases
