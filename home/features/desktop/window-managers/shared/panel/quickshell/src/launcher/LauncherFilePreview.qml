@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import "../services"
 import "../widgets" as SharedWidgets
+import "../features/workspace/FileBrowserHelpers.js" as FBH
 
 Rectangle {
     id: root
@@ -159,15 +160,6 @@ Rectangle {
         return "";
     }
 
-    function _formatSize(bytes) {
-        var b = parseInt(bytes, 10);
-        if (isNaN(b) || b < 0) return "";
-        if (b < 1024) return b + " B";
-        if (b < 1048576) return (b / 1024).toFixed(1) + " KB";
-        if (b < 1073741824) return (b / 1048576).toFixed(1) + " MB";
-        return (b / 1073741824).toFixed(1) + " GB";
-    }
-
     function _evictOldest() {
         if (_cacheSize < 10) return;
         var oldest = null;
@@ -279,7 +271,7 @@ Rectangle {
         stdout: StdioCollector {
             onStreamFinished: {
                 if (_statProc._destroyed || root._destroyed) return;
-                root._fileSize = root._formatSize(this.text || "");
+                root._fileSize = FBH.formatSize(this.text || "");
             }
         }
     }
