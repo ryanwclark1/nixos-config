@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../services"
+import "../VpnHelpers.js" as VH
 
 Row {
     id: root
@@ -26,15 +27,7 @@ Row {
         return parts.join(" • ");
     }
 
-    function statusColor() {
-        if (statusKey === "connected")
-            return Colors.success;
-        if (statusKey === "stopped")
-            return Colors.warning;
-        if (statusKey === "disconnected")
-            return Colors.textSecondary;
-        return Colors.textDisabled;
-    }
+    function statusColor() { return VH.statusColor(root.statusKey, Colors); }
 
     Ref {
         service: NetworkService

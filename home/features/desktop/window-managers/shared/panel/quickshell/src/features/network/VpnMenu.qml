@@ -4,6 +4,7 @@ import Quickshell
 import "../../shared"
 import "../../services"
 import "../../widgets" as SharedWidgets
+import "VpnHelpers.js" as VH
 
 BasePopupMenu {
     id: root
@@ -14,15 +15,7 @@ BasePopupMenu {
     title: "VPN Hub"
     subtitle: NetworkService.vpnPrimaryLabel + " • " + NetworkService.vpnStatusLabel(NetworkService.vpnPrimaryStatus)
 
-    function statusColor(statusKey) {
-        if (statusKey === "connected")
-            return Colors.success;
-        if (statusKey === "stopped")
-            return Colors.warning;
-        if (statusKey === "disconnected")
-            return Colors.textSecondary;
-        return Colors.textDisabled;
-    }
+    function statusColor(statusKey) { return VH.statusColor(statusKey, Colors); }
 
     function openNetworkMenu() {
         root.closeRequested();
