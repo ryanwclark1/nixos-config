@@ -59,11 +59,18 @@ var _MAPS = {
         ["height", "barHeight"],
         ["floating", "barFloating"],
         ["margin", "barMargin"],
-        ["opacity", "barOpacity"]
+        ["opacity", "barOpacity"],
+        ["leftEntries", "barLeftEntries"],
+        ["centerEntries", "barCenterEntries"],
+        ["rightEntries", "barRightEntries"],
+        ["useModularEntries", "barUseModularEntries"]
     ],
     glass: [
         ["blur", "blurEnabled"],
         ["opacity", "glassOpacity"],
+        ["opacityBase", "glassOpacityBase"],
+        ["opacitySurface", "glassOpacitySurface"],
+        ["opacityOverlay", "glassOpacityOverlay"],
         ["settingsBackdropOpacity", "settingsBackdropOpacity"],
         ["settingsSurfaceOpacity", "settingsSurfaceOpacity"],
         ["autoTransparency", "autoTransparency"]
@@ -133,6 +140,7 @@ var _MAPS = {
     ],
     background: [
         ["visualizerEnabled", "backgroundVisualizerEnabled"],
+        ["useShaderVisualizer", "backgroundUseShaderVisualizer"],
         ["clockEnabled", "backgroundClockEnabled"],
         ["autoHide", "backgroundAutoHide"],
         ["clockPosition", "backgroundClockPosition"]
@@ -237,6 +245,7 @@ var _MAPS = {
         ["name", "themeName"],
         ["autoScheduleEnabled", "themeAutoScheduleEnabled"],
         ["autoScheduleMode", "themeAutoScheduleMode"],
+        ["useDynamicTheming", "useDynamicTheming"],
         ["darkName", "themeDarkName"],
         ["lightName", "themeLightName"],
         ["darkHour", "themeDarkHour"],
@@ -273,7 +282,12 @@ var _MAPS = {
         ["monoFontFamily", "monoFontFamily", _strDef],
         ["fontScale", "fontScale", _num1],
         ["radiusScale", "radiusScale", _num1],
-        ["spacingScale", "spacingScale", _num1]
+        ["spacingScale", "spacingScale", _num1],
+        ["uiDensityScale", "uiDensityScale", _num1],
+        ["animationSpeedScale", "animationSpeedScale", _num1],
+        ["personalityGifEnabled", "personalityGifEnabled"],
+        ["personalityGifPath", "personalityGifPath", _strDef],
+        ["personalityGifReactionMode", "personalityGifReactionMode", _strDef]
     ],
     wallpaper: [
         ["runPywal", "wallpaperRunPywal"],

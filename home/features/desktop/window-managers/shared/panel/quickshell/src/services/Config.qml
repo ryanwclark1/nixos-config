@@ -15,10 +15,17 @@ QtObject {
     property real barOpacity: 1.0
     property var barConfigs: []
     property string selectedBarId: ""
+    property var barLeftEntries: ["logo", "workspaces", "specialWorkspaces"]
+    property var barCenterEntries: ["windowTitle"]
+    property var barRightEntries: ["updates", "cava", "mediaBar", "network", "bluetooth", "audio", "battery", "dateTime", "notifications", "tray", "controlCenter"]
+    property bool barUseModularEntries: false
 
     // --- GLASS ---
     property bool blurEnabled: true
     property real glassOpacity: 1.0
+    property real glassOpacityBase: 0.85
+    property real glassOpacitySurface: 0.94
+    property real glassOpacityOverlay: 1.0
     property real popupOpacity: 1.0
     property real cardOpacity: 1.0
     property real settingsBackdropOpacity: 0.92
@@ -171,6 +178,7 @@ QtObject {
 
     // --- BACKGROUND ---
     property bool backgroundVisualizerEnabled: false
+    property bool backgroundUseShaderVisualizer: false
     property bool backgroundClockEnabled: false
     property bool backgroundAutoHide: true
     property string backgroundClockPosition: "center"
@@ -276,6 +284,7 @@ QtObject {
     // --- THEME ---
     property string themeName: ""
     property bool themeAutoScheduleEnabled: false
+    property bool useDynamicTheming: false
     property string themeAutoScheduleMode: "time"
     property string themeDarkName: ""
     property string themeLightName: ""
@@ -292,6 +301,11 @@ QtObject {
     property real fontScale: 1.0
     property real radiusScale: 1.0
     property real spacingScale: 1.0
+    property real uiDensityScale: 1.0
+    property real animationSpeedScale: 1.0
+    property bool personalityGifEnabled: false
+    property string personalityGifPath: ""
+    property string personalityGifReactionMode: "media" // media | cpu | beat | idle
 
     // --- AI ASSISTANT ---
     property string aiProvider: "ollama"           // "ollama"|"anthropic"|"openai"|"gemini"|"custom"

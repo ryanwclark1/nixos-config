@@ -26,11 +26,17 @@ QtObject {
     readonly property string fontMono: Config.monoFontFamily || "JetBrainsMono Nerd Font"
     readonly property real _fontScale: clampScale(Config.fontScale, 1.0)
     readonly property real _radiusScale: clampScale(Config.radiusScale, 1.0)
-    readonly property real _spacingScale: clampScale(Config.spacingScale, 1.0)
+    readonly property real _spacingScale: clampScale(Config.spacingScale * Config.uiDensityScale, 1.0)
+    readonly property real _animScale: Config.animationSpeedScale
 
     readonly property color border: withAlpha(text, 0.15)
     readonly property color highlight: withAlpha(primary, 0.25)
     readonly property color highlightLight: withAlpha(primary, 0.15)
+
+    // --- TRANSPARENCY TIERS ---
+    readonly property real opacityBase: Config.glassOpacityBase
+    readonly property real opacitySurface: Config.glassOpacitySurface
+    readonly property real opacityOverlay: Config.glassOpacityOverlay
 
     // --- TEXT COLOR ALIASES ---
     readonly property color textFaint: withAlpha(text, 0.06)         // Subtle code/card bg
@@ -60,6 +66,7 @@ QtObject {
         }
         depth: 0
         rescaleSize: 10
+        onColorsChanged: colors.applyDynamicPalette()
     }
 
     readonly property real _wallpaperVibrancy: {
@@ -75,14 +82,14 @@ QtObject {
     }
 
     // --- GLASSMORPHISM ---
-    readonly property real bgOpacity: autoTransparencyEnabled ? (1.0 - autoGlassOpacity) : Config.glassOpacity
+    readonly property real bgOpacity: autoTransparencyEnabled ? (1.0 - autoGlassOpacity) : opacityBase
     readonly property color bgGlass: withAlpha(background, bgOpacity)
     readonly property color bgWidget: _isLight ? Qt.rgba(0, 0, 0, 0.06) : Qt.rgba(1, 1, 1, 0.08)
     readonly property color bg: background
 
     // --- GRADIENTS & DEPTH ---
-    readonly property color surfaceGradientStart: solid(surface)
-    readonly property color surfaceGradientEnd: solid(surface)
+    readonly property color surfaceGradientStart: withAlpha(surface, opacitySurface)
+    readonly property color surfaceGradientEnd: withAlpha(surface, opacitySurface * 0.95)
     readonly property color borderLight: withAlpha(text, 0.12)
     readonly property color borderDark: withAlpha("#000000", 0.25)
     readonly property color borderMedium: withAlpha(text, 0.4)       // Subtle separator / divider
@@ -96,37 +103,48 @@ QtObject {
     readonly property color overlayScrim: Qt.rgba(0, 0, 0, 0.45)
 
     // --- POPUP SURFACES (shared across all menus) ---
-    property real _popupOpacity: 0.96
-    property real _cardOpacity: 0.96
-    readonly property color popupSurface: withAlpha(surface, _popupOpacity)
-    readonly property color cardSurface: withAlpha(surface, _cardOpacity)
-    readonly property color chipSurface: withAlpha(surface, 0.92)
+    readonly property color popupSurface: withAlpha(surface, opacityBase)
+    readonly property color cardSurface: withAlpha(surface, opacitySurface)
+    readonly property color chipSurface: withAlpha(surface, opacityOverlay)
     readonly property color modalFieldSurface: chipSurface
 
     property Connections _configConn: Connections {
         target: Config
-        function onPopupOpacityChanged() { colors._popupOpacity = Config.popupOpacity; }
-        function onCardOpacityChanged() { colors._cardOpacity = Config.cardOpacity; }
+        function onPopupOpacityChanged() { /* legacy */ }
+        function onCardOpacityChanged() { /* legacy */ }
+        function onUseDynamicThemingChanged() {
+            if (Config.useDynamicTheming)
+                colors.applyDynamicPalette();
+            else
+                colors.reloadColors();
+        }
+    }
+
+    property Connections _wallpaperConn: Connections {
+        target: WallpaperService
+        function onWallpapersChanged() {
+            if (Config.useDynamicTheming)
+                colors.applyDynamicPalette();
+        }
     }
 
     Component.onCompleted: {
-        if (Config) {
-            colors._popupOpacity = Config.popupOpacity;
-            colors._cardOpacity = Config.cardOpacity;
-        }
-        colors.reloadColors();
+        if (Config.useDynamicTheming)
+            colors.applyDynamicPalette();
+        else
+            colors.reloadColors();
     }
 
 
     // --- DIMENSIONS ---
-    readonly property int spacingXXS: 2
-    readonly property int spacingXS: 4
-    readonly property int spacingSM: 6
-    readonly property int spacingS: 8
-    readonly property int spacingM: 12
-    readonly property int spacingL: 16
-    readonly property int spacingLG: 20
-    readonly property int spacingXL: 24
+    readonly property int spacingXXS: scaledMetric(2, _spacingScale, 1)
+    readonly property int spacingXS: scaledMetric(4, _spacingScale, 2)
+    readonly property int spacingSM: scaledMetric(6, _spacingScale, 3)
+    readonly property int spacingS: scaledMetric(8, _spacingScale, 4)
+    readonly property int spacingM: scaledMetric(12, _spacingScale, 8)
+    readonly property int spacingL: scaledMetric(16, _spacingScale, 10)
+    readonly property int spacingLG: scaledMetric(20, _spacingScale, 12)
+    readonly property int spacingXL: scaledMetric(24, _spacingScale, 16)
 
     readonly property int paddingSmall: scaledMetric(8, _spacingScale, 4)
     readonly property int paddingMedium: scaledMetric(12, _spacingScale, 8)
@@ -144,44 +162,44 @@ QtObject {
     readonly property int radiusPill: 999
 
     // --- ANIMATIONS ---
-    readonly property int durationFlash: 80
-    readonly property int durationSnap: 100
-    readonly property int durationMedium: 220
-    readonly property int durationFast: 160
-    readonly property int durationNormal: 250
-    readonly property int durationSlow: 350
-    readonly property int durationEmphasis: 400
-    readonly property int durationPulse: 600
-    readonly property int durationShake: 50        // Lock screen auth shake micro-steps
-    readonly property int durationPanelClose: 260  // Sidebar panel fade/scale out
-    readonly property int durationPanelOpen: 320   // Sidebar panel scale in (OutBack)
-    readonly property int durationLong: 800        // Extended pulse/countdown animations
+    readonly property int durationFlash: Math.round(80 * _animScale)
+    readonly property int durationSnap: Math.round(100 * _animScale)
+    readonly property int durationMedium: Math.round(220 * _animScale)
+    readonly property int durationFast: Math.round(160 * _animScale)
+    readonly property int durationNormal: Math.round(250 * _animScale)
+    readonly property int durationSlow: Math.round(350 * _animScale)
+    readonly property int durationEmphasis: Math.round(400 * _animScale)
+    readonly property int durationPulse: Math.round(600 * _animScale)
+    readonly property int durationShake: Math.round(50 * _animScale)
+    readonly property int durationPanelClose: Math.round(260 * _animScale)
+    readonly property int durationPanelOpen: Math.round(320 * _animScale)
+    readonly property int durationLong: Math.round(800 * _animScale)
 
     // --- ANIMATION EASING PRESETS ---
     // Named bezier-curve presets for consistent motion across the shell.
     // Based on Material Design 3 expressive motion.
     readonly property var animMove: ({
-        duration: 320,
+        duration: Math.round(320 * _animScale),
         type: Easing.BezierSpline,
         bezierCurve: [0.38, 1.21, 0.22, 1.00, 1, 1]
     })
     readonly property var animEnter: ({
-        duration: 400,
+        duration: Math.round(400 * _animScale),
         type: Easing.BezierSpline,
         bezierCurve: [0.05, 0.7, 0.1, 1, 1, 1]
     })
     readonly property var animExit: ({
-        duration: 200,
+        duration: Math.round(200 * _animScale),
         type: Easing.BezierSpline,
         bezierCurve: [0.3, 0, 0.8, 0.15, 1, 1]
     })
     readonly property var animFastSpatial: ({
-        duration: 350,
+        duration: Math.round(350 * _animScale),
         type: Easing.BezierSpline,
         bezierCurve: [0.42, 1.67, 0.21, 0.90, 1, 1]
     })
     readonly property var animEffect: ({
-        duration: 200,
+        duration: Math.round(200 * _animScale),
         type: Easing.BezierSpline,
         bezierCurve: [0.34, 0.80, 0.34, 1.00, 1, 1]
     })
@@ -299,5 +317,25 @@ QtObject {
         watchChanges: true
         onTextChanged: colors.reloadColors()
         onLoaded: colors.reloadColors()
+    }
+
+    function applyDynamicPalette() {
+        if (!Config.useDynamicTheming) return;
+        var c = _wallpaperQuant.colors;
+        if (!c || c.length === 0) return;
+
+        // Extract vibrant and muted tones
+        var p = c[0].color; // dominant
+        var s = c.length > 1 ? c[1].color : p;
+        var a = c.length > 2 ? c[2].color : s;
+
+        // Dark background based on muted version of dominant color
+        background = withAlpha(p, 1.0);
+        surface = withAlpha(p, 0.95);
+        primary = withAlpha(s, 1.0);
+        accent = withAlpha(a, 1.0);
+        text = "#ffffff";
+        textSecondary = withAlpha("#ffffff", 0.7);
+        textDisabled = withAlpha("#ffffff", 0.4);
     }
 }
