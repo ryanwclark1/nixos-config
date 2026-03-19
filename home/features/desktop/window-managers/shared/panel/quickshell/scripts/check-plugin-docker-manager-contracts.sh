@@ -98,6 +98,7 @@ require_pattern "$daemon_qml" 'function _resourceRefreshCommand\(' "docker-manag
 require_pattern "$daemon_qml" 'ScriptModel' "docker-manager daemon uses ScriptModel for efficient updates"
 require_pattern "$daemon_qml" 'type=image' "docker-manager daemon supports Podman image event types"
 require_pattern "$daemon_qml" 'signal toastRequested' "docker-manager daemon provides toast notification bridge"
+require_pattern "$daemon_qml" 'function _normalizeEnv\(' "docker-manager daemon normalizes container environment variables"
 require_pattern "$daemon_qml" '_actionQueue' "docker-manager daemon queues bulk actions sequentially"
 require_pattern "$daemon_qml" 'function _drainActionQueue\(' "docker-manager daemon drains action queue on completion"
 require_pattern "$daemon_qml" 'function removeContainer\(' "docker-manager daemon exposes container removal"
@@ -114,9 +115,25 @@ require_pattern "$bar_widget_qml" 'currentTab' "docker-manager widget uses tab-b
 require_pattern "$bar_widget_qml" 'selectionMode' "docker-manager widget supports bulk selection mode"
 require_pattern "$bar_widget_qml" 'searchQuery' "docker-manager widget supports search filtering"
 require_pattern "$bar_widget_qml" 'focusedCardIndex' "docker-manager widget supports keyboard navigation"
+require_pattern "$bar_widget_qml" 'searchDebounceTimer' "docker-manager widget debounces search input"
 require_pattern "$bar_widget_qml" '_filteredContainers' "docker-manager widget caches filtered container list"
 container_card_qml="${plugin_dir}/ContainerCard.qml"
+image_card_qml="${plugin_dir}/ImageCard.qml"
+volume_card_qml="${plugin_dir}/VolumeCard.qml"
+network_card_qml="${plugin_dir}/NetworkCard.qml"
+run_dialog_qml="${plugin_dir}/RunImageDialog.qml"
+bulk_bar_qml="${plugin_dir}/BulkActionBar.qml"
+
+for component in "$container_card_qml" "$image_card_qml" "$volume_card_qml" "$network_card_qml" "$run_dialog_qml" "$bulk_bar_qml"; do
+  if [[ -f "$component" ]]; then
+    pass "docker-manager extracted component exists: $(basename "$component")"
+  else
+    fail "docker-manager extracted component missing: $(basename "$component")"
+  fi
+done
+
 require_pattern "$container_card_qml" 'removeContainer' "docker-manager container card exposes container removal action"
+require_pattern "$container_card_qml" 'modelData\.env' "docker-manager container card displays environment variables"
 
 require_pattern "$settings_qml" 'dockerBinary' "docker-manager settings expose runtime binary"
 require_pattern "$settings_qml" 'debounceDelay' "docker-manager settings expose debounce delay"

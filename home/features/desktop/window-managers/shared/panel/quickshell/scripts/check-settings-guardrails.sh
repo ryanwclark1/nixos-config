@@ -37,10 +37,10 @@ main() {
   require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'SettingsDragHandle' "bar widget shared drag handle"
   require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'label:\s*"↑"' "bar widget up-arrow fallback"
   require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'label:\s*"↓"' "bar widget down-arrow fallback"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellCoreSectionTab.qml" 'SettingsDragHandle' "shell-core tab shared drag handle"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellCoreSectionTab.qml" 'targetIndexFromMappedY' "shell-core tab reorder math helper usage"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellCoreSectionTab.qml" 'label:\s*"↑"' "shell-core tab up-arrow fallback"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellCoreSectionTab.qml" 'label:\s*"↓"' "shell-core tab down-arrow fallback"
+  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'SettingsDragHandle' "shell-core tab shared drag handle"
+  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'currentWebProviderDropIndex' "shell-core tab reorder math helper usage"
+  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'label:\s*"↑"' "shell-core tab up-arrow fallback"
+  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'label:\s*"↓"' "shell-core tab down-arrow fallback"
 
   "${script_dir}/check-settings-responsive.sh" "$@"
   if (( ${#runtime_args[@]} == 0 )); then

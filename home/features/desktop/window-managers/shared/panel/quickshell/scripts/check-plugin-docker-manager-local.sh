@@ -148,7 +148,7 @@ fi
 if env PLUGIN_LOCAL_DOCKER_SKIP_LOCAL=1 "$local_runner" docker-all --quiet >"$tmp_all_out" 2>"$tmp_all_err"; then
   if ! rg -q 'Plugin docker local summary:' "$tmp_all_out" \
     && rg -q 'Plugin docker runtime smoke summary: 2 pass, 0 fail' "$tmp_all_out" \
-    && rg -q 'Docker-manager plugin contract summary: 74 pass, 0 fail' "$tmp_all_out" \
+    && rg -q 'Docker-manager plugin contract summary: 83 pass, 0 fail' "$tmp_all_out" \
     && rg -q 'Plugin docker diagnostics summary:' "$tmp_all_out"; then
     pass "plugin-local docker-all --quiet runs the assembled docker-manager guard sequence when local recursion is disabled"
   else

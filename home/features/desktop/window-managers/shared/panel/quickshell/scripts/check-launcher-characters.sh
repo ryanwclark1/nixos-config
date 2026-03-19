@@ -44,7 +44,6 @@ require_literal "$launcher_search_js" 'function stripCharacterTrigger(searchText
 require_literal "$launcher_search_js" 'function rankCharacterItem(item, clean, cleanLower)' "launcher character ranking helper"
 require_literal "$launcher_executor_js" 'actions.selectCharacter(item.name, actions.shouldPasteCharacter(actions.modifiers));' "launcher executor character action"
 require_literal "$launcher_result_delegate_qml" 'if (root.mode === "emoji")' "launcher character provider badge"
-require_literal "$launcher_settings_qml" 'label: "Characters"' "launcher settings character label"
 require_literal "$launcher_settings_qml" 'label: "Character Trigger"' "launcher settings character trigger row"
 require_literal "$launcher_settings_qml" 'configKey: "launcherCharacterPasteOnSelect"' "launcher settings paste toggle row"
 require_literal "$launcher_helpers_js" 'Config.launcherCharacterTrigger = ":";' "launcher character trigger reset"

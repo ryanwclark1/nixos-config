@@ -44,9 +44,11 @@ QML
 
 cat > "${tmp_home}/.local/state/quickshell/config.json" <<'JSON'
 {
-  "desktopWidgetsEnabled": true,
-  "desktopWidgetsGridSnap": false,
-  "desktopWidgetsMonitorWidgets": [],
+  "desktopWidgets": {
+    "enabled": true,
+    "gridSnap": false,
+    "monitorWidgets": []
+  },
   "bars": {
     "selectedBarId": "bar-main",
     "configs": [
@@ -162,6 +164,7 @@ set +e
 output="$(
   env -u WAYLAND_DISPLAY -u DISPLAY \
     HOME="${tmp_home}" \
+    QS_SCRIPT_ROOT="${repo_root}/scripts" \
     XDG_RUNTIME_DIR="${tmp_runtime}" \
     QT_QPA_PLATFORM=offscreen \
     timeout 5s quickshell -p "${tmp_qml}" --no-duplicate 2>&1

@@ -71,7 +71,7 @@ require_literal "$launcher_qml" 'return "Esc: Reset";' "legend tertiary reset ma
 require_literal "$launcher_qml" 'return "Shift+Tab: Next Mode";' "legend tertiary default mapping"
 
 # Wrapping semantics for mode/result cycling.
-require_literal "$launcher_qml" 'var nextIndex = (currentIndex + step + modeOrder.length) % modeOrder.length;' "mode cycle wrap-around"
+require_literal "$launcher_qml" 'var nextIndex = (currentIndex + step + availableModes.length) % availableModes.length;' "mode cycle wrap-around"
 require_literal "$launcher_qml" 'var next = (selectedIndex + step + filteredItems.length) % filteredItems.length;' "selection cycle wrap-around"
 
 if (( ${#violations[@]} > 0 )); then
