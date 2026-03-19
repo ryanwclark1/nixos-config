@@ -26,7 +26,7 @@
   '';
   home.file.".zprofile".text = ''
     if [[ -z "''${SSH_TTY:-}" && -z "''${SSH_CONNECTION:-}" && -z "''${WAYLAND_DISPLAY:-}" && -z "''${DISPLAY:-}" && "''${XDG_VTNR:-}" == "1" ]]; then
-      exec niri-session
+      exec uwsm start niri-uwsm.desktop
     fi
   '';
   home.file.".config/autostart/nm-applet.desktop".text = ''
@@ -47,7 +47,23 @@
       command = [
         "sh"
         "-lc"
-        "dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE NIRI_SOCKET || true; systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE NIRI_SOCKET || true"
+        "env_vars='WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE NIRI_SOCKET'; if [ -n \"\${DISPLAY:-}\" ]; then env_vars=\"DISPLAY \${env_vars}\"; fi; dbus-update-activation-environment --systemd \${env_vars} || true; systemctl --user import-environment \${env_vars} || true"
+      ];
+    }
+    {
+      command = [
+        "sh"
+        "-c"
+        "systemctl --user reset-failed quickshell.service >/dev/null 2>&1 || true"
+      ];
+    }
+    {
+      command = [
+        "systemctl"
+        "--user"
+        "start"
+        "--no-block"
+        "quickshell.service"
       ];
     }
     {
