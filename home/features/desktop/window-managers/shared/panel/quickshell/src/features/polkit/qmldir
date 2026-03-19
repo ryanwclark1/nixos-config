@@ -1,0 +1,4 @@
+PolkitAgent 1.0 PolkitAgent.qml
+PolkitAuthDialog 1.0 PolkitAuthDialog.qml
+PolkitAuthPrompt 1.0 PolkitAuthPrompt.qml
+PolkitPamContext 1.0 PolkitPamContext.qml

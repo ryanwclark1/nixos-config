@@ -1,0 +1,296 @@
+import QtQuick
+import QtQuick.Layouts
+import Quickshell
+import Quickshell.Wayland
+import "../../services"
+import "../../widgets" as SharedWidgets
+import "../../shared"
+
+PanelWindow {
+    id: root
+
+    property var screenRef: screen || Quickshell.cursorScreen || Config.primaryScreen()
+    screen: screenRef
+
+    anchors {
+        top: true
+        bottom: true
+        left: true
+        right: true
+    }
+    color: "transparent"
+
+    // Auth request state (set by PolkitAgent)
+    property string cookie: ""
+    property string actionId: ""
+    property string authMessage: ""
+    property string iconName: ""
+    property var identities: []
+    property bool isVisible: false
+
+    visible: root.isVisible || fadeAnim.running || scaleAnim.running
+
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.namespace: "quickshell:polkit"
+
+    signal authResult(string cookie, bool authenticated)
+
+    // PAM context
+    PolkitPamContext {
+        id: pamContext
+
+        onAuthenticated: {
+            root.authResult(root.cookie, true);
+            root._dismiss();
+        }
+
+        onFailed: {
+            prompt.shake();
+            prompt.clearInput();
+            prompt.forceActiveFocus();
+        }
+    }
+
+    // 120s auto-cancel timeout
+    Timer {
+        id: timeoutTimer
+        interval: 120000
+        running: root.isVisible
+        onTriggered: root._cancel()
+    }
+
+    function _cancel() {
+        authResult(cookie, false);
+        _dismiss();
+    }
+
+    function _dismiss() {
+        pamContext.reset();
+        prompt.clearInput();
+        isVisible = false;
+    }
+
+    onIsVisibleChanged: {
+        if (isVisible) {
+            prompt.forceActiveFocus();
+        }
+    }
+
+    Item {
+        anchors.fill: parent
+        visible: root.isVisible
+        focus: root.isVisible
+
+        Keys.onEscapePressed: root._cancel()
+
+        // Backdrop
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root._cancel()
+
+            Rectangle {
+                anchors.fill: parent
+                color: Colors.background
+                opacity: root.isVisible ? 0.85 : 0.0
+                Behavior on opacity { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
+            }
+        }
+
+        // Dialog card
+        Rectangle {
+            id: card
+            anchors.centerIn: parent
+            width: 420
+            implicitHeight: cardContent.implicitHeight + 2 * Colors.paddingLarge
+            radius: Colors.radiusLarge
+            color: Colors.cardSurface
+            border.color: Colors.border
+            border.width: 1
+            scale: root.isVisible ? 1.0 : 0.92
+            Behavior on scale { NumberAnimation { id: scaleAnim; duration: 500; easing.type: Easing.OutBack; easing.overshoot: 1.05 } }
+            opacity: root.isVisible ? 1.0 : 0.0
+            Behavior on opacity { NumberAnimation { id: fadeAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } }
+            layer.enabled: scaleAnim.running || fadeAnim.running
+
+            SharedWidgets.InnerHighlight { highlightOpacity: 0.12 }
+
+            ColumnLayout {
+                id: cardContent
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                    margins: Colors.paddingLarge
+                }
+                spacing: Colors.spacingL
+
+                // Shield icon
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "\u{f0552}"
+                    color: Colors.primary
+                    font.family: Colors.fontMono
+                    font.pixelSize: 48
+                }
+
+                // Title
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Authentication Required"
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeHuge
+                    font.weight: Font.Bold
+                    font.letterSpacing: Colors.letterSpacingTight
+                }
+
+                // Auth message
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    text: root.authMessage || "An application is requesting elevated privileges."
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeMedium
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                // Action ID (monospace, faint)
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    text: root.actionId
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Colors.fontMono
+                    wrapMode: Text.WrapAnywhere
+                    horizontalAlignment: Text.AlignHCenter
+                    visible: root.actionId !== ""
+                }
+
+                // Identity display
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: Colors.spacingS
+                    visible: root.identities.length > 0
+
+                    Text {
+                        text: "\u{f0004}"
+                        color: Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeMedium
+                    }
+
+                    Text {
+                        text: {
+                            var parts = [];
+                            for (var i = 0; i < root.identities.length; i++) {
+                                var id = root.identities[i];
+                                var colonIdx = id.indexOf(":");
+                                parts.push(colonIdx >= 0 ? id.substring(colonIdx + 1) : id);
+                            }
+                            return parts.join(", ");
+                        }
+                        color: Colors.text
+                        font.pixelSize: Colors.fontSizeMedium
+                        font.weight: Font.Medium
+                    }
+                }
+
+                // Separator
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 1
+                    color: Colors.border
+                }
+
+                // Password prompt
+                PolkitAuthPrompt {
+                    id: prompt
+                    Layout.fillWidth: true
+                    pamContext: pamContext
+
+                    onSubmitRequested: {
+                        if (pamContext.currentText.length > 0) {
+                            pamContext.tryAuth();
+                        }
+                    }
+                }
+
+                // Buttons
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingM
+
+                    // Cancel button
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 40
+                        radius: Colors.radiusSmall
+                        color: Colors.highlightLight
+                        border.color: Colors.border
+                        border.width: 1
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Cancel"
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeMedium
+                            font.weight: Font.Medium
+                        }
+
+                        SharedWidgets.StateLayer {
+                            id: cancelState
+                            hovered: cancelMa.containsMouse
+                            pressed: cancelMa.pressed
+                        }
+
+                        MouseArea {
+                            id: cancelMa
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root._cancel()
+                        }
+                    }
+
+                    // Authenticate button
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 40
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.primary, 0.15)
+                        border.color: Colors.withAlpha(Colors.primary, 0.3)
+                        border.width: 1
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Authenticate"
+                            color: Colors.primary
+                            font.pixelSize: Colors.fontSizeMedium
+                            font.weight: Font.Bold
+                        }
+
+                        SharedWidgets.StateLayer {
+                            id: authState
+                            hovered: authMa.containsMouse
+                            pressed: authMa.pressed
+                            stateColor: Colors.primary
+                        }
+
+                        MouseArea {
+                            id: authMa
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (pamContext.currentText.length > 0)
+                                    pamContext.tryAuth();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
