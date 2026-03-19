@@ -11,7 +11,7 @@ Flow {
   id: root
   spacing: Math.max(2, itemSpacing)
   property bool vertical: false
-  flow: vertical ? TopToBottom : LeftToRight
+  flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   property var anchorWindow: null
   property int itemSize: 24
   property int iconSize: 18

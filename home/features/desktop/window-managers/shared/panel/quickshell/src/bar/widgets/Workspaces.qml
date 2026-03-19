@@ -19,6 +19,18 @@ Rectangle {
   property bool showAddButton: true
   property bool showMiniMap: true
   property var state: ({ workspaces: [], activeWorkspace: -1 })
+  readonly property var stripSettings: {
+    var merged = {};
+    var source = root.settings || {};
+
+    for (var key in source) {
+      merged[key] = source[key];
+    }
+
+    merged.showAddButton = root.showAddButton;
+    merged.showMiniMap = root.showMiniMap;
+    return merged;
+  }
 
   readonly property bool workspaceApiAvailable: CompositorAdapter.supportsWorkspaceListing
   width: hasWorkspaceContent ? contentWidth : 0
@@ -194,8 +206,6 @@ Rectangle {
     anchors.centerIn: parent
     vertical: root.vertical
     state: root.state
-    settings: root.settings
-    showAddButton: root.showAddButton
-    showMiniMap: root.showMiniMap
+    settings: root.stripSettings
   }
 }

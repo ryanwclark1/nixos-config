@@ -6,6 +6,7 @@ SharedWidgets.BarPill {
   id: root
 
   property var widgetInstance: null
+  property bool vertical: false
   readonly property var widgetSettings: widgetInstance && widgetInstance.settings ? widgetInstance.settings : ({})
   readonly property string labelMode: {
     var mode = String(widgetSettings.labelMode || "short");
@@ -26,7 +27,7 @@ SharedWidgets.BarPill {
 
   Text {
     anchors.centerIn: parent
-    text: root.labelMode === "full" ? root.layoutName : root.layoutName.substring(0, 3).toUpperCase()
+    text: (root.vertical || root.labelMode !== "full") ? root.layoutName.substring(0, 3).toUpperCase() : root.layoutName
     color: Colors.text
     font.pixelSize: Colors.fontSizeSmall
     font.family: Colors.fontMono
