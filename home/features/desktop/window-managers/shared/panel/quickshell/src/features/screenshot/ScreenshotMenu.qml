@@ -220,7 +220,7 @@ BasePopupMenu {
                 Layout.fillWidth: true
             }
 
-            SharedWidgets.DankToggle {
+            SharedWidgets.ToggleSwitch {
                 checked: Config.screenshotEditAfterCapture
                 onToggled: Config.screenshotEditAfterCapture = !Config.screenshotEditAfterCapture
             }

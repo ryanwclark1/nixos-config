@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Io
+import "../../services"
 
 Item {
   id: root
@@ -46,7 +47,7 @@ Item {
 
       onNotification: function(notif) {
         if (++root._ingressCount > root._maxIngressPerSecond) {
-          console.warn("NotificationManager: rate limit exceeded, dropping from:", notif.appName);
+          Logger.w("NotificationManager", "rate limit exceeded, dropping from:", notif.appName);
           return;
         }
         notif.tracked = true;
@@ -131,7 +132,7 @@ Item {
         try {
           archivedNotifications = JSON.parse(raw);
         } catch (e) {
-          console.error("Failed to load notifications: " + e);
+          Logger.e("NotificationManager", "Failed to load notifications:", e);
         }
       }
     }

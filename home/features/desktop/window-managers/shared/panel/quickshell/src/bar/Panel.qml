@@ -148,7 +148,7 @@ Item {
         }
 
         _widgetDiagnosticStates[widgetId] = state;
-        console.warn("[Panel] widget state warning:", widgetId, "state=" + state, details || "");
+        Logger.w("Panel", "widget state warning:", widgetId, "state=" + state, details || "");
     }
 
     onBarConfigChanged: resetDiagnosticWarmup()
@@ -1501,7 +1501,7 @@ Item {
             source: pluginMeta ? pluginMeta.path + pluginMeta.entryFile : ""
             onStatusChanged: {
                 if (status === Loader.Error && widgetInstance)
-                    console.warn("BarWidgetRegistry: failed to load plugin widget " + widgetInstance.widgetType + " from " + source);
+                    Logger.w("BarWidgetRegistry", "failed to load plugin widget " + widgetInstance.widgetType + " from " + source);
                 if (status === Loader.Ready && item && pluginMeta) {
                     var api = PluginService.getPluginAPI(pluginMeta.id);
                     if (api && item.hasOwnProperty("pluginApi"))

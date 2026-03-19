@@ -76,9 +76,7 @@ QtObject {
                     notepad.saveToFile(filePath, pendingNotepadContent);
             });
         } else if (fileBrowserCaller === "wallpaper") {
-            Quickshell.execDetached(wallpaperMonitor
-                ? ["sh", "-c", "swww img \"$1\" --outputs \"$2\" --transition-type grow --transition-duration 1.5", "sh", filePath, wallpaperMonitor]
-                : ["sh", "-c", "swww img \"$1\" --transition-type grow --transition-duration 1.5", "sh", filePath]);
+            WallpaperService.setWallpaper(filePath, wallpaperMonitor);
         }
         _resetState();
     }

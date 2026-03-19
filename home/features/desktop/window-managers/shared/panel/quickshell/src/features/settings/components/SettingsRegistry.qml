@@ -675,35 +675,35 @@ QtObject {
         for (var i = 0; i < categories.length; i++) {
             var c = categories[i];
             if (!c.id)
-                console.warn("SettingsRegistry: category missing id at index " + i);
+                Logger.w("SettingsRegistry", "category missing id at index " + i);
             if (categoryIds[c.id])
-                console.warn("SettingsRegistry: duplicate category id '" + c.id + "'");
+                Logger.w("SettingsRegistry", "duplicate category id '" + c.id + "'");
             categoryIds[c.id] = true;
         }
 
         for (var j = 0; j < tabs.length; j++) {
             var t = tabs[j];
             if (!t.id)
-                console.warn("SettingsRegistry: tab missing id at index " + j);
+                Logger.w("SettingsRegistry", "tab missing id at index " + j);
             if (seenTabIds[t.id])
-                console.warn("SettingsRegistry: duplicate tab id '" + t.id + "'");
+                Logger.w("SettingsRegistry", "duplicate tab id '" + t.id + "'");
             seenTabIds[t.id] = true;
 
             if (!t.categoryId || !categoryIds[t.categoryId])
-                console.warn("SettingsRegistry: tab '" + t.id + "' references unknown category '" + t.categoryId + "'");
+                Logger.w("SettingsRegistry", "tab '" + t.id + "' references unknown category '" + t.categoryId + "'");
 
             if (!t.component)
-                console.warn("SettingsRegistry: tab '" + t.id + "' missing component");
+                Logger.w("SettingsRegistry", "tab '" + t.id + "' missing component");
 
             if (t.legacyIndex !== undefined) {
                 if (seenLegacy[t.legacyIndex] !== undefined)
-                    console.warn("SettingsRegistry: duplicate legacyIndex " + t.legacyIndex + " for tabs '" + seenLegacy[t.legacyIndex] + "' and '" + t.id + "'");
+                    Logger.w("SettingsRegistry", "duplicate legacyIndex " + t.legacyIndex + " for tabs '" + seenLegacy[t.legacyIndex] + "' and '" + t.id + "'");
                 seenLegacy[t.legacyIndex] = t.id;
             }
         }
 
         if (!findTab(defaultTabId))
-            console.warn("SettingsRegistry: defaultTabId '" + defaultTabId + "' not found");
+            Logger.w("SettingsRegistry", "defaultTabId '" + defaultTabId + "' not found");
     }
 
     Component.onCompleted: validateRegistry()
