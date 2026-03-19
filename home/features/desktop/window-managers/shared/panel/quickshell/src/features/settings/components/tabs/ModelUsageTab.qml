@@ -61,6 +61,10 @@ Item {
                     {
                         value: "codex",
                         label: "Codex"
+                    },
+                    {
+                        value: "gemini",
+                        label: "Gemini"
                     }
                 ]
                 onModeSelected: value => Config.modelUsageActiveProvider = value
