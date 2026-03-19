@@ -11,12 +11,14 @@ PowerActionsRow 1.0 PowerActionsRow.qml
 ProcessDetailPanel 1.0 ProcessDetailPanel.qml
 ProcessWidget 1.0 ProcessWidget.qml
 RamWidget 1.0 RamWidget.qml
+ResourceGauge 1.0 ResourceGauge.qml
 QuickLinkCard 1.0 QuickLinkCard.qml
 QuickToggle 1.0 QuickToggle.qml
 QuickToggleGrid 1.0 QuickToggleGrid.qml
 ScratchpadWidget 1.0 ScratchpadWidget.qml
 ServiceUnitLiveDetail 1.0 ServiceUnitLiveDetail.qml
 ServiceUnitWidget 1.0 ServiceUnitWidget.qml
+SparklineSection 1.0 SparklineSection.qml
 SystemCpuCores 1.0 SystemCpuCores.qml
 SystemGraphs 1.0 SystemGraphs.qml
 SystemIoHistory 1.0 SystemIoHistory.qml
