@@ -40,6 +40,11 @@ let
     ${builtins.readFile ./scripts/ai-stream.sh}
   '';
 
+  modelUsageScript = pkgs.writeShellScriptBin "qs-model-usage" ''
+    PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.curl}/bin:${pkgs.bc}/bin:$PATH"
+    ${builtins.readFile ./scripts/model-usage.sh}
+  '';
+
   bangSyncScript = pkgs.writeShellScriptBin "qs-bang-sync" ''
     PATH="${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:$PATH"
     ${builtins.readFile ./scripts/bang-sync.sh}
@@ -275,6 +280,7 @@ let
       aiScript
       aiStreamScript
       bookmarksScript
+      modelUsageScript
       bangSyncScript
       bangSearchScript
       updatorScript
