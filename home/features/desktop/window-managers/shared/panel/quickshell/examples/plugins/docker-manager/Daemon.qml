@@ -831,6 +831,11 @@ QtObject {
             return _openInTerminal(shellCommand + "logs -f");
         }
 
+        if (action === "edit") {
+            var editFile = configFiles.split(",")[0] || "compose.yaml";
+            return _openInTerminal("cd " + _shellQuote(workingDir) + " && ${EDITOR:-vi} " + _shellQuote(editFile.trim()));
+        }
+
         var supported = ({
                 up: "up -d",
                 down: "down",

@@ -130,14 +130,23 @@ Rectangle {
             }
         }
 
-        Rectangle {
+        Column {
             visible: root.expanded && root.daemon && root.daemon.containerLogs[root.modelData.id] !== undefined
-            width: parent.width; radius: 8; color: "#020617"; border.width: 1; border.color: "#1e293b"
-            implicitHeight: Math.min(logText.implicitHeight + 12, 160); clip: true
-            Text {
-                id: logText; anchors.fill: parent; anchors.margins: 6; wrapMode: Text.WrapAnywhere
-                text: root.daemon && root.daemon.containerLogs[root.modelData.id] ? root.daemon.containerLogs[root.modelData.id] : ""
-                color: "#94a3b8"; font.pixelSize: 9; font.family: "monospace"
+            width: parent.width; spacing: 2
+
+            Rectangle {
+                width: parent.width; radius: 8; color: "#020617"; border.width: 1; border.color: "#1e293b"
+                implicitHeight: Math.min(logText.implicitHeight + 12, 160); clip: true
+                Text {
+                    id: logText; anchors.fill: parent; anchors.margins: 6; wrapMode: Text.WrapAnywhere
+                    text: root.daemon && root.daemon.containerLogs[root.modelData.id] ? root.daemon.containerLogs[root.modelData.id] : ""
+                    color: "#94a3b8"; font.pixelSize: 9; font.family: "monospace"
+                }
+            }
+            Rectangle {
+                width: 70; height: 18; radius: 6; color: "#0f172a"; border.width: 1; border.color: "#1e293b"
+                Text { anchors.centerIn: parent; text: "\u21BB Refresh"; color: "#64748b"; font.pixelSize: 8 }
+                MouseArea { anchors.fill: parent; onClicked: { if (root.daemon && root.daemon.fetchLogs) root.daemon.fetchLogs(root.modelData.id); } }
             }
         }
 

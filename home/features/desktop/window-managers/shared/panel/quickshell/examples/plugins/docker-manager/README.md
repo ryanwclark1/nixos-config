@@ -82,9 +82,28 @@ Settings keys:
 | `logPreviewLines` | int | `10` | Number of log lines in inline preview |
 | `toastEnabled` | bool | `true` | Emit toast signals for action results |
 
+Architecture:
+
+| File | Lines | Role |
+|------|-------|------|
+| `Daemon.qml` | ~1260 | Data layer: polling, event stream, action queue, normalization |
+| `BarWidget.qml` | ~680 | Popup scaffold: tabs, search, keyboard nav, selection state |
+| `ContainerCard.qml` | ~220 | Container delegate: stats, ports, logs, env, actions |
+| `ImageCard.qml` | ~113 | Image delegate: in-use badge, run/remove |
+| `VolumeCard.qml` | ~63 | Volume delegate: cross-ref, protected delete |
+| `NetworkCard.qml` | ~72 | Network delegate: cross-ref, default badge |
+| `RunImageDialog.qml` | ~116 | Pull progress, port check, form fields |
+| `BulkActionBar.qml` | ~50 | Tab-aware bulk action buttons |
+| `DockerUtils.js` | ~182 | Pure functions: normalize, sort, filter, health indicators |
+| `Settings.qml` | ~315 | Settings panel with all configuration keys |
+
 Notes:
 
 - Compose project grouping is inferred from Docker and Podman compose labels.
 - The popup is self-contained inside the plugin and does not participate in `shell.qml` surface routing.
-- Images, volumes, and networks are fetched alongside containers in a single refresh cycle.
+- Container and resource data are polled on separate tiers (fast container events, slow resource polling).
 - Port heuristics cover common images (nginx, postgres, mysql, redis, mongo, grafana, etc.) with 8080 as fallback.
+- Bulk actions are queued sequentially through `_actionQueue` to avoid Process concurrency issues.
+- Search input is debounced (150ms) to prevent excessive filter recalculation on large lists.
+- Container cards display environment variables (collapsed by default, capped at 20 entries).
+- Compose "Edit" button opens the compose file in `$EDITOR` via terminal.

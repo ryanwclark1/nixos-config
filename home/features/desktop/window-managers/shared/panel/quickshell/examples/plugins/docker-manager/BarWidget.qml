@@ -527,11 +527,12 @@ Item {
                                                 Repeater {
                                                     model: [
                                                         { label: "Pull", enabled: true, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "pull"); } },
-                                                        { label: "Logs", enabled: true, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "logs"); } }
+                                                        { label: "Logs", enabled: true, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "logs"); } },
+                                                        { label: "Edit", enabled: true, action: function() { root.daemon.executeComposeAction(projectCard.modelData, "edit"); } }
                                                     ]
                                                     delegate: Rectangle {
                                                         id: projectSecBtn; required property var modelData
-                                                        width: Math.floor((parent.width - 6) / 2); height: 30; radius: 10; color: "#1e293b"; border.width: 1; border.color: "#475569"
+                                                        width: Math.floor((parent.width - 12) / 3); height: 30; radius: 10; color: "#1e293b"; border.width: 1; border.color: "#475569"
                                                         Text { anchors.centerIn: parent; text: projectSecBtn.modelData.label; color: "#f8fafc"; font.pixelSize: 10; font.bold: true }
                                                         MouseArea { anchors.fill: parent; onClicked: projectSecBtn.modelData.action() }
                                                     }
@@ -549,7 +550,7 @@ Item {
                                                         Text { text: childCard.modelData.composeService || childCard.modelData.name || childCard.modelData.id; color: "#f8fafc"; font.pixelSize: 12; font.bold: true }
                                                         Row {
                                                             spacing: 2
-                                                            Text { visible: childCard.modelData.healthStatus !== ""; text: root.healthDot(childCard.modelData.healthStatus); color: root.healthDotColor(childCard.modelData.healthStatus); font.pixelSize: 10 }
+                                                            Text { visible: childCard.modelData.healthStatus !== ""; text: DU.healthDot(childCard.modelData.healthStatus); color: DU.healthDotColor(childCard.modelData.healthStatus); font.pixelSize: 10 }
                                                             Text { text: childCard.modelData.status || childCard.modelData.state || ""; color: childCard.modelData.isRunning ? "#5eead4" : (childCard.modelData.isPaused ? "#fcd34d" : "#cbd5e1"); font.pixelSize: 10 }
                                                         }
                                                     }
