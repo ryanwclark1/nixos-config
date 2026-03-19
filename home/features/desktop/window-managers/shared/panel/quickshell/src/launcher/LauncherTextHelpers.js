@@ -15,6 +15,8 @@ function emptyStateTitle(mode, clean, fileMinQueryLength) {
         return "Clipboard history is empty";
     if (mode === "window")
         return "No open windows found";
+    if (mode === "ssh")
+        return "No SSH hosts found";
     return "No results";
 }
 
@@ -30,6 +32,8 @@ function emptyStateSubtitle(mode, clean, fileMinQueryLength) {
         return "Copy something to populate clipboard history";
     if (mode === "window")
         return "Open some applications to see them here";
+    if (mode === "ssh")
+        return "Add hosts in SSH widget settings or import from ~/.ssh/config";
     return "Try another query or switch modes";
 }
 
@@ -48,6 +52,8 @@ function emptyPrimaryCta(mode, clean, webPrimaryName) {
         return "Switch to Web";
     if (mode === "clip")
         return "Switch to Apps";
+    if (mode === "ssh")
+        return clean !== "" ? "Connect to " + clean : "Open SSH Settings";
     return "Switch to Apps";
 }
 
@@ -60,6 +66,8 @@ function emptySecondaryCta(mode, clean, searchText, webSecondaryName) {
         return "Open Controls";
     if (mode === "run")
         return clean !== "" ? "Run In Terminal" : "Open Terminal";
+    if (mode === "ssh")
+        return "Refresh Import";
     return searchText !== "" ? "Clear Query" : "";
 }
 
@@ -77,6 +85,8 @@ function emptyPrimaryHint(mode, clean, webPrimaryName, webPrimaryHintName) {
         return "Switch back to app launcher mode.";
     if (mode === "bookmarks")
         return "Switch to web mode for broader search.";
+    if (mode === "ssh")
+        return clean !== "" ? "Connect to this host directly." : "Configure SSH hosts and import settings.";
     return "Switch to app launcher mode.";
 }
 
@@ -91,6 +101,8 @@ function emptyPrimaryHintIcon(mode) {
         return "󰆍";
     if (mode === "bookmarks")
         return "󰃀";
+    if (mode === "ssh")
+        return "󰣀";
     return "󰀻";
 }
 
@@ -103,6 +115,8 @@ function emptySecondaryHint(mode, clean, searchText, webSecondaryName) {
         return "Open quickshell control center panel.";
     if (mode === "run")
         return clean !== "" ? "Run command inside terminal for interactive output." : "Open terminal app.";
+    if (mode === "ssh")
+        return "Re-read ~/.ssh/config and refresh the host list.";
     if (searchText !== "")
         return "Clear the current query text.";
     return "";
@@ -117,6 +131,8 @@ function emptySecondaryHintIcon(mode, searchText) {
         return "󰒓";
     if (mode === "run")
         return "󰆍";
+    if (mode === "ssh")
+        return "󰑐";
     if (searchText !== "")
         return "󰅖";
     return "";

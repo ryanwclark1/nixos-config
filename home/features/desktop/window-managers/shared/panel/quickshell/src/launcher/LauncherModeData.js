@@ -1,10 +1,10 @@
 .pragma library
 
-var allKnownModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator"];
+var allKnownModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
 var transientModes = ["dmenu"];
-var defaultModeOrder = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator"];
-var defaultPrimaryModes = ["drun", "window", "files", "ai", "clip", "system", "media", "settings", "devops", "orchestrator"];
-var modePrefixes = "!/@?>=:";
+var defaultModeOrder = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
+var defaultPrimaryModes = ["drun", "window", "files", "ai", "clip", "system", "media", "settings", "devops", "orchestrator", "ssh"];
+var modePrefixes = "!/@?>=:;";
 
 var modeMeta = {
     "drun": { label: "Apps", hint: "Launch applications", prefix: "" },
@@ -12,7 +12,7 @@ var modeMeta = {
     "files": { label: "Files", hint: "Search home with /", prefix: "/" },
     "ai": { label: "AI", hint: "Ask with !", prefix: "!" },
     "clip": { label: "Clipboard", hint: "Recent clipboard history", prefix: "" },
-    "emoji": { label: "Emoji", hint: "Search with :", prefix: ":" },
+    "emoji": { label: "Characters", hint: "Search characters with :", prefix: ":" },
     "calc": { label: "Calculator", hint: "Evaluate with =", prefix: "=" },
     "web": { label: "Web", hint: "Search with ?", prefix: "?" },
     "plugins": { label: "Plugins", hint: "Search plugin providers", prefix: "" },
@@ -25,7 +25,8 @@ var modeMeta = {
     "bookmarks": { label: "Bookmarks", hint: "Open bookmarked destinations", prefix: "@" },
     "settings": { label: "Settings", hint: "Jump to a settings tab with ,", prefix: "," },
     "devops": { label: "DevOps", hint: "Control containers & services", prefix: "" },
-    "orchestrator": { label: "Orchestrator", hint: "Full system dashboard", prefix: "" }
+    "orchestrator": { label: "Orchestrator", hint: "Full system dashboard", prefix: "" },
+    "ssh": { label: "SSH", hint: "Connect with ;", prefix: ";" }
 };
 
 var modeIcons = {
@@ -33,12 +34,14 @@ var modeIcons = {
     "clip": "󰅍", "emoji": "󰞅", "calc": "󰪚", "web": "󰖟",
     "plugins": "󰏗", "run": "󰆍", "system": "󰒓", "keybinds": "󰌌",
     "media": "󰝚", "nixos": "", "wallpapers": "󰸉", "bookmarks": "󰃭",
-    "settings": "󰒓", "devops": "󰒍", "orchestrator": "󰓅"
+    "settings": "󰒓", "devops": "󰒍", "orchestrator": "󰓅",
+    "ssh": "󰣀"
 };
 
 var modeDeps = {
     "run": ["qs-run"],
     "clip": ["cliphist", "wl-copy", "wl-paste"],
+    "emoji": ["wl-copy"],
     "keybinds": ["qs-keybinds"],
     "bookmarks": ["qs-bookmarks"],
     "wallpapers": ["qs-wallpapers"],

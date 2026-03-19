@@ -8,7 +8,8 @@ var _actionLabels = {
     window: "Focus",
     files: "Open", web: "Open", bookmarks: "Open", wallpapers: "Open",
     drun: "Run", run: "Run",
-    system: "Action", nixos: "Action", keybinds: "Action", media: "Action", plugins: "Action"
+    system: "Action", nixos: "Action", keybinds: "Action", media: "Action", plugins: "Action",
+    ssh: "Connect"
 };
 
 function itemActionLabel(mode, item) {
@@ -82,7 +83,8 @@ function buildRecentEntry(mode, item) {
 // Execute a selected item. `actions` provides QML-side capabilities:
 //   trackLaunch, launchExecString, close, rememberRecent, copyToClipboard,
 //   restoreClipboardHistoryItem, execDetached, dispatchAction,
-//   executeLauncherItem, showingConfirm, searchText
+//   executeLauncherItem, showingConfirm, searchText, modifiers,
+//   selectCharacter, shouldPasteCharacter
 function executeSelection(mode, item, actions) {
     var recent = buildRecentEntry(mode, item);
     if (recent)
@@ -104,7 +106,9 @@ function executeSelection(mode, item, actions) {
         var fifoPath = "/tmp/qs-dmenu-result";
         actions.execDetached(["sh", "-c", "printf '%s\\n' \"$1\" > \"$2\"", "sh", item.name, fifoPath]);
         actions.close();
-    } else if (mode === "emoji" || mode === "calc") {
+    } else if (mode === "emoji") {
+        actions.selectCharacter(item.name, actions.shouldPasteCharacter(actions.modifiers));
+    } else if (mode === "calc") {
         actions.copyToClipboard(item.name);
         actions.close();
     } else if (mode === "clip") {
@@ -142,6 +146,12 @@ function executeSelection(mode, item, actions) {
         if (item.disp && actions.supportsDispatcherActions)
             actions.dispatchAction(item.disp, item.args || "", "Trigger keybind action");
         actions.close();
+    } else if (mode === "ssh") {
+        if (item._hostRef)
+            actions.connectSshHost(item._hostRef);
+        else if (item._adHoc)
+            actions.connectAdHocSsh(item._adHoc.user, item._adHoc.host, item._adHoc.port);
+        actions.close();
     } else if (mode === "plugins") {
         var executed = actions.executeLauncherItem(item, actions.searchText);
         if (executed)
@@ -177,6 +187,21 @@ function executeEmptyPrimary(mode, clean, searchText, actions) {
     if (mode === "run" && clean !== "") {
         actions.launchExecString(clean, false);
         actions.close();
+        return;
+    }
+    if (mode === "ssh") {
+        if (clean !== "" && actions.connectAdHocSsh) {
+            var parsed = actions.parseAdHocTarget ? actions.parseAdHocTarget(clean) : null;
+            if (parsed) {
+                actions.connectAdHocSsh(parsed.user, parsed.host, parsed.port);
+                actions.close();
+                return;
+            }
+        }
+        if (actions.openSshSettings) {
+            actions.openSshSettings();
+            actions.close();
+        }
         return;
     }
     if (mode === "bookmarks") {
@@ -232,6 +257,11 @@ function executeEmptySecondary(mode, clean, actions) {
             actions.launchInTerminal("");
         }
         actions.close();
+        return;
+    }
+    if (mode === "ssh") {
+        if (actions.refreshSshImport)
+            actions.refreshSshImport();
         return;
     }
     actions.clearSearchQuery();

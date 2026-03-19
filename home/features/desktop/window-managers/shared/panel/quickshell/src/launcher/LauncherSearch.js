@@ -67,6 +67,22 @@ function fuzzyMatchLower(s, p) {
     return 0;
 }
 
+function stripCharacterTrigger(searchText, trigger) {
+    var value = String(searchText || "");
+    var activeTrigger = String(trigger || ":");
+    if (activeTrigger !== "" && value.startsWith(activeTrigger))
+        return value.substring(activeTrigger.length).trim();
+    if (value.startsWith(":"))
+        return value.substring(1).trim();
+    return value;
+}
+
+function tokenizeLower(text) {
+    return String(text || "").toLowerCase().split(/\s+/).filter(function(token) {
+        return token !== "";
+    });
+}
+
 function ensureItemRankCache(item) {
     if (!item || item._rankCacheReady)
         return;
@@ -74,6 +90,12 @@ function ensureItemRankCache(item) {
     item._titleLower = item.title ? String(item.title).toLowerCase() : "";
     item._execLower = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
     item._bodyLower = [item.body, item.description, item.fullPath].filter(Boolean).join(" ").toLowerCase();
+    item._keywordsLower = Array.isArray(item.keywords) ? item.keywords.map(function (keyword) {
+        return String(keyword || "").toLowerCase();
+    }) : [];
+    item._aliasesLower = Array.isArray(item.aliases) ? item.aliases.map(function (alias) {
+        return String(alias || "").toLowerCase();
+    }) : [];
     item._relativePathLower = item.relativePath ? String(item.relativePath).toLowerCase() : "";
     item._parentPathLower = item.parentPath ? String(item.parentPath).toLowerCase() : "";
     item._displayPathLower = item.displayPath ? String(item.displayPath).toLowerCase() : "";
@@ -99,6 +121,8 @@ function ensureItemRankCache(item) {
 function rankItem(item, clean, cleanLower, mode, weights) {
     if (clean === "")
         return 1;
+    if (mode === "emoji")
+        return rankCharacterItem(item, clean, cleanLower);
     if (mode === "files")
         return rankFileItem(item, cleanLower);
     ensureItemRankCache(item);
@@ -107,6 +131,67 @@ function rankItem(item, clean, cleanLower, mode, weights) {
     if (mode === "drun")
         bestScore += Number(item._drunUsageBoost || 0);
     return bestScore;
+}
+
+function characterTokenScore(item, token) {
+    if (token === "")
+        return 0;
+    if (item._nameLower === token)
+        return 5200;
+    if (item._titleLower === token)
+        return 5000;
+    if (item._nameLower.indexOf(token) !== -1)
+        return 3200;
+    for (var i = 0; i < item._keywordsLower.length; ++i) {
+        var keyword = item._keywordsLower[i];
+        if (keyword === token)
+            return 4600 - Math.min(400, i * 20);
+        if (keyword.startsWith(token))
+            return 3600 - Math.min(300, i * 15);
+        if (keyword.indexOf(token) !== -1)
+            return 2800 - Math.min(250, i * 10);
+    }
+    for (var j = 0; j < item._aliasesLower.length; ++j) {
+        var alias = item._aliasesLower[j];
+        if (alias === token)
+            return 4400 - Math.min(300, j * 15);
+        if (alias.startsWith(token))
+            return 3400 - Math.min(200, j * 10);
+        if (alias.indexOf(token) !== -1)
+            return 2600 - Math.min(160, j * 8);
+    }
+    if (item._titleLower.startsWith(token))
+        return 3000;
+    if (item._titleLower.indexOf(token) !== -1)
+        return 2400;
+    var fuzzy = Math.max(
+        fuzzyMatchLower(item._titleLower, token),
+        fuzzyMatchLower(item._categoryKeywordsLower, token)
+    );
+    if (fuzzy > 0)
+        return Math.round(fuzzy * 30);
+    return 0;
+}
+
+function rankCharacterItem(item, clean, cleanLower) {
+    ensureItemRankCache(item);
+    var tokens = tokenizeLower(cleanLower);
+    if (tokens.length === 0)
+        return 1;
+    var total = 0;
+    for (var i = 0; i < tokens.length; ++i) {
+        var tokenScore = characterTokenScore(item, tokens[i]);
+        if (tokenScore <= 0)
+            return 0;
+        total += tokenScore;
+    }
+    if (item._nameLower === cleanLower)
+        total += 2400;
+    if (item._titleLower === cleanLower)
+        total += 1800;
+    if (tokens.length > 1)
+        total += 200;
+    return total;
 }
 
 function rankFileItem(item, cleanLower) {
@@ -214,6 +299,8 @@ function stripSearchPrefix(mode, searchText) {
     if (mode === "bookmarks" && searchText.startsWith("@"))
         return searchText.substring(1).trim();
     if (mode === "settings" && searchText.startsWith(","))
+        return searchText.substring(1).trim();
+    if (mode === "ssh" && searchText.startsWith(";"))
         return searchText.substring(1).trim();
     return searchText;
 }

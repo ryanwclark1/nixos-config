@@ -71,6 +71,8 @@ Rectangle {
     function itemProviderLabel(it) {
         if (!it)
             return "";
+        if (root.mode === "emoji")
+            return String(it.categoryLabel || it.category || "");
         if (it.providerName)
             return it.providerName;
         if (root.mode === "files") {

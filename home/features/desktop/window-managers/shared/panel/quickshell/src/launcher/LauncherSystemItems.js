@@ -347,6 +347,107 @@ function buildDevOpsItems(actions) {
 }
 
 // ---------------------------------------------------------------------------
+// SSH items
+// ---------------------------------------------------------------------------
+
+/**
+ * Parse an ad-hoc SSH target string into connection parts.
+ *
+ * @param {string} query - Raw user input like "user@host:port", "host", etc.
+ * @returns {{ user: string, host: string, port: number }|null}
+ */
+function parseAdHocTarget(query) {
+    var raw = String(query || "").trim();
+    if (raw.length > 0 && raw[0] === ";")
+        raw = raw.substring(1).trim();
+    if (raw === "")
+        return null;
+
+    var user = "";
+    var rest = raw;
+    var atIdx = raw.indexOf("@");
+    if (atIdx !== -1) {
+        user = raw.substring(0, atIdx);
+        rest = raw.substring(atIdx + 1);
+    }
+
+    var host = rest;
+    var port = 22;
+    var colonIdx = rest.lastIndexOf(":");
+    if (colonIdx !== -1) {
+        var portStr = rest.substring(colonIdx + 1);
+        var portNum = parseInt(portStr, 10);
+        if (!isNaN(portNum) && portNum >= 1 && portNum <= 65535 && String(portNum) === portStr) {
+            host = rest.substring(0, colonIdx);
+            port = portNum;
+        }
+    }
+
+    if (host === "")
+        return null;
+    return { user: user, host: host, port: port };
+}
+
+/**
+ * Build the items array for the "ssh" launcher mode.
+ *
+ * @param {object} actions
+ * @param {Array}    actions.mergedHosts        - SshWidgetData.mergedHosts
+ * @param {Array}    actions.recentIds          - Recent host IDs (string[])
+ * @param {string}   actions.sshCommand         - e.g. "ssh" or "kitten ssh"
+ * @param {Function} actions.buildDisplayCommand(host) -> string
+ * @param {Function} actions.connectHost(host)
+ * @param {Function} actions.close()
+ * @returns {Array}
+ */
+function buildSshItems(actions) {
+    var items = [];
+    var hosts = actions.mergedHosts || [];
+    var recentIds = actions.recentIds || [];
+    var recentMap = {};
+    for (var r = 0; r < recentIds.length; ++r)
+        recentMap[String(recentIds[r] || "")] = 100 - r;
+
+    for (var i = 0; i < hosts.length; ++i) {
+        var host = hosts[i];
+        items.push({
+            category: host.source === "imported" ? "Imported" : (host.group || "Manual"),
+            name: host.label || host.alias || host.host,
+            title: actions.buildDisplayCommand(host),
+            icon: host.icon || "󰣀",
+            _hostRef: host,
+            _recentBoost: recentMap[String(host.id || "")] || 0
+        });
+    }
+    return items;
+}
+
+/**
+ * Build a fallback ad-hoc SSH item for an unknown host target.
+ *
+ * @param {string} query      - Cleaned search query
+ * @param {string} sshCommand - e.g. "ssh" or "kitten ssh"
+ * @returns {object|null}
+ */
+function buildAdHocSshItem(query, sshCommand) {
+    var parsed = parseAdHocTarget(query);
+    if (!parsed)
+        return null;
+    var target = parsed.user ? (parsed.user + "@" + parsed.host) : parsed.host;
+    var displayCmd = sshCommand + " " + target;
+    if (parsed.port !== 22)
+        displayCmd = sshCommand + " -p " + String(parsed.port) + " " + target;
+    return {
+        category: "Ad-hoc",
+        name: target,
+        title: displayCmd,
+        icon: "󰣀",
+        _adHoc: parsed,
+        _recentBoost: -1
+    };
+}
+
+// ---------------------------------------------------------------------------
 // resultSectionLabel
 // ---------------------------------------------------------------------------
 
@@ -391,7 +492,7 @@ function resultSectionLabel(mode, item, opts) {
     if (mode === "files")     return "Files";
     if (mode === "run")       return "Commands";
     if (mode === "clip")      return "Clipboard";
-    if (mode === "emoji")     return "Emoji";
+    if (mode === "emoji")     return String(item.categoryLabel || item.category || "Characters");
     if (mode === "bookmarks") return "Bookmarks";
     if (mode === "web")       return String(item.providerName || item.category || "Web");
 

@@ -20,7 +20,8 @@ import "LauncherHomeBuilder.js" as HomeBuilder
 import "LauncherCategoryHelpers.js" as CategoryHelpers
 import "LauncherTextHelpers.js" as TextHelpers
 import "LauncherWebProviders.js" as WebProviders
-import "EmojiData.js" as EmojiData
+import "CharacterData.js" as CharacterData
+import "../features/ssh" as SshFeature
 
 PanelWindow {
     id: launcherRoot
@@ -277,7 +278,11 @@ PanelWindow {
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
     readonly property string selectedHomeItemKey: ""
-    readonly property string _cleanSearch: ModeData.stripModePrefix(searchText).trim()
+    readonly property string characterTrigger: {
+        var trigger = String(Config.launcherCharacterTrigger || ":").trim();
+        return trigger !== "" ? trigger : ":";
+    }
+    readonly property string _cleanSearch: cleanSearchTextForMode(mode, searchText).trim()
     readonly property var _webPrimaryProvider: primaryWebProvider()
     readonly property var _webSecondaryProvider: secondaryWebProvider()
     readonly property string _webPrimaryName: _webPrimaryProvider ? _webPrimaryProvider.name : "Web"
@@ -301,6 +306,7 @@ PanelWindow {
     readonly property string emptyPrimaryHintIcon: TextHelpers.emptyPrimaryHintIcon(mode)
     readonly property string emptySecondaryHint: TextHelpers.emptySecondaryHint(mode, _cleanSearch, searchText, _webSecondaryName)
     readonly property string emptySecondaryHintIcon: TextHelpers.emptySecondaryHintIcon(mode, searchText)
+    readonly property string activeModeHintText: mode === "emoji" ? ("Search characters with " + characterTrigger) : (ModeData.modeInfo(mode).hint || "Search...")
     readonly property bool hasResults: filteredItems.length > 0
     readonly property var selectedItem: hasResults && selectedIndex >= 0 && selectedIndex < filteredItems.length ? filteredItems[selectedIndex] : null
     readonly property string launcherTabBehavior: {
@@ -318,6 +324,8 @@ PanelWindow {
         var resultHint = hasResults ? "↑/↓/Ctrl+P/N/PgUp/PgDn/Home/End: results • " : "";
         var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";
         var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded))) ? "Esc: reset/close" : "Esc: close";
+        if (mode === "emoji")
+            return resultHint + clearHint + (Config.launcherCharacterPasteOnSelect ? "Enter: copy+paste • Shift+Enter: paste • " : "Enter: copy • Shift+Enter: paste • ") + escapeHint;
         if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryOptions.length > 1)
             return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • " + escapeHint;
         return resultHint + clearHint + "Enter: run • " + escapeHint;
@@ -329,6 +337,8 @@ PanelWindow {
             return "Enter: " + emptyPrimaryCta;
         if (mode === "web" && Config.launcherWebEnterUsesPrimary)
             return "Enter: Search " + _webPrimaryName;
+        if (mode === "emoji")
+            return Config.launcherCharacterPasteOnSelect ? "Enter: Copy + Paste" : "Enter: Copy";
         var action = Executor.itemActionLabel(mode, selectedItem);
         if (action === "")
             action = "Open";
@@ -339,6 +349,8 @@ PanelWindow {
             return "Esc: Cancel";
         if (!hasResults && emptySecondaryCta !== "")
             return "Shift+Enter: " + emptySecondaryCta;
+        if (mode === "emoji" && hasResults)
+            return "Shift+Enter: Paste";
         if (launcherTabBehavior === "mode")
             return "Tab: Next Mode";
         if (launcherTabBehavior === "results")
@@ -721,6 +733,36 @@ PanelWindow {
     on_NixGensChanged: {
         if (launcherRoot.mode === "nixos" && launcherRoot.launcherOpacity > 0)
             launcherRoot.loadNixos();
+    }
+
+    // ── SSH launcher data ──────────────────────────
+    SshFeature.SshWidgetData {
+        id: launcherSshData
+        widgetInstance: launcherRoot._findFirstSshWidget()
+    }
+    readonly property string _launcherSshCommand: String((launcherSshData.rawSettings || {}).sshCommand || "ssh")
+
+    Connections {
+        target: launcherSshData
+        function onMergedHostsChanged() {
+            if (launcherRoot.mode === "ssh" && launcherRoot.launcherOpacity > 0)
+                launcherRoot.loadSsh();
+        }
+    }
+
+    function _findFirstSshWidget() {
+        var bars = Config.barConfigs || [];
+        var sections = ["left", "center", "right"];
+        for (var i = 0; i < bars.length; ++i) {
+            for (var j = 0; j < sections.length; ++j) {
+                var widgets = Config.barSectionWidgets(bars[i], sections[j]);
+                for (var k = 0; k < widgets.length; ++k) {
+                    if (String(widgets[k].widgetType || "") === "ssh")
+                        return widgets[k];
+                }
+            }
+        }
+        return { instanceId: "", settings: { enableSshConfigImport: true, manualHosts: [], sshCommand: "ssh", state: {} } };
     }
 
     onSelectedIndexChanged: {
@@ -1322,6 +1364,8 @@ PanelWindow {
                 loadDevOps();
             else if (mode === "orchestrator")
                 loadOrchestrator();
+            else if (mode === "ssh")
+                loadSsh();
             else if (mode === "ai")
                 loadAi();
             else if (mode === "keybinds")
@@ -1597,8 +1641,8 @@ PanelWindow {
             recordLoadMetric("emoji", 0, true, true);
             return;
         }
-        setCached("emoji", EmojiData.emojis);
-        allItems = EmojiData.emojis;
+        setCached("emoji", CharacterData.characterEntries);
+        allItems = CharacterData.characterEntries;
         filterItems();
         buildLauncherHome();
         completeModeLoad("emoji", true, "");
@@ -2121,6 +2165,22 @@ PanelWindow {
         completeModeLoad("devops", true, "");
     }
 
+    function loadSsh() {
+        if (!launcherSshData.importReady && !launcherSshData.importBusy)
+            launcherSshData.refreshImport();
+
+        allItems = SystemItems.buildSshItems({
+            mergedHosts: launcherSshData.mergedHosts,
+            recentIds: (launcherSshData.stateInfo || {}).recentIds || [],
+            sshCommand: _launcherSshCommand,
+            buildDisplayCommand: function(h) { return launcherSshData.buildDisplayCommand(h); },
+            connectHost: function(h) { launcherSshData.connectHost(h); },
+            close: close
+        });
+        filterItems();
+        completeModeLoad("ssh", true, "");
+    }
+
     function loadOrchestrator() {
         allItems = [];
         filterItems();
@@ -2320,6 +2380,8 @@ PanelWindow {
                 _bangQuery = "";
                 _bangResults = [];
             }
+        } else if (mode === "emoji") {
+            actualSearch = Search.stripCharacterTrigger(searchText, characterTrigger);
         } else {
             actualSearch = Search.stripSearchPrefix(mode, searchText);
         }
@@ -2372,7 +2434,17 @@ PanelWindow {
                         break;
                 }
             }
-            if (mode !== "web" && mode !== "ai" && mode !== "files")
+            if (mode === "ssh") {
+                scoredItems.sort(function(a, b) {
+                    var boostDiff = (b._recentBoost || 0) - (a._recentBoost || 0);
+                    if (boostDiff !== 0) return boostDiff;
+                    return (b._score || 0) - (a._score || 0);
+                });
+                if (clean !== "") {
+                    var adHoc = SystemItems.buildAdHocSshItem(clean, _launcherSshCommand);
+                    if (adHoc) scoredItems.push(adHoc);
+                }
+            } else if (mode !== "web" && mode !== "ai" && mode !== "files")
                 scoredItems.sort(Search.compareByScoreThenUsage);
             else if (mode === "files")
                 scoredItems.sort(Search.compareByScoreThenDepth);
@@ -2428,6 +2500,45 @@ PanelWindow {
         Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", text]);
     }
 
+    function matchesCharacterTrigger(text) {
+        var value = String(text || "");
+        return characterTrigger !== "" && value.startsWith(characterTrigger);
+    }
+
+    function cleanSearchTextForMode(modeKey, text) {
+        if (modeKey === "emoji")
+            return Search.stripCharacterTrigger(text, characterTrigger);
+        return ModeData.stripModePrefix(text).trim();
+    }
+
+    function shouldPasteCharacter(modifiers) {
+        var activeModifiers = modifiers || Qt.NoModifier;
+        return Config.launcherCharacterPasteOnSelect || Boolean(activeModifiers & Qt.ShiftModifier);
+    }
+
+    function selectCharacter(text, pasteRequested) {
+        if (!text) {
+            close();
+            return;
+        }
+        copyToClipboard(text);
+        if (!pasteRequested) {
+            showTransientNotice("Copied " + text, 2000);
+            close();
+            return;
+        }
+        depChecker.checkCommandAvailable("wtype", function(ok) {
+            if (!ok) {
+                showTransientNotice("Copied " + text + " (install wtype for paste)", 3200);
+                close();
+                return;
+            }
+            Quickshell.execDetached(["wtype", text]);
+            showTransientNotice("Pasted " + text, 2000);
+            close();
+        });
+    }
+
     function restoreClipboardHistoryItem(id) {
         ClipboardHistoryService.restore(id);
     }
@@ -2453,7 +2564,7 @@ PanelWindow {
     }
 
     function executeEmptyPrimary() {
-        var clean = ModeData.stripModePrefix(searchText).trim();
+        var clean = cleanSearchTextForMode(mode, searchText).trim();
         Executor.executeEmptyPrimary(mode, clean, searchText, {
             open: open,
             close: close,
@@ -2463,12 +2574,23 @@ PanelWindow {
             parseWebQuery: parseWebQuery,
             configuredWebProviderByKey: configuredWebProviderByKey,
             primaryWebProvider: primaryWebProvider,
-            homeDir: Quickshell.env("HOME") || "/"
+            homeDir: Quickshell.env("HOME") || "/",
+            parseAdHocTarget: SystemItems.parseAdHocTarget,
+            connectAdHocSsh: function(user, host, port) {
+                var target = user ? (user + "@" + host) : host;
+                var args = [];
+                if (port && port !== 22) { args.push("-p"); args.push(String(port)); }
+                args.push(target);
+                Quickshell.execDetached(SU.terminalCommand.apply(null, ["exec " + _launcherSshCommand + " \"$@\""].concat(args)));
+            },
+            openSshSettings: function() {
+                Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "settingsHub"]);
+            }
         });
     }
 
     function executeEmptySecondary() {
-        var clean = ModeData.stripModePrefix(searchText).trim();
+        var clean = cleanSearchTextForMode(mode, searchText).trim();
         Executor.executeEmptySecondary(mode, clean, {
             close: close,
             clearSearchQuery: clearSearchQuery,
@@ -2477,7 +2599,8 @@ PanelWindow {
             runShellEntryAction: runShellEntryAction,
             execDetached: Quickshell.execDetached,
             secondaryWebProvider: secondaryWebProvider,
-            homeDir: Quickshell.env("HOME") || "/"
+            homeDir: Quickshell.env("HOME") || "/",
+            refreshSshImport: function() { launcherSshData.refreshImport(); }
         });
     }
 
@@ -2658,7 +2781,7 @@ PanelWindow {
             item.action();
     }
 
-    function executeSelection() {
+    function executeSelection(modifiers) {
         if (filteredItems.length === 0 || selectedIndex < 0 || selectedIndex >= filteredItems.length)
             return;
         var item = filteredItems[selectedIndex];
@@ -2668,13 +2791,25 @@ PanelWindow {
             close: close,
             rememberRecent: rememberRecent,
             copyToClipboard: copyToClipboard,
+            selectCharacter: selectCharacter,
+            shouldPasteCharacter: shouldPasteCharacter,
             restoreClipboardHistoryItem: restoreClipboardHistoryItem,
             execDetached: Quickshell.execDetached,
             supportsDispatcherActions: CompositorAdapter.supportsDispatcherActions,
             dispatchAction: CompositorAdapter.dispatchAction,
             executeLauncherItem: PluginService.executeLauncherItem,
             showingConfirm: showingConfirm,
-            searchText: searchText
+            searchText: searchText,
+            modifiers: modifiers || Qt.NoModifier,
+            connectSshHost: function(host) { launcherSshData.connectHost(host); },
+            connectAdHocSsh: function(user, host, port) {
+                var target = user ? (user + "@" + host) : host;
+                var args = [];
+                if (port && port !== 22) { args.push("-p"); args.push(String(port)); }
+                args.push(target);
+                var cmd = _launcherSshCommand;
+                Quickshell.execDetached(SU.terminalCommand.apply(null, ["exec " + cmd + " \"$@\""].concat(args)));
+            }
         });
     }
 
@@ -2693,7 +2828,7 @@ PanelWindow {
         } else if (filteredItems.length === 0) {
             executeEmptyPrimary();
         } else {
-            executeSelection();
+            executeSelection(activeModifiers);
         }
     }
 
@@ -2898,7 +3033,7 @@ PanelWindow {
                     Layout.bottomMargin: launcherRoot.tightMode ? 0 : Colors.spacingXXS
                     text: launcherRoot.searchText
                     accentColor: Colors.primary
-                    placeholder: ModeData.modeInfo(launcherRoot.mode).hint || "Search..."
+                    placeholder: launcherRoot.activeModeHintText
                     onAccepted: modifiers => launcherRoot.handleSearchAccepted(modifiers)
 
                     onTextChanged: {
@@ -2906,7 +3041,7 @@ PanelWindow {
                             launcherRoot.open("calc", true);
                         else if (text.startsWith(">") && launcherRoot.mode !== "run")
                             launcherRoot.open("run", true);
-                        else if (text.startsWith(":") && launcherRoot.mode !== "emoji")
+                        else if (launcherRoot.matchesCharacterTrigger(text) && launcherRoot.mode !== "emoji")
                             launcherRoot.open("emoji", true);
                         else if (text.startsWith("?") && launcherRoot.mode !== "web")
                             launcherRoot.open("web", true);
@@ -2918,6 +3053,8 @@ PanelWindow {
                             launcherRoot.open("files", true);
                         else if (text.startsWith(",") && launcherRoot.mode !== "settings")
                             launcherRoot.open("settings", true);
+                        else if (text.startsWith(";") && launcherRoot.mode !== "ssh")
+                            launcherRoot.open("ssh", true);
                         else if (PluginService.shouldOpenPluginsModeForQuery(text) && launcherRoot.mode !== "plugins")
                             launcherRoot.open("plugins", true);
                         if (launcherRoot.searchText !== text) {
@@ -2945,7 +3082,7 @@ PanelWindow {
                 LauncherActionLegend {
                     visible: Config.launcherShowModeHints && !launcherRoot.tightMode
                     Layout.bottomMargin: visible ? Colors.spacingXXS : 0
-                    hintText: ModeData.modeInfo(launcherRoot.mode).hint
+                    hintText: launcherRoot.activeModeHintText
                     primaryAction: launcherRoot.legendPrimaryAction
                     secondaryAction: launcherRoot.legendSecondaryAction
                     tertiaryAction: launcherRoot.legendTertiaryAction
