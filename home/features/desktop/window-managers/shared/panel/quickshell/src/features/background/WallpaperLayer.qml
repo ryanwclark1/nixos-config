@@ -18,7 +18,6 @@ Item {
     property bool _flip: false
     property real _progress: 0.0
     property bool _transitioning: false
-    property string _activeShader: _fadeShader
 
     // Solid color background (below images)
     Rectangle {
@@ -33,8 +32,15 @@ Item {
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         cache: false
-        visible: !root._transitioning && !root._flip
+        visible: source !== ""
+        opacity: root._transitioning ? (root._flip ? root._progress : (1 - root._progress)) : (root._flip ? 0 : 1)
         sourceSize: Qt.size(root.width, root.height)
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Math.max(1, root.transitionDuration)
+                easing.type: Easing.InOutQuad
+            }
+        }
         onStatusChanged: {
             if (status === Image.Error && source !== "") {
                 Logger.w("WallpaperLayer", "Failed to load image A:", source);
@@ -50,8 +56,15 @@ Item {
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         cache: false
-        visible: !root._transitioning && root._flip
+        visible: source !== ""
+        opacity: root._transitioning ? (root._flip ? (1 - root._progress) : root._progress) : (root._flip ? 1 : 0)
         sourceSize: Qt.size(root.width, root.height)
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Math.max(1, root.transitionDuration)
+                easing.type: Easing.InOutQuad
+            }
+        }
         onStatusChanged: {
             if (status === Image.Error && source !== "") {
                 Logger.w("WallpaperLayer", "Failed to load image B:", source);
@@ -59,21 +72,6 @@ Item {
                 source = "";
             }
         }
-    }
-
-    // ShaderEffect for transitions — visible only during transition
-    ShaderEffect {
-        id: transitionShader
-        anchors.fill: parent
-        visible: root._transitioning
-        layer.enabled: root._transitioning
-
-        property var textureA: imageA
-        property var textureB: imageB
-        property real progress: root._progress
-        property bool flipDirection: root._flip
-
-        fragmentShader: root._activeShader
     }
 
     NumberAnimation {
@@ -98,9 +96,6 @@ Item {
             _flip = false;
             return;
         }
-
-        // Select shader BEFORE starting transition (cache it for the duration)
-        _activeShader = _shaderSource();
 
         // Load the new image into the inactive slot
         if (_flip) {
