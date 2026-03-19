@@ -20,6 +20,7 @@ import "LauncherHomeBuilder.js" as HomeBuilder
 import "LauncherCategoryHelpers.js" as CategoryHelpers
 import "LauncherTextHelpers.js" as TextHelpers
 import "LauncherWebProviders.js" as WebProviders
+import "LauncherFileOps.js" as FileOps
 import "CharacterData.js" as CharacterData
 import "../features/ssh" as SshFeature
 import "../features/settings/components/SettingsSearchIndex.js" as SettingsSearchIndex
@@ -188,6 +189,8 @@ PanelWindow {
     property bool fileIndexReady: false
     property bool fileIndexBuilding: false
     property var fileIndexBuiltAt: 0
+    property var _gitTrackedSet: ({})
+    property bool _gitIndexReady: false
     property string transientNoticeText: ""
     property bool sidebarOverflowExpanded: false
     property bool shortcutHelpExpanded: false
@@ -291,75 +294,23 @@ PanelWindow {
         completeModeLoad("files", false, String(fallbackMessage || "File search failed"));
     }
 
-    function openWithConfiguredOpener(targetPath) {
-        var target = String(targetPath || "");
-        if (target === "")
-            return;
-        Quickshell.execDetached(["sh", "-c", "exec " + fileOpenerCommand + " \"$1\"", "sh", target]);
-    }
+    readonly property var _fileOpsCtx: ({
+        get fileOpenerCommand()       { return launcherRoot.fileOpenerCommand; },
+        get fileSearchRootResolved()  { return launcherRoot.fileSearchRootResolved; },
+        execDetached:       function(args) { Quickshell.execDetached(args); },
+        showTransientNotice:function(msg, ms) { launcherRoot.showTransientNotice(msg, ms); },
+        copyToClipboard:    function(text) { launcherRoot.copyToClipboard(text); },
+        close:              function() { launcherRoot.close(); }
+    })
 
-    function openDirectoryPath(targetPath) {
-        openWithConfiguredOpener(targetPath);
-    }
-
-    function openFileItem(item) {
-        if (!item || !item.fullPath)
-            return;
-        openWithConfiguredOpener(item.fullPath);
-    }
-
-    function fileItemParentPath(item) {
-        if (!item || !item.fullPath)
-            return fileSearchRootResolved;
-        var fullPath = String(item.fullPath || "");
-        var slash = fullPath.lastIndexOf("/");
-        if (slash <= 0)
-            return fileSearchRootResolved;
-        return fullPath.substring(0, slash);
-    }
-
-    function openFileParent(item) {
-        openDirectoryPath(fileItemParentPath(item));
-        if (item && item.fullPath)
-            showTransientNotice("Opened parent folder for " + String(item.name || item.fullPath), 2200);
-    }
-
-    function revealFileInManager(item) {
-        if (!item || !item.fullPath)
-            return;
-        var target = String(item.fullPath || "");
-        var parent = fileItemParentPath(item);
-        Quickshell.execDetached(["sh", "-c",
-            "target=\"$1\"; parent=\"$2\"; " +
-            "if command -v dbus-send >/dev/null 2>&1; then " +
-            "  uri=$(printf 'file://%s' \"$target\" | sed 's/ /%20/g'); " +
-            "  if dbus-send --session --dest=org.freedesktop.FileManager1 --type=method_call --print-reply " +
-            "    /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"$uri\" string:\"\" >/dev/null 2>&1; then exit 0; fi; " +
-            "fi; " +
-            "exec " + fileOpenerCommand + " \"$parent\"",
-            "sh", target, parent
-        ]);
-        showTransientNotice("Revealed " + String(item.name || target), 2200);
-    }
-
-    function copyFilePath(item) {
-        if (!item || !item.fullPath)
-            return;
-        copyToClipboard(String(item.fullPath || ""));
-        showTransientNotice("Copied path for " + String(item.name || item.fullPath), 2200);
-    }
-
-    function fileContextMenuModel(item) {
-        if (!item || !item.fullPath)
-            return [];
-        return [
-            { label: "Open", icon: "󰈔", action: function() { openFileItem(item); close(); } },
-            { label: "Open Parent Folder", icon: "󰉋", action: function() { openFileParent(item); close(); } },
-            { label: "Reveal in File Manager", icon: "󰙅", action: function() { revealFileInManager(item); close(); } },
-            { separator: true },
-            { label: "Copy Full Path", icon: "󰅍", action: function() { copyFilePath(item); } }
-        ];
-    }
+    function openWithConfiguredOpener(targetPath) { FileOps.openWithConfiguredOpener(targetPath, _fileOpsCtx); }
+    function openDirectoryPath(targetPath)         { FileOps.openDirectoryPath(targetPath, _fileOpsCtx); }
+    function openFileItem(item)                    { FileOps.openFileItem(item, _fileOpsCtx); }
+    function fileItemParentPath(item)              { return FileOps.fileItemParentPath(item, fileSearchRootResolved); }
+    function openFileParent(item)                  { FileOps.openFileParent(item, _fileOpsCtx); }
+    function revealFileInManager(item)             { FileOps.revealFileInManager(item, _fileOpsCtx); }
+    function copyFilePath(item)                    { FileOps.copyFilePath(item, _fileOpsCtx); }
+    function fileContextMenuModel(item)            { return FileOps.fileContextMenuModel(item, _fileOpsCtx); }
 
     function updateDrunUsageCache(item) {
         if (!item)
@@ -549,6 +500,8 @@ PanelWindow {
         return "Shift+Tab: Next Mode";
     }
     readonly property string escapeStatusText: {
+        if (mode === "files" && _cleanSearch !== "" && fileIndexReady)
+            return filteredItems.length + "/" + fileIndexItems.length;
         if (showingConfirm)
             return "Esc cancels";
         if (sidebarOverflowExpanded)
@@ -564,6 +517,8 @@ PanelWindow {
         return "Esc closes";
     }
     readonly property string escapeStatusIcon: {
+        if (mode === "files" && _cleanSearch !== "" && fileIndexReady)
+            return "󰈔";
         if (showingConfirm)
             return "󰅖";
         if (sidebarOverflowExpanded || shortcutHelpExpanded)
@@ -799,6 +754,54 @@ PanelWindow {
                 launcherRoot.fileIndexReady = false;
                 launcherRoot.applyFileSearchFailure(stderrText, "Files index build failed");
             }
+        }
+    }
+
+    property Process gitIndexProc: Process {
+        property bool _destroyed: false
+        Component.onDestruction: _destroyed = true
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (gitIndexProc._destroyed) return;
+                launcherRoot._handleGitIndexBuilt(this.text || "");
+            }
+        }
+        onExited: exitCode => {
+            if (exitCode !== 0) {
+                launcherRoot._gitTrackedSet = {};
+                launcherRoot._gitIndexReady = false;
+            }
+        }
+    }
+
+    function _buildGitIndex(rootDir) {
+        if (gitIndexProc.running)
+            gitIndexProc.running = false;
+        gitIndexProc.command = ["git", "-C", rootDir, "ls-files", "--full-name"];
+        gitIndexProc.running = true;
+    }
+
+    function _handleGitIndexBuilt(raw) {
+        var set = {};
+        if (raw) {
+            var lines = raw.split("\n");
+            for (var i = 0; i < lines.length; ++i) {
+                var line = lines[i];
+                if (line !== "") set[line] = true;
+            }
+        }
+        _gitTrackedSet = set;
+        _gitIndexReady = true;
+        if (fileIndexReady && fileIndexItems.length > 0)
+            _tagFileItemsGit(fileIndexItems);
+    }
+
+    function _tagFileItemsGit(items) {
+        var set = _gitTrackedSet;
+        for (var i = 0; i < items.length; ++i) {
+            var rel = items[i].relativePath || "";
+            items[i]._isGitTracked = (rel !== "" && set[rel] === true);
         }
     }
 
@@ -1165,14 +1168,19 @@ PanelWindow {
     function clearCaches() {
         if (fileIndexProc.running)
             fileIndexProc.running = false;
+        if (gitIndexProc.running)
+            gitIndexProc.running = false;
         modeCache = ({});
         modeCacheTime = ({});
         fileQueryCache = ({});
         fileQueryCacheTime = ({});
+        resetFilterCache();
         fileIndexItems = [];
         fileIndexReady = false;
         fileIndexBuilding = false;
         fileIndexBuiltAt = 0;
+        _gitTrackedSet = ({});
+        _gitIndexReady = false;
     }
 
     onFileSearchRootResolvedChanged: clearCaches()
@@ -1247,10 +1255,15 @@ PanelWindow {
         fileIndexBuilding = false;
         var rootDir = fileSearchRootResolved;
         function _finishIndex(items) {
+            refreshFileUsageCaches(items);
             fileIndexItems = items;
             fileIndexReady = true;
             fileIndexBuiltAt = Date.now();
             recordFilesBackendLoad("fd", tookMs);
+            if (_gitIndexReady && Object.keys(_gitTrackedSet).length > 0)
+                _tagFileItemsGit(items);
+            else
+                _buildGitIndex(rootDir);
             if (mode === "files" && ModeData.stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength)
                 loadFiles();
             else if (mode === "files" && modeLoadState === "loading")
@@ -1479,6 +1492,24 @@ PanelWindow {
         buildLauncherHome();
     }
 
+    function trackFileOpen(item) {
+        if (!item || !item.fullPath) return;
+        UsageTrackerService.recordUsage(item.fullPath);
+        if (fileIndexReady && fileIndexItems.length > 0)
+            refreshFileUsageCaches(fileIndexItems);
+        resetFilterCache();
+    }
+
+    function updateFileUsageCache(item) {
+        if (!item || !item.fullPath) return;
+        item._fileUsageBoost = UsageTrackerService.getUsageScore(item.fullPath) * 1.5;
+    }
+
+    function refreshFileUsageCaches(items) {
+        for (var i = 0; i < items.length; ++i)
+            updateFileUsageCache(items[i]);
+    }
+
     function buildLauncherHome() {
         suggestionItems = [];
         if (mode === "drun") {
@@ -1518,6 +1549,30 @@ PanelWindow {
             launcherRoot.globalMouseInitialized = false;
         }
     }
+
+    readonly property var _modeDispatch: ({
+        "drun":        function() { loadApps(); },
+        "window":      function() { allItems = []; filterItems(); beginModeLoad("window", "Loading windows"); windowLoadTimer.restart(); },
+        "run":         function() { loadRun(); },
+        "emoji":       function() { loadEmojis(); },
+        "clip":        function() { loadClip(); },
+        "calc":        function() { allItems = []; filterItems(); completeModeLoad("calc", true, ""); },
+        "web":         function() { loadWeb(); },
+        "plugins":     function() { loadPlugins(); },
+        "system":      function() { loadSystem(); },
+        "media":       function() { allItems = []; filterItems(); completeModeLoad("media", true, ""); refreshMediaPlayers(); },
+        "nixos":       function() { loadNixos(); },
+        "wallpapers":  function() { loadWallpapers(); },
+        "files":       function() { prewarmFileIndex(); loadFiles(); },
+        "bookmarks":   function() { loadBookmarks(); },
+        "settings":    function() { loadSettings(); },
+        "devops":      function() { loadDevOps(); },
+        "orchestrator":function() { loadOrchestrator(); },
+        "ssh":         function() { loadSsh(); },
+        "ai":          function() { loadAi(); },
+        "keybinds":    function() { loadKeybinds(); },
+        "dmenu":       function() { filterItems(); completeModeLoad("dmenu", true, ""); }
+    })
 
     function open(newMode, keepSearch) {
         var startedAt = telemetryStart();
@@ -1572,59 +1627,8 @@ PanelWindow {
                 return;
             }
 
-            if (mode === "drun")
-                loadApps();
-            else if (mode === "window") {
-                allItems = [];
-                filterItems();
-                beginModeLoad("window", "Loading windows");
-                windowLoadTimer.restart();
-            } else if (mode === "run")
-                loadRun();
-            else if (mode === "emoji")
-                loadEmojis();
-            else if (mode === "clip")
-                loadClip();
-            else if (mode === "calc") {
-                allItems = [];
-                filterItems();
-                completeModeLoad("calc", true, "");
-            } else if (mode === "web")
-                loadWeb();
-            else if (mode === "plugins")
-                loadPlugins();
-            else if (mode === "system")
-                loadSystem();
-            else if (mode === "media") {
-                allItems = [];
-                filterItems();
-                completeModeLoad("media", true, "");
-                refreshMediaPlayers();
-            } else if (mode === "nixos")
-                loadNixos();
-            else if (mode === "wallpapers")
-                loadWallpapers();
-            else if (mode === "files") {
-                prewarmFileIndex();
-                loadFiles();
-            } else if (mode === "bookmarks")
-                loadBookmarks();
-            else if (mode === "settings")
-                loadSettings();
-            else if (mode === "devops")
-                loadDevOps();
-            else if (mode === "orchestrator")
-                loadOrchestrator();
-            else if (mode === "ssh")
-                loadSsh();
-            else if (mode === "ai")
-                loadAi();
-            else if (mode === "keybinds")
-                loadKeybinds();
-            else if (mode === "dmenu") {
-                filterItems();
-                completeModeLoad("dmenu", true, "");
-            }
+            var loader = _modeDispatch[mode];
+            if (loader) loader();
         });
 
         // Start background preload of other cacheable modes
@@ -2692,7 +2696,24 @@ PanelWindow {
                 && cleanLower.indexOf(_lastFilterQuery) === 0;
         var sourceItems = canReusePreviousCandidates ? _lastFilterCandidates : allItems;
 
-        if (clean === "" && mode !== "files" && mode !== "ai") {
+        if (clean === "" && mode === "files") {
+            // Empty query in files mode: show recently-opened files sorted by frecency
+            resetFilterCache();
+            var recentFiles = [];
+            for (var rf = 0; rf < allItems.length; ++rf) {
+                var rfItem = allItems[rf];
+                var boost = Number(rfItem._fileUsageBoost || 0);
+                if (boost > 0.01) {
+                    rfItem._score = boost * 100;
+                    recentFiles.push(rfItem);
+                }
+            }
+            recentFiles.sort(Search.compareByScoreThenDepth);
+            filteredItems = decorateResultSections(recentFiles.slice(0, Config.launcherMaxResults));
+            selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
+            recordFilterMetric(Date.now() - startedAt);
+            return;
+        } else if (clean === "" && mode !== "ai") {
             resetFilterCache();
             var baseItems = [];
             for (var j = 0; j < allItems.length; ++j) {
@@ -3109,6 +3130,7 @@ PanelWindow {
             rememberRecent: rememberRecent,
             copyToClipboard: copyToClipboard,
             openFileItem: openFileItem,
+            trackFileOpen: trackFileOpen,
             openDirectoryPath: openDirectoryPath,
             selectCharacter: selectCharacter,
             shouldPasteCharacter: shouldPasteCharacter,
@@ -3154,159 +3176,8 @@ PanelWindow {
         }
     }
 
-    IpcHandler {
-        target: "Launcher"
-        function openDrun() {
-            launcherRoot.open("drun");
-        }
-        function openWindow() {
-            launcherRoot.open("window");
-        }
-        function openRun() {
-            launcherRoot.open("run");
-        }
-        function openEmoji() {
-            launcherRoot.open("emoji");
-        }
-        function openCalc() {
-            launcherRoot.open("calc");
-        }
-        function openClip() {
-            launcherRoot.open("clip");
-        }
-        function openWeb() {
-            launcherRoot.open("web");
-        }
-        function openPlugins() {
-            launcherRoot.open("plugins");
-        }
-        function openSystem() {
-            launcherRoot.open("system");
-        }
-        function openNixos() {
-            launcherRoot.open("nixos");
-        }
-        function openMedia() {
-            launcherRoot.open("media");
-        }
-        function openWallpapers() {
-            launcherRoot.open("wallpapers");
-        }
-        function openKeybinds() {
-            launcherRoot.open("keybinds");
-        }
-        function openBookmarks() {
-            launcherRoot.open("bookmarks");
-        }
-        function openAi() {
-            launcherRoot.open("ai");
-        }
-        function openFiles() {
-            launcherRoot.open("files");
-        }
-        function openDmenu(itemsJson: string) {
-            var items = [];
-            try {
-                items = JSON.parse(itemsJson);
-            } catch (err) {}
-            launcherRoot.mode = "dmenu";
-            launcherRoot.allItems = items.map(function (it) {
-                return {
-                    name: it,
-                    title: it
-                };
-            });
-            launcherRoot.open("dmenu");
-        }
-        function clearMetrics() {
-            launcherRoot.clearLauncherMetrics();
-        }
-        function redetectFilesBackend() {
-            launcherRoot.forceRedetectFileSearchBackend(true, function (_) {});
-        }
-        function diagnosticReset() {
-            launcherRoot.diagnosticReset();
-        }
-        function filesBackendStatus(): string {
-            return JSON.stringify(launcherRoot.filesBackendStatusObject());
-        }
-        function drunCategoryState(): string {
-            return JSON.stringify(launcherRoot.drunCategoryStateObject());
-        }
-        function escapeActionState(): string {
-            return JSON.stringify(launcherRoot.escapeActionStateObject());
-        }
-        function launcherState(): string {
-            return JSON.stringify(launcherRoot.launcherStateObject());
-        }
-        function diagnosticSetSearchText(text: string): string {
-            return launcherRoot.diagnosticSetSearchText(text);
-        }
-        function diagnosticSetFileSearchRoot(rootValue: string): string {
-            launcherRoot.diagnosticFileSearchRootOverride = String(rootValue || "");
-            return JSON.stringify(launcherRoot.launcherStateObject());
-        }
-        function diagnosticSetFileShowHidden(value: string): string {
-            var normalized = String(value || "").trim().toLowerCase();
-            if (normalized === "" || normalized === "inherit") {
-                launcherRoot.diagnosticFileSearchShowHiddenOverrideActive = false;
-            } else {
-                launcherRoot.diagnosticFileSearchShowHiddenOverrideActive = true;
-                launcherRoot.diagnosticFileSearchShowHiddenOverride = ["1", "true", "yes", "on"].indexOf(normalized) !== -1;
-            }
-            return JSON.stringify(launcherRoot.launcherStateObject());
-        }
-        function diagnosticSetFileOpener(command: string): string {
-            launcherRoot.diagnosticFileOpenerOverride = String(command || "").trim();
-            return JSON.stringify(launcherRoot.launcherStateObject());
-        }
-        function diagnosticClearFileOverrides(): string {
-            launcherRoot.diagnosticFileSearchRootOverride = "";
-            launcherRoot.diagnosticFileSearchShowHiddenOverrideActive = false;
-            launcherRoot.diagnosticFileSearchShowHiddenOverride = false;
-            launcherRoot.diagnosticFileOpenerOverride = "";
-            return JSON.stringify(launcherRoot.launcherStateObject());
-        }
-        function diagnosticSetDrunCategoryFilter(categoryKey: string): string {
-            return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey);
-        }
-        function diagnosticSetViewport(widthValue: real, heightValue: real): string {
-            return launcherRoot.diagnosticSetViewport(widthValue, heightValue);
-        }
-        function diagnosticExecuteEmptyPrimary(): string {
-            launcherRoot.executeEmptyPrimary();
-            return JSON.stringify({
-                executed: true,
-                state: launcherRoot.launcherStateObject()
-            });
-        }
-        function diagnosticExecuteSelection(): string {
-            var item = launcherRoot.selectedItem;
-            var target = item ? String(item.fullPath || item.address || item.exec || item.name || "") : "";
-            var executed = launcherRoot.hasResults;
-            if (executed)
-                launcherRoot.executeSelection();
-            return JSON.stringify({
-                executed: executed,
-                target: target,
-                state: launcherRoot.launcherStateObject()
-            });
-        }
-        function invokeEscapeAction(): string {
-            var action = launcherRoot.escapeActionStateObject().action;
-            var handled = launcherRoot.handleEscapeAction();
-            return JSON.stringify({
-                handled: handled === true,
-                action: action,
-                state: launcherRoot.escapeActionStateObject()
-            });
-        }
-        function toggle() {
-            if (launcherRoot.launcherOpacity > 0)
-                launcherRoot.close();
-            else
-                launcherRoot.open(launcherRoot.effectiveDefaultMode());
-        }
+    LauncherIpcHandler {
+        launcher: launcherRoot
     }
 
     Rectangle {

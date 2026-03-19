@@ -16,7 +16,15 @@ function highlightMatch(fullText, query, stripPrefixFn, multiToken) {
         var highlights = {};
         var t = fullText.toLowerCase();
         for (var ti = 0; ti < tokens.length; ti++) {
-            _markTokenPositions(t, tokens[ti], highlights);
+            var rawTok = tokens[ti];
+            // Skip negate tokens — excluded items won't appear anyway
+            if (rawTok[0] === "!") continue;
+            // Strip operator prefixes for highlighting
+            var hlTok = rawTok;
+            if (hlTok[0] === "'" || hlTok[0] === "^") hlTok = hlTok.substring(1);
+            if (hlTok.length > 0 && hlTok[hlTok.length - 1] === "$") hlTok = hlTok.substring(0, hlTok.length - 1);
+            if (hlTok === "") continue;
+            _markTokenPositions(t, hlTok, highlights);
         }
         return _buildHighlightedString(fullText, highlights);
     }
@@ -139,6 +147,7 @@ function ensureItemRankCache(item) {
     if (!item || item._rankCacheReady)
         return;
     item._nameLower = item.name ? String(item.name).toLowerCase() : "";
+    item._nameOriginal = item.name ? String(item.name) : "";
     item._titleLower = item.title ? String(item.title).toLowerCase() : "";
     item._execLower = item.exec ? String(item.exec).toLowerCase() : (item.class ? String(item.class).toLowerCase() : "");
     item._bodyLower = [item.body, item.description, item.fullPath].filter(Boolean).join(" ").toLowerCase();
@@ -149,6 +158,7 @@ function ensureItemRankCache(item) {
         return String(alias || "").toLowerCase();
     }) : [];
     item._relativePathLower = item.relativePath ? String(item.relativePath).toLowerCase() : "";
+    item._relativePathOriginal = item.relativePath ? String(item.relativePath) : "";
     item._parentPathLower = item.parentPath ? String(item.parentPath).toLowerCase() : "";
     item._displayPathLower = item.displayPath ? String(item.displayPath).toLowerCase() : "";
     item._extensionLower = item.extension ? String(item.extension).toLowerCase() : "";
@@ -257,7 +267,8 @@ function rankCharacterItem(item, clean, cleanLower) {
 // fzf-style single-token scoring against a string.
 // Returns 0 for no match, higher = better match quality.
 // Rewards: consecutive runs, word boundary matches, start-of-string.
-function fzfScoreToken(str, token) {
+// Optional strOriginal (original case) enables camelCase boundary detection.
+function fzfScoreToken(str, token, strOriginal) {
     if (!token) return 100;
     if (!str) return 0;
     var sLen = str.length;
@@ -273,8 +284,8 @@ function fzfScoreToken(str, token) {
         var score = 800;
         // Bonus for match at start
         if (subIdx === 0) score += 200;
-        // Bonus for match at word boundary (after / . _ - space or uppercase)
-        else if (_isWordBoundary(str, subIdx)) score += 150;
+        // Bonus for match at word boundary (after / . _ - space or camelCase)
+        else if (_isWordBoundary(str, subIdx, strOriginal)) score += 150;
         // Coverage bonus: longer match relative to string
         score += Math.round((tLen / sLen) * 100);
         return score;
@@ -295,8 +306,8 @@ function fzfScoreToken(str, token) {
             consecutive++;
             // Consecutive run bonus: 1+2+3+4... = n*(n+1)/2 growth
             score += consecutive * 3;
-            // Word boundary bonus
-            if (_isWordBoundary(str, sIdx)) {
+            // Word boundary bonus (includes camelCase)
+            if (_isWordBoundary(str, sIdx, strOriginal)) {
                 boundaryMatches++;
                 score += 20;
             }
@@ -320,12 +331,66 @@ function fzfScoreToken(str, token) {
     return score;
 }
 
-// Check if position i in str is a word boundary start
-function _isWordBoundary(str, i) {
+// Check if position i in str is a word boundary start.
+// Optional strOriginal (original case) enables camelCase boundary detection.
+function _isWordBoundary(str, i, strOriginal) {
     if (i === 0) return true;
     var prev = str.charCodeAt(i - 1);
     // After / . _ - space
-    return prev === 47 || prev === 46 || prev === 95 || prev === 45 || prev === 32;
+    if (prev === 47 || prev === 46 || prev === 95 || prev === 45 || prev === 32)
+        return true;
+    // camelCase: lowercase→uppercase transition in original-case string
+    if (strOriginal && i < strOriginal.length) {
+        var origPrev = strOriginal.charCodeAt(i - 1);
+        var origCurr = strOriginal.charCodeAt(i);
+        if (origPrev >= 97 && origPrev <= 122 && origCurr >= 65 && origCurr <= 90)
+            return true;
+    }
+    return false;
+}
+
+// Parse a file-mode token into {text, mode} for operator dispatch.
+// Operators: !term (negate), 'term (exact), ^term (prefix), term$ (suffix), plain (fuzzy).
+function _parseFileToken(token) {
+    if (!token) return { text: "", mode: "fuzzy" };
+    if (token[0] === "!") return { text: token.substring(1), mode: "negate" };
+    if (token[0] === "'") return { text: token.substring(1), mode: "exact" };
+    if (token[0] === "^") return { text: token.substring(1), mode: "prefix" };
+    if (token[token.length - 1] === "$") return { text: token.substring(0, token.length - 1), mode: "suffix" };
+    return { text: token, mode: "fuzzy" };
+}
+
+// Score a single parsed file token against name/path strings.
+// Returns: -1 if negate term found, 0 for no match, >0 for match quality.
+function _scoreFileTokenOp(nameStr, pathStr, parsed, nameOrig, pathOrig) {
+    var term = parsed.text;
+    if (!term) return 1;
+    if (parsed.mode === "negate") {
+        return (nameStr.indexOf(term) !== -1 || pathStr.indexOf(term) !== -1) ? -1 : 1;
+    }
+    if (parsed.mode === "exact") {
+        var nameIdx = nameStr.indexOf(term);
+        if (nameIdx !== -1) return 800 + Math.round((term.length / nameStr.length) * 100);
+        var pathIdx = pathStr.indexOf(term);
+        if (pathIdx !== -1) return 600 + Math.round((term.length / pathStr.length) * 100);
+        return 0;
+    }
+    if (parsed.mode === "prefix") {
+        if (nameStr.indexOf(term) === 0) return 1000;
+        if (pathStr.indexOf(term) === 0) return 800;
+        return 0;
+    }
+    if (parsed.mode === "suffix") {
+        var nameEnd = nameStr.length - term.length;
+        if (nameEnd >= 0 && nameStr.indexOf(term, nameEnd) === nameEnd) return 1000;
+        var pathEnd = pathStr.length - term.length;
+        if (pathEnd >= 0 && pathStr.indexOf(term, pathEnd) === pathEnd) return 800;
+        return 0;
+    }
+    // fuzzy: delegate to fzfScoreToken with name/path weights and camelCase originals
+    var nameScore = fzfScoreToken(nameStr, term, nameOrig) * 2.5;
+    var pathScore = fzfScoreToken(pathStr, term, pathOrig) * 1.2;
+    return Math.max(nameScore, pathScore);
 }
 
 function rankFileItem(item, cleanLower) {
@@ -336,22 +401,36 @@ function rankFileItem(item, cleanLower) {
     var tokens = cleanLower.indexOf(" ") === -1 ? [cleanLower] : cleanLower.split(/\s+/).filter(function(t) { return t !== ""; });
     if (tokens.length === 0) return 1;
 
-    // Fast reject on first char of first token
-    var firstChar = tokens[0][0];
-    if (item._relativePathLower.indexOf(firstChar) === -1
-        && item._nameLower.indexOf(firstChar) === -1)
-        return 0;
+    // Fast reject on first char of each non-operator token
+    for (var r = 0; r < tokens.length; r++) {
+        var rt = tokens[r];
+        if (rt[0] === "!" || rt[0] === "'") continue;
+        var fc = (rt[0] === "^") ? (rt.length > 1 ? rt[1] : null) : rt[0];
+        if (!fc) continue;
+        // Also strip trailing $ for suffix tokens
+        if (fc === "$") continue;
+        if (item._relativePathLower.indexOf(fc) === -1
+            && item._nameLower.indexOf(fc) === -1)
+            return 0;
+    }
 
     var minScore = Infinity;
     for (var t = 0; t < tokens.length; t++) {
-        var tok = tokens[t];
-        // Score each token against name (2.5x weight) and relative path (1.2x weight)
-        var nameScore = fzfScoreToken(item._nameLower, tok) * 2.5;
-        var pathScore = fzfScoreToken(item._relativePathLower, tok) * 1.2;
-        var bestTok = Math.max(nameScore, pathScore);
-        if (bestTok <= 0) return 0; // AND semantics: all tokens must match
-        if (bestTok < minScore) minScore = bestTok;
+        var parsed = _parseFileToken(tokens[t]);
+        if (parsed.text === "") continue;
+        var tokScore = _scoreFileTokenOp(
+            item._nameLower, item._relativePathLower, parsed,
+            item._nameOriginal, item._relativePathOriginal
+        );
+        if (parsed.mode === "negate") {
+            if (tokScore < 0) return 0; // found — exclude
+            continue; // absent — passes, no score contribution
+        }
+        if (tokScore <= 0) return 0; // AND: all must match
+        if (tokScore < minScore) minScore = tokScore;
     }
+
+    if (minScore === Infinity) minScore = 1; // all tokens were negate-only
 
     var score = minScore;
     // Multi-token bonus: reward queries that use multiple tokens
@@ -360,6 +439,10 @@ function rankFileItem(item, cleanLower) {
     score -= Math.min(20, item._pathDepth * 2);
     // Length penalty: prefer shorter paths
     score -= Math.min(16, Math.floor(item._relativePathLower.length / 24));
+    // Frecency boost from UsageTrackerService
+    score += Number(item._fileUsageBoost || 0);
+    // Git-tracked boost
+    if (item._isGitTracked) score += 30;
     return score;
 }
 
@@ -409,10 +492,12 @@ function compareByScoreThenUsage(a, b) {
     return compareLauncherItemsAlpha(a, b);
 }
 
-// Sort comparator: score desc → pathDepth asc → path alpha. Used for files mode.
+// Sort comparator: score desc → usage desc → pathDepth asc → path alpha. Used for files mode.
 function compareByScoreThenDepth(a, b) {
     if (b._score !== a._score)
         return b._score - a._score;
+    var usageDiff = Number(b._fileUsageBoost || 0) - Number(a._fileUsageBoost || 0);
+    if (Math.abs(usageDiff) > 0.01) return usageDiff > 0 ? 1 : -1;
     var aDepth = Number(a.pathDepth || 0);
     var bDepth = Number(b.pathDepth || 0);
     if (aDepth !== bDepth)

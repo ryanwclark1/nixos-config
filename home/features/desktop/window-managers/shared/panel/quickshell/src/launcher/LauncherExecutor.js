@@ -143,6 +143,7 @@ function executeSelection(mode, item, actions) {
     } else if (mode === "files") {
         if (!item.isHint && item.fullPath) {
             actions.openFileItem(item);
+            if (actions.trackFileOpen) actions.trackFileOpen(item);
             actions.close();
         }
     } else if (mode === "system" || mode === "nixos") {
