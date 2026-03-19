@@ -216,6 +216,9 @@ QtObject {
     property string screenshotEditor: "none"        // none | swappy | satty
     property bool screenshotEditAfterCapture: false
     property int screenshotDelay: 0                 // 0, 3, 5, 10 seconds
+    property string ocrLanguage: "eng"              // tesseract language code
+    property var screenshotHistory: []               // [{path, timestamp, mode}]
+    property int screenshotHistoryMax: 20
 
     // --- RECORDING ---
     property string recordingCaptureSource: "portal"   // portal | screen
@@ -303,6 +306,7 @@ QtObject {
     property real spacingScale: 1.0
     property real uiDensityScale: 1.0
     property real animationSpeedScale: 1.0
+    property bool autoEcoMode: true
     property bool personalityGifEnabled: false
     property string personalityGifPath: ""
     property string personalityGifReactionMode: "media" // media | cpu | beat | idle
@@ -641,6 +645,57 @@ QtObject {
 
     property ConfigAutoSave _autoSave: ConfigAutoSave {
         config: root
+    }
+
+    function addModularEntry(section, type) {
+        var list = [];
+        if (section === "left") list = barLeftEntries.slice();
+        else if (section === "center") list = barCenterEntries.slice();
+        else if (section === "right") list = barRightEntries.slice();
+
+        list.push(type);
+
+        if (section === "left") barLeftEntries = list;
+        else if (section === "center") barCenterEntries = list;
+        else if (section === "right") barRightEntries = list;
+
+        scheduleSave();
+    }
+
+    function moveModularEntry(section, index, direction) {
+        var list = [];
+        if (section === "left") list = barLeftEntries.slice();
+        else if (section === "center") list = barCenterEntries.slice();
+        else if (section === "right") list = barRightEntries.slice();
+
+        if (index < 0 || index >= list.length) return;
+        var newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= list.length) return;
+
+        var item = list.splice(index, 1)[0];
+        list.splice(newIndex, 0, item);
+
+        if (section === "left") barLeftEntries = list;
+        else if (section === "center") barCenterEntries = list;
+        else if (section === "right") barRightEntries = list;
+
+        scheduleSave();
+    }
+
+    function removeModularEntry(section, index) {
+        var list = [];
+        if (section === "left") list = barLeftEntries.slice();
+        else if (section === "center") list = barCenterEntries.slice();
+        else if (section === "right") list = barRightEntries.slice();
+
+        if (index < 0 || index >= list.length) return;
+        list.splice(index, 1);
+
+        if (section === "left") barLeftEntries = list;
+        else if (section === "center") barCenterEntries = list;
+        else if (section === "right") barRightEntries = list;
+
+        scheduleSave();
     }
 
     function scheduleSave() {

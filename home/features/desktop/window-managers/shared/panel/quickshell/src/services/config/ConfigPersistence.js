@@ -177,7 +177,10 @@ var _MAPS = {
     screenshot: [
         ["editor", "screenshotEditor"],
         ["editAfterCapture", "screenshotEditAfterCapture"],
-        ["delay", "screenshotDelay"]
+        ["delay", "screenshotDelay"],
+        ["ocrLanguage", "ocrLanguage"],
+        ["history", "screenshotHistory"],
+        ["historyMax", "screenshotHistoryMax"]
     ],
     recording: [
         ["captureSource", "recordingCaptureSource"],
@@ -285,6 +288,7 @@ var _MAPS = {
         ["spacingScale", "spacingScale", _num1],
         ["uiDensityScale", "uiDensityScale", _num1],
         ["animationSpeedScale", "animationSpeedScale", _num1],
+        ["autoEcoMode", "autoEcoMode"],
         ["personalityGifEnabled", "personalityGifEnabled"],
         ["personalityGifPath", "personalityGifPath", _strDef],
         ["personalityGifReactionMode", "personalityGifReactionMode", _strDef]
