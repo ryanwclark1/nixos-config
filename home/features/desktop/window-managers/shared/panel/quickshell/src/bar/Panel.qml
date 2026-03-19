@@ -443,7 +443,7 @@ Item {
     BarSectionRepeater {
         id: leftSection
         vertical: root.vertical
-        sectionSpacing: runtimeSpacing + sectionSpacing
+        sectionSpacing: runtimeSpacing + root.sectionSpacing
         sectionModel: root._leftLeading
         trailingModel: root._leftTrailing
         trailingSpacing: runtimeSpacing
@@ -1123,122 +1123,37 @@ Item {
 
     Component {
         id: aiChatPillComponent
-        SharedWidgets.BarPill {
-            id: aiChatPill
-            property var widgetInstance: null
-            isActive: root.isSurfaceActive("aiChat")
-            anchorWindow: root.anchorWindow
+        BarSurfacePill {
+            surfaceId: "aiChat"
+            iconText: "󰚩"
+            iconSize: Colors.fontSizeLarge
+            defaultLabel: "AI"
             tooltipText: "AI Chat"
-            onClicked: root.requestSurface("aiChat", this)
-            contextActions: [
-                {
-                    label: "Open AI Chat",
-                    icon: "󰚩",
-                    action: () => root.requestSurface("aiChat", this)
-                }
-            ]
-            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
-
-            Row {
-                spacing: Colors.spacingXS
-
-                Text {
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeLarge
-                    font.family: Colors.fontMono
-                    text: "󰚩"
-                }
-
-                Text {
-                    visible: !root.triggerWidgetIconOnly(aiChatPill.widgetInstance)
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.DemiBold
-                    text: root.triggerWidgetLabel(aiChatPill.widgetInstance, "AI")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
+            panelRef: root
         }
     }
 
     Component {
         id: notepadComponent
-        SharedWidgets.BarPill {
-            id: notepadPill
-            property var widgetInstance: null
-            isActive: root.isSurfaceActive("notepad")
-            anchorWindow: root.anchorWindow
+        BarSurfacePill {
+            surfaceId: "notepad"
+            iconText: "󰠮"
+            iconSize: Colors.fontSizeLarge
+            defaultLabel: "Notes"
             tooltipText: "Notepad"
-            onClicked: root.requestSurface("notepad", this)
-            contextActions: [
-                {
-                    label: "Open Notepad",
-                    icon: "󰠮",
-                    action: () => root.requestSurface("notepad", this)
-                }
-            ]
-            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
-
-            Row {
-                spacing: Colors.spacingXS
-
-                Text {
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeLarge
-                    font.family: Colors.fontMono
-                    text: "󰠮"
-                }
-
-                Text {
-                    visible: !root.triggerWidgetIconOnly(notepadPill.widgetInstance)
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.DemiBold
-                    text: root.triggerWidgetLabel(notepadPill.widgetInstance, "Notes")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
+            panelRef: root
         }
     }
 
     Component {
         id: controlCenterComponent
-        SharedWidgets.BarPill {
-            id: controlCenterPill
-            property var widgetInstance: null
-            isActive: root.isSurfaceActive("controlCenter")
-            anchorWindow: root.anchorWindow
+        BarSurfacePill {
+            surfaceId: "controlCenter"
+            iconText: "󰒓"
+            defaultLabel: "Controls"
             tooltipText: "System controls"
-            tooltipShortcut: "Meta+C"
-            onClicked: root.requestSurface("controlCenter", this)
-            contextActions: [
-                {
-                    label: "Open Settings",
-                    icon: "󰒓",
-                    action: () => root.requestSurface("controlCenter", this)
-                }
-            ]
-            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
-
-            Row {
-                spacing: Colors.spacingXS
-
-                Text {
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeXL
-                    font.family: Colors.fontMono
-                    text: "󰒓"
-                }
-
-                Text {
-                    visible: !root.triggerWidgetIconOnly(controlCenterPill.widgetInstance)
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.DemiBold
-                    text: root.triggerWidgetLabel(controlCenterPill.widgetInstance, "Controls")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
+            tooltipShortcutText: "Meta+C"
+            panelRef: root
         }
     }
 
@@ -1256,90 +1171,31 @@ Item {
 
     Component {
         id: clipboardComponent
-        SharedWidgets.BarPill {
-            id: clipboardPill
-            property var widgetInstance: null
-            isActive: root.isSurfaceActive("clipboardMenu")
-            anchorWindow: root.anchorWindow
+        BarSurfacePill {
+            surfaceId: "clipboardMenu"
+            iconText: "󰅍"
+            defaultLabel: "Clipboard"
             tooltipText: "Clipboard history"
-            onClicked: root.requestSurface("clipboardMenu", this)
-            contextActions: [
+            panelRef: root
+            extraContextActions: [
                 {
                     label: "Clear History",
                     icon: "󰎟",
                     danger: true,
                     action: () => Quickshell.execDetached(["cliphist", "wipe"])
-                },
-                {
-                    separator: true
-                },
-                {
-                    label: "Open Clipboard",
-                    icon: "󰅍",
-                    action: () => root.requestSurface("clipboardMenu", this)
                 }
             ]
-            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
-
-            Row {
-                spacing: Colors.spacingXS
-
-                Text {
-                    text: "󰅍"
-                    color: Colors.text
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
-                }
-
-                Text {
-                    visible: !root.triggerWidgetIconOnly(clipboardPill.widgetInstance)
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.DemiBold
-                    text: root.triggerWidgetLabel(clipboardPill.widgetInstance, "Clipboard")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
         }
     }
 
     Component {
         id: screenshotComponent
-        SharedWidgets.BarPill {
-            id: screenshotPill
-            property var widgetInstance: null
-            isActive: root.isSurfaceActive("screenshotMenu")
-            anchorWindow: root.anchorWindow
+        BarSurfacePill {
+            surfaceId: "screenshotMenu"
+            iconText: "󰩭"
+            defaultLabel: "Shot"
             tooltipText: "Screenshot"
-            onClicked: root.requestSurface("screenshotMenu", this)
-            contextActions: [
-                {
-                    label: "Open Screenshot Menu",
-                    icon: "󰩭",
-                    action: () => root.requestSurface("screenshotMenu", this)
-                }
-            ]
-            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
-
-            Row {
-                spacing: Colors.spacingXS
-
-                Text {
-                    text: "󰩭"
-                    color: Colors.text
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
-                }
-
-                Text {
-                    visible: !root.triggerWidgetIconOnly(screenshotPill.widgetInstance)
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.DemiBold
-                    text: root.triggerWidgetLabel(screenshotPill.widgetInstance, "Shot")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
+            panelRef: root
         }
     }
 
