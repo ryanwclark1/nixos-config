@@ -26,6 +26,8 @@ import "../features/ssh" as SshFeature
 PanelWindow {
     id: launcherRoot
 
+    property bool _destroyed: false
+
     Component.onCompleted: {
         initialAppsPreloadTimer.restart();
     }
@@ -65,9 +67,12 @@ PanelWindow {
     WlrLayershell.keyboardFocus: launcherOpacity > 0 ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     WlrLayershell.namespace: "quickshell"
 
+    Component.onDestruction: _destroyed = true
+
     onVisibleChanged: {
         if (visible)
             Qt.callLater(function () {
+                if (_destroyed) return;
                 if (searchInputComp.searchInput)
                     searchInputComp.searchInput.forceActiveFocus();
             });
@@ -1418,6 +1423,7 @@ PanelWindow {
         launcherOpacity = 1;
         scaleValue = 1.0;
         Qt.callLater(function () {
+            if (_destroyed) return;
             if (searchInputComp.searchInput)
                 searchInputComp.searchInput.forceActiveFocus();
         });

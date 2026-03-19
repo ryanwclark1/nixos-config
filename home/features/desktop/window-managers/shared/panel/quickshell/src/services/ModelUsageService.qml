@@ -45,6 +45,18 @@ QtObject {
   property string codexModel: "unknown"
   property var codexLatestSession: ({})
 
+  // ── Gemini state ─────────────────────────────────
+  readonly property bool geminiEnabled: Config.modelUsageGeminiEnabled
+  property bool geminiReady: false
+  property int geminiTodayPrompts: 0
+  property int geminiTodaySessions: 0
+  property var geminiTodayTokens: ({})
+  property int geminiTotalSessions: 0
+  property int geminiTotalTokens: 0
+  property string geminiModel: "unknown"
+  property var geminiRecentDays: []
+  property var geminiTokensByModel: ({})
+
   // ── Computed display ───────────────────────────────
   readonly property string displayText: _computeDisplayText()
   readonly property string displayTooltip: _computeTooltip()
@@ -90,6 +102,8 @@ QtObject {
       claudeProc.running = true;
     if (root.codexEnabled && !codexProc.running)
       codexProc.running = true;
+    if (root.geminiEnabled && !geminiProc.running)
+      geminiProc.running = true;
   }
 
   function refreshRateLimit() {
@@ -98,9 +112,13 @@ QtObject {
   }
 
   function switchProvider() {
-    if (root.claudeEnabled && root.codexEnabled) {
-      Config.modelUsageActiveProvider = root.activeProvider === "claude" ? "codex" : "claude";
-    }
+    var providers = [];
+    if (root.claudeEnabled) providers.push("claude");
+    if (root.codexEnabled) providers.push("codex");
+    if (root.geminiEnabled) providers.push("gemini");
+    if (providers.length < 2) return;
+    var idx = providers.indexOf(root.activeProvider);
+    Config.modelUsageActiveProvider = providers[(idx + 1) % providers.length];
   }
 
   // ── Display computation ────────────────────────────
@@ -110,6 +128,11 @@ QtObject {
       if (!root.claudeReady) return "--";
       if (root.barMetric === "tokens") return formatTokenCount(root.claudeTotalTokens);
       return String(root.claudeTodayPrompts);
+    }
+    if (p === "gemini") {
+      if (!root.geminiReady) return "--";
+      if (root.barMetric === "tokens") return formatTokenCount(root.geminiTotalTokens);
+      return String(root.geminiTodayPrompts);
     }
     if (!root.codexReady) return "--";
     return String(root.codexTodayPrompts);
@@ -123,6 +146,10 @@ QtObject {
       if (root.claudeTodaySessions > 0)
         tip += " · " + root.claudeTodaySessions + " sessions";
       return tip;
+    }
+    if (p === "gemini") {
+      if (!root.geminiReady) return "Gemini CLI · No data";
+      return "Gemini CLI · " + root.geminiTodayPrompts + " prompts today";
     }
     if (!root.codexReady) return "Codex CLI · No data";
     return "Codex CLI · " + root.codexTodayPrompts + " prompts today";

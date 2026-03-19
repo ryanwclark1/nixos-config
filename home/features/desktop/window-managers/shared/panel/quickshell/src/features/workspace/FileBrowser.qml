@@ -30,6 +30,7 @@ PanelWindow {
   WlrLayershell.namespace: "quickshell-filebrowser"
 
   // ── Public API ─────────────────────────────────────────────────────────────
+  property bool _destroyed: false
   property bool isOpen: false
 
   // "open" or "save"
@@ -85,6 +86,8 @@ PanelWindow {
       depth++;
     }
   }
+
+  Component.onDestruction: _destroyed = true
 
   IpcHandler {
     target: "FileBrowser"
@@ -248,11 +251,13 @@ PanelWindow {
       if (visible) {
         if (root.mode === "save") {
           Qt.callLater(function() {
+            if (root._destroyed) return;
             if (root.isOpen && root.mode === "save")
               footer.saveFieldItem.forceActiveFocus();
           });
         } else {
           Qt.callLater(function() {
+            if (root._destroyed) return;
             if (root.isOpen && root.mode !== "save")
               focusSink.forceActiveFocus();
           });
