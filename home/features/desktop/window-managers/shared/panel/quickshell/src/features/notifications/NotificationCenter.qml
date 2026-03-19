@@ -196,18 +196,9 @@ PanelWindow {
 
           property var collapsedGroups: ({})
 
-          add: Transition {
-            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: Colors.durationPanelOpen; easing.type: Easing.OutCubic }
-            NumberAnimation { property: "scale"; from: 0.95; to: 1.0; duration: Colors.durationPanelOpen; easing.type: Easing.OutBack }
-          }
-
-          remove: Transition {
-            NumberAnimation { property: "opacity"; to: 0; duration: Colors.durationNormal }
-          }
-
-          displaced: Transition {
-            NumberAnimation { properties: "y"; duration: Colors.durationPanelOpen; easing.type: Easing.OutCubic }
-          }
+          add: SharedWidgets.ListTransitions.addFadeScale
+          remove: SharedWidgets.ListTransitions.removeFade
+          displaced: SharedWidgets.ListTransitions.displaced
 
           // Empty state
           ColumnLayout {

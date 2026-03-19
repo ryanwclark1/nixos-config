@@ -15,6 +15,21 @@ Item {
   property var archivedNotifications: []
   property string statePath: Quickshell.statePath("notifications.json")
 
+  // Rate limiting — prevent notification floods from misbehaving apps
+  property int _ingressCount: 0
+  readonly property int _maxIngressPerSecond: 20
+
+  Timer {
+    interval: 1000; running: true; repeat: true
+    onTriggered: root._ingressCount = 0
+  }
+
+  Timer {
+    id: saveDebounce
+    interval: 500; repeat: false
+    onTriggered: root._doSaveNotifications()
+  }
+
   Loader {
     id: notificationServerLoader
     active: root.notificationServerEnabled
@@ -30,6 +45,10 @@ Item {
       imageSupported: true
 
       onNotification: function(notif) {
+        if (++root._ingressCount > root._maxIngressPerSecond) {
+          console.warn("NotificationManager: rate limit exceeded, dropping from:", notif.appName);
+          return;
+        }
         notif.tracked = true;
         root.saveNotifications();
       }
@@ -39,6 +58,10 @@ Item {
   Component.onCompleted: loadNotifications()
 
   function saveNotifications() {
+    saveDebounce.restart();
+  }
+
+  function _doSaveNotifications() {
     var data = [];
     if (!server) {
       return;
@@ -55,12 +78,12 @@ Item {
         timestamp: Date.now()
       });
     }
-    
+
     // Add existing archived ones (limit to 50 total for performance)
     for (var j = 0; j < Math.min(archivedNotifications.length, 50 - data.length); j++) {
        data.push(archivedNotifications[j]);
     }
-    
+
     var json = JSON.stringify(data);
     Quickshell.execDetached([
       "sh",
