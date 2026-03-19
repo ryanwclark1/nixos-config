@@ -318,6 +318,7 @@ PanelWindow {
                     icon: "󰑐"
                     size: 34
                     iconSize: Colors.fontSizeLarge
+                    tooltipText: "Refresh"
                     onClicked: root.refreshAll()
                 }
 
@@ -325,6 +326,7 @@ PanelWindow {
                     icon: "󰅖"
                     size: 34
                     iconSize: Colors.fontSizeLarge
+                    tooltipText: "Close"
                     onClicked: root.closeRequested()
                 }
             }

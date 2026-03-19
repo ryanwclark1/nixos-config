@@ -48,6 +48,7 @@ BasePopupMenu {
         size: 30
         iconSize: Colors.fontSizeLarge
         iconColor: Colors.primary
+        tooltipText: "Open system monitor"
         onClicked: {
             root.closeRequested();
             Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "systemMonitor"]);

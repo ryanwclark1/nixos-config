@@ -198,6 +198,7 @@ ColumnLayout {
                             size: 28
                             iconSize: 14
                             iconColor: Colors.textDisabled
+                            tooltipText: "Open shell"
                             onClicked: {
                                 var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec -it " + modelData.id + " sh; else exit 1; fi";
                                 Quickshell.execDetached(SU.terminalCommand(cmd));
@@ -208,6 +209,7 @@ ColumnLayout {
                             size: 28
                             iconSize: 14
                             iconColor: Colors.textDisabled
+                            tooltipText: "View logs"
                             onClicked: {
                                 logOverlay.title = "Docker: " + modelData.name;
                                 logOverlay.command = ServiceUnitService.getLogStreamCommand("docker", modelData.id);
@@ -274,6 +276,7 @@ ColumnLayout {
                         size: 28
                         iconSize: 14
                         iconColor: Colors.textDisabled
+                        tooltipText: "Open shell"
                         onClicked: {
                             var host = sessionLabel.split("@")[1] || sessionLabel;
                             Quickshell.execDetached(SU.terminalCommand("exec ssh \"$1\"", host));
