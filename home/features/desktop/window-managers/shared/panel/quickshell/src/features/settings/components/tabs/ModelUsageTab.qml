@@ -35,6 +35,14 @@ Item {
                 enabledText: "Codex CLI usage is tracked and shown in the bar."
                 disabledText: "Codex CLI usage tracking is disabled."
             }
+
+            SettingsToggleRow {
+                label: "Gemini CLI"
+                icon: "󰫢"
+                configKey: "modelUsageGeminiEnabled"
+                enabledText: "Gemini CLI usage is tracked and shown in the bar."
+                disabledText: "Gemini CLI usage tracking is disabled."
+            }
         }
 
         SettingsCard {
