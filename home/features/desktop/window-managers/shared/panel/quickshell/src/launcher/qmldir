@@ -1,4 +1,5 @@
 AltTabSwitcher 1.0 AltTabSwitcher.qml
+CommandPalette 1.0 CommandPalette.qml
 Launcher 1.0 Launcher.qml
 LauncherActionLegend 1.0 LauncherActionLegend.qml
 LauncherConfirmDialog 1.0 LauncherConfirmDialog.qml
