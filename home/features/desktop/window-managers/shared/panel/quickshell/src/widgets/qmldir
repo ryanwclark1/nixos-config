@@ -30,6 +30,8 @@ FilterChip 1.0 ../shared/FilterChip.qml
 IconButton 1.0 ../shared/IconButton.qml
 InfoRow 1.0 ../shared/InfoRow.qml
 InnerHighlight 1.0 ../shared/InnerHighlight.qml
+ListTransitions 1.0 ../shared/ListTransitions.qml
+singleton ListTransitions
 LiveLogOverlay 1.0 ../shared/LiveLogOverlay.qml
 LoadingSpinner 1.0 ../shared/LoadingSpinner.qml
 LockContext 1.0 ../features/lock/components/LockContext.qml
@@ -38,6 +40,7 @@ MediaBar 1.0 ../features/media/components/MediaBar.qml
 MediaOsd 1.0 ../features/media/components/MediaOsd.qml
 MenuCloseButton 1.0 ../shared/MenuCloseButton.qml
 MiniProgressBar 1.0 ../shared/MiniProgressBar.qml
+NumericText 1.0 ../shared/NumericText.qml
 MuteButton 1.0 ../features/audio/components/MuteButton.qml
 NativeLock 1.0 ../features/lock/components/NativeLock.qml
 NetworkBadge 1.0 ../features/network/components/NetworkBadge.qml
