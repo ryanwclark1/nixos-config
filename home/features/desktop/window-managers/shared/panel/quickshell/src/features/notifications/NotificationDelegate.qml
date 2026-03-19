@@ -127,6 +127,7 @@ Rectangle {
         iconSize: Colors.fontSizeLarge
         iconColor: Colors.textDisabled
         stateColor: Colors.error
+        tooltipText: "Dismiss"
         onClicked: root.dismissRequested()
       }
     }
@@ -175,6 +176,7 @@ Rectangle {
         SharedWidgets.IconButton {
           icon: "󰒮"
           iconSize: Colors.fontSizeLarge
+          tooltipText: "Previous track"
           onClicked: if (root.mprisPlayer) root.mprisPlayer.previous()
         }
 
@@ -183,12 +185,14 @@ Rectangle {
           color: Colors.primary
           icon: root.mprisPlayer && root.mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
           iconColor: Colors.background
+          tooltipText: root.mprisPlayer && root.mprisPlayer.playbackState === Mpris.Playing ? "Pause" : "Play"
           onClicked: if (root.mprisPlayer) root.mprisPlayer.playPause()
         }
 
         SharedWidgets.IconButton {
           icon: "󰒭"
           iconSize: Colors.fontSizeLarge
+          tooltipText: "Next track"
           onClicked: if (root.mprisPlayer) root.mprisPlayer.next()
         }
 

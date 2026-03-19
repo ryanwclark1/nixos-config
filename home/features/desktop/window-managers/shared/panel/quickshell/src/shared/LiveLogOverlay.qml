@@ -42,6 +42,7 @@ Rectangle {
             IconButton {
                 icon: "󰅖"
                 size: 28; iconSize: 16
+                tooltipText: "Close"
                 onClicked: root.closeRequested()
             }
         }

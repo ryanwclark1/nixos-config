@@ -21,22 +21,30 @@ PopupWindow {
     return "bottom";
   }
 
-  // Map dock position to popup edge/gravity: menu appears on the opposite side
-  readonly property int _edgeFlag: {
-    switch (anchorEdge) {
-      case "top": return Edges.Bottom;
-      case "bottom": return Edges.Top;
-      case "left": return Edges.Right;
-      case "right": return Edges.Left;
-      default: return Edges.Top;
+  anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
+
+  function _updateRect() {
+    if (!anchorItem || !anchorWindow) return;
+    var r = anchorWindow.itemRect(anchorItem);
+    var gap = Config.popupGap;
+    var pw = root.implicitWidth;
+    var ph = root.implicitHeight;
+    var edge = anchorEdge;
+
+    if (edge === "left" || edge === "right") {
+      anchor.rect.y = r.y + r.height / 2 - ph / 2;
+      anchor.rect.x = edge === "left" ? r.x + r.width + gap : r.x - pw - gap;
+    } else {
+      anchor.rect.x = r.x + r.width / 2 - pw / 2;
+      anchor.rect.y = edge === "bottom" ? r.y - ph - gap : r.y + r.height + gap;
     }
   }
 
-  anchor.item: anchorItem
-  anchor.edges: _edgeFlag
-  anchor.gravity: _edgeFlag
-  anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
-  anchor.margins { top: 8; bottom: 8; left: 8; right: 8 }
+  onAnchorItemChanged: _updateRect()
+  onAnchorEdgeChanged: _updateRect()
+  onImplicitWidthChanged: _updateRect()
+  onImplicitHeightChanged: _updateRect()
+  onVisibleChanged: if (visible) _updateRect()
 
   visible: false
   implicitWidth: 200

@@ -20,8 +20,41 @@ Flow {
   readonly property int pillMinWidth: Config.workspacePillSize === "compact" ? 18 : (Config.workspacePillSize === "large" ? 30 : 22)
   readonly property int pillFontSize: Config.workspacePillSize === "compact" ? Colors.fontSizeXS : (Config.workspacePillSize === "large" ? Colors.fontSizeMedium : Colors.fontSizeSmall)
 
-  flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
+  readonly property bool isGrid: Config.workspaceLayout === "grid"
+  
+  flow: vertical ? Flow.TopToBottom : (isGrid ? Flow.LeftToRight : Flow.LeftToRight)
+  Layout.preferredWidth: isGrid ? 100 : -1 // Example constraint for grid
+  
   spacing: Colors.spacingSM
+
+  // Helper for click behavior
+  function handleWorkspaceClick(wsId) {
+    if (Config.workspaceClickBehavior === "last_window") {
+      // Find the last active window on this workspace
+      var wsList = root.state ? root.state.workspaces : [];
+      var wsData = null;
+      for (var i = 0; i < wsList.length; i++) {
+        if (wsList[i].id === wsId) { wsData = wsList[i]; break; }
+      }
+      
+      if (wsData && wsData.windowData && wsData.windowData.length > 0) {
+        // Find the one that was most recently active if possible, 
+        // or just the first one marked active in the data
+        var targetWin = wsData.windowData[0];
+        for (var j = 0; j < wsData.windowData.length; j++) {
+          if (wsData.windowData[j].active) { targetWin = wsData.windowData[j]; break; }
+        }
+        
+        if (targetWin && targetWin.address) {
+          CompositorAdapter.focusWindow(targetWin.address);
+          return;
+        }
+      }
+    }
+    
+    // Default or fallback
+    CompositorAdapter.focusWorkspace(wsId);
+  }
 
   // Scroll-to-switch workspace
   WheelHandler {
@@ -130,6 +163,26 @@ Flow {
         z: 2
       }
 
+      // Window count indicator
+      Rectangle {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: -4
+        width: 14; height: 14
+        radius: 7
+        color: Colors.accent
+        visible: Config.workspaceShowWindowCount && wsPill.windowCount > 0
+        z: 3
+
+        Text {
+          anchors.centerIn: parent
+          text: String(wsPill.windowCount)
+          color: Colors.background
+          font.pixelSize: 9
+          font.weight: Font.Bold
+        }
+      }
+
       // Live Mini-Map: dynamic window outlines
       Item {
         id: miniMap
@@ -173,7 +226,7 @@ Flow {
                 AiService.sendMessage("Rename workspace " + modelData.id + " from '" + current + "' to: ");
                 Quickshell.execDetached(["quickshell", "ipc", "call", "SurfaceService", "openSurface", "aiChat"]);
             } else {
-                CompositorAdapter.focusWorkspace(modelData.id)
+                root.handleWorkspaceClick(modelData.id)
             }
         }
       }
