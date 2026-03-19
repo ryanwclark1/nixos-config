@@ -16,7 +16,7 @@ Rectangle {
     required property var availableWidgets
 
     signal closeRequested
-    signal searchQueryChanged(string value)
+    signal searchQueryEdited(string value)
     signal widgetAdded(string widgetType)
 
     anchors.fill: parent
@@ -74,7 +74,7 @@ Rectangle {
                 leadingIcon: "󰍉"
                 placeholderText: "Filter widgets by name"
                 text: root.searchQuery
-                onTextEdited: value => root.searchQueryChanged(value)
+                onTextEdited: value => root.searchQueryEdited(value)
             }
 
             Flickable {

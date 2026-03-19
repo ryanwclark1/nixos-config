@@ -21,7 +21,7 @@ Rectangle {
     readonly property alias pluginSettingsLoader: pluginSettingsLoader
 
     signal closeRequested
-    signal pluginSettingsErrorChanged(string value)
+    signal pluginSettingsErrorUpdated(string value)
     signal settingChanged(string key, var value)
 
     function schemaFieldCurrentValue(field) {
@@ -228,9 +228,9 @@ Rectangle {
                     visible: root.editingPluginId !== "" && root.editingPluginHasSettings && root.editingPluginCanWriteSettings && status !== Loader.Error
                     onStatusChanged: {
                         if (status === Loader.Error)
-                            root.pluginSettingsErrorChanged(errorString());
+                            root.pluginSettingsErrorUpdated(errorString());
                         else if (status === Loader.Ready)
-                            root.pluginSettingsErrorChanged("");
+                            root.pluginSettingsErrorUpdated("");
                     }
                 }
             }
