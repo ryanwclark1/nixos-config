@@ -39,10 +39,12 @@ QtObject {
     Component.onCompleted: {
         if (Config.nightLightEnabled)
             verifyTimer.start();
+        if (Config.nightLightAutoSchedule)
+            _evaluateSchedule();
     }
 
     // Delayed start to let compositor settle
-    Timer {
+    property Timer verifyTimer: Timer {
         id: verifyTimer
         interval: 2000
         onTriggered: {
@@ -52,7 +54,7 @@ QtObject {
     }
 
     // ── Process state check ──────────────────────
-    Process {
+    property Process checkProc: Process {
         id: checkProc
         running: false
         command: ["sh", "-c", "pgrep -x hyprsunset >/dev/null 2>&1 || pgrep -x wlsunset >/dev/null 2>&1 && echo on || echo off"]
@@ -64,9 +66,7 @@ QtObject {
     }
 
     // ── Schedule ────────────────────────────────
-    // Check schedule every 60 seconds when auto-schedule is enabled
-    Timer {
-        id: scheduleTimer
+    property Timer scheduleTimer: Timer {
         interval: 60000
         running: Config.nightLightAutoSchedule
         repeat: true
@@ -154,7 +154,7 @@ QtObject {
     }
 
     // ── Wake recovery ────────────────────────────
-    Connections {
+    property Connections suspendConn: Connections {
         id: suspendConn
         target: SuspendManager
         function onWakingUp() {
@@ -163,7 +163,7 @@ QtObject {
         }
     }
 
-    Timer {
+    property Timer wakeCheckTimer: Timer {
         id: wakeCheckTimer
         interval: 2000
         onTriggered: {
@@ -175,7 +175,7 @@ QtObject {
         }
     }
 
-    Timer {
+    property Timer wakeRestartTimer: Timer {
         id: wakeRestartTimer
         interval: 3000
         onTriggered: {

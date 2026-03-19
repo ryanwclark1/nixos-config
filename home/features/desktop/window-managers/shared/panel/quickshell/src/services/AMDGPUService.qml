@@ -29,7 +29,8 @@ QtObject {
     // Per-process GPU usage
     property var processGpuUsage: ({}) // pid -> { gfx, mem, vram, name }
 
-    readonly property bool available: _probeProc.exitCode === 0
+    readonly property bool available: _probeComplete && _probeProc.exitCode === 0
+    property bool _probeComplete: false
     property bool _ready: false
     Component.onCompleted: _ready = true
 
@@ -37,6 +38,7 @@ QtObject {
         id: _probeProc
         command: ["sh", "-c", "command -v amdgpu_top >/dev/null 2>&1"]
         running: true
+        onExited: root._probeComplete = true
     }
 
     function refresh() {

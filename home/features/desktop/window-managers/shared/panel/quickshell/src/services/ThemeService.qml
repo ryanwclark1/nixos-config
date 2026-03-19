@@ -74,14 +74,13 @@ QtObject {
     Colors.reloadColors();
   }
 
-  // ── Auto Schedule ──────────────────────────────
-  property Timer _themeScheduleTimer: Timer {
-    interval: 60000
-    running: Config.themeAutoScheduleEnabled
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: root._evaluateThemeSchedule()
+  // ── Auto Schedule (fires once per minute via SystemClock) ──
+  property Connections _scheduleClock: Connections {
+    target: SystemClock
+    enabled: Config.themeAutoScheduleEnabled
+    function onMinutesChanged() { root._evaluateThemeSchedule(); }
   }
+  Component.onCompleted: if (Config.themeAutoScheduleEnabled) _evaluateThemeSchedule()
 
   function _evaluateThemeSchedule() {
     if (!Config.themeAutoScheduleEnabled) return;

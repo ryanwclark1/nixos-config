@@ -108,13 +108,14 @@ QtObject {
       _reportHelperScriptsUnavailable();
       return;
     }
-    var fixProc = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-    fixProc.command = ["bash", root.healthCheckScript, "--apply-safe-fixes"];
-    fixProc.onExited.connect(function() {
-      root.refreshHealth();
-      fixProc.destroy();
-    });
-    fixProc.running = true;
+    if (!_fixProc.running)
+      _fixProc.running = true;
+  }
+
+  property Process _fixProc: Process {
+    running: false
+    command: ["bash", root.healthCheckScript, "--apply-safe-fixes"]
+    onExited: root.refreshHealth()
   }
 
   function _loadDetailedIncidents() {
