@@ -3078,8 +3078,6 @@ PanelWindow {
 
     function pageSelection(step) {
         if (filteredItems.length <= 0) return false;
-        // Smoke-test compatibility marker for the legacy inline page-size calculation:
-        // var pageSize = Math.max(5, Math.min(12, Math.round(hudBox.height / 72)));
         var next = Search.pageSelection(filteredItems.length, selectedIndex, step, hudBox.height);
         if (next === selectedIndex) return false;
         selectedIndex = next;
