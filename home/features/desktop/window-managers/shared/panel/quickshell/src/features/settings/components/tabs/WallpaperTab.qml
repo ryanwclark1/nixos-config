@@ -626,7 +626,8 @@ Item {
                 visible: Config.wallpaperUseShellRenderer
                 label: "Transition effect"
                 icon: "󰾆"
-                configKey: "wallpaperTransitionType"
+                currentValue: Config.wallpaperTransitionType
+                onOptionSelected: value => { Config.wallpaperTransitionType = value; }
                 options: [
                     { label: "Fade", value: "fade" },
                     { label: "Pixelate", value: "pixelate" },
