@@ -148,6 +148,7 @@ PanelWindow {
                     icon: "󰒓"
                     size: 32
                     iconSize: Colors.fontSizeXL
+                    tooltipText: "Settings"
                     onClicked: {
                         root.closeRequested();
                         openSettingsTimer.restart();
@@ -157,6 +158,7 @@ PanelWindow {
                     icon: "󰅖"
                     size: 32
                     iconSize: Colors.fontSizeXL
+                    tooltipText: "Close"
                     onClicked: root.closeRequested()
                 }
             }

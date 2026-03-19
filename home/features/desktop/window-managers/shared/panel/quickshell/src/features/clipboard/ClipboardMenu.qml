@@ -139,7 +139,7 @@ BasePopupMenu {
           color: isSelected ? Colors.primarySubtle : Colors.cardSurface
           border.color: isSelected ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
           border.width: 1
-          Behavior on color { CAnim {} }
+          Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
           readonly property bool isImage: !!(modelData && modelData.content && String(modelData.content).indexOf("[[ binary data") !== -1)
           readonly property string imageSrc: {
@@ -199,7 +199,7 @@ BasePopupMenu {
               text: clipCard.contentText
               color: Colors.text
               font.pixelSize: Colors.fontSizeSmall
-              font.family: clipCard.isImage ? Colors.font : Colors.fontMono
+              font.family: clipCard.isImage ? Config.fontFamily : Colors.fontMono
               wrapMode: Text.WrapAnywhere
               maximumLineCount: 3
               elide: Text.ElideRight

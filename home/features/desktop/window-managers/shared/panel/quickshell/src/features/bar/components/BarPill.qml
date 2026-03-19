@@ -99,9 +99,9 @@ MouseArea {
     border.color: root.isActive ? root.activeBorderColor : root.normalBorderColor
     border.width: 1
     opacity: root.isActive ? 1.0 : (root.containsMouse ? 1.0 : 0.8)
-    Behavior on color { CAnim {} }
+    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
     Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
-    Behavior on border.color { CAnim {} }
+    Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
     gradient: SurfaceGradient {}
 

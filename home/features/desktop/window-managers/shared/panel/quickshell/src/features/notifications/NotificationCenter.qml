@@ -124,6 +124,7 @@ PanelWindow {
           size: 32
           icon: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
           iconColor: root.manager && root.manager.dndEnabled ? Colors.error : Colors.textSecondary
+          tooltipText: root.manager && root.manager.dndEnabled ? "Disable do not disturb" : "Do not disturb"
           onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
         }
 
@@ -132,6 +133,7 @@ PanelWindow {
           size: 32
           icon: "󰎟"
           iconColor: Colors.textDisabled
+          tooltipText: "Clear all"
           onClicked: if (root.manager) root.manager.dismissAll()
         }
 
@@ -139,6 +141,7 @@ PanelWindow {
         SharedWidgets.IconButton {
           size: 32
           icon: "󰅖"
+          tooltipText: "Close"
           onClicked: root.closeRequested()
         }
       }
@@ -294,6 +297,7 @@ PanelWindow {
               SharedWidgets.IconButton {
                 size: 28; icon: "󰅖"; iconColor: Colors.textDisabled
                 stateColor: Colors.error
+                tooltipText: "Dismiss group"
                 onClicked: if (root.manager) root.manager.dismissAll(section)
               }
             }

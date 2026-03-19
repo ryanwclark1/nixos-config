@@ -98,8 +98,8 @@ BasePopupMenu {
       border.color: Colors.withAlpha(root.providerAccent, 0.18)
       border.width: 1
 
-      Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
-      Behavior on border.color { ColorAnimation { duration: Colors.durationNormal } }
+      Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+      Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
 
       SharedWidgets.InnerHighlight { }
 
@@ -115,7 +115,7 @@ BasePopupMenu {
           Layout.preferredHeight: 52
           radius: Colors.radiusCard
           color: Colors.withAlpha(root.providerAccent, Colors.primarySubtle)
-          Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
 
           Text {
             anchors.centerIn: parent
@@ -123,7 +123,7 @@ BasePopupMenu {
             color: root.providerAccent
             font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeHuge
-            Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
           }
         }
 
@@ -159,7 +159,7 @@ BasePopupMenu {
           implicitHeight: modelBadgeText.implicitHeight + Colors.spacingSM * 2
           radius: height / 2
           color: Colors.withAlpha(root.providerAccent, Colors.primaryGhost)
-          Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
 
           Text {
             id: modelBadgeText
@@ -175,7 +175,7 @@ BasePopupMenu {
             color: root.providerAccent
             font.pixelSize: Colors.fontSizeXS
             font.weight: Font.DemiBold
-            Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
           }
         }
       }
@@ -422,7 +422,7 @@ BasePopupMenu {
                 opacity: isToday ? 1.0 : (0.5 + 0.5 * (modelData.messageCount / maxCount))
 
                 Behavior on width { NumberAnimation { duration: Colors.durationMedium } }
-                Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
               }
             }
 

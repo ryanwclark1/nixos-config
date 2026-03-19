@@ -46,7 +46,7 @@ Item {
             color: Colors.withAlpha(Colors.text, 0.85)
             font.pixelSize: 96
             font.weight: Font.Light
-            font.family: Colors.font
+            font.family: Config.fontFamily
             font.letterSpacing: Colors.letterSpacingTight
         }
 
@@ -59,7 +59,7 @@ Item {
             }
             color: Colors.withAlpha(Colors.text, 0.6)
             font.pixelSize: Colors.fontSizeXL
-            font.family: Colors.font
+            font.family: Config.fontFamily
         }
     }
 }
