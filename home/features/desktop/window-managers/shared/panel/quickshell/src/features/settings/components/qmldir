@@ -1,3 +1,5 @@
+LauncherSettingsHero 1.0 LauncherSettingsHero.qml
+LauncherSettingsPanel 1.0 LauncherSettingsPanel.qml
 SettingsActionButton 1.0 SettingsActionButton.qml
 SettingsCard 1.0 SettingsCard.qml
 SettingsColorRow 1.0 SettingsColorRow.qml

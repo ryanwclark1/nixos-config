@@ -6,6 +6,8 @@ AppearanceTab 1.0 AppearanceTab.qml
 AudioTab 1.0 AudioTab.qml
 BarTab 1.0 BarTab.qml
 BarWidgetsTab 1.0 BarWidgetsTab.qml
+BarWidgetPickerOverlay 1.0 BarWidgetPickerOverlay.qml
+BarWidgetSettingsOverlay 1.0 BarWidgetSettingsOverlay.qml
 ControlCenterTab 1.0 ControlCenterTab.qml
 DockTab 1.0 DockTab.qml
 HooksTab 1.0 HooksTab.qml
