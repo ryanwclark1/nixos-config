@@ -171,6 +171,7 @@ QtObject {
         _resourceRefreshQueued = false;
         statsPollingActive = false;
         pullInProgress = false;
+        _actionQueue = [];
         debounceTimer.stop();
         fallbackTimer.stop();
         resourceFallbackTimer.stop();
@@ -751,14 +752,29 @@ QtObject {
         if (!Array.isArray(command) || command.length === 0)
             return false;
         if (actionProc.running) {
-            _setNotice("warn", "Wait for the current action to finish.");
-            return false;
+            _actionQueue = _actionQueue.concat([{
+                command: command,
+                successMessage: String(successMessage || "Action completed."),
+                failureMessage: String(failureMessage || "Action failed.")
+            }]);
+            return true;
         }
         actionSuccessMessage = String(successMessage || "Action completed.");
         actionFailureMessage = String(failureMessage || "Action failed.");
         actionProc.command = command;
         actionProc.running = true;
         return true;
+    }
+
+    function _drainActionQueue() {
+        if (_actionQueue.length === 0 || actionProc.running)
+            return;
+        var next = _actionQueue[0];
+        _actionQueue = _actionQueue.slice(1);
+        actionSuccessMessage = next.successMessage;
+        actionFailureMessage = next.failureMessage;
+        actionProc.command = next.command;
+        actionProc.running = true;
     }
 
     function executeContainerAction(containerId, action) {
@@ -773,6 +789,18 @@ QtObject {
             cmd,
             _capitalize(action) + " requested for " + identifier + ".",
             "Failed to " + action + " " + identifier + "."
+        );
+    }
+
+    function removeContainer(containerId) {
+        var identifier = String(containerId || "").trim();
+        if (identifier === "")
+            return false;
+        var runtime = dockerBinary === "auto" ? "$(command -v docker || command -v podman)" : _shellQuote(dockerBinary);
+        return _runAction(
+            ["sh", "-c", "runtime=" + runtime + "; if [ -n \"$runtime\" ]; then \"$runtime\" rm " + _shellQuote(identifier) + "; else exit 1; fi"],
+            "Container " + identifier.slice(0, 12) + " removed.",
+            "Failed to remove container " + identifier.slice(0, 12) + "."
         );
     }
 
@@ -988,6 +1016,7 @@ QtObject {
 
     property string actionSuccessMessage: ""
     property string actionFailureMessage: ""
+    property var _actionQueue: []
 
     property Timer debounceTimer: Timer {
         id: debounceTimer
@@ -1126,6 +1155,7 @@ QtObject {
             }
             root.scheduleRefresh(250);
             root.scheduleResourceRefresh(250);
+            Qt.callLater(root._drainActionQueue);
         }
     }
 

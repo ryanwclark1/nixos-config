@@ -44,6 +44,13 @@ Item {
     // System prune confirmation
     property bool pruneConfirmPending: false
 
+    // Cached filtered lists (avoids redundant filter calls across bindings)
+    readonly property var _filteredContainers: daemon && daemon.runtimeAvailable && currentTab === "containers" ? filteredList(daemon.containers, searchQuery) : []
+    readonly property var _filteredCompose: daemon && daemon.runtimeAvailable && currentTab === "compose" ? filteredList(daemon.composeProjects, searchQuery) : []
+    readonly property var _filteredImages: daemon && daemon.runtimeAvailable && currentTab === "images" ? filteredList(daemon.images, searchQuery) : []
+    readonly property var _filteredVolumes: daemon && daemon.runtimeAvailable && currentTab === "volumes" ? filteredList(daemon.volumes, searchQuery) : []
+    readonly property var _filteredNetworks: daemon && daemon.runtimeAvailable && currentTab === "networks" ? filteredList(daemon.networks, searchQuery) : []
+
     implicitWidth: triggerRect.implicitWidth
     implicitHeight: triggerRect.implicitHeight
 
@@ -237,13 +244,12 @@ Item {
 
     // F11: Keyboard helpers
     function _currentListLength() {
-        if (!daemon || !daemon.runtimeAvailable) return 0;
         var list;
-        if (currentTab === "containers") list = filteredList(daemon.containers, searchQuery);
-        else if (currentTab === "compose") list = filteredList(daemon.composeProjects, searchQuery);
-        else if (currentTab === "images") list = filteredList(daemon.images, searchQuery);
-        else if (currentTab === "volumes") list = filteredList(daemon.volumes, searchQuery);
-        else if (currentTab === "networks") list = filteredList(daemon.networks, searchQuery);
+        if (currentTab === "containers") list = _filteredContainers;
+        else if (currentTab === "compose") list = _filteredCompose;
+        else if (currentTab === "images") list = _filteredImages;
+        else if (currentTab === "volumes") list = _filteredVolumes;
+        else if (currentTab === "networks") list = _filteredNetworks;
         else return 0;
         return list ? list.length : 0;
     }
@@ -264,16 +270,12 @@ Item {
 
     function _activateFocusedCard() {
         if (focusedCardIndex < 0) return;
-        var list;
         if (currentTab === "containers") {
-            list = filteredList(daemon.containers, searchQuery);
-            if (focusedCardIndex < list.length) toggleContainer(list[focusedCardIndex].id);
+            if (focusedCardIndex < _filteredContainers.length) toggleContainer(_filteredContainers[focusedCardIndex].id);
         } else if (currentTab === "compose") {
-            list = filteredList(daemon.composeProjects, searchQuery);
-            if (focusedCardIndex < list.length) toggleProject(list[focusedCardIndex].name);
+            if (focusedCardIndex < _filteredCompose.length) toggleProject(_filteredCompose[focusedCardIndex].name);
         } else if (currentTab === "images") {
-            list = filteredList(daemon.images, searchQuery);
-            if (focusedCardIndex < list.length) toggleImage(list[focusedCardIndex].id);
+            if (focusedCardIndex < _filteredImages.length) toggleImage(_filteredImages[focusedCardIndex].id);
         }
     }
 
@@ -747,7 +749,7 @@ Item {
 
                             // ── Containers tab: empty state ──
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" && root.filteredList(root.daemon.containers, root.searchQuery).length === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" && root._filteredContainers.length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -768,7 +770,7 @@ Item {
 
                             // ── Compose tab: empty state ──
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" && root.filteredList(root.daemon.composeProjects, root.searchQuery).length === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" && root._filteredCompose.length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -791,7 +793,7 @@ Item {
                             // ── CONTAINERS TAB ──
                             // ════════════════════════════════
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" ? root.filteredList(root.daemon.containers, root.searchQuery) : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" ? root._filteredContainers : []
                                 delegate: Rectangle {
                                     id: containerCard
                                     required property var modelData
@@ -1085,7 +1087,7 @@ Item {
                             // ── COMPOSE TAB ──
                             // ════════════════════════════════
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" ? root.filteredList(root.daemon.composeProjects, root.searchQuery) : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "compose" ? root._filteredCompose : []
                                 delegate: Rectangle {
                                     id: projectCard
                                     required property var modelData
