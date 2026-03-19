@@ -597,9 +597,12 @@ if (String(payload.mode || "") !== "files") process.exit(1);
       sleep 0.25
     done
   fi
-  if (( files_mode_ready == 1 )) && call_ipc Launcher diagnosticSetSearchText "/nixos" >/dev/null 2>&1; then
+  if (( files_mode_ready == 1 )); then
     local files_ready=0 files_attempt
     for files_attempt in $(seq 1 60); do
+      if (( files_attempt == 1 || files_attempt % 8 == 0 )); then
+        call_ipc Launcher diagnosticSetSearchText "/nixos" >/dev/null 2>&1 || true
+      fi
       data_state="$(call_ipc Launcher launcherState 2>/dev/null || true)"
 if [[ -n "${data_state}" ]] && printf '%s' "${data_state}" | node -e '
 const fs = require("node:fs");

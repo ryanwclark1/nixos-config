@@ -32,7 +32,8 @@ Open the live SettingsHub through QuickShell IPC, capture a centered viewport-si
 screenshot from the focused monitor, and save it to a file.
 This produces a review artifact for manual inspection, not PASS/WARN/FAIL results.
 
-Note: scroll-y is currently ignored in live capture mode.
+When scroll-y is provided, the capture requests SettingsHub.openTabScrolled(tabId, scrollY)
+before the screenshot is taken.
 EOF
 }
 
@@ -235,6 +236,33 @@ discover_reachable_instance() {
   return 1
 }
 
+refresh_instance_id() {
+  local refreshed_id=""
+
+  if [[ -n "${instance_id}" ]] && timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
+    return 0
+  fi
+
+  refreshed_id="$(discover_reachable_instance || true)"
+  if [[ -z "${refreshed_id}" ]]; then
+    if [[ -n "${instance_id}" ]]; then
+      printf 'Unable to rediscover a live QuickShell settings instance after %s became unavailable.\n' "${instance_id}" >&2
+    else
+      printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
+    fi
+    return 1
+  fi
+
+  if [[ -z "${instance_id}" ]]; then
+    printf '[INFO] Using discovered QuickShell settings instance %s\n' "${refreshed_id}" >&2
+  elif [[ "${refreshed_id}" != "${instance_id}" ]]; then
+    printf '[INFO] Refreshing stale QuickShell settings instance %s -> %s\n' "${instance_id}" "${refreshed_id}" >&2
+  fi
+
+  instance_id="${refreshed_id}"
+  return 0
+}
+
 active_workspace_token() {
   if [[ "${compositor}" == "niri" ]]; then
     niri_msg workspaces | jq -r '
@@ -344,6 +372,7 @@ switch_to_capture_workspace() {
 call_ipc() {
   local target="$1"
   shift
+  refresh_instance_id || return 1
   run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
 }
 
@@ -394,13 +423,7 @@ main() {
       ;;
   esac
 
-  if [[ -z "${instance_id}" ]]; then
-    instance_id="$(discover_reachable_instance || true)"
-    if [[ -z "${instance_id}" ]]; then
-      printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
-      exit 1
-    fi
-  fi
+  refresh_instance_id || exit 1
 
   if [[ -z "${output_path}" ]]; then
     output_path="/tmp/settings-${tab_id}-${width}x${height}.png"
@@ -414,14 +437,21 @@ main() {
   switch_to_capture_workspace "${workspace_target}"
 
   call_ipc SettingsHub close >/dev/null 2>&1 || true
-  if ! call_ipc SettingsHub open >/dev/null; then
-    printf 'SettingsHub.open timed out for instance %s.\n' "${instance_id}" >&2
-    exit 1
-  fi
-  sleep 0.2
-  if ! call_ipc SettingsHub openTab "${tab_id}" >/dev/null; then
-    printf 'SettingsHub.openTab %s timed out for instance %s.\n' "${tab_id}" "${instance_id}" >&2
-    exit 1
+  if (( scroll_y > 0 )); then
+    if ! call_ipc SettingsHub openTabScrolled "${tab_id}" "${scroll_y}" >/dev/null; then
+      printf 'SettingsHub.openTabScrolled %s %s timed out for instance %s.\n' "${tab_id}" "${scroll_y}" "${instance_id}" >&2
+      exit 1
+    fi
+  else
+    if ! call_ipc SettingsHub open >/dev/null; then
+      printf 'SettingsHub.open timed out for instance %s.\n' "${instance_id}" >&2
+      exit 1
+    fi
+    sleep 0.2
+    if ! call_ipc SettingsHub openTab "${tab_id}" >/dev/null; then
+      printf 'SettingsHub.openTab %s timed out for instance %s.\n' "${tab_id}" "${instance_id}" >&2
+      exit 1
+    fi
   fi
   sleep "${delay_seconds}"
 

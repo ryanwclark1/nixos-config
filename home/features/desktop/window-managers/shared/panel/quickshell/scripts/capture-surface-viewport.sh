@@ -349,6 +349,33 @@ discover_reachable_instance() {
   return 1
 }
 
+refresh_instance_id() {
+  local refreshed_id=""
+
+  if [[ -n "${instance_id}" ]] && instance_is_reachable "${instance_id}"; then
+    return 0
+  fi
+
+  refreshed_id="$(discover_reachable_instance || true)"
+  if [[ -z "${refreshed_id}" ]]; then
+    if [[ -n "${instance_id}" ]]; then
+      printf 'Unable to rediscover a live QuickShell surface instance after %s became unavailable.\n' "${instance_id}" >&2
+    else
+      printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
+    fi
+    return 1
+  fi
+
+  if [[ -z "${instance_id}" ]]; then
+    printf '[INFO] Using discovered QuickShell surface instance %s\n' "${refreshed_id}" >&2
+  elif [[ "${refreshed_id}" != "${instance_id}" ]]; then
+    printf '[INFO] Refreshing stale QuickShell surface instance %s -> %s\n' "${instance_id}" "${refreshed_id}" >&2
+  fi
+
+  instance_id="${refreshed_id}"
+  return 0
+}
+
 discover_instances_from_monitor_layers() {
   local monitor_name=""
   local pid
@@ -377,6 +404,7 @@ discover_instances_from_monitor_layers() {
 call_ipc() {
   local target="$1"
   shift
+  refresh_instance_id || return 1
   run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
 }
 
@@ -611,13 +639,7 @@ main() {
       ;;
   esac
 
-  if [[ -z "${instance_id}" ]]; then
-    instance_id="$(discover_reachable_instance || true)"
-    if [[ -z "${instance_id}" ]]; then
-      printf 'No live QuickShell instances found under %s\n' "${runtime_root}" >&2
-      exit 1
-    fi
-  fi
+  refresh_instance_id || exit 1
 
   local surface_kind
   surface_kind="$(surface_kind_for_id "${surface_id}")"

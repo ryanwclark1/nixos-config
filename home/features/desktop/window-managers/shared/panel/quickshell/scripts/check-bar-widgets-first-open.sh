@@ -6,6 +6,7 @@ repo_root="$(cd -- "${script_dir}/../../../../../../../.." >/dev/null 2>&1 && pw
 
 flake_target=".#administrator@woody"
 output_dir="${TMPDIR:-/tmp}/bar-widgets-first-open"
+capture_scroll_y="520"
 skip_switch=0
 instance_id=""
 repo_shell_mode=0
@@ -274,7 +275,11 @@ capture_until_visible() {
   local mean
 
   for attempt in 1 2 3 4; do
-    bash "${script_dir}/capture-settings-viewport.sh" --id "${instance_id}" --tab bar-widgets --output "${output_path}"
+    bash "${script_dir}/capture-settings-viewport.sh" \
+      --id "${instance_id}" \
+      --tab bar-widgets \
+      --scroll-y "${capture_scroll_y}" \
+      --output "${output_path}"
     mean="$(image_mean "${output_path}")"
     if awk "BEGIN { exit !(${mean} > 0.02) }"; then
       return 0

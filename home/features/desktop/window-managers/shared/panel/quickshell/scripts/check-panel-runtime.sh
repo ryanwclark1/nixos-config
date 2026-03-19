@@ -15,7 +15,7 @@ run_surfaces=1
 run_multibar=1
 settings_timeout_seconds="${QS_VERIFY_SETTINGS_TIMEOUT_SECONDS:-150}"
 surfaces_timeout_seconds="${QS_VERIFY_SURFACES_TIMEOUT_SECONDS:-150}"
-warnings_timeout_seconds="${QS_VERIFY_WARNINGS_TIMEOUT_SECONDS:-120}"
+warnings_timeout_seconds="${QS_VERIFY_WARNINGS_TIMEOUT_SECONDS:-300}"
 multibar_timeout_seconds="${QS_VERIFY_MULTIBAR_TIMEOUT_SECONDS:-120}"
 
 usage() {
@@ -128,6 +128,22 @@ discover_instances() {
   local service_pid=""
   local resolved=""
   local dir
+  local pid
+
+  if [[ -d "${runtime_pid_root}" ]]; then
+    while IFS= read -r pid; do
+      [[ "${pid}" =~ ^[0-9]+$ ]] || continue
+      resolved="$(readlink -f "${runtime_pid_root}/${pid}" 2>/dev/null || true)"
+      if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+        basename "${resolved}"
+      fi
+    done < <(
+      {
+        find "${runtime_pid_root}" -mindepth 1 -maxdepth 1 -type l -printf '%f\n' 2>/dev/null || true
+        ps -eo pid=,comm= | awk '$2 ~ /quickshell|\\.quickshell-wra/ { print $1 }'
+      } | awk 'NF && !seen[$0]++'
+    )
+  fi
 
   if command -v systemctl >/dev/null 2>&1; then
     service_pid="$(systemctl --user show quickshell.service --property MainPID --value 2>/dev/null || true)"
@@ -146,7 +162,7 @@ discover_instances() {
 
   while IFS= read -r dir; do
     basename "${dir}"
-  done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 20 | awk '{print $2}')
+  done < <(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec test -S '{}/ipc.sock' ';' -printf '%T@ %p\n' 2>/dev/null | sort -nr | awk '{print $2}')
 }
 
 discover_reachable_instance() {

@@ -368,6 +368,38 @@ wait_for_logged_target() {
   return 1
 }
 
+current_repo_shell_instance_id() {
+  if [[ -z "${repo_shell_pid}" ]]; then
+    return 1
+  fi
+  local runtime_dir
+  runtime_dir="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
+  [[ -n "${runtime_dir}" ]] || return 1
+  basename "${runtime_dir}"
+}
+
+wait_for_repo_shell_instance_stable() {
+  local label="$1"
+  local duration_seconds="$2"
+  local baseline current deadline
+  baseline="$(current_repo_shell_instance_id || true)"
+  if [[ -z "${baseline}" ]]; then
+    fail "$label"
+    return 1
+  fi
+  deadline=$((SECONDS + duration_seconds))
+  while (( SECONDS < deadline )); do
+    current="$(current_repo_shell_instance_id || true)"
+    if [[ -z "${current}" || "${current}" != "${baseline}" ]]; then
+      fail "$label"
+      return 1
+    fi
+    sleep 0.5
+  done
+  pass "$label"
+  return 0
+}
+
 create_fixtures() {
   fixture_dir="$(mktemp -d -t qs-launcher-files-XXXXXX)"
   fixture_root_a="${fixture_dir}/root-a"
@@ -485,6 +517,20 @@ main() {
   call_ipc Launcher openFiles >/dev/null
   call_ipc Launcher diagnosticSetSearchText "missing" >/dev/null
   wait_for_probe "Invalid search root surfaces an error state" "call_ipc Launcher launcherState" "state-load-error" "Search root unavailable"
+
+  if (( repo_shell_mode == 1 )); then
+    call_ipc Launcher diagnosticClearFileOverrides >/dev/null
+    if launcher_action_available diagnosticSetViewport; then
+      call_ipc Launcher diagnosticSetViewport 1600 1000 >/dev/null || true
+      call_ipc Launcher diagnosticSetViewport 1280 720 >/dev/null || true
+      call_ipc Launcher diagnosticSetViewport 820 720 >/dev/null || true
+      call_ipc Launcher diagnosticSetViewport 540 900 >/dev/null || true
+      call_ipc Launcher diagnosticSetViewport 0 0 >/dev/null || true
+    fi
+    call_ipc Launcher openFiles >/dev/null
+    call_ipc Launcher diagnosticSetSearchText "/nixos" >/dev/null || true
+    wait_for_repo_shell_instance_stable "Default files-mode path stays on the same shell instance" 20
+  fi
 
   printf '[INFO] Launcher files runtime summary: %d pass, %d fail\n' "${pass_count}" "${fail_count}"
   (( fail_count == 0 ))
