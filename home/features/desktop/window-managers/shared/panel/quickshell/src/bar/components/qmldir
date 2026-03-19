@@ -6,6 +6,7 @@ WeatherBarWidget 1.0 WeatherBarWidget.qml
 VpnBarWidget 1.0 VpnBarWidget.qml
 BluetoothBarWidget 1.0 BluetoothBarWidget.qml
 MarketBarWidget 1.0 MarketBarWidget.qml
+ModelUsageBarWidget 1.0 ModelUsageBarWidget.qml
 MusicBarWidget 1.0 MusicBarWidget.qml
 PrivacyBarWidget 1.0 PrivacyBarWidget.qml
 RecordingBarWidget 1.0 RecordingBarWidget.qml

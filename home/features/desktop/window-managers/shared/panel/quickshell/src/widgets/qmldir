@@ -30,8 +30,7 @@ FilterChip 1.0 ../shared/FilterChip.qml
 IconButton 1.0 ../shared/IconButton.qml
 InfoRow 1.0 ../shared/InfoRow.qml
 InnerHighlight 1.0 ../shared/InnerHighlight.qml
-ListTransitions 1.0 ../shared/ListTransitions.qml
-singleton ListTransitions
+singleton ListTransitions 1.0 ../shared/ListTransitions.qml
 LiveLogOverlay 1.0 ../shared/LiveLogOverlay.qml
 LoadingSpinner 1.0 ../shared/LoadingSpinner.qml
 LockContext 1.0 ../features/lock/components/LockContext.qml
