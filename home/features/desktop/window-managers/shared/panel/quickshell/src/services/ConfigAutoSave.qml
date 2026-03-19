@@ -611,6 +611,9 @@ QtObject {
         function onLauncherFileShowHiddenChanged() {
             root.config.scheduleSave();
         }
+        function onLauncherFilePreviewEnabledChanged() {
+            root.config.scheduleSave();
+        }
         function onLauncherFileOpenerChanged() {
             root.config.scheduleSave();
         }
