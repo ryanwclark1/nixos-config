@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "."
+import "ScheduleUtils.js" as SU
 
 QtObject {
   id: root
@@ -102,45 +103,17 @@ QtObject {
   }
 
   function _shouldBeDarkForFixedTime(now) {
-    var h = now.getHours();
-    var m = now.getMinutes();
-    var current = h * 60 + m;
-    var darkStart = Config.themeDarkHour * 60 + Config.themeDarkMinute;
-    var lightStart = Config.themeLightHour * 60 + Config.themeLightMinute;
-
-    if (darkStart > lightStart) {
-      return current >= darkStart || current < lightStart;
-    }
-    return current >= darkStart && current < lightStart;
+    return SU.isInWindow(
+      SU.currentMinutes(now),
+      Config.themeDarkHour * 60 + Config.themeDarkMinute,
+      Config.themeLightHour * 60 + Config.themeLightMinute
+    );
   }
 
   function _shouldBeDarkForSunrise(now) {
-    var lat = parseFloat(Config.themeAutoLatitude);
-    var lon = parseFloat(Config.themeAutoLongitude);
-    if (isNaN(lat) || isNaN(lon)) return false;
-
-    var times = _computeSunTimes(now, lat, lon);
-    var h = now.getHours();
-    var m = now.getMinutes();
-    var current = h * 60 + m;
-
-    return current >= times.sunset || current < times.sunrise;
-  }
-
-  function _computeSunTimes(date, lat, lon) {
-    var dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
-    var radLat = lat * Math.PI / 180;
-    var decl = -23.45 * Math.cos(2 * Math.PI / 365 * (dayOfYear + 10)) * Math.PI / 180;
-    var cosHA = (Math.cos(90.833 * Math.PI / 180) - Math.sin(radLat) * Math.sin(decl)) / (Math.cos(radLat) * Math.cos(decl));
-    cosHA = Math.max(-1, Math.min(1, cosHA));
-    var ha = Math.acos(cosHA) * 180 / Math.PI;
-    var solarNoon = 720 - 4 * lon;
-    var sunriseMin = Math.round(solarNoon - ha * 4);
-    var sunsetMin = Math.round(solarNoon + ha * 4);
-    var tzOffset = -date.getTimezoneOffset();
-    sunriseMin = ((sunriseMin + tzOffset) % 1440 + 1440) % 1440;
-    sunsetMin = ((sunsetMin + tzOffset) % 1440 + 1440) % 1440;
-    return { sunrise: sunriseMin, sunset: sunsetMin };
+    return SU.isDarkAtLocation(now,
+      parseFloat(Config.themeAutoLatitude),
+      parseFloat(Config.themeAutoLongitude));
   }
 
   function searchThemes(query, variantFilter) {
