@@ -3325,12 +3325,13 @@ PanelWindow {
                                 modeIcons: launcherRoot.modeIcons
                                 iconMap: launcherRoot.launcherIconMap
                                 onClicked: launcherRoot.executeSelection()
-                                onSecondaryActionRequested: function(globalX, globalY) {
+                                onSecondaryActionRequested: function(sourceItem, localX, localY) {
                                     if (launcherRoot.mode !== "files" || !modelData || !modelData.fullPath)
                                         return;
+                                    var point = sourceItem ? sourceItem.mapToItem(launcherRoot, localX, localY) : Qt.point(localX, localY);
                                     launcherRoot.selectedIndex = index;
                                     fileResultContextMenu.model = launcherRoot.fileContextMenuModel(modelData);
-                                    fileResultContextMenu.popup(globalX, globalY);
+                                    fileResultContextMenu.popup(point.x, point.y);
                                 }
                                 onEntered: if (!launcherRoot.ignoreMouseHover)
                                     launcherRoot.selectedIndex = index
@@ -3393,7 +3394,7 @@ PanelWindow {
 
     ContextMenu {
         id: fileResultContextMenu
-        parent: launcherRoot.contentItem
+        parent: launcherRoot
     }
 
         LauncherConfirmDialog {

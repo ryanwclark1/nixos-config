@@ -41,6 +41,10 @@ function _buildFileItem(path, rootDir, rootPrefix, rootLabel) {
         kind = raw.charAt(0) === "d" ? "dir" : "file";
         raw = raw.substring(2);
     }
+    if (raw.length > 1 && raw.charAt(raw.length - 1) === "/") {
+        kind = "dir";
+        raw = raw.substring(0, raw.length - 1);
+    }
     var fullPath = raw.charCodeAt(0) === 47 ? raw : (rootDir + "/" + raw);
     var relativePath = fullPath.indexOf(rootPrefix) === 0 ? fullPath.substring(rootPrefix.length) : fullPath;
     var slash = relativePath.lastIndexOf("/");

@@ -21,7 +21,7 @@ Rectangle {
 
     signal clicked
     signal entered
-    signal secondaryActionRequested(real globalX, real globalY)
+    signal secondaryActionRequested(var sourceItem, real localX, real localY)
 
     width: parent ? parent.width : 0
     height: tightMode ? 48 : (compactMode ? 54 : 64)
@@ -295,9 +295,7 @@ Rectangle {
         onEntered: root.entered()
         onClicked: function(mouse) {
             if (mouse.button === Qt.RightButton) {
-                var target = root.window ? root.window.contentItem : null;
-                var point = root.mapToItem(target, mouse.x, mouse.y);
-                root.secondaryActionRequested(point.x, point.y);
+                root.secondaryActionRequested(root, mouse.x, mouse.y);
                 return;
             }
             root.clicked();
