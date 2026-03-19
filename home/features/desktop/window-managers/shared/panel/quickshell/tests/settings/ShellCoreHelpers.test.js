@@ -9,6 +9,8 @@ import {
   supportedLauncherModeKeys,
   orderedPrimaryModes,
   orderedAdvancedModes,
+  moveDraggedPrimaryMode,
+  moveDraggedAdvancedMode,
   promoteLauncherMode,
   demoteLauncherMode,
   toggleLauncherMode,
@@ -16,6 +18,12 @@ import {
   launcherModeMeta,
   orderedEnabledModes,
   moveMode,
+  orderedWebProviders,
+  moveDraggedWebProvider,
+  orderedControlCenterToggles,
+  orderedControlCenterPlugins,
+  moveOrderedValue,
+  moveDraggedOrderedValue,
   toggleHiddenListValue,
   resetLauncherDefaults,
   _targetIndexFromMappedY,
@@ -33,6 +41,28 @@ const launcherModes = [
   { key: "keybinds", label: "Keybinds", icon: "K" },
   { key: "ssh", label: "SSH", icon: "S" },
 ];
+
+const webProviders = [
+  { key: "duckduckgo", label: "DuckDuckGo", icon: "D" },
+  { key: "google", label: "Google", icon: "G" },
+  { key: "github", label: "GitHub", icon: "H" },
+];
+
+const toggleRegistry = {
+  quickToggleItems: [
+    { id: "bluetooth", label: "Bluetooth", icon: "B" },
+    { id: "dnd", label: "DND", icon: "D" },
+    { id: "recording", label: "Recording", icon: "R" },
+  ],
+};
+
+const pluginService = {
+  controlCenterPlugins: [
+    { id: "weather", name: "Weather" },
+    { id: "vpn", name: "VPN" },
+    { id: "battery", name: "Battery" },
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Web alias helpers
@@ -284,6 +314,127 @@ describe("moveMode", () => {
     };
     moveMode(config, fullAdapter, launcherModes, "drun", -1);
     expect(config.launcherModeOrder[0]).toBe("drun");
+  });
+});
+
+describe("moveDraggedPrimaryMode / moveDraggedAdvancedMode", () => {
+  it("reorders primary modes within the primary group", () => {
+    const config = {
+      launcherEnabledModes: ["drun", "files", "ssh"],
+      launcherModeOrder: ["drun", "files", "ssh"],
+      launcherPrimaryModes: ["drun", "files"],
+      launcherDefaultMode: "drun",
+    };
+    const state = {
+      sourceItemId: "drun",
+      sourceListId: "launcher-primary-mode",
+      sourceIndex: 0,
+      targetListId: "launcher-primary-mode",
+      targetIndex: 2,
+    };
+
+    expect(moveDraggedPrimaryMode(config, fullAdapter, launcherModes, state, 2)).toBe(true);
+    expect(config.launcherPrimaryModes).toEqual(["files", "drun"]);
+    expect(state.sourceItemId).toBe("");
+    expect(state.targetIndex).toBe(-1);
+  });
+
+  it("reorders advanced modes without changing the primary group", () => {
+    const config = {
+      launcherEnabledModes: ["drun", "files", "ssh", "keybinds"],
+      launcherModeOrder: ["drun", "files", "ssh", "keybinds"],
+      launcherPrimaryModes: ["drun", "files"],
+      launcherDefaultMode: "drun",
+    };
+    const state = {
+      sourceItemId: "ssh",
+      sourceListId: "launcher-advanced-mode",
+      sourceIndex: 0,
+      targetListId: "launcher-advanced-mode",
+      targetIndex: 2,
+    };
+
+    expect(moveDraggedAdvancedMode(config, fullAdapter, launcherModes, state, 2)).toBe(true);
+    expect(config.launcherModeOrder).toEqual(["drun", "files", "keybinds", "ssh"]);
+    expect(config.launcherPrimaryModes).toEqual(["drun", "files"]);
+  });
+});
+
+describe("orderedWebProviders / moveDraggedWebProvider", () => {
+  const defaultOrder = ["duckduckgo", "google", "github"];
+
+  it("orders web providers by configured order and defaults", () => {
+    const config = { launcherWebProviderOrder: ["github"] };
+    expect(orderedWebProviders(config, webProviders, defaultOrder)).toEqual([
+      "github",
+      "duckduckgo",
+      "google",
+    ]);
+  });
+
+  it("moves a dragged web provider and clears the drag state", () => {
+    const config = { launcherWebProviderOrder: defaultOrder.slice() };
+    const state = {
+      sourceItemId: "google",
+      sourceListId: "launcher-web-provider",
+      sourceIndex: 1,
+      targetListId: "launcher-web-provider",
+      targetIndex: 3,
+    };
+
+    expect(moveDraggedWebProvider(config, webProviders, defaultOrder, state, 3)).toBe(true);
+    expect(config.launcherWebProviderOrder).toEqual(["duckduckgo", "github", "google"]);
+    expect(state.sourceItemId).toBe("");
+  });
+});
+
+describe("control center ordering helpers", () => {
+  it("orders quick toggles from the full toggle catalog", () => {
+    const config = { controlCenterToggleOrder: ["dnd"] };
+    expect(orderedControlCenterToggles(toggleRegistry, config).map(item => item.id)).toEqual([
+      "dnd",
+      "bluetooth",
+      "recording",
+    ]);
+  });
+
+  it("orders plugins from the full plugin catalog", () => {
+    const config = { controlCenterPluginOrder: ["vpn"] };
+    expect(orderedControlCenterPlugins(pluginService, config).map(item => item.id)).toEqual([
+      "vpn",
+      "weather",
+      "battery",
+    ]);
+  });
+
+  it("moves ordered values by arrow-button delta", () => {
+    const config = { controlCenterToggleOrder: ["bluetooth", "dnd", "recording"] };
+    moveOrderedValue(config, toggleRegistry, pluginService, "controlCenterToggleOrder", "bluetooth", 1);
+    expect(config.controlCenterToggleOrder).toEqual(["dnd", "bluetooth", "recording"]);
+  });
+
+  it("moves ordered values by drag target", () => {
+    const config = { controlCenterPluginOrder: ["weather", "vpn", "battery"] };
+    const state = {
+      sourceItemId: "battery",
+      sourceListId: "control-center-plugin",
+      sourceIndex: 2,
+      targetListId: "control-center-plugin",
+      targetIndex: 0,
+    };
+
+    expect(
+      moveDraggedOrderedValue(
+        config,
+        toggleRegistry,
+        pluginService,
+        "controlCenterPluginOrder",
+        state,
+        0
+      )
+    ).toBe(true);
+    expect(config.controlCenterPluginOrder).toEqual(["battery", "weather", "vpn"]);
+    expect(state.sourceItemId).toBe("");
   });
 });
 
