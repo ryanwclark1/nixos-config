@@ -146,7 +146,15 @@ Scope {
         images: daemon.images.length,
         volumes: daemon.volumes.length,
         networks: daemon.networks.length,
-        pluginState: status.state || ""
+        pluginState: status.state || "",
+        hasVolumeUsageMap: typeof daemon.volumeUsageMap === "object",
+        hasNetworkUsageMap: typeof daemon.networkUsageMap === "object",
+        hasContainerStats: typeof daemon.containerStats === "object",
+        hasContainerLogs: typeof daemon.containerLogs === "object",
+        hasActionQueue: Array.isArray(daemon._actionQueue),
+        hasFetchLogs: typeof daemon.fetchLogs === "function",
+        hasRemoveContainer: typeof daemon.removeContainer === "function",
+        toastEnabled: daemon.toastEnabled === true
       };
       phase = 1;
       pluginApi.saveSetting("groupByCompose", true);
@@ -277,6 +285,14 @@ main() {
       and .healthy.images >= 0
       and .healthy.volumes >= 0
       and .healthy.networks >= 0
+      and .healthy.hasVolumeUsageMap == true
+      and .healthy.hasNetworkUsageMap == true
+      and .healthy.hasContainerStats == true
+      and .healthy.hasContainerLogs == true
+      and .healthy.hasActionQueue == true
+      and .healthy.hasFetchLogs == true
+      and .healthy.hasRemoveContainer == true
+      and .healthy.toastEnabled == true
       and .degraded.runtimeAvailable == false
       and .degraded.pluginState == "degraded"
       and .degraded.pluginCode == "E_DOCKER_RUNTIME_UNAVAILABLE"

@@ -98,6 +98,9 @@ require_pattern "$daemon_qml" 'function _resourceRefreshCommand\(' "docker-manag
 require_pattern "$daemon_qml" 'ScriptModel' "docker-manager daemon uses ScriptModel for efficient updates"
 require_pattern "$daemon_qml" 'type=image' "docker-manager daemon supports Podman image event types"
 require_pattern "$daemon_qml" 'signal toastRequested' "docker-manager daemon provides toast notification bridge"
+require_pattern "$daemon_qml" '_actionQueue' "docker-manager daemon queues bulk actions sequentially"
+require_pattern "$daemon_qml" 'function _drainActionQueue\(' "docker-manager daemon drains action queue on completion"
+require_pattern "$daemon_qml" 'function removeContainer\(' "docker-manager daemon exposes container removal"
 
 require_pattern "$bar_widget_qml" 'PopupWindow' "docker-manager bar widget uses a popup surface"
 require_pattern "$bar_widget_qml" 'anchor\.item' "docker-manager popup anchors to the bar widget"
@@ -111,6 +114,8 @@ require_pattern "$bar_widget_qml" 'currentTab' "docker-manager widget uses tab-b
 require_pattern "$bar_widget_qml" 'selectionMode' "docker-manager widget supports bulk selection mode"
 require_pattern "$bar_widget_qml" 'searchQuery' "docker-manager widget supports search filtering"
 require_pattern "$bar_widget_qml" 'focusedCardIndex' "docker-manager widget supports keyboard navigation"
+require_pattern "$bar_widget_qml" '_filteredContainers' "docker-manager widget caches filtered container list"
+require_pattern "$bar_widget_qml" 'removeContainer' "docker-manager widget exposes container removal action"
 
 require_pattern "$settings_qml" 'dockerBinary' "docker-manager settings expose runtime binary"
 require_pattern "$settings_qml" 'debounceDelay' "docker-manager settings expose debounce delay"
