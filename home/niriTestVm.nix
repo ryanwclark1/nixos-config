@@ -25,8 +25,16 @@
     # Niri VM test profile
   '';
   home.file.".zprofile".text = ''
-    if [[ -z "''${SSH_TTY:-}" && -z "''${SSH_CONNECTION:-}" && -z "''${WAYLAND_DISPLAY:-}" && -z "''${DISPLAY:-}" && "''${XDG_VTNR:-}" == "1" ]]; then
-      exec uwsm start niri-uwsm.desktop
+    current_tty="$(tty 2>/dev/null || true)"
+
+    if [[ -z "''${SSH_TTY:-}" && -z "''${SSH_CONNECTION:-}" && -z "''${WAYLAND_DISPLAY:-}" && -z "''${DISPLAY:-}" ]]; then
+      case "''${current_tty}" in
+        /dev/tty1|/dev/ttyS0)
+          if ! systemctl --user is-active --quiet niri.service; then
+            exec uwsm start niri-uwsm.desktop
+          fi
+          ;;
+      esac
     fi
   '';
   home.file.".config/autostart/nm-applet.desktop".text = ''
