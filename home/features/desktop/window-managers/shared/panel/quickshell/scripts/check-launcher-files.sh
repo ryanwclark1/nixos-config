@@ -52,7 +52,7 @@ require_literal "$launcher_qml" 'if (fileSearchShowHidden)' "launcher fd hidden 
 require_literal "$launcher_executor_js" 'actions.openFileItem(item);' "launcher executor file open helper"
 require_literal "$launcher_executor_js" 'actions.openDirectoryPath(actions.fileSearchRootResolved);' "launcher executor open configured root"
 require_literal "$launcher_executor_js" 'actions.openDirectoryPath(target);' "launcher executor secondary open path"
-require_literal "$launcher_delegate_qml" 'signal secondaryActionRequested(real globalX, real globalY)' "launcher delegate secondary action signal"
+require_literal "$launcher_delegate_qml" 'signal secondaryActionRequested(var sourceItem, real localX, real localY)' "launcher delegate secondary action signal"
 require_literal "$launcher_parser_js" 'function iconForFile(name, extension, kind) {' "launcher file icon classifier"
 require_literal "$launcher_parser_js" 'icon: iconForFile(name, extension, kind)' "launcher parser assigns file icon"
 require_literal "$launcher_text_js" 'return "Start typing to search " + String(fileRootLabel || "Files");' "launcher text helper file root title"
