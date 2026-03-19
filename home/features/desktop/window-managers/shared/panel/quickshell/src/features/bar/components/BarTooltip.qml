@@ -12,6 +12,7 @@ PopupWindow {
   property string preferredEdge: ""
   property bool hovered: false
   property string text: ""
+  property string shortcut: ""
   property int delay: 250
   property real gap: 12
   property real maxWidth: 280
@@ -113,8 +114,8 @@ PopupWindow {
 
   Rectangle {
     id: tooltipBody
-    width: Math.min(textItem.implicitWidth + 24, root.maxWidth)
-    height: textItem.implicitHeight + 16
+    width: Math.min(tooltipRow.implicitWidth + 24, root.maxWidth)
+    height: tooltipRow.implicitHeight + 16
     radius: Colors.radiusSmall
     color: Colors.withAlpha(Colors.surface, 0.95)
     border.color: Colors.border
@@ -128,17 +129,41 @@ PopupWindow {
     // Subtly lighter inner border
     InnerHighlight { }
 
-    Text {
-      id: textItem
+    Row {
+      id: tooltipRow
       anchors.centerIn: parent
-      width: Math.min(implicitWidth, root.maxWidth - 24)
-      text: root.tooltipText
-      color: Colors.text
-      font.pixelSize: Colors.fontSizeSmall
-      font.weight: Font.Medium
-      horizontalAlignment: Text.AlignHCenter
-      wrapMode: Text.NoWrap
-      elide: Text.ElideRight
+      spacing: Colors.spacingXS
+
+      Text {
+        id: textItem
+        width: Math.min(implicitWidth, root.maxWidth - 24)
+        text: root.tooltipText
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeSmall
+        font.weight: Font.Medium
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.NoWrap
+        elide: Text.ElideRight
+        anchors.verticalCenter: parent.verticalCenter
+      }
+
+      Rectangle {
+        visible: root.shortcut !== ""
+        anchors.verticalCenter: parent.verticalCenter
+        radius: Colors.radiusMicro
+        color: Colors.withAlpha(Colors.text, 0.12)
+        width: shortcutLabel.implicitWidth + Colors.spacingXS * 2
+        height: shortcutLabel.implicitHeight + 4
+
+        Text {
+          id: shortcutLabel
+          anchors.centerIn: parent
+          text: root.shortcut
+          color: Colors.textSecondary
+          font.pixelSize: Colors.fontSizeXS
+          font.family: Colors.fontMono
+        }
+      }
     }
   }
 }

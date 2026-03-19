@@ -12,10 +12,13 @@ Item {
     property color solidColor: "transparent"
     property bool showSolid: false
 
+    signal imageLoadError(url source)
+
     // Internal state
     property bool _flip: false
     property real _progress: 0.0
     property bool _transitioning: false
+    property string _activeShader: _fadeShader
 
     // Solid color background (below images)
     Rectangle {
@@ -35,6 +38,7 @@ Item {
         onStatusChanged: {
             if (status === Image.Error && source !== "") {
                 Logger.w("WallpaperLayer", "Failed to load image A:", source);
+                root.imageLoadError(source);
                 source = "";
             }
         }
@@ -51,6 +55,7 @@ Item {
         onStatusChanged: {
             if (status === Image.Error && source !== "") {
                 Logger.w("WallpaperLayer", "Failed to load image B:", source);
+                root.imageLoadError(source);
                 source = "";
             }
         }
@@ -61,13 +66,14 @@ Item {
         id: transitionShader
         anchors.fill: parent
         visible: root._transitioning
+        layer.enabled: root._transitioning
 
         property var textureA: imageA
         property var textureB: imageB
         property real progress: root._progress
         property bool flipDirection: root._flip
 
-        fragmentShader: root._shaderSource()
+        fragmentShader: root._activeShader
     }
 
     NumberAnimation {
@@ -92,6 +98,9 @@ Item {
             _flip = false;
             return;
         }
+
+        // Select shader BEFORE starting transition (cache it for the duration)
+        _activeShader = _shaderSource();
 
         // Load the new image into the inactive slot
         if (_flip) {

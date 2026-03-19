@@ -1323,6 +1323,7 @@ Item {
             isActive: root.isSurfaceActive("controlCenter")
             anchorWindow: root.anchorWindow
             tooltipText: "System controls"
+            tooltipShortcut: "Meta+C"
             onClicked: root.requestSurface("controlCenter", this)
             contextActions: [
                 {

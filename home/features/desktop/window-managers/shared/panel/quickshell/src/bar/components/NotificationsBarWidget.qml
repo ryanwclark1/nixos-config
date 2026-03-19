@@ -17,6 +17,7 @@ SharedWidgets.BarPill {
     readonly property string badgeStyle: PanelHelpers.widgetStringSetting(widgetInstance, "badgeStyle", "dot", ["dot", "count", "off"])
 
     tooltipText: manager && manager.dndEnabled ? "Notifications paused" : "Notifications"
+    tooltipShortcut: "Meta+N"
     onClicked: root.triggerRequested(this)
     contextActions: [
         {

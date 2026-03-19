@@ -10,6 +10,7 @@ MouseArea {
   layer.enabled: containsMouse || pressed
 
   property string tooltipText: ""
+  property string tooltipShortcut: ""
   property var anchorWindow: null
   property bool isActive: false
   property var contextActions: []
@@ -200,5 +201,6 @@ MouseArea {
     anchorWindow: root.anchorWindow
     hovered: root.containsMouse
     text: root.tooltipText
+    shortcut: root.tooltipShortcut
   }
 }
