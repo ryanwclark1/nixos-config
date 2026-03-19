@@ -6,6 +6,7 @@ import "../models/ModuleUtils.js" as MU
 
 SharedWidgets.CardBase {
     id: root
+    property bool _destroyed: false
 
     property string searchQuery: ""
     property string filterMode: "failed"
@@ -231,7 +232,7 @@ SharedWidgets.CardBase {
             selectedScope = "";
             selectedUnitName = "";
         }
-        Qt.callLater(ensureSelectedVisible);
+        Qt.callLater(function() { if (_destroyed) return; ensureSelectedVisible(); });
         if (root.selectedUnit)
             ServiceUnitService.setDetailUnit(root.selectedUnit.scope, root.selectedUnit.name);
         else
@@ -242,6 +243,7 @@ SharedWidgets.CardBase {
         if (root.selectedUnit)
             ServiceUnitService.setDetailUnit(root.selectedUnit.scope, root.selectedUnit.name);
     }
+    Component.onDestruction: _destroyed = true
 
     Timer {
         interval: 1000

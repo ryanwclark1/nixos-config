@@ -9,6 +9,7 @@ import "../../../widgets" as SharedWidgets
 
 PanelWindow {
     id: root
+    property bool _destroyed: false
 
     readonly property var edgeMargins: Config.reservedEdgesForScreen(screen, "")
 
@@ -44,10 +45,13 @@ PanelWindow {
 
     visible: showContent || slidePanel.x < panelWidth
 
+    Component.onDestruction: _destroyed = true
+
     onShowContentChanged: {
         if (showContent) {
             slidePanel.forceActiveFocus();
             Qt.callLater(function() {
+                if (_destroyed) return;
                 root.focusKeyboardSection(0);
             });
         } else {

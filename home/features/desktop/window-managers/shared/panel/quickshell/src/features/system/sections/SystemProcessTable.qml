@@ -347,13 +347,14 @@ SharedWidgets.CardBase {
                 break;
             }
         }
-        Qt.callLater(ensureSelectedVisible);
+        Qt.callLater(function() { if (_destroyed) return; ensureSelectedVisible(); });
         ProcessService.setDetailPid(selectedPid);
     }
     Component.onCompleted: {
         syncSelection();
         ProcessService.setDetailPid(selectedPid);
     }
+    Component.onDestruction: _destroyed = true
 
     Timer {
         interval: 1000
