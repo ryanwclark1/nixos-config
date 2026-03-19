@@ -26,7 +26,6 @@
     "SystemIoHistory.qml": "../features/system/sections/SystemIoHistory.qml",
     "SystemMonitor.qml": "../features/system/sections/SystemMonitor.qml",
     "SystemMonitorSummary.qml": "../features/system/sections/SystemMonitorSummary.qml",
-    "SystemProcessTable.qml": "../features/system/sections/SystemProcessTable.qml",
     "SystemServiceTable.qml": "../features/system/sections/SystemServiceTable.qml",
     "UpdateWidget.qml": "../features/system/sections/UpdateWidget.qml",
     "UserWidget.qml": "../features/system/sections/UserWidget.qml",
