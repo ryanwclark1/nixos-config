@@ -197,7 +197,11 @@ QtObject {
       { type: "slider", key: "thickness", label: "Thickness", icon: "󰇘", min: 1, max: 8, step: 1 },
       { type: "slider", key: "length", label: "Length", icon: "󰝗", min: 8, max: 64, step: 1 },
       { type: "slider", key: "opacity", label: "Opacity", icon: "󰖔", min: 0.1, max: 1.0, step: 0.05, unit: "%" }
-    ] }
+    ] },
+    { widgetType: "personality", label: "Personality", icon: "󰄛", section: "center", description: "Animated personality GIF widget." },
+    { widgetType: "pomodoro", label: "Pomodoro Timer", icon: "󰔟", section: "right", description: "Focus/break timer with start, pause, skip, and reset controls." },
+    { widgetType: "todo", label: "Todo", icon: "󰄱", section: "right", description: "Pending task counter with clear-done shortcut." },
+    { widgetType: "gameMode", label: "Game Mode", icon: "󰊴", section: "right", description: "Performance mode indicator — shows when game mode is active." }
   ]
 
   readonly property var pluginWidgets: {
@@ -281,6 +285,49 @@ QtObject {
     return meta && meta.settingsSchema ? JSON.parse(JSON.stringify(meta.settingsSchema)) : [];
   }
 
+  function verticalBehavior(widgetType) {
+    var type = String(widgetType || "");
+
+    if (type === "windowTitle" || type === "ssh")
+      return "hidden";
+    if (type === "keyboardLayout")
+      return "short-label";
+    if (type === "cpuStatus" || type === "ramStatus" || type === "gpuStatus" || type === "diskStatus" || type === "networkStatus")
+      return "compact";
+    if (type === "logo" || type === "dateTime" || type === "updates" || type === "modelUsage" || type === "weather"
+        || type === "market" || type === "vpn" || type === "network" || type === "bluetooth" || type === "audio"
+        || type === "music" || type === "privacy" || type === "voxtype" || type === "recording" || type === "battery"
+        || type === "printer" || type === "notifications" || type === "aiChat" || type === "notepad"
+        || type === "controlCenter" || type === "clipboard" || type === "screenshot")
+      return "icon";
+    if (type === "workspaces" || type === "specialWorkspaces" || type === "taskbar" || type === "tray"
+        || type === "cava" || type === "idleInhibitor" || type === "mediaBar" || type === "spacer" || type === "separator")
+      return "native";
+    return "unverified";
+  }
+
+  function verticalHintLabel(widgetType) {
+    var behavior = verticalBehavior(widgetType);
+    if (behavior === "hidden")
+      return "Vertical: Hidden";
+    if (behavior === "short-label")
+      return "Vertical: Short Label";
+    if (behavior === "compact")
+      return "Vertical: Compact";
+    if (behavior === "icon")
+      return "Vertical: Icon";
+    if (behavior === "native")
+      return "Vertical: Native";
+    return "Vertical: Unverified";
+  }
+
+  function _isVerticalBarContext(barPositionOrVertical) {
+    if (barPositionOrVertical === true)
+      return true;
+    var position = String(barPositionOrVertical || "");
+    return position === "left" || position === "right";
+  }
+
   function _effectiveSettings(widgetInstance) {
     var widgetType = widgetInstance ? String(widgetInstance.widgetType || "") : "";
     var defaults = defaultSettings(widgetType);
@@ -319,7 +366,7 @@ QtObject {
     return "Open";
   }
 
-  function summaryChips(widgetInstance) {
+  function summaryChips(widgetInstance, barPositionOrVertical) {
     if (!widgetInstance)
       return [];
 
@@ -327,6 +374,8 @@ QtObject {
     var settings = _effectiveSettings(widgetInstance);
     var chips = [];
     var parsed;
+    if (_isVerticalBarContext(barPositionOrVertical))
+      chips.push(verticalHintLabel(widgetType));
 
     if (widgetType === "cpuStatus" || widgetType === "ramStatus" || widgetType === "gpuStatus" || widgetType === "diskStatus" || widgetType === "networkStatus") {
       var valueStyle = String(settings.valueStyle || (widgetType === "ramStatus" ? "usage" : "percent"));
