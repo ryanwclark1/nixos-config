@@ -35,7 +35,7 @@ Item {
 
         readonly property int _paddingH: Colors.spacingM
         readonly property int _paddingV: Colors.spacingXS
-        readonly property int _gap: 8
+        readonly property int _gap: Colors.spacingS
 
         width: Math.min(280, tooltipRow.implicitWidth + _paddingH * 2)
         height: tooltipRow.implicitHeight + _paddingV * 2
