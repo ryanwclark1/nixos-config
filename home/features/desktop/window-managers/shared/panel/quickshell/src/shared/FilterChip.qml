@@ -44,14 +44,25 @@ Rectangle {
     }
 
     // Leading icon
-    Text {
-      text: root.icon
-      color: root.selected ? Colors.primary : Colors.textSecondary
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeMedium
-      visible: root.icon !== ""
+    Loader {
+      active: root.icon !== ""
+      visible: active
       anchors.verticalCenter: parent.verticalCenter
-      Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+      sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
+    }
+    Component {
+      id: _svgIcon
+      SvgIcon { source: root.icon; color: root.selected ? Colors.primary : Colors.textSecondary; size: Colors.fontSizeMedium }
+    }
+    Component {
+      id: _nerdIcon
+      Text {
+        text: root.icon
+        color: root.selected ? Colors.primary : Colors.textSecondary
+        font.family: Colors.fontMono
+        font.pixelSize: Colors.fontSizeMedium
+        Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+      }
     }
 
     Text {

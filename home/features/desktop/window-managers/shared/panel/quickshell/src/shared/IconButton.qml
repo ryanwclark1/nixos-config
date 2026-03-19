@@ -29,12 +29,22 @@ Rectangle {
   radius: height / 2
   color: hoverArea.pressed ? root.activeColor : (hoverArea.containsMouse ? root.hoverColor : root.normalColor)
 
-  Text {
+  Loader {
     anchors.centerIn: parent
-    text: root.icon
-    color: root.iconColor
-    font.family: Colors.fontMono
-    font.pixelSize: root.iconSize
+    sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
+  }
+  Component {
+    id: _svgIcon
+    SvgIcon { source: root.icon; color: root.iconColor; size: root.iconSize }
+  }
+  Component {
+    id: _nerdIcon
+    Text {
+      text: root.icon
+      color: root.iconColor
+      font.family: Colors.fontMono
+      font.pixelSize: root.iconSize
+    }
   }
 
   StateLayer {

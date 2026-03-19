@@ -10,12 +10,22 @@ ColumnLayout {
 
     spacing: Colors.spacingS
 
-    Text {
-        text: root.icon
-        color: Colors.textDisabled
-        font.family: Colors.fontMono
-        font.pixelSize: root.iconSize
+    Loader {
+        sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
         Layout.alignment: Qt.AlignHCenter
+    }
+    Component {
+        id: _svgIcon
+        SvgIcon { source: root.icon; color: Colors.textDisabled; size: root.iconSize }
+    }
+    Component {
+        id: _nerdIcon
+        Text {
+            text: root.icon
+            color: Colors.textDisabled
+            font.family: Colors.fontMono
+            font.pixelSize: root.iconSize
+        }
     }
 
     Text {

@@ -34,11 +34,21 @@ Rectangle {
         anchors.centerIn: parent
         spacing: Colors.spacingS
 
-        Text {
-            text: root.icon
-            color: root.effectiveColor
-            font.family: Colors.fontMono
-            font.pixelSize: root.compact ? Colors.fontSizeSmall : Colors.fontSizeMedium
+        Loader {
+            sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
+        }
+        Component {
+            id: _svgIcon
+            SvgIcon { source: root.icon; color: root.effectiveColor; size: root.compact ? Colors.fontSizeSmall : Colors.fontSizeMedium }
+        }
+        Component {
+            id: _nerdIcon
+            Text {
+                text: root.icon
+                color: root.effectiveColor
+                font.family: Colors.fontMono
+                font.pixelSize: root.compact ? Colors.fontSizeSmall : Colors.fontSizeMedium
+            }
         }
 
         Text {
