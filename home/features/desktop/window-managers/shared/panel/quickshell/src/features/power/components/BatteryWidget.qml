@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell.Services.UPower
 import "../../system/sections"
 import "../../../services"
+import "../BatteryHelpers.js" as BatteryHelpers
 
 Row {
   id: root
@@ -10,15 +11,8 @@ Row {
 
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent
-  readonly property bool showBattery: hasBattery && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
-  readonly property string batteryStateText: {
-    if (!device) return "Unknown";
-    if (device.state === UPower.DeviceStateCharging) return "Charging";
-    if (device.state === UPower.DeviceStateFullyCharged) return "Fully charged";
-    if (device.state === UPower.DeviceStatePendingCharge) return "Pending charge";
-    if (device.state === UPower.DeviceStatePendingDischarge) return "Pending discharge";
-    return "Discharging";
-  }
+  readonly property bool showBattery: hasBattery
+  readonly property string batteryStateText: BatteryHelpers.stateText(device, UPower)
   readonly property string tooltipText: {
     if (!showBattery || !device) return "No battery detected";
     return Math.round(device.percentage * 100) + "% • " + batteryStateText;

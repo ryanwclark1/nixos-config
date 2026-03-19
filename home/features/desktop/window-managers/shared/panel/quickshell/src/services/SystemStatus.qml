@@ -36,13 +36,7 @@ QtObject {
   readonly property int _cpuTempHighThreshold: 85
   readonly property int _gpuTempHighThreshold: 80
 
-  readonly property bool isBatteryPowered: {
-    var d = UPower.displayDevice;
-    if (!d || !d.isPresent) return false;
-    return d.state === UPower.DeviceStateDischarging 
-        || d.state === UPower.DeviceStatePendingDischarge
-        || (d.state !== UPower.DeviceStateCharging && d.state !== UPower.DeviceStateFullyCharged);
-  }
+  readonly property bool isBatteryPowered: UPower.onBattery
 
   property Process _helperScriptProbe: Process {
     command: ["sh", "-c", "test -f \"$1\" && test -f \"$2\"", "qs-system-status-probe", root.healthCheckScript, root.pluginDoctorScript]
