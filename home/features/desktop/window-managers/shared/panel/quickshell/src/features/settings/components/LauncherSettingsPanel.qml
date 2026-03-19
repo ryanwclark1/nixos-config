@@ -26,14 +26,10 @@ Rectangle {
 
     SharedWidgets.InnerHighlight {}
 
-    Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        height: 4
-        radius: Colors.radiusPill
-        color: Colors.withAlpha(Colors.primary, 0.82)
-        opacity: 0.72
+    SharedWidgets.AdaptiveAccentStrip {
+        accentColor: Colors.primary
+        parentRadius: root.radius
+        opacityValue: 0.72
     }
 
     Behavior on implicitHeight {
