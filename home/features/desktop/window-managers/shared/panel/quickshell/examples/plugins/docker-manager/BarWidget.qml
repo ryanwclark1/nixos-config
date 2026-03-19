@@ -20,8 +20,9 @@ Item {
     property var expandedProjects: ({})
     property var expandedImages: ({})
 
-    // F6: Search/filter
+    // F6: Search/filter (debounced)
     property string searchQuery: ""
+    property string _pendingSearch: ""
 
     // F5: Bulk selection
     property bool selectionMode: false
@@ -257,7 +258,9 @@ Item {
     }
 
     onCurrentTabChanged: {
+        _pendingSearch = "";
         searchQuery = "";
+        searchDebounceTimer.stop();
         focusedCardIndex = -1;
         if (selectionMode) _clearSelection();
     }
@@ -285,6 +288,7 @@ Item {
     }
 
     Timer { id: pruneConfirmTimer; interval: 2000; repeat: false; onTriggered: root.pruneConfirmPending = false }
+    Timer { id: searchDebounceTimer; interval: 150; repeat: false; onTriggered: root.searchQuery = root._pendingSearch }
 
     Rectangle {
         id: triggerRect
@@ -322,7 +326,7 @@ Item {
 
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Escape) {
-                        if (root.searchQuery !== "") { root.searchQuery = ""; event.accepted = true; }
+                        if (root.searchQuery !== "" || root._pendingSearch !== "") { root._pendingSearch = ""; root.searchQuery = ""; searchDebounceTimer.stop(); event.accepted = true; }
                         else { root.popupOpen = false; event.accepted = true; }
                     } else if (event.key === Qt.Key_Tab && !event.modifiers) { root._nextTab(); event.accepted = true; }
                     else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)) { root._prevTab(); event.accepted = true; }
@@ -412,11 +416,12 @@ Item {
                             Text { text: "/"; color: "#64748b"; font.pixelSize: 12; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
                             TextInput {
                                 id: searchInput; width: parent.width - 20; anchors.verticalCenter: parent.verticalCenter
-                                color: "#f8fafc"; font.pixelSize: 11; text: root.searchQuery; onTextChanged: root.searchQuery = text
-                                Keys.onEscapePressed: { root.searchQuery = ""; text = ""; popupFocus.forceActiveFocus(); }
+                                color: "#f8fafc"; font.pixelSize: 11; text: root._pendingSearch
+                                onTextChanged: { root._pendingSearch = text; searchDebounceTimer.restart(); }
+                                Keys.onEscapePressed: { root._pendingSearch = ""; root.searchQuery = ""; text = ""; searchDebounceTimer.stop(); popupFocus.forceActiveFocus(); }
                             }
                         }
-                        Text { visible: root.searchQuery === ""; text: "Search..."; color: "#475569"; font.pixelSize: 11; anchors.verticalCenter: parent.verticalCenter; anchors.left: parent.left; anchors.leftMargin: 26 }
+                        Text { visible: root._pendingSearch === ""; text: "Search..."; color: "#475569"; font.pixelSize: 11; anchors.verticalCenter: parent.verticalCenter; anchors.left: parent.left; anchors.leftMargin: 26 }
                     }
 
                     // Ports toggle (containers tab only)

@@ -470,6 +470,15 @@ QtObject {
         return Object.keys(networkSettings.Networks);
     }
 
+    function _normalizeEnv(rawEnv) {
+        if (!rawEnv || !Array.isArray(rawEnv))
+            return [];
+        var out = [];
+        for (var i = 0; i < rawEnv.length && i < 20; ++i)
+            out.push(String(rawEnv[i] || ""));
+        return out;
+    }
+
     function _normalizeContainer(raw) {
         if (!raw || typeof raw !== "object")
             return null;
@@ -492,7 +501,8 @@ QtObject {
             composeConfigFiles: String(labels["com.docker.compose.project.config_files"] || labels["io.podman.compose.project.config_files"] || "compose.yaml"),
             healthStatus: String((raw.State && raw.State.Health && raw.State.Health.Status) || ""),
             mounts: _normalizeMounts(raw.Mounts),
-            networkNames: _extractNetworkNames(raw.NetworkSettings)
+            networkNames: _extractNetworkNames(raw.NetworkSettings),
+            env: _normalizeEnv(raw.Config && raw.Config.Env)
         };
     }
 
@@ -1146,9 +1156,11 @@ QtObject {
         id: actionProc
         running: false
         onExited: (exitCode, exitStatus) => {
-            if (exitCode === 0)
-                root._setNotice("ok", root.actionSuccessMessage);
-            else {
+            var isLastAction = root._actionQueue.length === 0;
+            if (exitCode === 0) {
+                if (isLastAction)
+                    root._setNotice("ok", root.actionSuccessMessage);
+            } else {
                 root.lastError = root.actionFailureMessage;
                 root._setNotice("error", root.actionFailureMessage);
                 root._setRuntimeStatus("degraded", "E_DOCKER_ACTION_FAILED", root.actionFailureMessage);
