@@ -1107,198 +1107,24 @@ Item {
                 body: "Settings, Run, SSH, and Web stay visible under the search field as prefix shortcuts even when they are not pinned in the sidebar."
             }
 
-            Column {
+            LauncherModeList {
                 id: advancedModeOrderList
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
-
-                Repeater {
-                    model: root.orderedAdvancedModes()
-
-                    delegate: Item {
-                        id: advancedModeRow
-                        width: parent ? parent.width : 0
-                        implicitHeight: advancedModeCard.implicitHeight + (advancedDropBeforeIndicator.visible ? advancedDropBeforeIndicator.height + Colors.spacingXS : 0)
-                        height: implicitHeight
-                        required property int index
-                        required property var modelData
-                        readonly property bool dropBeforeActive: advancedModeReorderState.active && advancedModeReorderState.targetListId === "launcher-advanced-mode" && advancedModeReorderState.targetIndex === index
-
-                        SettingsDropIndicator {
-                            id: advancedDropBeforeIndicator
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: parent.top
-                            }
-                            active: advancedModeRow.dropBeforeActive
-                            visible: advancedModeRow.dropBeforeActive
-                        }
-
-                        SettingsListRow {
-                            id: advancedModeCard
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: advancedDropBeforeIndicator.bottom
-                                topMargin: advancedDropBeforeIndicator.visible ? Colors.spacingXS : 0
-                            }
-                            minimumHeight: root.compactMode ? 84 : 56
-                            dragging: advancedDragHandle.dragActive
-                            dropTargeted: advancedModeRow.dropBeforeActive
-                            onYChanged: {
-                                if (advancedDragHandle.dragActive)
-                                    advancedModeReorderState.updateTarget("launcher-advanced-mode", root.currentModeDropIndex(advancedModeCard, advancedModeRow.index, advancedModeOrderList, root.orderedAdvancedModes().length));
-                            }
-
-                            Behavior on y {
-                                enabled: !advancedDragHandle.dragActive
-
-                                NumberAnimation {
-                                    duration: Colors.durationFast
-                                }
-                            }
-
-                            SettingsDragHandle {
-                                id: advancedDragHandle
-                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                                dragTarget: advancedModeCard
-                                onPressedChanged: {
-                                    if (pressed)
-                                        root.beginAdvancedModeDrag(advancedModeRow.modelData, advancedModeRow.index);
-                                }
-                                onReleased: function (wasDragging) {
-                                    var targetIndex = advancedModeReorderState.targetIndex;
-                                    if (wasDragging)
-                                        targetIndex = root.currentModeDropIndex(advancedModeCard, advancedModeRow.index, advancedModeOrderList, root.orderedAdvancedModes().length);
-                                    advancedModeCard.x = 0;
-                                    advancedModeCard.y = 0;
-                                    if (wasDragging) {
-                                        if (!root.moveDraggedAdvancedMode(targetIndex))
-                                            root.clearModeDragState();
-                                    } else {
-                                        root.clearModeDragState();
-                                    }
-                                }
-                            }
-
-                            Rectangle {
-                                implicitWidth: 28
-                                implicitHeight: 28
-                                radius: Colors.radiusCard
-                                color: Colors.surface
-                                border.color: Colors.border
-                                border.width: 1
-                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: root.launcherModeMeta(advancedModeRow.modelData).icon
-                                    color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
-                                }
-                            }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: Colors.spacingXS
-
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    spacing: Colors.spacingS
-
-                                    Text {
-                                        text: root.launcherModeMeta(advancedModeRow.modelData).label
-                                        color: Colors.text
-                                        font.pixelSize: Colors.fontSizeSmall
-                                        font.weight: Font.DemiBold
-                                    }
-
-                                    Rectangle {
-                                        visible: String(ModeData.modeInfo(advancedModeRow.modelData).prefix || "") !== ""
-                                        radius: Colors.radiusPill
-                                        color: Colors.primarySubtle
-                                        border.color: Colors.primaryRing
-                                        border.width: 1
-                                        implicitHeight: 22
-                                        implicitWidth: advancedPrefixLabel.implicitWidth + 12
-
-                                        Text {
-                                            id: advancedPrefixLabel
-                                            anchors.centerIn: parent
-                                            text: (ModeData.modeInfo(advancedModeRow.modelData).prefix || "") + " prefix"
-                                            color: Colors.primary
-                                            font.pixelSize: Colors.fontSizeXS
-                                            font.weight: Font.DemiBold
-                                        }
-                                    }
-                                }
-
-                                Text {
-                                    Layout.fillWidth: true
-                                    text: ModeData.modeInfo(advancedModeRow.modelData).hint || "Advanced launcher mode"
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    wrapMode: Text.WordWrap
-                                }
-
-                                Text {
-                                    Layout.fillWidth: true
-                                    text: "Drag to reorder within advanced modes, or use the arrow buttons."
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    wrapMode: Text.WordWrap
-                                }
-                            }
-
-                            Flow {
-                                spacing: Colors.spacingS
-                                Layout.alignment: Qt.AlignTop
-
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "󰅃"
-                                    enabled: advancedModeRow.index > 0
-                                    onClicked: root.moveAdvancedMode(advancedModeRow.modelData, -1)
-                                }
-
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "󰅀"
-                                    enabled: advancedModeRow.index < (root.orderedAdvancedModes().length - 1)
-                                    onClicked: root.moveAdvancedMode(advancedModeRow.modelData, 1)
-                                }
-
-                                SettingsActionButton {
-                                    compact: true
-                                    label: "Pin"
-                                    onClicked: root.promoteLauncherMode(advancedModeRow.modelData)
-                                }
-
-                                SettingsActionButton {
-                                    compact: true
-                                    label: "Disable"
-                                    onClicked: root.disableLauncherMode(advancedModeRow.modelData)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                SettingsDropIndicator {
-                    width: parent ? parent.width : 0
-                    active: advancedModeReorderState.active && advancedModeReorderState.targetListId === "launcher-advanced-mode" && advancedModeReorderState.targetIndex === root.orderedAdvancedModes().length
-                    visible: active
-                }
-
-                Text {
-                    width: parent ? parent.width : 0
-                    visible: advancedModeReorderState.active && advancedModeReorderState.targetListId === "launcher-advanced-mode" && advancedModeReorderState.targetIndex === root.orderedAdvancedModes().length
-                    text: "Drop at end of advanced modes"
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
-                }
+                modeModel: root.orderedAdvancedModes()
+                reorderState: advancedModeReorderState
+                listId: "launcher-advanced-mode"
+                compactMode: root.compactMode
+                beginDragFn: root.beginAdvancedModeDrag
+                moveDraggedFn: root.moveDraggedAdvancedMode
+                clearDragStateFn: root.clearModeDragState
+                moveModeFn: root.moveAdvancedMode
+                modeMetaFn: root.launcherModeMeta
+                dropIndexFn: root.currentModeDropIndex
+                promoteLabel: "Pin"
+                promoteFn: root.promoteLauncherMode
+                disableFn: root.disableLauncherMode
+                dropEndText: "Drop at end of advanced modes"
+                dragHintText: "Drag to reorder within advanced modes, or use the arrow buttons."
             }
 
             SettingsInfoCallout {
