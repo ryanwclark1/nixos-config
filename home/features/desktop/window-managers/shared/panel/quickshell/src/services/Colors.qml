@@ -133,8 +133,6 @@ QtObject {
 
     property Connections _configConn: Connections {
         target: Config
-        function onPopupOpacityChanged() { /* legacy */ }
-        function onCardOpacityChanged() { /* legacy */ }
         function onUseDynamicThemingChanged() {
             if (Config.useDynamicTheming)
                 colors.applyDynamicPalette();

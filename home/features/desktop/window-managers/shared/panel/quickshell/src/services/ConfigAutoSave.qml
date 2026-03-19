@@ -35,9 +35,6 @@ QtObject {
         function onBlurEnabledChanged() {
             root.config.scheduleSave();
         }
-        function onGlassOpacityChanged() {
-            root.config.scheduleSave();
-        }
         function onNotifWidthChanged() {
             root.config.scheduleSave();
         }
