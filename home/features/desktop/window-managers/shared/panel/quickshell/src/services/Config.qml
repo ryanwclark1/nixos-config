@@ -79,6 +79,7 @@ QtObject {
     property string launcherFileSearchRoot: "~"
     property bool launcherFileShowHidden: false
     property string launcherFileOpener: "xdg-open"
+    property bool launcherFilePreviewEnabled: true
     property int launcherRecentsLimit: 12
     property int launcherRecentAppsLimit: 6
     property int launcherSuggestionsLimit: 4
@@ -260,13 +261,16 @@ QtObject {
     property bool workspaceShowEmpty: true
     property bool workspaceShowNames: false
     property bool workspaceShowAppIcons: false
+    property bool workspaceShowWindowCount: false
     property int workspaceMaxIcons: 3
     property string workspacePillSize: "normal"
     property string workspaceStyle: "pill" // pill | strip | dots | icons
+    property string workspaceLayout: "horizontal" // horizontal | vertical | grid
     property bool workspaceScrollEnabled: true
     property bool workspaceReverseScroll: false
     property string workspaceActiveColor: ""
     property string workspaceUrgentColor: ""
+    property string workspaceClickBehavior: "focus" // focus | last_window
 
     // --- DISPLAY PROFILES ---
     property var displayProfiles: []

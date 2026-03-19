@@ -363,13 +363,16 @@ var _MAPS = {
         ["showEmpty", "workspaceShowEmpty"],
         ["showNames", "workspaceShowNames"],
         ["showAppIcons", "workspaceShowAppIcons"],
+        ["showWindowCount", "workspaceShowWindowCount"],
         ["maxIcons", "workspaceMaxIcons"],
         ["pillSize", "workspacePillSize"],
         ["style", "workspaceStyle"],
+        ["layout", "workspaceLayout"],
         ["scrollEnabled", "workspaceScrollEnabled"],
         ["reverseScroll", "workspaceReverseScroll"],
         ["activeColor", "workspaceActiveColor"],
-        ["urgentColor", "workspaceUrgentColor"]
+        ["urgentColor", "workspaceUrgentColor"],
+        ["clickBehavior", "workspaceClickBehavior"]
     ],
     osk: [
         ["layout", "oskLayout"],
@@ -429,6 +432,7 @@ var _MAPS = {
         ["fileSearchRoot", "launcherFileSearchRoot"],
         ["fileShowHidden", "launcherFileShowHidden"],
         ["fileOpener", "launcherFileOpener"],
+        ["filePreviewEnabled", "launcherFilePreviewEnabled"],
         ["recentsLimit", "launcherRecentsLimit"],
         ["recentAppsLimit", "launcherRecentAppsLimit"],
         ["suggestionsLimit", "launcherSuggestionsLimit"],

@@ -527,6 +527,15 @@ QtObject {
         function onWorkspaceReverseScrollChanged() {
             root.config.scheduleSave();
         }
+        function onWorkspaceShowWindowCountChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceLayoutChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceClickBehaviorChanged() {
+            root.config.scheduleSave();
+        }
         function onNotepadProjectSyncChanged() {
             root.config.scheduleSave();
         }
