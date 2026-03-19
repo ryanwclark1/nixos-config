@@ -74,10 +74,7 @@ Flow {
         if (isDots) return root.pillHeight;
         if (isStrip) return isActive ? root.pillMinWidth * 2 : root.pillMinWidth;
         
-        var base = Math.max(root.pillMinWidth, label.implicitWidth + 12);
-        // Fix for oddly large workspace 1: only add window padding if there are actually windows
-        if (windowCount > 0 && !isIcons) return base + Math.min(windowCount * 4, 24);
-        return base;
+        return Math.max(root.pillMinWidth, label.implicitWidth + 12);
       }
       color: dropHighlight ? Colors.accent : (isActive ? root.activeColor : root.inactiveColor)
 

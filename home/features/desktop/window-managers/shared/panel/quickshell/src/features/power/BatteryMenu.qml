@@ -170,7 +170,9 @@ BasePopupMenu {
 
     // Power profiles
     SharedWidgets.SectionLabel {
-      label: PowerProfileService.available ? "POWER PROFILE" : "POWER PROFILE UNAVAILABLE"
+      label: PowerProfileService.available
+        ? "POWER PROFILE"
+        : (PowerProfileService.availabilityKnown ? "POWER PROFILE UNAVAILABLE" : "POWER PROFILE")
     }
 
     RowLayout {
@@ -196,7 +198,7 @@ BasePopupMenu {
 
     Text {
       Layout.fillWidth: true
-      visible: !PowerProfileService.available
+      visible: PowerProfileService.availabilityKnown && !PowerProfileService.available
       text: "powerprofilesctl is not available on this system."
       color: Colors.textDisabled
       font.pixelSize: Colors.fontSizeSmall
