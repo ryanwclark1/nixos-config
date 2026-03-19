@@ -10,6 +10,7 @@ import ".."
 
 Item {
     id: root
+    property bool _destroyed: false
     property var settingsRoot: null
     property string tabId: ""
     property bool compactMode: false
@@ -26,6 +27,8 @@ Item {
     readonly property bool selectedPluginCanWriteSettings: selectedPluginId !== "" && PluginService.pluginCanWriteSettings(selectedPluginId)
     readonly property bool selectedPluginHasControlCenterDetail: selectedPluginId !== "" && PluginService.pluginSupportsControlCenterDetail(selectedPluginId)
 
+    Component.onDestruction: _destroyed = true
+
     onPluginPaneOpenChanged: {
         if (!pluginPaneOpen) {
             pluginPaneMode = "";
@@ -35,7 +38,7 @@ Item {
                 pluginPaneLoader.source = "";
             return;
         }
-        Qt.callLater(loadPluginPane);
+        Qt.callLater(function() { if (_destroyed) return; loadPluginPane(); });
     }
 
     function diagnosticsTimestamp() {
@@ -242,7 +245,7 @@ Item {
         pluginPaneMode = String(paneMode || "");
         pluginPaneError = "";
         pluginPaneOpen = true;
-        Qt.callLater(loadPluginPane);
+        Qt.callLater(function() { if (_destroyed) return; loadPluginPane(); });
     }
 
     function closePluginPane() {
