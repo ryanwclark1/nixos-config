@@ -793,7 +793,7 @@ Item {
                             // ── CONTAINERS TAB ──
                             // ════════════════════════════════
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "containers" ? root._filteredContainers : []
+                                model: root._filteredContainers
                                 delegate: Rectangle {
                                     id: containerCard
                                     required property var modelData
@@ -1762,7 +1762,7 @@ Item {
                             }
 
                             Rectangle {
-                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" && root.filteredList(root.daemon.networks, root.searchQuery).length === 0
+                                visible: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" && root._filteredNetworks.length === 0
                                 width: parent.width
                                 radius: 14
                                 color: "#111827"
@@ -1781,7 +1781,7 @@ Item {
                             }
 
                             Repeater {
-                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" ? root.filteredList(root.daemon.networks, root.searchQuery) : []
+                                model: root.daemon && root.daemon.runtimeAvailable && root.currentTab === "networks" ? root._filteredNetworks : []
                                 delegate: Rectangle {
                                     id: networkCard
                                     required property var modelData
