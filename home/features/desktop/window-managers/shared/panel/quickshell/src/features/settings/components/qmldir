@@ -11,15 +11,19 @@ SettingsFieldGrid 1.0 SettingsFieldGrid.qml
 SettingsIconBox 1.0 SettingsIconBox.qml
 SettingsInfoCallout 1.0 SettingsInfoCallout.qml
 SettingsListRow 1.0 SettingsListRow.qml
+SettingsPageHero 1.0 SettingsPageHero.qml
 SettingsModeRow 1.0 SettingsModeRow.qml
+SettingsQuickLinksRow 1.0 SettingsQuickLinksRow.qml
 SettingsReorderState 1.0 SettingsReorderState.qml
 singleton SettingsRegistry 1.0 SettingsRegistry.qml
 SettingsRemovableChip 1.0 SettingsRemovableChip.qml
 SettingsSectionLabel 1.0 SettingsSectionLabel.qml
+SettingsSectionGroup 1.0 SettingsSectionGroup.qml
 SettingsSelectRow 1.0 SettingsSelectRow.qml
 SettingsSecretInputRow 1.0 SettingsSecretInputRow.qml
 SettingsSidebar 1.0 SettingsSidebar.qml
 SettingsSliderRow 1.0 SettingsSliderRow.qml
+SettingsSummaryStrip 1.0 SettingsSummaryStrip.qml
 SettingsTabPage 1.0 SettingsTabPage.qml
 SettingsTextInputRow 1.0 SettingsTextInputRow.qml
 SettingsToggleRow 1.0 SettingsToggleRow.qml
