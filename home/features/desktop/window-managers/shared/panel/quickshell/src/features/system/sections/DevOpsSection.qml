@@ -126,7 +126,23 @@ ColumnLayout {
                 Column {
                     Layout.fillWidth: true
                     Text {
-                        text: ServiceUnitService.sshActiveCount + " SSH"
+                        text: {
+                            var count = ServiceUnitService.sshActiveCount;
+                            if (count === 0) return "0 SSH";
+                            var types = {};
+                            var sessions = ServiceUnitService.sshSessions;
+                            for (var i = 0; i < sessions.length; i++) {
+                                var t = sessions[i].type || "ssh";
+                                types[t] = (types[t] || 0) + (sessions[i].count || 1);
+                            }
+                            var parts = [];
+                            var order = ["ssh", "scp", "sftp", "rsync", "sshfs"];
+                            for (var j = 0; j < order.length; j++) {
+                                if (types[order[j]])
+                                    parts.push(types[order[j]] + " " + order[j].toUpperCase());
+                            }
+                            return parts.join(" · ") || (count + " SSH");
+                        }
                         color: Colors.text
                         font.pixelSize: Colors.fontSizeSmall
                         font.weight: Font.Bold
@@ -204,41 +220,63 @@ ColumnLayout {
         }
 
         Repeater {
-            model: ServiceUnitService.sshSessions.slice(0, 2)
+            model: ServiceUnitService.sshSessions.slice(0, 4)
             delegate: Rectangle {
+                required property var modelData
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Colors.radiusSmall
                 color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
+
+                readonly property string sessionType: modelData.type || "ssh"
+                readonly property string sessionLabel: modelData.label || ""
+                readonly property int sessionCount: modelData.count || 1
+                readonly property string typeIcon: {
+                    switch (sessionType) {
+                    case "scp":   return "󰆏";
+                    case "sftp":  return "󰉋";
+                    case "rsync": return "󰓦";
+                    case "sshfs": return "󰋊";
+                    default:      return "󰣀";
+                    }
+                }
+
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: Colors.spacingS
                     Text {
-                        text: "󰣀"
+                        text: typeIcon
                         color: Colors.accent
                         font.pixelSize: Colors.fontSizeLarge
                         font.family: Colors.fontMono
                     }
                     Text {
-                        text: modelData
+                        text: sessionLabel + (sessionCount > 1 ? " ×" + sessionCount : "")
                         color: Colors.text
                         font.pixelSize: Colors.fontSizeXS
                         font.weight: Font.DemiBold
                         elide: Text.ElideRight
                         Layout.fillWidth: true
                     }
+                    Text {
+                        visible: sessionType !== "ssh"
+                        text: sessionType.toUpperCase()
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeXXS
+                        font.weight: Font.Medium
+                    }
 
                     SharedWidgets.IconButton {
+                        visible: sessionType === "ssh"
                         icon: "󰆍"
                         size: 28
                         iconSize: 14
                         iconColor: Colors.textDisabled
                         onClicked: {
-                            var host = modelData.split("@")[1] || modelData;
-                            var cmd = "ssh " + host;
-                            Quickshell.execDetached(SU.terminalCommand(cmd));
+                            var host = sessionLabel.split("@")[1] || sessionLabel;
+                            Quickshell.execDetached(SU.terminalCommand("exec ssh \"$1\"", host));
                         }
                     }
                 }

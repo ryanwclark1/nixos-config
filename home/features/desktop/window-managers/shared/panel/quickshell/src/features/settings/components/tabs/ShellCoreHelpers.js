@@ -446,6 +446,9 @@ function resetLauncherDefaults(Config, webAliasDefaults, webProviderDefaultOrder
     Config.launcherRememberWebProvider = true;
     Config.launcherWebLastProviderKey = "duckduckgo";
     Config.launcherWebProviderOrder = webProviderDefaultOrder.slice();
+    Config.launcherWebCustomEngines = [];
+    Config.launcherWebBangsEnabled = false;
+    Config.launcherWebBangsLastSync = "";
     var supportedDefaults = launcherDefaultModes.filter(function (modeKey) {
         return isLauncherModeSupported(CompositorAdapter, modeKey);
     });

@@ -105,40 +105,74 @@ Item {
         }
     ]
     readonly property var launcherDefaultModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
-    readonly property var webProviders: [
-        {
-            key: "duckduckgo",
-            label: "DuckDuckGo",
-            icon: "󰇥"
-        },
-        {
-            key: "google",
-            label: "Google",
-            icon: "󰊯"
-        },
-        {
-            key: "youtube",
-            label: "YouTube",
-            icon: "󰗃"
-        },
-        {
-            key: "nixos",
-            label: "NixOS Packages",
-            icon: ""
-        },
-        {
-            key: "github",
-            label: "GitHub",
-            icon: "󰊤"
+    readonly property var webProviders: {
+        var builtIn = [
+            { key: "duckduckgo", label: "DuckDuckGo", icon: "󰇥" },
+            { key: "google", label: "Google", icon: "󰊯" },
+            { key: "youtube", label: "YouTube", icon: "󰗃" },
+            { key: "nixos", label: "NixOS Packages", icon: "" },
+            { key: "github", label: "GitHub", icon: "󰊤" },
+            { key: "brave", label: "Brave Search", icon: "󰊯" },
+            { key: "bing", label: "Bing", icon: "󰊯" },
+            { key: "kagi", label: "Kagi", icon: "󰊯" },
+            { key: "stackoverflow", label: "Stack Overflow", icon: "" },
+            { key: "npm", label: "npm", icon: "󰎙" },
+            { key: "pypi", label: "PyPI", icon: "󰌠" },
+            { key: "crates", label: "crates.io", icon: "🦀" },
+            { key: "mdn", label: "MDN Web Docs", icon: "󰖟" },
+            { key: "archwiki", label: "Arch Wiki", icon: "󰣇" },
+            { key: "aur", label: "AUR", icon: "󰣇" },
+            { key: "nixopts", label: "NixOS Options", icon: "" },
+            { key: "reddit", label: "Reddit", icon: "󰑍" },
+            { key: "twitter", label: "Twitter/X", icon: "󰕄" },
+            { key: "linkedin", label: "LinkedIn", icon: "󰌻" },
+            { key: "wikipedia", label: "Wikipedia", icon: "󰖬" },
+            { key: "translate", label: "Google Translate", icon: "󰗊" },
+            { key: "imdb", label: "IMDb", icon: "󰎁" },
+            { key: "amazon", label: "Amazon", icon: "󰅐" },
+            { key: "ebay", label: "eBay", icon: "󰮫" },
+            { key: "maps", label: "Google Maps", icon: "󰍎" },
+            { key: "images", label: "Google Images", icon: "󰋩" }
+        ];
+        // Append custom engines
+        var customs = Config.launcherWebCustomEngines;
+        if (Array.isArray(customs)) {
+            for (var i = 0; i < customs.length; ++i) {
+                var c = customs[i];
+                if (c && c.key && c.name)
+                    builtIn.push({ key: c.key, label: c.name, icon: c.icon || "󰖟", isCustom: true });
+            }
         }
-    ]
+        return builtIn;
+    }
     readonly property var webProviderDefaultOrder: ["duckduckgo", "google", "youtube", "nixos", "github"]
     readonly property var webAliasDefaults: ({
             "duckduckgo": ["d", "ddg"],
             "google": ["g"],
             "youtube": ["yt"],
             "nixos": ["nix", "np"],
-            "github": ["gh"]
+            "github": ["gh"],
+            "brave": ["br"],
+            "bing": ["b"],
+            "kagi": ["k"],
+            "stackoverflow": ["so", "stack"],
+            "npm": ["n"],
+            "pypi": ["pip", "py"],
+            "crates": ["cr", "cargo"],
+            "mdn": ["md"],
+            "archwiki": ["aw", "arch"],
+            "aur": ["au"],
+            "nixopts": ["no", "opts"],
+            "reddit": ["r"],
+            "twitter": ["tw", "x"],
+            "linkedin": ["li"],
+            "wikipedia": ["w", "wiki"],
+            "translate": ["tr"],
+            "imdb": ["im"],
+            "amazon": ["az"],
+            "ebay": ["eb"],
+            "maps": ["map"],
+            "images": ["img"]
         })
 
     // Thin wrappers so UI bindings stay readable
@@ -762,6 +796,203 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        // ----- Custom Search Engines (web) -----------------------------------
+        SettingsCard {
+            visible: root.isLauncherWebSection
+            Layout.fillWidth: true
+            title: "Custom Search Engines"
+            iconName: "󰖟"
+            description: "Add your own search engines with URL templates. Use %s as the query placeholder."
+
+            SettingsSectionLabel {
+                text: "CUSTOM ENGINES"
+            }
+
+            Repeater {
+                model: Array.isArray(Config.launcherWebCustomEngines) ? Config.launcherWebCustomEngines : []
+                delegate: RowLayout {
+                    id: customEngineRow
+                    Layout.fillWidth: true
+                    required property int index
+                    required property var modelData
+                    spacing: Colors.spacingS
+
+                    Rectangle {
+                        implicitWidth: 24
+                        implicitHeight: 24
+                        radius: Colors.radiusCard
+                        color: Colors.surface
+                        border.color: Colors.border
+                        border.width: 1
+
+                        Text {
+                            anchors.centerIn: parent
+                            color: Colors.primary
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeSmall
+                            text: customEngineRow.modelData.icon || "󰖟"
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+
+                        Text {
+                            text: customEngineRow.modelData.name + " (" + customEngineRow.modelData.key + ")"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.DemiBold
+                        }
+
+                        Text {
+                            text: customEngineRow.modelData.exec
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeXS
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    SettingsActionButton {
+                        compact: true
+                        iconName: "󰆴"
+                        onClicked: {
+                            var engines = Config.launcherWebCustomEngines.slice();
+                            engines.splice(customEngineRow.index, 1);
+                            Config.launcherWebCustomEngines = engines;
+                        }
+                    }
+                }
+            }
+
+            SettingsInfoCallout {
+                visible: !Array.isArray(Config.launcherWebCustomEngines) || Config.launcherWebCustomEngines.length === 0
+                iconName: "󰛢"
+                title: "No custom engines"
+                body: "Add a custom search engine below. It will appear in the web provider list."
+            }
+
+            SettingsSectionLabel {
+                text: "ADD NEW ENGINE"
+            }
+
+            property string newEngineKey: ""
+            property string newEngineName: ""
+            property string newEngineUrl: ""
+            property string newEngineIcon: ""
+
+            SettingsTextInputRow {
+                label: "Key (short ID)"
+                placeholderText: "e.g. rustdoc"
+                text: parent.newEngineKey
+                onSubmitted: value => parent.newEngineKey = value
+                onTextEdited: value => parent.newEngineKey = value
+            }
+
+            SettingsTextInputRow {
+                label: "Name"
+                placeholderText: "e.g. Rust Docs"
+                text: parent.newEngineName
+                onSubmitted: value => parent.newEngineName = value
+                onTextEdited: value => parent.newEngineName = value
+            }
+
+            SettingsTextInputRow {
+                label: "URL Template"
+                placeholderText: "https://example.com/search?q=%s"
+                text: parent.newEngineUrl
+                onSubmitted: value => parent.newEngineUrl = value
+                onTextEdited: value => parent.newEngineUrl = value
+            }
+
+            SettingsTextInputRow {
+                label: "Icon (optional)"
+                placeholderText: "Nerd Font icon"
+                text: parent.newEngineIcon
+                onSubmitted: value => parent.newEngineIcon = value
+                onTextEdited: value => parent.newEngineIcon = value
+            }
+
+            SettingsActionButton {
+                Layout.fillWidth: true
+                label: "Add Custom Engine"
+                iconName: "󰐕"
+                enabled: parent.newEngineKey.trim() !== "" && parent.newEngineName.trim() !== "" && parent.newEngineUrl.trim() !== ""
+                onClicked: {
+                    var engines = Array.isArray(Config.launcherWebCustomEngines) ? Config.launcherWebCustomEngines.slice() : [];
+                    var key = parent.newEngineKey.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+                    if (key === "")
+                        return;
+                    engines.push({
+                        key: key,
+                        name: parent.newEngineName.trim(),
+                        exec: parent.newEngineUrl.trim(),
+                        home: "",
+                        icon: parent.newEngineIcon.trim() || "󰖟"
+                    });
+                    Config.launcherWebCustomEngines = engines;
+                    parent.newEngineKey = "";
+                    parent.newEngineName = "";
+                    parent.newEngineUrl = "";
+                    parent.newEngineIcon = "";
+                }
+            }
+        }
+
+        // ----- DuckDuckGo Bangs (web) ----------------------------------------
+        SettingsCard {
+            visible: root.isLauncherWebSection
+            Layout.fillWidth: true
+            title: "DuckDuckGo Bangs"
+            iconName: "󰇥"
+            description: "Use DDG !bangs for quick site searches (e.g. !gh quickshell, !w quantum)."
+
+            SettingsToggleRow {
+                label: "Enable !Bangs"
+                icon: "󰇥"
+                configKey: "launcherWebBangsEnabled"
+            }
+
+            SettingsInfoCallout {
+                iconName: "󰛢"
+                title: "How bangs work"
+                body: "Type ?!prefix query in web mode. The bang database must be synced first using the button below."
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                SettingsActionButton {
+                    Layout.fillWidth: true
+                    label: "Sync Bang Database"
+                    iconName: "󰑓"
+                    enabled: Config.launcherWebBangsEnabled
+                    onClicked: {
+                        Quickshell.execDetached(["qs-bang-sync"]);
+                        Config.launcherWebBangsLastSync = new Date().toISOString();
+                    }
+                }
+            }
+
+            Text {
+                visible: Config.launcherWebBangsLastSync !== ""
+                text: "Last synced: " + Config.launcherWebBangsLastSync
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                Layout.fillWidth: true
+            }
+
+            Text {
+                visible: Config.launcherWebBangsLastSync === "" && Config.launcherWebBangsEnabled
+                text: "Bang database not yet synced. Click 'Sync' to download."
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                Layout.fillWidth: true
             }
         }
 

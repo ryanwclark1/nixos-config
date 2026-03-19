@@ -1,5 +1,5 @@
 # ai-stream.sh — Streaming curl wrapper for AI providers
-# Usage: qs-ai-stream <provider> <model> <endpoint> <api-key> <messages-file> [max-tokens] [temperature] [image-path]
+# Usage: qs-ai-stream <provider> <model> <endpoint> <api-key> <messages-file> [max-tokens] [temperature] [image-path] [timeout]
 # Output protocol: CONTENT:<text>, ERROR:<message>, USAGE:<json>, DONE
 
 set -euo pipefail
@@ -12,6 +12,7 @@ MESSAGES_FILE="${5:-}"
 MAX_TOKENS="${6:-4096}"
 TEMPERATURE="${7:-0.7}"
 IMAGE_PATH="${8:-}"
+TIMEOUT="${9:-120}"
 
 # Base64 image data if provided
 IMAGE_B64=""
@@ -60,7 +61,7 @@ case "$PROVIDER" in
             --argjson temperature "$TEMPERATURE" \
             '{model: $model, messages: $messages, stream: true, options: {num_predict: $max_tokens, temperature: $temperature}}')
 
-        curl -s --connect-timeout 5 --no-buffer -X POST "$URL" \
+        curl -s --connect-timeout 5 --max-time "$TIMEOUT" --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%$'\r'}"
@@ -138,7 +139,7 @@ case "$PROVIDER" in
                 {model: $model, messages: $messages, max_tokens: $max_tokens, temperature: $temperature, stream: true}
             end')
 
-        curl -s --connect-timeout 5 --no-buffer -X POST "$URL" \
+        curl -s --connect-timeout 5 --max-time "$TIMEOUT" --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -H "x-api-key: $API_KEY" \
             -H "anthropic-version: 2023-06-01" \
@@ -203,7 +204,7 @@ case "$PROVIDER" in
             --argjson temperature "$TEMPERATURE" \
             '{model: $model, messages: $messages, max_completion_tokens: $max_tokens, temperature: $temperature, stream: true, stream_options: {include_usage: true}}')
 
-        curl -s --connect-timeout 5 --no-buffer -X POST "$URL" \
+        curl -s --connect-timeout 5 --max-time "$TIMEOUT" --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $API_KEY" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
@@ -259,7 +260,7 @@ case "$PROVIDER" in
                 {contents: $contents, generationConfig: {maxOutputTokens: $max_tokens, temperature: $temperature}}
             end')
 
-        curl -s --connect-timeout 5 --no-buffer -X POST "$URL" \
+        curl -s --connect-timeout 5 --max-time "$TIMEOUT" --no-buffer -X POST "$URL" \
             -H "Content-Type: application/json" \
             -d "$BODY" 2>/dev/null | while IFS= read -r line || [[ -n "$line" ]]; do
             line="${line%$'\r'}"

@@ -32,12 +32,19 @@ function preferredProviderKey(rememberEnabled, persistedKey, sessionKey) {
 }
 
 // Build a web target URL from a provider and query string.
+// Supports two URL patterns:
+//   1. Append-query: exec URL ends with a query param, query is appended
+//   2. Placeholder: exec URL contains %s, replaced with encoded query
 function buildWebTarget(provider, query) {
     if (!provider)
         return "";
-    if (query !== "" && provider.exec)
-        return String(provider.exec) + encodeURIComponent(query);
-    return String(provider.home || provider.exec || "");
+    var exec = String(provider.exec || "");
+    if (query !== "" && exec) {
+        if (exec.indexOf("%s") !== -1)
+            return exec.replace(/%s/g, encodeURIComponent(query));
+        return exec + encodeURIComponent(query);
+    }
+    return String(provider.home || exec || "");
 }
 
 // Build a recent entry for a web provider action.

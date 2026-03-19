@@ -8,12 +8,8 @@
 set -euo pipefail
 
 [[ -f "$HOME/.config/user-dirs.dirs" ]] && source "$HOME/.config/user-dirs.dirs"
-readonly OUTPUT_DIR="${OS_SCREENRECORD_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}}"
-
-if [[ ! -d "$OUTPUT_DIR" ]]; then
-  notify-send "Screen recording directory does not exist: $OUTPUT_DIR" -u critical -t 3000
-  exit 1
-fi
+readonly DEFAULT_OUTPUT_DIR="${OS_SCREENRECORD_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}}"
+OUTPUT_DIR="$DEFAULT_OUTPUT_DIR"
 
 DESKTOP_AUDIO="false"
 MICROPHONE_AUDIO="false"
@@ -21,6 +17,11 @@ WEBCAM="false"
 WEBCAM_DEVICE=""
 RESOLUTION=""
 STOP_RECORDING="false"
+CAPTURE_SOURCE="portal"
+FPS="60"
+QUALITY="very_high"
+RECORD_CURSOR="true"
+OUTPUT_DIR_OVERRIDE=""
 RECORDING_FILE="/tmp/os-screenrecord-filename"
 
 for arg in "$@"; do
@@ -30,14 +31,31 @@ for arg in "$@"; do
     --with-webcam) WEBCAM="true" ;;
     --webcam-device=*) WEBCAM_DEVICE="${arg#*=}" ;;
     --resolution=*) RESOLUTION="${arg#*=}" ;;
+    --capture-source=*) CAPTURE_SOURCE="${arg#*=}" ;;
+    --fps=*) FPS="${arg#*=}" ;;
+    --quality=*) QUALITY="${arg#*=}" ;;
+    --record-cursor=*) RECORD_CURSOR="${arg#*=}" ;;
+    --output-dir=*) OUTPUT_DIR_OVERRIDE="${arg#*=}" ;;
     --stop-recording) STOP_RECORDING="true" ;;
     *)
       echo "Unknown option: $arg" >&2
-      echo "Usage: $0 [--with-desktop-audio] [--with-microphone-audio] [--with-webcam] [--webcam-device=PATH] [--resolution=WxH] [--stop-recording]" >&2
+      echo "Usage: $0 [--with-desktop-audio] [--with-microphone-audio] [--with-webcam] [--webcam-device=PATH] [--resolution=WxH] [--capture-source=portal|screen] [--fps=N] [--quality=medium|high|very_high] [--record-cursor=true|false] [--output-dir=PATH] [--stop-recording]" >&2
       exit 1
       ;;
   esac
 done
+
+if [[ -n "$OUTPUT_DIR_OVERRIDE" ]]; then
+  OUTPUT_DIR="$OUTPUT_DIR_OVERRIDE"
+fi
+
+if [[ "$OUTPUT_DIR" == "~" ]]; then
+  OUTPUT_DIR="$HOME"
+elif [[ "$OUTPUT_DIR" == "~/"* ]]; then
+  OUTPUT_DIR="$HOME/${OUTPUT_DIR#~/}"
+fi
+
+mkdir -p "$OUTPUT_DIR"
 
 cleanup_webcam() {
   pkill -f "WebcamOverlay" 2>/dev/null || true
@@ -111,6 +129,8 @@ start_screenrecording() {
   local filename="$OUTPUT_DIR/screenrecording-$(date +'%Y-%m-%d_%H-%M-%S').mp4"
   local audio_devices=""
   local audio_args=()
+  local capture_target="$CAPTURE_SOURCE"
+  local cursor_flag="yes"
 
   [[ "$DESKTOP_AUDIO" == "true" ]] && audio_devices+="default_output"
 
@@ -123,13 +143,23 @@ start_screenrecording() {
   [[ -n "$audio_devices" ]] && audio_args+=(-a "$audio_devices" -ac aac)
 
   local resolution="${RESOLUTION:-$(default_resolution)}"
+  [[ "$RECORD_CURSOR" == "false" ]] && cursor_flag="no"
+
+  case "$capture_target" in
+    portal) ;;
+    screen|fullscreen) capture_target="screen" ;;
+    *)
+      notify-send "Error" "Unsupported capture source: $capture_target" -u critical
+      exit 1
+      ;;
+  esac
 
   if ! command -v gpu-screen-recorder &>/dev/null; then
     notify-send "Error" "gpu-screen-recorder not found" -u critical
     exit 1
   fi
 
-  gpu-screen-recorder -w portal -k auto -s "$resolution" -f 60 -fm cfr -fallback-cpu-encoding yes -o "$filename" "${audio_args[@]}" &
+  gpu-screen-recorder -w "$capture_target" -k auto -s "$resolution" -f "$FPS" -q "$QUALITY" -cursor "$cursor_flag" -fm cfr -fallback-cpu-encoding yes -o "$filename" "${audio_args[@]}" &
   local pid=$!
 
   # Wait for recording to actually start (file appears after portal selection)

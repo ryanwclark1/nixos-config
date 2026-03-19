@@ -186,6 +186,26 @@ function _renderMarkdownLines(lines, colors) {
             continue;
         }
 
+        // Horizontal rules
+        if (line.trim().match(/^[-*_]{3,}$/)) {
+            if (inList) { html.push('</ul>'); inList = false; }
+            var hrColor = (colors && colors.textSecondary) || "#888888";
+            html.push('<hr style="border: none; border-top: 1px solid ' + hrColor + '; margin: 8px 0; opacity: 0.4;"/>');
+            continue;
+        }
+
+        // Blockquotes
+        var bqMatch = line.match(/^>\s?(.*)/);
+        if (bqMatch) {
+            if (inList) { html.push('</ul>'); inList = false; }
+            var bqColor = (colors && colors.primary) || "#7aa2f7";
+            var bqTextColor = (colors && colors.textSecondary) || "#aaaaaa";
+            html.push('<p style="border-left: 3px solid ' + bqColor +
+                '; padding-left: 10px; margin: 4px 0; color: ' + bqTextColor + '; font-style: italic;">' +
+                _inlineFormat(bqMatch[1], colors) + '</p>');
+            continue;
+        }
+
         // Headings
         var headingMatch = line.match(/^(#{1,3})\s+(.+)/);
         if (headingMatch) {
@@ -214,6 +234,38 @@ function _renderMarkdownLines(lines, colors) {
             if (!inList) { html.push('<ul style="margin: 2px 0 2px 16px;">'); inList = true; }
             html.push('<li style="color: ' + textColor + ';">' +
                 numMatch[1] + '. ' + _inlineFormat(numMatch[2], colors) + '</li>');
+            continue;
+        }
+
+        // GFM table: detect header row followed by separator row
+        var tableMatch = line.match(/^\|(.+)\|$/);
+        if (tableMatch && i + 1 < lines.length && lines[i + 1].match(/^\|[\s:|-]+\|$/)) {
+            if (inList) { html.push('</ul>'); inList = false; }
+            var codeBg = (colors && colors.codeBg) || "rgba(255,255,255,0.06)";
+            html.push('<table style="border-collapse: collapse; margin: 4px 0; width: 100%;">');
+            // Header row
+            var headers = tableMatch[1].split("|").map(function(c) { return c.trim(); });
+            html.push('<tr>');
+            for (var h = 0; h < headers.length; h++) {
+                html.push('<th style="border: 1px solid ' + (colors && colors.textSecondary || "#888") +
+                    '; padding: 4px 8px; color: ' + textColor + '; font-size: 12px; background: ' + codeBg + ';">' +
+                    _inlineFormat(headers[h], colors) + '</th>');
+            }
+            html.push('</tr>');
+            i++; // Skip separator row
+            // Data rows
+            while (i + 1 < lines.length && lines[i + 1].match(/^\|(.+)\|$/)) {
+                i++;
+                var cells = lines[i].match(/^\|(.+)\|$/)[1].split("|").map(function(c) { return c.trim(); });
+                html.push('<tr>');
+                for (var c = 0; c < cells.length; c++) {
+                    html.push('<td style="border: 1px solid ' + (colors && colors.textSecondary || "#888") +
+                        '; padding: 4px 8px; color: ' + textColor + '; font-size: 12px;">' +
+                        _inlineFormat(cells[c], colors) + '</td>');
+                }
+                html.push('</tr>');
+            }
+            html.push('</table>');
             continue;
         }
 
@@ -256,6 +308,9 @@ function _applyInlineFormatting(escapedText, colors) {
     var codeBg = (colors && colors.codeBg) || "rgba(255,255,255,0.06)";
 
     var result = escapedText;
+
+    // Strikethrough: ~~text~~
+    result = result.replace(/~~(.+?)~~/g, '<s>$1</s>');
 
     // Bold: **text** or __text__
     result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');

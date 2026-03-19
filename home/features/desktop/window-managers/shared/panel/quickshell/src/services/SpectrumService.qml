@@ -67,9 +67,7 @@ QtObject {
     "[output]\n" +
     "method = raw\n" +
     "raw_target = /dev/stdout\n" +
-    "data_format = ascii\n" +
-    "ascii_max_range = 100\n" +
-    "bar_delimiter = 59\n"  // semicolon = 59
+    "bit_format = 16bit\n"
 
   // ── Cava process ───────────────────────────────
   property Process _cavaProc: Process {
@@ -92,9 +90,9 @@ QtObject {
       }
     }
 
-    stdout: SplitParser {
+    stdout: BinaryParser {
       onRead: (data) => {
-        root._parseFrame(data);
+        root._parseBinaryFrame(data);
       }
     }
   }
@@ -106,25 +104,27 @@ QtObject {
   }
 
   // ── Frame parsing ──────────────────────────────
-  function _parseFrame(data) {
-    var str = String(data || "").trim();
-    if (!str) return;
+  function _parseBinaryFrame(data) {
+    var view = new DataView(data);
+    var count = Math.floor(data.byteLength / 2);
+    if (count === 0) return;
 
-    var parts = str.split(";");
     var buf = _bufToggle ? _buf1 : _buf0;
     var allZero = true;
 
-    for (var i = 0; i < barsCount && i < parts.length; i++) {
-      var v = parseInt(parts[i], 10) / 100.0;
-      if (isNaN(v)) v = 0;
+    for (var i = 0; i < barsCount && i < count; i++) {
+      var v = view.getUint16(i * 2, true) / 65535.0;
       buf[i] = Math.max(0, Math.min(1, v));
-      if (buf[i] > 0.01) allZero = false;
+      if (buf[i] > 0.005) allZero = false;
     }
 
     if (allZero) {
       _zeroFrames++;
       if (_zeroFrames >= _zeroThreshold) {
-        isIdle = true;
+        if (!isIdle) {
+          isIdle = true;
+          values = _emptyArray();
+        }
         return;
       }
     } else {

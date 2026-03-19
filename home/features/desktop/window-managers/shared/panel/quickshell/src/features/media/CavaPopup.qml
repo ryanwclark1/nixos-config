@@ -11,12 +11,17 @@ PopupWindow {
   implicitWidth: Math.min(400, availablePopupWidth)
   implicitHeight: compactMode ? 108 : 120
 
-  property string cavaData: ""
+  readonly property var cavaValues: (SpectrumService && SpectrumService.values) ? SpectrumService.values : []
   property string preferredEdge: "top"
   signal closeRequested()
   property bool wantVisible: false
   property bool showContent: wantVisible
   visible: root.wantVisible || cavaFadeAnim.running || cavaScaleAnim.running
+
+  SharedWidgets.Ref {
+    service: SpectrumService
+    active: root.visible
+  }
 
   Rectangle {
     anchors.fill: parent
@@ -60,7 +65,7 @@ PopupWindow {
       radius: Colors.radiusLarge
       gradient: Gradient {
         GradientStop { position: 0.0; color: "transparent" }
-        GradientStop { position: 1.0; color: Colors.withAlpha(Colors.primary, 0.06) }
+        GradientStop { position: 1.0; color: Colors.withAlpha(Colors.primary, 0.08) }
       }
     }
 
@@ -83,27 +88,30 @@ PopupWindow {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignHCenter
 
-        // Glow layer behind main text
-        Text {
+        Row {
           anchors.centerIn: parent
-          text: root.cavaData
-          color: Colors.primaryRing
-          font.pixelSize: root.compactMode ? 30 : 36
-          font.letterSpacing: 2
-          horizontalAlignment: Text.AlignHCenter
-          width: parent.width
-        }
+          spacing: 4
+          height: parent.height * 0.8
+          width: parent.width - Colors.spacingXL
 
-        // Main cava text
-        Text {
-          id: bigCavaText
-          anchors.centerIn: parent
-          text: root.cavaData
-          color: Colors.primary
-          font.pixelSize: root.compactMode ? 28 : 32
-          font.letterSpacing: 2
-          horizontalAlignment: Text.AlignHCenter
-          width: parent.width
+          Repeater {
+            model: root.cavaValues
+            delegate: Rectangle {
+              required property real modelData
+              width: Math.max(2, (parent.width - (parent.spacing * (SpectrumService.barsCount - 1))) / SpectrumService.barsCount)
+              height: Math.max(2, modelData * parent.height)
+              radius: width / 2
+              color: Colors.primary
+              anchors.bottom: parent.bottom
+
+              Behavior on height {
+                NumberAnimation {
+                  duration: 100
+                  easing.type: Easing.OutCubic
+                }
+              }
+            }
+          }
         }
       }
     }

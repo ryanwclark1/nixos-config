@@ -168,12 +168,20 @@ QtObject {
     property var sshSessions: []
     property string sshStatus: "ready"
     property string sshMessage: ""
-    property int sshActiveCount: sshSessions.length
+    property int sshActiveCount: {
+        var total = 0;
+        for (var i = 0; i < sshSessions.length; i++)
+            total += (sshSessions[i].count || 1);
+        return total;
+    }
+    property int sshPollInterval: 5000
 
     function _sshCommand() {
-        return ["sh", "-c", "if ! command -v who >/dev/null 2>&1; then printf '__STATUS__\\tmissing\\twho command not found\\n'; exit 0; fi; " +
-                              "output=$(who | grep 'pts/' | awk '{print $1 \"@\" $5}' | sed 's/[()]//g' 2>/dev/null); " +
-                              "printf '__STATUS__\\tready\\t\\n'; printf '%s\\n' \"$output\""];
+        return ["sh", "-c",
+            "if ! command -v who >/dev/null 2>&1; then printf '__STATUS__\\tmissing\\twho command not found\\n'; exit 0; fi; " +
+            "printf '__STATUS__\\tready\\t\\n'; " +
+            "who 2>/dev/null | grep 'pts/' | awk '{printf \"ssh\\t%s@%s\\n\", $1, $5}' | sed 's/[()]//g'; " +
+            "ps -eo comm=,args= 2>/dev/null | awk '$1==\"scp\"||$1==\"sftp\"||$1==\"rsync\"||$1==\"sshfs\"{for(i=2;i<=NF;i++)if($i~/@/){printf \"%s\\t%s\\n\",$1,$i;break}}'"];
     }
 
     function _parseSshSnapshot(out) {
@@ -189,17 +197,33 @@ QtObject {
             message = String(meta[2] || "");
             lines.shift();
         }
-        var sessions = [];
+        var countMap = {};
+        var order = [];
         for (var i = 0; i < lines.length; i++) {
             var s = String(lines[i] || "").trim();
-            if (s !== "") sessions.push(s);
+            if (s === "") continue;
+            var tab = s.indexOf("\t");
+            var type = tab > 0 ? s.substring(0, tab) : "ssh";
+            var label = tab > 0 ? s.substring(tab + 1) : s;
+            var key = type + "\t" + label;
+            if (countMap[key]) {
+                countMap[key]++;
+            } else {
+                countMap[key] = 1;
+                order.push({ type: type, label: label });
+            }
+        }
+        var sessions = [];
+        for (var j = 0; j < order.length; j++) {
+            var entry = order[j];
+            sessions.push({ type: entry.type, label: entry.label, count: countMap[entry.type + "\t" + entry.label] });
         }
         return { status: status, message: message, sessions: sessions };
     }
 
     property var sshPoll: CommandPoll {
         id: sshPoll
-        interval: 10000
+        interval: root.sshPollInterval
         running: root.subscriberCount > 0
         command: root._sshCommand()
         parse: function(out) { return root._parseSshSnapshot(out); }

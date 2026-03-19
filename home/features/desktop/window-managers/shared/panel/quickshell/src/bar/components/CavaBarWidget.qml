@@ -11,22 +11,19 @@ Item {
     property bool isActive: false
     signal clicked(var triggerItem)
 
-    readonly property string fullCavaData: {
-        var vals = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
-        var blocks = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
-        var s = "";
-        for (var i = 0; i < vals.length; ++i) {
-            var idx = Math.min(7, Math.floor(vals[i] * 8));
-            s += blocks[Math.max(0, idx)];
+    readonly property int barCount: PanelHelpers.widgetIntegerSetting(widgetInstance, "barCount", 8, 4, 32)
+    readonly property var cavaValues: {
+        var raw = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
+        if (raw.length === 0) return new Array(barCount).fill(0);
+        if (raw.length === barCount) return raw;
+
+        // Simple downsampling: pick indices evenly
+        var result = [];
+        for (var i = 0; i < barCount; i++) {
+            var idx = Math.floor(i * raw.length / barCount);
+            result.push(raw[idx]);
         }
-        return s;
-    }
-    readonly property string cavaBarText: {
-        var full = root.fullCavaData || "";
-        var barCount = PanelHelpers.widgetIntegerSetting(widgetInstance, "barCount", 8, 4, 20);
-        var fallback = "▁▂▃▄▅▆▇█";
-        var source = full.length > 0 ? full : fallback;
-        return source.length >= barCount ? source.substring(0, barCount) : source;
+        return result;
     }
 
     visible: !vertical && MediaService.currentPlayer !== null && MediaService.isPlaying
@@ -49,10 +46,29 @@ Item {
         clip: true
         onClicked: root.clicked(this)
 
-        Text {
-            text: root.cavaBarText
-            color: Colors.primary
-            font.pixelSize: Colors.fontSizeMedium
+        Row {
+            anchors.centerIn: parent
+            spacing: 2
+            height: 14
+
+            Repeater {
+                model: root.cavaValues
+                delegate: Rectangle {
+                    required property real modelData
+                    width: 2
+                    height: Math.max(2, modelData * parent.height)
+                    radius: 1
+                    color: Colors.primary
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    Behavior on height {
+                        NumberAnimation {
+                            duration: 80
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                }
+            }
         }
     }
 }

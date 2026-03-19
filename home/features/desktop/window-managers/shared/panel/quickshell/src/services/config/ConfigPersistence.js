@@ -159,6 +159,15 @@ var _MAPS = {
         ["hiddenOutputs", "audioHiddenOutputs"],
         ["hiddenInputs", "audioHiddenInputs"]
     ],
+    recording: [
+        ["captureSource", "recordingCaptureSource"],
+        ["fps", "recordingFps"],
+        ["quality", "recordingQuality"],
+        ["recordCursor", "recordingRecordCursor"],
+        ["outputDir", "recordingOutputDir"],
+        ["includeDesktopAudio", "recordingIncludeDesktopAudio"],
+        ["includeMicrophoneAudio", "recordingIncludeMicrophoneAudio"]
+    ],
     nightLight: [
         ["enabled", "nightLightEnabled"],
         ["temperature", "nightLightTemperature"],
@@ -205,7 +214,9 @@ var _MAPS = {
         ["openaiKey", "aiOpenaiKey"],
         ["geminiKey", "aiGeminiKey"],
         ["maxConversations", "aiMaxConversations"],
-        ["maxMessages", "aiMaxMessages"]
+        ["maxMessages", "aiMaxMessages"],
+        ["providerProfiles", "aiProviderProfiles"],
+        ["timeout", "aiTimeout"]
     ],
     state: [
         ["activeSurfaceId", "activeSurfaceId"]
@@ -233,6 +244,13 @@ var _MAPS = {
         ["reverseScroll", "workspaceReverseScroll"],
         ["activeColor", "workspaceActiveColor"],
         ["urgentColor", "workspaceUrgentColor"]
+    ],
+    osk: [
+        ["layout", "oskLayout"],
+        ["pinnedOnStartup", "oskPinnedOnStartup"]
+    ],
+    notepad: [
+        ["projectSync", "notepadProjectSync"]
     ],
     displayProfiles: [
         ["profiles", "displayProfiles"],
@@ -288,7 +306,10 @@ var _MAPS = {
         ["scoreTitleWeight", "launcherScoreTitleWeight"],
         ["scoreExecWeight", "launcherScoreExecWeight"],
         ["scoreBodyWeight", "launcherScoreBodyWeight"],
-        ["scoreCategoryWeight", "launcherScoreCategoryWeight"]
+        ["scoreCategoryWeight", "launcherScoreCategoryWeight"],
+        ["webCustomEngines", "launcherWebCustomEngines"],
+        ["webBangsEnabled", "launcherWebBangsEnabled"],
+        ["webBangsLastSync", "launcherWebBangsLastSync"]
     ]
 };
 

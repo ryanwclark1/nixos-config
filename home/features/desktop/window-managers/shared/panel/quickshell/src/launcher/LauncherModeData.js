@@ -89,14 +89,15 @@ function stripModePrefix(text) {
     return text;
 }
 
-function configuredWebProviders(orderArray) {
+function configuredWebProviders(orderArray, customEngines) {
+    var catalog = customEngines ? mergedProviderCatalog(customEngines) : webProviderCatalog;
     var fallback = ["duckduckgo", "google", "youtube", "nixos", "github"];
     var order = Array.isArray(orderArray) && orderArray.length > 0 ? orderArray : fallback;
     var out = [];
     var seen = {};
     for (var i = 0; i < order.length; ++i) {
         var key = String(order[i] || "");
-        var provider = webProviderCatalog[key];
+        var provider = catalog[key];
         if (!provider || seen[key])
             continue;
         out.push(provider);
@@ -104,7 +105,7 @@ function configuredWebProviders(orderArray) {
     }
     if (out.length === 0) {
         for (var j = 0; j < fallback.length; ++j) {
-            var fallbackProvider = webProviderCatalog[fallback[j]];
+            var fallbackProvider = catalog[fallback[j]];
             if (fallbackProvider)
                 out.push(fallbackProvider);
         }
@@ -112,11 +113,12 @@ function configuredWebProviders(orderArray) {
     return out;
 }
 
-function webAliasToProviderKey(token, providers, aliases) {
+function webAliasToProviderKey(token, providers, aliases, customEngines) {
     var key = String(token || "").toLowerCase();
     if (key === "")
         return "";
-    if (webProviderCatalog[key])
+    var catalog = customEngines ? mergedProviderCatalog(customEngines) : webProviderCatalog;
+    if (catalog[key])
         return key;
     for (var i = 0; i < providers.length; ++i) {
         var providerKey = String(providers[i].key || "");
@@ -133,7 +135,7 @@ function webAliasToProviderKey(token, providers, aliases) {
     return "";
 }
 
-function parseWebQuery(text, providers, aliases) {
+function parseWebQuery(text, providers, aliases, customEngines) {
     var clean = stripModePrefix(text || "").trim();
     var result = { query: clean, providerKey: "" };
     if (clean === "")
@@ -141,7 +143,7 @@ function parseWebQuery(text, providers, aliases) {
     var parts = clean.split(/\s+/);
     if (!parts || parts.length === 0)
         return result;
-    var mapped = webAliasToProviderKey(parts[0], providers, aliases);
+    var mapped = webAliasToProviderKey(parts[0], providers, aliases, customEngines);
     if (mapped === "")
         return result;
     result.providerKey = mapped;
@@ -179,5 +181,162 @@ var webProviderCatalog = {
         exec: "https://github.com/search?q=",
         home: "https://github.com/",
         icon: "󰊤", isWeb: true
+    },
+    "brave": {
+        key: "brave", name: "Brave Search",
+        exec: "https://search.brave.com/search?q=",
+        home: "https://search.brave.com/",
+        icon: "󰊯", isWeb: true
+    },
+    "bing": {
+        key: "bing", name: "Bing",
+        exec: "https://www.bing.com/search?q=",
+        home: "https://www.bing.com/",
+        icon: "󰊯", isWeb: true
+    },
+    "kagi": {
+        key: "kagi", name: "Kagi",
+        exec: "https://kagi.com/search?q=",
+        home: "https://kagi.com/",
+        icon: "󰊯", isWeb: true
+    },
+    "stackoverflow": {
+        key: "stackoverflow", name: "Stack Overflow",
+        exec: "https://stackoverflow.com/search?q=",
+        home: "https://stackoverflow.com/",
+        icon: "", isWeb: true
+    },
+    "npm": {
+        key: "npm", name: "npm",
+        exec: "https://www.npmjs.com/search?q=",
+        home: "https://www.npmjs.com/",
+        icon: "󰎙", isWeb: true
+    },
+    "pypi": {
+        key: "pypi", name: "PyPI",
+        exec: "https://pypi.org/search/?q=",
+        home: "https://pypi.org/",
+        icon: "󰌠", isWeb: true
+    },
+    "crates": {
+        key: "crates", name: "crates.io",
+        exec: "https://crates.io/search?q=",
+        home: "https://crates.io/",
+        icon: "🦀", isWeb: true
+    },
+    "mdn": {
+        key: "mdn", name: "MDN Web Docs",
+        exec: "https://developer.mozilla.org/en-US/search?q=",
+        home: "https://developer.mozilla.org/",
+        icon: "󰖟", isWeb: true
+    },
+    "archwiki": {
+        key: "archwiki", name: "Arch Wiki",
+        exec: "https://wiki.archlinux.org/index.php?search=",
+        home: "https://wiki.archlinux.org/",
+        icon: "󰣇", isWeb: true
+    },
+    "aur": {
+        key: "aur", name: "AUR",
+        exec: "https://aur.archlinux.org/packages?K=",
+        home: "https://aur.archlinux.org/",
+        icon: "󰣇", isWeb: true
+    },
+    "nixopts": {
+        key: "nixopts", name: "NixOS Options",
+        exec: "https://search.nixos.org/options?channel=unstable&query=",
+        home: "https://search.nixos.org/options",
+        icon: "", isWeb: true
+    },
+    "reddit": {
+        key: "reddit", name: "Reddit",
+        exec: "https://www.reddit.com/search?q=",
+        home: "https://www.reddit.com/",
+        icon: "󰑍", isWeb: true
+    },
+    "twitter": {
+        key: "twitter", name: "Twitter/X",
+        exec: "https://twitter.com/search?q=",
+        home: "https://twitter.com/",
+        icon: "󰕄", isWeb: true
+    },
+    "linkedin": {
+        key: "linkedin", name: "LinkedIn",
+        exec: "https://www.linkedin.com/search/results/all/?keywords=",
+        home: "https://www.linkedin.com/",
+        icon: "󰌻", isWeb: true
+    },
+    "wikipedia": {
+        key: "wikipedia", name: "Wikipedia",
+        exec: "https://en.wikipedia.org/wiki/Special:Search?search=",
+        home: "https://en.wikipedia.org/",
+        icon: "󰖬", isWeb: true
+    },
+    "translate": {
+        key: "translate", name: "Google Translate",
+        exec: "https://translate.google.com/?text=",
+        home: "https://translate.google.com/",
+        icon: "󰗊", isWeb: true
+    },
+    "imdb": {
+        key: "imdb", name: "IMDb",
+        exec: "https://www.imdb.com/find?q=",
+        home: "https://www.imdb.com/",
+        icon: "󰎁", isWeb: true
+    },
+    "amazon": {
+        key: "amazon", name: "Amazon",
+        exec: "https://www.amazon.com/s?k=",
+        home: "https://www.amazon.com/",
+        icon: "󰅐", isWeb: true
+    },
+    "ebay": {
+        key: "ebay", name: "eBay",
+        exec: "https://www.ebay.com/sch/i.html?_nkw=",
+        home: "https://www.ebay.com/",
+        icon: "󰮫", isWeb: true
+    },
+    "maps": {
+        key: "maps", name: "Google Maps",
+        exec: "https://www.google.com/maps/search/",
+        home: "https://www.google.com/maps",
+        icon: "󰍎", isWeb: true
+    },
+    "images": {
+        key: "images", name: "Google Images",
+        exec: "https://www.google.com/search?tbm=isch&q=",
+        home: "https://www.google.com/imghp",
+        icon: "󰋩", isWeb: true
     }
 };
+
+// Returns an array of all built-in catalog keys.
+function webProviderKeys() {
+    return Object.keys(webProviderCatalog);
+}
+
+// Merge custom user-defined engines into the built-in catalog.
+// Custom engines with the same key as a built-in engine override it.
+function mergedProviderCatalog(customEngines) {
+    var merged = {};
+    var key;
+    for (key in webProviderCatalog)
+        merged[key] = webProviderCatalog[key];
+    if (!Array.isArray(customEngines))
+        return merged;
+    for (var i = 0; i < customEngines.length; ++i) {
+        var engine = customEngines[i];
+        if (!engine || !engine.key || !engine.name || !engine.exec)
+            continue;
+        merged[engine.key] = {
+            key: engine.key,
+            name: engine.name,
+            exec: engine.exec,
+            home: engine.home || "",
+            icon: engine.icon || "󰖟",
+            isWeb: true,
+            isCustom: true
+        };
+    }
+    return merged;
+}

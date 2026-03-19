@@ -7,6 +7,7 @@ import Quickshell.Io
 import "../../services"
 import "services/AiProviders.js" as Providers
 import "services/AiMarkdown.js" as Markdown
+import "services/AiProviderProfiles.js" as Profiles
 import "../../shared"
 import "../../widgets" as SharedWidgets
 import "../../features/settings/components"
@@ -51,6 +52,7 @@ PanelWindow {
     property var attachedFiles: []
     property string _pendingMsgText: ""
     property int _fileReadIndex: 0
+    property bool _privacyDismissed: false
 
     signal closeRequested
 
@@ -691,12 +693,61 @@ PanelWindow {
                 }
             }
 
+            // ---- Privacy warning for remote providers ----
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: privacyRow.implicitHeight + Colors.spacingS * 2
+                radius: Colors.radiusXS
+                color: Colors.withAlpha(Colors.warning, 0.08)
+                border.color: Colors.withAlpha(Colors.warning, 0.25)
+                border.width: 1
+                visible: !root._privacyDismissed && !Profiles.isLocalProvider(Config.aiProvider, Profiles.loadProfile(Config.aiProviderProfiles, Config.aiProvider).endpoint || Config.aiCustomEndpoint)
+
+                RowLayout {
+                    id: privacyRow
+                    anchors.fill: parent
+                    anchors.margins: Colors.spacingS
+                    spacing: Colors.spacingS
+
+                    Text {
+                        text: "󰀦"
+                        color: Colors.warning
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeMedium
+                    }
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Remote provider — avoid sharing sensitive data"
+                        color: Colors.withAlpha(Colors.warning, 0.85)
+                        font.pixelSize: Colors.fontSizeXS
+                        wrapMode: Text.WordWrap
+                    }
+                    Text {
+                        text: "󰅖"
+                        color: Colors.textDisabled
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeSmall
+                        MouseArea {
+                            anchors.fill: parent
+                            anchors.margins: -4
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root._privacyDismissed = true
+                        }
+                    }
+                }
+            }
+
             // ---- Message list ----
             AiMessageList {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 renderBlocksFn: root._renderBlocks
                 renderMarkdownFn: root._renderMarkdown
+                onQuickStartSelected: text => {
+                    inputField.text = text;
+                    inputField.forceActiveFocus();
+                    inputField.cursorPosition = inputField.text.length;
+                }
             }
 
             // ---- Input area ----

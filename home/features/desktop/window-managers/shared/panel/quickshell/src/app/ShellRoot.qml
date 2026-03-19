@@ -351,6 +351,8 @@ Scope {
         }
     }
 
+    DisplayAutoProfile {}
+
     LazyLoader {
         active: root.displayConfigVisible
         DisplayConfig {

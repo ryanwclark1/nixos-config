@@ -133,8 +133,8 @@ Scope {
             AppIcon {
               Layout.alignment: Qt.AlignHCenter
               iconSize: 64
-              iconName: root.isSpecial ? "view-pin-symbolic" : "desktop-symbolic"
-              fallbackIcon: root.isSpecial ? "S" : "W"
+              iconName: root.isSpecial ? "view-pin-symbolic" : "view-grid-symbolic"
+              fallbackIcon: root.isSpecial ? "󰐃" : "󰖲"
             }
 
             Text {

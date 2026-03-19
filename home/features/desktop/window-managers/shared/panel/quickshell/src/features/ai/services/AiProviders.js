@@ -19,11 +19,11 @@ function defaultModels(provider) {
         case "ollama":
             return []; // dynamic — populated by refreshModels()
         case "anthropic":
-            return ["claude-3-7-sonnet-20250219", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"];
+            return ["claude-sonnet-4-20250514", "claude-3-7-sonnet-20250219", "claude-3-5-haiku-20241022"];
         case "openai":
-            return ["gpt-4o", "gpt-4o-mini", "o1", "o3-mini"];
+            return ["gpt-4.1", "gpt-4o", "gpt-4.1-mini", "o3-mini"];
         case "gemini":
-            return ["gemini-2.0-flash", "gemini-2.0-pro-exp-02-05", "gemini-1.5-pro"];
+            return ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"];
         case "custom":
             return []; // user enters manually
         default:
@@ -82,12 +82,12 @@ function envKeyName(provider) {
 
 function supportsVision(provider, model) {
     if (provider === "anthropic") {
-        // Most Claude 3 models support vision
-        return model.indexOf("claude-3") !== -1;
+        // Claude 3+, Claude 4 (sonnet-4, opus-4) support vision
+        return model.indexOf("claude-3") !== -1 || model.indexOf("claude-sonnet-4") !== -1 || model.indexOf("claude-opus-4") !== -1;
     }
     if (provider === "openai") {
-        // GPT-4o and O1 support vision
-        return model.indexOf("gpt-4o") !== -1 || model.indexOf("o1") !== -1;
+        // GPT-4o, GPT-4.1, O1, O3 support vision
+        return model.indexOf("gpt-4o") !== -1 || model.indexOf("gpt-4.1") !== -1 || model.indexOf("o1") !== -1 || model.indexOf("o3") !== -1;
     }
     if (provider === "gemini") {
         // All recent Gemini models support vision

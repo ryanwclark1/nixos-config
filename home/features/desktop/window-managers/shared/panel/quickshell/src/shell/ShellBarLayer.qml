@@ -159,7 +159,6 @@ Item {
                                 Component.onCompleted: barWindow.wirePopup(this, "dateTimeMenu")
                             }
                             CavaPopup {
-                                cavaData: panel.fullCavaData || ""
                                 Component.onCompleted: barWindow.wirePopup(this, "cavaPopup")
                             }
                         }

@@ -7,7 +7,6 @@ ColumnLayout {
   id: root
 
   required property real currentValue
-  required property real maxValue
   required property color osdColor
   required property string osdIcon
   required property string osdLabel
@@ -22,7 +21,7 @@ ColumnLayout {
     width: 78
     height: 78
     thickness: 6
-    value: Math.min(root.currentValue / root.maxValue, 1.0)
+    value: Math.min(root.currentValue, 1.0)
     color: root.osdColor
     icon: root.osdIcon
   }

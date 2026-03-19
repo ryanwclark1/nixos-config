@@ -23,19 +23,19 @@ require_literal() {
 
 # Config: schema and persistence.
 require_literal "$config_qml" 'property var launcherWebAliases: ({' "launcherWebAliases property"
-require_literal "$config_persistence_js" '"webAliases": config.launcherWebAliases,' "web alias persistence"
+require_literal "$config_persistence_js" '["webAliases", "launcherWebAliases"]' "web alias persistence"
 
 # Launcher mode data owns alias resolution/parsing.
-require_literal "$mode_data_js" 'function webAliasToProviderKey(token, providers, aliases) {' "web alias normalization helper"
-require_literal "$mode_data_js" 'if (webProviderCatalog[key])' "provider key direct mapping"
-require_literal "$mode_data_js" 'function parseWebQuery(text, providers, aliases) {' "alias parsing in web query"
-require_literal "$mode_data_js" 'var mapped = webAliasToProviderKey(parts[0], providers, aliases);' "alias parsing mapped provider"
+require_literal "$mode_data_js" 'function webAliasToProviderKey(token, providers, aliases, customEngines) {' "web alias normalization helper"
+require_literal "$mode_data_js" 'if (catalog[key])' "provider key direct mapping"
+require_literal "$mode_data_js" 'function parseWebQuery(text, providers, aliases, customEngines) {' "alias parsing in web query"
+require_literal "$mode_data_js" 'var mapped = webAliasToProviderKey(parts[0], providers, aliases, customEngines);' "alias parsing mapped provider"
 
 # Launcher: alias-to-provider resolution and hint wiring.
-require_literal "$launcher_qml" 'readonly property string webAliasHint: {' "web alias hint property"
+require_literal "$launcher_qml" 'readonly property string webAliasHint: TextHelpers.webAliasHint(' "web alias hint property"
 require_literal "$launcher_qml" 'var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({})' "web alias hint source map"
 require_literal "$launcher_qml" 'function webAliasToProviderKey(token) {' "alias resolver function"
-require_literal "$launcher_qml" 'var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({})' "alias resolver source map"
+require_literal "$launcher_qml" 'function parseWebQuery(text) {' "parseWebQuery function"
 require_literal "$launcher_qml" 'aliasHint: launcherRoot.webAliasHint' "web alias hint shown in UI"
 
 # Settings: editable alias tokens and reset/default behavior.

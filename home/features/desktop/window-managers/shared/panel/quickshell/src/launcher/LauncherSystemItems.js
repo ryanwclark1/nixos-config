@@ -306,16 +306,21 @@ function buildDevOpsItems(actions) {
 
     // --- SSH sessions ---
     var ssh = actions.sshSessions || [];
+    var sshTypeIcons = { scp: "󰆏", sftp: "󰉋", rsync: "󰓦", sshfs: "󰋊" };
     for (var j = 0; j < ssh.length; j++) {
+        var session = ssh[j];
+        var sType = session.type || "ssh";
+        var sLabel = session.label || "";
+        var sCount = session.count || 1;
         items.push({
-            category: "SSH",
-            name:     ssh[j],
-            icon:     "󰣀",
+            category: sType === "ssh" ? "SSH" : sType.toUpperCase(),
+            name:     sLabel + (sCount > 1 ? " ×" + sCount : ""),
+            icon:     sshTypeIcons[sType] || "󰣀",
             action:   (function(a) {
                 return function() {
                     a.close();
                 };
-            })(actions) // Just info for now
+            })(actions)
         });
     }
 

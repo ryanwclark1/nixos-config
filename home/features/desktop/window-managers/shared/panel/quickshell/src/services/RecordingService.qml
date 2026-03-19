@@ -49,12 +49,46 @@ QtObject {
     return (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
   }
 
+  function qualityLabel(value) {
+    if (value === "very_high")
+      return "Very High";
+    if (value === "high")
+      return "High";
+    if (value === "medium")
+      return "Medium";
+    return String(value || "Auto");
+  }
+
   // ── Actions ──────────────────────────────────
   function startRecording(mode) {
-    Quickshell.execDetached(["screenrecord", mode]);
+    var captureSource = String(mode || Config.recordingCaptureSource || "portal");
+    if (captureSource === "fullscreen")
+      captureSource = "screen";
+
+    var command = [
+      "os-cmd-screenrecord",
+      "--capture-source=" + captureSource,
+      "--fps=" + String(Config.recordingFps || 60),
+      "--quality=" + String(Config.recordingQuality || "very_high"),
+      "--record-cursor=" + (Config.recordingRecordCursor ? "true" : "false")
+    ];
+
+    if (Config.recordingIncludeDesktopAudio)
+      command.push("--with-desktop-audio");
+    if (Config.recordingIncludeMicrophoneAudio)
+      command.push("--with-microphone-audio");
+    if (String(Config.recordingOutputDir || "").trim() !== "")
+      command.push("--output-dir=" + String(Config.recordingOutputDir).trim());
+
+    Quickshell.execDetached(command);
+  }
+
+  function startLegacyRegionRecording() {
+    Quickshell.execDetached(["screenrecord", "region"]);
   }
 
   function stopRecording() {
+    Quickshell.execDetached(["os-cmd-screenrecord", "--stop-recording"]);
     Quickshell.execDetached(["screenrecord-stop"]);
     elapsedText = "00:00";
     recordingStartTime = 0;

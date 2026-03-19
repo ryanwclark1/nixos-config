@@ -6,6 +6,8 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 "${script_dir}/check-launcher-keymap.sh"
 "${script_dir}/check-launcher-tab-matrix.sh"
 "${script_dir}/check-launcher-web-aliases.sh"
+"${script_dir}/check-launcher-web-providers.sh"
+node "${script_dir}/check-launcher-web-units.js"
 "${script_dir}/check-launcher-category-filters.sh"
 "${script_dir}/check-launcher-performance.sh"
 

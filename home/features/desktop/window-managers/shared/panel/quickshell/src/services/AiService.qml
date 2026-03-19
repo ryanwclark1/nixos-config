@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../features/ai/services/AiProviders.js" as Providers
+import "../features/ai/services/AiProviderProfiles.js" as Profiles
 
 QtObject {
     id: root
@@ -46,6 +47,45 @@ QtObject {
     property int lastPromptTokens: 0
     property int lastCompletionTokens: 0
     readonly property int lastTotalTokens: lastPromptTokens + lastCompletionTokens
+
+    // ── Streaming elapsed time ──────────────────
+    property real _streamStartTime: 0
+    property int streamElapsedSec: 0
+
+    property Timer _streamElapsedTimer: Timer {
+        interval: 1000
+        repeat: true
+        running: root.isStreaming
+        onTriggered: {
+            if (root._streamStartTime > 0)
+                root.streamElapsedSec = Math.floor((Date.now() - root._streamStartTime) / 1000);
+        }
+    }
+
+    // ── Session-only API keys (not persisted) ───
+    property string _sessionAnthropicKey: ""
+    property string _sessionOpenaiKey: ""
+    property string _sessionGeminiKey: ""
+    property string _sessionCustomKey: ""
+
+    function setSessionKey(provider, key) {
+        switch (provider) {
+            case "anthropic": _sessionAnthropicKey = key; break;
+            case "openai":    _sessionOpenaiKey = key; break;
+            case "gemini":    _sessionGeminiKey = key; break;
+            case "custom":    _sessionCustomKey = key; break;
+        }
+    }
+
+    function sessionKey(provider) {
+        switch (provider) {
+            case "anthropic": return _sessionAnthropicKey;
+            case "openai":    return _sessionOpenaiKey;
+            case "gemini":    return _sessionGeminiKey;
+            case "custom":    return _sessionCustomKey;
+            default:          return "";
+        }
+    }
 
     property var _statusConn: Connections {
         target: SystemStatus
@@ -587,6 +627,7 @@ QtObject {
                     root.lastError = "Process exited with code " + exitCode;
                 }
                 root.isStreaming = false;
+                root._streamStartTime = 0;
                 root._scheduleSave();
             }
         }
@@ -789,6 +830,8 @@ QtObject {
         streamingContent = "";
         lastPromptTokens = 0;
         lastCompletionTokens = 0;
+        _streamStartTime = Date.now();
+        streamElapsedSec = 0;
 
         // API key guard for cloud providers
         var provider = Config.aiProvider;
@@ -832,7 +875,8 @@ QtObject {
         // Write messages to temp file, then start streaming
         var tmpFile = "/tmp/qs-ai-" + activeConversationId + "-" + Date.now() + ".json";
         var apiKey = _resolveApiKey(provider);
-        var endpoint = provider === "custom" ? Config.aiCustomEndpoint : Providers.defaultEndpoint(provider);
+        var profile = Profiles.loadProfile(Config.aiProviderProfiles, provider);
+        var endpoint = profile.endpoint || (provider === "custom" ? Config.aiCustomEndpoint : Providers.defaultEndpoint(provider));
         var model = activeModel;
 
         // Stage pending stream command — launched when temp file write completes
@@ -842,7 +886,10 @@ QtObject {
         // Add visual context (image path) if supported and provided
         if (visualContext && Providers.supportsVision(provider, model)) {
             cmd.push(visualContext);
+        } else {
+            cmd.push(""); // placeholder for image path
         }
+        cmd.push(Config.aiTimeout.toString());
 
         _pendingStreamCommand = cmd;
         isStreaming = true;
@@ -860,6 +907,7 @@ QtObject {
         }
         isStreaming = false;
         streamingContent = "";
+        _streamStartTime = 0;
         _scheduleSave();
     }
 
@@ -890,6 +938,30 @@ QtObject {
 
         // Re-send
         sendMessage(lastUserMsg);
+    }
+
+    function regenerateFromMessage(msgIndex) {
+        if (isStreaming) return;
+        var conv = activeConversation;
+        if (!conv || conv.messages.length === 0) return;
+        if (msgIndex < 0 || msgIndex >= conv.messages.length) return;
+
+        // Walk back from msgIndex to find the preceding user message
+        var userMsgIdx = -1;
+        for (var i = msgIndex; i >= 0; i--) {
+            if (conv.messages[i].role === "user") {
+                userMsgIdx = i;
+                break;
+            }
+        }
+        if (userMsgIdx === -1) return;
+
+        var userText = conv.messages[userMsgIdx].content;
+        // Truncate to just before the user message
+        var truncated = conv.messages.slice(0, userMsgIdx);
+        _updateConv(activeConversationId, function(c) { c.messages = truncated; });
+
+        sendMessage(userText);
     }
 
     // ── Model Refresh ───────────────────────────
@@ -925,13 +997,14 @@ QtObject {
 
     // ── API Key Resolution ──────────────────────
     function _resolveApiKey(provider) {
-        // Try environment variable first
+        // Priority: env var → session key → config key
         var envKey = Providers.envKeyName(provider);
         if (envKey) {
             var envVal = Quickshell.env(envKey);
             if (envVal) return envVal;
         }
-        // Fallback to config
+        var sessKey = sessionKey(provider);
+        if (sessKey) return sessKey;
         switch (provider) {
             case "anthropic": return Config.aiAnthropicKey;
             case "openai":    return Config.aiOpenaiKey;
@@ -1039,7 +1112,38 @@ QtObject {
     }
 
     // ── Provider change handler ─────────────────
-    onActiveProviderChanged: refreshModels()
+    property string _previousProvider: ""
+
+    onActiveProviderChanged: {
+        // On first binding (_previousProvider is ""), just record the provider — don't
+        // overwrite user settings with defaults when no profiles have been saved yet.
+        if (!_previousProvider) {
+            _previousProvider = activeProvider;
+            refreshModels();
+            return;
+        }
+        if (_previousProvider === activeProvider) {
+            refreshModels();
+            return;
+        }
+        // Save outgoing provider's settings to its profile
+        Config.aiProviderProfiles = Profiles.saveProfile(
+            Config.aiProviderProfiles, _previousProvider, {
+                model: Config.aiModel,
+                temperature: Config.aiTemperature,
+                maxTokens: Config.aiMaxTokens,
+                endpoint: Config.aiCustomEndpoint
+            });
+        // Load incoming provider's profile
+        var profile = Profiles.loadProfile(Config.aiProviderProfiles, activeProvider);
+        Config.aiModel = profile.model;
+        Config.aiTemperature = profile.temperature;
+        Config.aiMaxTokens = profile.maxTokens;
+        if (profile.endpoint)
+            Config.aiCustomEndpoint = profile.endpoint;
+        _previousProvider = activeProvider;
+        refreshModels();
+    }
 
     // ── IPC ─────────────────────────────────────
     function _ensureIpcHandler() {
@@ -1050,7 +1154,7 @@ QtObject {
     }
 
     Component.onCompleted: {
-        refreshModels();
+        // _previousProvider and refreshModels() are handled by onActiveProviderChanged
         _ensureIpcHandler();
     }
 

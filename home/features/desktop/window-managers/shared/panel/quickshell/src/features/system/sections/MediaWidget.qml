@@ -28,6 +28,11 @@ Rectangle {
 
   HoverHandler { id: cardHover }
 
+  SharedWidgets.Ref {
+    service: SpectrumService
+    active: root.visible && root.activePlayers.some(p => p.playbackState === Mpris.Playing)
+  }
+
   readonly property var activePlayers: {
     var players = [];
     for (var i = 0; i < Mpris.players.length; i++) {
@@ -72,6 +77,33 @@ Rectangle {
               asynchronous: true
               fillMode: Image.PreserveAspectCrop
               visible: status === Image.Ready
+            }
+
+            // Mini Visualizer Overlay
+            Row {
+              anchors.bottom: parent.bottom
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.bottomMargin: 4
+              spacing: 2
+              height: 12
+              visible: modelData.playbackState === Mpris.Playing && SpectrumService.subscriberCount > 0
+
+              Repeater {
+                model: 4
+                delegate: Rectangle {
+                  required property int index
+                  width: 3
+                  height: Math.max(2, (SpectrumService.values[index * 4] || 0) * parent.height)
+                  radius: 1
+                  color: Colors.primary
+                  anchors.bottom: parent.bottom
+                  opacity: 0.8
+
+                  Behavior on height {
+                    NumberAnimation { duration: 80; easing.type: Easing.OutCubic }
+                  }
+                }
+              }
             }
 
             Text {

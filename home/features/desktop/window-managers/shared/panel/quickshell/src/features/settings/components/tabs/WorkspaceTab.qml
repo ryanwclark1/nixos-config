@@ -91,24 +91,35 @@ Item {
         }
 
         SettingsCard {
+            title: "Notepad"
+            iconName: "󱓧"
+            description: "Notepad integration with workspaces."
+
+            SettingsToggleRow {
+                label: "Auto-Switch Tabs by Workspace"
+                icon: "󰓹"
+                checked: Config.notepadProjectSync
+                onToggled: Config.notepadProjectSync = !Config.notepadProjectSync
+            }
+        }
+
+        SettingsCard {
             title: "Colors"
             iconName: "󰏘"
             description: "Custom colors for workspace pills. Leave empty to use theme defaults."
 
-            SettingsTextInputRow {
+            SettingsColorRow {
                 label: "Active Color"
-                leadingIcon: "󰸌"
-                text: Config.workspaceActiveColor
-                placeholderText: "Theme default"
-                onSubmitted: v => Config.workspaceActiveColor = v.trim()
+                icon: "󰸌"
+                currentValue: Config.workspaceActiveColor
+                onColorSelected: v => Config.workspaceActiveColor = v
             }
 
-            SettingsTextInputRow {
+            SettingsColorRow {
                 label: "Urgent Color"
-                leadingIcon: "󰀦"
-                text: Config.workspaceUrgentColor
-                placeholderText: "Theme default"
-                onSubmitted: v => Config.workspaceUrgentColor = v.trim()
+                icon: "󰀦"
+                currentValue: Config.workspaceUrgentColor
+                onColorSelected: v => Config.workspaceUrgentColor = v
             }
         }
     }

@@ -103,6 +103,52 @@ PanelWindow {
         }
     ]
     property string _sessionWebProviderKey: ""
+    property string _bangQuery: ""
+    property string _bangSearchTerm: ""
+    property var _bangResults: []
+
+    property Process bangSearchProc: Process {
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var raw = this.text || "";
+                if (raw.trim() === "") {
+                    launcherRoot._bangResults = [];
+                    return;
+                }
+                try {
+                    var results = JSON.parse(raw);
+                    if (!Array.isArray(results)) {
+                        launcherRoot._bangResults = [];
+                        return;
+                    }
+                    var items = [];
+                    for (var i = 0; i < results.length; ++i) {
+                        var bang = results[i];
+                        items.push({
+                            name: "!" + bang.t + " — " + bang.s,
+                            title: bang.u || "",
+                            icon: "󰖟",
+                            bangTrigger: bang.t,
+                            bangUrl: bang.u,
+                            isBang: true,
+                            isWeb: true
+                        });
+                    }
+                    launcherRoot._bangResults = items;
+                    if (launcherRoot.mode === "web")
+                        launcherRoot.filterItems();
+                } catch (e) {
+                    launcherRoot._bangResults = [];
+                }
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0)
+                launcherRoot._bangResults = [];
+        }
+    }
+
     property var appFrequency: ({})
     property var launchHistory: []
     property var onCommandOutput: null
@@ -729,7 +775,7 @@ PanelWindow {
         filterItems();
     }
 
-    readonly property var _cachedWebProviders: ModeData.configuredWebProviders(Config.launcherWebProviderOrder)
+    readonly property var _cachedWebProviders: ModeData.configuredWebProviders(Config.launcherWebProviderOrder, Config.launcherWebCustomEngines)
 
     function configuredWebProviders() {
         return _cachedWebProviders;
@@ -745,12 +791,12 @@ PanelWindow {
 
     function webAliasToProviderKey(token) {
         var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
-        return ModeData.webAliasToProviderKey(token, configuredWebProviders(), aliases);
+        return ModeData.webAliasToProviderKey(token, configuredWebProviders(), aliases, Config.launcherWebCustomEngines);
     }
 
     function parseWebQuery(text) {
         var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
-        return ModeData.parseWebQuery(text, configuredWebProviders(), aliases);
+        return ModeData.parseWebQuery(text, configuredWebProviders(), aliases, Config.launcherWebCustomEngines);
     }
 
     function secondaryWebProvider() {
@@ -2250,6 +2296,30 @@ PanelWindow {
         if (mode === "web") {
             webContext = parseWebQuery(searchText);
             actualSearch = webContext.query;
+            // Bang detection: if query starts with !, search bang database
+            if (Config.launcherWebBangsEnabled && actualSearch.length > 0 && actualSearch[0] === "!") {
+                var bangParts = actualSearch.substring(1).split(/\s+/);
+                var bangPrefix = bangParts[0] || "";
+                var bangQuery = bangParts.length > 1 ? actualSearch.substring(1 + bangPrefix.length).trim() : "";
+                _bangSearchTerm = bangQuery;
+                if (bangPrefix !== "" && bangPrefix !== _bangQuery) {
+                    _bangQuery = bangPrefix;
+                    _bangResults = [];
+                    bangSearchProc.running = false;
+                    bangSearchProc.command = ["qs-bang-search", bangPrefix];
+                    bangSearchProc.running = true;
+                }
+                // If we have cached bang results, show them
+                if (_bangResults.length > 0) {
+                    filteredItems = _bangResults;
+                    selectedIndex = 0;
+                    recordFilterMetric(Date.now() - startedAt);
+                    return;
+                }
+            } else if (_bangQuery !== "") {
+                _bangQuery = "";
+                _bangResults = [];
+            }
         } else {
             actualSearch = Search.stripSearchPrefix(mode, searchText);
         }
@@ -2536,6 +2606,14 @@ PanelWindow {
     function executePrimaryWebSearch() {
         if (mode !== "web")
             return;
+        // Check if selected item is a bang result
+        if (selectedIndex >= 0 && selectedIndex < filteredItems.length) {
+            var selectedItem = filteredItems[selectedIndex];
+            if (selectedItem.isBang && selectedItem.bangUrl) {
+                executeBangSearch(selectedItem.bangUrl, _bangSearchTerm);
+                return;
+            }
+        }
         var webCtx = parseWebQuery(searchText);
         var provider = configuredWebProviderByKey(webCtx.providerKey) || primaryWebProvider();
         if (!provider)
@@ -2545,6 +2623,18 @@ PanelWindow {
             return;
         rememberRecent(WebProviders.buildWebRecent(provider, target));
         Quickshell.execDetached(["xdg-open", target]);
+        close();
+    }
+
+    function executeBangSearch(bangUrlTemplate, query) {
+        var url = bangUrlTemplate;
+        if (url.indexOf("{{{s}}}") !== -1)
+            url = url.replace("{{{s}}}", encodeURIComponent(query));
+        else if (url.indexOf("%s") !== -1)
+            url = url.replace(/%s/g, encodeURIComponent(query));
+        else
+            url = url + encodeURIComponent(query);
+        Quickshell.execDetached(["xdg-open", url]);
         close();
     }
 

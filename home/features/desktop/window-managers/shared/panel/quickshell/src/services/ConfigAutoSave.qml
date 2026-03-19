@@ -290,6 +290,27 @@ QtObject {
         function onVolumeProtectionMaxJumpChanged() {
             root.config.scheduleSave();
         }
+        function onRecordingCaptureSourceChanged() {
+            root.config.scheduleSave();
+        }
+        function onRecordingFpsChanged() {
+            root.config.scheduleSave();
+        }
+        function onRecordingQualityChanged() {
+            root.config.scheduleSave();
+        }
+        function onRecordingRecordCursorChanged() {
+            root.config.scheduleSave();
+        }
+        function onRecordingOutputDirChanged() {
+            root.config.scheduleSave();
+        }
+        function onRecordingIncludeDesktopAudioChanged() {
+            root.config.scheduleSave();
+        }
+        function onRecordingIncludeMicrophoneAudioChanged() {
+            root.config.scheduleSave();
+        }
         function onNightLightEnabledChanged() {
             root.config.scheduleSave();
         }
@@ -351,6 +372,48 @@ QtObject {
             root.config.scheduleSave();
         }
         function onPluginHotReloadChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiProviderChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiModelChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiCustomEndpointChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiSystemContextChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiMaxTokensChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiTemperatureChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiSystemPromptChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiAnthropicKeyChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiOpenaiKeyChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiGeminiKeyChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiMaxConversationsChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiMaxMessagesChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiProviderProfilesChanged() {
+            root.config.scheduleSave();
+        }
+        function onAiTimeoutChanged() {
             root.config.scheduleSave();
         }
         function onWallpaperRunPywalChanged() {

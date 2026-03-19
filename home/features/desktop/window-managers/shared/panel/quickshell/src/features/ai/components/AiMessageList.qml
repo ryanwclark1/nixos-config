@@ -14,6 +14,8 @@ Rectangle {
     required property var renderBlocksFn    // function(text) -> blocks array
     required property var renderMarkdownFn  // function(text) -> HTML string (for system messages)
 
+    signal quickStartSelected(string text)
+
     color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
@@ -88,6 +90,60 @@ Rectangle {
                     color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeSmall
                     horizontalAlignment: Text.AlignHCenter
+                }
+
+                // Quick-start prompt chips
+                Flow {
+                    width: parent.width
+                    spacing: Colors.spacingS
+                    leftPadding: Colors.spacingL
+                    rightPadding: Colors.spacingL
+
+                    Repeater {
+                        model: [
+                            { icon: "󰆏", label: "Summarize clipboard", prompt: "Summarize the text in my clipboard concisely." },
+                            { icon: "󰯃", label: "Explain error", prompt: "Explain this error and suggest a fix:" },
+                            { icon: "󰈮", label: "Write a script", prompt: "Write a shell script that " },
+                            { icon: "󰒓", label: "System check", prompt: "Analyze my current system status and suggest improvements." }
+                        ]
+
+                        delegate: Rectangle {
+                            required property var modelData
+                            width: qsChipRow.implicitWidth + Colors.spacingL
+                            height: 30
+                            radius: Colors.radiusPill
+                            color: qsChipMouse.containsMouse ? Colors.primaryGhost : Colors.textFaint
+                            border.color: qsChipMouse.containsMouse ? Colors.primaryRing : Colors.border
+                            border.width: 1
+
+                            Row {
+                                id: qsChipRow
+                                anchors.centerIn: parent
+                                spacing: Colors.spacingXS
+                                Text {
+                                    text: modelData.icon
+                                    color: qsChipMouse.containsMouse ? Colors.primary : Colors.textSecondary
+                                    font.family: Colors.fontMono
+                                    font.pixelSize: Colors.fontSizeSmall
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                Text {
+                                    text: modelData.label
+                                    color: qsChipMouse.containsMouse ? Colors.text : Colors.textSecondary
+                                    font.pixelSize: Colors.fontSizeSmall
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            MouseArea {
+                                id: qsChipMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.quickStartSelected(modelData.prompt)
+                            }
+                        }
+                    }
                 }
             }
 
@@ -230,7 +286,69 @@ Rectangle {
                                     }
                                 }
                             }
+
+                            // Regenerate + copy actions row
+                            Row {
+                                spacing: Colors.spacingXS
+                                opacity: assistantHoverArea.containsMouse ? 1 : 0
+                                Behavior on opacity {
+                                    NumberAnimation { duration: Colors.durationFast }
+                                }
+
+                                Rectangle {
+                                    width: 22; height: 22
+                                    radius: Colors.radiusXXS
+                                    color: regenHover.containsMouse ? Colors.bgWidget : "transparent"
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰑐"
+                                        color: Colors.textSecondary
+                                        font.family: Colors.fontMono
+                                        font.pixelSize: Colors.fontSizeSmall
+                                    }
+                                    MouseArea {
+                                        id: regenHover
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: AiService.regenerateFromMessage(msgDelegate.index)
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: 22; height: 22
+                                    radius: Colors.radiusXXS
+                                    color: assistCopyHover.containsMouse ? Colors.bgWidget : "transparent"
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰆏"
+                                        color: Colors.textSecondary
+                                        font.family: Colors.fontMono
+                                        font.pixelSize: Colors.fontSizeSmall
+                                    }
+                                    MouseArea {
+                                        id: assistCopyHover
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", msgDelegate.modelData.content]);
+                                            ToastService.showNotice("Copied", "Response copied to clipboard");
+                                        }
+                                    }
+                                }
+                            }
                         }
+                    }
+
+                    // Hover area for assistant actions — lives on the delegate Item, not inside the Column
+                    MouseArea {
+                        id: assistantHoverArea
+                        anchors.fill: parent
+                        visible: isAssistant
+                        hoverEnabled: true
+                        acceptedButtons: Qt.NoButton
+                        propagateComposedEvents: true
                     }
                 }
             }
@@ -268,7 +386,7 @@ Rectangle {
                             }
                         }
                         Text {
-                            text: "Thinking..."
+                            text: "Thinking" + (AiService.streamElapsedSec > 0 ? "... " + AiService.streamElapsedSec + "s" : "...")
                             color: Colors.textDisabled
                             font.pixelSize: Colors.fontSizeSmall
                             font.italic: true

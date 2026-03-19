@@ -476,6 +476,20 @@ QtObject {
             }
         },
         {
+            id: "recording",
+            label: "Recording",
+            icon: "󰻃",
+            categoryId: "interaction",
+            order: 55,
+            component: "RecordingTab.qml",
+            searchTerms: ["recording", "screen recorder", "gpu-screen-recorder", "portal", "fps", "cursor"],
+            owner: {
+                surface: "recordingMenu",
+                service: "RecordingService",
+                configDomain: "recording"
+            }
+        },
+        {
             id: "workspaces",
             legacyIndex: 19,
             label: "Workspaces",

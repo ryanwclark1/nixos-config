@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
 import ".."
+import "../../../../features/ai/services/AiProviderProfiles.js" as Profiles
 
 Item {
     id: root
@@ -122,34 +123,111 @@ Item {
             expanded: Config.aiProvider !== "ollama"
 
             SettingsInfoCallout {
-                body: "Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY environment variables for automatic detection. These fields are fallbacks."
+                body: "Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY environment variables for automatic detection. These fields are fallbacks. Toggle \"Remember\" off to keep the key in memory only (cleared on restart)."
             }
 
-            SettingsTextInputRow {
+            ColumnLayout {
                 visible: Config.aiProvider === "anthropic"
-                label: "Anthropic API Key"
-                leadingIcon: "󰌋"
-                placeholderText: "sk-ant-..."
-                text: Config.aiAnthropicKey
-                onTextEdited: value => Config.aiAnthropicKey = value
+                Layout.fillWidth: true
+                spacing: Colors.spacingXS
+                property bool _remember: true
+                SettingsTextInputRow {
+                    label: "Anthropic API Key"
+                    leadingIcon: "󰌋"
+                    placeholderText: "sk-ant-..."
+                    text: Config.aiAnthropicKey || AiService.sessionKey("anthropic")
+                    onTextEdited: value => {
+                        if (parent._remember) Config.aiAnthropicKey = value;
+                        else AiService.setSessionKey("anthropic", value);
+                    }
+                }
+                SettingsToggleRow {
+                    label: "Remember key"
+                    icon: "󰆓"
+                    checked: parent._remember
+                    enabledText: "Key is persisted to disk."
+                    disabledText: "Key is session-only (cleared on restart)."
+                    onToggled: parent._remember = !parent._remember
+                }
             }
 
-            SettingsTextInputRow {
+            ColumnLayout {
                 visible: Config.aiProvider === "openai" || Config.aiProvider === "custom"
-                label: "OpenAI API Key"
-                leadingIcon: "󰌋"
-                placeholderText: "sk-..."
-                text: Config.aiOpenaiKey
-                onTextEdited: value => Config.aiOpenaiKey = value
+                Layout.fillWidth: true
+                spacing: Colors.spacingXS
+                property bool _remember: true
+                SettingsTextInputRow {
+                    label: "OpenAI API Key"
+                    leadingIcon: "󰌋"
+                    placeholderText: "sk-..."
+                    text: Config.aiOpenaiKey || AiService.sessionKey("openai")
+                    onTextEdited: value => {
+                        if (parent._remember) Config.aiOpenaiKey = value;
+                        else AiService.setSessionKey("openai", value);
+                    }
+                }
+                SettingsToggleRow {
+                    label: "Remember key"
+                    icon: "󰆓"
+                    checked: parent._remember
+                    enabledText: "Key is persisted to disk."
+                    disabledText: "Key is session-only (cleared on restart)."
+                    onToggled: parent._remember = !parent._remember
+                }
             }
 
-            SettingsTextInputRow {
+            ColumnLayout {
                 visible: Config.aiProvider === "gemini"
-                label: "Gemini API Key"
-                leadingIcon: "󰌋"
-                placeholderText: "AIza..."
-                text: Config.aiGeminiKey
-                onTextEdited: value => Config.aiGeminiKey = value
+                Layout.fillWidth: true
+                spacing: Colors.spacingXS
+                property bool _remember: true
+                SettingsTextInputRow {
+                    label: "Gemini API Key"
+                    leadingIcon: "󰌋"
+                    placeholderText: "AIza..."
+                    text: Config.aiGeminiKey || AiService.sessionKey("gemini")
+                    onTextEdited: value => {
+                        if (parent._remember) Config.aiGeminiKey = value;
+                        else AiService.setSessionKey("gemini", value);
+                    }
+                }
+                SettingsToggleRow {
+                    label: "Remember key"
+                    icon: "󰆓"
+                    checked: parent._remember
+                    enabledText: "Key is persisted to disk."
+                    disabledText: "Key is session-only (cleared on restart)."
+                    onToggled: parent._remember = !parent._remember
+                }
+            }
+        }
+
+        SettingsCard {
+            title: "Endpoint Override"
+            iconName: "󰌘"
+            description: "Per-provider base URL. Saved independently for each provider."
+            collapsible: true
+            expanded: false
+
+            SettingsTextInputRow {
+                label: "Base URL for " + Config.aiProvider
+                leadingIcon: "󰌘"
+                placeholderText: Profiles.isLocalProvider(Config.aiProvider, "") ? "http://localhost:11434" : "https://api.example.com"
+                text: {
+                    var profile = Profiles.loadProfile(Config.aiProviderProfiles, Config.aiProvider);
+                    return profile.endpoint || "";
+                }
+                onTextEdited: value => {
+                    Config.aiProviderProfiles = Profiles.saveProfile(
+                        Config.aiProviderProfiles, Config.aiProvider, {
+                            model: Config.aiModel,
+                            temperature: Config.aiTemperature,
+                            maxTokens: Config.aiMaxTokens,
+                            endpoint: value
+                        });
+                    if (Config.aiProvider === "custom")
+                        Config.aiCustomEndpoint = value;
+                }
             }
         }
 
@@ -174,6 +252,15 @@ Item {
                 step: 256
                 value: Config.aiMaxTokens
                 onMoved: v => Config.aiMaxTokens = Math.round(v)
+            }
+
+            SettingsSliderRow {
+                label: "Timeout (seconds)"
+                min: 30
+                max: 600
+                step: 30
+                value: Config.aiTimeout
+                onMoved: v => Config.aiTimeout = Math.round(v)
             }
         }
 

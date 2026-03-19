@@ -24,6 +24,7 @@ PluginsTab 1.0 PluginsTab.qml
 PowerTab 1.0 PowerTab.qml
 PresetsTab 1.0 PresetsTab.qml
 PrivacyTab 1.0 PrivacyTab.qml
+RecordingTab 1.0 RecordingTab.qml
 ShellCoreSectionTab 1.0 ShellCoreSectionTab.qml
 ShellSystemSection 1.0 ShellSystemSection.qml
 ShellLauncherSection 1.0 ShellLauncherSection.qml

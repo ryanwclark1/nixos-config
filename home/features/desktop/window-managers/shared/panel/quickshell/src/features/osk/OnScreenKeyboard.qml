@@ -31,7 +31,7 @@ PanelWindow {
     WlrLayershell.namespace:     "quickshell:osk"
 
     // Pinned = reserve vertical space so windows don't overlap the keyboard
-    property bool pinned: false
+    property bool pinned: Config.oskPinnedOnStartup
     exclusiveZone: pinned && isVisible ? oskBg.height + 2 : 0
 
     implicitWidth:  oskBg.width

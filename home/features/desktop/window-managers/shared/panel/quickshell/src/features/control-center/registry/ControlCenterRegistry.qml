@@ -129,7 +129,7 @@ QtObject {
             if (Services.RecordingService.isRecording)
                 Services.RecordingService.stopRecording();
             else
-                Services.RecordingService.startRecording("fullscreen");
+                Services.RecordingService.startRecording();
             return;
         case "gameMode":
             Services.GameModeService.toggle();

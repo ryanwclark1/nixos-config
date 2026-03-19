@@ -364,7 +364,6 @@ Scope {
             sourceComponent: Component {
               OsdCircularGauge {
                 currentValue: root.currentValue
-                maxValue: root.maxValue
                 osdColor: root.osdColor
                 osdIcon: root.osdIcon
                 osdLabel: root.osdLabel

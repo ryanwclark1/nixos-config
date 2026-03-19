@@ -40,6 +40,16 @@ let
     ${builtins.readFile ./scripts/ai-stream.sh}
   '';
 
+  bangSyncScript = pkgs.writeShellScriptBin "qs-bang-sync" ''
+    PATH="${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/bang-sync.sh}
+  '';
+
+  bangSearchScript = pkgs.writeShellScriptBin "qs-bang-search" ''
+    PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/bang-search.sh}
+  '';
+
   bookmarksScript = pkgs.writeShellScriptBin "qs-bookmarks" ''
     PATH="${pkgs.sqlite}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:$PATH"
     ${builtins.readFile ./scripts/bookmarks.sh}
@@ -48,11 +58,6 @@ let
   updatorScript = pkgs.writeShellScriptBin "qs-updator" ''
     PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.perl}/bin:$PATH"
     ${builtins.readFile ./scripts/updator.sh}
-  '';
-
-  cavaScript = pkgs.writeShellScriptBin "qs-cava" ''
-    PATH="${pkgs.cava}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:$PATH"
-    ${builtins.readFile ./scripts/cava.sh}
   '';
 
   sleepMonitorScript = pkgs.writeShellScriptBin "qs-sleep-monitor" ''
@@ -265,8 +270,9 @@ let
       aiScript
       aiStreamScript
       bookmarksScript
+      bangSyncScript
+      bangSearchScript
       updatorScript
-      cavaScript
       sleepMonitorScript
       screenshotScript
       inhibitorScript

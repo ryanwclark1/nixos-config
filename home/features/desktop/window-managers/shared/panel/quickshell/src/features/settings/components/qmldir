@@ -1,5 +1,6 @@
 SettingsActionButton 1.0 SettingsActionButton.qml
 SettingsCard 1.0 SettingsCard.qml
+SettingsColorRow 1.0 SettingsColorRow.qml
 SettingsContent 1.0 SettingsContent.qml
 SettingsDataRow 1.0 SettingsDataRow.qml
 SettingsDragHandle 1.0 SettingsDragHandle.qml

@@ -81,7 +81,28 @@ QtObject {
             "google": ["g"],
             "youtube": ["yt"],
             "nixos": ["nix", "np"],
-            "github": ["gh"]
+            "github": ["gh"],
+            "brave": ["br"],
+            "bing": ["b"],
+            "kagi": ["k"],
+            "stackoverflow": ["so", "stack"],
+            "npm": ["n"],
+            "pypi": ["pip", "py"],
+            "crates": ["cr", "cargo"],
+            "mdn": ["md"],
+            "archwiki": ["aw", "arch"],
+            "aur": ["au"],
+            "nixopts": ["no", "opts"],
+            "reddit": ["r"],
+            "twitter": ["tw", "x"],
+            "linkedin": ["li"],
+            "wikipedia": ["w", "wiki"],
+            "translate": ["tr"],
+            "imdb": ["im"],
+            "amazon": ["az"],
+            "ebay": ["eb"],
+            "maps": ["map"],
+            "images": ["img"]
         })
     property bool launcherRememberWebProvider: true
     property string launcherWebLastProviderKey: "duckduckgo"
@@ -93,6 +114,9 @@ QtObject {
     property real launcherScoreExecWeight: 0.88
     property real launcherScoreBodyWeight: 0.75
     property real launcherScoreCategoryWeight: 0.7
+    property var launcherWebCustomEngines: []
+    property bool launcherWebBangsEnabled: false
+    property string launcherWebBangsLastSync: ""
 
     // --- CONTROL CENTER ---
     readonly property int controlCenterWidthMin: 440
@@ -164,6 +188,15 @@ QtObject {
     property var audioPinnedInputs: []
     property var audioHiddenOutputs: []
     property var audioHiddenInputs: []
+
+    // --- RECORDING ---
+    property string recordingCaptureSource: "portal"   // portal | screen
+    property int recordingFps: 60
+    property string recordingQuality: "very_high"      // medium | high | very_high
+    property bool recordingRecordCursor: true
+    property string recordingOutputDir: ""
+    property bool recordingIncludeDesktopAudio: true
+    property bool recordingIncludeMicrophoneAudio: false
 
     // --- NIGHT LIGHT ---
     property bool nightLightEnabled: false
@@ -254,6 +287,8 @@ QtObject {
     property string aiGeminiKey: ""                // fallback if GEMINI_API_KEY env not set
     property int aiMaxConversations: 20
     property int aiMaxMessages: 100                // per conversation
+    property string aiProviderProfiles: "{}"       // JSON — per-provider model/temp/tokens/endpoint
+    property int aiTimeout: 120                    // seconds, passed to curl --max-time
 
     // --- STATE RECOVERY ---
     property string activeSurfaceId: ""

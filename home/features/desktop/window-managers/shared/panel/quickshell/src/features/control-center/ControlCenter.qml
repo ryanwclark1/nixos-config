@@ -190,143 +190,152 @@ PanelWindow {
                     ColumnLayout {
                         id: mainCol
                         width: parent.width
-                        spacing: Colors.spacingLG
+                        spacing: Colors.spacingXL
 
-                        UserWidget {
+                        // --- Group 1: Essential Tools ---
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingLG
                             opacity: root.entranceOpacity(0)
                             scale: root.entranceScale(0)
                             transform: Translate { y: root.entranceY(0) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            layer.enabled: opacity > 0 && opacity < 1
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutBack } } }
-                        }
 
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Colors.spacingS
-                            visible: Config.controlCenterShowQuickLinks
-                            opacity: root.entranceOpacity(1)
-                            scale: root.entranceScale(1)
-                            transform: Translate { y: root.entranceY(1) }
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(1) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(1) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutBack } } }
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            UserWidget {
+                                Layout.fillWidth: true
+                            }
 
-                            Repeater {
-                                model: ControlCenterRegistry.quickLinkItems
-                                delegate: QuickLinkCard {
-                                    icon: modelData.icon
-                                    title: modelData.title
-                                    subtitle: modelData.subtitle
-                                    clickCommand: modelData.clickCommand
-                                    clickAction: modelData.id === "screenshotControls"
-                                        ? function() {
-                                            root.closeRequested();
-                                            openScreenshotTimer.restart();
-                                        }
-                                        : null
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: Colors.spacingS
+                                visible: Config.controlCenterShowQuickLinks
+
+                                Repeater {
+                                    model: ControlCenterRegistry.quickLinkItems
+                                    delegate: QuickLinkCard {
+                                        icon: modelData.icon
+                                        title: modelData.title
+                                        subtitle: modelData.subtitle
+                                        clickCommand: modelData.clickCommand
+                                        clickAction: modelData.id === "screenshotControls"
+                                            ? function() {
+                                                root.closeRequested();
+                                                openScreenshotTimer.restart();
+                                            }
+                                            : null
+                                    }
                                 }
                             }
-                        }
 
-                        // Quick Toggles Grid
-                        QuickToggleGrid {
-                            manager: root.manager
-                            showContent: root.showContent
-                            baseIndex: 2
-                            staggerDelay: root.staggerDelay
-                        }
+                            // Quick Toggles Grid
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: Colors.spacingS
+                                
+                                SharedWidgets.SectionLabel {
+                                    label: "QUICK TOGGLES"
+                                }
 
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Colors.spacingS
-                            visible: PluginService.visibleControlCenterPlugins.length > 0
-                            opacity: root.entranceOpacity(3)
-                            scale: root.entranceScale(3)
-                            transform: Translate { y: root.entranceY(3) }
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(3) } NumberAnimation { duration: root.entranceDuration(3); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(3) } NumberAnimation { duration: root.entranceDuration(3); easing.type: Easing.OutBack } } }
-
-                            Text {
-                                text: "PLUGINS"
-                                color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXS
-                                font.weight: Font.Bold
+                                QuickToggleGrid {
+                                    manager: root.manager
+                                    showContent: root.showContent
+                                    baseIndex: 2
+                                    staggerDelay: root.staggerDelay
+                                }
                             }
 
-                            Repeater {
-                                model: PluginService.visibleControlCenterPlugins
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: Colors.spacingS
+                                visible: PluginService.visibleControlCenterPlugins.length > 0
 
-                                delegate: Loader {
-                                    required property var modelData
-                                    Layout.fillWidth: true
-                                    source: (modelData.path || "") + (modelData.entryPoints && modelData.entryPoints.controlCenterWidget ? modelData.entryPoints.controlCenterWidget : "")
+                                Text {
+                                    text: "PLUGINS"
+                                    color: Colors.textDisabled
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.Bold
+                                }
 
-                                    onStatusChanged: {
-                                        if (status === Loader.Error)
-                                            console.warn("ControlCenter: failed to load control-center plugin widget " + modelData.id + " from " + source);
-                                        if (status === Loader.Ready && item) {
-                                            var api = PluginService.getPluginAPI(modelData.id);
-                                            if (api && item.hasOwnProperty("pluginApi"))
-                                                item.pluginApi = api;
-                                            if (item.hasOwnProperty("pluginManifest"))
-                                                item.pluginManifest = modelData;
-                                            if (item.hasOwnProperty("pluginService"))
-                                                item.pluginService = PluginService;
-                                            if (item.hasOwnProperty("controlCenterRoot"))
-                                                item.controlCenterRoot = root;
-                                            if (item.hasOwnProperty("manager"))
-                                                item.manager = root.manager;
+                                Repeater {
+                                    model: PluginService.visibleControlCenterPlugins
+
+                                    delegate: Loader {
+                                        required property var modelData
+                                        Layout.fillWidth: true
+                                        source: (modelData.path || "") + (modelData.entryPoints && modelData.entryPoints.controlCenterWidget ? modelData.entryPoints.controlCenterWidget : "")
+
+                                        onStatusChanged: {
+                                            if (status === Loader.Error)
+                                                console.warn("ControlCenter: failed to load control-center plugin widget " + modelData.id + " from " + source);
+                                            if (status === Loader.Ready && item) {
+                                                var api = PluginService.getPluginAPI(modelData.id);
+                                                if (api && item.hasOwnProperty("pluginApi"))
+                                                    item.pluginApi = api;
+                                                if (item.hasOwnProperty("pluginManifest"))
+                                                    item.pluginManifest = modelData;
+                                                if (item.hasOwnProperty("pluginService"))
+                                                    item.pluginService = PluginService;
+                                                if (item.hasOwnProperty("controlCenterRoot"))
+                                                    item.controlCenterRoot = root;
+                                                if (item.hasOwnProperty("manager"))
+                                                    item.manager = root.manager;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
 
-                        MediaWidget {
-                            opacity: root.entranceOpacity(4)
-                            scale: root.entranceScale(4)
-                            transform: Translate { y: root.entranceY(4) }
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(4) } NumberAnimation { duration: root.entranceDuration(4); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(4) } NumberAnimation { duration: root.entranceDuration(4); easing.type: Easing.OutBack } } }
-                        }
-
-                        // Pomodoro Timer
-                        PomodoroWidget {
-                            Layout.fillWidth: true
-                            opacity: root.entranceOpacity(5)
-                            scale: root.entranceScale(5)
-                            transform: Translate { y: root.entranceY(5) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(5); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(5); easing.type: Easing.OutBack } } }
-                        }
-
-                        // Todo List
-                        TodoWidget {
-                            Layout.fillWidth: true
-                            opacity: root.entranceOpacity(6)
-                            scale: root.entranceScale(6)
-                            transform: Translate { y: root.entranceY(6) }
-                            visible: opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(6) } NumberAnimation { duration: root.entranceDuration(6); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(6) } NumberAnimation { duration: root.entranceDuration(6); easing.type: Easing.OutBack } } }
-                        }
-
-                        // DevOps & Services
-                        DevOpsSection {
-                            showContent: root.showContent
-                            baseIndex: 17
-                            staggerDelay: root.staggerDelay
-                        }
-
-                        // Sliders
+                        // --- Group 2: Active Session ---
                         ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingLG
+                            opacity: root.entranceOpacity(1)
+                            scale: root.entranceScale(1)
+                            transform: Translate { y: root.entranceY(1) }
+                            layer.enabled: opacity > 0 && opacity < 1
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutBack } } }
+
+                            MediaWidget {
+                                Layout.fillWidth: true
+                            }
+
+                            // Pomodoro Timer
+                            PomodoroWidget {
+                                Layout.fillWidth: true
+                                visible: opacity > 0
+                            }
+
+                            // Todo List
+                            TodoWidget {
+                                Layout.fillWidth: true
+                                visible: opacity > 0
+                            }
+
+                            // DevOps & Services
+                            DevOpsSection {
+                                showContent: root.showContent
+                                baseIndex: 10
+                                staggerDelay: root.staggerDelay
+                            }
+                        }
+
+                        // --- Group 3: System Controls ---
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingLG
+                            opacity: root.entranceOpacity(2)
+                            scale: root.entranceScale(2)
+                            transform: Translate { y: root.entranceY(2) }
+                            layer.enabled: opacity > 0 && opacity < 1
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(2); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(2); easing.type: Easing.OutBack } } }
+
+                            // Sliders
+                            ColumnLayout {
                             Layout.fillWidth: true
                             spacing: Colors.paddingMedium
                             opacity: root.entranceOpacity(7)
