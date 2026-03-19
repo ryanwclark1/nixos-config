@@ -379,6 +379,7 @@ BasePopupMenu {
 
             readonly property int maxCount: {
               var days = root.showGemini ? ModelUsageService.geminiRecentDays
+                                       : root.showCodex ? ModelUsageService.codexRecentDays
                                          : ModelUsageService.claudeRecentDays;
               var m = 1;
               for (var i = 0; i < days.length; i++)
