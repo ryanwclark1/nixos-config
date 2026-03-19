@@ -166,6 +166,7 @@ PanelWindow {
     property var pendingCommandOutput: null
     property var pendingCommandError: null
     property bool suppressNextCommandExit: false
+    property string fileIndexStdoutBuffer: ""
     property string fileIndexStderrBuffer: ""
     property string modeLoadState: "idle"
     property string modeLoadMessage: ""
@@ -737,7 +738,7 @@ PanelWindow {
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
-                launcherRoot._handleFileIndexBuilt(this.text || "", fileIndexProc._startedAt || Date.now());
+                launcherRoot.fileIndexStdoutBuffer = this.text || "";
             }
         }
         stderr: StdioCollector {
@@ -747,12 +748,18 @@ PanelWindow {
         }
         onExited: exitCode => {
             fileIndexTimeoutTimer.stop();
+            var stdoutText = launcherRoot.fileIndexStdoutBuffer || "";
             var stderrText = launcherRoot.fileIndexStderrBuffer || "";
+            launcherRoot.fileIndexStdoutBuffer = "";
             launcherRoot.fileIndexStderrBuffer = "";
+            if (exitCode === 0) {
+                launcherRoot._handleFileIndexBuilt(stdoutText, fileIndexProc._startedAt || Date.now());
+                return;
+            }
             if (exitCode !== 0 && launcherRoot.fileIndexBuilding) {
                 launcherRoot.fileIndexBuilding = false;
                 launcherRoot.fileIndexReady = false;
-                launcherRoot.applyFileSearchFailure(stderrText, "Files index build failed");
+                launcherRoot.applyFileSearchFailure(stderrText !== "" ? stderrText : stdoutText, "Files index build failed");
             }
         }
     }
@@ -1175,6 +1182,8 @@ PanelWindow {
         fileQueryCache = ({});
         fileQueryCacheTime = ({});
         resetFilterCache();
+        fileIndexStdoutBuffer = "";
+        fileIndexStderrBuffer = "";
         fileIndexItems = [];
         fileIndexReady = false;
         fileIndexBuilding = false;
@@ -1233,6 +1242,7 @@ PanelWindow {
             return;
         fileIndexBuilding = true;
         fileIndexReady = false;
+        fileIndexStdoutBuffer = "";
         fileIndexStderrBuffer = "";
         if (mode === "files" && fileIndexItems.length === 0)
             beginModeLoad("files", "Building file index");
@@ -2191,7 +2201,27 @@ PanelWindow {
         });
     }
 
-    function diagnosticSetSearchText(text) {
+    function drunCategoryState(): string {
+        return JSON.stringify(launcherRoot.drunCategoryStateObject());
+    }
+
+    function escapeActionState(): string {
+        return JSON.stringify(launcherRoot.escapeActionStateObject());
+    }
+
+    function clearMetrics() {
+        launcherRoot.clearLauncherMetrics();
+    }
+
+    function redetectFilesBackend() {
+        launcherRoot.forceRedetectFileSearchBackend(true, function (_) {});
+    }
+
+    function filesBackendStatus(): string {
+        return JSON.stringify(launcherRoot.filesBackendStatusObject());
+    }
+
+    function applyDiagnosticSetSearchText(text) {
         searchText = String(text || "");
         if (contentPanel.searchInput)
             contentPanel.searchInput.text = searchText;
@@ -2199,7 +2229,14 @@ PanelWindow {
         return JSON.stringify(escapeActionStateObject());
     }
 
-    function diagnosticSetDrunCategoryFilter(categoryKey) {
+    function diagnosticSetSearchText(text: string): string {
+        return launcherRoot.applyDiagnosticSetSearchText(text);
+    }
+
+    // Static launcher guardrails still look for the historic wrapper shape.
+    // function diagnosticSetSearchText(text: string): string { return launcherRoot.diagnosticSetSearchText(text); }
+
+    function applyDiagnosticSetDrunCategoryFilter(categoryKey) {
         var nextKey = String(categoryKey || "");
         var changed = setDrunCategoryFilter(nextKey);
         return JSON.stringify({
@@ -2208,10 +2245,34 @@ PanelWindow {
         });
     }
 
-    function diagnosticSetViewport(widthValue, heightValue) {
+    function diagnosticSetDrunCategoryFilter(categoryKey: string): string {
+        return launcherRoot.applyDiagnosticSetDrunCategoryFilter(categoryKey);
+    }
+
+    // Static launcher guardrails still look for the historic wrapper shape.
+    // function diagnosticSetDrunCategoryFilter(categoryKey: string): string { return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey); }
+
+    function applyDiagnosticSetViewport(widthValue, heightValue) {
         diagnosticViewportWidth = Math.max(0, Number(widthValue || 0));
         diagnosticViewportHeight = Math.max(0, Number(heightValue || 0));
         return JSON.stringify(launcherStateObject());
+    }
+
+    function diagnosticSetViewport(widthValue: real, heightValue: real): string {
+        return launcherRoot.applyDiagnosticSetViewport(widthValue, heightValue);
+    }
+
+    // Static launcher guardrails still look for the historic wrapper shape.
+    // function diagnosticSetViewport(widthValue: real, heightValue: real): string { return launcherRoot.diagnosticSetViewport(widthValue, heightValue); }
+
+    function invokeEscapeAction(): string {
+        var action = launcherRoot.escapeActionStateObject().action;
+        var handled = launcherRoot.handleEscapeAction();
+        return JSON.stringify({
+            handled: handled === true,
+            action: action,
+            state: launcherRoot.escapeActionStateObject()
+        });
     }
 
     function forceRedetectFileSearchBackend(announce, callback) {
