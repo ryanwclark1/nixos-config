@@ -49,6 +49,19 @@ Item {
         subtitle: "Manage independent bars, monitor assignment, and per-bar layout settings."
 
         SettingsCard {
+            title: "Modular Layout"
+            iconName: "󰕮"
+            description: "Enable true dynamic layout arrays. (Experimental)"
+
+            SettingsToggleRow {
+                label: "Use Modular Entries"
+                description: "Uses barLeftEntries, etc. from config.json"
+                icon: "󰕮"
+                configKey: "barUseModularEntries"
+            }
+        }
+
+        SettingsCard {
             title: "Bar Configurations"
             iconName: "󰕮"
             description: "Select, add, and remove up to four independent bars."

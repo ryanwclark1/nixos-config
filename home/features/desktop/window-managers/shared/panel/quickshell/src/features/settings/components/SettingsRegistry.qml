@@ -563,6 +563,20 @@ QtObject {
                 service: "AiService",
                 configDomain: "ai"
             }
+        },
+        {
+            id: "model-usage",
+            label: "Model Usage",
+            icon: "󰊤",
+            categoryId: "extensibility",
+            order: 35,
+            component: "ModelUsageTab.qml",
+            searchTerms: ["model", "usage", "claude", "codex", "tokens", "prompts", "rate limit"],
+            owner: {
+                surface: "modelUsageMenu",
+                service: "ModelUsageService",
+                configDomain: "modelUsage"
+            }
         }
     ]
 

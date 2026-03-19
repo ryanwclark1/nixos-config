@@ -29,6 +29,12 @@ Item {
                     configKey: "backgroundVisualizerEnabled"
                 }
                 SettingsToggleRow {
+                    label: "Shader Visualizer"
+                    description: "High-performance GLSL mode."
+                    icon: "󰓃"
+                    configKey: "backgroundUseShaderVisualizer"
+                }
+                SettingsToggleRow {
                     label: "Desktop Clock"
                     icon: "󰥔"
                     configKey: "backgroundClockEnabled"
@@ -51,6 +57,44 @@ Item {
                     { value: "bottom-right", label: "Bottom Right" }
                 ]
                 onModeSelected: v => Config.backgroundClockPosition = v
+            }
+        }
+
+        SettingsCard {
+            title: "Personality GIF"
+            iconName: "󰄛"
+            description: "An optional animated element that reacts to your environment."
+
+            SettingsToggleRow {
+                label: "Enable GIF"
+                icon: "󰄛"
+                configKey: "personalityGifEnabled"
+            }
+
+            SettingsTextInputRow {
+                label: "GIF Path"
+                placeholderText: "~/Pictures/bongocat.gif"
+                leadingIcon: "󰉋"
+                text: Config.personalityGifPath
+                onTextEdited: value => Config.personalityGifPath = value
+
+                SettingsActionButton {
+                    label: "Pick File"
+                    compact: true
+                    onClicked: if (root.settingsRoot) root.settingsRoot.pickPersonalityGif()
+                }
+            }
+
+            SettingsModeRow {
+                label: "Reaction Mode"
+                currentValue: Config.personalityGifReactionMode
+                options: [
+                    { value: "media", label: "Music Playback" },
+                    { value: "cpu", label: "CPU Usage" },
+                    { value: "beat", label: "Audio Beat" },
+                    { value: "idle", label: "Always" }
+                ]
+                onModeSelected: v => Config.personalityGifReactionMode = v
             }
         }
     }

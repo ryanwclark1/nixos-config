@@ -18,55 +18,64 @@ Item {
         SettingsCard {
             title: "Glass Surface"
             iconName: "󰖲"
-            description: "Shell-wide blur and translucency settings shared by bars and menus."
+            description: "Shell-wide blur and tiered transparency settings for bars and menus."
 
             SettingsSliderRow {
-                label: "Glass Opacity"
+                label: "Base Opacity"
+                description: "Used for main bars and panels."
                 min: 0.1
                 max: 1.0
-                value: Config.glassOpacity
+                value: Config.glassOpacityBase
                 step: 0.05
-                onMoved: v => Config.glassOpacity = v
+                onMoved: v => Config.glassOpacityBase = v
+            }
+
+            SettingsSliderRow {
+                label: "Surface Opacity"
+                description: "Used for menu items and cards."
+                min: 0.1
+                max: 1.0
+                value: Config.glassOpacitySurface
+                step: 0.05
+                onMoved: v => Config.glassOpacitySurface = v
+            }
+
+            SettingsSliderRow {
+                label: "Overlay Opacity"
+                description: "Used for tooltips and floating OSDs."
+                min: 0.1
+                max: 1.0
+                value: Config.glassOpacityOverlay
+                step: 0.05
+                onMoved: v => Config.glassOpacityOverlay = v
             }
 
             SettingsModeRow {
                 label: "Blur"
                 currentValue: Config.blurEnabled ? "enabled" : "disabled"
                 options: [
-                    {
-                        value: "enabled",
-                        label: "Enabled"
-                    },
-                    {
-                        value: "disabled",
-                        label: "Disabled"
-                    }
+                    { value: "enabled", label: "Enabled" },
+                    { value: "disabled", label: "Disabled" }
                 ]
                 onModeSelected: value => Config.blurEnabled = value === "enabled"
-            }
-
-            SettingsSliderRow {
-                label: "Settings Backdrop Opacity"
-                min: 0.1
-                max: 1.0
-                value: Config.settingsBackdropOpacity
-                step: 0.05
-                onMoved: v => Config.settingsBackdropOpacity = v
-            }
-
-            SettingsSliderRow {
-                label: "Settings Surface Opacity"
-                min: 0.1
-                max: 1.0
-                value: Config.settingsSurfaceOpacity
-                step: 0.05
-                onMoved: v => Config.settingsSurfaceOpacity = v
             }
 
             SettingsToggleRow {
                 label: "Auto Transparency"
                 icon: "󰂵"
                 configKey: "autoTransparency"
+            }
+        }
+
+        SettingsCard {
+            title: "Theme Mode"
+            iconName: "󰏘"
+            description: "Automate color extraction from your current wallpaper."
+
+            SettingsToggleRow {
+                label: "Dynamic Wallpaper Theming"
+                icon: "󰸉"
+                configKey: "useDynamicTheming"
             }
         }
 
@@ -104,7 +113,7 @@ Item {
         SettingsCard {
             title: "Shape & Density"
             iconName: "󰉵"
-            description: "Tune radius and spacing without changing the selected color theme."
+            description: "Tune scaling and responsiveness globally."
 
             SettingsSliderRow {
                 label: "Corner Radius Scale"
@@ -116,12 +125,22 @@ Item {
             }
 
             SettingsSliderRow {
-                label: "Spacing Scale"
+                label: "UI Density Scale"
                 min: 0.85
                 max: 1.35
-                value: Config.spacingScale
+                value: Config.uiDensityScale
                 step: 0.05
-                onMoved: v => Config.spacingScale = v
+                onMoved: v => Config.uiDensityScale = v
+            }
+
+            SettingsSliderRow {
+                label: "Animation Speed Scale"
+                description: "0.5 = Fast, 1.5 = Slow"
+                min: 0.0
+                max: 2.0
+                value: Config.animationSpeedScale
+                step: 0.05
+                onMoved: v => Config.animationSpeedScale = v
             }
         }
     }
