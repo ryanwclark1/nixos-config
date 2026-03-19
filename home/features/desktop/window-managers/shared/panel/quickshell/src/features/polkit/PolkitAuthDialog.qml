@@ -26,6 +26,7 @@ PanelWindow {
     property string authMessage: ""
     property string iconName: ""
     property var identities: []
+    property var details: ({})
     property bool isVisible: false
 
     visible: root.isVisible || fadeAnim.running || scaleAnim.running
@@ -46,9 +47,14 @@ PanelWindow {
         }
 
         onFailed: {
-            prompt.shake();
-            prompt.clearInput();
-            prompt.forceActiveFocus();
+            if (pamContext.attemptsExhausted) {
+                // Auto-cancel after max attempts
+                root._cancel();
+            } else {
+                prompt.shake();
+                prompt.clearInput();
+                prompt.forceActiveFocus();
+            }
         }
     }
 
@@ -75,6 +81,12 @@ PanelWindow {
         if (isVisible) {
             prompt.forceActiveFocus();
         }
+    }
+
+    // Readable description from details dict if available
+    readonly property string _actionDescription: {
+        var d = root.details || {};
+        return d["polkit.gettext_domain"] ? "" : (d["polkit.message"] || "");
     }
 
     Item {
@@ -211,7 +223,7 @@ PanelWindow {
                     pamContext: pamContext
 
                     onSubmitRequested: {
-                        if (pamContext.currentText.length > 0) {
+                        if (pamContext.currentText.length > 0 && !pamContext.attemptsExhausted) {
                             pamContext.tryAuth();
                         }
                     }
@@ -259,14 +271,18 @@ PanelWindow {
                         Layout.fillWidth: true
                         height: 40
                         radius: Colors.radiusSmall
-                        color: Colors.withAlpha(Colors.primary, 0.15)
-                        border.color: Colors.withAlpha(Colors.primary, 0.3)
+                        color: pamContext.attemptsExhausted
+                            ? Colors.highlightLight
+                            : Colors.withAlpha(Colors.primary, 0.15)
+                        border.color: pamContext.attemptsExhausted
+                            ? Colors.border
+                            : Colors.withAlpha(Colors.primary, 0.3)
                         border.width: 1
 
                         Text {
                             anchors.centerIn: parent
                             text: "Authenticate"
-                            color: Colors.primary
+                            color: pamContext.attemptsExhausted ? Colors.textDisabled : Colors.primary
                             font.pixelSize: Colors.fontSizeMedium
                             font.weight: Font.Bold
                         }
@@ -282,9 +298,9 @@ PanelWindow {
                             id: authMa
                             anchors.fill: parent
                             hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
+                            cursorShape: pamContext.attemptsExhausted ? Qt.ArrowCursor : Qt.PointingHandCursor
                             onClicked: {
-                                if (pamContext.currentText.length > 0)
+                                if (pamContext.currentText.length > 0 && !pamContext.attemptsExhausted)
                                     pamContext.tryAuth();
                             }
                         }

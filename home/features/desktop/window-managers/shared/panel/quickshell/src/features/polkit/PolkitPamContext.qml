@@ -17,6 +17,12 @@ QtObject {
     property string errorMessage: ""
     property bool showError: false
 
+    // Retry tracking (3 attempts max, matching standard polkit agent behavior)
+    readonly property int maxAttempts: 3
+    property int attemptCount: 0
+    readonly property int attemptsRemaining: maxAttempts - attemptCount
+    readonly property bool attemptsExhausted: attemptCount >= maxAttempts
+
     signal authenticated()
     signal failed()
 
@@ -63,8 +69,13 @@ QtObject {
             if (result === PamResult.Success) {
                 root.authenticated();
             } else {
+                root.attemptCount++;
                 root.currentText = "";
-                root.errorMessage = "Authentication failed";
+                if (root.attemptsExhausted) {
+                    root.errorMessage = "Too many failed attempts";
+                } else {
+                    root.errorMessage = "Authentication failed (" + root.attemptsRemaining + " attempt" + (root.attemptsRemaining !== 1 ? "s" : "") + " remaining)";
+                }
                 root.showError = true;
                 root.failed();
             }
@@ -74,6 +85,7 @@ QtObject {
     }
 
     function tryAuth() {
+        if (attemptsExhausted) return;
         showError = false;
         if (waitingForPassword) {
             pam.respond(currentText);
@@ -89,5 +101,6 @@ QtObject {
         showError = false;
         waitingForPassword = false;
         authInProgress = false;
+        attemptCount = 0;
     }
 }

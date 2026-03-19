@@ -12,6 +12,7 @@ Scope {
     property string _authMessage: ""
     property string _iconName: ""
     property var _identities: []
+    property var _details: ({})
     property bool _daemonReady: false
 
     // Long-running Python polkit agent daemon
@@ -38,6 +39,7 @@ Scope {
                     root._authMessage = msg.message || "";
                     root._iconName = msg.icon_name || "";
                     root._identities = msg.identities || [];
+                    root._details = msg.details || {};
                     root._authActive = true;
                 } else if (msg.type === "cancel") {
                     if (msg.cookie === root._cookie) {
@@ -71,7 +73,7 @@ Scope {
             cookie: cookie,
             authenticated: authenticated
         });
-        agentProc.stdin.write(msg + "\n");
+        agentProc.write(msg + "\n");
     }
 
     // Dialog displayed on cursor screen when auth is active
@@ -85,11 +87,18 @@ Scope {
             authMessage: root._authMessage
             iconName: root._iconName
             identities: root._identities
+            details: root._details
             isVisible: root._authActive
 
             onAuthResult: (cookie, authenticated) => {
                 root._sendResponse(cookie, authenticated);
                 root._authActive = false;
+
+                if (authenticated) {
+                    ToastService.showSuccess("Authenticated", root._authMessage || root._actionId);
+                } else {
+                    ToastService.showError("Authentication cancelled", root._actionId);
+                }
             }
         }
     }
