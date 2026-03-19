@@ -7,11 +7,16 @@ import "../widgets" as SharedWidgets
 import "LauncherModeData.js" as ModeData
 
 // LauncherResultView: the stacked results/loading/empty-state/media area.
-// Owns the file context menu. The parent ColumnLayout gives it fillWidth + fillHeight.
+// Emits fileContextMenuRequested so the parent can show the context menu at the
+// correct coordinate space (the ContextMenu needs to live in a non-layout parent).
 StackLayout {
     id: root
 
     required property var launcher
+
+    // Emitted when the user right-clicks a file result.
+    // `menuModel` is the array of menu entries; `point` is in launcherRoot coordinates.
+    signal fileContextMenuRequested(var menuModel, point menuPoint)
 
     // Convenience aliases so bindings below stay readable
     readonly property bool compactMode: launcher.compactMode
@@ -58,10 +63,9 @@ StackLayout {
                 onSecondaryActionRequested: function(sourceItem, localX, localY) {
                     if (root.mode !== "files" || !modelData || !modelData.fullPath)
                         return;
-                    var point = sourceItem ? sourceItem.mapToItem(root.launcher, localX, localY) : Qt.point(localX, localY);
+                    var pt = sourceItem ? sourceItem.mapToItem(root.launcher, localX, localY) : Qt.point(localX, localY);
                     root.launcher.selectedIndex = index;
-                    fileResultContextMenu.model = root.launcher.fileContextMenuModel(modelData);
-                    fileResultContextMenu.popup(point.x, point.y);
+                    root.fileContextMenuRequested(root.launcher.fileContextMenuModel(modelData), pt);
                 }
                 onEntered: if (!root.launcher.ignoreMouseHover)
                     root.launcher.selectedIndex = index
@@ -122,8 +126,4 @@ StackLayout {
         tightMode: root.tightMode
     }
 
-    // ── File result context menu ───────────────────────────────────────────
-    ContextMenu {
-        id: fileResultContextMenu
-    }
 }

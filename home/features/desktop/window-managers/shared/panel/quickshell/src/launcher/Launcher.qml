@@ -74,8 +74,8 @@ PanelWindow {
         if (visible)
             Qt.callLater(function () {
                 if (_destroyed) return;
-                if (searchInputComp.searchInput)
-                    searchInputComp.searchInput.forceActiveFocus();
+                if (contentPanel.searchInput)
+                    contentPanel.searchInput.forceActiveFocus();
             });
     }
 
@@ -89,7 +89,6 @@ PanelWindow {
     property string searchText: ""
     property var allItems: []
     property var filteredItems: []
-    ScriptModel { id: resultsModel; values: launcherRoot.filteredItems }
     property int selectedIndex: 0
     property string mode: "drun"
 
@@ -1525,8 +1524,8 @@ PanelWindow {
         var shouldKeepSearch = keepSearch === true && Config.launcherKeepSearchOnModeSwitch;
         if (!shouldKeepSearch) {
             searchText = "";
-            if (searchInputComp.searchInput)
-                searchInputComp.searchInput.text = "";
+            if (contentPanel.searchInput)
+                contentPanel.searchInput.text = "";
         }
         selectedIndex = 0;
         // Instant open: bypass spring animations for immediate show
@@ -1537,8 +1536,8 @@ PanelWindow {
         Qt.callLater(function () {
             if (_destroyed) return;
             _skipOpenAnim = false;
-            if (searchInputComp.searchInput)
-                searchInputComp.searchInput.forceActiveFocus();
+            if (contentPanel.searchInput)
+                contentPanel.searchInput.forceActiveFocus();
         });
 
         depChecker.ensureModeDependencies(mode, function (ok, missingCmd) {
@@ -1611,8 +1610,8 @@ PanelWindow {
     }
 
     function close() {
-        if (searchInputComp.searchInput && searchInputComp.searchInput.activeFocus)
-            searchInputComp.searchInput.focus = false;
+        if (contentPanel.searchInput && contentPanel.searchInput.activeFocus)
+            contentPanel.searchInput.focus = false;
         sidebarOverflowExpanded = false;
         shortcutHelpExpanded = false;
         launcherOpacity = 0;
@@ -1687,7 +1686,7 @@ PanelWindow {
     function cancelConfirm() {
         confirmTitle = "";
         confirmCallback = null;
-        searchInputComp.searchInput.forceActiveFocus();
+        contentPanel.searchInput.forceActiveFocus();
     }
 
     function doConfirm() {
@@ -2165,8 +2164,8 @@ PanelWindow {
 
     function diagnosticSetSearchText(text) {
         searchText = String(text || "");
-        if (searchInputComp.searchInput)
-            searchInputComp.searchInput.text = searchText;
+        if (contentPanel.searchInput)
+            contentPanel.searchInput.text = searchText;
         scheduleSearchRefresh(false);
         return JSON.stringify(escapeActionStateObject());
     }
@@ -2891,11 +2890,11 @@ PanelWindow {
 
     function clearSearchQuery() {
         searchText = "";
-        if (searchInputComp.searchInput)
-            searchInputComp.searchInput.text = "";
+        if (contentPanel.searchInput)
+            contentPanel.searchInput.text = "";
         filterItems();
-        if (searchInputComp.searchInput)
-            searchInputComp.searchInput.forceActiveFocus();
+        if (contentPanel.searchInput)
+            contentPanel.searchInput.forceActiveFocus();
     }
 
     function handleEscapeAction() {
@@ -3364,247 +3363,13 @@ PanelWindow {
                 launcher: launcherRoot
             }
 
-            ColumnLayout {
+            LauncherContentPanel {
+                id: contentPanel
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: launcherRoot.compactMode ? Colors.spacingS : Colors.spacingM
-
-                LauncherSearchField {
-                    id: searchInputComp
-                    Layout.fillWidth: true
-                    Layout.bottomMargin: launcherRoot.tightMode ? 0 : Colors.spacingXXS
-                    text: launcherRoot.searchText
-                    accentColor: Colors.primary
-                    placeholder: launcherRoot.activeModeHintText
-                    statusText: launcherRoot.escapeStatusText
-                    statusIcon: launcherRoot.escapeStatusIcon
-                    onAccepted: modifiers => launcherRoot.handleSearchAccepted(modifiers)
-
-                    onTextChanged: {
-                        if (text.startsWith("=") && launcherRoot.mode !== "calc")
-                            launcherRoot.open("calc", true);
-                        else if (text.startsWith(">") && launcherRoot.mode !== "run")
-                            launcherRoot.open("run", true);
-                        else if (launcherRoot.matchesCharacterTrigger(text) && launcherRoot.mode !== "emoji")
-                            launcherRoot.open("emoji", true);
-                        else if (text.startsWith("?") && launcherRoot.mode !== "web")
-                            launcherRoot.open("web", true);
-                        else if (text.startsWith("!") && launcherRoot.mode !== "ai")
-                            launcherRoot.open("ai", true);
-                        else if (text.startsWith("@") && launcherRoot.mode !== "bookmarks")
-                            launcherRoot.open("bookmarks", true);
-                        else if (text.startsWith("/") && launcherRoot.mode !== "files")
-                            launcherRoot.open("files", true);
-                        else if (text.startsWith(",") && launcherRoot.mode !== "settings")
-                            launcherRoot.open("settings", true);
-                        else if (text.startsWith(";") && launcherRoot.mode !== "ssh")
-                            launcherRoot.open("ssh", true);
-                        else if (text.startsWith("~") && launcherRoot.mode !== "window")
-                            launcherRoot.open("window", true);
-                        else if (PluginService.shouldOpenPluginsModeForQuery(text) && launcherRoot.mode !== "plugins")
-                            launcherRoot.open("plugins", true);
-                        if (launcherRoot.searchText !== text) {
-                            launcherRoot.searchText = text;
-                            launcherRoot.scheduleSearchRefresh(false);
-                        }
-                    }
-
-                    Connections {
-                        target: searchInputComp.searchInput
-                        function onVisibleChanged() {
-                            if (!searchInputComp.searchInput.visible && searchInputComp.searchInput.activeFocus)
-                                searchInputComp.searchInput.focus = false;
-                        }
-                    }
-
-                    LauncherKeyHandler {
-                        id: keyHandler
-                        launcher: launcherRoot
-                    }
-
-                    Keys.onPressed: event => keyHandler.handleKeyPress(event)
-                }
-
-                LauncherPrefixStrip {
-                    Layout.fillWidth: true
-                    launcher: launcherRoot
-                    visible: !launcherRoot.tightMode && launcherRoot.prefixQuickModes.length > 0
-                }
-
-                LauncherActionLegend {
-                    visible: Config.launcherShowModeHints && !launcherRoot.tightMode
-                    Layout.bottomMargin: visible ? Colors.spacingXXS : 0
-                    summaryText: launcherRoot.modeSummaryText
-                    primaryAction: launcherRoot.legendPrimaryAction
-                    secondaryAction: launcherRoot.legendSecondaryAction
-                    tertiaryAction: launcherRoot.legendTertiaryAction
-                    compact: launcherRoot.compactMode || launcherRoot.webHintCompact
-                    helpExpanded: launcherRoot.shortcutHelpExpanded
-                    onHelpToggled: launcherRoot.shortcutHelpExpanded = !launcherRoot.shortcutHelpExpanded
-                }
-
-                LauncherWebProviderBar {
-                    visible: launcherRoot.mode === "web" && launcherRoot.filteredItems.length > 0
-                    providers: launcherRoot.configuredWebProviders()
-                    selectedKey: launcherRoot.selectedWebProviderKey
-                    onProviderSelected: key => launcherRoot.selectWebProviderByKey(key)
-                }
-
-                LauncherWebHints {
-                    visible: Config.launcherShowModeHints && launcherRoot.mode === "web" && !launcherRoot.tightMode
-                    primaryEnterHint: launcherRoot.webPrimaryEnterHint
-                    secondaryEnterHint: launcherRoot.webSecondaryEnterHint
-                    aliasHint: launcherRoot.webAliasHint
-                    hotkeyHint: launcherRoot.webHotkeyHint
-                    compact: launcherRoot.webHintCompact
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    visible: launcherRoot.transientNoticeText !== "" && !launcherRoot.tightMode
-                    color: Colors.primarySubtle
-                    radius: Colors.radiusMedium
-                    border.color: Colors.withAlpha(Colors.primary, 0.5)
-                    border.width: 1
-                    implicitHeight: transientNoticeLabel.implicitHeight + (Colors.spacingS * 2)
-
-                    Text {
-                        id: transientNoticeLabel
-                        anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        text: launcherRoot.transientNoticeText
-                        color: Colors.primary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.DemiBold
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        wrapMode: Text.WordWrap
-                    }
-                }
-
-                LauncherMetricsBox {
-                    metrics: launcherRoot.launcherMetrics
-                    mode: launcherRoot.mode
-                    tightMode: launcherRoot.tightMode
-                    filesBackendLabel: launcherRoot.filesBackendLabel
-                    filesCacheStatsLabel: launcherRoot.filesCacheStatsLabel
-                    modeMetricFn: launcherRoot.modeMetric
-                    onResetRequested: launcherRoot.clearLauncherMetrics()
-                }
-
-                LauncherHome {
-                    Layout.fillWidth: true
-                    launcher: launcherRoot
-                    visible: launcherRoot.showLauncherHomePanel && !launcherRoot.isModeLoading
-                    showHomeSections: false
-                }
-
-                OrchestratorView {
-                    visible: launcherRoot.mode === "orchestrator" && launcherRoot.searchText === ""
-                }
-
-                StackLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    currentIndex: mode === "media" ? 1 : 0
-
-                    StackLayout {
-                        currentIndex: launcherRoot.filteredItems.length > 0 ? 0 : (launcherRoot.isModeLoading ? 1 : 2)
-
-                        ListView {
-                            id: resultsList
-                            model: resultsModel
-                            clip: true
-                            cacheBuffer: 400
-                            spacing: launcherRoot.compactMode ? Colors.spacingXS : Colors.spacingS
-                            currentIndex: launcherRoot.selectedIndex
-                            enabled: !launcherRoot.showingConfirm
-                            topMargin: launcherRoot.compactMode ? Colors.spacingXXS : Colors.spacingXS
-                            section.property: "sectionLabel"
-                            section.delegate: LauncherSectionHeader {
-                                compactMode: launcherRoot.compactMode
-                            }
-
-                            delegate: LauncherResultDelegate {
-                                itemData: modelData
-                                itemIndex: index
-                                searchText: launcherRoot.searchText
-                                mode: launcherRoot.mode
-                                compactMode: launcherRoot.compactMode
-                                tightMode: launcherRoot.tightMode
-                                ignoreMouseHover: launcherRoot.ignoreMouseHover
-                                modeIcons: launcherRoot.modeIcons
-                                iconMap: launcherRoot.launcherIconMap
-                                onClicked: launcherRoot.executeSelection()
-                                onSecondaryActionRequested: function(sourceItem, localX, localY) {
-                                    if (launcherRoot.mode !== "files" || !modelData || !modelData.fullPath)
-                                        return;
-                                    var point = sourceItem ? sourceItem.mapToItem(launcherRoot, localX, localY) : Qt.point(localX, localY);
-                                    launcherRoot.selectedIndex = index;
-                                    fileResultContextMenu.model = launcherRoot.fileContextMenuModel(modelData);
-                                    fileResultContextMenu.popup(point.x, point.y);
-                                }
-                                onEntered: if (!launcherRoot.ignoreMouseHover)
-                                    launcherRoot.selectedIndex = index
-                            }
-                        }
-
-                        Rectangle {
-                            color: Colors.bgWidget
-                            radius: Colors.radiusMedium
-                            border.color: Colors.border
-                            border.width: 1
-
-                            ColumnLayout {
-                                anchors.centerIn: parent
-                                spacing: Colors.spacingS
-
-                                SharedWidgets.LoadingSpinner {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    size: launcherRoot.compactMode ? 18 : 24
-                                }
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: launcherRoot.modeLoadMessage !== "" ? launcherRoot.modeLoadMessage : ("Loading " + ModeData.modeInfo(launcherRoot.mode).label)
-                                    color: Colors.text
-                                    font.pixelSize: Colors.fontSizeSmall
-                                    font.weight: Font.DemiBold
-                                }
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: "Please wait"
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                }
-                            }
-                        }
-
-                        LauncherEmptyState {
-                            icon: launcherRoot.modeIcons[launcherRoot.mode] || "󰈔"
-                            title: launcherRoot.emptyStateTitle
-                            subtitle: launcherRoot.emptyStateSubtitle
-                            primaryCta: launcherRoot.emptyPrimaryCta
-                            secondaryCta: launcherRoot.emptySecondaryCta
-                            primaryHint: launcherRoot.emptyPrimaryHint
-                            primaryHintIcon: launcherRoot.emptyPrimaryHintIcon
-                            secondaryHint: launcherRoot.emptySecondaryHint
-                            secondaryHintIcon: launcherRoot.emptySecondaryHintIcon
-                            onPrimaryClicked: launcherRoot.executeEmptyPrimary()
-                            onSecondaryClicked: launcherRoot.executeEmptySecondary()
-                        }
-                    }
-
-                    LauncherMediaView {
-                        mediaPlayers: launcherRoot.mediaPlayers
-                        compactMode: launcherRoot.compactMode
-                        tightMode: launcherRoot.tightMode
-                }
+                launcher: launcherRoot
             }
         }
-    }
-
-    ContextMenu {
-        id: fileResultContextMenu
     }
 
         LauncherConfirmDialog {
