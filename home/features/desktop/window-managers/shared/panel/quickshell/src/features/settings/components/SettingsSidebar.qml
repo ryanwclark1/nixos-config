@@ -24,7 +24,7 @@ Rectangle {
   readonly property var compactEntries: buildCompactEntries()
 
   Layout.fillHeight: true
-  color: Colors.cardSurface
+  color: Colors.withAlpha(Colors.background, 0.75)
 
   Rectangle {
     anchors.right: parent.right
@@ -32,7 +32,18 @@ Rectangle {
     anchors.bottom: parent.bottom
     width: 1
     color: Colors.border
-    opacity: 0.5
+    opacity: 0.85
+    z: 10
+  }
+
+  SharedWidgets.SurfaceGradient {
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    width: 12
+    rotation: 90
+    opacity: 0.15
+    visible: !root.compactMode
   }
 
   property var expandedCategories: ({})

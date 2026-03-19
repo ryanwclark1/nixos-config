@@ -248,8 +248,8 @@ PanelWindow {
     anchors.left: parent.left
     anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(settingsRoot.gutterY, (settingsRoot.usableHeight - height) / 2)
     anchors.leftMargin: settingsRoot.edgeMargins.left + Math.max(settingsRoot.gutterX, (settingsRoot.usableWidth - width) / 2)
-    color: Colors.cardSurface
-    border.color: Colors.border
+    color: Colors.withAlpha(Colors.surface, 0.4)
+    border.color: Colors.withAlpha(Colors.text, 0.12)
     border.width: 1
     radius: Colors.radiusLarge
     clip: true
