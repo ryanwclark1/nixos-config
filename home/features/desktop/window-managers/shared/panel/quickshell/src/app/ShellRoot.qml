@@ -70,6 +70,7 @@ Scope {
     readonly property bool screenshotMenuVisible: root.isSurfaceOpen("screenshotMenu")
     readonly property bool cavaPopupVisible: root.isSurfaceOpen("cavaPopup")
     readonly property bool aiChatVisible: root.isSurfaceOpen("aiChat")
+    readonly property bool commandPaletteVisible: root.isSurfaceOpen("commandPalette")
 
     function currentSurfaceScreen() {
         return surfaceService.currentSurfaceScreen();
@@ -175,6 +176,11 @@ Scope {
     Shortcut {
         sequence: "Meta+N"
         onActivated: root.toggleSurface("notifCenter")
+    }
+
+    Shortcut {
+        sequence: "Meta+K"
+        onActivated: root.toggleSurface("commandPalette")
     }
 
     // Marks true ~100ms after startup so lazy-loaded panels can gate on it
@@ -346,6 +352,16 @@ Scope {
             screen: root.currentSurfaceScreen()
             showContent: root.aiChatVisible
             onCloseRequested: root.closeSurface("aiChat")
+        }
+    }
+
+    LazyLoader {
+        active: root.commandPaletteVisible
+        CommandPalette {
+            id: commandPalette
+            screen: root.currentSurfaceScreen()
+            showContent: root.commandPaletteVisible
+            onCloseRequested: root.closeSurface("commandPalette")
         }
     }
 

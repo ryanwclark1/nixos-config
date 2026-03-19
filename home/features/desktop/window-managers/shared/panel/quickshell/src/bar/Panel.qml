@@ -435,7 +435,10 @@ Item {
                         return {
                             label: w.label,
                             icon: w.icon,
-                            action: function() { Config.addModularEntry(section, w.type); }
+                            action: function() { 
+                                Config.addModularEntry(section, w.type); 
+                                ToastService.showNoticeAction("Widget added", "Added " + w.label, "Undo", () => Config.undoModularChange());
+                            }
                         };
                     });
                 }
@@ -688,16 +691,26 @@ Item {
                         return;
                     }
 
+                    var moveWidget = function(dir) {
+                        Config.moveModularEntry(widgetInstance.section, widgetInstance.index, dir);
+                        ToastService.showNoticeAction("Layout updated", "Widget moved", "Undo", () => Config.undoModularChange());
+                    };
+
+                    var removeWidget = function() {
+                        Config.removeModularEntry(widgetInstance.section, widgetInstance.index);
+                        ToastService.showNoticeAction("Widget removed", "Removed " + widgetInstance.widgetType, "Undo", () => Config.undoModularChange());
+                    };
+
                     var actions = [
                         {
                             label: "Move Left",
                             icon: "󰁍",
-                            action: function() { Config.moveModularEntry(widgetInstance.section, widgetInstance.index, -1); }
+                            action: function() { moveWidget(-1); }
                         },
                         {
                             label: "Move Right",
                             icon: "󰁔",
-                            action: function() { Config.moveModularEntry(widgetInstance.section, widgetInstance.index, 1); }
+                            action: function() { moveWidget(1); }
                         },
                         {
                             separator: true
@@ -706,7 +719,7 @@ Item {
                             label: "Remove Widget",
                             icon: "󰅖",
                             danger: true,
-                            action: function() { Config.removeModularEntry(widgetInstance.section, widgetInstance.index); }
+                            action: function() { removeWidget(); }
                         }
                     ];
 
