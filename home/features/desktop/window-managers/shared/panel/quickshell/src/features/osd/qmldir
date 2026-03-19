@@ -1,4 +1,5 @@
 Osd 1.0 Osd.qml
+CountdownOsd 1.0 components/CountdownOsd.qml
 OsdCircularGauge 1.0 components/OsdCircularGauge.qml
 OsdCriticalAlert 1.0 components/OsdCriticalAlert.qml
 OsdPill 1.0 components/OsdPill.qml
