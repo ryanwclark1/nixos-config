@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import Quickshell.Io
 
 QtObject {
     id: root
@@ -43,6 +44,8 @@ QtObject {
     property real _lastTx: -1
     property real _lastReadSectors: -1
     property real _lastWriteSectors: -1
+
+    property bool _destroyed: false
 
     function filledHistory() {
         return new Array(historyLength).fill(0);
@@ -96,7 +99,8 @@ QtObject {
             return;
         selectedInterface = next;
         resetHistories();
-        samplePoll.triggerPoll();
+        rxFile.reload();
+        txFile.reload();
     }
 
     function setSelectedDiskDevice(name) {
@@ -105,7 +109,7 @@ QtObject {
             return;
         selectedDiskDevice = next;
         resetHistories();
-        samplePoll.triggerPoll();
+        diskStatsFile.reload();
     }
 
     function refreshMetadata() {
@@ -171,28 +175,64 @@ QtObject {
         ];
     }
 
-    function _sampleCommand() {
-        return [
-            "sh",
-            "-c",
-            "iface=\"$1\"; disk=\"$2\"; "
-            + "rx=0; tx=0; readSec=0; writeSec=0; "
-            + "if [ -n \"$iface\" ]; then "
-            + "  rx=$(cat \"/sys/class/net/$iface/statistics/rx_bytes\" 2>/dev/null || echo 0); "
-            + "  tx=$(cat \"/sys/class/net/$iface/statistics/tx_bytes\" 2>/dev/null || echo 0); "
-            + "fi; "
-            + "if [ -n \"$disk\" ]; then "
-            + "  diskLine=$(awk -v dev=\"$disk\" '$3 == dev {print; exit}' /proc/diskstats 2>/dev/null); "
-            + "  if [ -n \"$diskLine\" ]; then "
-            + "    readSec=$(printf '%s\\n' \"$diskLine\" | awk '{print $6}'); "
-            + "    writeSec=$(printf '%s\\n' \"$diskLine\" | awk '{print $10}'); "
-            + "  fi; "
-            + "fi; "
-            + "printf 'IFACE=%s\\nRX=%s\\nTX=%s\\nDISK=%s\\nREAD_SEC=%s\\nWRITE_SEC=%s\\n' \"$iface\" \"$rx\" \"$tx\" \"$disk\" \"$readSec\" \"$writeSec\"",
-            "sh",
-            String(selectedInterface || ""),
-            String(selectedDiskDevice || "")
-        ];
+    function _parseDiskStats(text, deviceName) {
+        var lines = String(text || "").split("\n");
+        for (var i = 0; i < lines.length; i++) {
+            var fields = String(lines[i]).trim().split(/\s+/);
+            if (fields.length >= 10 && fields[2] === deviceName)
+                return { readSectors: Number(fields[5] || 0), writeSectors: Number(fields[9] || 0) };
+        }
+        return { readSectors: 0, writeSectors: 0 };
+    }
+
+    function _readSamples() {
+        if (_destroyed) return;
+        var rx = parseInt(String(rxFile.text || "").trim()) || 0;
+        var tx = parseInt(String(txFile.text || "").trim()) || 0;
+        var diskData = _parseDiskStats(diskStatsFile.text, selectedDiskDevice);
+        var readSectors = diskData.readSectors;
+        var writeSectors = diskData.writeSectors;
+        var now = Date.now();
+
+        if (_lastRx >= 0) {
+            currentNetworkDown = Math.max(0, rx - _lastRx);
+            currentNetworkUp = Math.max(0, tx - _lastTx);
+            networkHistoryDown = pushHistory(networkHistoryDown, currentNetworkDown);
+            networkHistoryUp = pushHistory(networkHistoryUp, currentNetworkUp);
+            peakNetworkDown = arrayMax(networkHistoryDown);
+            peakNetworkUp = arrayMax(networkHistoryUp);
+            networkHotspot = (peakNetworkDown > 0 && currentNetworkDown >= peakNetworkDown * 0.8)
+                || (peakNetworkUp > 0 && currentNetworkUp >= peakNetworkUp * 0.8);
+        }
+        if (selectedInterface !== "") {
+            networkLastSampleMs = now;
+            networkDegraded = false;
+        }
+
+        if (_lastReadSectors >= 0) {
+            currentDiskRead = Math.max(0, readSectors - _lastReadSectors) * 512;
+            currentDiskWrite = Math.max(0, writeSectors - _lastWriteSectors) * 512;
+            diskHistoryRead = pushHistory(diskHistoryRead, currentDiskRead);
+            diskHistoryWrite = pushHistory(diskHistoryWrite, currentDiskWrite);
+            peakDiskRead = arrayMax(diskHistoryRead);
+            peakDiskWrite = arrayMax(diskHistoryWrite);
+            diskHotspot = (peakDiskRead > 0 && currentDiskRead >= peakDiskRead * 0.8)
+                || (peakDiskWrite > 0 && currentDiskWrite >= peakDiskWrite * 0.8);
+        }
+        if (selectedDiskDevice !== "") {
+            diskLastSampleMs = now;
+            diskDegraded = false;
+        }
+
+        _lastRx = rx;
+        _lastTx = tx;
+        _lastReadSectors = readSectors;
+        _lastWriteSectors = writeSectors;
+        _updateTelemetryState();
+
+        rxFile.reload();
+        txFile.reload();
+        diskStatsFile.reload();
     }
 
     function _parseKeyValueOutput(out) {
@@ -268,58 +308,27 @@ QtObject {
         }
     }
 
-    property var samplePoll: CommandPoll {
-        id: samplePoll
+    property FileView rxFile: FileView {
+        id: rxFile
+        path: root.selectedInterface !== "" ? ("/sys/class/net/" + root.selectedInterface + "/statistics/rx_bytes") : ""
+    }
+
+    property FileView txFile: FileView {
+        id: txFile
+        path: root.selectedInterface !== "" ? ("/sys/class/net/" + root.selectedInterface + "/statistics/tx_bytes") : ""
+    }
+
+    property FileView diskStatsFile: FileView {
+        id: diskStatsFile
+        path: root.selectedDiskDevice !== "" ? "/proc/diskstats" : ""
+    }
+
+    property Timer sampleTimer: Timer {
+        id: sampleTimer
         interval: Math.max(1000, root.sampleIntervalMs)
+        repeat: true
         running: root.subscriberCount > 0 && (root.selectedInterface !== "" || root.selectedDiskDevice !== "")
-        command: root._sampleCommand()
-        parse: function(out) {
-            return root._parseKeyValueOutput(out);
-        }
-        onUpdated: {
-            var snapshot = samplePoll.value || {};
-            var rx = Number(snapshot.RX || 0);
-            var tx = Number(snapshot.TX || 0);
-            var readSectors = Number(snapshot.READ_SEC || 0);
-            var writeSectors = Number(snapshot.WRITE_SEC || 0);
-            var now = Date.now();
-
-            if (root._lastRx >= 0) {
-                root.currentNetworkDown = Math.max(0, rx - root._lastRx);
-                root.currentNetworkUp = Math.max(0, tx - root._lastTx);
-                root.networkHistoryDown = root.pushHistory(root.networkHistoryDown, root.currentNetworkDown);
-                root.networkHistoryUp = root.pushHistory(root.networkHistoryUp, root.currentNetworkUp);
-                root.peakNetworkDown = root.arrayMax(root.networkHistoryDown);
-                root.peakNetworkUp = root.arrayMax(root.networkHistoryUp);
-                root.networkHotspot = (root.peakNetworkDown > 0 && root.currentNetworkDown >= root.peakNetworkDown * 0.8)
-                    || (root.peakNetworkUp > 0 && root.currentNetworkUp >= root.peakNetworkUp * 0.8);
-            }
-            if (root.selectedInterface !== "") {
-                root.networkLastSampleMs = now;
-                root.networkDegraded = false;
-            }
-
-            if (root._lastReadSectors >= 0) {
-                root.currentDiskRead = Math.max(0, readSectors - root._lastReadSectors) * 512;
-                root.currentDiskWrite = Math.max(0, writeSectors - root._lastWriteSectors) * 512;
-                root.diskHistoryRead = root.pushHistory(root.diskHistoryRead, root.currentDiskRead);
-                root.diskHistoryWrite = root.pushHistory(root.diskHistoryWrite, root.currentDiskWrite);
-                root.peakDiskRead = root.arrayMax(root.diskHistoryRead);
-                root.peakDiskWrite = root.arrayMax(root.diskHistoryWrite);
-                root.diskHotspot = (root.peakDiskRead > 0 && root.currentDiskRead >= root.peakDiskRead * 0.8)
-                    || (root.peakDiskWrite > 0 && root.currentDiskWrite >= root.peakDiskWrite * 0.8);
-            }
-            if (root.selectedDiskDevice !== "") {
-                root.diskLastSampleMs = now;
-                root.diskDegraded = false;
-            }
-
-            root._lastRx = rx;
-            root._lastTx = tx;
-            root._lastReadSectors = readSectors;
-            root._lastWriteSectors = writeSectors;
-            root._updateTelemetryState();
-        }
+        onTriggered: root._readSamples()
     }
 
     property Timer staleTimer: Timer {
@@ -336,4 +345,6 @@ QtObject {
             root._updateTelemetryState();
         }
     }
+
+    Component.onDestruction: _destroyed = true
 }

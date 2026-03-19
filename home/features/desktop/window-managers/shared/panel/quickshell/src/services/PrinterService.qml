@@ -5,7 +5,7 @@ import Quickshell
 // PrinterService — subscriber-based CUPS printer monitoring singleton.
 //
 // Usage: add `SharedWidgets.Ref { service: PrinterService }` in any component
-// that needs printer data. The service polls lpstat every 10s while any
+// that needs printer data. The service polls lpstat every 30s while any
 // subscriber is active. Drop the Ref to stop polling.
 //
 // Exposes:
@@ -30,7 +30,7 @@ QtObject {
   // Combines `lpstat -p -d` (printer list + default) and `lpstat -o | wc -l`
   // (active job count) in a single shell invocation to minimise process spawns.
   property var printerPoll: CommandPoll {
-    interval: 10000
+    interval: 30000
     running: root.subscriberCount > 0
 
     command: [
@@ -86,7 +86,7 @@ QtObject {
 
   function setDefault(printerName) {
     Quickshell.execDetached(["lpoptions", "-d", printerName]);
-    // Optimistic local update — poll will confirm within 10s
+    // Optimistic local update — poll will confirm within 30s
     root.defaultPrinter = printerName;
   }
 

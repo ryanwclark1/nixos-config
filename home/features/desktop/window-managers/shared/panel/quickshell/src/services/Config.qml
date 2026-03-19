@@ -267,6 +267,7 @@ QtObject {
     property bool workspaceShowAppIcons: false
     property int workspaceMaxIcons: 3
     property string workspacePillSize: "normal"
+    property string workspaceStyle: "pill" // pill | strip | dots | icons
     property bool workspaceScrollEnabled: true
     property bool workspaceReverseScroll: false
     property string workspaceActiveColor: ""

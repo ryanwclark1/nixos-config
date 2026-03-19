@@ -356,6 +356,7 @@ var _MAPS = {
         ["showAppIcons", "workspaceShowAppIcons"],
         ["maxIcons", "workspaceMaxIcons"],
         ["pillSize", "workspacePillSize"],
+        ["style", "workspaceStyle"],
         ["scrollEnabled", "workspaceScrollEnabled"],
         ["reverseScroll", "workspaceReverseScroll"],
         ["activeColor", "workspaceActiveColor"],
