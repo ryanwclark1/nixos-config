@@ -86,6 +86,19 @@ require_pattern "$daemon_qml" 'image ls' "docker-manager daemon lists images"
 require_pattern "$daemon_qml" 'volume ls' "docker-manager daemon lists volumes"
 require_pattern "$daemon_qml" 'network ls' "docker-manager daemon lists networks"
 
+# Round 2 daemon assertions
+require_pattern "$daemon_qml" 'property var containerStats' "docker-manager daemon tracks container stats"
+require_pattern "$daemon_qml" 'stats --no-stream' "docker-manager daemon uses stats command"
+require_pattern "$daemon_qml" 'property bool pullInProgress' "docker-manager daemon tracks pull progress"
+require_pattern "$daemon_qml" 'function fetchLogs\(' "docker-manager daemon exposes log preview"
+require_pattern "$daemon_qml" 'property var volumeUsageMap' "docker-manager daemon tracks volume cross-references"
+require_pattern "$daemon_qml" 'property var networkUsageMap' "docker-manager daemon tracks network cross-references"
+require_pattern "$daemon_qml" 'function _containerRefreshCommand\(' "docker-manager daemon splits container refresh"
+require_pattern "$daemon_qml" 'function _resourceRefreshCommand\(' "docker-manager daemon splits resource refresh"
+require_pattern "$daemon_qml" 'ScriptModel' "docker-manager daemon uses ScriptModel for efficient updates"
+require_pattern "$daemon_qml" 'type=image' "docker-manager daemon supports Podman image event types"
+require_pattern "$daemon_qml" 'signal toastRequested' "docker-manager daemon provides toast notification bridge"
+
 require_pattern "$bar_widget_qml" 'PopupWindow' "docker-manager bar widget uses a popup surface"
 require_pattern "$bar_widget_qml" 'anchor\.item' "docker-manager popup anchors to the bar widget"
 require_pattern "$bar_widget_qml" 'groupByCompose' "docker-manager widget persists compose-view preference"
@@ -93,6 +106,11 @@ require_pattern "$bar_widget_qml" 'showPorts' "docker-manager widget persists po
 require_pattern "$bar_widget_qml" 'executeComposeAction' "docker-manager widget exposes compose project actions"
 require_pattern "$bar_widget_qml" 'executeContainerAction' "docker-manager widget exposes container actions"
 require_pattern "$bar_widget_qml" 'currentTab' "docker-manager widget uses tab-based navigation"
+
+# Round 2 bar widget assertions
+require_pattern "$bar_widget_qml" 'selectionMode' "docker-manager widget supports bulk selection mode"
+require_pattern "$bar_widget_qml" 'searchQuery' "docker-manager widget supports search filtering"
+require_pattern "$bar_widget_qml" 'focusedCardIndex' "docker-manager widget supports keyboard navigation"
 
 require_pattern "$settings_qml" 'dockerBinary' "docker-manager settings expose runtime binary"
 require_pattern "$settings_qml" 'debounceDelay' "docker-manager settings expose debounce delay"
@@ -107,8 +125,17 @@ require_pattern "$settings_qml" 'showVolumes' "docker-manager settings expose vo
 require_pattern "$settings_qml" 'showNetworks' "docker-manager settings expose networks tab visibility"
 require_pattern "$settings_qml" 'confirmPrune' "docker-manager settings expose prune confirmation"
 
+# Round 2 settings assertions
+require_pattern "$settings_qml" 'statsInterval' "docker-manager settings expose stats interval"
+require_pattern "$settings_qml" 'logPreviewLines' "docker-manager settings expose log preview lines"
+require_pattern "$settings_qml" 'resourceRefreshInterval' "docker-manager settings expose resource refresh interval"
+require_pattern "$settings_qml" 'toastEnabled' "docker-manager settings expose toast notifications toggle"
+
 require_pattern "$utils_js" 'function guessDefaultPort' "docker-manager utils expose port heuristics"
 require_pattern "$utils_js" 'function normalizeImage' "docker-manager utils expose image normalization"
+
+# Round 2 utils assertions
+require_pattern "$utils_js" 'function matchesFilter' "docker-manager utils expose search filter function"
 
 require_pattern "$readme" 'Docker or Podman' "docker-manager README documents runtime support"
 require_pattern "$readme" '~/.config/quickshell/plugins/docker-manager' "docker-manager README documents install location"
