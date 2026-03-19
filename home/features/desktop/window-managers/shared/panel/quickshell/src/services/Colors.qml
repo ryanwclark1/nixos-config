@@ -235,6 +235,25 @@ QtObject {
         return "󰖐";
     }
 
+    function aqiColor(value, isUS) {
+        var v = parseInt(value);
+        if (isNaN(v)) return Colors.textDisabled;
+        if (isUS) {
+            if (v <= 50) return "#4caf50";
+            if (v <= 100) return "#ffeb3b";
+            if (v <= 150) return "#ff9800";
+            if (v <= 200) return "#f44336";
+            if (v <= 300) return "#9c27b0";
+            return "#7e0023";
+        }
+        if (v <= 20) return "#4caf50";
+        if (v <= 40) return "#8bc34a";
+        if (v <= 60) return "#ffeb3b";
+        if (v <= 80) return "#ff9800";
+        if (v <= 100) return "#f44336";
+        return "#7e0023";
+    }
+
     property bool _themeActive: false
 
     function applyBase24(palette, variant) {

@@ -282,6 +282,8 @@ var _MAPS = {
         ["keepSearchOnModeSwitch", "launcherKeepSearchOnModeSwitch"],
         ["enableDebugTimings", "launcherEnableDebugTimings"],
         ["showRuntimeMetrics", "launcherShowRuntimeMetrics"],
+        ["characterTrigger", "launcherCharacterTrigger"],
+        ["characterPasteOnSelect", "launcherCharacterPasteOnSelect"],
         ["preloadFailureThreshold", "launcherPreloadFailureThreshold"],
         ["preloadFailureBackoffSec", "launcherPreloadFailureBackoffSec"],
         ["maxResults", "launcherMaxResults"],

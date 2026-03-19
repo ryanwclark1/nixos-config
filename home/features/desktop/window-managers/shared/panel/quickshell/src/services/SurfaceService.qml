@@ -62,6 +62,11 @@ QtObject {
                 focusPolicy: "preserve-app-focus",
                 legacyFlags: ["weatherMenuVisible"]
             },
+            marketMenu: {
+                kind: "popup",
+                focusPolicy: "preserve-app-focus",
+                legacyFlags: ["marketMenuVisible"]
+            },
             sshMenu: {
                 kind: "popup",
                 focusPolicy: "preserve-app-focus",

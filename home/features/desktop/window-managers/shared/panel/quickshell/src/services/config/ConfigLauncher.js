@@ -209,6 +209,8 @@ function applyLauncherConfig(config, data) {
     config.launcherKeepSearchOnModeSwitch = asBool(launcher.keepSearchOnModeSwitch, true);
     config.launcherEnableDebugTimings = asBool(launcher.enableDebugTimings, false);
     config.launcherShowRuntimeMetrics = asBool(launcher.showRuntimeMetrics, false);
+    config.launcherCharacterTrigger = normalizeCharacterTrigger(launcher.characterTrigger);
+    config.launcherCharacterPasteOnSelect = asBool(launcher.characterPasteOnSelect, false);
     config.launcherPreloadFailureThreshold = clampInt(launcher.preloadFailureThreshold, 1, 10, 3);
     config.launcherPreloadFailureBackoffSec = clampInt(launcher.preloadFailureBackoffSec, 10, 900, 120);
 
@@ -270,4 +272,15 @@ function applyLauncherConfig(config, data) {
     config.launcherScoreExecWeight = clampReal(launcher.scoreExecWeight, 0.1, 4.0, 0.88);
     config.launcherScoreBodyWeight = clampReal(launcher.scoreBodyWeight, 0.1, 4.0, 0.75);
     config.launcherScoreCategoryWeight = clampReal(launcher.scoreCategoryWeight, 0.1, 4.0, 0.7);
+}
+
+function normalizeCharacterTrigger(value) {
+    var trigger = String(value || ":").trim();
+    if (trigger === "")
+        return ":";
+    if (trigger.length > 4)
+        trigger = trigger.substring(0, 4);
+    if (/[\s]/.test(trigger))
+        return ":";
+    return trigger;
 }

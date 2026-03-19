@@ -53,6 +53,9 @@ QtObject {
     property string weatherLongitude: ""
     property string weatherLocationPriority: "latlon_city_auto"
 
+    // --- MARKET ---
+    property string marketTickers: "^SPX ^DJI ^NDQ"
+
     // --- LAUNCHER ---
     property string launcherDefaultMode: "drun"
     property bool launcherShowModeHints: true
@@ -62,6 +65,8 @@ QtObject {
     property bool launcherKeepSearchOnModeSwitch: true
     property bool launcherEnableDebugTimings: false
     property bool launcherShowRuntimeMetrics: false
+    property string launcherCharacterTrigger: ":"
+    property bool launcherCharacterPasteOnSelect: false
     property int launcherPreloadFailureThreshold: 3
     property int launcherPreloadFailureBackoffSec: 120
     property int launcherMaxResults: 80
