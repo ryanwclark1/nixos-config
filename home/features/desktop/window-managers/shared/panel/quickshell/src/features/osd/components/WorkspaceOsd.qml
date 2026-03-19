@@ -21,12 +21,31 @@ Scope {
     onTriggered: root.shouldShowOsd = false
   }
 
+  property string specialIcon: ""
+
+  function _specialWorkspaceIcon(shortName) {
+    var lower = shortName.toLowerCase();
+    if (lower === "scratchpad") return "󱂬";
+    if (lower === "communication" || lower === "chat") return "󰍡";
+    if (lower === "music" || lower === "media") return "󰎆";
+    if (lower === "terminal" || lower === "term") return "";
+    if (lower === "browser" || lower === "web") return "󰖟";
+    if (lower === "mail" || lower === "email") return "󰇰";
+    return "";
+  }
+
   function updateWorkspace(name) {
     if (!name || name === root._lastWorkspaceName) return;
     root._lastWorkspaceName = name;
     root.workspaceName = name;
     root.isSpecial = root.workspaceName.startsWith("special");
-    if (root.isSpecial) root.workspaceName = root.workspaceName.replace("special:", "Special: ");
+    if (root.isSpecial) {
+      var shortName = root.workspaceName.substring(8);
+      root.specialIcon = _specialWorkspaceIcon(shortName);
+      root.workspaceName = shortName.charAt(0).toUpperCase() + shortName.substring(1);
+    } else {
+      root.specialIcon = "";
+    }
 
     if (!root.initialized) {
       root.initialized = true;
@@ -52,6 +71,11 @@ Scope {
   function _onHyprlandEvent(event) {
     if (event.name === "workspace" || event.name === "workspacev2")
       Qt.callLater(_readFocusedWorkspaceName);
+    if (event.name === "activespecial") {
+      var wsName = String(event.data || "").split(",")[0] || "";
+      if (wsName.startsWith("special:"))
+        updateWorkspace(wsName);
+    }
   }
 
   function _readFocusedWorkspaceName() {
@@ -165,7 +189,17 @@ Scope {
               Layout.alignment: Qt.AlignHCenter
               iconSize: 64
               iconName: root.isSpecial ? "view-pin-symbolic" : "view-grid-symbolic"
-              fallbackIcon: root.isSpecial ? "󰐃" : "󰖲"
+              fallbackIcon: root.isSpecial ? (root.specialIcon !== "" ? root.specialIcon : "󰐃") : "󰖲"
+              visible: !root.isSpecial || root.specialIcon === ""
+            }
+
+            Text {
+              Layout.alignment: Qt.AlignHCenter
+              text: root.specialIcon
+              color: Colors.primary
+              font.pixelSize: 48
+              font.family: Colors.fontMono
+              visible: root.isSpecial && root.specialIcon !== ""
             }
 
             Text {

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import "../../../services"
 import "../../../shared"
 import "../../../widgets" as SharedWidgets
@@ -7,21 +8,31 @@ import "../../../widgets" as SharedWidgets
 SharedWidgets.CardBase {
   id: root
   readonly property var allToplevels: CompositorAdapter.toplevels
-  Layout.preferredHeight: root.scratchpadWindows.length > 0 ? col.implicitHeight + root.pad * 2 : 0
-  visible: CompositorAdapter.supportsScratchpad && root.scratchpadWindows.length > 0
+  Layout.preferredHeight: root.specialWindows.length > 0 ? col.implicitHeight + root.pad * 2 : 0
+  visible: CompositorAdapter.supportsScratchpad && root.specialWindows.length > 0
 
-  readonly property var scratchpadWindows: {
+  readonly property var specialWindows: {
     var windows = [];
     if (!CompositorAdapter.supportsScratchpad) return windows;
     for (var i = 0; i < allToplevels.length; i++) {
       var win = allToplevels[i];
       if (!win) continue;
       var workspaceName = (win.workspace && win.workspace.name) ? win.workspace.name : "";
-      if (workspaceName === "special:scratchpad") {
-        windows.push(win);
+      if (workspaceName.startsWith("special:")) {
+        windows.push({
+          title: win.title || win.class || "Unknown Window",
+          address: win.address || "",
+          workspace: workspaceName.substring(8),
+          class: win.class || ""
+        });
       }
     }
     return windows;
+  }
+
+  function toggleWorkspace(wsName) {
+    if (!CompositorAdapter.supportsScratchpad) return;
+    Quickshell.execDetached(["hyprctl", "dispatch", "togglespecialworkspace", wsName]);
   }
 
   function summonWindow(address) {
@@ -38,7 +49,7 @@ SharedWidgets.CardBase {
     spacing: Colors.paddingSmall
 
     Text {
-      text: "SCRATCHPAD WINDOWS"
+      text: "SPECIAL WORKSPACES"
       color: Colors.textDisabled
       font.pixelSize: Colors.fontSizeXS
       font.weight: Font.Bold
@@ -52,7 +63,7 @@ SharedWidgets.CardBase {
 
       Repeater {
         id: scratchRepeater
-        model: root.scratchpadWindows
+        model: root.specialWindows
 
         delegate: Rectangle {
           id: itemRect
@@ -69,14 +80,24 @@ SharedWidgets.CardBase {
           RowLayout {
             id: scratchRow
             anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
-            Text { text: "󱂬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium; Layout.alignment: Qt.AlignTop }
-            Text {
-              text: modelData.title || modelData.class || "Unknown Window"
-              color: Colors.text
-              font.pixelSize: Colors.fontSizeSmall
+            Text { text: "󰐃"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium; Layout.alignment: Qt.AlignTop }
+            ColumnLayout {
               Layout.fillWidth: true
-              wrapMode: Text.Wrap
-              maximumLineCount: 2
+              spacing: 2
+              Text {
+                text: modelData.title
+                color: Colors.text
+                font.pixelSize: Colors.fontSizeSmall
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                maximumLineCount: 2
+              }
+              Text {
+                text: modelData.workspace
+                color: Colors.textDisabled
+                font.pixelSize: Colors.fontSizeXS
+                font.capitalization: Font.Capitalize
+              }
             }
             Text { text: "󰁔"; color: Colors.textDisabled; font.family: Colors.fontMono }
           }
@@ -94,9 +115,13 @@ SharedWidgets.CardBase {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: (mouse) => {
               scratchStateLayer.burst(mouse.x, mouse.y);
-              root.summonWindow(modelData.address);
+              if (mouse.button === Qt.RightButton)
+                root.toggleWorkspace(modelData.workspace);
+              else
+                root.summonWindow(modelData.address);
             }
           }
         }
