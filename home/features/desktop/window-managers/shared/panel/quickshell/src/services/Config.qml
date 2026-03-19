@@ -11,7 +11,7 @@ QtObject {
     // --- BAR (legacy compatibility + shell defaults) ---
     property int barHeight: 38
     property bool barFloating: true
-    property int barMargin: 6
+    property int barMargin: 4
     property real barOpacity: 1.0
     property var barConfigs: []
     property string selectedBarId: ""
