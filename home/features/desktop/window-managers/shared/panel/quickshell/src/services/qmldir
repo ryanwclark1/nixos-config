@@ -47,6 +47,7 @@ singleton ToastService 1.0 ToastService.qml
 singleton TodoService 1.0 TodoService.qml
 singleton UsageTrackerService 1.0 UsageTrackerService.qml
 singleton WallpaperService 1.0 WallpaperService.qml
+singleton ModelUsageService 1.0 ModelUsageService.qml
 singleton WeatherService 1.0 WeatherService.qml
 singleton WorkspaceIdentityService 1.0 WorkspaceIdentityService.qml
 singleton YdotoolService 1.0 YdotoolService.qml

@@ -96,6 +96,13 @@ var _MAPS = {
         ["longitude", "weatherLongitude", _str],
         ["locationPriority", "weatherLocationPriority"]
     ],
+    modelUsage: [
+        ["claudeEnabled", "modelUsageClaudeEnabled"],
+        ["codexEnabled", "modelUsageCodexEnabled"],
+        ["activeProvider", "modelUsageActiveProvider"],
+        ["barMetric", "modelUsageBarMetric"],
+        ["refreshSec", "modelUsageRefreshSec"]
+    ],
     controlCenter: [
         ["showQuickLinks", "controlCenterShowQuickLinks"],
         ["showMediaWidget", "controlCenterShowMediaWidget"],
@@ -289,6 +296,9 @@ var _MAPS = {
         ["maxResults", "launcherMaxResults"],
         ["fileMinQueryLength", "launcherFileMinQueryLength"],
         ["fileMaxResults", "launcherFileMaxResults"],
+        ["fileSearchRoot", "launcherFileSearchRoot"],
+        ["fileShowHidden", "launcherFileShowHidden"],
+        ["fileOpener", "launcherFileOpener"],
         ["recentsLimit", "launcherRecentsLimit"],
         ["recentAppsLimit", "launcherRecentAppsLimit"],
         ["suggestionsLimit", "launcherSuggestionsLimit"],

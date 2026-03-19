@@ -38,6 +38,16 @@ function asBool(value, fallback) {
     return fallback;
 }
 
+function normalizeLauncherPath(value, fallback) {
+    var raw = String(value === undefined || value === null ? fallback : value).trim();
+    return raw !== "" ? raw : fallback;
+}
+
+function normalizeLauncherCommand(value, fallback) {
+    var raw = String(value === undefined || value === null ? fallback : value).trim();
+    return raw !== "" ? raw : fallback;
+}
+
 function normalizeModeList(list, fallbackList) {
     var allowed = {
         "drun": true,
@@ -217,6 +227,9 @@ function applyLauncherConfig(config, data) {
     config.launcherMaxResults = clampInt(launcher.maxResults, 20, 400, 80);
     config.launcherFileMinQueryLength = clampInt(launcher.fileMinQueryLength, 1, 8, 2);
     config.launcherFileMaxResults = clampInt(launcher.fileMaxResults, 20, 500, 100);
+    config.launcherFileSearchRoot = normalizeLauncherPath(launcher.fileSearchRoot, "~");
+    config.launcherFileShowHidden = asBool(launcher.fileShowHidden, false);
+    config.launcherFileOpener = normalizeLauncherCommand(launcher.fileOpener, "xdg-open");
     config.launcherRecentsLimit = clampInt(launcher.recentsLimit, 1, 40, 12);
     config.launcherRecentAppsLimit = clampInt(launcher.recentAppsLimit, 1, 20, 6);
     config.launcherSuggestionsLimit = clampInt(launcher.suggestionsLimit, 1, 20, 4);

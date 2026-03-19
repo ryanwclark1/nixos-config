@@ -42,7 +42,6 @@ QtObject {
   // ── Toplevel abstraction ───────────────────
   readonly property bool hasHyprlandToplevels: isHyprland && typeof Hyprland !== "undefined"
   readonly property bool hasToplevelManager: hasHyprlandToplevels || typeof ToplevelManager !== "undefined"
-  property string _lastActiveWindowSourceLog: ""
   readonly property var toplevels: {
     if (hasHyprlandToplevels)
       return Hyprland.toplevels || [];
@@ -146,10 +145,7 @@ QtObject {
   Component.onCompleted: {
     if (hasHyprlandToplevels && typeof Hyprland.refreshToplevels === "function")
       Hyprland.refreshToplevels();
-    logActiveWindowSourceTransition();
   }
-
-  onActiveWindowSourceChanged: logActiveWindowSourceTransition()
 
   function windowTitle(windowRef) {
     return windowRef ? String(windowRef.title || "") : "";
@@ -191,12 +187,6 @@ QtObject {
     var leftApp = windowAppId(left);
     var rightApp = windowAppId(right);
     return leftTitle !== "" && leftApp !== "" && leftTitle === rightTitle && leftApp === rightApp;
-  }
-
-  function logActiveWindowSourceTransition() {
-    if (_lastActiveWindowSourceLog === activeWindowSource)
-      return;
-    _lastActiveWindowSourceLog = activeWindowSource;
   }
 
   function workspaceNameById(wsId) {
@@ -428,19 +418,6 @@ QtObject {
       return;
     }
     Quickshell.execDetached(["hyprctl", "keyword", String(key || ""), String(value || "")]);
-  }
-
-  // Legacy alias — prefer focusWindow()
-  function focusWindowAddress(address) {
-    if (isNiri) {
-      console.warn("[CompositorAdapter] focusWindowAddress: Use focusWindow() with Niri window ID instead.");
-      return;
-    }
-    if (!supportsDispatcherActions) {
-      notifyUnsupported("Focus window");
-      return;
-    }
-    dispatchAction("focuswindow", "address:" + String(address), "Focus window");
   }
 
   // ═══════════════════════════════════════════════

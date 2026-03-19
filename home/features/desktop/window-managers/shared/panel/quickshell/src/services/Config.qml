@@ -72,6 +72,9 @@ QtObject {
     property int launcherMaxResults: 80
     property int launcherFileMinQueryLength: 2
     property int launcherFileMaxResults: 100
+    property string launcherFileSearchRoot: "~"
+    property bool launcherFileShowHidden: false
+    property string launcherFileOpener: "xdg-open"
     property int launcherRecentsLimit: 12
     property int launcherRecentAppsLimit: 6
     property int launcherSuggestionsLimit: 4
@@ -122,6 +125,13 @@ QtObject {
     property var launcherWebCustomEngines: []
     property bool launcherWebBangsEnabled: false
     property string launcherWebBangsLastSync: ""
+
+    // --- MODEL USAGE ---
+    property bool modelUsageClaudeEnabled: true
+    property bool modelUsageCodexEnabled: false
+    property string modelUsageActiveProvider: "claude"
+    property string modelUsageBarMetric: "prompts" // prompts | tokens
+    property int modelUsageRefreshSec: 30
 
     // --- CONTROL CENTER ---
     readonly property int controlCenterWidthMin: 440
