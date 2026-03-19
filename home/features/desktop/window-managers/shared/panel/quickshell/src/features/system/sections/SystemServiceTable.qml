@@ -333,6 +333,7 @@ SharedWidgets.CardBase {
                     size: 28
                     iconSize: Colors.fontSizeSmall
                     iconColor: Colors.textSecondary
+                    tooltipText: "Refresh"
                     onClicked: ServiceUnitService.refresh()
                 }
             }

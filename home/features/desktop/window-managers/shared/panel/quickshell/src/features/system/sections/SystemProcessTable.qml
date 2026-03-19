@@ -490,6 +490,7 @@ SharedWidgets.CardBase {
                     size: 28
                     iconSize: Colors.fontSizeSmall
                     iconColor: Colors.textSecondary
+                    tooltipText: "Refresh"
                     onClicked: ProcessService.refresh()
                 }
             }
@@ -692,6 +693,7 @@ SharedWidgets.CardBase {
                                             size: 18
                                             iconSize: Colors.fontSizeXS
                                             iconColor: selected ? Colors.primary : Colors.textDisabled
+                                            tooltipText: modelData._collapsed ? "Expand" : "Collapse"
                                             onClicked: {
                                                 root.selectProcess(modelData.pid);
                                                 if (modelData._hasChildren)

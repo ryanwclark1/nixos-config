@@ -103,6 +103,7 @@ SharedWidgets.CardBase {
                 icon: root.showProcesses ? "󱗼" : "󱗻"
                 size: 24
                 iconSize: Colors.fontSizeSmall
+                tooltipText: root.showProcesses ? "Hide GPU processes" : "Show GPU processes"
                 onClicked: root.showProcesses = !root.showProcesses
             }
         }
