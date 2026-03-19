@@ -19,6 +19,7 @@ QtObject {
     property var barCenterEntries: ["windowTitle"]
     property var barRightEntries: ["updates", "cava", "mediaBar", "network", "bluetooth", "audio", "battery", "dateTime", "notifications", "tray", "controlCenter"]
     property bool barUseModularEntries: false
+    property var _modularLayoutHistory: []
 
     // --- GLASS ---
     property bool blurEnabled: true
@@ -175,6 +176,7 @@ QtObject {
     // --- DESKTOP WIDGETS ---
     property bool desktopWidgetsEnabled: false
     property bool desktopWidgetsGridSnap: false
+    property bool desktopEditMode: false
     property var desktopWidgetsMonitorWidgets: []
 
     // --- BACKGROUND ---
@@ -652,7 +654,36 @@ QtObject {
         config: root
     }
 
+    function _pushModularHistory() {
+        var snapshot = {
+            left: barLeftEntries.slice(),
+            center: barCenterEntries.slice(),
+            right: barRightEntries.slice()
+        };
+        var history = _modularLayoutHistory.slice();
+        history.push(snapshot);
+        if (history.length > 10) history.shift();
+        _modularLayoutHistory = history;
+    }
+
+    function undoModularChange() {
+        if (_modularLayoutHistory.length === 0) return;
+        var history = _modularLayoutHistory.slice();
+        var last = history.pop();
+        
+        // Block save during restore to avoid loops
+        _loading = true;
+        barLeftEntries = last.left;
+        barCenterEntries = last.center;
+        barRightEntries = last.right;
+        _loading = false;
+        
+        _modularLayoutHistory = history;
+        scheduleSave();
+    }
+
     function addModularEntry(section, type) {
+        _pushModularHistory();
         var list = [];
         if (section === "left") list = barLeftEntries.slice();
         else if (section === "center") list = barCenterEntries.slice();
@@ -668,6 +699,7 @@ QtObject {
     }
 
     function moveModularEntry(section, index, direction) {
+        _pushModularHistory();
         var list = [];
         if (section === "left") list = barLeftEntries.slice();
         else if (section === "center") list = barCenterEntries.slice();
@@ -688,6 +720,7 @@ QtObject {
     }
 
     function removeModularEntry(section, index) {
+        _pushModularHistory();
         var list = [];
         if (section === "left") list = barLeftEntries.slice();
         else if (section === "center") list = barCenterEntries.slice();

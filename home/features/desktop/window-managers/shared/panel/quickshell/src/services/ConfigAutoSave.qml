@@ -344,6 +344,9 @@ QtObject {
         function onThemeNameChanged() {
             root.config.scheduleSave();
         }
+        function onDebugChanged() {
+            root.config.scheduleSave();
+        }
         function onFontFamilyChanged() {
             root.config.scheduleSave();
         }
@@ -678,6 +681,9 @@ QtObject {
             root.config.scheduleSave();
         }
         function onWallpaperTransitionTypeChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallpaperTransitionDurationChanged() {
             root.config.scheduleSave();
         }
         function onWallpaperUseShellRendererChanged() {
