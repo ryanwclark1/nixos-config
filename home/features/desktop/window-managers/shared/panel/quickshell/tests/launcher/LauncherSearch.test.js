@@ -8,6 +8,10 @@ import {
   highlightMatch,
   ensureItemRankCache,
   compareLauncherItemsAlpha,
+  cycleSelection,
+  moveSelectionRelative,
+  jumpSelectionBoundary,
+  pageSelection,
 } from "../../src/launcher/LauncherSearch.js";
 
 // ---------------------------------------------------------------------------
@@ -219,5 +223,140 @@ describe("compareLauncherItemsAlpha", () => {
     const a = { name: "App", exec: "app-a", title: "" };
     const b = { name: "App", exec: "app-b", title: "" };
     expect(compareLauncherItemsAlpha(a, b)).toBeLessThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// cycleSelection
+// ---------------------------------------------------------------------------
+
+describe("cycleSelection", () => {
+  it("moves forward and wraps around at end", () => {
+    // count=5, index=4, step=+1 → wraps to 0
+    expect(cycleSelection(5, 4, 1)).toBe(0);
+  });
+
+  it("moves backward and wraps at beginning", () => {
+    // count=5, index=0, step=-1 → wraps to 4
+    expect(cycleSelection(5, 0, -1)).toBe(4);
+  });
+
+  it("advances by positive step without wrapping", () => {
+    expect(cycleSelection(10, 3, 2)).toBe(5);
+  });
+
+  it("wraps when step exceeds count", () => {
+    expect(cycleSelection(3, 2, 2)).toBe(1);
+  });
+
+  it("returns current index unchanged when count is 0", () => {
+    expect(cycleSelection(0, 0, 1)).toBe(0);
+  });
+
+  it("returns current index unchanged when count is negative", () => {
+    expect(cycleSelection(-1, 2, 1)).toBe(2);
+  });
+
+  it("handles step of 0 (no movement)", () => {
+    expect(cycleSelection(5, 3, 0)).toBe(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// moveSelectionRelative
+// ---------------------------------------------------------------------------
+
+describe("moveSelectionRelative", () => {
+  it("moves forward within bounds", () => {
+    expect(moveSelectionRelative(10, 3, 2)).toBe(5);
+  });
+
+  it("clamps at the last item (count - 1)", () => {
+    expect(moveSelectionRelative(5, 3, 10)).toBe(4);
+  });
+
+  it("clamps at 0 when stepping backward past the start", () => {
+    expect(moveSelectionRelative(5, 1, -5)).toBe(0);
+  });
+
+  it("stays at current index when step is 0", () => {
+    expect(moveSelectionRelative(5, 2, 0)).toBe(2);
+  });
+
+  it("returns current index unchanged when count is 0", () => {
+    expect(moveSelectionRelative(0, 0, 1)).toBe(0);
+  });
+
+  it("moves backward by 1", () => {
+    expect(moveSelectionRelative(10, 5, -1)).toBe(4);
+  });
+
+  it("does not go below 0", () => {
+    expect(moveSelectionRelative(10, 0, -1)).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// jumpSelectionBoundary
+// ---------------------------------------------------------------------------
+
+describe("jumpSelectionBoundary", () => {
+  it("jumps to the last item when toEnd is true", () => {
+    expect(jumpSelectionBoundary(10, true)).toBe(9);
+  });
+
+  it("jumps to the first item (0) when toEnd is false", () => {
+    expect(jumpSelectionBoundary(10, false)).toBe(0);
+  });
+
+  it("returns 0 for empty list with toEnd true", () => {
+    expect(jumpSelectionBoundary(0, true)).toBe(0);
+  });
+
+  it("returns 0 for empty list with toEnd false", () => {
+    expect(jumpSelectionBoundary(0, false)).toBe(0);
+  });
+
+  it("returns 0 for single-item list at end", () => {
+    expect(jumpSelectionBoundary(1, true)).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// pageSelection
+// ---------------------------------------------------------------------------
+
+describe("pageSelection", () => {
+  it("pages forward by computed page size", () => {
+    // hudHeight=360 → pageSize = round(360/72)=5 → index 0+5=5
+    expect(pageSelection(20, 0, 1, 360)).toBe(5);
+  });
+
+  it("pages backward by computed page size", () => {
+    // hudHeight=360 → pageSize=5 → index 10-5=5
+    expect(pageSelection(20, 10, -1, 360)).toBe(5);
+  });
+
+  it("clamps at the last item when paging beyond end", () => {
+    // hudHeight=360 → pageSize=5; index 18 + 5 = 23, clamped to 19
+    expect(pageSelection(20, 18, 1, 360)).toBe(19);
+  });
+
+  it("clamps at 0 when paging backward beyond start", () => {
+    expect(pageSelection(20, 2, -1, 360)).toBe(0);
+  });
+
+  it("uses minimum page size of 5 for very small hudHeight", () => {
+    // hudHeight=10 → round(10/72)=0, clamp to min 5 → index 0+5=5
+    expect(pageSelection(20, 0, 1, 10)).toBe(5);
+  });
+
+  it("uses maximum page size of 12 for very large hudHeight", () => {
+    // hudHeight=2000 → round(2000/72)=28, clamp to max 12 → index 0+12=12
+    expect(pageSelection(20, 0, 1, 2000)).toBe(12);
+  });
+
+  it("returns current index unchanged when count is 0", () => {
+    expect(pageSelection(0, 3, 1, 360)).toBe(3);
   });
 });
