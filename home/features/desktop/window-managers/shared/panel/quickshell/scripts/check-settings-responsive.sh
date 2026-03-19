@@ -32,6 +32,7 @@ repo_shell_mode=0
 repo_shell_pid=""
 repo_shell_service_was_active=0
 repo_shell_env=()
+repo_shell_ready_timeout_sec="${QS_REPO_SHELL_READY_TIMEOUT_SEC:-40}"
 
 pass() {
   printf '[PASS] %s\n' "$1"
@@ -186,7 +187,7 @@ start_repo_shell() {
   env "${repo_shell_env[@]}" quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-settings.log 2>&1 &
   repo_shell_pid="$!"
 
-  deadline=$((SECONDS + 20))
+  deadline=$((SECONDS + repo_shell_ready_timeout_sec))
   while (( SECONDS < deadline )); do
     runtime_dir="$(readlink -f "${runtime_pid_root}/${repo_shell_pid}" 2>/dev/null || true)"
     runtime_id=""

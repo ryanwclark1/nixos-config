@@ -170,6 +170,25 @@ start_repo_shell() {
   exit 1
 }
 
+wait_for_instance_ready() {
+  local deadline=$((SECONDS + 15))
+  local discovered=""
+  while (( SECONDS < deadline )); do
+    if quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
+      return 0
+    fi
+    discovered="$(discover_reachable_instance || true)"
+    if [[ -n "${discovered}" ]]; then
+      instance_id="${discovered}"
+      if quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
+        return 0
+      fi
+    fi
+    sleep 0.2
+  done
+  return 1
+}
+
 discover_reachable_instance() {
   local candidate show_output launch_line log_file fallback_candidate=""
   if [[ ! -d "${runtime_root}" ]]; then
@@ -195,8 +214,29 @@ launcher_action_available() {
   quickshell ipc --id "${instance_id}" show 2>/dev/null | rg -q "function ${action}\\("
 }
 
+ipc_error_is_retryable() {
+  local output="$1"
+  printf '%s' "${output}" | rg -q 'No running instances start with|Not ready to accept queries yet'
+}
+
 call_ipc() {
-  quickshell ipc --id "${instance_id}" call "$@"
+  local output=""
+  local attempt
+  for attempt in $(seq 1 8); do
+    wait_for_instance_ready >/dev/null 2>&1 || true
+    output="$(quickshell ipc --id "${instance_id}" call "$@" 2>&1)" && {
+      printf '%s\n' "${output}"
+      return 0
+    }
+    if ipc_error_is_retryable "${output}"; then
+      sleep 0.25
+      continue
+    fi
+    printf '%s\n' "${output}" >&2
+    return 1
+  done
+  printf '%s\n' "${output}" >&2
+  return 1
 }
 
 json_probe() {

@@ -141,6 +141,11 @@ wait_for_instance_ready() {
   return 1
 }
 
+ipc_error_is_retryable() {
+  local output="$1"
+  printf '%s' "${output}" | rg -q 'No running instances start with|Not ready to accept queries yet'
+}
+
 populate_repo_shell_env() {
   local line key value
   repo_shell_env=()
@@ -278,31 +283,31 @@ call_ipc() {
   local action="$2"
   shift 2
   local output=""
+  local attempt
 
-  wait_for_instance_ready >/dev/null 2>&1 || true
-  if (( ${#ipc_timeout_cmd[@]} > 0 )); then
-    output="$("${ipc_timeout_cmd[@]}" quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@" 2>&1)" || {
-      if printf '%s' "${output}" | rg -q 'No running instances start with'; then
-        wait_for_instance_ready >/dev/null 2>&1 || true
-        "${ipc_timeout_cmd[@]}" quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
-        return
-      fi
-      printf '%s\n' "${output}" >&2
-      return 1
-    }
-    printf '%s\n' "${output}"
-  else
-    output="$(quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@" 2>&1)" || {
-      if printf '%s' "${output}" | rg -q 'No running instances start with'; then
-        wait_for_instance_ready >/dev/null 2>&1 || true
-        quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@"
-        return
-      fi
-      printf '%s\n' "${output}" >&2
-      return 1
-    }
-    printf '%s\n' "${output}"
-  fi
+  for attempt in $(seq 1 8); do
+    wait_for_instance_ready >/dev/null 2>&1 || true
+    if (( ${#ipc_timeout_cmd[@]} > 0 )); then
+      output="$("${ipc_timeout_cmd[@]}" quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@" 2>&1)" && {
+        printf '%s\n' "${output}"
+        return 0
+      }
+    else
+      output="$(quickshell ipc --id "${instance_id}" call "${target}" "${action}" "$@" 2>&1)" && {
+        printf '%s\n' "${output}"
+        return 0
+      }
+    fi
+    if ipc_error_is_retryable "${output}"; then
+      sleep 0.25
+      continue
+    fi
+    printf '%s\n' "${output}" >&2
+    return 1
+  done
+
+  printf '%s\n' "${output}" >&2
+  return 1
 }
 
 wait_for_viewport_matrix() {
