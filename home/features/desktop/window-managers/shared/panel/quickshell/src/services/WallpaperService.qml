@@ -43,6 +43,10 @@ QtObject {
   property bool _colorNotify: true
   property var _queuedSolidApplies: []
 
+  // Signal emitted when wallpaper should change — WallpaperLayer listens to this
+  signal wallpaperApplied(string imagePath, string monitorName)
+  signal solidColorApplied(string colorHex, string monitorName)
+
   // Primary wallpaper directory shown in the UI (default: Pictures).
   // The service always scans *all* wallpaperSearchDirs; this is just the folder
   // used by wallpaper selection workflows.
@@ -102,6 +106,38 @@ QtObject {
   function _startApply(request) {
     _applyImagePath = request.imagePath;
     _applyMonitorName = request.monitorName;
+
+    // Shell-rendered mode: update state and emit signal, skip external tool
+    if (Config.wallpaperUseShellRenderer) {
+      var key = _applyMonitorName || "__all__";
+      var clearedSolid = Object.assign({}, solidColorsByMonitor);
+      if (key === "__all__") clearedSolid = {};
+      else delete clearedSolid[key];
+      _persistSolidMap(clearedSolid);
+      if (!solidColorActive)
+        solidColorHex = Config.wallpaperSolidColor || "000000ff";
+      var updated = Object.assign({}, wallpapers);
+      updated[key] = _applyImagePath;
+      wallpapers = updated;
+      Config.wallpaperPaths = Object.assign({}, wallpapers);
+
+      if (Config.wallpaperRunPywal && !Config.themeName) {
+        Quickshell.execDetached(["sh", "-c",
+          "wal -i \"$1\" -n -q 2>/dev/null || true", "sh", _applyImagePath
+        ]);
+      }
+
+      wallpaperApplied(_applyImagePath, _applyMonitorName || "");
+
+      if (_queuedApply) {
+        var next = _queuedApply;
+        _queuedApply = null;
+        _startApply(next);
+      }
+      return;
+    }
+
+    // External tool mode (existing code below)
     _applyStdout = "";
     _applyStderr = "";
     applyProc.command = _buildSetterCommand(_applyImagePath, _applyMonitorName);
@@ -145,6 +181,35 @@ QtObject {
     _colorNotify = request.notifyUser;
     if (request.persistSetting)
       Config.wallpaperSolidColor = _colorHex;
+
+    // Shell-rendered mode
+    if (Config.wallpaperUseShellRenderer) {
+      var key = _colorMonitorName || "__all__";
+      var updated = Object.assign({}, wallpapers);
+      delete updated[key];
+      wallpapers = updated;
+      Config.wallpaperPaths = Object.assign({}, wallpapers);
+      var solidMap = Object.assign({}, solidColorsByMonitor);
+      if (key === "__all__")
+        solidMap = { "__all__": _colorHex };
+      else
+        solidMap[key] = _colorHex;
+      _persistSolidMap(solidMap);
+      solidColorHex = _colorHex;
+
+      solidColorApplied(_colorHex, _colorMonitorName || "");
+
+      if (_colorNotify)
+        ToastService.showSuccess("Solid color applied", "#" + _colorHex.slice(0, 6));
+      if (_queuedSolidApplies.length > 0) {
+        var nextReq = _queuedSolidApplies[0];
+        _queuedSolidApplies = _queuedSolidApplies.slice(1);
+        _startSolidApply(nextReq);
+      }
+      return;
+    }
+
+    // External tool mode (existing code below)
     _colorApplyStderr = "";
     colorApplyProc.command = _buildSolidColorCommand(_colorHex, _colorMonitorName);
     colorApplyProc.running = true;
@@ -284,7 +349,7 @@ QtObject {
       } else {
         var err = (root._applyStderr || "").trim();
         if (!err.length) err = "All wallpaper backends failed";
-        console.warn("WallpaperService: failed to apply wallpaper", "monitor", key, "path", root._applyImagePath, "error", err);
+        Logger.w("WallpaperService", "failed to apply wallpaper", "monitor", key, "path", root._applyImagePath, "error", err);
         ToastService.showError("Wallpaper apply failed", "Check quickshell logs for backend errors.");
       }
 
@@ -313,7 +378,7 @@ QtObject {
       if (exitCode !== 0) {
         var err = (root._colorApplyStderr || "").trim();
         if (!err.length) err = "Failed to apply solid color background";
-        console.warn("WallpaperService: solid color apply failed", "color", root._colorHex, "monitor", root._colorMonitorName || "__all__", "error", err);
+        Logger.w("WallpaperService", "solid color apply failed", "color", root._colorHex, "monitor", root._colorMonitorName || "__all__", "error", err);
         if (root._colorNotify)
           ToastService.showError("Solid color failed", "Could not apply solid color wallpaper.");
         if (root._queuedSolidApplies.length > 0) {
