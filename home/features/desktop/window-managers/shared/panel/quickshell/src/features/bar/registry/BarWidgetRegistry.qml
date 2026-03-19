@@ -201,7 +201,8 @@ QtObject {
     { widgetType: "personality", label: "Personality", icon: "󰄛", section: "center", description: "Animated personality GIF widget." },
     { widgetType: "pomodoro", label: "Pomodoro Timer", icon: "󰔟", section: "right", description: "Focus/break timer with start, pause, skip, and reset controls." },
     { widgetType: "todo", label: "Todo", icon: "󰄱", section: "right", description: "Pending task counter with clear-done shortcut." },
-    { widgetType: "gameMode", label: "Game Mode", icon: "󰊴", section: "right", description: "Performance mode indicator — shows when game mode is active." }
+    { widgetType: "gameMode", label: "Game Mode", icon: "󰊴", section: "right", description: "Performance mode indicator — shows when game mode is active." },
+    { widgetType: "nightLight", label: "Night Light", icon: "󰌵", section: "right", description: "Night light indicator — shows when color temperature filter is active." }
   ]
 
   readonly property var pluginWidgets: {

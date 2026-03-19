@@ -254,6 +254,7 @@ Item {
         "pomodoro": pomodoroComponent,
         "todo": todoComponent,
         "gameMode": gameModeComponent,
+        "nightLight": nightLightComponent,
         "spacer": spacerComponent,
         "separator": separatorComponent
     })
@@ -1335,6 +1336,16 @@ Item {
     Component {
         id: gameModeComponent
         GameModeBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: nightLightComponent
+        NightLightBarWidget {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical

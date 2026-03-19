@@ -16,4 +16,5 @@ VoxtypeBarWidget 1.0 VoxtypeBarWidget.qml
 PomodoroBarWidget 1.0 PomodoroBarWidget.qml
 TodoBarWidget 1.0 TodoBarWidget.qml
 GameModeBarWidget 1.0 GameModeBarWidget.qml
+NightLightBarWidget 1.0 NightLightBarWidget.qml
 BarSurfacePill 1.0 BarSurfacePill.qml
