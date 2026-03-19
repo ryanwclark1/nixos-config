@@ -6,32 +6,25 @@ import "../shared"
 import "../widgets" as SharedWidgets
 import "LauncherModeData.js" as ModeData
 
-// LauncherResultView: the stacked results/loading/empty-state/media area.
-// Emits fileContextMenuRequested so the parent can show the context menu at the
-// correct coordinate space (the ContextMenu needs to live in a non-layout parent).
 StackLayout {
     id: root
 
     required property var launcher
 
-    // Emitted when the user right-clicks a file result.
-    // `menuModel` is the array of menu entries; `point` is in launcherRoot coordinates.
     signal fileContextMenuRequested(var menuModel, point menuPoint)
 
-    // Convenience aliases so bindings below stay readable
     readonly property bool compactMode: launcher.compactMode
     readonly property bool tightMode: launcher.tightMode
     readonly property string mode: launcher.mode
     readonly property bool isModeLoading: launcher.isModeLoading
     readonly property var filteredItems: launcher.filteredItems
     readonly property bool hasResults: launcher.hasResults
+    readonly property color accentColor: launcher.modeAccentColor ? launcher.modeAccentColor : Colors.primary
 
     currentIndex: mode === "media" ? 1 : 0
 
-    // ScriptModel for efficient list diffing on the results ListView
     ScriptModel { id: resultsModel; values: root.filteredItems }
 
-    // ── Slot 0: results / loading / empty ──────────────────────────────────
     StackLayout {
         currentIndex: root.filteredItems.length > 0 ? 0 : (root.isModeLoading ? 1 : 2)
 
@@ -47,6 +40,7 @@ StackLayout {
             section.property: "sectionLabel"
             section.delegate: LauncherSectionHeader {
                 compactMode: root.compactMode
+                accentColor: root.accentColor
             }
 
             delegate: LauncherResultDelegate {
@@ -59,6 +53,7 @@ StackLayout {
                 ignoreMouseHover: root.launcher.ignoreMouseHover
                 modeIcons: root.launcher.modeIcons
                 iconMap: root.launcher.launcherIconMap
+                accentColor: root.accentColor
                 onClicked: root.launcher.executeSelection()
                 onSecondaryActionRequested: function(sourceItem, localX, localY) {
                     if (root.mode !== "files" || !modelData || !modelData.fullPath)
@@ -72,12 +67,15 @@ StackLayout {
             }
         }
 
-        // Loading state
         Rectangle {
-            color: Colors.bgWidget
-            radius: Colors.radiusMedium
-            border.color: Colors.border
+            color: Colors.withAlpha(root.accentColor, 0.08)
+            radius: Colors.radiusXL
+            border.color: Colors.withAlpha(root.accentColor, 0.24)
             border.width: 1
+
+            SharedWidgets.InnerHighlight {
+                highlightOpacity: 0.12
+            }
 
             ColumnLayout {
                 anchors.centerIn: parent
@@ -87,23 +85,24 @@ StackLayout {
                     Layout.alignment: Qt.AlignHCenter
                     size: root.compactMode ? 18 : 24
                 }
+
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     text: root.launcher.modeLoadMessage !== "" ? root.launcher.modeLoadMessage : ("Loading " + ModeData.modeInfo(root.mode).label)
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.DemiBold
+                    font.weight: Font.Black
                 }
+
                 Text {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "Please wait"
+                    text: "Preparing the next result stage"
                     color: Colors.textSecondary
                     font.pixelSize: Colors.fontSizeXS
                 }
             }
         }
 
-        // Empty state
         LauncherEmptyState {
             icon: root.launcher.modeIcons[root.mode] || "󰈔"
             title: root.launcher.emptyStateTitle
@@ -114,16 +113,15 @@ StackLayout {
             primaryHintIcon: root.launcher.emptyPrimaryHintIcon
             secondaryHint: root.launcher.emptySecondaryHint
             secondaryHintIcon: root.launcher.emptySecondaryHintIcon
+            accentColor: root.accentColor
             onPrimaryClicked: root.launcher.executeEmptyPrimary()
             onSecondaryClicked: root.launcher.executeEmptySecondary()
         }
     }
 
-    // ── Slot 1: media view ─────────────────────────────────────────────────
     LauncherMediaView {
         mediaPlayers: root.launcher.mediaPlayers
         compactMode: root.compactMode
         tightMode: root.tightMode
     }
-
 }

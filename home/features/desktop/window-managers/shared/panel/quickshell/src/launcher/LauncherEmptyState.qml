@@ -15,13 +15,14 @@ Rectangle {
     required property string primaryHintIcon
     required property string secondaryHint
     required property string secondaryHintIcon
+    property color accentColor: Colors.primary
 
     signal primaryClicked
     signal secondaryClicked
 
-    color: Colors.withAlpha(Colors.surface, 0.4)
-    radius: Colors.radiusLarge
-    border.color: Colors.primarySubtle
+    color: Colors.withAlpha(Colors.surface, 0.34)
+    radius: Colors.radiusXL
+    border.color: Colors.withAlpha(root.accentColor, 0.18)
     border.width: 1
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -29,50 +30,52 @@ Rectangle {
     ColumnLayout {
         anchors.centerIn: parent
         spacing: Colors.spacingM
-        width: Math.min(parent.width - 64, 460)
+        width: Math.min(parent.width - 64, 520)
 
-        ColumnLayout {
-            Layout.fillWidth: true
+        Rectangle {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Colors.spacingXS
-
-            Rectangle {
-                Layout.alignment: Qt.AlignHCenter
-                width: 64
-                height: 64
-                radius: Colors.radiusPill
-                color: Colors.primaryGhost
-                border.color: Colors.primaryTint
-                border.width: 1
-                Layout.bottomMargin: Colors.spacingS
-
-                Text {
-                    anchors.centerIn: parent
-                    text: root.icon
-                    color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeHuge
-                }
-            }
+            width: 76
+            height: 76
+            radius: Colors.radiusPill
+            color: Colors.withAlpha(root.accentColor, 0.12)
+            border.color: Colors.withAlpha(root.accentColor, 0.28)
+            border.width: 1
 
             Text {
-                text: root.title
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeLarge
-                font.weight: Font.Bold
-                Layout.alignment: Qt.AlignHCenter
-                horizontalAlignment: Text.AlignHCenter
+                anchors.centerIn: parent
+                text: root.icon
+                color: root.accentColor
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeHuge
             }
+        }
 
-            Text {
-                text: root.subtitle
-                color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
-                Layout.alignment: Qt.AlignHCenter
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-            }
+        Text {
+            text: "READY FOR INPUT"
+            color: Colors.withAlpha(root.accentColor, 0.92)
+            font.pixelSize: Colors.fontSizeXXS
+            font.weight: Font.Black
+            font.letterSpacing: Colors.letterSpacingExtraWide
+            Layout.alignment: Qt.AlignHCenter
+        }
+
+        Text {
+            text: root.title
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeXL
+            font.weight: Font.Black
+            Layout.alignment: Qt.AlignHCenter
+            horizontalAlignment: Text.AlignHCenter
+        }
+
+        Text {
+            text: root.subtitle
+            color: Colors.textSecondary
+            font.pixelSize: Colors.fontSizeSmall
+            Layout.alignment: Qt.AlignHCenter
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
         }
 
         RowLayout {
@@ -81,12 +84,10 @@ Rectangle {
             Layout.topMargin: Colors.spacingS
 
             Rectangle {
-                radius: Colors.radiusMedium
-                color: Colors.primary
-                implicitHeight: 38
-                implicitWidth: emptyPrimaryText.implicitWidth + 32
-                scale: primaryHover.containsMouse ? 1.02 : 1.0
-                Behavior on scale { Anim { duration: Colors.durationFast } }
+                radius: Colors.radiusLarge
+                color: root.accentColor
+                implicitHeight: 40
+                implicitWidth: emptyPrimaryText.implicitWidth + 34
 
                 Text {
                     id: emptyPrimaryText
@@ -98,7 +99,6 @@ Rectangle {
                 }
 
                 MouseArea {
-                    id: primaryHover
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
@@ -108,14 +108,12 @@ Rectangle {
 
             Rectangle {
                 visible: root.secondaryCta !== ""
-                radius: Colors.radiusMedium
-                color: Colors.withAlpha(Colors.surface, 0.6)
-                border.color: Colors.border
+                radius: Colors.radiusLarge
+                color: Colors.withAlpha(Colors.surface, 0.74)
+                border.color: Colors.withAlpha(root.accentColor, 0.18)
                 border.width: 1
-                implicitHeight: 38
-                implicitWidth: emptySecondaryText.implicitWidth + 32
-                scale: secondaryHover.containsMouse ? 1.02 : 1.0
-                Behavior on scale { Anim { duration: Colors.durationFast } }
+                implicitHeight: 40
+                implicitWidth: emptySecondaryText.implicitWidth + 34
 
                 Text {
                     id: emptySecondaryText
@@ -127,7 +125,6 @@ Rectangle {
                 }
 
                 MouseArea {
-                    id: secondaryHover
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
@@ -140,22 +137,22 @@ Rectangle {
             Layout.fillWidth: true
             Layout.topMargin: Colors.spacingM
             spacing: Colors.spacingS
-            visible: root.primaryHint !== ""
+            visible: root.primaryHint !== "" || root.secondaryHint !== ""
 
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: Colors.borderMedium
+                color: Colors.withAlpha(root.accentColor, 0.12)
             }
 
             RowLayout {
-                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
+                visible: root.primaryHint !== ""
                 spacing: Colors.spacingS
-                opacity: 0.7
 
                 Text {
                     text: root.primaryHintIcon
-                    color: Colors.primary
+                    color: root.accentColor
                     font.family: Colors.fontMono
                     font.pixelSize: Colors.fontSizeSmall
                     visible: text !== ""
@@ -164,6 +161,28 @@ Rectangle {
                 Text {
                     text: root.primaryHint
                     color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                visible: root.secondaryHint !== ""
+                spacing: Colors.spacingS
+
+                Text {
+                    text: root.secondaryHintIcon
+                    color: Colors.textDisabled
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeSmall
+                    visible: text !== ""
+                }
+
+                Text {
+                    text: root.secondaryHint
+                    color: Colors.textDisabled
                     font.pixelSize: Colors.fontSizeXS
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true

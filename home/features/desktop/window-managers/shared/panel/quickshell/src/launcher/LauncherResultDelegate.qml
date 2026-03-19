@@ -8,6 +8,7 @@ import "LauncherModeData.js" as ModeData
 
 Rectangle {
     id: root
+
     property var itemData: null
     property int itemIndex: -1
     property string searchText: ""
@@ -17,38 +18,33 @@ Rectangle {
     property bool ignoreMouseHover: false
     property var modeIcons: ({})
     property var iconMap: ({})
+    property color accentColor: Colors.primary
 
     signal clicked
     signal entered
     signal secondaryActionRequested(var sourceItem, real localX, real localY)
 
     width: parent ? parent.width : 0
-    height: tightMode ? 48 : (compactMode ? 54 : 64)
+    height: tightMode ? 54 : (compactMode ? 60 : 70)
 
     readonly property bool highlighted: ListView.isCurrentItem
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
 
-    color: highlighted ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
-    radius: Colors.radiusMedium
-    border.color: highlighted ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
+    color: highlighted ? Colors.withAlpha(accentColor, 0.16) : (hovered ? Colors.withAlpha(Colors.surface, 0.82) : "transparent")
+    radius: Colors.radiusLarge
+    border.color: highlighted ? Colors.withAlpha(accentColor, 0.38) : (hovered ? Colors.withAlpha(Colors.border, 0.42) : "transparent")
     border.width: 1
     scale: highlighted ? 1.01 : 1.0
+
+    SharedWidgets.InnerHighlight {
+        hovered: root.highlighted || root.hovered
+        highlightOpacity: root.highlighted ? 0.2 : 0.08
+    }
 
     Behavior on color { enabled: !Colors.isTransitioning && (highlighted || hovered); CAnim {} }
     Behavior on border.color { enabled: !Colors.isTransitioning && (highlighted || hovered); CAnim {} }
     Behavior on scale { enabled: highlighted || hovered; NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
     layer.enabled: highlighted && scale !== 1.0
-
-    // Glow Effect
-    Rectangle {
-        anchors.fill: parent
-        radius: root.radius
-        z: -1
-        color: Colors.primary
-        opacity: highlighted ? 0.08 : 0
-        visible: highlighted
-        Behavior on opacity { enabled: highlighted; NumberAnimation { duration: Colors.durationNormal } }
-    }
 
     function highlightMatch(text, query) {
         return Search.highlightMatch(text, query, ModeData.stripModePrefix, root.mode === "files");
@@ -64,7 +60,7 @@ Rectangle {
         if (it.ipcTarget && it.ipcAction)
             return "System";
         if (it.isCalc)
-            return "Calculator";
+            return "Calc";
         if (it.fullPath)
             return "File";
         if (it.url)
@@ -142,48 +138,32 @@ Rectangle {
         return root.modeIcons[root.mode] || "󰀻";
     }
 
-    // Indicator bar
     Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: 0
-        anchors.verticalCenter: parent.verticalCenter
-        width: highlighted ? 4 : 0
-        height: highlighted ? parent.height * 0.5 : 0
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: highlighted ? 5 : 0
         radius: Colors.radiusPill
-        color: Colors.primary
+        color: root.accentColor
         opacity: highlighted ? 1.0 : 0.0
-        Behavior on height { enabled: highlighted; NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
-        Behavior on width { enabled: highlighted; NumberAnimation { duration: Colors.durationMedium } }
-        Behavior on opacity { enabled: highlighted; NumberAnimation { duration: Colors.durationFast } }
+        Behavior on width { NumberAnimation { duration: Colors.durationFast } }
+        Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
     }
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: root.compactMode ? (Colors.spacingS + 4) : (Colors.spacingM + 4)
+        anchors.leftMargin: root.compactMode ? Colors.spacingM : Colors.spacingL
         anchors.rightMargin: root.compactMode ? Colors.spacingS : Colors.spacingM
-        spacing: root.compactMode ? Colors.paddingSmall : Colors.paddingMedium
+        spacing: root.compactMode ? Colors.spacingS : Colors.paddingMedium
 
-        // Icon area
         Rectangle {
-            width: root.compactMode ? 30 : 34
-            height: root.compactMode ? 30 : 34
-            radius: Colors.radiusXS
-            color: highlighted ? Colors.primaryAccent : (hovered ? Colors.primaryFaint : Colors.surface)
-            border.color: highlighted ? Colors.primaryRing : "transparent"
-            border.width: highlighted ? 1 : 0
-            scale: highlighted ? 1.04 : 1.0
-
-            Behavior on color {
-                enabled: !Colors.isTransitioning
-                CAnim {}
-            }
-            Behavior on border.color {
-                enabled: !Colors.isTransitioning
-                CAnim {}
-            }
-            Behavior on scale {
-                Anim { duration: Colors.durationFast }
-            }
+            width: root.compactMode ? 34 : 40
+            height: root.compactMode ? 34 : 40
+            radius: root.compactMode ? Colors.radiusMedium : Colors.radiusLarge
+            color: highlighted ? Colors.withAlpha(root.accentColor, 0.16) : (hovered ? Colors.withAlpha(Colors.surface, 0.78) : Colors.withAlpha(Colors.surface, 0.66))
+            border.color: highlighted ? Colors.withAlpha(root.accentColor, 0.34) : Colors.withAlpha(Colors.border, 0.24)
+            border.width: 1
 
             SharedWidgets.AppIcon {
                 anchors.centerIn: parent
@@ -193,30 +173,32 @@ Rectangle {
                 execName: itemData ? String(itemData.exec || "") : ""
                 appName: itemData ? String(itemData.name || itemData.title || "") : ""
                 iconMap: root.iconMap
-                iconSize: root.compactMode ? 18 : 20
+                iconSize: root.compactMode ? 19 : 22
                 fallbackIcon: root.itemFallbackIcon(itemData)
             }
         }
 
         ColumnLayout {
-            spacing: Colors.spacingXXS
+            spacing: 0
             Layout.fillWidth: true
             Layout.minimumWidth: 0
+
             Text {
                 text: root.highlightMatch(itemData ? itemData.name || itemData.title || "" : "", root.searchText)
-                color: highlighted ? Colors.primary : Colors.text
+                color: highlighted ? Colors.text : Colors.text
                 textFormat: Text.StyledText
                 font.pixelSize: root.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
-                font.weight: highlighted ? Font.Bold : Font.Normal
+                font.weight: highlighted ? Font.Bold : Font.DemiBold
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
                 maximumLineCount: 1
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
             }
+
             Text {
                 text: root.itemSecondaryLabel(itemData)
-                color: highlighted ? Colors.withAlpha(Colors.primary, 0.82) : Colors.textSecondary
+                color: highlighted ? Colors.withAlpha(root.accentColor, 0.84) : Colors.textSecondary
                 font.pixelSize: Colors.fontSizeXS
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
@@ -227,69 +209,71 @@ Rectangle {
             }
         }
 
-        RowLayout {
+        ColumnLayout {
             spacing: Colors.spacingXS
-            Layout.maximumWidth: root.compactMode ? 160 : 220
             Layout.alignment: Qt.AlignVCenter
+            visible: !root.tightMode
 
-            // Provider Badge
             Rectangle {
                 property string provider: root.itemProviderLabel(itemData)
                 visible: provider !== ""
                 radius: Colors.radiusPill
-                color: highlighted ? Colors.primaryMarked : Colors.highlight
-                border.color: Colors.withAlpha(Colors.primary, 0.45)
+                color: Colors.withAlpha(root.accentColor, highlighted ? 0.14 : 0.08)
+                border.color: Colors.withAlpha(root.accentColor, highlighted ? 0.3 : 0.16)
                 border.width: 1
-                implicitHeight: 22
+                implicitHeight: 20
                 implicitWidth: providerBadgeText.implicitWidth + 12
+
                 Text {
                     id: providerBadgeText
                     anchors.centerIn: parent
                     text: parent.provider
-                    color: Colors.primary
-                    font.pixelSize: Colors.fontSizeXS
+                    color: highlighted ? root.accentColor : Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXXS
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
-                    width: Math.min(implicitWidth, root.mode === "files" ? (root.compactMode ? 110 : 160) : (root.compactMode ? 84 : 120))
+                    width: Math.min(implicitWidth, root.mode === "files" ? (root.compactMode ? 100 : 140) : (root.compactMode ? 82 : 110))
                 }
             }
 
-            // Action Badge
             Rectangle {
                 property string action: root.itemActionLabel(itemData)
                 visible: action !== ""
                 radius: Colors.radiusPill
-                color: highlighted ? Colors.primaryMid : Colors.surface
-                border.color: Colors.border
+                color: Colors.withAlpha(Colors.surface, 0.84)
+                border.color: Colors.withAlpha(Colors.border, 0.5)
                 border.width: 1
-                implicitHeight: 22
+                implicitHeight: 20
                 implicitWidth: actionBadgeText.implicitWidth + 12
+
                 Text {
                     id: actionBadgeText
                     anchors.centerIn: parent
                     text: parent.action
-                    color: highlighted ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    color: highlighted ? Colors.text : Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXXS
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
-                    width: Math.min(implicitWidth, root.compactMode ? 72 : 96)
+                    width: Math.min(implicitWidth, root.compactMode ? 70 : 92)
                 }
             }
+        }
 
-            // Execute icon
-            Rectangle {
-                width: root.compactMode ? 24 : 28
-                height: root.compactMode ? 24 : 28
-                radius: Colors.radiusMedium
-                visible: highlighted || hovered
-                color: highlighted ? Colors.primaryMid : "transparent"
-                Text {
-                    anchors.centerIn: parent
-                    text: "󰄮"
-                    color: highlighted ? Colors.primary : Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeSmall
-                }
+        Rectangle {
+            width: root.compactMode ? 26 : 30
+            height: root.compactMode ? 26 : 30
+            radius: Colors.radiusMedium
+            visible: highlighted || hovered
+            color: highlighted ? Colors.withAlpha(root.accentColor, 0.16) : Colors.withAlpha(Colors.surface, 0.8)
+            border.color: highlighted ? Colors.withAlpha(root.accentColor, 0.32) : Colors.withAlpha(Colors.border, 0.36)
+            border.width: 1
+
+            Text {
+                anchors.centerIn: parent
+                text: "󰄮"
+                color: highlighted ? root.accentColor : Colors.textDisabled
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeSmall
             }
         }
     }
