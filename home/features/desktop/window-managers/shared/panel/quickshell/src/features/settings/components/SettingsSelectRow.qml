@@ -15,6 +15,7 @@ Rectangle {
     property var options: []
     property bool expanded: false
     property int maxMenuHeight: 240
+    property bool highlighted: false
     signal optionSelected(string value)
 
     function currentOption() {
