@@ -22,4 +22,11 @@ describe("Bar Widgets QA contract", () => {
     expect(source).toContain("L.{0,2}ft[[:space:]]+Section");
     expect(source).not.toContain("Left[[:space:]]+Section");
   });
+
+  it("tolerates the current OCR punctuation join in the Bar Widgets heading", () => {
+    const source = readFileSync(barWidgetsQaPath, "utf8");
+
+    expect(source).toContain("Bar[[:space:].]+Widgets");
+    expect(source).not.toContain("Bar[[:space:]]+Widgets");
+  });
 });
