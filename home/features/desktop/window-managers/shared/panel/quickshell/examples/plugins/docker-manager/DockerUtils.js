@@ -148,3 +148,21 @@ function sortNetworks(a, b) {
         return a.isDefault ? 1 : -1;
     return String(a.name || "").localeCompare(String(b.name || ""));
 }
+
+function matchesFilter(item, query) {
+    if (!item || typeof item !== "object")
+        return false;
+    var q = String(query || "").toLowerCase().trim();
+    if (q === "")
+        return true;
+    var fields = ["name", "image", "repo", "tag", "driver", "composeProject", "composeService", "displayName", "scope"];
+    for (var i = 0; i < fields.length; ++i) {
+        var value = item[fields[i]];
+        if (value && String(value).toLowerCase().indexOf(q) !== -1)
+            return true;
+    }
+    // Also check ID prefix
+    if (item.id && String(item.id).toLowerCase().indexOf(q) !== -1)
+        return true;
+    return false;
+}
