@@ -30,20 +30,6 @@ PanelWindow {
   property var manager: null
   readonly property int maxLayerTextureSize: 4096
 
-  // Track which notification IDs have auto-expired from popup (timed out)
-  // but should remain visible in the notification center
-  property var _expiredPopupIds: ({})
-
-  function markPopupExpired(notifId) {
-    var next = Object.assign({}, _expiredPopupIds);
-    next[notifId] = true;
-    _expiredPopupIds = next;
-  }
-
-  function isPopupExpired(notifId) {
-    return _expiredPopupIds[notifId] === true;
-  }
-
   function allowLayer(width, height) {
     return width > 0 && height > 0
       && width <= maxLayerTextureSize
@@ -61,8 +47,9 @@ PanelWindow {
       delegate: Item {
         id: notifWrapper
         property var notification: modelData || null
-        readonly property bool _popupExpired: notification ? (root._expiredPopupIds[notification.id] === true) : false
-        visible: notification && !notification.dismissed && !_popupExpired && (!root.manager || !root.manager.dndEnabled || isUrgent) && !_isMuted
+        // Local flag: true after popup timeout expires (hides popup, keeps in center)
+        property bool _expired: false
+        visible: notification && !notification.dismissed && !_expired && (!root.manager || !root.manager.dndEnabled || isUrgent) && !_isMuted
         Layout.preferredWidth: Config.notifWidth
         Layout.preferredHeight: visible ? delegate.height : 0
 
@@ -139,9 +126,9 @@ PanelWindow {
           onFinished: {
             if (!notification) return;
             if (notifWrapper._isAutoExpiry) {
-              // Auto-expired: keep in trackedNotifications for the center,
-              // just mark as popup-expired so the popup stays hidden
-              root.markPopupExpired(notification.id);
+              // Auto-expired: hide popup but keep notification in trackedNotifications
+              // so it remains visible in the NotificationCenter
+              notifWrapper._expired = true;
             } else {
               // User-initiated: fully dismiss from everywhere
               notification.dismiss();

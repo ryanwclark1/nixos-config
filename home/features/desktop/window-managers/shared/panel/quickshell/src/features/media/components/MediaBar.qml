@@ -20,7 +20,7 @@ Rectangle {
   property bool showVisualizer: true
   property int visualizerBars: 8
   visible: MediaService.currentPlayer !== null
-  readonly property bool visualizerVisible: showVisualizer && MediaService.currentPlayer !== null && MediaService.isPlaying
+  readonly property bool visualizerVisible: !root.vertical && showVisualizer && MediaService.currentPlayer !== null && MediaService.isPlaying
   readonly property var visualizerValues: {
     var source = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];
     var count = Math.max(4, visualizerBars);
