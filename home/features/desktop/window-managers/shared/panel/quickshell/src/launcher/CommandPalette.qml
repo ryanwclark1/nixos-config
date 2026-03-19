@@ -18,7 +18,12 @@ PanelWindow {
     WlrLayershell.keyboardFocus: showContent ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     WlrLayershell.namespace: "quickshell:command-palette"
 
-    anchors.fill: parent
+    anchors {
+        top: true
+        left: true
+        right: true
+        bottom: true
+    }
     color: "transparent"
     visible: showContent || fadeAnim.running
 

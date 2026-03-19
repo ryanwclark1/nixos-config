@@ -104,12 +104,15 @@ function buildFileItemsFromRaw(raw, rootDir, rootLabel) {
 // Returns { done: bool, state: state }.
 // The caller (QML) handles timer restart and callback invocation.
 function processParseChunk(state, chunkSize) {
+    var rootDir = String(state.rootDir || state.homeDir || "");
+    var rootPrefix = String(state.rootPrefix || state.homePrefix || (rootDir !== "" ? (rootDir.endsWith("/") ? rootDir : (rootDir + "/")) : ""));
+    var rootLabel = String(state.rootLabel || state.homeLabel || "~");
     var end = Math.min(state.idx + chunkSize, state.lines.length);
     for (var i = state.idx; i < end; ++i) {
         var path = String(state.lines[i] || "");
         if (path === "")
             continue;
-        state.items[state.count] = _buildFileItem(path, state.rootDir, state.rootPrefix, state.rootLabel);
+        state.items[state.count] = _buildFileItem(path, rootDir, rootPrefix, rootLabel);
         state.count += 1;
     }
     state.idx = end;
