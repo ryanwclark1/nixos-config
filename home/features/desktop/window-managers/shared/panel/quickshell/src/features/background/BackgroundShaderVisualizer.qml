@@ -14,6 +14,7 @@ Item {
 
     ShaderEffect {
         anchors.fill: parent
+        enabled: !Colors._isEcoMode
 
         readonly property real barCount: root.barCount
         readonly property real gap: root.gap

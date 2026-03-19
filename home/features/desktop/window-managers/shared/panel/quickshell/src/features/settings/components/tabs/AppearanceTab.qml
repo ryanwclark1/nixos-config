@@ -80,6 +80,19 @@ Item {
         }
 
         SettingsCard {
+            title: "Power Management"
+            iconName: "󰂄"
+            description: "Control how the shell behaves when running on battery."
+
+            SettingsToggleRow {
+                label: "Automatic Eco Mode"
+                description: "Optimizes animations and disables shaders on battery."
+                icon: "󰂃"
+                configKey: "autoEcoMode"
+            }
+        }
+
+        SettingsCard {
             title: "Typography"
             iconName: "󰛖"
             description: "Font families and sizing are appearance settings, independent from the active color theme."

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import "../../shared"
 import "../../services"
 import "../../widgets" as SharedWidgets
@@ -33,6 +34,16 @@ BasePopupMenu {
           selected: ModelUsageService.activeProvider === modelData.key
           onClicked: Config.modelUsageActiveProvider = modelData.key
         }
+      }
+    },
+    SharedWidgets.IconButton {
+      icon: "󰒓"
+      size: 28
+      iconSize: Colors.fontSizeLarge
+      tooltipText: "Settings"
+      onClicked: {
+        Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "model-usage"]);
+        root.closeRequested();
       }
     }
   ]

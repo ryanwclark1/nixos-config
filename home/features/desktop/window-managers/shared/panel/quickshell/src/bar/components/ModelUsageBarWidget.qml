@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import "../../services"
 import "../../widgets" as SharedWidgets
 import "../PanelWidgetHelpers.js" as PanelHelpers
@@ -24,6 +25,11 @@ SharedWidgets.BarPill {
             icon: "󰔡",
             visible: ModelUsageService.claudeEnabled && ModelUsageService.codexEnabled,
             action: () => ModelUsageService.switchProvider()
+        },
+        {
+            label: "Settings",
+            icon: "󰒓",
+            action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "model-usage"])
         }
     ]
 
