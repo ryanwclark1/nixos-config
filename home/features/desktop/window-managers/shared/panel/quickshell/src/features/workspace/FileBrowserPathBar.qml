@@ -98,7 +98,7 @@ Rectangle {
                                 if (crumbHover.containsMouse) return Colors.textWash;
                                 return "transparent";
                             }
-                            Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+                            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
                             Text {
                                 id: crumbText

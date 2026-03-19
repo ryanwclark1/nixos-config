@@ -24,7 +24,7 @@ Rectangle {
         if (listItemHover.containsMouse) return Colors.textFaint;
         return index % 2 === 0 ? "transparent" : Colors.cardSurface;
     }
-    Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
     // bottom separator
     Rectangle {

@@ -108,6 +108,7 @@ ColumnLayout {
                                 border.color: hoverArea.containsMouse ? Colors.primary : Colors.border
                                 border.width: 1
                                 Behavior on border.color {
+                                    enabled: !Colors.isTransitioning
                                     CAnim {}
                                 }
                                 clip: true

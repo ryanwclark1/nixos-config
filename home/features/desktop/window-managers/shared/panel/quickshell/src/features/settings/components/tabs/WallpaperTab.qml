@@ -631,6 +631,9 @@ Item {
                     { label: "Fade", value: "fade" },
                     { label: "Pixelate", value: "pixelate" },
                     { label: "Wipe", value: "wipe" },
+                    { label: "Dissolve", value: "dissolve" },
+                    { label: "Zoom", value: "zoom" },
+                    { label: "Radial", value: "radial" },
                     { label: "None", value: "none" }
                 ]
             }

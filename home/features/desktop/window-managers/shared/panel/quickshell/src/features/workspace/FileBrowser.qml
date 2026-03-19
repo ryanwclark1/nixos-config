@@ -330,7 +330,7 @@ PanelWindow {
             color: root._viewGrid
               ? Colors.highlight
               : "transparent"
-            Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
             Text {
               anchors.centerIn: parent
@@ -360,7 +360,7 @@ PanelWindow {
             color: !root._viewGrid
               ? Colors.highlight
               : "transparent"
-            Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
             Text {
               anchors.centerIn: parent

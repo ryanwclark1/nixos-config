@@ -55,7 +55,7 @@ Rectangle {
                     if (locHover.containsMouse) return Colors.withAlpha(Colors.text, 0.07);
                     return "transparent";
                 }
-                Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
                 RowLayout {
                     anchors.fill: parent

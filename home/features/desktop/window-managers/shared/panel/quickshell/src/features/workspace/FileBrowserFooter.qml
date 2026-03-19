@@ -49,7 +49,7 @@ Rectangle {
             color: Colors.cardSurface
             border.color: saveField.activeFocus ? Colors.primary : Colors.border
             border.width: 1
-            Behavior on border.color { ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
             RowLayout {
                 anchors.fill: parent
@@ -132,7 +132,7 @@ Rectangle {
                     ? Colors.textWash : Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
-                Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
                 RowLayout {
                     anchors.fill: parent
@@ -175,7 +175,7 @@ Rectangle {
                     ? Colors.textWash : Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
-                Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
                 Text {
                     id: cancelText
@@ -211,7 +211,7 @@ Rectangle {
                     : Colors.cardSurface
                 border.color: canConfirm ? Colors.primary : Colors.border
                 border.width: 1
-                Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
                 Text {
                     id: actionText

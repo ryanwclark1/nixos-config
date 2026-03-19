@@ -278,7 +278,7 @@ Rectangle {
               implicitHeight: resultRow.implicitHeight + Colors.spacingS * 2
               radius: Colors.radiusSmall
               color: root.currentTabId === modelData.id ? Colors.highlight : "transparent"
-              Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+              Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
               SharedWidgets.StateLayer {
                 id: resultState
@@ -481,7 +481,7 @@ Rectangle {
                     implicitHeight: tabRow.implicitHeight + Colors.spacingS * 2
                     radius: Colors.radiusSmall
                     color: root.currentTabId === modelData.id ? Colors.highlight : "transparent"
-                    Behavior on color { ColorAnimation { duration: Colors.durationSnap } }
+                    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
 
                     SharedWidgets.StateLayer {
                       id: tabState
