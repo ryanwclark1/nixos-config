@@ -34,9 +34,26 @@ Item {
                 onToggled: Config.workspaceShowNames = !Config.workspaceShowNames
             }
 
+            SettingsToggleRow {
+                label: "Show Window Count"
+                icon: "󰇄"
+                checked: Config.workspaceShowWindowCount
+                onToggled: Config.workspaceShowWindowCount = !Config.workspaceShowWindowCount
+            }
+
             SettingsModeRow {
-                label: "Visual Style"
-                currentValue: Config.workspaceStyle
+                label: "Layout"
+                currentValue: Config.workspaceLayout
+                options: [
+                    { value: "horizontal", label: "Horizontal" },
+                    { value: "vertical",   label: "Vertical"   },
+                    { value: "grid",       label: "Grid"       }
+                ]
+                onModeSelected: value => Config.workspaceLayout = value
+            }
+
+            SettingsModeRow {
+                label: "Visual Style"                currentValue: Config.workspaceStyle
                 options: [
                     { value: "pill",  label: "Pill"  },
                     { value: "strip", label: "Strip" },
@@ -132,6 +149,22 @@ Item {
                 icon: "󰀦"
                 currentValue: Config.workspaceUrgentColor
                 onColorSelected: v => Config.workspaceUrgentColor = v
+            }
+        }
+
+        SettingsCard {
+            title: "Advanced Interaction"
+            iconName: "󰒔"
+            description: "Customize how you interact with workspaces."
+
+            SettingsModeRow {
+                label: "Click Behavior"
+                currentValue: Config.workspaceClickBehavior
+                options: [
+                    { value: "focus",       label: "Focus Workspace" },
+                    { value: "last_window", label: "Last Active Window" }
+                ]
+                onModeSelected: value => Config.workspaceClickBehavior = value
             }
         }
     }

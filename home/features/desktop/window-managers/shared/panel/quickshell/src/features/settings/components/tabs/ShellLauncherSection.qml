@@ -589,6 +589,14 @@ Item {
                 disabledText: "Hide dotfiles and hidden directories in file mode."
             }
 
+            SettingsToggleRow {
+                label: "File Preview Pane"
+                icon: "󰋩"
+                configKey: "launcherFilePreviewEnabled"
+                enabledText: "Show a content preview beside file search results (Alt+P)."
+                disabledText: "Hide the file preview pane."
+            }
+
             SettingsTextInputRow {
                 label: "File Opener"
                 leadingIcon: "󰈔"

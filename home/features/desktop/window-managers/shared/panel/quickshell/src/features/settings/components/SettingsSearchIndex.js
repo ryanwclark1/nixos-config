@@ -248,6 +248,7 @@ var entries = [
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Search Root", keywords: "file search root directory", type: "text" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "Show Hidden Files", keywords: "file search hidden dotfiles", type: "toggle" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Opener", keywords: "file opener application", type: "text" },
+    { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Preview", keywords: "file preview pane toggle", type: "toggle" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "Cache TTL", keywords: "search cache ttl expire", type: "slider" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "Search Debounce", keywords: "search debounce delay", type: "slider" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Search Debounce", keywords: "file search debounce delay", type: "slider" },
