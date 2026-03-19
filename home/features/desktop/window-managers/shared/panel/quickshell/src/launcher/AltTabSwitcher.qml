@@ -201,7 +201,7 @@ Scope {
                                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                                     root.confirm();
                                     event.accepted = true;
-                                } else if (event.key === Qt.Key_Delete || event.key === Qt.Key_W && (event.modifiers & Qt.ControlModifier)) {
+                                } else if (event.key === Qt.Key_Delete || (event.key === Qt.Key_W && (event.modifiers & Qt.ControlModifier))) {
                                     root.closeSelected();
                                     event.accepted = true;
                                 }
@@ -380,12 +380,24 @@ Scope {
                                                 }
                                             }
 
-                                            // Close button
+                                            MouseArea {
+                                                id: cardMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+
+                                                onClicked: {
+                                                    root.selectedIndex = index;
+                                                    root.confirm();
+                                                }
+                                                onEntered: root.selectedIndex = index
+                                            }
+
+                                            // Close button — declared after cardMouse so it wins input priority
                                             SharedWidgets.IconButton {
                                                 anchors.top: parent.top
                                                 anchors.left: parent.left
                                                 anchors.margins: Colors.spacingXS
-                                                z: 1
                                                 icon: "󰅖"
                                                 size: 22
                                                 iconSize: Colors.fontSizeXS
@@ -401,19 +413,6 @@ Scope {
                                                     root.selectedIndex = index;
                                                     root.closeSelected();
                                                 }
-                                            }
-
-                                            MouseArea {
-                                                id: cardMouse
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
-
-                                                onClicked: {
-                                                    root.selectedIndex = index;
-                                                    root.confirm();
-                                                }
-                                                onEntered: root.selectedIndex = index
                                             }
                                         }
                                         }
