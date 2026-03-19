@@ -46,7 +46,7 @@ function buildRecentEntry(mode, item) {
             title: item.title || item.appId || "",
             icon: item.icon || item.appId || "󰖯",
             appId: item.appId || "",
-            address: item.address || "",
+            id: item.address || item.id || "",
             openMode: "window"
         };
     }
@@ -99,8 +99,8 @@ function executeSelection(mode, item, actions) {
             actions.execDetached(["bash", "-c", item.exec]);
         actions.close();
     } else if (mode === "window") {
-        if (item.address && actions.focusWindow)
-            actions.focusWindow(item.address);
+        if ((item.id || item.address) && actions.focusWindow)
+            actions.focusWindow(item.id || item.address);
         else if (item.toplevel && item.toplevel.activate)
             item.toplevel.activate();
         actions.close();

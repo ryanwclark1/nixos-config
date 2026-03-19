@@ -31,7 +31,7 @@ function emptyStateSubtitle(mode, clean, fileMinQueryLength, fileRootLabel) {
     if (mode === "clip")
         return "Copy something to populate clipboard history";
     if (mode === "window")
-        return "Open some applications to see them here";
+        return "Press Enter to show all windows in overview";
     if (mode === "ssh")
         return "Add hosts in SSH widget settings or import from ~/.ssh/config";
     return "Try another query or switch modes";
@@ -47,7 +47,7 @@ function emptyPrimaryCta(mode, clean, webPrimaryName, fileRootLabel) {
     if (mode === "run")
         return clean !== "" ? "Run Command" : "Switch to Apps";
     if (mode === "window")
-        return "Open Apps";
+        return "Show Overview";
     if (mode === "bookmarks")
         return "Switch to Web";
     if (mode === "clip")
@@ -87,6 +87,8 @@ function emptyPrimaryHint(mode, clean, webPrimaryName, webPrimaryHintName, fileR
         return "Switch to web mode for broader search.";
     if (mode === "ssh")
         return clean !== "" ? "Connect to this host directly." : "Configure SSH hosts and import settings.";
+    if (mode === "window")
+        return "Open the compositor overview to see all windows.";
     return "Switch to app launcher mode.";
 }
 
@@ -103,6 +105,8 @@ function emptyPrimaryHintIcon(mode) {
         return "󰃀";
     if (mode === "ssh")
         return "󰣀";
+    if (mode === "window")
+        return "󱇙";
     return "󰀻";
 }
 
