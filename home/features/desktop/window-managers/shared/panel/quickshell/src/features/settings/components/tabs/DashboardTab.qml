@@ -59,7 +59,7 @@ Item {
                 Layout.fillWidth: true
                 title: "Now Playing"
                 iconName: "󰝚"
-                visible: MediaService.playing || MediaService.hasPlayer
+                visible: !!MediaService.playing || !!MediaService.hasPlayer
 
                 RowLayout {
                     Layout.fillWidth: true

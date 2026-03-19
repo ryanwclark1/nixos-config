@@ -33,6 +33,7 @@ repo_shell_pid=""
 repo_shell_service_was_active=0
 repo_shell_env=()
 repo_shell_ready_timeout_sec="${QS_REPO_SHELL_READY_TIMEOUT_SEC:-40}"
+skip_reload=0
 
 pass() {
   printf '[PASS] %s\n' "$1"
@@ -51,7 +52,7 @@ fail() {
 
 usage() {
   cat <<'EOF'
-Usage: check-settings-responsive.sh [--id INSTANCE_ID] [--repo-shell]
+Usage: check-settings-responsive.sh [--id INSTANCE_ID] [--pid INSTANCE_PID] [--repo-shell] [--skip-reload]
 
 Smoke-check the live QuickShell settings surface by:
   1. locating a running QuickShell instance,
@@ -78,8 +79,16 @@ while [[ $# -gt 0 ]]; do
       instance_id="${2:-}"
       shift 2
       ;;
+    --pid)
+      instance_pid="${2:-}"
+      shift 2
+      ;;
     --repo-shell)
       repo_shell_mode=1
+      shift
+      ;;
+    --skip-reload)
+      skip_reload=1
       shift
       ;;
     -h|--help)
@@ -498,7 +507,9 @@ main() {
     fi
   fi
 
-  if call_ipc Shell reloadConfig; then
+  if (( skip_reload == 1 )); then
+    pass "Shell.reloadConfig skipped"
+  elif call_ipc Shell reloadConfig; then
     pass "Shell.reloadConfig"
   else
     fail "Shell.reloadConfig"

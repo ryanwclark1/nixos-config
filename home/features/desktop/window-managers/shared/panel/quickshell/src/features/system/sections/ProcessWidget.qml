@@ -13,6 +13,7 @@ SharedWidgets.CardBase {
     property int maxRows: 24
     property string sortField: ProcessService.sortBy === "mem" ? "mem" : "cpu"
     property bool sortDescending: true
+    property bool compactMode: false
     property string displayMode: "flat"
     property int selectedPid: 0
     property Flickable viewportFlickable: null

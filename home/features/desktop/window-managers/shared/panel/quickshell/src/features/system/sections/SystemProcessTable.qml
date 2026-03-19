@@ -788,8 +788,6 @@ SharedWidgets.CardBase {
                 pendingAction: root.pendingAction
                 clockTick: root._clockTick
             }
-                            }
-                        }
 
                         Text {
                             text: root.pendingAction !== "" ? ("PENDING  " + root.pendingAction.toUpperCase()) : "READY"
@@ -797,7 +795,6 @@ SharedWidgets.CardBase {
                             font.pixelSize: Colors.fontSizeXS
                             font.weight: Font.Bold
                         }
-                    }
 
                     SharedWidgets.EmptyState {
                         Layout.fillWidth: true
@@ -1235,6 +1232,4 @@ SharedWidgets.CardBase {
                     }
                 }
             }
-        }
-    }
 }

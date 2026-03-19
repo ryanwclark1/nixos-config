@@ -2,143 +2,302 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
-import Quickshell.Widgets
+import Quickshell.Services.Mpris
 import "../../services"
 import "../../widgets" as SharedWidgets
 
-PanelWindow {
+Rectangle {
   id: root
 
-  readonly property var edgeMargins: Config.notificationMargins(screen)
+  property var notification: null
+  property bool isPopup: false
+  property bool showContent: true
+  property real swipeOffset: 0
+  property bool isSwiping: false
+  property bool isUrgent: !!(notification && notification.urgency === NotificationUrgency.Critical)
+  property bool isReplying: false
+  readonly property bool isHovered: delegateMouseArea.containsMouse
 
-  anchors {
-    top: Config.notifPosition.indexOf("top") !== -1
-    bottom: Config.notifPosition.indexOf("bottom") !== -1
-    left: Config.notifPosition.indexOf("left") !== -1 || Config.notifPosition === "top" || Config.notifPosition === "bottom"
-    right: Config.notifPosition.indexOf("right") !== -1 || Config.notifPosition === "top" || Config.notifPosition === "bottom"
+  signal dismissRequested()
+  signal actionInvoked(var action)
+  signal replySent(string text)
+
+  width: parent.width
+  height: root.showContent ? colMain.implicitHeight + Colors.paddingLarge * 2 : 0
+  opacity: root.showContent ? 1.0 : 0.0
+  visible: height > 0
+
+  color: root.isUrgent ? Colors.errorLight : Colors.cardSurface
+  border.color: root.isUrgent ? Colors.error : Colors.border
+  border.width: 1
+  radius: Colors.radiusLarge
+  clip: true
+
+  Behavior on height { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+  Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
+
+  SharedWidgets.InnerHighlight { highlightOpacity: root.isUrgent ? 0.25 : 0.12 }
+
+  SequentialAnimation on border.color {
+    running: root.isUrgent
+    loops: Animation.Infinite
+    ColorAnimation { from: Colors.error; to: Qt.lighter(Colors.error, 1.4); duration: Colors.durationLong }
+    ColorAnimation { from: Qt.lighter(Colors.error, 1.4); to: Colors.error; duration: Colors.durationLong }
   }
-  margins.top: edgeMargins.top
-  margins.right: edgeMargins.right
-  margins.bottom: edgeMargins.bottom || edgeMargins.top
-  margins.left: edgeMargins.left || edgeMargins.right
 
-  implicitWidth: Config.notifWidth
-  implicitHeight: col.implicitHeight
-  color: "transparent"
-  mask: Region {
-    item: col
+  property var mprisPlayer: {
+    if (!notification || !notification.appName)
+      return null;
+    var app = notification.appName.toLowerCase();
+    for (var i = 0; i < Mpris.players.length; i++) {
+      var player = Mpris.players[i];
+      if ((player.identity || "").toLowerCase().includes(app) || player.desktopEntry === app)
+        return player;
+    }
+    return null;
   }
 
-  property var manager: null
-  readonly property int maxLayerTextureSize: 4096
-
-  function allowLayer(width, height) {
-    return width > 0 && height > 0
-      && width <= maxLayerTextureSize
-      && height <= maxLayerTextureSize;
+  readonly property string previewImageSource: {
+    var source = String((notification && notification.image) || "");
+    if (source === "")
+      return "";
+    if (source.startsWith("/") || source.startsWith("file://")
+        || source.startsWith("data:") || source.startsWith("image://")
+        || source.startsWith("http://") || source.startsWith("https://")) {
+      return source;
+    }
+    return "";
   }
+
+  default property alias overlays: overlaySlot.data
 
   ColumnLayout {
-    id: col
-    width: Config.notifWidth
-    spacing: Colors.paddingSmall
+    id: colMain
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.margins: Colors.paddingLarge
+    spacing: Colors.spacingM
 
-    Repeater {
-      model: root.manager ? root.manager.notifications : null
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: Colors.spacingM
 
-      delegate: Item {
-        id: notifWrapper
-        property var notification: modelData || null
-        visible: notification && !notification.dismissed && (!root.manager || !root.manager.dndEnabled || isUrgent) && !_isMuted
-        Layout.preferredWidth: Config.notifWidth
-        Layout.preferredHeight: visible ? delegate.height : 0
+      SharedWidgets.AppIcon {
+        iconName: notification ? notification.appIcon : ""
+        appName: notification ? notification.appName : ""
+        iconSize: 38
+        fallbackIcon: "󰂚"
+        visible: notification && notification.appIcon !== ""
+      }
 
-        property bool isUrgent: !!(notification && notification.urgency === NotificationUrgency.Critical)
-        readonly property int _urgencyTimeout: {
-          if (!notification) return Config.popupTimer;
-          var rules = Config.notifRules;
-          for (var i = 0; i < rules.length; i++) {
-            if (rules[i].appName && (notification.appName || "").toLowerCase() === rules[i].appName.toLowerCase()) {
-              if (rules[i].action === "mute") return -1;
-              if (rules[i].timeout !== undefined) return rules[i].timeout;
-            }
-          }
-          if (notification.urgency === NotificationUrgency.Critical) return Config.notifTimeoutCritical;
-          if (notification.urgency === NotificationUrgency.Low) return Config.notifTimeoutLow;
-          return Config.notifTimeoutNormal;
-        }
-        readonly property bool _isMuted: _urgencyTimeout < 0
+      ColumnLayout {
+        Layout.fillWidth: true
+        spacing: 0
 
-        // Entrance/Exit Animation Logic
-        property real entranceProgress: 0
-        property real exitProgress: 1.0
-        property bool isDismissing: false
-
-        opacity: entranceProgress * exitProgress
-        scale: 0.95 + (0.05 * entranceProgress)
-        x: (1.0 - entranceProgress) * 40 + delegate.swipeOffset
-
-        layer.enabled: (entranceAnim.running || dismissAnim.running) && root.allowLayer(width, height)
-
-        Component.onCompleted: {
-          entranceTimer.interval = Math.min(index * 60, 240);
-          entranceTimer.start();
+        Text {
+          text: notification ? (notification.appName || "Notification") : ""
+          color: root.isUrgent ? Colors.error : Colors.textSecondary
+          font.pixelSize: Colors.fontSizeXXS
+          font.weight: Font.Black
+          font.capitalization: Font.AllUppercase
+          font.letterSpacing: Colors.letterSpacingWide
         }
 
-        Timer { id: entranceTimer; onTriggered: entranceAnim.start() }
-        NumberAnimation { id: entranceAnim; target: notifWrapper; property: "entranceProgress"; to: 1.0; duration: 400; easing.type: Easing.OutQuint }
+        Text {
+          text: notification ? notification.summary : ""
+          color: Colors.text
+          font.pixelSize: Colors.fontSizeMedium
+          font.weight: Font.Bold
+          Layout.fillWidth: true
+          elide: Text.ElideRight
+        }
+      }
 
-        function animatedDismiss() {
-          if (isDismissing) return;
-          isDismissing = true;
-          dismissAnim.start();
+      Text {
+        visible: !root.isPopup && notification && notification.time
+        text: notification ? Qt.formatDateTime(notification.time, "HH:mm") : ""
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeXS
+      }
+
+      SharedWidgets.IconButton {
+        icon: "󰅖"
+        size: 28
+        iconSize: Colors.fontSizeLarge
+        iconColor: Colors.textDisabled
+        stateColor: Colors.error
+        onClicked: root.dismissRequested()
+      }
+    }
+
+    Text {
+      Layout.fillWidth: true
+      text: notification ? notification.body : ""
+      color: Colors.textSecondary
+      font.pixelSize: Colors.fontSizeSmall
+      wrapMode: Text.Wrap
+      visible: notification && notification.body !== ""
+      maximumLineCount: root.isPopup ? 3 : 10
+      elide: Text.ElideRight
+    }
+
+    Rectangle {
+      Layout.fillWidth: true
+      Layout.preferredHeight: 160
+      visible: root.previewImageSource !== ""
+      radius: Colors.radiusMedium
+      color: "#33000000"
+      clip: true
+
+      Image {
+        anchors.fill: parent
+        source: root.previewImageSource
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+      }
+    }
+
+    Rectangle {
+      Layout.fillWidth: true
+      height: 44
+      radius: Colors.radiusMedium
+      color: Colors.highlightLight
+      visible: root.mprisPlayer !== null
+
+      RowLayout {
+        anchors.fill: parent
+        anchors.margins: Colors.spacingS
+        spacing: Colors.spacingM
+
+        Item { Layout.fillWidth: true }
+
+        SharedWidgets.IconButton {
+          icon: "󰒮"
+          iconSize: Colors.fontSizeLarge
+          onClicked: if (root.mprisPlayer) root.mprisPlayer.previous()
         }
 
-        ParallelAnimation {
-          id: dismissAnim
-          NumberAnimation { target: notifWrapper; property: "exitProgress"; to: 0; duration: 300; easing.type: Easing.InCubic }
-          NumberAnimation { target: notifWrapper; property: "x"; to: notifWrapper.width + 40; duration: 300; easing.type: Easing.InCubic }
-          onFinished: if (notification) notification.dismiss()
+        SharedWidgets.IconButton {
+          size: 34
+          color: Colors.primary
+          icon: root.mprisPlayer && root.mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
+          iconColor: Colors.background
+          onClicked: if (root.mprisPlayer) root.mprisPlayer.playPause()
         }
 
-        NotificationDelegate {
-          id: delegate
-          notification: notifWrapper.notification
-          isPopup: true
-          showContent: !notifWrapper.isDismissing
-          onDismissRequested: notifWrapper.animatedDismiss()
-          onActionInvoked: action => { action.invoke(); notifWrapper.animatedDismiss(); }
-          onReplySent: text => { notification.invoke(text); notifWrapper.animatedDismiss(); }
-
-          // Progress bar for auto-dismiss
-          Rectangle {
-            id: progress
-            anchors.top: parent.top
-            anchors.left: parent.left
-            height: 3
-            radius: Colors.radiusXS
-            color: notifWrapper.isUrgent ? Colors.error : Colors.primary
-            opacity: 0.6
-            width: parent.width * (1.0 - dismissTimer.progress)
-            visible: !notifWrapper.isDismissing && notifWrapper._urgencyTimeout > 0
-          }
+        SharedWidgets.IconButton {
+          icon: "󰒭"
+          iconSize: Colors.fontSizeLarge
+          onClicked: if (root.mprisPlayer) root.mprisPlayer.next()
         }
 
-        Timer {
-          id: dismissTimer
-          property real progress: 0
-          interval: 50
-          repeat: true
-          running: notifWrapper.notification && !delegate.isReplying && !notifWrapper.isDismissing && notifWrapper._urgencyTimeout > 0 && !delegate.isHovered
-          onTriggered: {
-            progress += 50 / notifWrapper._urgencyTimeout;
-            if (progress >= 1.0) {
-              stop();
-              notifWrapper.animatedDismiss();
+        Item { Layout.fillWidth: true }
+      }
+    }
+
+    Rectangle {
+      Layout.fillWidth: true
+      height: 40
+      radius: Colors.radiusSmall
+      color: Colors.highlightLight
+      visible: root.isReplying
+      border.color: replyInput.activeFocus ? Colors.primary : Colors.border
+      border.width: 1
+
+      TextInput {
+        id: replyInput
+        anchors.fill: parent
+        anchors.margins: Colors.paddingSmall
+        verticalAlignment: Text.AlignVCenter
+        color: Colors.text
+        font.pixelSize: Colors.fontSizeSmall
+        onVisibleChanged: if (!visible && activeFocus) focus = false
+        Keys.onReturnPressed: {
+          root.replySent(text);
+          root.isReplying = false;
+        }
+        Keys.onEscapePressed: root.isReplying = false
+      }
+
+      Text {
+        anchors.fill: parent
+        anchors.leftMargin: Colors.paddingSmall
+        verticalAlignment: Text.AlignVCenter
+        text: "Type a reply..."
+        color: Colors.textDisabled
+        font.pixelSize: Colors.fontSizeSmall
+        visible: !replyInput.text && !replyInput.activeFocus
+      }
+    }
+
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: Colors.spacingS
+      visible: !root.isReplying && notification && notification.actions && notification.actions.count > 0
+
+      Repeater {
+        model: notification ? notification.actions : null
+
+        delegate: SharedWidgets.Button {
+          Layout.fillWidth: true
+          Layout.preferredHeight: 32
+          text: modelData.label || ""
+          fontSize: Colors.fontSizeSmall
+          onClicked: {
+            var label = (modelData.label || "").toLowerCase();
+            if (label.includes("reply")) {
+              root.isReplying = true;
+              replyInput.forceActiveFocus();
+            } else {
+              root.actionInvoked(modelData);
             }
           }
         }
       }
     }
+  }
+
+  Item {
+    id: overlaySlot
+    anchors.fill: parent
+    z: 1
+  }
+
+  MouseArea {
+    id: delegateMouseArea
+    anchors.fill: parent
+    z: -1
+    acceptedButtons: Qt.LeftButton | Qt.RightButton
+    hoverEnabled: true
+    onClicked: function(mouse) {
+      if (mouse.button === Qt.RightButton)
+        root.dismissRequested();
+    }
+    onPressed: function(mouse) {
+      if (mouse.button === Qt.LeftButton && root.isPopup) {
+        root._swipeStartX = mouse.x;
+        root.isSwiping = true;
+      }
+    }
+    onPositionChanged: function(mouse) {
+      if (root.isSwiping) {
+        var delta = mouse.x - root._swipeStartX;
+        root.swipeOffset = Math.max(0, delta);
+      }
+    }
+    onReleased: function(mouse) {
+      if (root.isSwiping) {
+        root.isSwiping = false;
+        var threshold = Math.max(80, root.width * 0.35);
+        if (root.swipeOffset >= threshold) {
+          root.dismissRequested();
+        } else {
+          root.swipeOffset = 0;
+        }
+      }
+    }
+
+    property real _swipeStartX: 0
   }
 }

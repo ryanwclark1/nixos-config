@@ -101,11 +101,9 @@ Then connect from host:
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 administrator@127.0.0.1
 ```
 
-Password: `niri`
-
-After any QA wrapper or smoke run, your local SSH public key is copied into the
-guest automatically when `~/.ssh/id_ed25519.pub` or `~/.ssh/id_rsa.pub` exists,
-so follow-up `ssh` to the running VM should not prompt for a password.
+Fresh Niri test VMs authorize the host's default `~/.ssh/id_rsa`, so the normal
+host-side `ssh` flow should not prompt for a password. If that key is missing,
+the QA wrappers still fall back to the legacy VM password: `niri`.
 
 ## Useful launch variants
 

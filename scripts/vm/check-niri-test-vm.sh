@@ -9,7 +9,9 @@ poll_attempts="${NIRI_VM_SMOKE_POLL_ATTEMPTS:-}"
 launcher="${repo_root}/scripts/vm/launch-niri-test-vm.sh"
 log_file="${NIRI_VM_SMOKE_LOG:-/tmp/niri-test-vm-smoke.log}"
 vm_password="${NIRI_VM_PASSWORD:-niri}"
+ssh_identity_file="${NIRI_VM_SSH_IDENTITY:-}"
 host_pubkey_file=""
+use_key_auth=0
 
 if [[ -z "${poll_attempts}" ]]; then
   poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
@@ -23,8 +25,34 @@ cleanup() {
 }
 trap cleanup EXIT
 
+resolve_host_identity() {
+  local candidate=""
+
+  if [[ -n "${ssh_identity_file}" ]]; then
+    [[ -r "${ssh_identity_file}" ]] || return 1
+    return 0
+  fi
+
+  candidate="${HOME}/.ssh/id_rsa"
+  if [[ -r "${candidate}" ]]; then
+    ssh_identity_file="${candidate}"
+    return 0
+  fi
+
+  return 1
+}
+
 resolve_host_pubkey() {
   local candidate=""
+
+  if resolve_host_identity; then
+    candidate="${ssh_identity_file}.pub"
+    if [[ -r "${candidate}" ]]; then
+      host_pubkey_file="${candidate}"
+      return 0
+    fi
+  fi
+
   for candidate in \
     "${HOME}/.ssh/id_ed25519.pub" \
     "${HOME}/.ssh/id_rsa.pub"
@@ -37,7 +65,33 @@ resolve_host_pubkey() {
   return 1
 }
 
-ssh_base=(
+ssh_common_opts=(
+  -o LogLevel=ERROR
+  -o StrictHostKeyChecking=no
+  -o UserKnownHostsFile=/dev/null
+  -o ConnectTimeout=5
+  -o KbdInteractiveAuthentication=no
+  -o NumberOfPasswordPrompts=1
+  -o ControlMaster=no
+  -o ControlPath=none
+)
+
+if resolve_host_identity; then
+  use_key_auth=1
+  ssh_key_base=(
+    ssh
+    "${ssh_common_opts[@]}"
+    -o PreferredAuthentications=publickey
+    -o PubkeyAuthentication=yes
+    -o PasswordAuthentication=no
+    -o IdentitiesOnly=yes
+    -i "${ssh_identity_file}"
+    -p "${port}"
+    administrator@127.0.0.1
+  )
+fi
+
+ssh_password_base=(
   nix
   shell
   nixpkgs#sshpass
@@ -50,18 +104,20 @@ ssh_base=(
   sshpass
   -e
   ssh
-  -o StrictHostKeyChecking=no
-  -o UserKnownHostsFile=/dev/null
-  -o ConnectTimeout=5
+  "${ssh_common_opts[@]}"
   -o PreferredAuthentications=password
   -o PubkeyAuthentication=no
-  -o KbdInteractiveAuthentication=no
-  -o NumberOfPasswordPrompts=1
-  -o ControlMaster=no
-  -o ControlPath=none
   -p "${port}"
   administrator@127.0.0.1
 )
+
+vm_ssh() {
+  if (( use_key_auth == 1 )) && "${ssh_key_base[@]}" "$@"; then
+    return 0
+  fi
+
+  "${ssh_password_base[@]}" "$@"
+}
 
 install_host_pubkey() {
   local pubkey=""
@@ -70,10 +126,15 @@ install_host_pubkey() {
   pubkey="$(<"${host_pubkey_file}")"
   [[ -n "${pubkey}" ]] || return 0
 
-  "${ssh_base[@]}" "umask 077 && mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && grep -qxF $(printf '%q' "${pubkey}") ~/.ssh/authorized_keys || printf '%s\n' $(printf '%q' "${pubkey}") >> ~/.ssh/authorized_keys"
+  vm_ssh "umask 077 && mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && grep -qxF $(printf '%q' "${pubkey}") ~/.ssh/authorized_keys || printf '%s\n' $(printf '%q' "${pubkey}") >> ~/.ssh/authorized_keys"
 }
 
 echo "[INFO] Launching smoke VM on SSH port ${port}"
+if (( use_key_auth == 1 )); then
+  echo "[INFO] Using SSH identity ${ssh_identity_file} for Niri VM access"
+else
+  echo "[INFO] Using password-based SSH fallback for Niri VM access"
+fi
 : > "${log_file}"
 coproc VM_LAUNCHER {
   exec bash "${launcher}" --reset-disk --ssh-port "${port}" >"${log_file}" 2>&1
@@ -81,7 +142,7 @@ coproc VM_LAUNCHER {
 launcher_pid="${VM_LAUNCHER_PID}"
 
 for ((i = 1; i <= poll_attempts; i++)); do
-  if "${ssh_base[@]}" "echo READY" >/dev/null 2>&1; then
+  if vm_ssh "echo READY" >/dev/null 2>&1; then
     break
   fi
   if ! kill -0 "${launcher_pid}" 2>/dev/null; then
@@ -92,7 +153,7 @@ for ((i = 1; i <= poll_attempts; i++)); do
   sleep "${poll_delay}"
 done
 
-if ! "${ssh_base[@]}" "echo READY" >/dev/null 2>&1; then
+if ! vm_ssh "echo READY" >/dev/null 2>&1; then
   echo "[ERROR] Timed out waiting for SSH on port ${port}" >&2
   tail -n 120 "${log_file}" >&2 || true
   exit 1
@@ -102,7 +163,7 @@ install_host_pubkey
 
 echo "[INFO] SSH is ready; validating session"
 
-if ! "${ssh_base[@]}" '
+if ! vm_ssh '
   pgrep -fa "niri --session" >/dev/null 2>&1 ||
   systemctl --user start niri.service >/dev/null 2>&1
 ' ; then
@@ -111,7 +172,7 @@ if ! "${ssh_base[@]}" '
 fi
 
 for ((i = 1; i <= 30; i++)); do
-  if "${ssh_base[@]}" '
+  if vm_ssh '
     pgrep -fa "niri --session" >/dev/null &&
     pgrep -fa "/quickshell" >/dev/null &&
     pgrep -fa "kitty" >/dev/null
@@ -121,17 +182,17 @@ for ((i = 1; i <= 30; i++)); do
   sleep 2
 done
 
-if ! "${ssh_base[@]}" '
+if ! vm_ssh '
   pgrep -fa "niri --session" >/dev/null &&
   pgrep -fa "/quickshell" >/dev/null &&
   pgrep -fa "kitty" >/dev/null
 '; then
   echo "[ERROR] Expected niri/quickshell/kitty to be running" >&2
-  "${ssh_base[@]}" 'pgrep -a "niri|quickshell|kitty|waybar|voxtype|blueman|nm-applet|syncthing|polkit|geoclue" || true' >&2
+  vm_ssh 'pgrep -a "niri|quickshell|kitty|waybar|voxtype|blueman|nm-applet|syncthing|polkit|geoclue" || true' >&2
   exit 1
 fi
 
-if "${ssh_base[@]}" '
+if vm_ssh '
   pgrep -x waybar >/dev/null ||
   pgrep -x voxtype >/dev/null ||
   pgrep -x blueman-applet >/dev/null ||
@@ -141,7 +202,7 @@ if "${ssh_base[@]}" '
   systemctl --user --quiet is-active geoclue-agent.service
 '; then
   echo "[ERROR] Unexpected applet/background processes are still running" >&2
-  "${ssh_base[@]}" '
+  vm_ssh '
     for proc in waybar voxtype blueman-applet nm-applet syncthing geoclue-agent; do
       pgrep -a -x "$proc" || true
     done
@@ -151,7 +212,7 @@ if "${ssh_base[@]}" '
 fi
 
 echo "[INFO] Session summary:"
-"${ssh_base[@]}" '
+vm_ssh '
   echo "Processes:"
   pgrep -a "niri|quickshell|kitty" || true
   echo
@@ -165,8 +226,8 @@ echo "[INFO] Session summary:"
   journalctl --user --no-pager -n 20
 '
 
-desktop_name="$("${ssh_base[@]}" 'loginctl show-session "$XDG_SESSION_ID" -p Desktop --value 2>/dev/null || true')"
-session_type="$("${ssh_base[@]}" 'loginctl show-session "$XDG_SESSION_ID" -p Type --value 2>/dev/null || true')"
+desktop_name="$(vm_ssh 'loginctl show-session "$XDG_SESSION_ID" -p Desktop --value 2>/dev/null || true')"
+session_type="$(vm_ssh 'loginctl show-session "$XDG_SESSION_ID" -p Type --value 2>/dev/null || true')"
 
 if [[ -n "${desktop_name}" && "${desktop_name}" != "niri" ]]; then
   echo "[WARN] Desktop session reports '${desktop_name}' instead of 'niri'" >&2

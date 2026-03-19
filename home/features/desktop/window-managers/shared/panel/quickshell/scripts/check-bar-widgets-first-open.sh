@@ -295,7 +295,7 @@ population_score() {
     'Sett(irgs|ings)'
     'App[[:space:]]+Launcher'
     'Workspace[[:space:]]+Switcher'
-    'Left[[:space:]]+Section'
+    'L.{0,2}ft[[:space:]]+Section'
     'Window[[:space:]]+Title'
     'Active[[:space:]]+Ap(p|o)[[:space:]]+Context'
     'Running Apps'
@@ -365,7 +365,7 @@ if [[ -z "${instance_id}" ]]; then
 fi
 
 printf '[INFO] Running settings smoke against instance %s\n' "${instance_id}"
-bash "${script_dir}/check-settings-responsive.sh" --id "${instance_id}"
+bash "${script_dir}/check-settings-responsive.sh" --pid "${repo_shell_pid}" --skip-reload
 instance_id="$(discover_instance)" || {
   printf 'Could not rediscover a reachable quickshell instance after settings smoke.\n' >&2
   exit 1

@@ -6,6 +6,7 @@ import "../../shared"
 import "../../services"
 import "../system/sections"
 import "../../widgets" as SharedWidgets
+import "BatteryHelpers.js" as BatteryHelpers
 
 BasePopupMenu {
   id: root
@@ -15,20 +16,9 @@ BasePopupMenu {
   title: "Battery"
 
   property var device: UPower.displayDevice
-  property bool hasBattery: device != null && device.isPresent && (device.kind === UPower.DeviceKindDisplayDevice || device.kind === UPower.DeviceKindBattery)
+  property bool hasBattery: device != null && device.isPresent
 
-  SharedWidgets.Ref { service: PowerProfileService }
-
-  onVisibleChanged: if (visible) PowerProfileService.refresh()
-
-  readonly property string batteryStateText: {
-    if (!device) return "Unknown";
-    if (device.state === UPower.DeviceStateCharging) return "Charging";
-    if (device.state === UPower.DeviceStateFullyCharged) return "Fully charged";
-    if (device.state === UPower.DeviceStatePendingCharge) return "Pending charge";
-    if (device.state === UPower.DeviceStatePendingDischarge) return "Pending discharge";
-    return "Discharging";
-  }
+  readonly property string batteryStateText: BatteryHelpers.stateText(device, UPower)
 
   readonly property string batteryIcon: {
     if (!device) return "󰂑";

@@ -5,6 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 launcher="${repo_root}/scripts/vm/launch-niri-test-vm.sh"
 ssh_port="${NIRI_VM_QA_SSH_PORT:-2232}"
 vm_password="${NIRI_VM_PASSWORD:-niri}"
+ssh_identity_file="${NIRI_VM_SSH_IDENTITY:-}"
 boot_timeout="${NIRI_VM_QA_BOOT_TIMEOUT:-300}"
 poll_delay="${NIRI_VM_QA_POLL_DELAY:-2}"
 poll_attempts="${NIRI_VM_QA_POLL_ATTEMPTS:-}"
@@ -16,6 +17,7 @@ vm_output_dir=""
 launcher_log="${NIRI_VM_QA_LOG:-/tmp/niri-test-vm-qa.log}"
 extra_capture_args=()
 host_pubkey_file=""
+use_key_auth=0
 
 if [[ -z "${poll_attempts}" ]]; then
   poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
@@ -89,8 +91,34 @@ fi
 
 mkdir -p "${output_dir}"
 
+resolve_host_identity() {
+  local candidate=""
+
+  if [[ -n "${ssh_identity_file}" ]]; then
+    [[ -r "${ssh_identity_file}" ]] || return 1
+    return 0
+  fi
+
+  candidate="${HOME}/.ssh/id_rsa"
+  if [[ -r "${candidate}" ]]; then
+    ssh_identity_file="${candidate}"
+    return 0
+  fi
+
+  return 1
+}
+
 resolve_host_pubkey() {
   local candidate=""
+
+  if resolve_host_identity; then
+    candidate="${ssh_identity_file}.pub"
+    if [[ -r "${candidate}" ]]; then
+      host_pubkey_file="${candidate}"
+      return 0
+    fi
+  fi
+
   for candidate in \
     "${HOME}/.ssh/id_ed25519.pub" \
     "${HOME}/.ssh/id_rsa.pub"
@@ -103,7 +131,54 @@ resolve_host_pubkey() {
   return 1
 }
 
-ssh_base=(
+ssh_common_opts=(
+  -o LogLevel=ERROR
+  -o StrictHostKeyChecking=no
+  -o UserKnownHostsFile=/dev/null
+  -o ConnectTimeout=5
+  -o KbdInteractiveAuthentication=no
+  -o NumberOfPasswordPrompts=1
+  -o ControlMaster=no
+  -o ControlPath=none
+)
+
+scp_common_opts=(
+  -o LogLevel=ERROR
+  -o StrictHostKeyChecking=no
+  -o UserKnownHostsFile=/dev/null
+  -o KbdInteractiveAuthentication=no
+  -o NumberOfPasswordPrompts=1
+  -o ControlMaster=no
+  -o ControlPath=none
+)
+
+if resolve_host_identity; then
+  use_key_auth=1
+  ssh_key_base=(
+    ssh
+    "${ssh_common_opts[@]}"
+    -o PreferredAuthentications=publickey
+    -o PubkeyAuthentication=yes
+    -o PasswordAuthentication=no
+    -o IdentitiesOnly=yes
+    -i "${ssh_identity_file}"
+    -p "${ssh_port}"
+    administrator@127.0.0.1
+  )
+
+  scp_key_base=(
+    scp
+    "${scp_common_opts[@]}"
+    -o PreferredAuthentications=publickey
+    -o PubkeyAuthentication=yes
+    -o PasswordAuthentication=no
+    -o IdentitiesOnly=yes
+    -i "${ssh_identity_file}"
+    -P "${ssh_port}"
+  )
+fi
+
+ssh_password_base=(
   nix
   shell
   nixpkgs#sshpass
@@ -116,20 +191,14 @@ ssh_base=(
   sshpass
   -e
   ssh
-  -o StrictHostKeyChecking=no
-  -o UserKnownHostsFile=/dev/null
-  -o ConnectTimeout=5
+  "${ssh_common_opts[@]}"
   -o PreferredAuthentications=password
   -o PubkeyAuthentication=no
-  -o KbdInteractiveAuthentication=no
-  -o NumberOfPasswordPrompts=1
-  -o ControlMaster=no
-  -o ControlPath=none
   -p "${ssh_port}"
   administrator@127.0.0.1
 )
 
-scp_base=(
+scp_password_base=(
   nix
   shell
   nixpkgs#sshpass
@@ -142,16 +211,27 @@ scp_base=(
   sshpass
   -e
   scp
-  -o StrictHostKeyChecking=no
-  -o UserKnownHostsFile=/dev/null
+  "${scp_common_opts[@]}"
   -o PreferredAuthentications=password
   -o PubkeyAuthentication=no
-  -o KbdInteractiveAuthentication=no
-  -o NumberOfPasswordPrompts=1
-  -o ControlMaster=no
-  -o ControlPath=none
   -P "${ssh_port}"
 )
+
+vm_ssh() {
+  if (( use_key_auth == 1 )) && "${ssh_key_base[@]}" "$@"; then
+    return 0
+  fi
+
+  "${ssh_password_base[@]}" "$@"
+}
+
+vm_scp() {
+  if (( use_key_auth == 1 )) && "${scp_key_base[@]}" "$@"; then
+    return 0
+  fi
+
+  "${scp_password_base[@]}" "$@"
+}
 
 cleanup() {
   if (( keep_vm_running == 0 )) && [[ -n "${launcher_pid:-}" ]] && kill -0 "${launcher_pid}" 2>/dev/null; then
@@ -164,7 +244,7 @@ trap cleanup EXIT
 wait_for_ssh() {
   local i
   for ((i = 1; i <= poll_attempts; i++)); do
-    if "${ssh_base[@]}" "echo READY" >/dev/null 2>&1; then
+    if vm_ssh "echo READY" >/dev/null 2>&1; then
       return 0
     fi
     if [[ -n "${launcher_pid:-}" ]] && ! kill -0 "${launcher_pid}" 2>/dev/null; then
@@ -186,20 +266,20 @@ install_host_pubkey() {
   pubkey="$(<"${host_pubkey_file}")"
   [[ -n "${pubkey}" ]] || return 0
 
-  "${ssh_base[@]}" "umask 077 && mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && grep -qxF $(printf '%q' "${pubkey}") ~/.ssh/authorized_keys || printf '%s\n' $(printf '%q' "${pubkey}") >> ~/.ssh/authorized_keys"
+  vm_ssh "umask 077 && mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && grep -qxF $(printf '%q' "${pubkey}") ~/.ssh/authorized_keys || printf '%s\n' $(printf '%q' "${pubkey}") >> ~/.ssh/authorized_keys"
 }
 
 wait_for_niri() {
   local i
   for ((i = 1; i <= 60; i++)); do
-    if "${ssh_base[@]}" '
+    if vm_ssh '
       pgrep -fa "niri --session" >/dev/null 2>&1 &&
       systemctl --user show-environment 2>/dev/null | grep -q "^NIRI_SOCKET=" &&
       systemctl --user show-environment 2>/dev/null | grep -q "^WAYLAND_DISPLAY="
     ' >/dev/null 2>&1; then
       return 0
     fi
-    "${ssh_base[@]}" '
+    vm_ssh '
       systemctl --user reset-failed niri.service >/dev/null 2>&1 || true
       systemctl --user start niri.service >/dev/null 2>&1 || true
     ' >/dev/null 2>&1 || true
@@ -207,7 +287,7 @@ wait_for_niri() {
   done
 
   echo "[ERROR] Expected Niri session to be running in the VM" >&2
-  "${ssh_base[@]}" '
+  vm_ssh '
     echo "--- processes ---"
     pgrep -a "niri|quickshell|kitty|uwsm|sddm" || true
     echo "--- niri.service ---"
@@ -232,8 +312,8 @@ sync_repo() {
   local remote_panel_parent="${remote_repo}/home/features/desktop/window-managers/shared"
 
   echo "[INFO] Syncing repo checkout into VM: ${remote_repo}"
-  "${ssh_base[@]}" "rm -rf '${remote_repo}' && mkdir -p '${remote_panel_parent}'"
-  tar -C "${repo_root}" -cf - "${panel_rel}" | "${ssh_base[@]}" "tar -xf - -C '${remote_repo}'"
+  vm_ssh "rm -rf '${remote_repo}' && mkdir -p '${remote_panel_parent}'"
+  tar -C "${repo_root}" -cf - "${panel_rel}" | vm_ssh "tar -xf - -C '${remote_repo}'"
 }
 
 run_remote_capture() {
@@ -254,7 +334,7 @@ run_remote_capture() {
       remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-settings --skip-launcher --output-dir '${vm_output_dir}'"
       ;;
     settings-qa)
-      "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+      vm_ssh "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
 set -euo pipefail
 
 mkdir -p "${VM_OUTPUT_DIR}"
@@ -267,7 +347,7 @@ EOF
       return $?
       ;;
     gate)
-      "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+      vm_ssh "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
 set -uo pipefail
 
 mkdir -p "${VM_OUTPUT_DIR}"
@@ -324,14 +404,14 @@ EOF
   fi
 
   echo "[INFO] Running capture mode '${capture_mode}' in VM"
-  "${ssh_base[@]}" "${remote_cmd}"
+  vm_ssh "${remote_cmd}"
 }
 
 copy_artifacts_home() {
   echo "[INFO] Copying artifacts back to host: ${output_dir}"
   rm -rf "${output_dir}"
   mkdir -p "${output_dir}"
-  "${scp_base[@]}" -r "administrator@127.0.0.1:${vm_output_dir}/." "${output_dir}/"
+  vm_scp -r "administrator@127.0.0.1:${vm_output_dir}/." "${output_dir}/"
 }
 
 write_summary() {
@@ -392,6 +472,11 @@ EOF
 }
 
 echo "[INFO] Launching Niri test VM on SSH port ${ssh_port}"
+if (( use_key_auth == 1 )); then
+  echo "[INFO] Using SSH identity ${ssh_identity_file} for Niri VM access"
+else
+  echo "[INFO] Using password-based SSH fallback for Niri VM access"
+fi
 : > "${launcher_log}"
 launcher_args=(--ssh-port "${ssh_port}")
 if (( reset_disk == 1 )); then

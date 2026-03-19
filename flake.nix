@@ -238,6 +238,11 @@
                 users.users.administrator = {
                   hashedPasswordFile = lib.mkForce null;
                   initialPassword = lib.mkForce "niri";
+                  # Allow the host's default SSH identity to log into the test
+                  # VM without falling back to the VM password prompt.
+                  openssh.authorizedKeys.keys = lib.mkAfter [
+                    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJyFGjFO4HM7d5k8WOaz3n46BUlmBS8TSzr3yazOkXIi4VUe5pUtnJVilxla0CV+9e9S+o2yFiK7sFxltyrE935CJQ1zmnB7CUFjkc9XdArmCpBwyrfvDDPycZuIwJBx5D7K813JDabFioJ1YL5pNcRdSPW440j0GliaOOEMHwEey0tsNgPLECKejRhyBoUkJmNEUO/VZB3tU9cbyf4sAZVkjHPgtQWqqIMHv11vEQGFBbsNfqh8BFfPcMU14JpMVW1iyEGYXdJVb+XOtnkXEE8ytQ0aSSj0g8gyfuGqPeHdfRcjZ16DSUKpWHbvzcI+z1RENvtTi75KRc7WpAMUsEzwGlcKcmgGu8/65Wa/Q3C5Z/Ail2IjIA7ClHG5V0/rn2vzlnUp4TovWdBv2sTIDJ4NFZgcMSrta6yFcL4qXPjBPXTr0C9JmZBGjYxLjHqZ3Z/xpPw1Cz5Ija0AlSD5DACvmw/n2F6TST65q/8mAt+jA/oTFFmCKK+JpNCYlUZgCdwhilRQ6IvmP0A8HlorM8MyN9gjG8hXSvzYs5me09m/fe52+haZLIRonlwCPyYo8lMi0yyery4qDCFpKXdfSnbiN2e941xBfShn6dytRLglHqCa4VldW8OUJeHdC4nVIPQbhXwVen3aoy4lsreh5v/ilq0lEFWBiDpMtCpvHXnQ== administrator@woody"
+                  ];
                 };
                 systemd.user.services.niri-flake-polkit.wantedBy = lib.mkForce [ ];
 
