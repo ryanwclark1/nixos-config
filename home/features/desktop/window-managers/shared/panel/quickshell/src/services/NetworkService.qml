@@ -151,15 +151,6 @@ QtObject {
         });
     }
 
-    function formatBytes(bytesValue) {
-        var bytes = parseInt(bytesValue || "0", 10);
-        if (!bytes) return "0 B";
-        if (bytes < 1024) return bytes + " B";
-        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-        if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + " MB";
-        return (bytes / 1073741824).toFixed(2) + " GB";
-    }
-
     function vpnStatusLabel(statusValue) {
         var status = String(statusValue || "");
         if (status === "connected") return "Connected";

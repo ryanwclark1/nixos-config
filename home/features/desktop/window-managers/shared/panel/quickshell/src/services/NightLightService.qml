@@ -38,11 +38,12 @@ QtObject {
     // ── Startup restore ──────────────────────────
     Component.onCompleted: {
         if (Config.nightLightEnabled)
-            _verifyTimer.start();
+            verifyTimer.start();
     }
 
     // Delayed start to let compositor settle
-    property Timer _verifyTimer: Timer {
+    Timer {
+        id: verifyTimer
         interval: 2000
         onTriggered: {
             if (Config.nightLightEnabled && !root.active)
@@ -51,7 +52,8 @@ QtObject {
     }
 
     // ── Process state check ──────────────────────
-    property Process _checkProc: Process {
+    Process {
+        id: checkProc
         running: false
         command: ["sh", "-c", "pgrep -x hyprsunset >/dev/null 2>&1 || pgrep -x wlsunset >/dev/null 2>&1 && echo on || echo off"]
         stdout: StdioCollector {
@@ -63,7 +65,8 @@ QtObject {
 
     // ── Schedule ────────────────────────────────
     // Check schedule every 60 seconds when auto-schedule is enabled
-    property Timer _scheduleTimer: Timer {
+    Timer {
+        id: scheduleTimer
         interval: 60000
         running: Config.nightLightAutoSchedule
         repeat: true
@@ -151,26 +154,29 @@ QtObject {
     }
 
     // ── Wake recovery ────────────────────────────
-    property Connections _suspendConn: Connections {
+    Connections {
+        id: suspendConn
         target: SuspendManager
         function onWakingUp() {
             // Re-check process state after wake
-            root._wakeCheckTimer.restart();
+            wakeCheckTimer.restart();
         }
     }
 
-    property Timer _wakeCheckTimer: Timer {
+    Timer {
+        id: wakeCheckTimer
         interval: 2000
         onTriggered: {
             if (Config.nightLightEnabled) {
-                root._checkProc.running = true;
+                checkProc.running = true;
                 // If process died during suspend, restart it
-                root._wakeRestartTimer.restart();
+                wakeRestartTimer.restart();
             }
         }
     }
 
-    property Timer _wakeRestartTimer: Timer {
+    Timer {
+        id: wakeRestartTimer
         interval: 3000
         onTriggered: {
             if (Config.nightLightEnabled && !root.active)
