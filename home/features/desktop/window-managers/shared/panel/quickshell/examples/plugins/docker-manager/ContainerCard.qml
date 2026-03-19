@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import "DockerUtils.js" as DU
 
 Rectangle {
     id: root
@@ -26,16 +27,6 @@ Rectangle {
     border.color: isFocused ? "#93c5fd" : (expanded ? "#38bdf8" : "#334155")
     implicitHeight: bodyColumn.implicitHeight + 18
 
-    function _healthDot(status) {
-        if (status === "healthy" || status === "starting" || status === "unhealthy") return "\u25CF ";
-        return "";
-    }
-    function _healthDotColor(status) {
-        if (status === "healthy") return "#5eead4";
-        if (status === "starting") return "#fcd34d";
-        if (status === "unhealthy") return "#f87171";
-        return "transparent";
-    }
     function _actionLabel() {
         return modelData && modelData.isRunning ? "Restart" : "Start";
     }
@@ -82,8 +73,8 @@ Rectangle {
                     spacing: 2
                     Text {
                         visible: root.modelData.healthStatus !== ""
-                        text: root._healthDot(root.modelData.healthStatus)
-                        color: root._healthDotColor(root.modelData.healthStatus)
+                        text: DU.healthDot(root.modelData.healthStatus)
+                        color: DU.healthDotColor(root.modelData.healthStatus)
                         font.pixelSize: 11
                     }
                     Text {
