@@ -94,8 +94,14 @@ Item {
             else if (section === "center") entries = Config.barCenterEntries;
             else if (section === "right") entries = Config.barRightEntries;
 
-            return entries.map(function(type) {
-                return { widgetType: type, enabled: true };
+            return entries.map(function(type, idx) {
+                return { 
+                    widgetType: type, 
+                    enabled: true,
+                    section: section,
+                    index: idx,
+                    isModular: true
+                };
             });
         }
         var items = sectionWidgets && sectionWidgets[section] ? sectionWidgets[section] : [];
@@ -402,6 +408,70 @@ Item {
             highlightOpacity: 0.12
             visible: !root.noBackground
         }
+
+        TapHandler {
+            acceptedButtons: Qt.RightButton
+            onTapped: {
+                if (!Config.barUseModularEntries) return;
+
+                var availableWidgets = [
+                    { label: "Logo/Launcher", type: "logo", icon: "󰓩" },
+                    { label: "Workspaces", type: "workspaces", icon: "󰏘" },
+                    { label: "Window Title", type: "windowTitle", icon: "󰖲" },
+                    { label: "Clock/Date", type: "dateTime", icon: "󰥔" },
+                    { label: "Media Bar", type: "mediaBar", icon: "󰓃" },
+                    { label: "System Tray", type: "tray", icon: "󰒓" },
+                    { label: "Notifications", type: "notifications", icon: "󰂚" },
+                    { label: "Audio", type: "audio", icon: "󰕾" },
+                    { label: "Network", type: "network", icon: "󰛳" },
+                    { label: "Battery", type: "battery", icon: "󰁹" },
+                    { label: "Personality", type: "personality", icon: "󰄛" },
+                    { label: "Spacer", type: "spacer", icon: "󰏫" },
+                    { label: "Separator", type: "separator", icon: "󰏫" }
+                ];
+
+                function makeSectionMenu(section) {
+                    return availableWidgets.map(function(w) {
+                        return {
+                            label: w.label,
+                            icon: w.icon,
+                            action: function() { Config.addModularEntry(section, w.type); }
+                        };
+                    });
+                }
+
+                var actions = [
+                    {
+                        label: "Add Widget to Left",
+                        icon: "󰁍",
+                        children: makeSectionMenu("left")
+                    },
+                    {
+                        label: "Add Widget to Center",
+                        icon: "󰁔",
+                        children: makeSectionMenu("center")
+                    },
+                    {
+                        label: "Add Widget to Right",
+                        icon: "󰁔",
+                        children: makeSectionMenu("right")
+                    },
+                    { separator: true },
+                    {
+                        label: "Open Settings",
+                        icon: "󰒓",
+                        action: function() { root.requestSurface("controlCenter", null); }
+                    }
+                ];
+
+                root.contextMenuRequested(actions, {
+                    x: point.position.x,
+                    y: point.position.y,
+                    width: 1,
+                    height: 1
+                });
+            }
+        }
     }
 
     Row {
@@ -412,6 +482,10 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: runtimeSpacing + sectionSpacing
 
+        move: Transition {
+            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+        }
+
         Repeater {
             model: root._leftLeading
             delegate: widgetLoaderDelegate
@@ -420,6 +494,10 @@ Item {
         Row {
             visible: root._leftTrailing.length > 0
             spacing: runtimeSpacing
+
+            move: Transition {
+                NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+            }
 
             Repeater {
                 model: root._leftTrailing
@@ -435,6 +513,11 @@ Item {
         anchors.horizontalCenterOffset: root.centerClampedOffset
         anchors.verticalCenter: parent.verticalCenter
         spacing: runtimeSpacing
+        
+        move: Transition {
+            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+        }
+
         Repeater {
             model: root._centerItems
             delegate: widgetLoaderDelegate
@@ -448,6 +531,11 @@ Item {
         anchors.rightMargin: outerPadding
         anchors.verticalCenter: parent.verticalCenter
         spacing: runtimeSpacing
+
+        move: Transition {
+            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+        }
+
         Repeater {
             model: root._rightItems
             delegate: widgetLoaderDelegate
@@ -462,6 +550,10 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: runtimeSpacing + sectionSpacing
 
+        move: Transition {
+            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+        }
+
         Repeater {
             model: root._leftLeading
             delegate: widgetLoaderDelegate
@@ -470,6 +562,10 @@ Item {
         Column {
             visible: root._leftTrailing.length > 0
             spacing: runtimeSpacing
+
+            move: Transition {
+                NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+            }
 
             Repeater {
                 model: root._leftTrailing
@@ -483,6 +579,11 @@ Item {
         visible: vertical
         anchors.centerIn: parent
         spacing: runtimeSpacing
+
+        move: Transition {
+            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+        }
+
         Repeater {
             model: root._centerItems
             delegate: widgetLoaderDelegate
@@ -496,6 +597,11 @@ Item {
         anchors.bottomMargin: outerPadding
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: runtimeSpacing
+
+        move: Transition {
+            NumberAnimation { properties: "x,y"; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+        }
+
         Repeater {
             model: root._rightItems
             delegate: widgetLoaderDelegate
@@ -584,6 +690,49 @@ Item {
                     if (item && item.widgetInstance !== undefined)
                         item.widgetInstance = parent.widgetInstance;
                     diagnosticWrapper.refreshDiagnosticState();
+                }
+            }
+
+            TapHandler {
+                acceptedButtons: Qt.RightButton
+                onTapped: {
+                    if (!Config.barUseModularEntries || !widgetInstance.isModular) {
+                        // Fallback to widget's own context menu if it has one
+                        if (widgetLoader.item && widgetLoader.item.contextMenuRequested) {
+                            // This is handled inside widgets usually
+                        }
+                        return;
+                    }
+
+                    var actions = [
+                        {
+                            label: "Move Left",
+                            icon: "󰁍",
+                            action: function() { Config.moveModularEntry(widgetInstance.section, widgetInstance.index, -1); }
+                        },
+                        {
+                            label: "Move Right",
+                            icon: "󰁔",
+                            action: function() { Config.moveModularEntry(widgetInstance.section, widgetInstance.index, 1); }
+                        },
+                        {
+                            separator: true
+                        },
+                        {
+                            label: "Remove Widget",
+                            icon: "󰅖",
+                            danger: true,
+                            action: function() { Config.removeModularEntry(widgetInstance.section, widgetInstance.index); }
+                        }
+                    ];
+
+                    var topLeft = diagnosticWrapper.mapToItem(root, 0, 0);
+                    root.contextMenuRequested(actions, {
+                        x: topLeft.x,
+                        y: topLeft.y,
+                        width: diagnosticWrapper.width,
+                        height: diagnosticWrapper.height
+                    });
                 }
             }
         }

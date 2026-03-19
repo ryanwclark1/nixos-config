@@ -227,6 +227,11 @@ Scope {
         id: workspaceOsd
     }
 
+    CountdownOsd {
+        remaining: ScreenshotService.delayRemaining
+        active: ScreenshotService.delayActive
+    }
+
     LazyLoader {
         id: overviewLoader
         active: CompositorAdapter.supportsOverview
