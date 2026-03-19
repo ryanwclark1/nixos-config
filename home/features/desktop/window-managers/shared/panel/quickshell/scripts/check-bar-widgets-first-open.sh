@@ -86,7 +86,7 @@ populate_repo_shell_env() {
   local key=""
   local value=""
   local has_wayland_session=0
-  local found_session_env=0
+  local found_graphics_env=0
 
   repo_shell_env=()
   repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
@@ -94,8 +94,10 @@ populate_repo_shell_env() {
     value="${!key:-}"
     if [[ -n "${value}" ]]; then
       repo_shell_env+=("${key}=${value}")
-      found_session_env=1
       case "${key}" in
+        HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
+          found_graphics_env=1
+          ;;&
         WAYLAND_DISPLAY|NIRI_SOCKET)
           has_wayland_session=1
           ;;
@@ -103,7 +105,7 @@ populate_repo_shell_env() {
     fi
   done
 
-  if (( found_session_env == 1 )); then
+  if (( found_graphics_env == 1 )); then
     if (( has_wayland_session == 1 )); then
       repo_shell_env+=("QT_QPA_PLATFORM=wayland")
     fi
@@ -118,8 +120,10 @@ populate_repo_shell_env() {
       HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE|DISPLAY)
         if [[ -n "${value}" ]]; then
           repo_shell_env+=("${key}=${value}")
-          found_session_env=1
           case "${key}" in
+            HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
+              found_graphics_env=1
+              ;;&
             WAYLAND_DISPLAY|NIRI_SOCKET)
               has_wayland_session=1
               ;;

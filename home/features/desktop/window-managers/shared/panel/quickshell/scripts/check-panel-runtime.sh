@@ -331,6 +331,7 @@ main() {
 
   run_step "Running panel config contract checks" "${script_dir}/check-panel-config-contracts.sh"
   run_step "Running hidden bar widget collapse checks" "${script_dir}/check-bar-widget-collapse.sh"
+  run_step "Running vertical bar width checks" "${script_dir}/check-vertical-bar-width.sh"
 
   if (( run_settings == 1 )); then
     refresh_instance_args
