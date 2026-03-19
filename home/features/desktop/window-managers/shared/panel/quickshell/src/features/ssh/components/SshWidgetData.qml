@@ -17,6 +17,10 @@ QtObject {
     readonly property string defaultAction: String(rawSettings.defaultAction || "connect") === "copy" ? "copy" : "connect"
     readonly property bool showWhenEmpty: rawSettings.showWhenEmpty === true
     readonly property string emptyClickAction: String(rawSettings.emptyClickAction || "menu") === "refresh" ? "refresh" : "menu"
+    readonly property string sshCommand: {
+        var cmd = String(rawSettings.sshCommand || "ssh").trim();
+        return cmd !== "" ? cmd : "ssh";
+    }
     readonly property string emptyLabel: {
         var text = String(rawSettings.emptyLabel || "SSH").trim();
         return text !== "" ? text : "SSH";
@@ -148,6 +152,7 @@ QtObject {
             enableSshConfigImport: enableSshConfigImport,
             displayMode: displayMode,
             defaultAction: defaultAction,
+            sshCommand: sshCommand,
             state: _clone(stateInfo)
         };
     }
@@ -213,6 +218,7 @@ QtObject {
             enableSshConfigImport: true,
             displayMode: "count",
             defaultAction: "connect",
+            sshCommand: "ssh",
             state: {
                 lastConnectedId: "",
                 lastConnectedLabel: "",
@@ -439,7 +445,7 @@ QtObject {
         var escaped = [];
         for (var i = 0; i < parts.length; ++i)
             escaped.push(ShellUtils.shellQuote(parts[i]));
-        return "exec ssh " + escaped.join(" ");
+        return "exec " + root.sshCommand + " " + escaped.join(" ");
     }
 
     function _copyText(text) {
@@ -456,7 +462,7 @@ QtObject {
         if (!host)
             return "";
         if (host.source === "imported")
-            return "ssh " + String(host.alias || host.label || "");
+            return root.sshCommand + " " + String(host.alias || host.label || "");
         return _buildManualCommand(host).replace(/^exec\s+/, "");
     }
 
@@ -513,11 +519,10 @@ QtObject {
         if (!host)
             return false;
         if (host.source === "imported") {
-            Quickshell.execDetached(ShellUtils.terminalCommand("exec ssh \"$1\"", String(host.alias || "")));
+            Quickshell.execDetached(ShellUtils.terminalCommand("exec " + root.sshCommand + " \"$1\"", String(host.alias || "")));
         } else {
             var sshArgs = _buildManualSshArgs(host);
-            // Build exec ssh $@ script with positional args
-            Quickshell.execDetached(ShellUtils.terminalCommand.apply(null, ["exec ssh \"$@\""].concat(sshArgs)));
+            Quickshell.execDetached(ShellUtils.terminalCommand.apply(null, ["exec " + root.sshCommand + " \"$@\""].concat(sshArgs)));
         }
         _rememberHost(host);
         return true;
