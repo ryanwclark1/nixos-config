@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../services"
+import "../../../shared"
 import "../../../widgets"
 
 Rectangle {
@@ -46,5 +47,10 @@ Rectangle {
       if (root.action) root.action();
       else AudioService.toggleMute(root.target, root.muted);
     }
+  }
+
+  Tooltip {
+    text: root.muted ? "Unmute" : "Mute"
+    shown: hover.containsMouse
   }
 }

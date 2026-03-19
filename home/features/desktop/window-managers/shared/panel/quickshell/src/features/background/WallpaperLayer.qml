@@ -113,6 +113,10 @@ Item {
     }
 
     function _shaderSource() {
+        if (transitionType === "random") {
+            var shaders = [_fadeShader, _pixelateShader, _wipeShader, _dissolveShader, _zoomShader, _radialShader];
+            return shaders[Math.floor(Math.random() * shaders.length)];
+        }
         if (transitionType === "pixelate") return _pixelateShader;
         if (transitionType === "wipe") return _wipeShader;
         if (transitionType === "dissolve") return _dissolveShader;

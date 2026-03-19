@@ -77,10 +77,12 @@ BasePopupMenu {
   headerExtras: [
     SharedWidgets.IconButton {
       icon: ClipboardHistoryService.loading ? "󰇚" : "󰑐"
+      tooltipText: "Refresh"
       onClicked: root.refresh()
     },
     SharedWidgets.IconButton {
       icon: "󰃢"
+      tooltipText: "Clear history"
       enabled: root.clipboardItems.length > 0
       onClicked: {
         ClipboardHistoryService.wipe();
@@ -224,6 +226,7 @@ BasePopupMenu {
                 iconSize: Colors.fontSizeSmall
                 iconColor: Colors.textDisabled
                 stateColor: Colors.error
+                tooltipText: "Delete"
                 onClicked: root.deleteClipboardItem(modelData)
               }
             }
