@@ -8,6 +8,7 @@ import "../../widgets" as SharedWidgets
 
 Item {
   id: root
+  property bool _destroyed: false
 
   property var widgetInstance: null
   property var anchorWindow: null
@@ -91,10 +92,12 @@ Item {
       }
       if (["createworkspace", "createworkspacev2", "destroyworkspace", "destroyworkspacev2",
            "openwindow", "closewindow", "movewindow"].indexOf(event.name) !== -1) {
-        Qt.callLater(updateSpecialWorkspaces);
+        Qt.callLater(function() { if (root._destroyed) return; updateSpecialWorkspaces(); });
       }
     }
   }
+
+  Component.onDestruction: _destroyed = true
 
   Component.onCompleted: {
     if (CompositorAdapter.isHyprland) {

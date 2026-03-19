@@ -5,6 +5,7 @@ import "../../services"
 
 Rectangle {
   id: root
+  property bool _destroyed: false
   readonly property bool hasWorkspaceContent: workspaceApiAvailable && !!state && (state.workspaces || []).length > 0
   readonly property real contentWidth: vertical ? 28 : (strip.implicitWidth + 12)
   readonly property real contentHeight: vertical ? (strip.implicitHeight + 12) : 24
@@ -59,6 +60,7 @@ Rectangle {
   }
 
   Component.onDestruction: {
+    _destroyed = true;
     if (CompositorAdapter.isHyprland) {
       Hyprland.rawEvent.disconnect(_onHyprlandEvent);
     }
@@ -69,7 +71,7 @@ Rectangle {
     if (n === "workspace" || n === "workspacev2" || n === "createworkspace"
         || n === "destroyworkspace" || n === "openwindow" || n === "closewindow"
         || n === "movewindow" || n === "urgent" || n === "renameworkspace") {
-      Qt.callLater(_updateStateFromHyprland);
+      Qt.callLater(function() { if (root._destroyed) return; _updateStateFromHyprland(); });
     }
   }
 
