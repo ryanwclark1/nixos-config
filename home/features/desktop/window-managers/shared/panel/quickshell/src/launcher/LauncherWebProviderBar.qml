@@ -7,27 +7,25 @@ Rectangle {
 
     required property var providers
     required property string selectedKey
+    property color accentColor: Colors.primary
 
     signal providerSelected(string key)
 
     Layout.fillWidth: true
-    color: Colors.bgWidget
-    radius: Colors.radiusMedium
-    border.color: Colors.border
-    border.width: 1
-    implicitHeight: providerFlowContainer.implicitHeight + (Colors.spacingM * 2)
+    color: "transparent"
+    implicitHeight: providerFlowContainer.implicitHeight
 
     Column {
         id: providerFlowContainer
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
         spacing: Colors.spacingXS
 
         Text {
-            color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
-            font.weight: Font.Bold
-            text: "PROVIDERS"
+            color: Colors.withAlpha(root.accentColor, 0.92)
+            font.pixelSize: Colors.fontSizeXXS
+            font.weight: Font.Black
+            font.letterSpacing: Colors.letterSpacingExtraWide
+            text: "ACTIVE PROVIDERS"
         }
 
         Flow {
@@ -41,9 +39,9 @@ Rectangle {
                     required property var modelData
 
                     readonly property bool selected: String(modelData.key || "") === root.selectedKey
-                    color: selected ? Colors.primaryMid : Colors.surface
+                    color: selected ? Colors.withAlpha(root.accentColor, 0.16) : Colors.withAlpha(Colors.surface, 0.72)
                     radius: Colors.radiusPill
-                    border.color: selected ? Colors.withAlpha(Colors.primary, 0.6) : Colors.border
+                    border.color: selected ? Colors.withAlpha(root.accentColor, 0.4) : Colors.border
                     border.width: 1
                     implicitHeight: 28
                     implicitWidth: Math.min(providerChipText.implicitWidth + 24, providerFlowContainer.width)
@@ -53,7 +51,7 @@ Rectangle {
                         anchors.centerIn: parent
                         width: Math.min(implicitWidth, parent.width - 18)
                         text: (modelData.icon || "󰖟") + " " + (modelData.name || "")
-                        color: parent.selected ? Colors.primary : Colors.textSecondary
+                        color: parent.selected ? root.accentColor : Colors.textSecondary
                         font.pixelSize: Colors.fontSizeXS
                         font.weight: Font.DemiBold
                         elide: Text.ElideRight

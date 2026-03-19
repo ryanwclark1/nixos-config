@@ -10,14 +10,15 @@ Rectangle {
     required property var launcher
     readonly property var _primaryModes: Array.isArray(root.launcher && root.launcher.primaryModes) ? root.launcher.primaryModes : []
     readonly property var _overflowModes: Array.isArray(root.launcher && root.launcher.overflowModes) ? root.launcher.overflowModes : []
+    readonly property color accentColor: root.launcher && root.launcher.modeAccentColor ? root.launcher.modeAccentColor : Colors.primary
 
-    radius: Colors.radiusLarge
-    color: Colors.withAlpha("#000000", 0.15)
-    border.color: Colors.border
+    radius: Colors.radiusXL
+    color: Colors.withAlpha(Colors.surface, 0.74)
+    border.color: Colors.withAlpha(root.accentColor, 0.18)
     border.width: 1
 
     SharedWidgets.InnerHighlight {
-        highlightOpacity: 0.1
+        highlightOpacity: 0.14
     }
 
     component ModeButton: Rectangle {
@@ -25,35 +26,52 @@ Rectangle {
         required property string label
         required property string iconText
         required property bool compact
+        property string prefix: ""
         property bool active: false
         property bool hovered: hoverArea.containsMouse
         signal clicked
 
         Layout.fillWidth: true
-        implicitHeight: compact ? 44 : 46
-        radius: Colors.radiusMedium
-        color: active ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
-        border.color: active ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
+        implicitHeight: compact ? 48 : 52
+        radius: Colors.radiusLarge
+        color: active ? Colors.withAlpha(root.accentColor, 0.16) : (hovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
+        border.color: active ? Colors.withAlpha(root.accentColor, 0.36) : (hovered ? Colors.withAlpha(Colors.border, 0.4) : "transparent")
         border.width: 1
 
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
+        Rectangle {
+            anchors.left: parent.left
+            anchors.leftMargin: compact ? 6 : 8
+            anchors.verticalCenter: parent.verticalCenter
+            width: active ? 4 : 0
+            height: active ? parent.height * 0.52 : 0
+            radius: Colors.radiusPill
+            color: root.accentColor
+            opacity: active ? 1 : 0
+            Behavior on width { NumberAnimation { duration: Colors.durationFast } }
+            Behavior on height { NumberAnimation { duration: Colors.durationFast } }
+            Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+        }
+
         RowLayout {
             anchors.fill: parent
-            anchors.margins: compact ? Colors.spacingXS : Colors.paddingSmall
+            anchors.margins: compact ? Colors.spacingXS : Colors.spacingS
             spacing: compact ? Colors.spacingXS : Colors.paddingMedium
 
             Rectangle {
-                Layout.preferredWidth: 30
-                Layout.preferredHeight: 30
-                radius: Colors.radiusSmall
-                color: active ? Colors.surface : "transparent"
+                Layout.preferredWidth: compact ? 34 : 32
+                Layout.preferredHeight: compact ? 34 : 32
+                radius: compact ? Colors.radiusMedium : Colors.radiusSmall
+                color: active ? Colors.withAlpha(root.accentColor, 0.12) : Colors.withAlpha(Colors.surface, 0.78)
+                border.color: active ? Colors.withAlpha(root.accentColor, 0.3) : "transparent"
+                border.width: 1
                 visible: !compact
 
                 Text {
                     anchors.centerIn: parent
                     text: iconText || "•"
-                    color: active ? Colors.primary : Colors.textSecondary
+                    color: active ? root.accentColor : Colors.textSecondary
                     font.family: Colors.fontMono
                     font.pixelSize: Colors.fontSizeLarge
                 }
@@ -63,23 +81,37 @@ Rectangle {
                 visible: compact
                 Layout.alignment: Qt.AlignHCenter
                 text: iconText || "•"
-                color: active ? Colors.primary : Colors.textSecondary
+                color: active ? root.accentColor : Colors.textSecondary
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeXL
             }
 
-            Text {
+            ColumnLayout {
                 visible: !compact
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.alignment: Qt.AlignVCenter
-                text: label
-                color: active ? Colors.primary : Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
-                font.weight: active ? Font.Black : Font.Medium
-                font.capitalization: active ? Font.AllUppercase : Font.MixedCase
-                font.letterSpacing: active ? 0.5 : 0
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
+                spacing: 0
+
+                Text {
+                    Layout.fillWidth: true
+                    text: label
+                    color: active ? Colors.text : Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.weight: active ? Font.Black : Font.DemiBold
+                    elide: Text.ElideRight
+                }
+
+                Text {
+                    visible: prefix !== ""
+                    Layout.fillWidth: true
+                    text: prefix + " prefix"
+                    color: active ? root.accentColor : Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXXS
+                    font.family: Colors.fontMono
+                    font.weight: Font.Bold
+                    elide: Text.ElideRight
+                }
             }
         }
 
@@ -95,54 +127,75 @@ Rectangle {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: root.launcher.sidebarCompact ? Colors.spacingS : Colors.spacingM
-        spacing: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.paddingSmall
+        spacing: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.spacingM
 
-        RowLayout {
+        Rectangle {
             visible: !root.launcher.sidebarCompact
             Layout.fillWidth: true
-            spacing: Colors.spacingS
-
-            Rectangle {
-                width: 32
-                height: 32
-                radius: Colors.radiusMedium
-                color: Colors.primaryMarked
-                border.color: Colors.withAlpha(Colors.primary, 0.24)
-                border.width: 1
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "󰍉"
-                    color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
-                }
-            }
+            radius: Colors.radiusLarge
+            color: Colors.withAlpha(root.accentColor, 0.1)
+            border.color: Colors.withAlpha(root.accentColor, 0.22)
+            border.width: 1
+            implicitHeight: railIntro.implicitHeight + (Colors.spacingM * 2)
 
             ColumnLayout {
-                spacing: 0
+                id: railIntro
+                anchors.fill: parent
+                anchors.margins: Colors.spacingM
+                spacing: Colors.spacingXS
 
-                Text {
-                    text: "NAVIGATE"
-                    color: Colors.text
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Black
-                    font.capitalization: Font.AllUppercase
-                    font.letterSpacing: Colors.letterSpacingWide
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingS
+
+                    Rectangle {
+                        width: 34
+                        height: 34
+                        radius: Colors.radiusMedium
+                        color: Colors.withAlpha(root.accentColor, 0.18)
+                        border.color: Colors.withAlpha(root.accentColor, 0.34)
+                        border.width: 1
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: root.launcher.modeHeroIcon
+                            color: root.accentColor
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeXL
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 0
+
+                        Text {
+                            text: "NAV RAIL"
+                            color: Colors.withAlpha(root.accentColor, 0.92)
+                            font.pixelSize: Colors.fontSizeXXS
+                            font.weight: Font.Black
+                            font.letterSpacing: Colors.letterSpacingExtraWide
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: root.launcher.modeHeroLabel
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.Black
+                            elide: Text.ElideRight
+                        }
+                    }
                 }
 
                 Text {
-                    text: root.launcher.sidebarOverflowExpanded ? "Advanced Modes" : "Quick Hub"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Bold
+                    Layout.fillWidth: true
+                    text: root.launcher.sidebarOverflowExpanded ? "Advanced modes are open below the primary rail." : "Pinned modes stay visible here while advanced modes live behind More."
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    wrapMode: Text.WordWrap
                 }
             }
-        }
-
-        Item {
-            Layout.preferredHeight: Colors.spacingS
-            visible: !root.launcher.sidebarCompact
         }
 
         Flickable {
@@ -157,6 +210,15 @@ Rectangle {
                 width: parent.width
                 spacing: Colors.spacingS
 
+                Text {
+                    visible: !root.launcher.sidebarCompact
+                    text: "PRIMARY"
+                    color: Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXXS
+                    font.weight: Font.Black
+                    font.letterSpacing: Colors.letterSpacingExtraWide
+                }
+
                 Repeater {
                     model: root._primaryModes
 
@@ -165,6 +227,7 @@ Rectangle {
                         modeKey: modelData
                         label: root.launcher.modeMeta(modelData).label
                         iconText: root.launcher.modeIcons[modelData] || "•"
+                        prefix: root.launcher.modeMeta(modelData).prefix || ""
                         compact: root.launcher.sidebarCompact
                         active: root.launcher.mode === modelData
                         onClicked: root.launcher.open(modelData, true)
@@ -174,7 +237,7 @@ Rectangle {
                 ModeButton {
                     visible: root._overflowModes.length > 0
                     modeKey: "__more__"
-                    label: root.launcher.sidebarOverflowExpanded ? "Hide More" : "More"
+                    label: root.launcher.sidebarOverflowExpanded ? "Hide Advanced" : "Advanced"
                     iconText: root.launcher.sidebarOverflowExpanded ? "󰅀" : "󰅂"
                     compact: root.launcher.sidebarCompact
                     active: root.launcher.sidebarOverflowExpanded || root._overflowModes.indexOf(root.launcher.mode) !== -1
@@ -186,6 +249,15 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: Colors.spacingS
 
+                    Text {
+                        visible: !root.launcher.sidebarCompact
+                        text: "ADVANCED MODES"
+                        color: Colors.textDisabled
+                        font.pixelSize: Colors.fontSizeXXS
+                        font.weight: Font.Black
+                        font.letterSpacing: Colors.letterSpacingExtraWide
+                    }
+
                     Repeater {
                         model: root._overflowModes
 
@@ -194,6 +266,7 @@ Rectangle {
                             modeKey: modelData
                             label: root.launcher.modeMeta(modelData).label
                             iconText: root.launcher.modeIcons[modelData] || "•"
+                            prefix: root.launcher.modeMeta(modelData).prefix || ""
                             compact: root.launcher.sidebarCompact
                             active: root.launcher.mode === modelData
                             onClicked: root.launcher.open(modelData, true)
@@ -204,13 +277,12 @@ Rectangle {
         }
 
         Rectangle {
-            id: controlsBox
             Layout.fillWidth: true
             Layout.topMargin: Colors.spacingS
             implicitHeight: controlsLayout.implicitHeight + (Colors.paddingMedium * 2)
-            radius: Colors.radiusMedium
-            color: Colors.withAlpha("#000000", 0.1)
-            border.color: Colors.border
+            radius: Colors.radiusLarge
+            color: Colors.withAlpha(Colors.surface, 0.72)
+            border.color: Colors.withAlpha(root.accentColor, 0.16)
             border.width: 1
             visible: Config.launcherShowModeHints && !root.launcher.sidebarCompact
 
@@ -221,19 +293,19 @@ Rectangle {
                 spacing: Colors.spacingXXS
 
                 Text {
-                    text: "MODE"
-                    color: Colors.textDisabled
+                    text: "CONTROL NOTES"
+                    color: Colors.withAlpha(root.accentColor, 0.92)
                     font.pixelSize: Colors.fontSizeXXS
                     font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingWide
+                    font.letterSpacing: Colors.letterSpacingExtraWide
                 }
 
                 Text {
                     Layout.fillWidth: true
                     text: String(root.launcher.modeSummaryText || "")
-                    color: Colors.textSecondary
+                    color: Colors.text
                     font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Bold
+                    font.weight: Font.DemiBold
                     wrapMode: Text.WordWrap
                 }
 

@@ -1,16 +1,16 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
-import "../widgets" as SharedWidgets
 
 Item {
     id: root
 
     required property string section
     required property bool compactMode
+    property color accentColor: Colors.primary
 
     width: ListView.view ? ListView.view.width : 0
-    height: compactMode ? 26 : 30
+    height: compactMode ? 30 : 36
 
     RowLayout {
         anchors.fill: parent
@@ -18,19 +18,20 @@ Item {
         spacing: root.compactMode ? Colors.spacingXS : Colors.spacingS
 
         Rectangle {
+            width: compactMode ? 8 : 10
+            height: width
             radius: Colors.radiusPill
-            color: Colors.primarySubtle
-            border.color: Colors.primaryMarked
-            border.width: 1
-            implicitHeight: root.compactMode ? 18 : 20
-            implicitWidth: sectionHeaderLabel.implicitWidth + (root.compactMode ? 12 : 14)
+            color: root.accentColor
+            Layout.alignment: Qt.AlignVCenter
+        }
 
-            SharedWidgets.SectionLabel {
-                id: sectionHeaderLabel
-                anchors.centerIn: parent
-                label: root.section
-                color: Colors.primary
-            }
+        Text {
+            text: root.section
+            color: Colors.withAlpha(root.accentColor, 0.94)
+            font.pixelSize: root.compactMode ? Colors.fontSizeXS : Colors.fontSizeSmall
+            font.weight: Font.Black
+            font.capitalization: Font.AllUppercase
+            font.letterSpacing: Colors.letterSpacingWide
         }
 
         Rectangle {
@@ -38,7 +39,7 @@ Item {
             Layout.alignment: Qt.AlignVCenter
             implicitHeight: 1
             radius: Colors.radiusXXXS
-            color: Colors.withAlpha(Colors.border, 0.9)
+            color: Colors.withAlpha(root.accentColor, 0.16)
         }
     }
 }

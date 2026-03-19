@@ -2,57 +2,85 @@ import QtQuick
 import QtQuick.Layouts
 import "../services"
 
-Flow {
+ColumnLayout {
     id: root
 
     required property var launcher
+    property color accentColor: launcher && launcher.modeAccentColor ? launcher.modeAccentColor : Colors.primary
 
     spacing: Colors.spacingS
     visible: launcher.prefixQuickModes.length > 0
 
-    Repeater {
-        model: launcher.prefixQuickModes
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: Colors.spacingS
 
-        delegate: Rectangle {
-            required property var modelData
+        Text {
+            text: "PREFIXES"
+            color: Colors.withAlpha(root.accentColor, 0.92)
+            font.pixelSize: Colors.fontSizeXXS
+            font.weight: Font.Black
+            font.letterSpacing: Colors.letterSpacingExtraWide
+        }
 
-            readonly property var modeInfo: root.launcher.modeMeta(modelData)
-            readonly property bool active: root.launcher.mode === modelData
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignVCenter
+            implicitHeight: 1
+            radius: Colors.radiusXXXS
+            color: Colors.withAlpha(root.accentColor, 0.18)
+        }
+    }
 
-            radius: Colors.radiusPill
-            color: active ? Colors.primarySubtle : Colors.withAlpha(Colors.surface, 0.72)
-            border.color: active ? Colors.primaryRing : Colors.border
-            border.width: 1
-            implicitHeight: 30
-            implicitWidth: prefixRow.implicitWidth + 20
+    Flow {
+        Layout.fillWidth: true
+        width: parent.width
+        spacing: Colors.spacingS
 
-            RowLayout {
-                id: prefixRow
-                anchors.centerIn: parent
-                spacing: Colors.spacingXS
+        Repeater {
+            model: launcher.prefixQuickModes
 
-                Text {
-                    text: modeInfo.prefix || ""
-                    visible: text !== ""
-                    color: active ? Colors.primary : Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXS
-                    font.weight: Font.Black
+            delegate: Rectangle {
+                required property var modelData
+
+                readonly property var modeInfo: root.launcher.modeMeta(modelData)
+                readonly property bool active: root.launcher.mode === modelData
+
+                radius: Colors.radiusPill
+                color: active ? Colors.withAlpha(root.accentColor, 0.18) : Colors.withAlpha(Colors.surface, 0.72)
+                border.color: active ? Colors.withAlpha(root.accentColor, 0.38) : Colors.border
+                border.width: 1
+                implicitHeight: 30
+                implicitWidth: prefixRow.implicitWidth + 20
+
+                RowLayout {
+                    id: prefixRow
+                    anchors.centerIn: parent
+                    spacing: Colors.spacingXS
+
+                    Text {
+                        text: modeInfo.prefix || ""
+                        visible: text !== ""
+                        color: active ? root.accentColor : Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.Black
+                    }
+
+                    Text {
+                        text: modeInfo.label
+                        color: active ? root.accentColor : Colors.text
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: active ? Font.Bold : Font.DemiBold
+                    }
                 }
 
-                Text {
-                    text: modeInfo.label
-                    color: active ? Colors.primary : Colors.text
-                    font.pixelSize: Colors.fontSizeXS
-                    font.weight: active ? Font.Bold : Font.DemiBold
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.launcher.open(modelData, true)
                 }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.launcher.open(modelData, true)
             }
         }
     }

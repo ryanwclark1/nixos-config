@@ -9,20 +9,26 @@ Rectangle {
     required property string secondaryEnterHint
     required property string aliasHint
     required property string hotkeyHint
+    property color accentColor: Colors.primary
     property bool compact: false
 
     Layout.fillWidth: true
-    color: Colors.bgWidget
-    radius: Colors.radiusMedium
-    border.color: Colors.border
-    border.width: 1
-    implicitHeight: webHintColumn.implicitHeight + (Colors.spacingS * 2)
+    color: "transparent"
+    implicitHeight: webHintColumn.implicitHeight
 
     Column {
         id: webHintColumn
         anchors.fill: parent
-        anchors.margins: Colors.spacingS
         spacing: root.compact ? 3 : Colors.spacingXS
+
+        Text {
+            width: parent.width
+            text: "WEB CONTROLS"
+            color: Colors.withAlpha(root.accentColor, 0.92)
+            font.pixelSize: Colors.fontSizeXXS
+            font.weight: Font.Black
+            font.letterSpacing: Colors.letterSpacingExtraWide
+        }
 
         Row {
             width: parent.width
@@ -30,7 +36,7 @@ Rectangle {
 
             Text {
                 text: "󰖟"
-                color: Colors.primary
+                color: root.accentColor
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeSmall
             }

@@ -12,14 +12,15 @@ Rectangle {
     required property string filesBackendLabel
     required property string filesCacheStatsLabel
     required property var modeMetricFn
+    property color accentColor: Colors.primary
 
     signal resetRequested()
 
     Layout.fillWidth: true
     visible: Config.launcherShowRuntimeMetrics && !root.tightMode
-    color: Colors.bgWidget
-    radius: Colors.radiusMedium
-    border.color: Colors.border
+    color: Colors.withAlpha(Colors.surface, 0.76)
+    radius: Colors.radiusLarge
+    border.color: Colors.withAlpha(root.accentColor, 0.18)
     border.width: 1
     implicitHeight: metricsLayout.implicitHeight + (Colors.spacingM * 2)
 
@@ -32,12 +33,14 @@ Rectangle {
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Colors.spacingXXS
+
             Text {
                 text: "Launcher Metrics"
-                color: Colors.text
+                color: root.accentColor
                 font.pixelSize: Colors.fontSizeSmall
-                font.weight: Font.DemiBold
+                font.weight: Font.Black
             }
+
             Text {
                 Layout.fillWidth: true
                 text: "opens " + root.metrics.opens + " • cache " + root.metrics.cacheHits + "/" + root.metrics.cacheMisses + " • failures " + root.metrics.commandFailures + " • filter avg " + (root.metrics.avgFilterMs || 0) + "ms" + " / last " + (root.metrics.lastFilterMs || 0) + "ms" + (root.mode === "files" ? (" • backend " + root.filesBackendLabel + " • fd/find " + (root.metrics.filesFdLoads || 0) + "/" + (root.metrics.filesFindLoads || 0) + " • fd " + (root.metrics.filesFdAvgMs || 0) + "/" + (root.metrics.filesFdLastMs || 0) + "ms" + " • find " + (root.metrics.filesFindAvgMs || 0) + "/" + (root.metrics.filesFindLastMs || 0) + "ms" + " • resolve " + (root.metrics.filesResolveAvgMs || 0) + "/" + (root.metrics.filesResolveLastMs || 0) + "ms") : "")
@@ -45,6 +48,7 @@ Rectangle {
                 font.pixelSize: Colors.fontSizeXS
                 wrapMode: Text.WordWrap
             }
+
             Text {
                 readonly property var modeStats: root.modeMetricFn(root.mode)
                 Layout.fillWidth: true
@@ -57,8 +61,8 @@ Rectangle {
 
         Rectangle {
             radius: Colors.radiusPill
-            color: Colors.surface
-            border.color: Colors.border
+            color: Colors.withAlpha(root.accentColor, 0.12)
+            border.color: Colors.withAlpha(root.accentColor, 0.3)
             border.width: 1
             implicitHeight: 28
             implicitWidth: metricResetText.implicitWidth + 18
@@ -67,7 +71,7 @@ Rectangle {
                 id: metricResetText
                 anchors.centerIn: parent
                 text: "Reset"
-                color: Colors.text
+                color: root.accentColor
                 font.pixelSize: Colors.fontSizeXS
                 font.weight: Font.DemiBold
             }
