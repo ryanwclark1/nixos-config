@@ -74,7 +74,8 @@ StackLayout {
 
             LauncherFilePreview {
                 id: filePreview
-                visible: root.mode === "files" && root.launcher.selectedItem
+                visible: root.launcher.filePreviewVisible && root.mode === "files"
+                         && root.launcher.selectedItem
                          && !!root.launcher.selectedItem.fullPath
                 Layout.preferredWidth: visible ? Math.min(400, root.width * 0.4) : 0
                 Layout.fillHeight: true

@@ -192,6 +192,7 @@ PanelWindow {
     property var fileIndexBuiltAt: 0
     property var _gitTrackedSet: ({})
     property bool _gitIndexReady: false
+    property bool filePreviewVisible: true
     property string transientNoticeText: ""
     property bool sidebarOverflowExpanded: false
     property bool shortcutHelpExpanded: false
@@ -353,6 +354,19 @@ PanelWindow {
             updateDrunUsageCache(item);
         }
         return source;
+    }
+
+    function applyDrunItems(items, persistCache) {
+        var appItems = prepareDrunItems(items);
+        if (persistCache !== false)
+            setCached("drun", appItems);
+        if (mode === "drun") {
+            allItems = appItems;
+            resetFilterCache();
+            filterItems();
+            buildLauncherHome();
+        }
+        return appItems;
     }
 
     // ── Hover anti-flicker ─────────────────────────
@@ -1822,19 +1836,23 @@ PanelWindow {
         var startedAt = Date.now();
         var cached = getCached("drun");
         if (cached) {
-            allItems = cached;
-            refreshDrunUsageCaches(allItems);
-            resetFilterCache();
-            filterItems();
-            buildLauncherHome();
+            applyDrunItems(cached, false);
             completeModeLoad("drun", true, "");
             recordLoadMetric("drun", 0, true, true);
             return;
         }
-        allItems = [];
-        filteredItems = [];
-        beginModeLoad("drun", "Loading " + ModeData.modeInfo("drun").label);
-        filterItems();
+        var snapshotItems = (AppCatalogService.loaded && Array.isArray(AppCatalogService.items))
+                ? AppCatalogService.items
+                : [];
+        if (snapshotItems.length > 0) {
+            applyDrunItems(snapshotItems, true);
+            completeModeLoad("drun", true, "");
+        } else {
+            allItems = [];
+            filteredItems = [];
+            beginModeLoad("drun", "Loading " + ModeData.modeInfo("drun").label);
+            filterItems();
+        }
         var token = beginRequest("drun");
         AppCatalogService.ensureLoaded(function(items, errorText) {
             if (!isRequestCurrent("drun", token))
@@ -1844,14 +1862,9 @@ PanelWindow {
                 _handleLoadFailure("drun", startedAt);
                 return;
             }
-            var appItems = prepareDrunItems(items);
-            setCached("drun", appItems);
+            applyDrunItems(items, true);
             recordLoadMetric("drun", Date.now() - startedAt, false, true);
             if (mode === "drun") {
-                allItems = appItems;
-                resetFilterCache();
-                filterItems();
-                buildLauncherHome();
                 completeModeLoad("drun", true, "");
             }
         });
@@ -3030,6 +3043,11 @@ PanelWindow {
             return true;
         }
         close();
+        return true;
+    }
+
+    function toggleFilePreview() {
+        filePreviewVisible = !filePreviewVisible;
         return true;
     }
 

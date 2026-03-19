@@ -11,6 +11,7 @@ Item {
 
     readonly property alias searchInput: searchField.searchInput
     readonly property color accentColor: launcher.modeAccentColor ? launcher.modeAccentColor : Colors.primary
+    readonly property real panelGap: launcher.compactMode ? Colors.spacingS : Colors.spacingXS
     readonly property bool showAssistBand: !launcher.tightMode && (launcher.prefixQuickModes.length > 0
         || Config.launcherShowModeHints
         || (launcher.mode === "web" && launcher.filteredItems.length > 0)
@@ -18,11 +19,11 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: launcher.compactMode ? Colors.spacingS : Colors.spacingM
+        spacing: root.panelGap
 
         Rectangle {
             Layout.fillWidth: true
-            radius: Colors.radiusXL
+            radius: Colors.radiusLarge
             color: Colors.withAlpha(Colors.surface, 0.78)
             border.color: Colors.withAlpha(root.accentColor, 0.26)
             border.width: 1
@@ -45,62 +46,6 @@ Item {
                 anchors.fill: parent
                 anchors.margins: launcher.tightMode ? Colors.spacingM : Colors.spacingL
                 spacing: launcher.compactMode ? Colors.spacingS : Colors.spacingM
-
-                RowLayout {
-                    visible: !launcher.tightMode
-                    Layout.fillWidth: true
-                    spacing: Colors.spacingM
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 0
-
-                        Text {
-                            text: "COMMAND DECK"
-                            color: Colors.withAlpha(root.accentColor, 0.92)
-                            font.pixelSize: Colors.fontSizeXXS
-                            font.weight: Font.Black
-                            font.letterSpacing: Colors.letterSpacingExtraWide
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: launcher.modeHeroLabel
-                            color: Colors.text
-                            font.pixelSize: launcher.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
-                            font.weight: Font.Black
-                            elide: Text.ElideRight
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: launcher.modeSummaryText
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            wrapMode: Text.WordWrap
-                        }
-                    }
-
-                    Rectangle {
-                        Layout.alignment: Qt.AlignTop
-                        radius: Colors.radiusPill
-                        color: Colors.withAlpha(root.accentColor, 0.14)
-                        border.color: Colors.withAlpha(root.accentColor, 0.32)
-                        border.width: 1
-                        implicitHeight: 26
-                        implicitWidth: deckModeLabel.implicitWidth + 18
-
-                        Text {
-                            id: deckModeLabel
-                            anchors.centerIn: parent
-                            text: launcher.currentModeMeta.label || "Launcher"
-                            color: root.accentColor
-                            font.pixelSize: Colors.fontSizeXS
-                            font.weight: Font.Black
-                            font.capitalization: Font.AllUppercase
-                        }
-                    }
-                }
 
                 LauncherSearchField {
                     id: searchField
@@ -252,7 +197,7 @@ Item {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            radius: Colors.radiusXL
+            radius: Colors.radiusLarge
             color: Colors.withAlpha(Colors.surface, 0.72)
             border.color: Colors.withAlpha(root.accentColor, 0.18)
             border.width: 1

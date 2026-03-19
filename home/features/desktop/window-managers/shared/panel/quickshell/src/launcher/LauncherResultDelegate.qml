@@ -259,23 +259,6 @@ Rectangle {
             }
         }
 
-        Rectangle {
-            width: root.compactMode ? 26 : 30
-            height: root.compactMode ? 26 : 30
-            radius: Colors.radiusMedium
-            visible: highlighted || hovered
-            color: highlighted ? Colors.withAlpha(root.accentColor, 0.16) : Colors.withAlpha(Colors.surface, 0.8)
-            border.color: highlighted ? Colors.withAlpha(root.accentColor, 0.32) : Colors.withAlpha(Colors.border, 0.36)
-            border.width: 1
-
-            Text {
-                anchors.centerIn: parent
-                text: "󰄮"
-                color: highlighted ? root.accentColor : Colors.textDisabled
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeSmall
-            }
-        }
     }
 
     MouseArea {

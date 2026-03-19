@@ -92,6 +92,9 @@ QtObject {
         } else if (event.key === Qt.Key_End) {
             if (launcher.jumpSelectionBoundary(true))
                 event.accepted = true;
+        } else if (launcher.mode === "files" && (event.modifiers & Qt.AltModifier) && event.key === Qt.Key_P) {
+            if (launcher.toggleFilePreview())
+                event.accepted = true;
         }
     }
 }
