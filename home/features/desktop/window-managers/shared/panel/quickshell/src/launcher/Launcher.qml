@@ -744,7 +744,7 @@ PanelWindow {
 
     Timer {
         id: initialAppsPreloadTimer
-        interval: 150
+        interval: 50
         repeat: false
         onTriggered: launcherRoot.prewarmAppsCache()
     }
@@ -3497,7 +3497,6 @@ PanelWindow {
 
     ContextMenu {
         id: fileResultContextMenu
-        parent: launcherRoot
     }
 
         LauncherConfirmDialog {
