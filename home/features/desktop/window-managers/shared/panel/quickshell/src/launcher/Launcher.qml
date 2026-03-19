@@ -2216,8 +2216,10 @@ PanelWindow {
 
     function loadFiles() {
         var searchQuery = searchText.startsWith("/") ? searchText.substring(1).trim() : searchText;
+        var cacheKey = String(searchQuery).toLowerCase();
         var startedAt = Date.now();
         var rootDir = fileSearchRootResolved;
+        var maxResults = Math.max(20, Config.launcherFileMaxResults);
 
         // Index-first: always use in-memory index when available
         if (fileIndexReady && fileIndexItems.length > 0) {
@@ -2682,8 +2684,8 @@ PanelWindow {
             filteredItems = decorateResultSections(baseItems);
         } else {
             var scoredItems = [];
-            var filesScanCap = mode === "files" ? Math.max(200, Config.launcherMaxResults * 4) : 0;
-            if (mode === "files" && cleanLower !== "" && sourceItems.length >= 5000) {
+            var filesScanCap = mode === "files" ? Math.max(500, Config.launcherMaxResults * 8) : 0;
+            if (mode === "files" && cleanLower !== "" && sourceItems.length >= 15000) {
                 _startChunkedFilter(sourceItems, clean, cleanLower, filesScanCap, startedAt);
                 return;
             }
