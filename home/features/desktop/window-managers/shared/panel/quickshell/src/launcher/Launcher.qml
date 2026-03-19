@@ -165,6 +165,7 @@ PanelWindow {
     property var pendingCommandOutput: null
     property var pendingCommandError: null
     property bool suppressNextCommandExit: false
+    property string fileIndexStderrBuffer: ""
     property string modeLoadState: "idle"
     property string modeLoadMessage: ""
     property string modeLoadTarget: ""
@@ -270,6 +271,22 @@ PanelWindow {
         if (home !== "" && path.indexOf(home + "/") === 0)
             return "~/" + path.substring(home.length + 1);
         return path !== "" ? path : "~";
+    }
+
+    function applyFileSearchFailure(errorText, fallbackMessage) {
+        var detail = String(errorText || "").trim();
+        var normalized = detail.toLowerCase();
+        var unavailable = normalized.indexOf("no such file") !== -1
+            || normalized.indexOf("not a directory") !== -1
+            || normalized.indexOf("cannot access") !== -1;
+        if (unavailable) {
+            setModeHint("Search root unavailable", "Check File Search Root: " + fileSearchRootLabel, "󰅚");
+            completeModeLoad("files", false, "Search root unavailable");
+            return;
+        }
+        var summary = detail !== "" ? detail.split("\n")[0] : "Check helper command output and logs.";
+        setModeHint("File search failed", summary, "󰅚");
+        completeModeLoad("files", false, String(fallbackMessage || "File search failed"));
     }
 
     function openWithConfiguredOpener(targetPath) {
@@ -381,15 +398,22 @@ PanelWindow {
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
     readonly property string selectedHomeItemKey: ""
+    // Runtime-only overrides used by launcher smoke tests; they never persist.
+    property string diagnosticFileSearchRootOverride: ""
+    property bool diagnosticFileSearchShowHiddenOverrideActive: false
+    property bool diagnosticFileSearchShowHiddenOverride: false
+    property string diagnosticFileOpenerOverride: ""
     readonly property string fileSearchRootSetting: {
-        var raw = String(Config.launcherFileSearchRoot || "~").trim();
+        var raw = String((diagnosticFileSearchRootOverride !== "" ? diagnosticFileSearchRootOverride : Config.launcherFileSearchRoot) || "~").trim();
         return raw !== "" ? raw : "~";
     }
     readonly property string fileSearchRootResolved: resolveFileSearchRoot(fileSearchRootSetting)
     readonly property string fileSearchRootLabel: formatFileSearchRootLabel(fileSearchRootResolved)
-    readonly property bool fileSearchShowHidden: Config.launcherFileShowHidden === true
+    readonly property bool fileSearchShowHidden: diagnosticFileSearchShowHiddenOverrideActive
+        ? (diagnosticFileSearchShowHiddenOverride === true)
+        : (Config.launcherFileShowHidden === true)
     readonly property string fileOpenerCommand: {
-        var raw = String(Config.launcherFileOpener || "xdg-open").trim();
+        var raw = String((diagnosticFileOpenerOverride !== "" ? diagnosticFileOpenerOverride : Config.launcherFileOpener) || "xdg-open").trim();
         return raw !== "" ? raw : "xdg-open";
     }
     readonly property string characterTrigger: {
@@ -686,13 +710,19 @@ PanelWindow {
                 launcherRoot._handleFileIndexBuilt(this.text || "", fileIndexProc._startedAt || Date.now());
             }
         }
-        stderr: StdioCollector {}
+        stderr: StdioCollector {
+            onStreamFinished: {
+                launcherRoot.fileIndexStderrBuffer = this.text || "";
+            }
+        }
         onExited: exitCode => {
             fileIndexTimeoutTimer.stop();
+            var stderrText = launcherRoot.fileIndexStderrBuffer || "";
+            launcherRoot.fileIndexStderrBuffer = "";
             if (exitCode !== 0 && launcherRoot.fileIndexBuilding) {
                 launcherRoot.fileIndexBuilding = false;
                 launcherRoot.fileIndexReady = false;
-                launcherRoot.completeModeLoad("files", false, "Files index build failed");
+                launcherRoot.applyFileSearchFailure(stderrText, "Files index build failed");
             }
         }
     }
@@ -1101,6 +1131,7 @@ PanelWindow {
             return;
         fileIndexBuilding = true;
         fileIndexReady = false;
+        fileIndexStderrBuffer = "";
         if (mode === "files" && fileIndexItems.length === 0)
             beginModeLoad("files", "Building file index");
         fileIndexProc._startedAt = Date.now();
@@ -2015,6 +2046,10 @@ PanelWindow {
             launcherOpacity: launcherOpacity,
             mode: mode,
             searchText: searchText,
+            fileSearchRootResolved: fileSearchRootResolved,
+            fileSearchRootLabel: fileSearchRootLabel,
+            fileSearchShowHidden: fileSearchShowHidden,
+            fileOpenerCommand: fileOpenerCommand,
             showLauncherHome: showLauncherHome,
             drunCategoryFilter: drunCategoryFilter,
             drunCategorySectionExpanded: drunCategorySectionExpanded,
@@ -2173,6 +2208,11 @@ PanelWindow {
                     filterItems();
                     completeModeLoad("files", true, fileIndexBuilding ? "Indexing in background" : "");
                     recordLoadMetric("files", tookMs, false, true);
+                }, function (errorText, _exitCode, _exitStatus) {
+                    if (!isRequestCurrent("files", token))
+                        return;
+                    applyFileSearchFailure(errorText, "File search failed");
+                    recordLoadMetric("files", Date.now() - startedAt, false, false);
                 });
                 return;
             }
@@ -2203,10 +2243,10 @@ PanelWindow {
                 filterItems();
                 completeModeLoad("files", true, "");
                 recordLoadMetric("files", tookMs, false, true);
-            }, function (_errorText, _exitCode, _exitStatus) {
+            }, function (errorText, _exitCode, _exitStatus) {
                 if (!isRequestCurrent("files", token))
                     return;
-                completeModeLoad("files", false, "File search failed");
+                applyFileSearchFailure(errorText, "File search failed");
                 recordLoadMetric("files", Date.now() - startedAt, false, false);
             });
         });
@@ -3074,11 +3114,55 @@ PanelWindow {
         function diagnosticSetSearchText(text: string): string {
             return launcherRoot.diagnosticSetSearchText(text);
         }
+        function diagnosticSetFileSearchRoot(rootValue: string): string {
+            launcherRoot.diagnosticFileSearchRootOverride = String(rootValue || "");
+            return JSON.stringify(launcherRoot.launcherStateObject());
+        }
+        function diagnosticSetFileShowHidden(value: string): string {
+            var normalized = String(value || "").trim().toLowerCase();
+            if (normalized === "" || normalized === "inherit") {
+                launcherRoot.diagnosticFileSearchShowHiddenOverrideActive = false;
+            } else {
+                launcherRoot.diagnosticFileSearchShowHiddenOverrideActive = true;
+                launcherRoot.diagnosticFileSearchShowHiddenOverride = ["1", "true", "yes", "on"].indexOf(normalized) !== -1;
+            }
+            return JSON.stringify(launcherRoot.launcherStateObject());
+        }
+        function diagnosticSetFileOpener(command: string): string {
+            launcherRoot.diagnosticFileOpenerOverride = String(command || "").trim();
+            return JSON.stringify(launcherRoot.launcherStateObject());
+        }
+        function diagnosticClearFileOverrides(): string {
+            launcherRoot.diagnosticFileSearchRootOverride = "";
+            launcherRoot.diagnosticFileSearchShowHiddenOverrideActive = false;
+            launcherRoot.diagnosticFileSearchShowHiddenOverride = false;
+            launcherRoot.diagnosticFileOpenerOverride = "";
+            return JSON.stringify(launcherRoot.launcherStateObject());
+        }
         function diagnosticSetDrunCategoryFilter(categoryKey: string): string {
             return launcherRoot.diagnosticSetDrunCategoryFilter(categoryKey);
         }
         function diagnosticSetViewport(widthValue: real, heightValue: real): string {
             return launcherRoot.diagnosticSetViewport(widthValue, heightValue);
+        }
+        function diagnosticExecuteEmptyPrimary(): string {
+            launcherRoot.executeEmptyPrimary();
+            return JSON.stringify({
+                executed: true,
+                state: launcherRoot.launcherStateObject()
+            });
+        }
+        function diagnosticExecuteSelection(): string {
+            var item = launcherRoot.selectedItem;
+            var target = item ? String(item.fullPath || item.address || item.exec || item.name || "") : "";
+            var executed = launcherRoot.hasResults;
+            if (executed)
+                launcherRoot.executeSelection();
+            return JSON.stringify({
+                executed: executed,
+                target: target,
+                state: launcherRoot.launcherStateObject()
+            });
         }
         function invokeEscapeAction(): string {
             var action = launcherRoot.escapeActionStateObject().action;
