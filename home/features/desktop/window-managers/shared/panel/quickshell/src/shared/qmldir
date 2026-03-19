@@ -16,8 +16,7 @@ FilterChip 1.0 FilterChip.qml
 IconButton 1.0 IconButton.qml
 InfoRow 1.0 InfoRow.qml
 InnerHighlight 1.0 InnerHighlight.qml
-ListTransitions 1.0 ListTransitions.qml
-singleton ListTransitions
+singleton ListTransitions 1.0 ListTransitions.qml
 LoadingSpinner 1.0 LoadingSpinner.qml
 LiveLogOverlay 1.0 LiveLogOverlay.qml
 MenuCloseButton 1.0 MenuCloseButton.qml
