@@ -141,6 +141,7 @@ Scope {
             launcher.close();
             osk.close();
             regionSelector.dismiss();
+            polkitAgent.cancel();
             if (overview)
                 overview.forceClose();
             if (altTabSwitcher.item && altTabSwitcher.item.hide)
@@ -385,6 +386,12 @@ Scope {
 
     RegionSelector {
         id: regionSelector
+        onAnalyzeRegionCaptured: path => {
+            root.openSurface("aiChat");
+            // AiChat's existing Connections on ScreenshotService.onRegionCaptured
+            // already sets includeVisualContext = true. If AiChat was just created
+            // by LazyLoader, it checks lastRegionPath in Component.onCompleted.
+        }
     }
 
     HotCorners {
