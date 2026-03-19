@@ -11,6 +11,7 @@ Rectangle {
     property string description: ""
     property string currentValue
     property var options: []
+    property bool highlighted: false
     signal modeSelected(string modeValue)
     readonly property bool narrowLayout: width < 420
 
@@ -104,6 +105,23 @@ Rectangle {
                     onClicked: root.modeSelected(modelData.value)
                 }
             }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: Colors.primary
+        opacity: modeHighlightPulse.running ? modeHighlightPulse._opacity : 0
+        visible: root.highlighted
+
+        SequentialAnimation {
+            id: modeHighlightPulse
+            property real _opacity: 0
+            running: root.highlighted
+            loops: 2
+            NumberAnimation { target: modeHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: 300; easing.type: Easing.OutCubic }
+            NumberAnimation { target: modeHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: 300; easing.type: Easing.InCubic }
         }
     }
 }
