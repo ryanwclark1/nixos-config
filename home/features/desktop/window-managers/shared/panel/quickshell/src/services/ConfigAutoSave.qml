@@ -512,6 +512,9 @@ QtObject {
         function onWorkspaceShowNamesChanged() {
             root.config.scheduleSave();
         }
+        function onWorkspaceStyleChanged() {
+            root.config.scheduleSave();
+        }
         function onWorkspacePillSizeChanged() {
             root.config.scheduleSave();
         }
