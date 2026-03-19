@@ -28,7 +28,7 @@ BasePopupMenu {
   readonly property bool showProviderTabs: enabledCount > 1
 
   // Provider accent — flows through hero, charts, token values
-  readonly property color providerAccent: ModelUsageService.providerColor
+  property color providerAccent: ModelUsageService.providerColor
   Behavior on providerAccent { ColorAnimation { duration: Colors.durationNormal } }
 
   // ── Provider tabs ──────────────────────────────────
