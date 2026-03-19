@@ -1,0 +1,191 @@
+import QtQuick
+import QtQuick.Layouts
+import "../../../services"
+import "../../../shared"
+import "../../../widgets" as SharedWidgets
+
+Rectangle {
+    id: root
+
+    property string label: ""
+    property string icon: ""
+    property string description: ""
+    property string currentValue: ""
+    property string placeholderText: "Theme default"
+
+    // These presets will store HEX values so they are compatible with QML's color property
+    property var presets: [
+        { value: Colors.primary.toString(), label: "Primary", color: Colors.primary },
+        { value: Colors.accent.toString(), label: "Accent", color: Colors.accent },
+        { value: Colors.success.toString(), label: "Success", color: Colors.success },
+        { value: Colors.error.toString(), label: "Error", color: Colors.error },
+        { value: Colors.warning.toString(), label: "Warning", color: Colors.warning },
+        { value: Colors.info.toString(), label: "Info", color: Colors.info }
+    ]
+
+    signal colorSelected(string colorValue)
+    readonly property bool narrowLayout: width < 420
+
+    Layout.fillWidth: true
+    implicitHeight: mainLayout.implicitHeight + Colors.spacingM * 2
+    radius: Colors.radiusMedium
+    color: Colors.modalFieldSurface
+    border.color: Colors.border
+    border.width: 1
+
+    ColumnLayout {
+        id: mainLayout
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: Colors.spacingM
+        spacing: Colors.spacingS
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Colors.spacingM
+
+            SettingsIconBox { icon: root.icon }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Colors.spacingXXS
+
+                Text {
+                    text: root.label
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
+
+                Text {
+                    visible: root.description !== ""
+                    text: root.description
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
+            }
+
+            Rectangle {
+                width: 24
+                height: 24
+                radius: Colors.radiusPill
+                color: root.currentValue || "transparent"
+                border.color: Colors.border
+                border.width: 1
+                visible: root.currentValue !== ""
+                Layout.alignment: Qt.AlignTop
+            }
+
+            Rectangle {
+                id: colorPill
+                implicitWidth: Math.max(80, selectedText.implicitWidth + 14)
+                implicitHeight: 24
+                radius: Colors.radiusCard
+                color: Colors.surface
+                border.color: Colors.border
+                border.width: 1
+                Layout.alignment: Qt.AlignTop
+
+                Text {
+                    id: selectedText
+                    anchors.centerIn: parent
+                    text: root.currentValue ? root.currentValue.toUpperCase() : root.placeholderText
+                    color: root.currentValue ? Colors.primary : Colors.textDisabled
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.DemiBold
+                }
+            }
+        }
+
+        Flow {
+            Layout.fillWidth: true
+            Layout.preferredWidth: parent.width
+            Layout.leftMargin: (root.icon !== "" && !root.narrowLayout) ? 38 + Colors.spacingM : 0
+            spacing: Colors.spacingS
+
+            SharedWidgets.FilterChip {
+                label: "Default"
+                icon: "󰑐"
+                selected: root.currentValue === ""
+                onClicked: root.colorSelected("")
+            }
+
+            Repeater {
+                model: root.presets
+                delegate: Rectangle {
+                    required property var modelData
+                    width: 32
+                    height: 32
+                    radius: Colors.radiusPill
+                    color: modelData.color
+                    border.color: root.currentValue.toLowerCase() === modelData.value.toLowerCase() ? Colors.text : Colors.border
+                    border.width: root.currentValue.toLowerCase() === modelData.value.toLowerCase() ? 2 : 1
+                    clip: true
+
+                    SharedWidgets.BarTooltip {
+                        text: modelData.label
+                        hovered: colorMouse.containsMouse
+                    }
+
+                    MouseArea {
+                        id: colorMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.colorSelected(modelData.value)
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: parent.radius
+                        color: "white"
+                        opacity: colorMouse.pressed ? 0.2 : colorMouse.containsMouse ? 0.1 : 0
+                    }
+                }
+            }
+
+            // Custom hex input
+            Rectangle {
+                width: 100
+                height: 32
+                radius: Colors.radiusSmall
+                color: Colors.modalFieldSurface
+                border.color: customInput.activeFocus ? Colors.primary : Colors.border
+                border.width: 1
+
+                TextInput {
+                    id: customInput
+                    anchors.fill: parent
+                    anchors.leftMargin: 8
+                    anchors.rightMargin: 8
+                    verticalAlignment: Text.AlignVCenter
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeSmall
+                    font.family: Colors.fontMono
+                    selectByMouse: true
+                    text: root.currentValue.startsWith("#") ? root.currentValue : ""
+                    onAccepted: {
+                        var t = text.trim();
+                        if (t.length > 0 && !t.startsWith("#")) t = "#" + t;
+                        root.colorSelected(t);
+                    }
+
+                    Text {
+                        text: "#HEX"
+                        color: Colors.textDisabled
+                        font.pixelSize: parent.font.pixelSize
+                        font.family: parent.font.family
+                        visible: parent.text.length === 0 && !parent.activeFocus
+                        anchors.fill: parent
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+        }
+    }
+}
