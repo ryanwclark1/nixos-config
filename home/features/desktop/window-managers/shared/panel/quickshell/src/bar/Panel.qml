@@ -241,6 +241,8 @@ Item {
             return musicComponent;
         if (widgetType === "privacy")
             return privacyComponent;
+        if (widgetType === "voxtype")
+            return voxtypeComponent;
         if (widgetType === "recording")
             return recordingComponent;
         if (widgetType === "battery")
@@ -966,6 +968,16 @@ Item {
             vertical: root.vertical
             isActive: root.isSurfaceActive("privacyMenu")
             onTriggerRequested: triggerItem => root.requestSurface("privacyMenu", triggerItem)
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: voxtypeComponent
+        VoxtypeBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
