@@ -19,9 +19,11 @@ import "LauncherSystemItems.js" as SystemItems
 import "LauncherHomeBuilder.js" as HomeBuilder
 import "LauncherCategoryHelpers.js" as CategoryHelpers
 import "LauncherTextHelpers.js" as TextHelpers
+import "LauncherEntryRegistry.js" as EntryRegistry
 import "LauncherWebProviders.js" as WebProviders
 import "CharacterData.js" as CharacterData
 import "../features/ssh" as SshFeature
+import "../features/settings/components/SettingsSearchIndex.js" as SettingsSearchIndex
 
 PanelWindow {
     id: launcherRoot
@@ -190,6 +192,8 @@ PanelWindow {
     property bool fileIndexBuilding: false
     property var fileIndexBuiltAt: 0
     property string transientNoticeText: ""
+    property bool sidebarOverflowExpanded: false
+    property bool shortcutHelpExpanded: false
     readonly property int fileSearchBackendRefreshMs: 180000
     readonly property int fileSearchBackendMissRefreshMs: 20000
     property int openCount: 0
@@ -394,7 +398,7 @@ PanelWindow {
     property real globalLastMouseX: 0
     property real globalLastMouseY: 0
 
-    readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "system" || mode === "files")
+    readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "files")
     readonly property bool showLauncherHomePanel: showLauncherHome && mode !== "orchestrator"
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
@@ -433,8 +437,27 @@ PanelWindow {
     readonly property var defaultModeOrder: ModeData.defaultModeOrder
     readonly property var defaultPrimaryModes: ModeData.defaultPrimaryModes
     property var modeOrder: computeModeOrder()
-    property var primaryModes: ModeData.sanitizeModeList(Config.launcherEnabledModes, defaultPrimaryModes, allKnownModes).filter(function (modeKey) {
-        return launcherRoot.isModeAllowedByCompositor(modeKey);
+    property var primaryModes: ModeData.sanitizeModeList(Config.launcherPrimaryModes, defaultPrimaryModes, allKnownModes).filter(function (modeKey) {
+        return launcherRoot.modeOrder.indexOf(modeKey) !== -1;
+    })
+    readonly property var overflowModes: modeOrder.filter(function(modeKey) {
+        return primaryModes.indexOf(modeKey) === -1;
+    })
+    readonly property var cyclableModes: {
+        var ordered = [];
+        var seen = ({});
+        var source = primaryModes.concat(overflowModes);
+        for (var i = 0; i < source.length; ++i) {
+            var key = String(source[i] || "");
+            if (key === "" || seen[key])
+                continue;
+            ordered.push(key);
+            seen[key] = true;
+        }
+        return ordered.length > 0 ? ordered : modeOrder;
+    }
+    readonly property var prefixQuickModes: ["settings", "run", "ssh", "web"].filter(function(modeKey) {
+        return launcherRoot.supportsMode(modeKey);
     })
     readonly property var modeIcons: ModeData.modeIcons
     readonly property string emptyStateTitle: TextHelpers.emptyStateTitle(mode, _cleanSearch, Config.launcherFileMinQueryLength, fileSearchRootLabel)
@@ -446,6 +469,17 @@ PanelWindow {
     readonly property string emptySecondaryHint: TextHelpers.emptySecondaryHint(mode, _cleanSearch, searchText, _webSecondaryName)
     readonly property string emptySecondaryHintIcon: TextHelpers.emptySecondaryHintIcon(mode, searchText)
     readonly property string activeModeHintText: mode === "emoji" ? ("Search characters with " + characterTrigger) : (ModeData.modeInfo(mode).hint || "Search...")
+    readonly property string modeSummaryText: {
+        var info = ModeData.modeInfo(mode);
+        var prefix = String(info.prefix || "");
+        var hint = String(info.hint || "Search...");
+        return info.label + (prefix !== "" ? (" • " + prefix + " prefix") : "") + " • " + hint;
+    }
+    readonly property string overflowHintText: {
+        if (overflowModes.length > 0)
+            return "More reveals " + overflowModes.length + " advanced modes. " + tabControlHintText;
+        return tabControlHintText;
+    }
     readonly property bool hasResults: filteredItems.length > 0
     readonly property var selectedItem: hasResults && selectedIndex >= 0 && selectedIndex < filteredItems.length ? filteredItems[selectedIndex] : null
     readonly property string launcherTabBehavior: {
@@ -502,6 +536,30 @@ PanelWindow {
         if (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded)))
             return "Esc: Reset";
         return "Shift+Tab: Next Mode";
+    }
+    readonly property string escapeStatusText: {
+        if (showingConfirm)
+            return "Esc cancels";
+        if (sidebarOverflowExpanded)
+            return "Esc closes more";
+        if (shortcutHelpExpanded)
+            return "Esc hides help";
+        if (searchText !== "")
+            return "Esc clears query";
+        if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "")
+            return "Esc clears filter";
+        if (drunCategoryFiltersEnabled && mode === "drun" && drunCategorySectionExpanded)
+            return "Esc collapses filters";
+        return "Esc closes";
+    }
+    readonly property string escapeStatusIcon: {
+        if (showingConfirm)
+            return "󰅖";
+        if (sidebarOverflowExpanded || shortcutHelpExpanded)
+            return "󰅀";
+        if (searchText !== "" || drunCategoryFilter !== "")
+            return "󰅖";
+        return "󰅚";
     }
     readonly property string webPrimaryProviderLabel: _webPrimaryProvider ? _webPrimaryProvider.name : "Primary"
     readonly property string webHotkeyHint: {
@@ -935,6 +993,10 @@ PanelWindow {
         if (filtered.length === 0)
             return ["drun"];
         return filtered;
+    }
+
+    function modeMeta(modeKey) {
+        return ModeData.modeInfo(modeKey);
     }
 
     function isModeAllowedByCompositor(modeKey) {
@@ -1435,6 +1497,8 @@ PanelWindow {
         var startedAt = telemetryStart();
         if (showingConfirm)
             cancelConfirm();
+        sidebarOverflowExpanded = false;
+        shortcutHelpExpanded = false;
         var nextMetrics = Object.assign({}, launcherMetrics);
         nextMetrics.opens = (nextMetrics.opens || 0) + 1;
         if (!nextMetrics.perMode)
@@ -1547,6 +1611,8 @@ PanelWindow {
     function close() {
         if (searchInputComp.searchInput && searchInputComp.searchInput.activeFocus)
             searchInputComp.searchInput.focus = false;
+        sidebarOverflowExpanded = false;
+        shortcutHelpExpanded = false;
         launcherOpacity = 0;
         scaleValue = 0.94;
         yOffset = 15;
@@ -1582,11 +1648,12 @@ PanelWindow {
     }
 
     function cycleMode(step) {
-        var currentIndex = modeOrder.indexOf(mode);
+        var availableModes = cyclableModes;
+        var currentIndex = availableModes.indexOf(mode);
         if (currentIndex === -1)
             currentIndex = 0;
-        var nextIndex = (currentIndex + step + modeOrder.length) % modeOrder.length;
-        open(modeOrder[nextIndex], true);
+        var nextIndex = (currentIndex + step + availableModes.length) % availableModes.length;
+        open(availableModes[nextIndex], true);
     }
 
     function askConfirm(title, callback) {
@@ -2313,20 +2380,58 @@ PanelWindow {
 
     function loadSettings() {
         var items = [];
-        var tabs = SettingsRegistry.tabs;
+        var tabs = SettingsRegistry.supportedTabs ? SettingsRegistry.supportedTabs() : SettingsRegistry.tabs;
+        var categories = SettingsRegistry.categories || [];
+
+        function _categoryLabel(categoryId) {
+            for (var categoryIndex = 0; categoryIndex < categories.length; ++categoryIndex) {
+                var category = categories[categoryIndex];
+                if (String(category.id || "") === categoryId)
+                    return String(category.label || "Settings");
+            }
+            return "Settings";
+        }
+
         for (var i = 0; i < tabs.length; i++) {
             var tab = tabs[i];
             items.push({
-                category: "Settings",
+                category: _categoryLabel(tab.categoryId),
                 name: tab.label,
                 icon: tab.icon || "󰒓",
+                title: "Open settings tab",
+                breadcrumb: _categoryLabel(tab.categoryId) + " > " + tab.label,
+                entryKind: "settings",
+                keywords: (tab.searchTerms || []).join(" "),
                 action: (function (tId) {
                         return function () {
                             Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", tId]);
-                            close();
                         };
                     })(tab.id),
-                _keywords: (tab.searchTerms || []).join(" ")
+            });
+        }
+
+        var indexedSettings = SettingsSearchIndex.entries || [];
+        for (var j = 0; j < indexedSettings.length; ++j) {
+            var entry = indexedSettings[j];
+            var entryTab = SettingsRegistry.findTab ? SettingsRegistry.findTab(entry.tabId) : null;
+            if (!entryTab)
+                continue;
+            var categoryLabel = _categoryLabel(entryTab.categoryId);
+            items.push({
+                category: categoryLabel,
+                name: entry.label,
+                title: entry.cardTitle || entryTab.label,
+                icon: entryTab.icon || "󰒓",
+                breadcrumb: categoryLabel + " > " + entryTab.label,
+                description: entry.cardTitle || "Setting",
+                entryKind: "settings",
+                hiddenWhenEmpty: true,
+                keywords: [entry.keywords || "", entryTab.label, categoryLabel, entry.cardTitle || ""].join(" "),
+                action: (function(tabId, cardTitle, labelText) {
+                    return function() {
+                        Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openSetting", tabId, cardTitle || "", labelText || ""]);
+                    };
+                })(entry.tabId, entry.cardTitle || "", entry.label || "")
             });
         }
         allItems = items;
@@ -2375,6 +2480,12 @@ PanelWindow {
             shellEntryActions: SystemActionRegistry.shellEntryActions,
             makeConfirmedSystemAction: makeConfirmedSystemAction,
             makeDetachedSystemAction: makeDetachedSystemAction,
+            openDashboard: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "dashboard"]); },
+            openSettings: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "open"]); },
+            openNotifications: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "notifCenter"]); },
+            openControlCenter: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "controlCenter"]); },
+            openScreenshotMenu: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "screenshotMenu"]); },
+            openPowerMenu: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "powerMenu"]); },
             execDetached: function(cmd) { Quickshell.execDetached(cmd); },
             resolveCommand: function(name, args) { return DependencyService.resolveCommand(name, args); },
             launchInTerminal: launchInTerminal,
@@ -2591,6 +2702,8 @@ PanelWindow {
             var baseItems = [];
             for (var j = 0; j < allItems.length; ++j) {
                 var item = allItems[j];
+                if (item.hiddenWhenEmpty === true)
+                    continue;
                 if (mode === "drun" && drunCategoryFilter !== "" && !itemMatchesDrunCategory(item, drunCategoryFilter))
                     continue;
                 if (mode === "drun")
@@ -2811,6 +2924,14 @@ PanelWindow {
     function handleEscapeAction() {
         if (showingConfirm) {
             cancelConfirm();
+            return true;
+        }
+        if (sidebarOverflowExpanded) {
+            sidebarOverflowExpanded = false;
+            return true;
+        }
+        if (shortcutHelpExpanded) {
+            shortcutHelpExpanded = false;
             return true;
         }
         if (searchText !== "") {
@@ -3278,6 +3399,8 @@ PanelWindow {
                     text: launcherRoot.searchText
                     accentColor: Colors.primary
                     placeholder: launcherRoot.activeModeHintText
+                    statusText: launcherRoot.escapeStatusText
+                    statusIcon: launcherRoot.escapeStatusIcon
                     onAccepted: modifiers => launcherRoot.handleSearchAccepted(modifiers)
 
                     onTextChanged: {
@@ -3325,14 +3448,22 @@ PanelWindow {
                     Keys.onPressed: event => keyHandler.handleKeyPress(event)
                 }
 
+                LauncherPrefixStrip {
+                    Layout.fillWidth: true
+                    launcher: launcherRoot
+                    visible: !launcherRoot.tightMode && launcherRoot.prefixQuickModes.length > 0
+                }
+
                 LauncherActionLegend {
                     visible: Config.launcherShowModeHints && !launcherRoot.tightMode
                     Layout.bottomMargin: visible ? Colors.spacingXXS : 0
-                    hintText: launcherRoot.activeModeHintText
+                    summaryText: launcherRoot.modeSummaryText
                     primaryAction: launcherRoot.legendPrimaryAction
                     secondaryAction: launcherRoot.legendSecondaryAction
                     tertiaryAction: launcherRoot.legendTertiaryAction
                     compact: launcherRoot.compactMode || launcherRoot.webHintCompact
+                    helpExpanded: launcherRoot.shortcutHelpExpanded
+                    onHelpToggled: launcherRoot.shortcutHelpExpanded = !launcherRoot.shortcutHelpExpanded
                 }
 
                 LauncherWebProviderBar {

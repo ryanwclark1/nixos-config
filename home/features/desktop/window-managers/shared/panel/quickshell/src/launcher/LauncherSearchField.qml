@@ -10,6 +10,8 @@ Rectangle {
     property alias searchInput: input
     property string placeholder: "Search..."
     property color accentColor: Colors.primary
+    property string statusText: ""
+    property string statusIcon: "󱞩"
 
     signal accepted(var modifiers)
     signal escapePressed
@@ -55,38 +57,38 @@ Rectangle {
         }
 
         Rectangle {
-        id: categoryBadge
-        readonly property string category: root.parent && root.parent.launcher ? root.parent.launcher.drunCategoryFilterLabel : ""
-        visible: category !== "" && category !== "All"
-        Layout.alignment: Qt.AlignVCenter
-        radius: Colors.radiusSmall
-        color: Colors.withAlpha(accentColor, 0.15)
-        border.color: Colors.withAlpha(accentColor, 0.4)
-        border.width: 1
-        implicitHeight: 24
-        implicitWidth: categoryLabel.implicitWidth + 16
+            id: categoryBadge
+            readonly property string category: root.parent && root.parent.launcher ? root.parent.launcher.drunCategoryFilterLabel : ""
+            visible: category !== "" && category !== "All"
+            Layout.alignment: Qt.AlignVCenter
+            radius: Colors.radiusSmall
+            color: Colors.withAlpha(accentColor, 0.15)
+            border.color: Colors.withAlpha(accentColor, 0.4)
+            border.width: 1
+            implicitHeight: 24
+            implicitWidth: categoryLabel.implicitWidth + 16
 
-        RowLayout {
-            anchors.centerIn: parent
-            spacing: Colors.spacingXS
-            Text {
-                id: categoryLabel
-                text: categoryBadge.category
-                color: accentColor
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.Bold
-            }
-            SharedWidgets.IconButton {
-                icon: "󰅖"
-                size: 14
-                iconSize: 10
-                iconColor: accentColor
-                onClicked: if (root.parent && root.parent.launcher) root.parent.launcher.setDrunCategoryFilter("")
+            RowLayout {
+                anchors.centerIn: parent
+                spacing: Colors.spacingXS
+                Text {
+                    id: categoryLabel
+                    text: categoryBadge.category
+                    color: accentColor
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.Bold
+                }
+                SharedWidgets.IconButton {
+                    icon: "󰅖"
+                    size: 14
+                    iconSize: 10
+                    iconColor: accentColor
+                    onClicked: if (root.parent && root.parent.launcher) root.parent.launcher.setDrunCategoryFilter("")
+                }
             }
         }
-    }
 
-    TextInput {
+        TextInput {
             id: input
             Layout.fillWidth: true
             color: Colors.text
@@ -108,6 +110,38 @@ Rectangle {
                 if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                     root.accepted(event.modifiers);
                     event.accepted = true;
+                }
+            }
+        }
+
+        Rectangle {
+            visible: root.statusText !== ""
+            Layout.alignment: Qt.AlignVCenter
+            radius: Colors.radiusPill
+            color: Colors.withAlpha(accentColor, 0.1)
+            border.color: Colors.withAlpha(accentColor, 0.35)
+            border.width: 1
+            implicitHeight: 26
+            implicitWidth: statusRow.implicitWidth + 18
+
+            RowLayout {
+                id: statusRow
+                anchors.centerIn: parent
+                spacing: Colors.spacingXS
+
+                Text {
+                    visible: root.statusIcon !== ""
+                    text: root.statusIcon
+                    color: accentColor
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeXS
+                }
+
+                Text {
+                    text: root.statusText
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.DemiBold
                 }
             }
         }
