@@ -60,8 +60,9 @@ Item {
     onWidgetSettingsOpenChanged: {
         if (!widgetSettingsOpen) {
             pluginSettingsError = "";
-            if (pluginSettingsLoader)
-                pluginSettingsLoader.source = "";
+            var loader = widgetSettingsOverlay ? widgetSettingsOverlay.pluginSettingsLoader : null;
+            if (loader)
+                loader.source = "";
         }
         Qt.callLater(function() { if (_destroyed) return; refreshEditingWidgetState(); });
     }
@@ -268,9 +269,10 @@ Item {
     }
 
     function loadPluginSettingsPane() {
-        if (!pluginSettingsLoader)
+        var loader = widgetSettingsOverlay.pluginSettingsLoader;
+        if (!loader)
             return;
-        pluginSettingsLoader.source = "";
+        loader.source = "";
         if (!widgetSettingsOpen || editingPluginId === "" || !editingPluginHasSettings)
             return;
         if (!editingPluginCanWriteSettings) {
@@ -283,100 +285,11 @@ Item {
             return;
         }
         var api = PluginService.getPluginAPI(editingPluginId);
-        pluginSettingsLoader.setSource(src, {
+        loader.setSource(src, {
             pluginApi: api,
             pluginManifest: PluginService.pluginById(editingPluginId),
             pluginService: PluginService
         });
-    }
-
-    function schemaFieldCurrentValue(field) {
-        if (!editingWidget || !field)
-            return "";
-        var settings = editingWidget.settings ? editingWidget.settings : {};
-        if (settings[field.key] !== undefined)
-            return settings[field.key];
-        var defaults = BarWidgetRegistry.defaultSettings(editingWidget.widgetType);
-        if (defaults[field.key] !== undefined)
-            return defaults[field.key];
-        if (field.type === "toggle")
-            return false;
-        if (field.type === "slider")
-            return field.min !== undefined ? field.min : 0;
-        return "";
-    }
-
-    Component {
-        id: schemaModeField
-
-        SettingsModeRow {
-            property var field: null
-            visible: !!field
-            label: field ? (field.label || "") : ""
-            icon: field && field.icon ? field.icon : ""
-            description: field && field.description ? field.description : ""
-            currentValue: root.schemaFieldCurrentValue(field)
-            options: field && field.options ? field.options : []
-            onModeSelected: value => {
-                if (field)
-                    root.updateEditingWidgetSetting(field.key, value);
-            }
-        }
-    }
-
-    Component {
-        id: schemaSliderField
-
-        SettingsSliderRow {
-            property var field: null
-            visible: !!field
-            label: field ? (field.label || "") : ""
-            icon: field && field.icon ? field.icon : ""
-            min: field && field.min !== undefined ? field.min : 0
-            max: field && field.max !== undefined ? field.max : 100
-            step: field && field.step !== undefined ? field.step : 1
-            unit: field && field.unit ? field.unit : ""
-            value: root.schemaFieldCurrentValue(field)
-            onMoved: value => {
-                if (field)
-                    root.updateEditingWidgetSetting(field.key, value);
-            }
-        }
-    }
-
-    Component {
-        id: schemaToggleField
-
-        SettingsToggleRow {
-            property var field: null
-            visible: !!field
-            label: field ? (field.label || "") : ""
-            icon: field && field.icon ? field.icon : ""
-            checked: !!root.schemaFieldCurrentValue(field)
-            enabledText: field && field.enabledText ? field.enabledText : "Enabled"
-            disabledText: field && field.disabledText ? field.disabledText : "Disabled"
-            onToggled: {
-                if (field)
-                    root.updateEditingWidgetSetting(field.key, !root.schemaFieldCurrentValue(field));
-            }
-        }
-    }
-
-    Component {
-        id: schemaTextField
-
-        SettingsTextInputRow {
-            property var field: null
-            visible: !!field
-            label: field ? (field.label || "") : ""
-            leadingIcon: field && field.icon ? field.icon : ""
-            placeholderText: field && field.placeholder ? field.placeholder : ""
-            text: String(root.schemaFieldCurrentValue(field) || "")
-            onTextEdited: value => {
-                if (field)
-                    root.updateEditingWidgetSetting(field.key, value);
-            }
-        }
     }
 
     SettingsTabPage {
@@ -737,288 +650,32 @@ Item {
         }
     }
 
-    Rectangle {
-        anchors.fill: parent
-        visible: root.widgetPickerOpen
-        color: Qt.rgba(0, 0, 0, 0.45)
-        z: 20
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.widgetPickerOpen = false
-        }
-
-        Rectangle {
-            width: Math.min(root.compactMode ? 560 : 640, parent.width - root.overlayInset * 2)
-            height: Math.min(560, parent.height - root.overlayInset * 2)
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.topMargin: Math.max(root.overlayInset, (parent.height - height) / 2)
-            anchors.leftMargin: Math.max(root.overlayInset, (parent.width - width) / 2)
-            radius: Colors.radiusLarge
-            color: Colors.popupSurface
-            border.color: Colors.border
-            border.width: 1
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: Colors.paddingLarge
-                spacing: Colors.spacingM
-
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Colors.spacingS
-
-                    Text {
-                        width: root.compactMode ? parent.width : Math.max(0, parent.width - closePickerButton.implicitWidth - Colors.spacingS)
-                        text: "Add Widget to " + root.sectionLabel(root.addSection)
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeXL
-                        font.weight: Font.DemiBold
-                        wrapMode: Text.WordWrap
-                    }
-
-                    SettingsActionButton {
-                        id: closePickerButton
-                        compact: true
-                        iconName: "󰅖"
-                        label: "Close"
-                        onClicked: root.widgetPickerOpen = false
-                    }
-                }
-
-                SettingsTextInputRow {
-                    label: "Search"
-                    leadingIcon: "󰍉"
-                    placeholderText: "Filter widgets by name"
-                    text: root.widgetSearchQuery
-                    onTextEdited: value => root.widgetSearchQuery = value
-                }
-
-                Flickable {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-                    contentHeight: pickerColumn.implicitHeight
-
-                    Column {
-                        id: pickerColumn
-                        width: parent.width
-                        spacing: Colors.spacingS
-
-                        Repeater {
-                            model: root.availablePickerWidgets
-                            delegate: SettingsListRow {
-                                required property var modelData
-                                width: pickerColumn.width
-                                minimumHeight: root.compactMode ? 88 : 64
-
-                                Text {
-                                    text: modelData.icon
-                                    color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeLarge
-                                }
-
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: Colors.spacingXXS
-
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        spacing: Colors.spacingS
-
-                                        Text {
-                                            text: modelData.label
-                                            color: Colors.text
-                                            font.pixelSize: Colors.fontSizeMedium
-                                            font.weight: Font.Medium
-                                            Layout.fillWidth: true
-                                            wrapMode: Text.WordWrap
-                                        }
-
-                                        Rectangle {
-                                            radius: Colors.radiusSmall
-                                            color: String(modelData.section || "") === root.addSection ? Colors.primaryStrong : Colors.cardSurface
-                                            border.color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.border
-                                            border.width: 1
-                                            implicitWidth: sectionBadgeLabel.implicitWidth + Colors.spacingM
-                                            implicitHeight: sectionBadgeLabel.implicitHeight + Colors.spacingXS
-
-                                            Text {
-                                                id: sectionBadgeLabel
-                                                anchors.centerIn: parent
-                                                text: "Best in " + root.sectionLabel(String(modelData.section || "right"))
-                                                color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.textSecondary
-                                                font.pixelSize: Colors.fontSizeXS
-                                                font.weight: Font.Medium
-                                            }
-                                        }
-                                    }
-
-                                    Text {
-                                        text: modelData.description || ""
-                                        color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        Layout.fillWidth: true
-                                        wrapMode: Text.WordWrap
-                                    }
-                                }
-
-                                Flow {
-                                    Layout.fillWidth: true
-                                    width: parent.width
-                                    spacing: Colors.spacingS
-
-                                    SettingsActionButton {
-                                        compact: true
-                                        emphasized: true
-                                        iconName: "󰐕"
-                                        label: "Add"
-                                        onClicked: root.addWidget(modelData.widgetType)
-                                    }
-                                }
-                            }
-                        }
-
-                        Text {
-                            width: parent.width
-                            visible: root.availablePickerWidgets.length === 0
-                            text: "No widgets match \"" + root.widgetSearchQuery + "\"."
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
-                            wrapMode: Text.WordWrap
-                        }
-                    }
-                }
-            }
-        }
+    BarWidgetPickerOverlay {
+        open: root.widgetPickerOpen
+        compactMode: root.compactMode
+        overlayInset: root.overlayInset
+        addSection: root.addSection
+        sectionLabelFn: root.sectionLabel
+        searchQuery: root.widgetSearchQuery
+        availableWidgets: root.availablePickerWidgets
+        onCloseRequested: root.widgetPickerOpen = false
+        onSearchQueryEdited: value => root.widgetSearchQuery = value
+        onWidgetAdded: widgetType => root.addWidget(widgetType)
     }
 
-    Rectangle {
-        anchors.fill: parent
-        visible: root.widgetSettingsOpen
-        color: Qt.rgba(0, 0, 0, 0.45)
-        z: 21
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.widgetSettingsOpen = false
-        }
-
-        Rectangle {
-            width: Math.min(460, parent.width - root.overlayInset * 2)
-            height: Math.min(settingsFlick.contentHeight, parent.height - root.overlayInset * 2)
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.topMargin: Math.max(root.overlayInset, (parent.height - height) / 2)
-            anchors.leftMargin: Math.max(root.overlayInset, (parent.width - width) / 2)
-            radius: Colors.radiusLarge
-            color: Colors.popupSurface
-            border.color: Colors.border
-            border.width: 1
-
-            Flickable {
-                id: settingsFlick
-                anchors.fill: parent
-                anchors.margins: Colors.paddingLarge
-                clip: true
-                contentHeight: settingsColumn.implicitHeight
-
-                ColumnLayout {
-                    id: settingsColumn
-                    width: settingsFlick.width
-                    spacing: Colors.spacingM
-
-                    Flow {
-                        Layout.fillWidth: true
-                        width: parent.width
-                        spacing: Colors.spacingS
-
-                        Text {
-                            width: root.compactMode ? parent.width : Math.max(0, parent.width - closeSettingsButton.implicitWidth - Colors.spacingS)
-                            text: root.editingWidget ? (BarWidgetRegistry.displayName(root.editingWidget.widgetType) + " Settings") : "Widget Settings"
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeXL
-                            font.weight: Font.DemiBold
-                            wrapMode: Text.WordWrap
-                        }
-
-                        SettingsActionButton {
-                            id: closeSettingsButton
-                            compact: true
-                            iconName: "󰅖"
-                            label: "Close"
-                            onClicked: root.widgetSettingsOpen = false
-                        }
-                    }
-
-                    SettingsInfoCallout {
-                        visible: !root.editingWidget || (!BarWidgetRegistry.supportsSettings(root.editingWidget.widgetType) && root.editingPluginId === "")
-                        title: "No configurable options"
-                        body: "This widget does not expose custom per-instance settings yet."
-                    }
-
-                    SettingsInfoCallout {
-                        visible: root.editingPluginId !== "" && root.editingPluginHasSettings && !root.editingPluginCanWriteSettings
-                        title: "Permission required"
-                        body: "This plugin is missing settings_write permission in its manifest."
-                    }
-
-                    SettingsInfoCallout {
-                        visible: root.pluginSettingsError !== ""
-                        title: "Plugin settings failed to load"
-                        body: root.pluginSettingsError
-                    }
-
-                    Repeater {
-                        model: root.editingWidgetSchema
-
-                        delegate: Loader {
-                            required property var modelData
-                            readonly property var field: modelData
-                            Layout.fillWidth: true
-                            active: !!root.editingWidget
-
-                            sourceComponent: {
-                                if (field.type === "mode")
-                                    return schemaModeField;
-                                if (field.type === "slider")
-                                    return schemaSliderField;
-                                if (field.type === "toggle")
-                                    return schemaToggleField;
-                                if (field.type === "text")
-                                    return schemaTextField;
-                                return null;
-                            }
-
-                            onLoaded: {
-                                if (item && item.field !== undefined)
-                                    item.field = field;
-                            }
-                        }
-                    }
-
-                    SharedWidgets.SshWidgetSettings {
-                        Layout.fillWidth: true
-                        visible: !!root.editingWidget && root.editingWidget.widgetType === "ssh"
-                        widgetInstance: root.editingWidget
-                    }
-
-                    Loader {
-                        id: pluginSettingsLoader
-                        Layout.fillWidth: true
-                        visible: root.editingPluginId !== "" && root.editingPluginHasSettings && root.editingPluginCanWriteSettings && status !== Loader.Error
-                        onStatusChanged: {
-                            if (status === Loader.Error)
-                                root.pluginSettingsError = errorString();
-                            else if (status === Loader.Ready)
-                                root.pluginSettingsError = "";
-                        }
-                    }
-                }
-            }
-        }
+    BarWidgetSettingsOverlay {
+        id: widgetSettingsOverlay
+        open: root.widgetSettingsOpen
+        compactMode: root.compactMode
+        overlayInset: root.overlayInset
+        editingWidget: root.editingWidget
+        editingWidgetSchema: root.editingWidgetSchema
+        editingPluginId: root.editingPluginId
+        editingPluginHasSettings: root.editingPluginHasSettings
+        editingPluginCanWriteSettings: root.editingPluginCanWriteSettings
+        pluginSettingsError: root.pluginSettingsError
+        onCloseRequested: root.widgetSettingsOpen = false
+        onPluginSettingsErrorUpdated: value => root.pluginSettingsError = value
+        onSettingChanged: (key, value) => root.updateEditingWidgetSetting(key, value)
     }
 }
