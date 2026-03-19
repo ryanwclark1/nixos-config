@@ -210,7 +210,7 @@ ColumnLayout {
                             border.width: 1
                             scale: hovered ? 1.04 : 1.0
                             Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
-                            Behavior on color { CAnim {} }
+                            Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
                             ColumnLayout {
                                 anchors.centerIn: parent
@@ -308,7 +308,7 @@ ColumnLayout {
                         border.width: 1
                         scale: selected ? 1.01 : (hovered ? 1.005 : 1.0)
 
-                        Behavior on color { CAnim {} }
+                        Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                         Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
 
                         RowLayout {

@@ -30,6 +30,7 @@ Rectangle {
     }
 
     Behavior on border.color {
+        enabled: !Colors.isTransitioning
         CAnim {}
     }
 
@@ -48,6 +49,7 @@ Rectangle {
             font.pixelSize: Colors.fontSizeXL
             font.family: Colors.fontMono
             Behavior on color {
+                enabled: !Colors.isTransitioning
                 CAnim {}
             }
         }

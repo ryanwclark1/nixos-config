@@ -35,8 +35,8 @@ Rectangle {
     border.width: 1
     scale: highlighted ? 1.01 : 1.0
 
-    Behavior on color { CAnim {} }
-    Behavior on border.color { CAnim {} }
+    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+    Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
     Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
     layer.enabled: highlighted && scale !== 1.0
 
@@ -168,9 +168,11 @@ Rectangle {
             scale: highlighted ? 1.04 : 1.0
 
             Behavior on color {
+                enabled: !Colors.isTransitioning
                 CAnim {}
             }
             Behavior on border.color {
+                enabled: !Colors.isTransitioning
                 CAnim {}
             }
             Behavior on scale {
