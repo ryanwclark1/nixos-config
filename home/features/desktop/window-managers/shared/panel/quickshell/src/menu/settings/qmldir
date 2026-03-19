@@ -2,12 +2,14 @@ SettingsActionButton 1.0 ../../features/settings/components/SettingsActionButton
 SettingsCard 1.0 ../../features/settings/components/SettingsCard.qml
 SettingsContent 1.0 ../../features/settings/components/SettingsContent.qml
 SettingsDataRow 1.0 ../../features/settings/components/SettingsDataRow.qml
+SettingsDropIndicator 1.0 ../../features/settings/components/SettingsDropIndicator.qml
 SettingsDragHandle 1.0 ../../features/settings/components/SettingsDragHandle.qml
 SettingsFieldGrid 1.0 ../../features/settings/components/SettingsFieldGrid.qml
 SettingsIconBox 1.0 ../../features/settings/components/SettingsIconBox.qml
 SettingsInfoCallout 1.0 ../../features/settings/components/SettingsInfoCallout.qml
 SettingsListRow 1.0 ../../features/settings/components/SettingsListRow.qml
 SettingsModeRow 1.0 ../../features/settings/components/SettingsModeRow.qml
+SettingsReorderState 1.0 ../../features/settings/components/SettingsReorderState.qml
 singleton SettingsRegistry 1.0 ../../features/settings/components/SettingsRegistry.qml
 SettingsRemovableChip 1.0 ../../features/settings/components/SettingsRemovableChip.qml
 SettingsSectionLabel 1.0 ../../features/settings/components/SettingsSectionLabel.qml

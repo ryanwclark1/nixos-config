@@ -23,7 +23,8 @@ export default function qmlJsPlugin() {
     },
 
     transform(code, id) {
-      if (!id.endsWith(".js") || !code.includes(".pragma library")) return null;
+      const cleanId = String(id || "").split("?", 1)[0].split("#", 1)[0];
+      if (!cleanId.endsWith(".js") || !code.includes(".pragma library")) return null;
 
       let transformed = code
         // Strip .pragma library
@@ -31,7 +32,7 @@ export default function qmlJsPlugin() {
         // Convert .import "Foo.js" as Bar → import * as Bar from "./Foo.js";
         .replace(
           /^\.import\s+"([^"]+)"\s+as\s+(\w+)\s*$/gm,
-          'import * as $2 from "./$1";'
+          'import * as $2 from "$1";'
         );
 
       // Collect top-level function and var names for export

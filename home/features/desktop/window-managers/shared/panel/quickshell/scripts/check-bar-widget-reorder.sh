@@ -3,22 +3,21 @@ set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
+repo_root="$(cd -- "${script_dir}/.." >/dev/null 2>&1 && pwd -P)"
 source "${script_dir}/harness-warnings.sh"
 
 tmp_home="$(mktemp -d)"
 tmp_runtime="$(mktemp -d)"
-tmp_dir="$(mktemp -d)"
-tmp_qml="${tmp_dir}/reorder-harness.qml"
+tmp_qml="$(mktemp "${repo_root}/tmp-reorder-harness-XXXXXX.qml")"
 cleanup() {
-  rm -rf -- "${tmp_home}" "${tmp_runtime}" "${tmp_dir}"
+  rm -rf -- "${tmp_home}" "${tmp_runtime}"
+  rm -f -- "${tmp_qml}"
 }
 trap cleanup EXIT
 
 mkdir -p "${tmp_home}/.local/state/quickshell" "${tmp_home}/.config/quickshell" "${tmp_runtime}/quickshell"
 chmod 700 "${tmp_runtime}"
 printf '{"themes":[]}\n' > "${tmp_home}/.config/quickshell/themes.json"
-ln -s "${config_dir}/services" "${tmp_dir}/services"
-ln -s "${config_dir}/widgets" "${tmp_dir}/widgets"
 
 cat > "${tmp_home}/.local/state/quickshell/config.json" <<'JSON'
 {
@@ -55,7 +54,7 @@ JSON
 cat > "${tmp_qml}" <<QML
 import Quickshell
 import QtQuick
-import "./services"
+import "./src/services"
 
 QtObject {
   property int attempts: 0
@@ -137,6 +136,7 @@ set +e
 output="$(
   env -u WAYLAND_DISPLAY -u DISPLAY \
     HOME="${tmp_home}" \
+    QS_SCRIPT_ROOT="${repo_root}/scripts" \
     XDG_RUNTIME_DIR="${tmp_runtime}" \
     QT_QPA_PLATFORM=offscreen \
     timeout 5s quickshell -p "${tmp_qml}" --no-duplicate 2>&1
