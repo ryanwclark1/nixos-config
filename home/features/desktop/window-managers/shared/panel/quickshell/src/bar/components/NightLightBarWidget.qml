@@ -9,8 +9,6 @@ SharedWidgets.BarPill {
     property var anchorWindow: null
     property bool vertical: false
 
-    signal contextMenuRequested(var actions, var triggerRect)
-
     visible: NightLightService.active
     tooltipText: "Night Light — " + NightLightService.temperature + "K"
 
@@ -25,8 +23,6 @@ SharedWidgets.BarPill {
             action: () => NightLightService.toggle()
         }
     ]
-    onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
-
     Text {
         anchors.centerIn: parent
         color: Colors.warning
