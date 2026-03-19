@@ -545,7 +545,17 @@ def on_nm_state_changed(*args):
     schedule_snapshot()
 
 
+_subscribed_acs = set()
+
+
 def on_nm_props_changed(iface, changed, invalidated):
+    # Dynamically subscribe to new active connections
+    if "ActiveConnections" in changed:
+        for ac_path in changed["ActiveConnections"]:
+            ac_str = str(ac_path)
+            if ac_str not in _subscribed_acs:
+                _subscribed_acs.add(ac_str)
+                subscribe_active_connection(ac_str)
     schedule_snapshot()
 
 
@@ -619,7 +629,9 @@ def subscribe_signals():
     # Subscribe to existing active connections
     ac_paths = get_nm_property("ActiveConnections") or []
     for ac_path in ac_paths:
-        subscribe_active_connection(ac_path)
+        ac_str = str(ac_path)
+        _subscribed_acs.add(ac_str)
+        subscribe_active_connection(ac_str)
 
 
 # ── Polling timers (internal, no subprocess spawns from QML) ──
