@@ -107,7 +107,7 @@ require_pattern "$bar_widget_qml" 'PopupWindow' "docker-manager bar widget uses 
 require_pattern "$bar_widget_qml" 'anchor\.item' "docker-manager popup anchors to the bar widget"
 require_pattern "$bar_widget_qml" 'groupByCompose' "docker-manager widget persists compose-view preference"
 require_pattern "$bar_widget_qml" 'showPorts' "docker-manager widget persists port-visibility preference"
-require_pattern "$bar_widget_qml" 'executeComposeAction' "docker-manager widget exposes compose project actions"
+require_pattern "$bar_widget_qml" 'ComposeCard' "docker-manager widget uses extracted compose card component"
 require_pattern "$bar_widget_qml" 'executeContainerAction' "docker-manager widget exposes container actions"
 require_pattern "$bar_widget_qml" 'currentTab' "docker-manager widget uses tab-based navigation"
 
@@ -123,8 +123,9 @@ volume_card_qml="${plugin_dir}/VolumeCard.qml"
 network_card_qml="${plugin_dir}/NetworkCard.qml"
 run_dialog_qml="${plugin_dir}/RunImageDialog.qml"
 bulk_bar_qml="${plugin_dir}/BulkActionBar.qml"
+compose_card_qml="${plugin_dir}/ComposeCard.qml"
 
-for component in "$container_card_qml" "$image_card_qml" "$volume_card_qml" "$network_card_qml" "$run_dialog_qml" "$bulk_bar_qml"; do
+for component in "$container_card_qml" "$image_card_qml" "$volume_card_qml" "$network_card_qml" "$run_dialog_qml" "$bulk_bar_qml" "$compose_card_qml"; do
   if [[ -f "$component" ]]; then
     pass "docker-manager extracted component exists: $(basename "$component")"
   else
@@ -138,6 +139,8 @@ require_pattern "$container_card_qml" 'DU\.healthDot' "docker-manager container 
 require_pattern "$container_card_qml" 'Refresh' "docker-manager container card has log refresh button"
 
 require_pattern "$daemon_qml" 'action === .edit.' "docker-manager daemon supports compose edit action"
+require_pattern "$compose_card_qml" 'executeComposeAction' "docker-manager compose card dispatches compose actions"
+require_pattern "$compose_card_qml" 'DU\.healthDot' "docker-manager compose card uses shared health dot utility"
 
 require_pattern "$settings_qml" 'dockerBinary' "docker-manager settings expose runtime binary"
 require_pattern "$settings_qml" 'debounceDelay' "docker-manager settings expose debounce delay"

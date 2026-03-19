@@ -5,6 +5,7 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 launcher_qml="${config_root}/launcher/Launcher.qml"
+launcher_ipc_handler_qml="${config_root}/launcher/LauncherIpcHandler.qml"
 expected_config="$(realpath "${config_root}/shell.qml" 2>/dev/null || printf '%s' "${config_root}/shell.qml")"
 
 instance_id=""
@@ -328,16 +329,16 @@ main() {
   trap cleanup EXIT
   trap handle_termination TERM INT
 
-  require_literal "$launcher_qml" 'function openFiles() {' "Launcher.openFiles IPC mapping"
-  require_literal "$launcher_qml" 'function filesBackendStatus(): string {' "Launcher.filesBackendStatus IPC mapping"
-  require_literal "$launcher_qml" 'function launcherState(): string {' "Launcher.launcherState IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticSetSearchText(text: string): string {' "Launcher.diagnosticSetSearchText IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticSetFileSearchRoot(rootValue: string): string {' "Launcher.diagnosticSetFileSearchRoot IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticSetFileShowHidden(value: string): string {' "Launcher.diagnosticSetFileShowHidden IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticSetFileOpener(command: string): string {' "Launcher.diagnosticSetFileOpener IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticClearFileOverrides(): string {' "Launcher.diagnosticClearFileOverrides IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticExecuteEmptyPrimary(): string {' "Launcher.diagnosticExecuteEmptyPrimary IPC mapping"
-  require_literal "$launcher_qml" 'function diagnosticExecuteSelection(): string {' "Launcher.diagnosticExecuteSelection IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function openFiles() {' "Launcher.openFiles IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function filesBackendStatus(): string {' "Launcher.filesBackendStatus IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function launcherState(): string {' "Launcher.launcherState IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function diagnosticSetSearchText(text: string): string {' "Launcher.diagnosticSetSearchText IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function diagnosticSetFileSearchRoot(rootValue: string): string {' "Launcher.diagnosticSetFileSearchRoot IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function diagnosticSetFileShowHidden(value: string): string {' "Launcher.diagnosticSetFileShowHidden IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function diagnosticSetFileOpener(command: string): string {' "Launcher.diagnosticSetFileOpener IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function diagnosticClearFileOverrides(): string {' "Launcher.diagnosticClearFileOverrides IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function diagnosticExecuteEmptyPrimary(): string {' "Launcher.diagnosticExecuteEmptyPrimary IPC mapping"
+  require_literal "$launcher_ipc_handler_qml" 'function diagnosticExecuteSelection(): string {' "Launcher.diagnosticExecuteSelection IPC mapping"
 
   if (( ci_mode == 1 )); then
     (( fail_count == 0 ))

@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
+runtime_pid_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid"
 instance_id=""
 repo_shell_mode=0
 repo_shell_pid=""
@@ -167,13 +168,15 @@ refresh_instance_args() {
   local resolved=""
 
   if (( repo_shell_mode == 1 )); then
-    if [[ -n "${repo_shell_pid}" ]] && run_ipc quickshell ipc --pid "${repo_shell_pid}" show >/dev/null; then
-      resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
+    if [[ -n "${repo_shell_pid}" ]]; then
+      resolved="$(readlink -f "${runtime_pid_root}/${repo_shell_pid}" 2>/dev/null || true)"
       if [[ -n "${resolved}" ]]; then
         refreshed_id="$(basename "${resolved}")"
-        if [[ -z "${instance_id}" || "${refreshed_id}" != "${instance_id}" ]]; then
-          printf '[INFO] Refreshing repo-shell instance id %s -> %s\n' "${instance_id:-<unset>}" "${refreshed_id}"
-          instance_id="${refreshed_id}"
+        if run_ipc quickshell ipc --id "${refreshed_id}" show >/dev/null; then
+          if [[ -z "${instance_id}" || "${refreshed_id}" != "${instance_id}" ]]; then
+            printf '[INFO] Refreshing repo-shell instance id %s -> %s\n' "${instance_id:-<unset>}" "${refreshed_id}"
+            instance_id="${refreshed_id}"
+          fi
         fi
       fi
     fi
@@ -251,6 +254,7 @@ populate_repo_shell_env() {
 start_repo_shell() {
   local deadline
   local resolved=""
+  local runtime_id=""
 
   if ! command -v systemctl >/dev/null 2>&1; then
     printf 'systemctl is required for --repo-shell mode.\n' >&2
@@ -269,13 +273,15 @@ start_repo_shell() {
 
   deadline=$((SECONDS + 20))
   while (( SECONDS < deadline )); do
-    if run_ipc quickshell ipc --pid "${repo_shell_pid}" show >/dev/null; then
+    resolved="$(readlink -f "${runtime_pid_root}/${repo_shell_pid}" 2>/dev/null || true)"
+    runtime_id=""
+    if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
+      runtime_id="$(basename "${resolved}")"
+    fi
+    if [[ -n "${runtime_id}" ]] && run_ipc quickshell ipc --id "${runtime_id}" show >/dev/null; then
       sleep 1
-      resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
-      if [[ -n "${resolved}" ]]; then
-        instance_id="$(basename "${resolved}")"
-      fi
-      printf '[INFO] Repo shell instance ready: pid %s\n' "${repo_shell_pid}"
+      instance_id="${runtime_id}"
+      printf '[INFO] Repo shell instance ready: pid %s id %s\n' "${repo_shell_pid}" "${instance_id}"
       return 0
     fi
     sleep 0.5
