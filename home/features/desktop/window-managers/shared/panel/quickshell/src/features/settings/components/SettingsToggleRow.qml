@@ -38,6 +38,7 @@ Rectangle {
         radius: parent.radius
         color: root._active ? Colors.primaryFaint : "transparent"
         Behavior on color {
+            enabled: !Colors.isTransitioning
             CAnim {}
         }
     }

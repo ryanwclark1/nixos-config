@@ -3,6 +3,8 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "config/ConfigPersistence.js" as ConfigPersistence
+import "preset/PresetData.js" as PresetData
 
 QtObject {
     id: root
@@ -55,18 +57,88 @@ QtObject {
             _scanProc.running = true;
     }
 
+    function _safePresetName(name) {
+        return String(name || "").trim().replace(/[^a-zA-Z0-9_-]/g, "_");
+    }
+
+    function _presetPath(name) {
+        return root._presetsDir + "/" + root._safePresetName(name) + ".json";
+    }
+
+    function _writeFile(path, contents, onDone) {
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process { stdinEnabled: true }',
+            root
+        );
+        proc.command = ["sh", "-c", "mkdir -p \"$(dirname \"$1\")\" && cat > \"$1\"", "sh", path];
+        proc.onStarted.connect(function() {
+            proc.write(contents);
+            proc.stdinEnabled = false;
+        });
+        proc.onExited.connect(function(code) {
+            if (onDone)
+                onDone(code === 0);
+            proc.destroy();
+        });
+        proc.running = true;
+    }
+
+    function _deleteFile(path, onDone) {
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process {}',
+            root
+        );
+        proc.command = ["rm", "-f", path];
+        proc.onExited.connect(function(code) {
+            if (onDone)
+                onDone(code === 0);
+            proc.destroy();
+        });
+        proc.running = true;
+    }
+
+    function _readFile(path, onDone) {
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process { property string collectedText: ""; stdout: StdioCollector { onStreamFinished: parent.collectedText = this.text } }',
+            root
+        );
+        proc.command = ["sh", "-c", "cat \"$1\"", "sh", path];
+        proc.onExited.connect(function(code) {
+            if (onDone)
+                onDone(code === 0, proc.collectedText || "");
+            proc.destroy();
+        });
+        proc.running = true;
+    }
+
+    function _applyPresetData(data) {
+        Config._loading = true;
+        try {
+            ConfigPersistence.applyData(Config, data);
+            Config.ensureSelectedBar();
+            Config.syncLegacyBarSettingsFromPrimary();
+        } finally {
+            Config._loading = false;
+        }
+        Config.applyRuntimeSettings();
+        Config.save();
+    }
+
     // ── Save preset ──────────────────────────────
     function savePreset(name, description) {
-        if (!name) return;
-        var safeName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
-        // Read current config, inject description, write to preset file
-        Quickshell.execDetached(["sh", "-c",
-            "mkdir -p '" + _presetsDir + "'; "
-            + "jq '. + {\"description\": " + JSON.stringify(description || "") + "}' "
-            + "'" + _configPath + "' > '" + _presetsDir + "/" + safeName + ".json' 2>/dev/null"
-        ]);
-        // Refresh after a short delay to pick up the new file
-        _refreshDelay.restart();
+        var safeName = root._safePresetName(name);
+        if (!safeName)
+            return;
+
+        var data = ConfigPersistence.buildData(Config);
+        var presetData = PresetData.sanitizePresetData(data);
+        presetData.description = String(description || "");
+
+        root._writeFile(root._presetPath(safeName), JSON.stringify(presetData, null, 2) + "\n", function(success) {
+            if (!success)
+                Logger.e("PresetService", "failed to save preset:", safeName);
+            root.refresh();
+        });
     }
 
     property Timer _refreshDelay: Timer {
@@ -76,21 +148,36 @@ QtObject {
 
     // ── Load preset ──────────────────────────────
     function loadPreset(name) {
-        if (!name) return;
-        var safeName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
-        Quickshell.execDetached(["sh", "-c",
-            "cp '" + _presetsDir + "/" + safeName + ".json' '" + _configPath + "' 2>/dev/null"
-        ]);
-        // Trigger config reload
-        Qt.callLater(function() { if (root._destroyed) return; Config.load(); });
+        var safeName = root._safePresetName(name);
+        if (!safeName)
+            return;
+
+        root._readFile(root._presetPath(safeName), function(success, text) {
+            if (!success) {
+                Logger.e("PresetService", "failed to read preset:", safeName);
+                return;
+            }
+
+            try {
+                var presetData = JSON.parse(text || "{}");
+                var currentData = ConfigPersistence.buildData(Config);
+                var mergedData = PresetData.mergePresetData(currentData, presetData);
+                root._applyPresetData(mergedData);
+            } catch (e) {
+                Logger.e("PresetService", "failed to load preset:", e);
+            }
+        });
     }
 
     // ── Delete preset ────────────────────────────
     function deletePreset(name) {
-        if (!name) return;
-        var safeName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
-        Quickshell.execDetached(["rm", "-f", _presetsDir + "/" + safeName + ".json"]);
-        _refreshDelay.restart();
+        var safeName = root._safePresetName(name);
+        if (!safeName)
+            return;
+
+        root._deleteFile(root._presetPath(safeName), function() {
+            root.refresh();
+        });
     }
 
 }

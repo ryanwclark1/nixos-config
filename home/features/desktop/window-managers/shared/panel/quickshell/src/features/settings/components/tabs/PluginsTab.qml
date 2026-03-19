@@ -488,6 +488,7 @@ Item {
                             font.family: Colors.fontMono
                             font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             Behavior on color {
+                                enabled: !Colors.isTransitioning
                                 CAnim {}
                             }
                         }

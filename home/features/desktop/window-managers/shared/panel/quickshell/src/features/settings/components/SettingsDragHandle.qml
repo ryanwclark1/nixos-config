@@ -27,6 +27,7 @@ Rectangle {
     opacity: root.enabled ? 1.0 : 0.45
 
     Behavior on color {
+        enabled: !Colors.isTransitioning
         CAnim {}
     }
 

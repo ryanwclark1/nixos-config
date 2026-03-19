@@ -51,8 +51,8 @@ Item {
         border.width: isActive ? 2 : 1
         clip: true
 
-        Behavior on border.color { CAnim {} }
-        Behavior on color { CAnim {} }
+        Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
+        Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
         Image {
             id: thumbImage
@@ -107,6 +107,7 @@ Item {
             anchors.fill: parent
             color: thumbMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.35) : "transparent"
             Behavior on color {
+                enabled: !Colors.isTransitioning
                 ColorAnimation { duration: Colors.durationSnap }
             }
         }
