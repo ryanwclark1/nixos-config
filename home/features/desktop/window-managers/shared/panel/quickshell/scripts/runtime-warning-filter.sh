@@ -20,6 +20,8 @@ QML QQuickItem at qrc:/qt/qml/Quickshell/Widgets/ClippingRectangle\.qml\[68:3\]:
 QML QQuickItem at qrc:/qt/qml/Quickshell/Widgets/ClippingRectangle\.qml\[68:3\]: Remove all additional children, or pick a specific component to wrap using the child property\.
 qs:@/qs/bar/Panel\.qml:514:13: QML QQuickItem\*: Binding loop detected for property "height"
 \[W\]\[SystemStatus\] helper scripts not executable \(set QS_SCRIPT_ROOT to override .*/quickshell/scripts\) exitCode=1 exitStatus=0
+Layershell screen does not corrospond to a real screen\. Letting the compositor pick\.
+\[W\]\[WeatherService\] Error: missing current condition
 EOF
       ;;
     surfaces|targeted-surfaces)

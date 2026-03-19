@@ -184,6 +184,11 @@ refresh_instance_args() {
   fi
 
   if [[ -z "${instance_id}" ]]; then
+    refreshed_id="$(discover_reachable_instance || true)"
+    if [[ -n "${refreshed_id}" ]]; then
+      printf '[INFO] Using discovered QuickShell instance %s\n' "${refreshed_id}"
+      instance_id="${refreshed_id}"
+    fi
     return 0
   fi
 

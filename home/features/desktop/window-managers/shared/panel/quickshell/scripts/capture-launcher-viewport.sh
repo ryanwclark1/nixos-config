@@ -213,7 +213,7 @@ wait_for_workspace() {
   done
 
   printf 'Workspace %s did not become active in time.\n' "${target}" >&2
-  exit 1
+  return 1
 }
 
 dispatch_workspace() {
@@ -245,7 +245,14 @@ switch_to_capture_workspace() {
 
   capture_workspace="${target}"
   dispatch_workspace "${target}"
-  wait_for_workspace "${target}"
+  if ! wait_for_workspace "${target}"; then
+    if [[ "${requested}" == "auto" ]]; then
+      printf '[INFO] Falling back to the current workspace after capture workspace %s did not activate.\n' "${target}" >&2
+      capture_workspace="${restore_workspace}"
+      return 0
+    fi
+    exit 1
+  fi
 }
 
 reassert_capture_workspace() {
@@ -254,7 +261,13 @@ reassert_capture_workspace() {
     return 0
   fi
   dispatch_workspace "${capture_workspace}"
-  wait_for_workspace "${capture_workspace}"
+  wait_for_workspace "${capture_workspace}" || {
+    if [[ "${workspace_target}" == "auto" ]]; then
+      printf '[INFO] Continuing capture on the current workspace after %s stopped responding.\n' "${capture_workspace}" >&2
+      return 0
+    fi
+    exit 1
+  }
 }
 
 discover_instances() {

@@ -308,7 +308,7 @@ wait_for_workspace() {
   done
 
   printf 'Workspace %s did not become active in time.\n' "${target}" >&2
-  exit 1
+  return 1
 }
 
 switch_to_capture_workspace() {
@@ -332,7 +332,13 @@ switch_to_capture_workspace() {
   fi
 
   focus_workspace "${target}"
-  wait_for_workspace "${target}"
+  if ! wait_for_workspace "${target}"; then
+    if [[ "${requested}" == "auto" ]]; then
+      printf '[INFO] Falling back to the current workspace after capture workspace %s did not activate.\n' "${target}" >&2
+      return 0
+    fi
+    exit 1
+  fi
 }
 
 call_ipc() {
