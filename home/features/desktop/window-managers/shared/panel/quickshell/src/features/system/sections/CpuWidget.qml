@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Io
 import "../../../services"
 import "../../../widgets" as SharedWidgets
 
@@ -24,13 +25,19 @@ SharedWidgets.CardBase {
         }
     }
 
-    readonly property int _loadPollMs: 5000
+    FileView {
+        id: _loadAvgFile
+        path: "/proc/loadavg"
+        printErrors: false
+        onTextChanged: {
+            var parts = String(this.text || "").trim().split(/\s+/);
+            root.loadAverage = parts.length >= 3 ? parts.slice(0, 3).join(" ") : "--";
+        }
+    }
 
-    CommandPoll {
-        interval: root._loadPollMs
-        running: root.visible
-        command: ["sh", "-c", "cut -d' ' -f1-3 /proc/loadavg 2>/dev/null"]
-        onUpdated: root.loadAverage = String(this.value || "--").trim()
+    Timer {
+        interval: 5000; running: root.visible; repeat: true
+        onTriggered: _loadAvgFile.reload()
     }
 
     readonly property color usageColor: SystemStatus.cpuPercent >= 0.9 ? Colors.error

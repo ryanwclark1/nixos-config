@@ -36,40 +36,36 @@ SharedWidgets.CardBase {
     return seconds.toFixed(1) + "s";
   }
 
-  readonly property int _updateCachePollMs: 3600000  // 1 hour
+  FileView {
+    id: nixCacheFile
+    path: root.cacheDir + "/nixos"
+    watchChanges: true; printErrors: false
+    onTextChanged: root._updateFromCache()
+  }
 
-  CommandPoll {
-    id: cachePoll
-    interval: root._updateCachePollMs
-    running: true
-    command: ["sh", "-c",
-      "nix=$(cat '" + root.cacheDir + "/nixos' 2>/dev/null || echo __missing__); "
-      + "fpk=$(cat '" + root.cacheDir + "/flatpak' 2>/dev/null || echo __missing__); "
-      + "printf '%s\\n%s\\n' \"$nix\" \"$fpk\""
-    ]
-    parse: function(out) {
-      var lines = (out || "").trim().split("\n");
-      return {
-        nix: root.sanitizeCount(lines[0] || "0"),
-        flatpak: root.sanitizeCount(lines.length >= 2 ? lines[1] : "0"),
-        hasCache: (lines[0] || "") !== "__missing__" || (lines.length >= 2 && (lines[1] || "") !== "__missing__")
-      };
-    }
-    onUpdated: {
-      root.nixUpdates = cachePoll.value.nix;
-      root.flatpakUpdates = cachePoll.value.flatpak;
-      if (root.isChecking) return;
-      if (root.lastRunFailed) return;
-      if (!cachePoll.value.hasCache) {
-        root.statusText = "Status: cache not initialized";
-        root.statusDetail = "Run Refresh to generate update cache files.";
-      } else if (root.totalUpdates === 0) {
-        root.statusText = "Status: system is up to date";
-        root.statusDetail = "No pending updates in tracked managers.";
-      } else {
-        root.statusText = "Status: " + root.totalUpdates + " update(s) available";
-        root.statusDetail = "NixOS: " + root.nixUpdates + "  Flatpak: " + root.flatpakUpdates;
-      }
+  FileView {
+    id: flatpakCacheFile
+    path: root.cacheDir + "/flatpak"
+    watchChanges: true; printErrors: false
+    onTextChanged: root._updateFromCache()
+  }
+
+  function _updateFromCache() {
+    var nixRaw = (nixCacheFile.text || "").trim();
+    var fpkRaw = (flatpakCacheFile.text || "").trim();
+    root.nixUpdates = sanitizeCount(nixRaw);
+    root.flatpakUpdates = sanitizeCount(fpkRaw);
+    if (root.isChecking || root.lastRunFailed) return;
+    var hasCache = nixRaw !== "" || fpkRaw !== "";
+    if (!hasCache) {
+      root.statusText = "Status: cache not initialized";
+      root.statusDetail = "Run Refresh to generate update cache files.";
+    } else if (root.totalUpdates === 0) {
+      root.statusText = "Status: system is up to date";
+      root.statusDetail = "No pending updates in tracked managers.";
+    } else {
+      root.statusText = "Status: " + root.totalUpdates + " update(s) available";
+      root.statusDetail = "NixOS: " + root.nixUpdates + "  Flatpak: " + root.flatpakUpdates;
     }
   }
 
@@ -91,11 +87,11 @@ SharedWidgets.CardBase {
         root.lastRunFailed = false;
         root.statusText = "Status: update check finished";
         root.statusDetail = "Completed in " + root.formatDuration(Date.now() - root.checkStartedAtMs);
+        root._updateFromCache();
         ToastService.showSuccess(
           "Update check complete",
           "Total available updates: " + root.totalUpdates
         );
-        cachePoll.triggerPoll();
       } else {
         root.lastRunFailed = true;
         root.statusText = "Status: update check failed";
