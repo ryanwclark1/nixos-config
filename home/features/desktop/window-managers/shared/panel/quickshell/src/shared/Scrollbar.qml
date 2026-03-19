@@ -94,7 +94,7 @@ Item {
       if (thumbDrag.containsMouse) return Colors.textSecondary;
       return Colors.border;
     }
-    Behavior on color { CAnim {} }
+    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
     // Smooth position updates while not dragging.
     Behavior on y {
       enabled: !thumbDrag.drag.active

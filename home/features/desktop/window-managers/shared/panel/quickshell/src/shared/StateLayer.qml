@@ -19,7 +19,7 @@ Rectangle {
   color: Qt.rgba(stateColor.r, stateColor.g, stateColor.b,
     disabled ? 0 : pressed ? 0.12 : hovered ? 0.08 : 0)
 
-  Behavior on color { CAnim {} }
+  Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
   // Integrated click ripple (triggered externally via burst())
   ClickRipple {

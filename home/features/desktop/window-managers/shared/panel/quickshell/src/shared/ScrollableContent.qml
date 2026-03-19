@@ -95,7 +95,7 @@ Item {
       radius: width / 2
       color: thumbDrag.drag.active ? Colors.primary : (thumbDrag.containsMouse ? Colors.textSecondary : Colors.border)
 
-      Behavior on color { CAnim {} }
+      Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
       Behavior on y {
         enabled: !thumbDrag.drag.active

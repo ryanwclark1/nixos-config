@@ -54,8 +54,8 @@ Rectangle {
   border.color: root.muted ? root.mutedColor : (sliderMouse.containsMouse ? root.activeColor : Colors.border)
   border.width: 1
 
-  Behavior on color { CAnim {} }
-  Behavior on border.color { CAnim {} }
+  Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+  Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
   // Background inner shadow/depth
   Rectangle {
@@ -86,7 +86,7 @@ Rectangle {
     width: Math.max(root.minThumbWidth, parent.width * (root.muted ? 0 : root.value))
     radius: parent.radius
     color: root.muted ? root.mutedColor : root.activeColor
-    Behavior on color { CAnim {} }
+    Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
     gradient: Gradient {
       orientation: Gradient.Horizontal
@@ -108,7 +108,7 @@ Rectangle {
       anchors.centerIn: parent
       text: root.muted ? root.mutedIcon : root.icon
       color: root.value > 0.15 ? Colors.background : Colors.text
-      Behavior on color { CAnim {} }
+      Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
       font.family: Colors.fontMono
       font.pixelSize: Colors.fontSizeSmall
       visible: root.muted || root.value > root.minVisibleValue

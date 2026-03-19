@@ -4,4 +4,5 @@ import "../services"
 
 IconButton {
   icon: "󰅖"
+  tooltipText: "Close"
 }

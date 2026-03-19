@@ -154,6 +154,7 @@ PopupWindow {
           iconSize: Colors.fontSizeXL
           iconColor: Colors.textDisabled
           stateColor: Colors.error
+          tooltipText: "Close"
           onClicked: root.closeRequested()
         }
       }
