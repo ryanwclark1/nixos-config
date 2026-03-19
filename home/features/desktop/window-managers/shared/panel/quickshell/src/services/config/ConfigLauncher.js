@@ -226,7 +226,7 @@ function normalizeCustomEngines(list) {
 
 function applyLauncherConfig(config, data) {
     var launcher = data && data.launcher ? data.launcher : {};
-    var fallbackModes = ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "plugins", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks", "settings", "devops", "orchestrator", "ssh"];
+    var fallbackModes = ["drun", "window", "files", "ai", "system", "settings", "run", "ssh", "web", "clip", "emoji", "calc", "bookmarks", "media", "nixos", "wallpapers", "plugins", "devops", "orchestrator", "keybinds"];
     var fallbackPrimaryModes = ["drun", "window", "files", "ai", "system"];
     var fallbackWebProviders = ["duckduckgo", "google", "youtube", "nixos", "github"];
 

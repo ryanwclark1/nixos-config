@@ -7,7 +7,7 @@ import Quickshell.Io
 QtObject {
   id: root
 
-  property var items: []
+  readonly property alias items: adapter.items
   property string statePath: Quickshell.statePath("todo.json")
 
   readonly property int totalCount: items.length
@@ -17,59 +17,52 @@ QtObject {
   function addTask(description) {
     var text = (description || "").trim();
     if (!text) return;
-    var newItems = items.slice();
+    var newItems = adapter.items.slice();
     newItems.push({ content: text, done: false, created: Date.now() });
-    items = newItems;
-    _save();
+    adapter.items = newItems;
   }
 
   function toggleDone(index) {
-    if (index < 0 || index >= items.length) return;
-    var newItems = items.slice();
+    if (index < 0 || index >= adapter.items.length) return;
+    var newItems = adapter.items.slice();
     newItems[index] = Object.assign({}, newItems[index], { done: !newItems[index].done });
-    items = newItems;
-    _save();
+    adapter.items = newItems;
   }
 
   function deleteItem(index) {
-    if (index < 0 || index >= items.length) return;
-    var newItems = items.slice();
+    if (index < 0 || index >= adapter.items.length) return;
+    var newItems = adapter.items.slice();
     newItems.splice(index, 1);
-    items = newItems;
-    _save();
+    adapter.items = newItems;
   }
 
   function clearDone() {
-    items = items.filter(function(i) { return !i.done; });
-    _save();
+    adapter.items = adapter.items.filter(function(i) { return !i.done; });
   }
 
-  function _save() {
-    var json = JSON.stringify(items);
-    Quickshell.execDetached([
-      "sh", "-c", "printf %s \"$1\" > \"$2\"",
-      "sh", json, root.statePath
-    ]);
+  readonly property FileView fileView: FileView {
+    id: fileView
+    path: root.statePath
+    blockLoading: true
+    printErrors: false
+    watchChanges: true
+    onFileChanged: reload()
+    onAdapterUpdated: writeAdapter()
+
+    adapter: JsonAdapter {
+      id: adapter
+      property var items: []
+    }
   }
 
-  function _load() {
-    _readProc.running = true;
-  }
-
-  Component.onCompleted: _load()
-
-  property Process _readProc: Process {
-    command: ["sh", "-c", "cat \"$1\" 2>/dev/null || echo '[]'", "sh", root.statePath]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        var raw = (this.text || "").trim();
-        if (!raw) return;
-        try {
-          root.items = JSON.parse(raw);
-        } catch (e) {
-          Logger.e("TodoService", "failed to load:", e);
-          root.items = [];
-        }
+  // Migrate from old bare-array format [...] to new {items: [...]} on first load
+  Component.onCompleted: {
+    var raw = (fileView.text() || "").trim();
+    if (raw.startsWith("[")) {
+      try {
+        adapter.items = JSON.parse(raw);
+      } catch (e) {
+        Logger.e("TodoService", "migration failed:", e);
       }
     }
   }

@@ -19,6 +19,11 @@ Rectangle {
 
   signal clicked(real x, real y)
 
+  Accessible.role: Accessible.Button
+  Accessible.name: root.tooltipText || root.icon
+  Accessible.description: root.tooltipText
+  Accessible.onPressAction: root.clicked(width / 2, height / 2)
+
   width: size
   height: size
   radius: height / 2

@@ -14,6 +14,11 @@ Item {
   property bool checked: false
   signal toggled()
 
+  Accessible.role: Accessible.CheckBox
+  Accessible.name: "Toggle"
+  Accessible.checked: root.checked
+  Accessible.onToggleAction: root.toggled()
+
   implicitWidth: 44
   implicitHeight: 24
 

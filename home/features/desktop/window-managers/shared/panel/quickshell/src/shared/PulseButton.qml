@@ -10,6 +10,10 @@ Rectangle {
 
   signal clicked()
 
+  Accessible.role: Accessible.Button
+  Accessible.name: root.icon
+  Accessible.onPressAction: root.clicked()
+
   width: size
   height: size
   radius: size / 2

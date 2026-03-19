@@ -15,6 +15,11 @@ Rectangle {
     property string tooltipShortcut: ""
     signal clicked(real mouseX, real mouseY)
 
+    Accessible.role: Accessible.Button
+    Accessible.name: root.label
+    Accessible.description: root.tooltipText || root.label
+    Accessible.onPressAction: root.clicked(width / 2, height / 2)
+
     readonly property color effectiveColor: danger ? Colors.error : accentColor
 
     width: compact ? actionRow.implicitWidth + Colors.spacingL * 2 : 140

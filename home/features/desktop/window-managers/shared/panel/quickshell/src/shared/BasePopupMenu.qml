@@ -19,8 +19,12 @@ PopupWindow {
   property color surfaceTint: "transparent"
   property int contentSpacing: 14
   property string preferredEdge: "top"
-  property bool focusOnOpen: false
-  property var initialFocusTarget: null
+  property bool focusOnOpen: true
+  // focusTarget: if set, receives focus when the menu opens instead of the surface.
+  // Child menus with a search bar should bind this to their TextInput item.
+  property Item focusTarget: null
+  // Keep old name as an alias for back-compat (both point to the same item).
+  property alias initialFocusTarget: root.focusTarget
 
   // ── Responsive width ──────────────────────────
   property int popupMinWidth: 320
@@ -54,14 +58,14 @@ PopupWindow {
       Qt.callLater(function() {
         if (_destroyed) return;
         if (!root.showContent) return;
-        if (root.initialFocusTarget && root.initialFocusTarget.forceActiveFocus)
-          root.initialFocusTarget.forceActiveFocus();
+        if (root.focusTarget && root.focusTarget.forceActiveFocus)
+          root.focusTarget.forceActiveFocus();
         else if (surface.forceActiveFocus)
           surface.forceActiveFocus();
       });
     } else if (!showContent) {
-      if (root.initialFocusTarget && root.initialFocusTarget.activeFocus)
-        root.initialFocusTarget.focus = false;
+      if (root.focusTarget && root.focusTarget.activeFocus)
+        root.focusTarget.focus = false;
       if (surface.activeFocus)
         surface.focus = false;
     }

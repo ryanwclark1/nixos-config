@@ -13,6 +13,10 @@ Rectangle {
   property bool enabled: true
   signal clicked()
 
+  Accessible.role: Accessible.Button
+  Accessible.name: root.label
+  Accessible.checked: root.selected
+
   implicitWidth: row.implicitWidth + 24
   implicitHeight: 32
   radius: height / 2
