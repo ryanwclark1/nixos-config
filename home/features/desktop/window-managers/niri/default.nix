@@ -167,6 +167,12 @@
           "Mod+Print".action.screenshot-screen = { };
           "Alt+Print".action.screenshot-window = { };
 
+          # Window overview (spatial grid)
+          "Mod+Tab".action.spawn = [ "quickshell" "ipc" "call" "Overview" "toggle" ];
+
+          # Alt-Tab window switcher (MRU cycle)
+          "Alt+Tab".action.spawn = [ "quickshell" "ipc" "call" "AltTab" "toggle" ];
+
           # Power menu
           "Mod+Escape".action.spawn = [ "quickshell" "ipc" "call" "Shell" "toggleSurface" "powerMenu" ];
 
