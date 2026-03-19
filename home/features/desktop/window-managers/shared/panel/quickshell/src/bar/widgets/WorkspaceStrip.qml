@@ -11,8 +11,8 @@ Flow {
   property bool vertical: false
 
   readonly property bool showEmpty: settings.hasOwnProperty("showEmpty") ? settings.showEmpty : Config.workspaceShowEmpty
-  readonly property bool showAddButton: settings.hasOwnProperty("showAddButton") ? settings.showAddButton : Config.workspaceShowAddButton
-  readonly property bool showMiniMap: settings.hasOwnProperty("showMiniMap") ? settings.showMiniMap : Config.workspaceShowMiniMap
+  property bool showAddButton: settings.hasOwnProperty("showAddButton") ? settings.showAddButton : Config.workspaceShowAddButton
+  property bool showMiniMap: settings.hasOwnProperty("showMiniMap") ? settings.showMiniMap : Config.workspaceShowMiniMap
   readonly property bool showNames: settings.hasOwnProperty("showNames") ? settings.showNames : Config.workspaceShowNames
   readonly property bool showAppIcons: settings.hasOwnProperty("showAppIcons") ? settings.showAppIcons : Config.workspaceShowAppIcons
   readonly property bool showWindowCount: settings.hasOwnProperty("showWindowCount") ? settings.showWindowCount : Config.workspaceShowWindowCount
