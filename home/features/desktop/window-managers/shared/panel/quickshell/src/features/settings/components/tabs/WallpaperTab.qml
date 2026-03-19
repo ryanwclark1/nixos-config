@@ -635,6 +635,7 @@ Item {
                     { label: "Dissolve", value: "dissolve" },
                     { label: "Zoom", value: "zoom" },
                     { label: "Radial", value: "radial" },
+                    { label: "Random", value: "random" },
                     { label: "None", value: "none" }
                 ]
             }

@@ -40,6 +40,7 @@ BasePopupMenu {
     // Refresh button
     SharedWidgets.IconButton {
       icon: "󰑐"
+      tooltipText: "Refresh"
       onClicked: PrinterService.refresh()
     }
   ]

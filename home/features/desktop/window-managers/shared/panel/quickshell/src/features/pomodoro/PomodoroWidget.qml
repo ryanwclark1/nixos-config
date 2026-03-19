@@ -155,6 +155,7 @@ Rectangle {
         iconSize: Colors.fontSizeMedium
         iconColor: Colors.textSecondary
         stateColor: Colors.text
+        tooltipText: "Reset timer"
         onClicked: PomodoroService.reset()
       }
 
@@ -167,6 +168,7 @@ Rectangle {
         stateColor: root.lapColor
         normalColor: Colors.withAlpha(root.lapColor, Colors.primaryFaint)
         hoverColor: Colors.withAlpha(root.lapColor, Colors.primarySubtle)
+        tooltipText: PomodoroService.running ? "Pause" : "Start"
         onClicked: PomodoroService.toggle()
       }
 
@@ -177,6 +179,7 @@ Rectangle {
         iconSize: Colors.fontSizeMedium
         iconColor: Colors.textSecondary
         stateColor: Colors.text
+        tooltipText: "Skip"
         onClicked: PomodoroService.skip()
       }
 

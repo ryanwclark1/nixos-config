@@ -133,11 +133,13 @@ BasePopupMenu {
     },
     SharedWidgets.IconButton {
       icon: "󰒓"
+      tooltipText: "Settings"
       onClicked: root.openBarWidgetSettings()
     },
     SharedWidgets.IconButton {
       visible: sshData.enableSshConfigImport
       icon: "󰑐"
+      tooltipText: "Refresh SSH config"
       onClicked: sshData.refreshImport()
     }
   ]

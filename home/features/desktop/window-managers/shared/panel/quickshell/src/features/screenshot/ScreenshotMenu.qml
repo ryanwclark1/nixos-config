@@ -355,6 +355,7 @@ BasePopupMenu {
                 SharedWidgets.IconButton {
                     icon: "󰈙"
                     iconSize: Colors.fontSizeMedium
+                    tooltipText: "Open image"
                     onClicked: Quickshell.execDetached(["xdg-open", modelData.path])
                 }
             }
@@ -370,6 +371,7 @@ BasePopupMenu {
             SharedWidgets.IconButton {
                 icon: "󰉋"
                 iconSize: Colors.fontSizeLarge
+                tooltipText: "Open folder"
                 onClicked: ScreenshotService.openScreenshotsFolder()
             }
         }
