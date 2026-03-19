@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
-import "../models/ModuleUtils.js" as MU
-import "ProcessTableHelpers.js" as PTH
 
 SharedWidgets.CardBase {
     id: root

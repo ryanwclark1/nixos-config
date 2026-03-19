@@ -29,10 +29,11 @@ SharedWidgets.CardBase {
         id: _loadAvgFile
         path: "/proc/loadavg"
         printErrors: false
-        onTextChanged: {
-            var parts = String(this.text || "").trim().split(/\s+/);
+        onLoaded: {
+            var parts = String(this.text() || "").trim().split(/\s+/);
             root.loadAverage = parts.length >= 3 ? parts.slice(0, 3).join(" ") : "--";
         }
+        onFileChanged: this.reload()
     }
 
     Timer {

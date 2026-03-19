@@ -40,19 +40,21 @@ SharedWidgets.CardBase {
     id: nixCacheFile
     path: root.cacheDir + "/nixos"
     watchChanges: true; printErrors: false
-    onTextChanged: root._updateFromCache()
+    onLoaded: root._updateFromCache()
+    onFileChanged: this.reload()
   }
 
   FileView {
     id: flatpakCacheFile
     path: root.cacheDir + "/flatpak"
     watchChanges: true; printErrors: false
-    onTextChanged: root._updateFromCache()
+    onLoaded: root._updateFromCache()
+    onFileChanged: this.reload()
   }
 
   function _updateFromCache() {
-    var nixRaw = (nixCacheFile.text || "").trim();
-    var fpkRaw = (flatpakCacheFile.text || "").trim();
+    var nixRaw = String(nixCacheFile.text() || "").trim();
+    var fpkRaw = String(flatpakCacheFile.text() || "").trim();
     root.nixUpdates = sanitizeCount(nixRaw);
     root.flatpakUpdates = sanitizeCount(fpkRaw);
     if (root.isChecking || root.lastRunFailed) return;
