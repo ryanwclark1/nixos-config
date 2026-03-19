@@ -154,7 +154,7 @@ Flow {
     running: true
     stdout: StdioCollector {
       onStreamFinished: {
-        try { root.iconMap = JSON.parse(this.text || "{}"); } catch(e) { console.warn("Taskbar: icon map parse error:", e) }
+        try { root.iconMap = JSON.parse(this.text || "{}"); } catch(e) { Logger.w("Taskbar", "icon map parse error:", e) }
       }
     }
   }

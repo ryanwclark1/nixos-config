@@ -266,7 +266,7 @@ PanelWindow {
 
                                         onStatusChanged: {
                                             if (status === Loader.Error)
-                                                console.warn("ControlCenter: failed to load control-center plugin widget " + modelData.id + " from " + source);
+                                                Logger.w("ControlCenter", "failed to load control-center plugin widget " + modelData.id + " from " + source);
                                             if (status === Loader.Ready && item) {
                                                 var api = PluginService.getPluginAPI(modelData.id);
                                                 if (api && item.hasOwnProperty("pluginApi"))

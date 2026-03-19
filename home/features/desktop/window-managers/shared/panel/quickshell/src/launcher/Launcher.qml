@@ -1664,7 +1664,7 @@ PanelWindow {
         }, function (errorText, exitCode, _exitStatus) {
             if (!isRequestCurrent(modeKey, token))
                 return;
-            console.warn("Launcher load command failed for", modeKey, "exit", exitCode, errorText || "");
+            Logger.w("Launcher", "load command failed for", modeKey, "exit", exitCode, errorText || "");
             _handleLoadFailure(modeKey, startedAt);
         });
     }
@@ -1691,7 +1691,7 @@ PanelWindow {
             if (!isRequestCurrent("drun", token))
                 return;
             if (errorText) {
-                console.warn("Launcher app catalog load failed:", errorText);
+                Logger.w("Launcher", "app catalog load failed:", errorText);
                 _handleLoadFailure("drun", startedAt);
                 return;
             }
@@ -1788,7 +1788,7 @@ PanelWindow {
             if (!isRequestCurrent("clip", token))
                 return;
             if (errorText) {
-                console.warn("Launcher clipboard load failed:", errorText);
+                Logger.w("Launcher", "clipboard load failed:", errorText);
                 _handleLoadFailure("clip", startedAt);
                 return;
             }
@@ -2373,7 +2373,7 @@ PanelWindow {
                 });
             }
         } catch (e) {
-            console.error("Error loading windows: " + e);
+            Logger.e("Launcher", "Error loading windows:", e);
         }
         // Sort by workspace for grouped display
         items.sort(function(a, b) {

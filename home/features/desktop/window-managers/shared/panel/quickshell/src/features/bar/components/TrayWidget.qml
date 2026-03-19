@@ -73,7 +73,7 @@ Flow {
                   modelData.display(win, Math.round(pos.x), Math.round(pos.y));
                 }
               } catch (e) {
-                console.warn("TrayWidget: failed to display menu:", e);
+                Logger.w("TrayWidget", "failed to display menu:", e);
               }
             } else if (modelData.secondaryActivate) {
               modelData.secondaryActivate();

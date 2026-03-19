@@ -189,7 +189,7 @@ PanelWindow {
             settingsRoot.layoutIsMaster = (layout.str === "master");
           }
         } catch (e) {
-          console.error("Failed to parse window-manager layout settings: " + e);
+          Logger.e("SettingsHub", "Failed to parse window-manager layout settings:", e);
         }
       }
     }

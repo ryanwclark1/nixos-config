@@ -70,9 +70,9 @@ PanelWindow {
         root.saveState();
         return;
       }
-      console.error("Notepad: failed to load file: " + error);
+      Logger.e("Notepad", "failed to load file:", error);
     }
-    onSaveFailed: (error) => console.error("Notepad: failed to save file: " + error)
+    onSaveFailed: (error) => Logger.e("Notepad", "failed to save file:", error)
   }
 
   function load() {

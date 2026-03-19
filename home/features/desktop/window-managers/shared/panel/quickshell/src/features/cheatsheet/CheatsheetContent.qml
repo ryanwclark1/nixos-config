@@ -29,7 +29,7 @@ Item {
         }
         onExited: (exitCode, exitStatus) => {
             if (exitCode !== 0) {
-                console.warn("Cheatsheet: qs-keybinds exited with code", exitCode);
+                Logger.w("Cheatsheet", "qs-keybinds exited with code", exitCode);
                 return;
             }
             var trimmed = root._stdoutBuffer.trim();
@@ -57,7 +57,7 @@ Item {
                     root.keybinds = parsed;
                 }
             } catch (e) {
-                console.warn("Cheatsheet: failed to parse keybinds:", e);
+                Logger.w("Cheatsheet", "failed to parse keybinds:", e);
             }
         }
     }
