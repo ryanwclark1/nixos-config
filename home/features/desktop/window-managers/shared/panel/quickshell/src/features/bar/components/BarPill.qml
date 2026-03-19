@@ -42,6 +42,8 @@ MouseArea {
       var child = contentContainer.children[i];
       if (isOverlayChild(child))
         continue;
+      if (!child.visible)
+        continue;
       maxWidth = Math.max(maxWidth, child.implicitWidth || 0, child.width || 0);
     }
     return maxWidth;
@@ -52,6 +54,8 @@ MouseArea {
     for (var i = 0; i < contentContainer.children.length; ++i) {
       var child = contentContainer.children[i];
       if (isOverlayChild(child))
+        continue;
+      if (!child.visible)
         continue;
       maxHeight = Math.max(maxHeight, child.implicitHeight || 0, child.height || 0);
     }
