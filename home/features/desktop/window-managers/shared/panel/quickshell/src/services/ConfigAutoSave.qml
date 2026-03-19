@@ -440,5 +440,248 @@ QtObject {
         function onWallpaperRecentSolidColorsChanged() {
             root.config.scheduleSave();
         }
+        function onGlassOpacityBaseChanged() {
+            root.config.scheduleSave();
+        }
+        function onGlassOpacitySurfaceChanged() {
+            root.config.scheduleSave();
+        }
+        function onGlassOpacityOverlayChanged() {
+            root.config.scheduleSave();
+        }
+        function onUseDynamicThemingChanged() {
+            root.config.scheduleSave();
+        }
+        function onAutoEcoModeChanged() {
+            root.config.scheduleSave();
+        }
+        function onUiDensityScaleChanged() {
+            root.config.scheduleSave();
+        }
+        function onAnimationSpeedScaleChanged() {
+            root.config.scheduleSave();
+        }
+        function onBackgroundUseShaderVisualizerChanged() {
+            root.config.scheduleSave();
+        }
+        function onPersonalityGifEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onPersonalityGifPathChanged() {
+            root.config.scheduleSave();
+        }
+        function onPersonalityGifReactionModeChanged() {
+            root.config.scheduleSave();
+        }
+        function onBarUseModularEntriesChanged() {
+            root.config.scheduleSave();
+        }
+        function onModelUsageClaudeEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onModelUsageCodexEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onModelUsageGeminiEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onModelUsageActiveProviderChanged() {
+            root.config.scheduleSave();
+        }
+        function onModelUsageBarMetricChanged() {
+            root.config.scheduleSave();
+        }
+        function onModelUsageRefreshSecChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceShowEmptyChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceShowNamesChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspacePillSizeChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceShowAppIconsChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceMaxIconsChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceScrollEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceReverseScrollChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotepadProjectSyncChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceActiveColorChanged() {
+            root.config.scheduleSave();
+        }
+        function onWorkspaceUrgentColorChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifPositionChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifTimeoutLowChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifTimeoutNormalChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifTimeoutCriticalChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifCompactChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifPrivacyModeChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifHistoryEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifHistoryMaxCountChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifHistoryMaxAgeDaysChanged() {
+            root.config.scheduleSave();
+        }
+        function onNotifRulesChanged() {
+            root.config.scheduleSave();
+        }
+        function onPowerAcMonitorTimeoutChanged() {
+            root.config.scheduleSave();
+        }
+        function onPowerAcLockTimeoutChanged() {
+            root.config.scheduleSave();
+        }
+        function onPowerAcSuspendTimeoutChanged() {
+            root.config.scheduleSave();
+        }
+        function onPowerAcSuspendActionChanged() {
+            root.config.scheduleSave();
+        }
+        function onPowerBatMonitorTimeoutChanged() {
+            root.config.scheduleSave();
+        }
+        function onPowerBatLockTimeoutChanged() {
+            root.config.scheduleSave();
+        }
+        function onPowerBatSuspendTimeoutChanged() {
+            root.config.scheduleSave();
+        }
+        function onPowerBatSuspendActionChanged() {
+            root.config.scheduleSave();
+        }
+        function onLauncherCharacterPasteOnSelectChanged() {
+            root.config.scheduleSave();
+        }
+        function onLauncherCharacterTriggerChanged() {
+            root.config.scheduleSave();
+        }
+        function onLauncherFileSearchRootChanged() {
+            root.config.scheduleSave();
+        }
+        function onLauncherFileShowHiddenChanged() {
+            root.config.scheduleSave();
+        }
+        function onLauncherFileOpenerChanged() {
+            root.config.scheduleSave();
+        }
+        function onLauncherWebCustomEnginesChanged() {
+            root.config.scheduleSave();
+        }
+        function onLauncherWebBangsEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onLauncherWebBangsLastSyncChanged() {
+            root.config.scheduleSave();
+        }
+        function onNightLightAutoScheduleChanged() {
+            root.config.scheduleSave();
+        }
+        function onNightLightScheduleModeChanged() {
+            root.config.scheduleSave();
+        }
+        function onNightLightStartHourChanged() {
+            root.config.scheduleSave();
+        }
+        function onNightLightStartMinuteChanged() {
+            root.config.scheduleSave();
+        }
+        function onNightLightEndHourChanged() {
+            root.config.scheduleSave();
+        }
+        function onNightLightEndMinuteChanged() {
+            root.config.scheduleSave();
+        }
+        function onNightLightLatitudeChanged() {
+            root.config.scheduleSave();
+        }
+        function onNightLightLongitudeChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeAutoScheduleEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeAutoScheduleModeChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeDarkNameChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeLightNameChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeDarkHourChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeDarkMinuteChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeLightHourChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeLightMinuteChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeAutoLatitudeChanged() {
+            root.config.scheduleSave();
+        }
+        function onThemeAutoLongitudeChanged() {
+            root.config.scheduleSave();
+        }
+        function onMarketTickersChanged() {
+            root.config.scheduleSave();
+        }
+        function onAudioPinnedOutputsChanged() {
+            root.config.scheduleSave();
+        }
+        function onAudioPinnedInputsChanged() {
+            root.config.scheduleSave();
+        }
+        function onAudioHiddenOutputsChanged() {
+            root.config.scheduleSave();
+        }
+        function onAudioHiddenInputsChanged() {
+            root.config.scheduleSave();
+        }
+        function onDisplayProfilesChanged() {
+            root.config.scheduleSave();
+        }
+        function onDisplayAutoProfileChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallpaperTransitionTypeChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallpaperUseShellRendererChanged() {
+            root.config.scheduleSave();
+        }
     }
 }
