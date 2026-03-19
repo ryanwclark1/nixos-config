@@ -55,6 +55,9 @@ PanelWindow {
     readonly property bool webHintCompact: usableWidth < 760 || usableHeight < 560
     readonly property bool diagnosticMinimalShell: Quickshell.env("QS_VERIFY_LAUNCHER_MINIMAL") === "1"
     readonly property bool diagnosticDisableFilePreview: diagnosticMinimalShell || Quickshell.env("QS_VERIFY_LAUNCHER_DISABLE_FILE_PREVIEW") === "1"
+    // File preview remains opt-in until the Qt 6.10 layout/restart issue is fully root-caused.
+    readonly property bool filePreviewSupported: Quickshell.env("QS_ENABLE_UNSTABLE_LAUNCHER_FILE_PREVIEW") === "1"
+    readonly property bool filePreviewRuntimeEnabled: filePreviewSupported && !diagnosticDisableFilePreview
 
     anchors {
         top: true
@@ -194,7 +197,7 @@ PanelWindow {
     property var fileIndexBuiltAt: 0
     property var _gitTrackedSet: ({})
     property bool _gitIndexReady: false
-    property bool filePreviewVisible: !diagnosticDisableFilePreview && Config.launcherFilePreviewEnabled
+    property bool filePreviewVisible: filePreviewRuntimeEnabled && Config.launcherFilePreviewEnabled
     property string transientNoticeText: ""
     property bool sidebarOverflowExpanded: false
     property bool shortcutHelpExpanded: false
@@ -488,7 +491,9 @@ PanelWindow {
         var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";
         var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded))) ? "Esc: reset/close" : "Esc: close";
         if (mode === "files")
-            return resultHint + "Alt+P: " + (filePreviewVisible ? "hide" : "show") + " preview • " + clearHint + "Enter: open • " + escapeHint;
+            return filePreviewRuntimeEnabled
+                ? (resultHint + "Alt+P: " + (filePreviewVisible ? "hide" : "show") + " preview • " + clearHint + "Enter: open • " + escapeHint)
+                : (resultHint + clearHint + "Enter: open • " + escapeHint);
         if (mode === "emoji")
             return resultHint + clearHint + (Config.launcherCharacterPasteOnSelect ? "Enter: copy+paste • Shift+Enter: paste • " : "Enter: copy • Shift+Enter: paste • ") + escapeHint;
         if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryOptions.length > 1)
@@ -3051,7 +3056,7 @@ PanelWindow {
     }
 
     function toggleFilePreview() {
-        if (diagnosticDisableFilePreview) {
+        if (!filePreviewRuntimeEnabled) {
             filePreviewVisible = false;
             return false;
         }

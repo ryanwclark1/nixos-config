@@ -178,29 +178,29 @@ Rectangle {
 
     // Apply basic syntax highlighting to content
     function _highlightContent(content, ext) {
+        var source = String(content || "");
         var lang = _langMap[(ext || "").toLowerCase()] || "";
-        if (!lang || lang === "md") return _escapeHtml(content);
+        if (!lang || lang === "md") return _escapeHtml(source);
 
         var kws = _keywords[lang] || [];
-        if (kws.length === 0) return _escapeHtml(content);
+        if (kws.length === 0) return _escapeHtml(source);
 
         var kwSet = {};
         for (var k = 0; k < kws.length; k++) kwSet[kws[k]] = true;
 
-        var lines = content.split("\n");
+        var lines = source.split("\n");
         var result = [];
         var commentColor = Colors.textDisabled;
-        var stringColor = Colors.withAlpha(Colors.success || Colors.primary, 1.0);
         var keywordColor = Colors.primary;
         var numberColor = Colors.warning || Colors.primary;
 
         for (var li = 0; li < lines.length; li++) {
-            var line = lines[li];
+            var line = String(lines[li] || "");
             var escaped = _escapeHtml(line);
 
             // Comment detection (single-line)
-            var trimmed = line.trimStart();
-            if (trimmed.startsWith("//") || trimmed.startsWith("#") || trimmed.startsWith("--")) {
+            var trimmed = line.replace(/^\s+/, "");
+            if (trimmed.indexOf("//") === 0 || trimmed.indexOf("#") === 0 || trimmed.indexOf("--") === 0) {
                 result.push("<font color=\"" + commentColor + "\">" + escaped + "</font>");
                 continue;
             }
@@ -347,62 +347,51 @@ Rectangle {
             Layout.fillHeight: true
 
             // 0: Text preview with line numbers
-            Flickable {
-                id: previewFlickable
+            Item {
                 anchors.fill: parent
                 visible: root._currentType === 0
                 clip: true
-                boundsBehavior: Flickable.StopAtBounds
-                contentWidth: width
-                contentHeight: previewContent.implicitHeight
 
-                Item {
-                    id: previewContent
-                    width: previewFlickable.width
-                    implicitHeight: Math.max(lineNumbers.paintedHeight, previewText.paintedHeight)
+                Row {
+                    anchors.fill: parent
+                    spacing: Colors.spacingXS
 
-                    Row {
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        width: parent.width
-                        height: parent.implicitHeight
-                        spacing: Colors.spacingXS
-
-                        Text {
-                            id: lineNumbers
-                            text: root._lineNumbers(root._currentContent)
-                            color: Colors.withAlpha(Colors.textDisabled, 0.5)
-                            font.pixelSize: Colors.fontSizeXXS
-                            font.family: Colors.fontMono
-                            lineHeight: 1.3
-                            horizontalAlignment: Text.AlignRight
-                            width: {
-                                var count = (root._currentContent || "").split("\n").length;
-                                return count > 99 ? 24 : count > 9 ? 18 : 12;
-                            }
+                    Text {
+                        id: lineNumbers
+                        text: root._lineNumbers(root._currentContent)
+                        color: Colors.withAlpha(Colors.textDisabled, 0.5)
+                        font.pixelSize: Colors.fontSizeXXS
+                        font.family: Colors.fontMono
+                        lineHeight: 1.3
+                        horizontalAlignment: Text.AlignRight
+                        verticalAlignment: Text.AlignTop
+                        width: {
+                            var count = (root._currentContent || "").split("\n").length;
+                            return count > 99 ? 24 : count > 9 ? 18 : 12;
                         }
+                    }
 
-                        Rectangle {
-                            id: gutterSeparator
-                            width: 1
-                            height: parent.height
-                            color: Colors.withAlpha(Colors.border, 0.15)
-                        }
+                    Rectangle {
+                        id: gutterSeparator
+                        width: 1
+                        height: parent.height
+                        color: Colors.withAlpha(Colors.border, 0.15)
+                    }
 
-                        Text {
-                            id: previewText
-                            width: Math.max(0, previewContent.width - lineNumbers.width - gutterSeparator.width - (Colors.spacingXS * 2))
-                            text: root._highlightContent(
-                                root._currentContent,
-                                root.selectedItem ? (root.selectedItem.extension || "") : ""
-                            )
-                            textFormat: Text.RichText
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXXS
-                            font.family: Colors.fontMono
-                            wrapMode: Text.WrapAnywhere
-                            lineHeight: 1.3
-                        }
+                    Text {
+                        id: previewText
+                        width: Math.max(0, parent.width - lineNumbers.width - gutterSeparator.width - (Colors.spacingXS * 2))
+                        text: root._highlightContent(
+                            root._currentContent,
+                            root.selectedItem ? (root.selectedItem.extension || "") : ""
+                        )
+                        textFormat: Text.RichText
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeXXS
+                        font.family: Colors.fontMono
+                        wrapMode: Text.WrapAnywhere
+                        lineHeight: 1.3
+                        verticalAlignment: Text.AlignTop
                     }
                 }
             }
