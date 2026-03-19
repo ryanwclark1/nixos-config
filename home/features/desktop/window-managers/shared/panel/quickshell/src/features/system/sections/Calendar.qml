@@ -118,7 +118,7 @@ Rectangle {
         Rectangle {
           anchors.fill: parent; radius: Colors.radiusSmall
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
-          Behavior on color { CAnim {} }
+          Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
         Text {
           anchors.centerIn: parent
@@ -165,7 +165,7 @@ Rectangle {
           color: parent.containsMouse ? Colors.primary : Colors.highlightLight
           border.color: Colors.primary
           border.width: 1
-          Behavior on color { CAnim {} }
+          Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
 
         Text {
@@ -175,7 +175,7 @@ Rectangle {
           color: parent.containsMouse ? Colors.background : Colors.primary
           font.pixelSize: Colors.fontSizeXS
           font.weight: Font.Bold
-          Behavior on color { CAnim {} }
+          Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
       }
 
@@ -187,7 +187,7 @@ Rectangle {
         Rectangle {
           anchors.fill: parent; radius: Colors.radiusSmall
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
-          Behavior on color { CAnim {} }
+          Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
         Text {
           anchors.centerIn: parent
@@ -242,7 +242,7 @@ Rectangle {
               : dayMouse.containsMouse && modelData.currentMonth ? Colors.highlightLight
               : "transparent"
             radius: width / 2
-            Behavior on color { CAnim {} }
+            Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
             Text {
               anchors.centerIn: parent

@@ -262,10 +262,12 @@ SharedWidgets.CardBase {
                     border.width: 1
 
                     Behavior on color {
+                        enabled: !Colors.isTransitioning
                         CAnim {}
                     }
 
                     Behavior on border.color {
+                        enabled: !Colors.isTransitioning
                         CAnim {}
                     }
 

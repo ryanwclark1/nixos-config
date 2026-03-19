@@ -18,7 +18,7 @@ Rectangle {
   clip: true
   scale: cardHover.hovered ? 1.01 : 1.0
   Behavior on scale { NumberAnimation { id: mediaScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
-  Behavior on border.color { CAnim {} }
+  Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
   layer.enabled: mediaScaleAnim.running
 
   gradient: SharedWidgets.SurfaceGradient {}
@@ -191,7 +191,7 @@ Rectangle {
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeXL
                 anchors.centerIn: parent
-                Behavior on color { CAnim {} }
+                Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               }
               onClicked: modelData.previous()
             }
@@ -208,14 +208,14 @@ Rectangle {
                 color: playBtn.containsMouse ? Colors.primary : Colors.cardSurface
                 border.color: playBtn.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
-                Behavior on color { CAnim {} }
+                Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                 Text { 
                   text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
                   color: playBtn.containsMouse ? Colors.background : Colors.text
                   font.family: Colors.fontMono
                   font.pixelSize: Colors.fontSizeLarge
                   anchors.centerIn: parent
-                  Behavior on color { CAnim {} }
+                  Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                 }
               }
               onClicked: modelData.playPause()
@@ -233,7 +233,7 @@ Rectangle {
                 font.family: Colors.fontMono
                 font.pixelSize: Colors.fontSizeXL
                 anchors.centerIn: parent
-                Behavior on color { CAnim {} }
+                Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               }
               onClicked: modelData.next()
             }

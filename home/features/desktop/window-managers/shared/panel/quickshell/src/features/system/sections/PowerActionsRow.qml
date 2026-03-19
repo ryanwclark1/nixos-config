@@ -48,7 +48,7 @@ RowLayout {
       radius: Colors.radiusXS
       border.color: Colors.border
       border.width: 1
-      Behavior on color { CAnim {} }
+      Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
       // Inner highlight border
       SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }

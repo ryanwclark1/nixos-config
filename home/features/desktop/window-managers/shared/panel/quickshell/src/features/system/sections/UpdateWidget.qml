@@ -148,7 +148,7 @@ SharedWidgets.CardBase {
         color: root.isChecking ? Colors.cardSurface : Colors.primaryMid
         border.color: root.isChecking ? Colors.border : Colors.primary
         border.width: 1
-        Behavior on color { CAnim {} }
+        Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         scale: refreshHover.pressed ? 0.96 : 1.0
         Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
 

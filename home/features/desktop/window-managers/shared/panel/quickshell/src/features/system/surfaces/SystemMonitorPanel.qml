@@ -201,6 +201,7 @@ PanelWindow {
                 }
             }
             Behavior on color {
+                enabled: !Colors.isTransitioning
                 CAnim {}
             }
 

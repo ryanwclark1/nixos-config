@@ -73,7 +73,7 @@ SharedWidgets.CardBase {
           border.width: 1
           radius: Colors.radiusXXS
           implicitHeight: scratchRow.implicitHeight + Colors.paddingSmall * 2
-          Behavior on color { CAnim {} }
+          Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
           SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: scratchHover.containsMouse }
 

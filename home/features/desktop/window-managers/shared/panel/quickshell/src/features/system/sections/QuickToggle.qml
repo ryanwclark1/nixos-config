@@ -39,8 +39,8 @@ Rectangle {
   opacity: enabled ? 1.0 : 0.4
   scale: toggleMouse.pressed ? 0.96 : 1.0
   Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
-  Behavior on color { CAnim {} }
-  Behavior on border.color { CAnim {} }
+  Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+  Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
   RowLayout {
     anchors.fill: parent

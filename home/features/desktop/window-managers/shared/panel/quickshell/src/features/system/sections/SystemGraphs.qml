@@ -15,7 +15,7 @@ Rectangle {
   clip: true
   scale: sysCardHover.hovered ? 1.01 : 1.0
   Behavior on scale { NumberAnimation { id: sysScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
-  Behavior on border.color { CAnim {} }
+  Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
   layer.enabled: sysScaleAnim.running
 
   HoverHandler { id: sysCardHover }
