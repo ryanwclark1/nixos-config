@@ -12,18 +12,6 @@ GridLayout {
 
   property var manager: null
   property bool showContent: false
-  property int baseIndex: 2
-  property int staggerDelay: 35
-
-  opacity: showContent ? 1.0 : 0.0
-  scale: showContent ? 1.0 : 0.96
-  transform: Translate { y: showContent ? 0 : 8 }
-  visible: opacity > 0
-
-  Behavior on opacity { SequentialAnimation { id: toggleFadeAnim; PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
-  Behavior on scale { SequentialAnimation { id: toggleScaleAnim; PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutBack } } }
-  Behavior on transform { SequentialAnimation { PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
-  layer.enabled: toggleFadeAnim.running || toggleScaleAnim.running
 
   Repeater {
     model: ControlCenterRegistry.visibleQuickToggleItems

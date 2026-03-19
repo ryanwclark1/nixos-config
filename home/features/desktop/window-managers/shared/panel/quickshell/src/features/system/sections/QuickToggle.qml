@@ -80,6 +80,16 @@ Rectangle {
         font.pixelSize: Colors.fontSizeXS
       }
     }
+
+    // Drag Handle
+    Text {
+      text: "󰐚"
+      color: active ? Colors.withAlpha(Colors.text, 0.4) : Colors.textDisabled
+      font.family: Colors.fontMono
+      font.pixelSize: Colors.fontSizeSmall
+      opacity: toggleMouse.containsMouse ? 1.0 : 0.0
+      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+    }
   }
 
   SharedWidgets.StateLayer {
