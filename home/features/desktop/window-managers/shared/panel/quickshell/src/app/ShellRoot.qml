@@ -177,10 +177,28 @@ Scope {
         onActivated: root.toggleSurface("notifCenter")
     }
 
-    // Ensure ThemeService and HookService initialize early
+    // Marks true ~100ms after startup so lazy-loaded panels can gate on it
+    property bool startupComplete: false
+
+    Timer {
+        id: startupTimer
+        interval: 100
+        running: true
+        onTriggered: root.startupComplete = true
+    }
+
+    // Ensure ThemeService and HookService initialize early, then defer
+    // non-critical service init until after the first frame.
     Component.onCompleted: {
         void ThemeService.activeThemeId;
         void HookService;
+        Qt.callLater(function() {
+            // Force-init deferred services by reading a property
+            var _ = WeatherService.subscriberCount;
+            _ = TodoService.totalCount;
+            _ = PomodoroService.progress;
+            _ = GameModeService.gameRunning;
+        });
     }
 
     NotificationManager {
