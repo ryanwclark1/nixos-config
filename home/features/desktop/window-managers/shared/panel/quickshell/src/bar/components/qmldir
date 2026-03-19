@@ -5,8 +5,10 @@ IdleInhibitorBarWidget 1.0 IdleInhibitorBarWidget.qml
 WeatherBarWidget 1.0 WeatherBarWidget.qml
 VpnBarWidget 1.0 VpnBarWidget.qml
 BluetoothBarWidget 1.0 BluetoothBarWidget.qml
+MarketBarWidget 1.0 MarketBarWidget.qml
 MusicBarWidget 1.0 MusicBarWidget.qml
 PrivacyBarWidget 1.0 PrivacyBarWidget.qml
 RecordingBarWidget 1.0 RecordingBarWidget.qml
 PrinterBarWidget 1.0 PrinterBarWidget.qml
 NotificationsBarWidget 1.0 NotificationsBarWidget.qml
+VoxtypeBarWidget 1.0 VoxtypeBarWidget.qml
