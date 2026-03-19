@@ -36,11 +36,13 @@ Rectangle {
     z: 10
   }
 
-  SharedWidgets.SurfaceGradient {
+  Rectangle {
     anchors.right: parent.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     width: 12
+    color: "transparent"
+    gradient: SharedWidgets.SurfaceGradient {}
     rotation: 90
     opacity: 0.15
     visible: !root.compactMode
