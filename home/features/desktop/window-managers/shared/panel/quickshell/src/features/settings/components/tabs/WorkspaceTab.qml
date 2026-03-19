@@ -4,166 +4,205 @@ import ".."
 
 Item {
     id: root
+
+    property bool compactMode: false
     property var settingsRoot: null
     property string tabId: ""
-    property bool compactMode: false
     property bool tightSpacing: false
 
     SettingsTabPage {
         anchors.fill: parent
+        iconName: "󰕮"
         tabId: root.tabId
         title: "Workspaces"
-        iconName: "󰕮"
 
         SettingsCard {
-            title: "Workspace Display"
-            iconName: "󰕮"
             description: "Control which workspaces are shown and how they appear."
+            iconName: "󰕮"
+            title: "Workspace Display"
 
             SettingsToggleRow {
-                label: "Show Empty Workspaces"
-                icon: "󱗝"
                 checked: Config.workspaceShowEmpty
+                icon: "󱗝"
+                label: "Show Empty Workspaces"
+
                 onToggled: Config.workspaceShowEmpty = !Config.workspaceShowEmpty
             }
-
             SettingsToggleRow {
-                label: "Show Workspace Names"
-                icon: "󰑭"
                 checked: Config.workspaceShowNames
+                icon: "󰑭"
+                label: "Show Workspace Names"
+
                 onToggled: Config.workspaceShowNames = !Config.workspaceShowNames
             }
-
             SettingsToggleRow {
-                label: "Show Window Count"
-                icon: "󰇄"
                 checked: Config.workspaceShowWindowCount
+                icon: "󰇄"
+                label: "Show Window Count"
+
                 onToggled: Config.workspaceShowWindowCount = !Config.workspaceShowWindowCount
             }
-
             SettingsModeRow {
-                label: "Layout"
                 currentValue: Config.workspaceLayout
+                label: "Layout"
                 options: [
-                    { value: "horizontal", label: "Horizontal" },
-                    { value: "vertical",   label: "Vertical"   },
-                    { value: "grid",       label: "Grid"       }
+                    {
+                        value: "horizontal",
+                        label: "Horizontal"
+                    },
+                    {
+                        value: "vertical",
+                        label: "Vertical"
+                    },
+                    {
+                        value: "grid",
+                        label: "Grid"
+                    }
                 ]
+
                 onModeSelected: value => Config.workspaceLayout = value
             }
-
             SettingsModeRow {
-                label: "Visual Style"                currentValue: Config.workspaceStyle
+                currentValue: Config.workspaceStyle
+                label: "Visual Style"
                 options: [
-                    { value: "pill",  label: "Pill"  },
-                    { value: "strip", label: "Strip" },
-                    { value: "dots",  label: "Dots"  },
-                    { value: "icons", label: "Icons" }
+                    {
+                        value: "pill",
+                        label: "Pill"
+                    },
+                    {
+                        value: "strip",
+                        label: "Strip"
+                    },
+                    {
+                        value: "dots",
+                        label: "Dots"
+                    },
+                    {
+                        value: "icons",
+                        label: "Icons"
+                    }
                 ]
+
                 onModeSelected: value => Config.workspaceStyle = value
             }
-
             SettingsModeRow {
-                label: "Pill Size"
                 currentValue: Config.workspacePillSize
+                label: "Pill Size"
                 options: [
-                    { value: "compact", label: "Compact" },
-                    { value: "normal",  label: "Normal"  },
-                    { value: "large",   label: "Large"   }
+                    {
+                        value: "compact",
+                        label: "Compact"
+                    },
+                    {
+                        value: "normal",
+                        label: "Normal"
+                    },
+                    {
+                        value: "large",
+                        label: "Large"
+                    }
                 ]
+
                 onModeSelected: value => Config.workspacePillSize = value
             }
         }
-
         SettingsCard {
-            title: "App Icons"
-            iconName: "󰀻"
             description: "Show application icons inside workspace pills."
+            iconName: "󰀻"
+            title: "App Icons"
 
             SettingsToggleRow {
-                label: "Show App Icons"
-                icon: "󰀻"
                 checked: Config.workspaceShowAppIcons
+                icon: "󰀻"
+                label: "Show App Icons"
+
                 onToggled: Config.workspaceShowAppIcons = !Config.workspaceShowAppIcons
             }
-
             SettingsSliderRow {
-                visible: Config.workspaceShowAppIcons
                 label: "Max Icons Per Pill"
-                min: 1
                 max: 6
-                value: Config.workspaceMaxIcons
+                min: 1
                 step: 1
+                value: Config.workspaceMaxIcons
+                visible: Config.workspaceShowAppIcons
+
                 onMoved: v => Config.workspaceMaxIcons = v
             }
         }
-
         SettingsCard {
-            title: "Scroll Behavior"
-            iconName: "󰍽"
             description: "Mouse wheel workspace switching on the workspace strip."
+            iconName: "󰍽"
+            title: "Scroll Behavior"
 
             SettingsToggleRow {
-                label: "Scroll to Switch"
-                icon: "󰍽"
                 checked: Config.workspaceScrollEnabled
+                icon: "󰍽"
+                label: "Scroll to Switch"
+
                 onToggled: Config.workspaceScrollEnabled = !Config.workspaceScrollEnabled
             }
-
             SettingsToggleRow {
-                visible: Config.workspaceScrollEnabled
-                label: "Reverse Scroll Direction"
-                icon: "󰁝"
                 checked: Config.workspaceReverseScroll
+                icon: "󰁝"
+                label: "Reverse Scroll Direction"
+                visible: Config.workspaceScrollEnabled
+
                 onToggled: Config.workspaceReverseScroll = !Config.workspaceReverseScroll
             }
         }
-
         SettingsCard {
-            title: "Notepad"
-            iconName: "󱓧"
             description: "Notepad integration with workspaces."
+            iconName: "󱓧"
+            title: "Notepad"
 
             SettingsToggleRow {
-                label: "Auto-Switch Tabs by Workspace"
-                icon: "󰓹"
                 checked: Config.notepadProjectSync
+                icon: "󰓹"
+                label: "Auto-Switch Tabs by Workspace"
+
                 onToggled: Config.notepadProjectSync = !Config.notepadProjectSync
             }
         }
-
         SettingsCard {
-            title: "Colors"
-            iconName: "󰏘"
             description: "Custom colors for workspace pills. Leave empty to use theme defaults."
+            iconName: "󰏘"
+            title: "Colors"
 
             SettingsColorRow {
-                label: "Active Color"
-                icon: "󰸌"
                 currentValue: Config.workspaceActiveColor
+                icon: "󰸌"
+                label: "Active Color"
+
                 onColorSelected: v => Config.workspaceActiveColor = v
             }
-
             SettingsColorRow {
-                label: "Urgent Color"
-                icon: "󰀦"
                 currentValue: Config.workspaceUrgentColor
+                icon: "󰀦"
+                label: "Urgent Color"
+
                 onColorSelected: v => Config.workspaceUrgentColor = v
             }
         }
-
         SettingsCard {
-            title: "Advanced Interaction"
-            iconName: "󰒔"
             description: "Customize how you interact with workspaces."
+            iconName: "󰒔"
+            title: "Advanced Interaction"
 
             SettingsModeRow {
-                label: "Click Behavior"
                 currentValue: Config.workspaceClickBehavior
+                label: "Click Behavior"
                 options: [
-                    { value: "focus",       label: "Focus Workspace" },
-                    { value: "last_window", label: "Last Active Window" }
+                    {
+                        value: "focus",
+                        label: "Focus Workspace"
+                    },
+                    {
+                        value: "last_window",
+                        label: "Last Active Window"
+                    }
                 ]
+
                 onModeSelected: value => Config.workspaceClickBehavior = value
             }
         }
