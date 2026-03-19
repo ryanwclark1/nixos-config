@@ -1,12 +1,13 @@
 {
   inputs,
+  lib,
   pkgs,
   ...
 }:
 
 {
   services.hyprpolkitagent = {
-    enable = true;
+    enable = lib.mkDefault true;
     package = inputs.hyprpolkitagent.packages.${pkgs.stdenv.hostPlatform.system}.default;
   };
 

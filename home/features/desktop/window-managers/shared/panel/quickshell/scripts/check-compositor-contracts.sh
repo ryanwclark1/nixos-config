@@ -50,7 +50,7 @@ require_literal "$adapter_qml" 'function windowIdentifier(windowRef) {' "window 
 require_literal "$adapter_qml" 'function windowAppId(windowRef) {' "window app id helper"
 require_literal "$adapter_qml" 'function sameWindow(left, right) {' "stable window comparison helper"
 require_literal "$adapter_qml" 'function logActiveWindowSourceTransition() {' "active window source transition tracker"
-require_literal "$adapter_qml" 'function reportHyprctlFailureState(state, details) {' "Hyprland failure-state logger"
+require_literal "$adapter_qml" 'function workspaceNameById(wsId) {' "compositor-agnostic workspace name lookup"
 
 require_literal "$title_qml" 'readonly property string activeTitle: CompositorAdapter.activeWindowTitle || ""' "window title widget uses normalized title"
 require_literal "$title_qml" 'readonly property string activeAppId: CompositorAdapter.activeWindowAppId || ""' "window title widget uses normalized app id"
