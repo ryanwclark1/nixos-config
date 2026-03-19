@@ -37,6 +37,7 @@ PanelWindow {
   WlrLayershell.keyboardFocus: (isOpen && !interactionBlocked) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
   WlrLayershell.namespace: "quickshell-settings"
 
+  property bool _destroyed: false
   property bool isOpen: false
   property bool interactionBlocked: false
   property string currentTabId: _persist.currentTabId
@@ -127,16 +128,19 @@ PanelWindow {
     }
   }
 
+  Component.onDestruction: _destroyed = true
+
   IpcHandler {
     target: "SettingsHub"
     function toggle() {
-      Qt.callLater(() => settingsRoot.toggle());
+      Qt.callLater(() => { if (settingsRoot._destroyed) return; settingsRoot.toggle(); });
     }
     function open() {
-      Qt.callLater(() => settingsRoot.open());
+      Qt.callLater(() => { if (settingsRoot._destroyed) return; settingsRoot.open(); });
     }
     function openTab(tabId: string) {
       Qt.callLater(() => {
+        if (settingsRoot._destroyed) return;
         settingsRoot.pendingTabId = tabId;
         settingsRoot.setCaptureScrollY(0);
         deferredOpenTimer.restart();
@@ -147,6 +151,7 @@ PanelWindow {
     }
     function openBarWidgetInstance(instanceId: string) {
       Qt.callLater(() => {
+        if (settingsRoot._destroyed) return;
         var target = Config.findBarWidgetInstance(instanceId);
         settingsRoot.pendingBarWidgetTarget = target ? JSON.parse(JSON.stringify(target)) : null;
         settingsRoot.pendingTabId = "bar-widgets";
@@ -155,7 +160,7 @@ PanelWindow {
       });
     }
     function close() {
-      Qt.callLater(() => settingsRoot.close());
+      Qt.callLater(() => { if (settingsRoot._destroyed) return; settingsRoot.close(); });
     }
   }
 

@@ -6,6 +6,7 @@ import ".."
 
 Item {
     id: root
+    property bool _destroyed: false
     property var settingsRoot: null
     property string tabId: ""
     property bool compactMode: false
@@ -62,19 +63,19 @@ Item {
             if (pluginSettingsLoader)
                 pluginSettingsLoader.source = "";
         }
-        Qt.callLater(refreshEditingWidgetState);
+        Qt.callLater(function() { if (_destroyed) return; refreshEditingWidgetState(); });
     }
     onEditingPluginIdChanged: {
         if (widgetSettingsOpen)
-            Qt.callLater(loadPluginSettingsPane);
+            Qt.callLater(function() { if (_destroyed) return; loadPluginSettingsPane(); });
     }
-    onSettingsSectionChanged: Qt.callLater(refreshEditingWidgetState)
-    onSettingsInstanceIdChanged: Qt.callLater(refreshEditingWidgetState)
+    onSettingsSectionChanged: Qt.callLater(function() { if (_destroyed) return; refreshEditingWidgetState(); })
+    onSettingsInstanceIdChanged: Qt.callLater(function() { if (_destroyed) return; refreshEditingWidgetState(); })
 
     Connections {
         target: Config
         function onBarConfigsChanged() {
-            Qt.callLater(root.refreshEditingWidgetState);
+            Qt.callLater(function() { if (root._destroyed) return; root.refreshEditingWidgetState(); });
         }
     }
 
@@ -145,7 +146,7 @@ Item {
         widgetSettingsOpen = true;
         settingsRoot.pendingBarWidgetTarget = null;
         applyingPendingBarWidgetTarget = false;
-        Qt.callLater(loadPluginSettingsPane);
+        Qt.callLater(function() { if (_destroyed) return; loadPluginSettingsPane(); });
         return true;
     }
 
@@ -169,14 +170,15 @@ Item {
         settingsInstanceId = instanceId;
         pluginSettingsError = "";
         widgetSettingsOpen = true;
-        Qt.callLater(refreshEditingWidgetState);
-        Qt.callLater(loadPluginSettingsPane);
+        Qt.callLater(function() { if (_destroyed) return; refreshEditingWidgetState(); });
+        Qt.callLater(function() { if (_destroyed) return; loadPluginSettingsPane(); });
     }
 
     Component.onCompleted: queuePendingBarWidgetTarget()
+    Component.onDestruction: _destroyed = true
     onSettingsRootChanged: queuePendingBarWidgetTarget()
     onSelectedBarChanged: {
-        Qt.callLater(refreshEditingWidgetState);
+        Qt.callLater(function() { if (_destroyed) return; refreshEditingWidgetState(); });
         if (settingsRoot && settingsRoot.pendingBarWidgetTarget)
             queuePendingBarWidgetTarget();
     }

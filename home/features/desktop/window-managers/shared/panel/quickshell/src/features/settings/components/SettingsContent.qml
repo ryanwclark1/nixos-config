@@ -9,6 +9,7 @@ import "."
 Item {
   id: root
 
+  property bool _destroyed: false
   property string currentTabId: SettingsRegistry.defaultTabId
   property var settingsRoot: null
   property string searchQuery: ""
@@ -58,7 +59,7 @@ Item {
       item.compactMode = root.compactMode;
     if (item.tightSpacing !== undefined)
       item.tightSpacing = root.tightSpacing;
-    Qt.callLater(root.applyRequestedScroll);
+    Qt.callLater(function() { if (_destroyed) return; root.applyRequestedScroll(); });
   }
 
   ColumnLayout {
@@ -275,11 +276,12 @@ Item {
     }
   }
 
+  Component.onDestruction: _destroyed = true
   onSettingsRootChanged: root.applyLayoutProps(tabLoader.item)
   onCurrentTabIdChanged: root.applyLayoutProps(tabLoader.item)
   onCompactModeChanged: root.applyLayoutProps(tabLoader.item)
   onTightSpacingChanged: root.applyLayoutProps(tabLoader.item)
-  onRequestedScrollYChanged: Qt.callLater(root.applyRequestedScroll)
+  onRequestedScrollYChanged: Qt.callLater(function() { if (_destroyed) return; root.applyRequestedScroll(); })
   onSearchQueryChanged: {
     if (compactSearchInput.text !== searchQuery)
       compactSearchInput.text = searchQuery;
