@@ -31,5 +31,6 @@ describe("ShellLauncherSection contract", () => {
 
     expect(source).toContain("SettingsCard {");
     expect(source).not.toContain("LauncherSettingsPanel {");
+    expect(source).not.toContain("LauncherSettingsHero {");
   });
 });

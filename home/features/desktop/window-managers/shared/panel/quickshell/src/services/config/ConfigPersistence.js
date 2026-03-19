@@ -2,11 +2,25 @@
 
 var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
 
-var CURRENT_VERSION = 2;
+var CURRENT_VERSION = 3;
 
 var _EXTRA_SECTION_KEYS = {
     controlCenter: {
         width: true
+    },
+    power: {
+        acMonitorTimeout: true,
+        acLockTimeout: true,
+        acSuspendTimeout: true,
+        acSuspendAction: true,
+        batMonitorTimeout: true,
+        batLockTimeout: true,
+        batSuspendTimeout: true,
+        batSuspendAction: true
+    },
+    glass: {
+        opacity: true,
+        settingsSurfaceOpacity: true
     }
 };
 
@@ -35,6 +49,23 @@ var _MIGRATIONS = [
             data.wallpaper.transitionDuration = 1500;
         if (data.wallpaper.useShellRenderer === undefined)
             data.wallpaper.useShellRenderer = false;
+    },
+    // v2 → v3: Drop legacy idle-timeout power keys and dead opacity keys.
+    function(data) {
+        if (data.power && typeof data.power === "object") {
+            delete data.power.acMonitorTimeout;
+            delete data.power.acLockTimeout;
+            delete data.power.acSuspendTimeout;
+            delete data.power.acSuspendAction;
+            delete data.power.batMonitorTimeout;
+            delete data.power.batLockTimeout;
+            delete data.power.batSuspendTimeout;
+            delete data.power.batSuspendAction;
+        }
+        if (data.glass && typeof data.glass === "object") {
+            delete data.glass.opacity;
+            delete data.glass.settingsSurfaceOpacity;
+        }
     }
 ];
 
@@ -153,12 +184,10 @@ var _MAPS = {
     ],
     glass: [
         ["blur", "blurEnabled"],
-        ["opacity", "glassOpacity"],
         ["opacityBase", "glassOpacityBase"],
         ["opacitySurface", "glassOpacitySurface"],
         ["opacityOverlay", "glassOpacityOverlay"],
         ["settingsBackdropOpacity", "settingsBackdropOpacity"],
-        ["settingsSurfaceOpacity", "settingsSurfaceOpacity"],
         ["autoTransparency", "autoTransparency"]
     ],
     notifications: [
@@ -295,14 +324,6 @@ var _MAPS = {
         ["longitude", "nightLightLongitude", _str]
     ],
     power: [
-        ["acMonitorTimeout", "powerAcMonitorTimeout"],
-        ["acLockTimeout", "powerAcLockTimeout"],
-        ["acSuspendTimeout", "powerAcSuspendTimeout"],
-        ["acSuspendAction", "powerAcSuspendAction"],
-        ["batMonitorTimeout", "powerBatMonitorTimeout"],
-        ["batLockTimeout", "powerBatLockTimeout"],
-        ["batSuspendTimeout", "powerBatSuspendTimeout"],
-        ["batSuspendAction", "powerBatSuspendAction"],
         ["idleInhibit", "idleInhibitEnabled"],
         ["inhibitIdleWhenPlaying", "inhibitIdleWhenPlaying"],
         ["batteryAlertsEnabled", "batteryAlertsEnabled"],

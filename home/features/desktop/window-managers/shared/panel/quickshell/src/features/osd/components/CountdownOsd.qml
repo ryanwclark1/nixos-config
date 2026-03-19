@@ -106,7 +106,11 @@ Scope {
                 onClicked: ScreenshotService.cancelDelay()
             }
 
-            Keys.onEscapePressed: ScreenshotService.cancelDelay()
+            Shortcut {
+                enabled: root.active && osdWindow.visible
+                sequence: "Escape"
+                onActivated: ScreenshotService.cancelDelay()
+            }
         }
     }
 }

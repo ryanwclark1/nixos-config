@@ -15,6 +15,7 @@ QuickLinkCard 1.0 QuickLinkCard.qml
 QuickToggle 1.0 QuickToggle.qml
 QuickToggleGrid 1.0 QuickToggleGrid.qml
 ScratchpadWidget 1.0 ScratchpadWidget.qml
+ServiceUnitLiveDetail 1.0 ServiceUnitLiveDetail.qml
 ServiceUnitWidget 1.0 ServiceUnitWidget.qml
 SystemCpuCores 1.0 SystemCpuCores.qml
 SystemGraphs 1.0 SystemGraphs.qml

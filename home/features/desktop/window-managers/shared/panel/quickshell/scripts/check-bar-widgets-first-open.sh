@@ -269,6 +269,7 @@ population_score() {
     'Manage the widget composition'
     '(Main|Mlan)[[:space:]]+Bar'
     'Active[[:space:]]+Bar'
+    'Top[[:space:]]+Section'
     'Current widgets'
     'Rem(aove|ove)'
     'Sett(irgs|ings)'

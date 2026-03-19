@@ -79,3 +79,27 @@ function fileContextMenuModel(item, ctx) {
         { label: "Copy Full Path",        icon: "󰅍", action: function() { copyFilePath(item, ctx); } }
     ];
 }
+
+// ── Git index helpers ────────────────────────────────────────────────────────
+
+// Parse raw git ls-files output into a set object { relativePath: true }.
+function parseGitIndex(raw) {
+    var set = {};
+    if (raw) {
+        var lines = raw.split("\n");
+        for (var i = 0; i < lines.length; ++i) {
+            var line = lines[i];
+            if (line !== "") set[line] = true;
+        }
+    }
+    return set;
+}
+
+// Tag file items with _isGitTracked using the provided set.
+function tagFileItemsGit(items, gitTrackedSet) {
+    var set = gitTrackedSet;
+    for (var i = 0; i < items.length; ++i) {
+        var rel = items[i].relativePath || "";
+        items[i]._isGitTracked = (rel !== "" && set[rel] === true);
+    }
+}

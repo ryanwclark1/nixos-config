@@ -31,6 +31,50 @@ Item {
         : (isLauncherWebSection ? "launcher-web"
         : (isLauncherModesSection ? "launcher-modes"
         : (isLauncherRuntimeSection ? "launcher-runtime" : "launcher")))
+    readonly property var launcherHeroMeta: ({
+            "launcher": {
+                label: "General",
+                icon: "󰍉",
+                description: "Tune the launcher shell, default entry mode, and home-stage behavior.",
+                chips: ["Default mode", "Home stage", "Hints"]
+            },
+            "launcher-search": {
+                label: "Search",
+                icon: "󰍉",
+                description: "Adjust result breadth, debounce timing, and ranking signals for faster search.",
+                chips: ["Result mix", "Debounce", "Ranking"]
+            },
+            "launcher-web": {
+                label: "Web",
+                icon: "󰖟",
+                description: "Manage providers, aliases, custom engines, and web-specific shortcuts.",
+                chips: ["Providers", "Aliases", "Custom engines"]
+            },
+            "launcher-modes": {
+                label: "Modes",
+                icon: "󰌌",
+                description: "Control pinned and advanced mode layout, presets, and drag ordering.",
+                chips: ["Primary", "Advanced", "Presets"]
+            },
+            "launcher-runtime": {
+                label: "Runtime",
+                icon: "󰔟",
+                description: "Configure preload, diagnostics, metrics, and recovery behavior.",
+                chips: ["Preload", "Metrics", "Recovery"]
+            }
+        })[currentLauncherTabId] || ({
+            label: "General",
+            icon: "󰍉",
+            description: "Tune the launcher runtime, search flow, and mode surfaces from one place.",
+            chips: ["Launcher"]
+        })
+    readonly property var launcherHeroTabs: [
+        { id: "launcher", label: "General", icon: "󰍉" },
+        { id: "launcher-search", label: "Search", icon: "󰍉" },
+        { id: "launcher-web", label: "Web", icon: "󰖟" },
+        { id: "launcher-modes", label: "Modes", icon: "󰌌" },
+        { id: "launcher-runtime", label: "Runtime", icon: "󰔟" }
+    ]
 
     // Static data arrays
     readonly property var launcherModes: ModeData.allKnownModes.map(function(modeKey) {
@@ -225,6 +269,14 @@ Item {
     function resetLauncherDefaults() {
         Helpers.resetLauncherDefaults(Config, webAliasDefaults, webProviderDefaultOrder, launcherDefaultModes, CompositorAdapter, launcherModes);
     }
+    function selectLauncherTab(tabId) {
+        if (!root.settingsRoot)
+            return;
+        if (root.settingsRoot.clearSettingHighlight)
+            root.settingsRoot.clearSettingHighlight();
+        if (root.settingsRoot.setCurrentTab)
+            root.settingsRoot.setCurrentTab(tabId);
+    }
 
     Component.onCompleted: {
         var currentModes = Array.isArray(Config.launcherEnabledModes) ? Config.launcherEnabledModes.slice() : launcherDefaultModes.slice();
@@ -243,12 +295,111 @@ Item {
         anchors.right: parent.right
         spacing: Colors.spacingL
 
-        LauncherSettingsHero {
+        Rectangle {
             visible: root.isLauncherSection || root.isLauncherGeneralSection || root.isLauncherSearchSection || root.isLauncherWebSection || root.isLauncherModesSection || root.isLauncherRuntimeSection
             Layout.fillWidth: true
-            settingsRoot: root.settingsRoot
-            tabId: root.currentLauncherTabId
-            compactMode: root.compactMode
+            radius: Colors.radiusLarge
+            color: Colors.withAlpha(Colors.primary, 0.08)
+            border.color: Colors.primaryMarked
+            border.width: 1
+            implicitHeight: launcherHeroColumn.implicitHeight + (root.compactMode ? Colors.spacingM * 2 : Colors.spacingL * 2)
+
+            ColumnLayout {
+                id: launcherHeroColumn
+                anchors.fill: parent
+                anchors.margins: root.compactMode ? Colors.spacingM : Colors.spacingL
+                spacing: Colors.spacingM
+
+                Text {
+                    text: "LAUNCHER CONTROL DECK"
+                    color: Colors.primary
+                    font.pixelSize: Colors.fontSizeXXS
+                    font.weight: Font.Black
+                    font.letterSpacing: Colors.letterSpacingExtraWide
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingM
+
+                    Rectangle {
+                        width: root.compactMode ? 42 : 48
+                        height: width
+                        radius: Colors.radiusLarge
+                        color: Colors.primarySubtle
+                        border.color: Colors.primaryRing
+                        border.width: 1
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: root.launcherHeroMeta.icon
+                            color: Colors.primary
+                            font.family: Colors.fontMono
+                            font.pixelSize: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingXXS
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: root.launcherHeroMeta.label
+                            color: Colors.text
+                            font.pixelSize: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeHuge
+                            font.weight: Font.Black
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: root.launcherHeroMeta.description
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+                }
+
+                Flow {
+                    Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingS
+
+                    Repeater {
+                        model: root.launcherHeroTabs
+
+                        delegate: SharedWidgets.FilterChip {
+                            required property var modelData
+                            label: modelData.label
+                            icon: modelData.icon
+                            selected: modelData.id === root.currentLauncherTabId
+                            onClicked: root.selectLauncherTab(modelData.id)
+                        }
+                    }
+                }
+
+                Flow {
+                    Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingS
+
+                    Repeater {
+                        model: root.launcherHeroMeta.chips
+
+                        delegate: SharedWidgets.Chip {
+                            required property string modelData
+                            text: modelData
+                            icon: "󰋗"
+                            iconColor: Colors.primary
+                            textColor: Colors.text
+                            bgColor: Colors.withAlpha(Colors.primary, 0.1)
+                            borderColor: Colors.withAlpha(Colors.primary, 0.18)
+                        }
+                    }
+                }
+            }
         }
 
         // ----- Launcher Behavior (general) ----------------------------------

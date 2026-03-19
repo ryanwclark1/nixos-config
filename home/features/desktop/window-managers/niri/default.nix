@@ -118,17 +118,17 @@
         ];
 
         binds = {
-          "Mod+Q".action.close-window = null;
+          "Mod+Q".action.close-window = { };
 
-          "Mod+H".action.focus-column-left = null;
-          "Mod+L".action.focus-column-right = null;
-          "Mod+J".action.focus-window-down = null;
-          "Mod+K".action.focus-window-up = null;
+          "Mod+H".action.focus-column-left = { };
+          "Mod+L".action.focus-column-right = { };
+          "Mod+J".action.focus-window-down = { };
+          "Mod+K".action.focus-window-up = { };
 
-          "Mod+Shift+H".action.move-column-left = null;
-          "Mod+Shift+L".action.move-column-right = null;
-          "Mod+Shift+J".action.move-window-down = null;
-          "Mod+Shift+K".action.move-window-up = null;
+          "Mod+Shift+H".action.move-column-left = { };
+          "Mod+Shift+L".action.move-column-right = { };
+          "Mod+Shift+J".action.move-window-down = { };
+          "Mod+Shift+K".action.move-window-up = { };
 
           "Mod+1".action.focus-workspace = 1;
           "Mod+2".action.focus-workspace = 2;
@@ -164,8 +164,8 @@
           # Screenshot (using shared Wayland script)
           "Print".action.spawn = [ "sh" "-c" "~/.local/bin/scripts/wayland/screenshot.sh area" ];
           "Mod+S".action.spawn = [ "sh" "-c" "~/.local/bin/scripts/wayland/screenshot.sh area" ];
-          "Mod+Print".action.screenshot-screen = null;
-          "Alt+Print".action.screenshot-window = null;
+          "Mod+Print".action.screenshot-screen = { };
+          "Alt+Print".action.screenshot-window = { };
 
           # Power menu
           "Mod+Escape".action.spawn = [ "quickshell" "ipc" "call" "Shell" "toggleSurface" "powerMenu" ];

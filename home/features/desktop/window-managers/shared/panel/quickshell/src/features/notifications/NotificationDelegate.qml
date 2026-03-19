@@ -176,14 +176,13 @@ Rectangle {
     // ── Large Image Preview ─────────────────────
     // Only show when the image is large enough to be a meaningful preview
     // (not a small app icon that Chrome/Teams sends as notification.image).
-    Rectangle {
+    ClippingWrapperRectangle {
       Layout.fillWidth: true
       Layout.preferredHeight: 160
       visible: root.previewImageSource !== "" && previewImage.status === Image.Ready
         && previewImage.sourceSize.width > 96 && previewImage.sourceSize.height > 96
       radius: Colors.radiusMedium
       color: "#33000000"
-      clip: true
 
       Image {
         id: previewImage

@@ -34,8 +34,8 @@ Item {
             pluginPaneMode = "";
             selectedPluginId = "";
             pluginPaneError = "";
-            if (pluginPaneLoader)
-                pluginPaneLoader.source = "";
+            if (pluginPaneOverlay.pluginPaneLoader)
+                pluginPaneOverlay.pluginPaneLoader.source = "";
             return;
         }
         Qt.callLater(function() { if (_destroyed) return; loadPluginPane(); });
@@ -263,9 +263,10 @@ Item {
     }
 
     function loadPluginPane() {
-        if (!pluginPaneLoader)
+        var loader = pluginPaneOverlay.pluginPaneLoader;
+        if (!loader)
             return;
-        pluginPaneLoader.source = "";
+        loader.source = "";
         pluginPaneError = "";
         if (!pluginPaneOpen || selectedPluginId === "" || !selectedPlugin)
             return;
@@ -295,7 +296,7 @@ Item {
         }
 
         var api = PluginService.getPluginAPI(selectedPluginId);
-        pluginPaneLoader.setSource(src, {
+        loader.setSource(src, {
             pluginApi: api,
             pluginManifest: selectedPlugin,
             pluginService: PluginService
@@ -744,106 +745,22 @@ Item {
         }
     }
 
-    Rectangle {
+    PluginPaneOverlay {
+        id: pluginPaneOverlay
         anchors.fill: parent
         visible: root.pluginPaneOpen
-        color: Qt.rgba(0, 0, 0, 0.45)
-        z: 20
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.closePluginPane()
-        }
-
-        Rectangle {
-            width: Math.min(520, parent.width - 24)
-            height: Math.min(pluginPaneFlick.contentHeight + (Colors.paddingLarge * 2), parent.height - 24)
-            anchors.centerIn: parent
-            radius: Colors.radiusLarge
-            color: Colors.withAlpha(Colors.surface, 0.98)
-            border.color: Colors.border
-            border.width: 1
-
-            gradient: SharedWidgets.SurfaceGradient {}
-
-            // Inner highlight
-            SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
-
-            Flickable {
-                id: pluginPaneFlick
-                anchors.fill: parent
-                anchors.margins: Colors.paddingLarge
-                clip: true
-                contentHeight: pluginPaneColumn.implicitHeight
-
-                ColumnLayout {
-                    id: pluginPaneColumn
-                    width: parent.width
-                    spacing: Colors.spacingM
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: Colors.spacingS
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: root.pluginPaneTitle()
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeXL
-                            font.weight: Font.DemiBold
-                            wrapMode: Text.WordWrap
-                        }
-
-                        SettingsActionButton {
-                            compact: true
-                            iconName: "󰅖"
-                            label: "Close"
-                            onClicked: root.closePluginPane()
-                        }
-                    }
-
-                    SettingsInfoCallout {
-                        visible: !!root.selectedPlugin
-                        iconName: root.selectedPlugin ? root.pluginTypeIcon(root.selectedPlugin.type) : "󰏗"
-                        title: root.selectedPlugin ? String(root.selectedPlugin.name || root.selectedPlugin.id) : "Plugin"
-                        body: root.selectedPlugin ? String(root.selectedPlugin.description || "") : ""
-
-                        Text {
-                            visible: !!root.selectedPlugin
-                            text: root.selectedPlugin ? ("Type: " + root.pluginTypeLabel(root.selectedPlugin.type) + " • Author: " + String(root.selectedPlugin.author || "Unknown") + " • Version: " + String(root.selectedPlugin.version || "")) : ""
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
-                            wrapMode: Text.WordWrap
-                            Layout.fillWidth: true
-                        }
-                    }
-
-                    SettingsInfoCallout {
-                        visible: root.pluginPaneMode === "settings" && root.selectedPluginHasSettings && !root.selectedPluginCanWriteSettings
-                        title: "Permission required"
-                        body: "This plugin is missing settings_write permission in its manifest."
-                    }
-
-                    SettingsInfoCallout {
-                        visible: root.pluginPaneError !== ""
-                        title: "Plugin pane failed to load"
-                        body: root.pluginPaneError
-                    }
-
-                    Loader {
-                        id: pluginPaneLoader
-                        Layout.fillWidth: true
-                        visible: root.pluginPaneOpen && root.pluginPaneError === "" && status !== Loader.Error
-                        onStatusChanged: {
-                            if (status === Loader.Error)
-                                root.pluginPaneError = errorString();
-                            else if (status === Loader.Ready)
-                                root.pluginPaneError = "";
-                        }
-                    }
-                }
-            }
-        }
+        open: root.pluginPaneOpen
+        compactMode: root.compactMode
+        selectedPlugin: root.selectedPlugin
+        selectedPluginHasSettings: root.selectedPluginHasSettings
+        selectedPluginCanWriteSettings: root.selectedPluginCanWriteSettings
+        pluginPaneMode: root.pluginPaneMode
+        pluginPaneError: root.pluginPaneError
+        pluginPaneTitle: root.pluginPaneTitle()
+        pluginTypeIcon: root.selectedPlugin ? root.pluginTypeIcon(root.selectedPlugin.type) : "󰏗"
+        pluginTypeLabel: root.selectedPlugin ? root.pluginTypeLabel(root.selectedPlugin.type) : ""
+        onCloseRequested: root.closePluginPane()
+        onPluginPaneErrorUpdated: (value) => { root.pluginPaneError = value; }
     }
 
     Process {

@@ -264,7 +264,7 @@ artifact_dir="${VM_OUTPUT_DIR}/bar-widgets-first-open"
 set -o pipefail
 bash "${REMOTE_PANEL_ROOT}/scripts/check-settings-qa.sh" --repo-shell --skip-switch --output-dir "${artifact_dir}" 2>&1 | tee "${log_path}"
 EOF
-      return 0
+      return $?
       ;;
     gate)
       "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
@@ -308,7 +308,7 @@ if (( settings_status != 0 && settings_status != 99 )); then
 fi
 exit 0
 EOF
-      return 0
+      return $?
       ;;
     *)
       printf 'Unknown mode: %s\n' "${capture_mode}" >&2

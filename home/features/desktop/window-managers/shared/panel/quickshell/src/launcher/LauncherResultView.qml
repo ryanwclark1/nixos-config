@@ -28,42 +28,61 @@ StackLayout {
     StackLayout {
         currentIndex: root.filteredItems.length > 0 ? 0 : (root.isModeLoading ? 1 : 2)
 
-        ListView {
-            id: resultsList
-            model: resultsModel
-            clip: true
-            cacheBuffer: 400
-            spacing: root.compactMode ? Colors.spacingXS : Colors.spacingS
-            currentIndex: root.launcher.selectedIndex
-            enabled: !root.launcher.showingConfirm
-            topMargin: root.compactMode ? Colors.spacingXXS : Colors.spacingXS
-            section.property: "sectionLabel"
-            section.delegate: LauncherSectionHeader {
-                compactMode: root.compactMode
-                accentColor: root.accentColor
+        RowLayout {
+            spacing: Colors.spacingS
+
+            ListView {
+                id: resultsList
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                model: resultsModel
+                clip: true
+                cacheBuffer: 400
+                spacing: root.compactMode ? Colors.spacingXS : Colors.spacingS
+                currentIndex: root.launcher.selectedIndex
+                enabled: !root.launcher.showingConfirm
+                topMargin: root.compactMode ? Colors.spacingXXS : Colors.spacingXS
+                section.property: "sectionLabel"
+                section.delegate: LauncherSectionHeader {
+                    compactMode: root.compactMode
+                    accentColor: root.accentColor
+                }
+
+                delegate: LauncherResultDelegate {
+                    itemData: modelData
+                    itemIndex: index
+                    searchText: root.launcher.searchText
+                    mode: root.mode
+                    compactMode: root.compactMode
+                    tightMode: root.tightMode
+                    ignoreMouseHover: root.launcher.ignoreMouseHover
+                    modeIcons: root.launcher.modeIcons
+                    iconMap: root.launcher.launcherIconMap
+                    accentColor: root.accentColor
+                    onClicked: root.launcher.executeSelection()
+                    onSecondaryActionRequested: function(sourceItem, localX, localY) {
+                        if (root.mode !== "files" || !modelData || !modelData.fullPath)
+                            return;
+                        var pt = sourceItem ? sourceItem.mapToItem(root.launcher, localX, localY) : Qt.point(localX, localY);
+                        root.launcher.selectedIndex = index;
+                        root.fileContextMenuRequested(root.launcher.fileContextMenuModel(modelData), pt);
+                    }
+                    onEntered: if (!root.launcher.ignoreMouseHover)
+                        root.launcher.selectedIndex = index
+                }
             }
 
-            delegate: LauncherResultDelegate {
-                itemData: modelData
-                itemIndex: index
-                searchText: root.launcher.searchText
-                mode: root.mode
-                compactMode: root.compactMode
-                tightMode: root.tightMode
-                ignoreMouseHover: root.launcher.ignoreMouseHover
-                modeIcons: root.launcher.modeIcons
-                iconMap: root.launcher.launcherIconMap
-                accentColor: root.accentColor
-                onClicked: root.launcher.executeSelection()
-                onSecondaryActionRequested: function(sourceItem, localX, localY) {
-                    if (root.mode !== "files" || !modelData || !modelData.fullPath)
-                        return;
-                    var pt = sourceItem ? sourceItem.mapToItem(root.launcher, localX, localY) : Qt.point(localX, localY);
-                    root.launcher.selectedIndex = index;
-                    root.fileContextMenuRequested(root.launcher.fileContextMenuModel(modelData), pt);
+            LauncherFilePreview {
+                id: filePreview
+                visible: root.mode === "files" && root.launcher.selectedItem
+                         && !!root.launcher.selectedItem.fullPath
+                Layout.preferredWidth: visible ? Math.min(400, root.width * 0.4) : 0
+                Layout.fillHeight: true
+                selectedItem: root.launcher.selectedItem
+
+                Behavior on Layout.preferredWidth {
+                    NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic }
                 }
-                onEntered: if (!root.launcher.ignoreMouseHover)
-                    root.launcher.selectedIndex = index
             }
         }
 

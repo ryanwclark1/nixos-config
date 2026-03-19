@@ -1,10 +1,11 @@
-import QtQml
+import QtQuick
 import Quickshell
 import Quickshell.Io
 
-QtObject {
+Item {
     id: root
-    required property var launcher
+    required property QtObject launcher
+    visible: false
 
     IpcHandler {
         target: "Launcher"

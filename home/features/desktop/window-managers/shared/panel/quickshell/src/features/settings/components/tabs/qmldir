@@ -24,6 +24,7 @@ LockScreenTab 1.0 LockScreenTab.qml
 NightLightTab 1.0 NightLightTab.qml
 NotificationsTab 1.0 NotificationsTab.qml
 OsdTab 1.0 OsdTab.qml
+PluginPaneOverlay 1.0 PluginPaneOverlay.qml
 PluginsTab 1.0 PluginsTab.qml
 PowerTab 1.0 PowerTab.qml
 PresetsTab 1.0 PresetsTab.qml

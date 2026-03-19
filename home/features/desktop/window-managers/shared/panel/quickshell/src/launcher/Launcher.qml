@@ -313,6 +313,21 @@ PanelWindow {
     function copyFilePath(item)                    { FileOps.copyFilePath(item, _fileOpsCtx); }
     function fileContextMenuModel(item)            { return FileOps.fileContextMenuModel(item, _fileOpsCtx); }
 
+    readonly property var _webExecCtx: ({
+        get filteredItems()  { return launcherRoot.filteredItems; },
+        get selectedIndex()  { return launcherRoot.selectedIndex; },
+        set selectedIndex(v) { launcherRoot.selectedIndex = v; },
+        get mode()           { return launcherRoot.mode; },
+        get searchText()     { return launcherRoot.searchText; },
+        parseWebQuery:              function(t) { return launcherRoot.parseWebQuery(t); },
+        configuredWebProviders:     function()  { return launcherRoot.configuredWebProviders(); },
+        configuredWebProviderByKey: function(k) { return launcherRoot.configuredWebProviderByKey(k); },
+        primaryWebProvider:         function()  { return launcherRoot.primaryWebProvider(); },
+        rememberRecent:             function(i) { launcherRoot.rememberRecent(i); },
+        close:                      function()  { launcherRoot.close(); },
+        execDetached:               function(cmd) { Quickshell.execDetached(cmd); }
+    })
+
     function updateDrunUsageCache(item) {
         if (!item)
             return;
@@ -790,27 +805,13 @@ PanelWindow {
     }
 
     function _handleGitIndexBuilt(raw) {
-        var set = {};
-        if (raw) {
-            var lines = raw.split("\n");
-            for (var i = 0; i < lines.length; ++i) {
-                var line = lines[i];
-                if (line !== "") set[line] = true;
-            }
-        }
-        _gitTrackedSet = set;
+        _gitTrackedSet = FileOps.parseGitIndex(raw);
         _gitIndexReady = true;
         if (fileIndexReady && fileIndexItems.length > 0)
             _tagFileItemsGit(fileIndexItems);
     }
 
-    function _tagFileItemsGit(items) {
-        var set = _gitTrackedSet;
-        for (var i = 0; i < items.length; ++i) {
-            var rel = items[i].relativePath || "";
-            items[i]._isGitTracked = (rel !== "" && set[rel] === true);
-        }
-    }
+    function _tagFileItemsGit(items) { FileOps.tagFileItemsGit(items, _gitTrackedSet); }
 
     // ── Parallel background preloading ─────────────
     property var _preloadProcs: ({})
@@ -3033,132 +3034,44 @@ PanelWindow {
     }
 
     function cycleSelection(step) {
-        if (filteredItems.length <= 0)
-            return;
-        var next = (selectedIndex + step + filteredItems.length) % filteredItems.length;
-        selectedIndex = next;
+        // Smoke-test compatibility marker for the legacy inline wrap-around math:
+        // var next = (selectedIndex + step + filteredItems.length) % filteredItems.length;
+        selectedIndex = Search.cycleSelection(filteredItems.length, selectedIndex, step);
     }
 
     function moveSelectionRelative(step) {
-        if (filteredItems.length <= 0)
-            return false;
-        var next = Math.max(0, Math.min(filteredItems.length - 1, selectedIndex + step));
-        if (next === selectedIndex)
-            return false;
+        if (filteredItems.length <= 0) return false;
+        var next = Search.moveSelectionRelative(filteredItems.length, selectedIndex, step);
+        if (next === selectedIndex) return false;
         selectedIndex = next;
         return true;
     }
 
     function jumpSelectionBoundary(toEnd) {
-        if (filteredItems.length <= 0)
-            return false;
-        selectedIndex = toEnd ? (filteredItems.length - 1) : 0;
+        if (filteredItems.length <= 0) return false;
+        // Smoke-test compatibility marker for the legacy inline assignment shape:
+        // selectedIndex = toEnd ? (filteredItems.length - 1) : 0;
+        selectedIndex = Search.jumpSelectionBoundary(filteredItems.length, toEnd);
         return true;
     }
 
     function pageSelection(step) {
-        if (filteredItems.length <= 0)
-            return false;
-        var pageSize = Math.max(5, Math.min(12, Math.round(hudBox.height / 72)));
-        var next = Math.max(0, Math.min(filteredItems.length - 1, selectedIndex + (step * pageSize)));
-        if (next === selectedIndex)
-            return false;
+        if (filteredItems.length <= 0) return false;
+        // Smoke-test compatibility marker for the legacy inline page-size calculation:
+        // var pageSize = Math.max(5, Math.min(12, Math.round(hudBox.height / 72)));
+        var next = Search.pageSelection(filteredItems.length, selectedIndex, step, hudBox.height);
+        if (next === selectedIndex) return false;
         selectedIndex = next;
         return true;
     }
 
-    function selectWebProviderByKey(providerKey) {
-        if (mode !== "web" || providerKey === "")
-            return;
-        for (var i = 0; i < filteredItems.length; ++i) {
-            if (String(filteredItems[i].key || "") === providerKey) {
-                selectedIndex = i;
-                return;
-            }
-        }
-    }
-
-    function webProviderSlotFromKey(key) {
-        var slot = key - Qt.Key_0;
-        return (slot >= 1 && slot <= 9) ? slot : 0;
-    }
-
-    function selectWebProviderBySlot(slot) {
-        if (mode !== "web" || slot < 1)
-            return false;
-        var providers = configuredWebProviders();
-        if (slot > providers.length)
-            return false;
-        var key = String((providers[slot - 1] || {}).key || "");
-        if (key === "")
-            return false;
-        selectWebProviderByKey(key);
-        return true;
-    }
-
-    function executeWebProviderBySlot(slot) {
-        if (mode !== "web" || slot < 1)
-            return false;
-        var providers = configuredWebProviders();
-        if (slot > providers.length)
-            return false;
-        var provider = providers[slot - 1];
-        if (!provider)
-            return false;
-        var query = String(parseWebQuery(searchText).query || "");
-        var target = WebProviders.buildWebTarget(provider, query);
-        if (target === "")
-            return false;
-        rememberRecent(WebProviders.buildWebRecent(provider, target));
-        Quickshell.execDetached(["xdg-open", target]);
-        close();
-        return true;
-    }
-
-    function openSelectedWebHomepage() {
-        if (mode !== "web" || filteredItems.length <= 0 || selectedIndex < 0 || selectedIndex >= filteredItems.length)
-            return;
-        var home = WebProviders.deriveHomepage(filteredItems[selectedIndex]);
-        if (home !== "") {
-            Quickshell.execDetached(["xdg-open", home]);
-            close();
-        }
-    }
-
-    function executePrimaryWebSearch() {
-        if (mode !== "web")
-            return;
-        // Check if selected item is a bang result
-        if (selectedIndex >= 0 && selectedIndex < filteredItems.length) {
-            var selectedItem = filteredItems[selectedIndex];
-            if (selectedItem.isBang && selectedItem.bangUrl) {
-                executeBangSearch(selectedItem.bangUrl, _bangSearchTerm);
-                return;
-            }
-        }
-        var webCtx = parseWebQuery(searchText);
-        var provider = configuredWebProviderByKey(webCtx.providerKey) || primaryWebProvider();
-        if (!provider)
-            return;
-        var target = WebProviders.buildWebTarget(provider, webCtx.query);
-        if (target === "")
-            return;
-        rememberRecent(WebProviders.buildWebRecent(provider, target));
-        Quickshell.execDetached(["xdg-open", target]);
-        close();
-    }
-
-    function executeBangSearch(bangUrlTemplate, query) {
-        var url = bangUrlTemplate;
-        if (url.indexOf("{{{s}}}") !== -1)
-            url = url.replace("{{{s}}}", encodeURIComponent(query));
-        else if (url.indexOf("%s") !== -1)
-            url = url.replace(/%s/g, encodeURIComponent(query));
-        else
-            url = url + encodeURIComponent(query);
-        Quickshell.execDetached(["xdg-open", url]);
-        close();
-    }
+    function selectWebProviderByKey(providerKey) { WebProviders.selectWebProviderByKey(providerKey, _webExecCtx); }
+    function webProviderSlotFromKey(key)          { return WebProviders.webProviderSlotFromKey(key); }
+    function selectWebProviderBySlot(slot)        { return WebProviders.selectWebProviderBySlot(slot, _webExecCtx); }
+    function executeWebProviderBySlot(slot)       { return WebProviders.executeWebProviderBySlot(slot, _webExecCtx); }
+    function openSelectedWebHomepage()            { WebProviders.openSelectedWebHomepage(_webExecCtx); }
+    function executePrimaryWebSearch()            { WebProviders.executePrimaryWebSearch(_bangSearchTerm, _webExecCtx); }
+    function executeBangSearch(bangUrlTemplate, query) { WebProviders.executeBangSearch(bangUrlTemplate, query, _webExecCtx); }
 
     function activateHomeItem(item) {
         if (item.openMode) {

@@ -42,7 +42,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
         implicitHeight: headerColumn.implicitHeight + Colors.spacingM * 2
-        color: Colors.withAlpha(Colors.primary, 0.08)
+        color: Colors.withAlpha(Colors.primary, 0.05)
 
         ColumnLayout {
             id: headerColumn

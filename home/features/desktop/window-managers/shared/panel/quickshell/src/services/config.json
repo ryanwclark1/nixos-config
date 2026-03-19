@@ -7,9 +7,7 @@
   },
   "glass": {
     "blur": true,
-    "opacity": 0.65,
-    "settingsBackdropOpacity": 0.82,
-    "settingsSurfaceOpacity": 0.985
+    "settingsBackdropOpacity": 0.82
   },
   "notifications": {
     "width": 350,

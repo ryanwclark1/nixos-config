@@ -23,14 +23,10 @@ QtObject {
 
     // --- GLASS ---
     property bool blurEnabled: true
-    property real glassOpacity: 1.0
     property real glassOpacityBase: 0.85
     property real glassOpacitySurface: 0.94
     property real glassOpacityOverlay: 1.0
-    property real popupOpacity: 1.0
-    property real cardOpacity: 1.0
     property real settingsBackdropOpacity: 0.92
-    property real settingsSurfaceOpacity: 1.0
     property bool autoTransparency: false
 
     // --- NOTIFICATIONS ---

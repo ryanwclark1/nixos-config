@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import "../../../../services"
 import "../../../../widgets" as SharedWidgets
 import ".."
@@ -69,19 +70,24 @@ Item {
                         Layout.preferredHeight: 68
                         radius: Colors.radiusSmall
                         color: Colors.bgWidget
-                        clip: true
                         border.color: Colors.border
                         border.width: 1
 
-                        Image {
+                        ClippingWrapperRectangle {
                             anchors.fill: parent
-                            source: {
-                                var keys = Object.keys(WallpaperService.wallpapers);
-                                var path = WallpaperService.wallpapers["__all__"]
-                                    || (keys.length > 0 ? WallpaperService.wallpapers[keys[0]] : "");
-                                return path ? "file://" + path : ""
+                            radius: Colors.radiusSmall
+                            color: "transparent"
+
+                            Image {
+                                anchors.fill: parent
+                                source: {
+                                    var keys = Object.keys(WallpaperService.wallpapers);
+                                    var path = WallpaperService.wallpapers["__all__"]
+                                        || (keys.length > 0 ? WallpaperService.wallpapers[keys[0]] : "");
+                                    return path ? "file://" + path : ""
+                                }
+                                fillMode: Image.PreserveAspectCrop
                             }
-                            fillMode: Image.PreserveAspectCrop
                         }
                     }
 
@@ -110,19 +116,18 @@ Item {
                     Layout.fillWidth: true
                     spacing: Colors.spacingM
 
-                    Rectangle {
+                    ClippingWrapperRectangle {
                         Layout.preferredWidth: 64
                         Layout.preferredHeight: 64
                         radius: Colors.radiusSmall
                         color: Colors.bgWidget
-                        clip: true
 
                         Image {
                             anchors.fill: parent
                             source: MediaService.trackArtUrl || ""
                             fillMode: Image.PreserveAspectCrop
                         }
-                        
+
                         Text {
                             visible: !MediaService.trackArtUrl
                             anchors.centerIn: parent

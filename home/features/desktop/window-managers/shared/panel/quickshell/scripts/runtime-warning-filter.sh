@@ -9,7 +9,6 @@ qt\.svg: .*Could not resolve property
 Could not register notification server
 Registration will be attempted again
 quickshell\.hyprland\.ipc: Got removal for workspace id .* which was not previously tracked\.
-Could not attach Keys property to:\s+qs::wayland::layershell::WaylandPanelInterface
 QML QQuickImage at @features/clipboard/ClipboardMenu\.qml\[.*\]: Error decoding: file:///run/user/.*/quickshell-clipboard/.*
 EOF
 

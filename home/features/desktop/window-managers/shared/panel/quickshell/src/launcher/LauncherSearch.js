@@ -549,3 +549,28 @@ function compareLauncherItemsAlpha(a, b) {
     if (aTitle > bTitle) return 1;
     return 0;
 }
+
+// ── Selection / navigation pure helpers ─────────────────────────────────────
+// Each returns the new selectedIndex. Callers assign the result.
+
+function cycleSelection(count, selectedIndex, step) {
+    if (count <= 0) return selectedIndex;
+    return (selectedIndex + step + count) % count;
+}
+
+function moveSelectionRelative(count, selectedIndex, step) {
+    if (count <= 0) return selectedIndex;
+    return Math.max(0, Math.min(count - 1, selectedIndex + step));
+}
+
+function jumpSelectionBoundary(count, toEnd) {
+    if (count <= 0) return 0;
+    return toEnd ? (count - 1) : 0;
+}
+
+// hudHeight is the pixel height of the results list, used to compute page size.
+function pageSelection(count, selectedIndex, step, hudHeight) {
+    if (count <= 0) return selectedIndex;
+    var pageSize = Math.max(5, Math.min(12, Math.round(hudHeight / 72)));
+    return Math.max(0, Math.min(count - 1, selectedIndex + (step * pageSize)));
+}
