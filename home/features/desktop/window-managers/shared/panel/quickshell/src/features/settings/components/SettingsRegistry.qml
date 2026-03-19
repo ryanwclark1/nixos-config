@@ -13,20 +13,19 @@ QtObject {
         {
             id: "system-overview",
             label: "Overview",
+            shortLabel: "Overview",
+            description: "Status, shortcuts, and the quickest path into shell controls.",
+            tone: "neutral",
             icon: "󰕮",
-            tabs: [
-                {
-                    id: "dashboard",
-                    label: "Dashboard",
-                    icon: "󰕮",
-                    component: "DashboardTab.qml",
-                    searchTerms: ["overview", "performance", "cpu", "ram", "vitals", "media"]
-                }
-            ]
+            order: 0,
+            expandedByDefault: true
         },
         {
             id: "shell-core",
-            label: "Shell Core",
+            label: "Shell",
+            shortLabel: "Shell",
+            description: "Core shell behavior, popups, and the control center.",
+            tone: "shell",
             icon: "󰒓",
             order: 10,
             expandedByDefault: true
@@ -34,57 +33,81 @@ QtObject {
         {
             id: "launcher",
             label: "Launcher",
+            shortLabel: "Launcher",
+            description: "Search, mode layout, providers, and runtime controls.",
+            tone: "launcher",
             icon: "󰍉",
-            order: 15,
+            order: 20,
             expandedByDefault: true
         },
         {
             id: "visuals",
             label: "Visuals",
+            shortLabel: "Visuals",
+            description: "Themes, wallpaper, motion, density, and shell styling.",
+            tone: "visual",
             icon: "󰏘",
-            order: 20,
+            order: 30,
             expandedByDefault: true
         },
         {
             id: "interaction",
             label: "Interaction",
+            shortLabel: "Input",
+            description: "Notifications, audio, overlays, and input-facing behavior.",
+            tone: "interaction",
             icon: "󰍉",
-            order: 30,
+            order: 40,
             expandedByDefault: true
         },
         {
             id: "surfaces",
             label: "Surfaces",
+            shortLabel: "Surfaces",
+            description: "Bars, docks, widgets, and other persistent shell surfaces.",
+            tone: "surface",
             icon: "󰖲",
-            order: 40,
+            order: 50,
             expandedByDefault: true
         },
         {
             id: "window-manager",
             label: "Window Manager",
+            shortLabel: "WM",
+            description: "Compositor layout, monitors, and workspace behavior.",
+            tone: "window-manager",
             icon: "󱗼",
-            order: 50,
+            order: 60,
             expandedByDefault: false
         },
         {
             id: "power-privacy",
             label: "Power & Privacy",
+            shortLabel: "Power",
+            description: "Battery policies, privacy indicators, and night-light behavior.",
+            tone: "power",
             icon: "󰒃",
-            order: 60,
-            expandedByDefault: false
-        },
-        {
-            id: "extensibility",
-            label: "Extensibility",
-            icon: "󰏗",
             order: 70,
             expandedByDefault: false
         },
         {
-            id: "meta",
-            label: "Meta",
-            icon: "󰋗",
+            id: "extensibility",
+            label: "Extensions",
+            shortLabel: "Extensions",
+            description: "Plugins, hooks, AI integrations, and model usage surfaces.",
+            tone: "extensions",
+            icon: "󰏗",
             order: 80,
+            expandedByDefault: false
+        },
+        {
+            id: "meta",
+            label: "Tools",
+            shortLabel: "Tools",
+            description: "Diagnostics, presets, and information about the current shell.",
+            tone: "tools",
+            icon: "󰋗",
+            order: 90,
             expandedByDefault: false
         }
     ]
@@ -93,6 +116,9 @@ QtObject {
         {
             id: "dashboard",
             label: "Dashboard",
+            shortLabel: "Dashboard",
+            description: "Check shell status, media, and a few high-value quick actions.",
+            pageStyle: "dashboard",
             icon: "󰕮",
             categoryId: "system-overview",
             order: 0,
@@ -108,6 +134,9 @@ QtObject {
             id: "system",
             legacyIndex: 0,
             label: "Shell",
+            shortLabel: "Shell",
+            description: "Configure shell chrome, popup behavior, and shared surface settings.",
+            pageStyle: "control",
             icon: "󰒓",
             categoryId: "shell-core",
             order: 10,
@@ -120,11 +149,31 @@ QtObject {
             }
         },
         {
+            id: "control-center",
+            legacyIndex: 25,
+            label: "Control Center",
+            shortLabel: "Control Center",
+            description: "Tune modules, quick toggles, and media controls in the control center.",
+            pageStyle: "control",
+            icon: "󰖲",
+            categoryId: "shell-core",
+            order: 20,
+            component: "ControlCenterTab.qml",
+            searchTerms: ["control center", "quick toggles", "quick links", "media widget"],
+            owner: {
+                surface: "controlCenter",
+                service: "Config",
+                configDomain: "controlCenter"
+            }
+        },
+        {
             id: "launcher",
             legacyIndex: 24,
             label: "General",
-            icon: "󰍉",
+            shortLabel: "General",
             description: "Tune the launcher shell, default entry mode, and home-stage behavior.",
+            pageStyle: "launcher",
+            icon: "󰍉",
             categoryId: "launcher",
             order: 10,
             component: "LauncherTab.qml",
@@ -138,8 +187,10 @@ QtObject {
         {
             id: "launcher-search",
             label: "Search",
-            icon: "󰍉",
+            shortLabel: "Search",
             description: "Adjust result breadth, file search timing, and launcher ranking signals.",
+            pageStyle: "launcher",
+            icon: "󰍉",
             categoryId: "launcher",
             order: 20,
             component: "LauncherSearchTab.qml",
@@ -153,8 +204,10 @@ QtObject {
         {
             id: "launcher-web",
             label: "Web",
-            icon: "󰖟",
+            shortLabel: "Web",
             description: "Manage providers, aliases, custom engines, and web-specific shortcuts.",
+            pageStyle: "launcher",
+            icon: "󰖟",
             categoryId: "launcher",
             order: 30,
             component: "LauncherWebTab.qml",
@@ -168,8 +221,10 @@ QtObject {
         {
             id: "launcher-modes",
             label: "Modes",
-            icon: "󰌌",
+            shortLabel: "Modes",
             description: "Control which modes stay pinned, which stay advanced, and how presets apply.",
+            pageStyle: "launcher",
+            icon: "󰌌",
             categoryId: "launcher",
             order: 40,
             component: "LauncherModesTab.qml",
@@ -183,8 +238,10 @@ QtObject {
         {
             id: "launcher-runtime",
             label: "Runtime",
-            icon: "󰔟",
+            shortLabel: "Runtime",
             description: "Configure preload, diagnostics, metrics, and recovery actions for launcher runtime.",
+            pageStyle: "launcher",
+            icon: "󰔟",
             categoryId: "launcher",
             order: 50,
             component: "LauncherRuntimeTab.qml",
@@ -196,39 +253,12 @@ QtObject {
             }
         },
         {
-            id: "control-center",
-            legacyIndex: 25,
-            label: "Control Center",
-            icon: "󰖲",
-            categoryId: "shell-core",
-            order: 30,
-            component: "ControlCenterTab.qml",
-            searchTerms: ["control center", "quick toggles", "quick links", "media widget"],
-            owner: {
-                surface: "controlCenter",
-                service: "Config",
-                configDomain: "controlCenter"
-            }
-        },
-        {
-            id: "appearance",
-            legacyIndex: 1,
-            label: "Appearance",
-            icon: "󰏘",
-            categoryId: "visuals",
-            order: 30,
-            component: "AppearanceTab.qml",
-            searchTerms: ["appearance", "glass", "blur", "density", "scale", "spacing", "speed", "animations", "eco", "power", "battery"],
-            owner: {
-                surface: "bar",
-                service: "Config",
-                configDomain: "appearance"
-            }
-        },
-        {
             id: "theme",
             legacyIndex: 2,
             label: "Theme",
+            shortLabel: "Theme",
+            description: "Browse shell themes, schedules, and theme-source behavior.",
+            pageStyle: "catalog",
             icon: "󰏘",
             categoryId: "visuals",
             order: 10,
@@ -244,6 +274,9 @@ QtObject {
             id: "wallpaper",
             legacyIndex: 3,
             label: "Wallpaper",
+            shortLabel: "Wallpaper",
+            description: "Choose wallpapers, folders, and dynamic theming inputs.",
+            pageStyle: "catalog",
             icon: "󰸉",
             categoryId: "visuals",
             order: 20,
@@ -256,25 +289,30 @@ QtObject {
             }
         },
         {
-            id: "hyprland",
-            legacyIndex: 4,
-            label: "Hyprland",
-            icon: "󱗼",
-            categoryId: "window-manager",
-            order: 10,
-            component: "HyprlandTab.qml",
-            compositor: "hyprland",
-            searchTerms: ["hyprland", "gaps", "opacity", "layout"],
+            id: "appearance",
+            legacyIndex: 1,
+            label: "Style & Motion",
+            shortLabel: "Style",
+            description: "Adjust glass, typography, density, radii, and animation behavior.",
+            pageStyle: "catalog",
+            icon: "󰏘",
+            categoryId: "visuals",
+            order: 30,
+            component: "AppearanceTab.qml",
+            searchTerms: ["appearance", "glass", "blur", "density", "scale", "spacing", "speed", "animations", "eco", "power", "battery"],
             owner: {
-                surface: "",
-                service: "SettingsHub",
-                configDomain: "hyprland"
+                surface: "bar",
+                service: "Config",
+                configDomain: "appearance"
             }
         },
         {
             id: "osd",
             legacyIndex: 5,
             label: "OSD",
+            shortLabel: "OSD",
+            description: "Position and style on-screen display overlays across the shell.",
+            pageStyle: "control",
             icon: "󰍡",
             categoryId: "interaction",
             order: 10,
@@ -287,187 +325,12 @@ QtObject {
             }
         },
         {
-            id: "bars",
-            legacyIndex: 6,
-            label: "Bars",
-            icon: "󰕮",
-            categoryId: "surfaces",
-            order: 10,
-            component: "BarTab.qml",
-            searchTerms: ["bar", "bars", "multi bar", "display assignment"],
-            owner: {
-                surface: "bar",
-                service: "Config",
-                configDomain: "bars"
-            }
-        },
-        {
-            id: "bar-widgets",
-            legacyIndex: 7,
-            label: "Bar Widgets",
-            icon: "󰖲",
-            categoryId: "surfaces",
-            order: 20,
-            component: "BarWidgetsTab.qml",
-            searchTerms: ["bar widgets", "widgets", "sections"],
-            owner: {
-                surface: "bar",
-                service: "BarWidgetRegistry",
-                configDomain: "barWidgets"
-            }
-        },
-        {
-            id: "dock",
-            legacyIndex: 8,
-            label: "Dock",
-            icon: "󰍜",
-            categoryId: "surfaces",
-            order: 30,
-            component: "DockTab.qml",
-            searchTerms: ["dock", "pinned", "apps"],
-            owner: {
-                surface: "dock",
-                service: "Config",
-                configDomain: "dock"
-            }
-        },
-        {
-            id: "widgets",
-            legacyIndex: 9,
-            label: "Desktop Widgets",
-            icon: "󰖲",
-            categoryId: "surfaces",
-            order: 40,
-            component: "WidgetsTab.qml",
-            searchTerms: ["widgets", "desktop"],
-            owner: {
-                surface: "desktopWidgets",
-                service: "DesktopWidgetRegistry",
-                configDomain: "desktopWidgets"
-            }
-        },
-        {
-            id: "background",
-            label: "Background",
-            icon: "󰸉",
-            categoryId: "surfaces",
-            order: 45,
-            component: "BackgroundTab.qml",
-            searchTerms: ["background", "visualizer", "clock", "spectrum", "cava", "shader", "glsl", "personality", "cat", "gif"],
-            owner: {
-                surface: "background",
-                service: "Config",
-                configDomain: "background"
-            }
-        },
-        {
-            id: "lock-screen",
-            legacyIndex: 10,
-            label: "Lock Screen",
-            icon: "󰌾",
-            categoryId: "surfaces",
-            order: 50,
-            component: "LockScreenTab.qml",
-            searchTerms: ["lock", "screen", "auth"],
-            owner: {
-                surface: "lockscreen",
-                service: "Config",
-                configDomain: "lockScreen"
-            }
-        },
-        {
-            id: "privacy",
-            legacyIndex: 11,
-            label: "Privacy",
-            icon: "󰒃",
-            categoryId: "power-privacy",
-            order: 10,
-            component: "PrivacyTab.qml",
-            searchTerms: ["privacy", "camera", "mic"],
-            owner: {
-                surface: "privacyMenu",
-                service: "PrivacyService",
-                configDomain: "privacy"
-            }
-        },
-        {
-            id: "power",
-            legacyIndex: 12,
-            label: "Power",
-            icon: "󰌪",
-            categoryId: "power-privacy",
-            order: 20,
-            component: "PowerTab.qml",
-            searchTerms: ["power", "battery"],
-            owner: {
-                surface: "powerMenu",
-                service: "Config",
-                configDomain: "power"
-            }
-        },
-        {
-            id: "hotkeys",
-            legacyIndex: 13,
-            label: "Keybinds",
-            icon: "󰌌",
-            categoryId: "interaction",
-            order: 30,
-            component: "HotkeysTab.qml",
-            searchTerms: ["keys", "shortcuts", "bindings", "cheatsheet"],
-            owner: {
-                surface: "",
-                service: "Config",
-                configDomain: "hotkeys"
-            }
-        },
-        {
-            id: "plugins",
-            legacyIndex: 14,
-            label: "Plugins",
-            icon: "󰏗",
-            categoryId: "extensibility",
-            order: 10,
-            component: "PluginsTab.qml",
-            searchTerms: ["plugins", "extensions"],
-            owner: {
-                surface: "",
-                service: "PluginService",
-                configDomain: "plugins"
-            }
-        },
-        {
-            id: "health",
-            label: "Health",
-            icon: "󰓅",
-            categoryId: "meta",
-            order: 5,
-            component: "HealthTab.qml",
-            searchTerms: ["health", "status", "incidents", "diagnostics", "vitals"],
-            owner: {
-                surface: "",
-                service: "SystemStatus",
-                configDomain: "health"
-            }
-        },
-        {
-            id: "about",
-            legacyIndex: 15,
-            label: "About",
-            icon: "󰋗",
-            categoryId: "meta",
-            order: 10,
-            component: "AboutTab.qml",
-            searchTerms: ["about", "version"],
-            owner: {
-                surface: "",
-                service: "Config",
-                configDomain: "about"
-            }
-        },
-        {
             id: "time-weather",
             legacyIndex: 16,
             label: "Time & Weather",
+            shortLabel: "Time",
+            description: "Configure clocks, weather, markets, and live location data.",
+            pageStyle: "control",
             icon: "󰔛",
             categoryId: "interaction",
             order: 20,
@@ -480,9 +343,30 @@ QtObject {
             }
         },
         {
+            id: "hotkeys",
+            legacyIndex: 13,
+            label: "Keybinds",
+            shortLabel: "Keybinds",
+            description: "Search, review, and reason about keyboard bindings across the shell.",
+            pageStyle: "control",
+            icon: "󰌌",
+            categoryId: "interaction",
+            order: 30,
+            component: "HotkeysTab.qml",
+            searchTerms: ["keys", "shortcuts", "bindings", "cheatsheet"],
+            owner: {
+                surface: "",
+                service: "Config",
+                configDomain: "hotkeys"
+            }
+        },
+        {
             id: "notifications",
             legacyIndex: 17,
             label: "Notifications",
+            shortLabel: "Notifications",
+            description: "Tune popup layout, history, timeout behavior, and notification rules.",
+            pageStyle: "control",
             icon: "󰂚",
             categoryId: "interaction",
             order: 40,
@@ -498,6 +382,9 @@ QtObject {
             id: "audio",
             legacyIndex: 18,
             label: "Audio",
+            shortLabel: "Audio",
+            description: "Manage audio safeguards, device visibility, and pinned devices.",
+            pageStyle: "control",
             icon: "󰕾",
             categoryId: "interaction",
             order: 50,
@@ -512,9 +399,12 @@ QtObject {
         {
             id: "recording",
             label: "Recording",
+            shortLabel: "Recording",
+            description: "Configure screen recording capture, audio sources, and output storage.",
+            pageStyle: "control",
             icon: "󰻃",
             categoryId: "interaction",
-            order: 55,
+            order: 60,
             component: "RecordingTab.qml",
             searchTerms: ["recording", "screen recorder", "gpu-screen-recorder", "portal", "fps", "cursor"],
             owner: {
@@ -524,9 +414,138 @@ QtObject {
             }
         },
         {
+            id: "bars",
+            legacyIndex: 6,
+            label: "Bar Layout",
+            shortLabel: "Bars",
+            description: "Manage bar instances, monitor placement, and per-bar layout settings.",
+            pageStyle: "surface",
+            icon: "󰕮",
+            categoryId: "surfaces",
+            order: 10,
+            component: "BarTab.qml",
+            searchTerms: ["bar", "bars", "multi bar", "display assignment"],
+            owner: {
+                surface: "bar",
+                service: "Config",
+                configDomain: "bars"
+            }
+        },
+        {
+            id: "bar-widgets",
+            legacyIndex: 7,
+            label: "Bar Widgets",
+            shortLabel: "Widgets",
+            description: "Arrange bar widget instances, sections, and placement rules.",
+            pageStyle: "surface",
+            icon: "󰖲",
+            categoryId: "surfaces",
+            order: 20,
+            component: "BarWidgetsTab.qml",
+            searchTerms: ["bar widgets", "widgets", "sections"],
+            owner: {
+                surface: "bar",
+                service: "BarWidgetRegistry",
+                configDomain: "barWidgets"
+            }
+        },
+        {
+            id: "dock",
+            legacyIndex: 8,
+            label: "Dock",
+            shortLabel: "Dock",
+            description: "Configure dock behavior, layout, and pinned destinations.",
+            pageStyle: "surface",
+            icon: "󰍜",
+            categoryId: "surfaces",
+            order: 30,
+            component: "DockTab.qml",
+            searchTerms: ["dock", "pinned", "apps"],
+            owner: {
+                surface: "dock",
+                service: "Config",
+                configDomain: "dock"
+            }
+        },
+        {
+            id: "widgets",
+            legacyIndex: 9,
+            label: "Desktop Widgets",
+            shortLabel: "Desktop",
+            description: "Manage desktop widget surfaces and their placement behavior.",
+            pageStyle: "surface",
+            icon: "󰖲",
+            categoryId: "surfaces",
+            order: 40,
+            component: "WidgetsTab.qml",
+            searchTerms: ["widgets", "desktop"],
+            owner: {
+                surface: "desktopWidgets",
+                service: "DesktopWidgetRegistry",
+                configDomain: "desktopWidgets"
+            }
+        },
+        {
+            id: "background",
+            label: "Background",
+            shortLabel: "Background",
+            description: "Control background layers, visualizers, and personality overlays.",
+            pageStyle: "surface",
+            icon: "󰸉",
+            categoryId: "surfaces",
+            order: 45,
+            component: "BackgroundTab.qml",
+            searchTerms: ["background", "visualizer", "clock", "spectrum", "cava", "shader", "glsl", "personality", "cat", "gif"],
+            owner: {
+                surface: "background",
+                service: "Config",
+                configDomain: "background"
+            }
+        },
+        {
+            id: "lock-screen",
+            legacyIndex: 10,
+            label: "Lock Screen",
+            shortLabel: "Lock",
+            description: "Choose lock-screen features and authentication presentation.",
+            pageStyle: "surface",
+            icon: "󰌾",
+            categoryId: "surfaces",
+            order: 50,
+            component: "LockScreenTab.qml",
+            searchTerms: ["lock", "screen", "auth"],
+            owner: {
+                surface: "lockscreen",
+                service: "Config",
+                configDomain: "lockScreen"
+            }
+        },
+        {
+            id: "hyprland",
+            legacyIndex: 4,
+            label: "Hyprland",
+            shortLabel: "Hyprland",
+            description: "Control display layout, gaps, opacity, and compositor layout defaults.",
+            pageStyle: "control",
+            icon: "󱗼",
+            categoryId: "window-manager",
+            order: 10,
+            component: "HyprlandTab.qml",
+            compositor: "hyprland",
+            searchTerms: ["hyprland", "gaps", "opacity", "layout"],
+            owner: {
+                surface: "",
+                service: "SettingsHub",
+                configDomain: "hyprland"
+            }
+        },
+        {
             id: "workspaces",
             legacyIndex: 19,
             label: "Workspaces",
+            shortLabel: "Workspaces",
+            description: "Adjust workspace display, scroll behavior, and auxiliary features.",
+            pageStyle: "control",
             icon: "󰕮",
             categoryId: "window-manager",
             order: 20,
@@ -539,9 +558,48 @@ QtObject {
             }
         },
         {
+            id: "privacy",
+            legacyIndex: 11,
+            label: "Privacy",
+            shortLabel: "Privacy",
+            description: "Manage privacy indicators and capture-related disclosure surfaces.",
+            pageStyle: "control",
+            icon: "󰒃",
+            categoryId: "power-privacy",
+            order: 10,
+            component: "PrivacyTab.qml",
+            searchTerms: ["privacy", "camera", "mic"],
+            owner: {
+                surface: "privacyMenu",
+                service: "PrivacyService",
+                configDomain: "privacy"
+            }
+        },
+        {
+            id: "power",
+            legacyIndex: 12,
+            label: "Power",
+            shortLabel: "Power",
+            description: "Set power-menu behavior, display policies, and battery profiles.",
+            pageStyle: "control",
+            icon: "󰌪",
+            categoryId: "power-privacy",
+            order: 20,
+            component: "PowerTab.qml",
+            searchTerms: ["power", "battery"],
+            owner: {
+                surface: "powerMenu",
+                service: "Config",
+                configDomain: "power"
+            }
+        },
+        {
             id: "night-light",
             legacyIndex: 20,
             label: "Night Light",
+            shortLabel: "Night Light",
+            description: "Control color temperature and automatic scheduling for eye comfort.",
+            pageStyle: "control",
             icon: "󰖔",
             categoryId: "power-privacy",
             order: 30,
@@ -554,24 +612,30 @@ QtObject {
             }
         },
         {
-            id: "presets",
-            legacyIndex: 21,
-            label: "Presets",
-            icon: "󰆓",
-            categoryId: "meta",
-            order: 20,
-            component: "PresetsTab.qml",
-            searchTerms: ["presets", "save", "load", "snapshot", "backup"],
+            id: "plugins",
+            legacyIndex: 14,
+            label: "Plugins",
+            shortLabel: "Plugins",
+            description: "Enable installed plugins and manage plugin installation sources.",
+            pageStyle: "catalog",
+            icon: "󰏗",
+            categoryId: "extensibility",
+            order: 10,
+            component: "PluginsTab.qml",
+            searchTerms: ["plugins", "extensions"],
             owner: {
                 surface: "",
-                service: "PresetService",
-                configDomain: "presets"
+                service: "PluginService",
+                configDomain: "plugins"
             }
         },
         {
             id: "hooks",
             legacyIndex: 22,
             label: "Hooks",
+            shortLabel: "Hooks",
+            description: "Configure automation hooks and inspect installed event-driven scripts.",
+            pageStyle: "catalog",
             icon: "󱁨",
             categoryId: "extensibility",
             order: 20,
@@ -587,6 +651,9 @@ QtObject {
             id: "ai",
             legacyIndex: 23,
             label: "AI Assistant",
+            shortLabel: "AI",
+            description: "Choose providers, keys, prompts, and generation defaults for AI features.",
+            pageStyle: "catalog",
             icon: "󰚩",
             categoryId: "extensibility",
             order: 30,
@@ -601,15 +668,71 @@ QtObject {
         {
             id: "model-usage",
             label: "Model Usage",
+            shortLabel: "Usage",
+            description: "Track provider usage panels, polling, and usage display behavior.",
+            pageStyle: "catalog",
             icon: "󰊤",
             categoryId: "extensibility",
-            order: 35,
+            order: 40,
             component: "ModelUsageTab.qml",
             searchTerms: ["model", "usage", "claude", "codex", "gemini", "tokens", "prompts", "rate limit"],
             owner: {
                 surface: "modelUsageMenu",
                 service: "ModelUsageService",
                 configDomain: "modelUsage"
+            }
+        },
+        {
+            id: "health",
+            label: "Diagnostics",
+            shortLabel: "Diagnostics",
+            description: "Review shell incidents, vitals, and recovery actions.",
+            pageStyle: "utility",
+            icon: "󰓅",
+            categoryId: "meta",
+            order: 10,
+            component: "HealthTab.qml",
+            searchTerms: ["health", "status", "incidents", "diagnostics", "vitals"],
+            owner: {
+                surface: "",
+                service: "SystemStatus",
+                configDomain: "health"
+            }
+        },
+        {
+            id: "about",
+            legacyIndex: 15,
+            label: "About",
+            shortLabel: "About",
+            description: "Inspect shell identity, host information, and runtime details.",
+            pageStyle: "utility",
+            icon: "󰋗",
+            categoryId: "meta",
+            order: 20,
+            component: "AboutTab.qml",
+            searchTerms: ["about", "version"],
+            owner: {
+                surface: "",
+                service: "Config",
+                configDomain: "about"
+            }
+        },
+        {
+            id: "presets",
+            legacyIndex: 21,
+            label: "Presets",
+            shortLabel: "Presets",
+            description: "Save, restore, and inspect reusable shell configuration snapshots.",
+            pageStyle: "catalog",
+            icon: "󰆓",
+            categoryId: "meta",
+            order: 30,
+            component: "PresetsTab.qml",
+            searchTerms: ["presets", "save", "load", "snapshot", "backup"],
+            owner: {
+                surface: "",
+                service: "PresetService",
+                configDomain: "presets"
             }
         }
     ]
@@ -631,17 +754,25 @@ QtObject {
     }
 
     function sortedCategories() {
-        return categories.slice().sort(function (a, b) {
+        return categories.slice().sort(function(a, b) {
             return (a.order || 0) - (b.order || 0);
-        }).filter(function (category) {
+        }).filter(function(category) {
             return tabsForCategory(category.id).length > 0;
         });
     }
 
+    function findCategory(categoryId) {
+        for (var i = 0; i < categories.length; i++) {
+            if (categories[i].id === categoryId)
+                return categories[i];
+        }
+        return null;
+    }
+
     function tabsForCategory(categoryId) {
-        return supportedTabs().filter(function (tab) {
+        return supportedTabs().filter(function(tab) {
             return tab.categoryId === categoryId;
-        }).sort(function (a, b) {
+        }).sort(function(a, b) {
             return (a.order || 0) - (b.order || 0);
         });
     }
@@ -653,6 +784,39 @@ QtObject {
                 return supported[i];
         }
         return null;
+    }
+
+    function categoryForTab(tabId) {
+        var tab = findTab(tabId);
+        return tab ? findCategory(tab.categoryId) : null;
+    }
+
+    function relatedTabsFor(tabId, limit) {
+        var tab = findTab(tabId);
+        if (!tab)
+            return [];
+
+        var out = [];
+        var seen = {};
+        var preferred = tab.relatedTabs || [];
+        var maxItems = limit !== undefined ? Math.max(0, Number(limit) || 0) : 4;
+
+        function pushTab(candidateId) {
+            var candidate = findTab(candidateId);
+            if (!candidate || candidate.id === tab.id || seen[candidate.id])
+                return;
+            seen[candidate.id] = true;
+            out.push(candidate);
+        }
+
+        for (var i = 0; i < preferred.length; i++)
+            pushTab(preferred[i]);
+
+        var siblings = tabsForCategory(tab.categoryId);
+        for (var j = 0; j < siblings.length; j++)
+            pushTab(siblings[j].id);
+
+        return maxItems > 0 ? out.slice(0, maxItems) : out;
     }
 
     function tabIdForIndex(index) {
@@ -681,10 +845,18 @@ QtObject {
         var results = [];
         var supported = supportedTabs();
         for (var i = 0; i < supported.length; i++) {
-            var t = supported[i];
-            var haystack = (t.label + " " + (t.searchTerms || []).join(" ")).toLowerCase();
+            var tab = supported[i];
+            var category = findCategory(tab.categoryId);
+            var haystack = [
+                tab.label,
+                tab.shortLabel || "",
+                tab.description || "",
+                category ? category.label : "",
+                category && category.description ? category.description : "",
+                (tab.searchTerms || []).join(" ")
+            ].join(" ").toLowerCase();
             if (haystack.indexOf(q) !== -1)
-                results.push(t);
+                results.push(tab);
         }
         return results;
     }
@@ -699,32 +871,32 @@ QtObject {
         var categoryIds = {};
 
         for (var i = 0; i < categories.length; i++) {
-            var c = categories[i];
-            if (!c.id)
+            var category = categories[i];
+            if (!category.id)
                 Logger.w("SettingsRegistry", "category missing id at index " + i);
-            if (categoryIds[c.id])
-                Logger.w("SettingsRegistry", "duplicate category id '" + c.id + "'");
-            categoryIds[c.id] = true;
+            if (categoryIds[category.id])
+                Logger.w("SettingsRegistry", "duplicate category id '" + category.id + "'");
+            categoryIds[category.id] = true;
         }
 
         for (var j = 0; j < tabs.length; j++) {
-            var t = tabs[j];
-            if (!t.id)
+            var tab = tabs[j];
+            if (!tab.id)
                 Logger.w("SettingsRegistry", "tab missing id at index " + j);
-            if (seenTabIds[t.id])
-                Logger.w("SettingsRegistry", "duplicate tab id '" + t.id + "'");
-            seenTabIds[t.id] = true;
+            if (seenTabIds[tab.id])
+                Logger.w("SettingsRegistry", "duplicate tab id '" + tab.id + "'");
+            seenTabIds[tab.id] = true;
 
-            if (!t.categoryId || !categoryIds[t.categoryId])
-                Logger.w("SettingsRegistry", "tab '" + t.id + "' references unknown category '" + t.categoryId + "'");
+            if (!tab.categoryId || !categoryIds[tab.categoryId])
+                Logger.w("SettingsRegistry", "tab '" + tab.id + "' references unknown category '" + tab.categoryId + "'");
 
-            if (!t.component)
-                Logger.w("SettingsRegistry", "tab '" + t.id + "' missing component");
+            if (!tab.component)
+                Logger.w("SettingsRegistry", "tab '" + tab.id + "' missing component");
 
-            if (t.legacyIndex !== undefined) {
-                if (seenLegacy[t.legacyIndex] !== undefined)
-                    Logger.w("SettingsRegistry", "duplicate legacyIndex " + t.legacyIndex + " for tabs '" + seenLegacy[t.legacyIndex] + "' and '" + t.id + "'");
-                seenLegacy[t.legacyIndex] = t.id;
+            if (tab.legacyIndex !== undefined) {
+                if (seenLegacy[tab.legacyIndex] !== undefined)
+                    Logger.w("SettingsRegistry", "duplicate legacyIndex " + tab.legacyIndex + " for tabs '" + seenLegacy[tab.legacyIndex] + "' and '" + tab.id + "'");
+                seenLegacy[tab.legacyIndex] = tab.id;
             }
         }
 

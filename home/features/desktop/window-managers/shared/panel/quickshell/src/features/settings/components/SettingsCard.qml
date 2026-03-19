@@ -18,15 +18,13 @@ Rectangle {
 
     Layout.fillWidth: true
     implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Colors.spacingL : 0)
-    radius: Colors.radiusMedium
-    color: Colors.withAlpha(Colors.surface, 0.6)
+    radius: Colors.radiusLarge
+    color: Colors.withAlpha(Colors.surface, 0.64)
     border.color: Colors.withAlpha(Colors.text, 0.12)
     border.width: 1
     clip: true
 
-
-    // Inner highlight
-    SharedWidgets.InnerHighlight { }
+    SharedWidgets.InnerHighlight { highlightOpacity: 0.1 }
 
     Behavior on implicitHeight {
         Anim {}
@@ -34,44 +32,49 @@ Rectangle {
 
     Rectangle {
         id: headerContainer
-        anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-        }
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
         implicitHeight: headerColumn.implicitHeight + Colors.spacingM * 2
-        color: Colors.withAlpha(Colors.primary, 0.08)
-        radius: Colors.radiusMedium
+        color: Colors.withAlpha(Colors.surface, 0.28)
 
-        // Round only top corners
         Rectangle {
+            anchors.left: parent.left
+            anchors.top: parent.top
             anchors.bottom: parent.bottom
-            width: parent.width
-            height: parent.radius
-            color: parent.color
-            visible: root.expanded
+            width: 3
+            color: Colors.withAlpha(Colors.primary, root.expanded ? 0.8 : 0.55)
         }
 
         ColumnLayout {
             id: headerColumn
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                margins: Colors.spacingM
-            }
-            spacing: Colors.spacingXXS
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: Colors.spacingM
+            anchors.leftMargin: Colors.spacingL
+            spacing: Colors.spacingXS
 
             RowLayout {
                 Layout.fillWidth: true
                 spacing: Colors.spacingS
 
-                Text {
+                Rectangle {
                     visible: root.iconName !== ""
-                    text: root.iconName
-                    color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    Layout.preferredWidth: 28
+                    Layout.preferredHeight: 28
+                    radius: Colors.radiusMedium
+                    color: Colors.primarySubtle
+                    border.color: Colors.primaryRing
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: root.iconName
+                        color: Colors.primary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeSmall
+                    }
                 }
 
                 Text {
@@ -79,16 +82,16 @@ Rectangle {
                     text: root.title
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeMedium
-                    font.weight: Font.DemiBold
+                    font.weight: Font.Black
                     wrapMode: Text.WordWrap
                 }
 
                 Rectangle {
                     visible: root._showChevron
-                    implicitWidth: 24
-                    implicitHeight: 24
+                    implicitWidth: 26
+                    implicitHeight: 26
                     radius: Colors.radiusCard
-                    color: Colors.withAlpha(Colors.text, collapseHover.containsMouse ? 0.14 : 0.08)
+                    color: Colors.withAlpha(Colors.surface, collapseHover.containsMouse ? 0.62 : 0.42)
                     border.color: Colors.border
                     border.width: 1
 
@@ -130,11 +133,9 @@ Rectangle {
     }
 
     Rectangle {
-        anchors {
-            left: parent.left
-            right: parent.right
-            top: headerContainer.bottom
-        }
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: headerContainer.bottom
         height: 1
         color: Colors.withAlpha(Colors.border, 0.7)
         visible: root.expanded
@@ -142,15 +143,13 @@ Rectangle {
 
     ColumnLayout {
         id: contentColumn
-        anchors {
-            left: parent.left
-            right: parent.right
-            top: headerContainer.bottom
-            leftMargin: Colors.spacingL
-            rightMargin: Colors.spacingL
-            topMargin: Colors.spacingM
-            bottomMargin: Colors.spacingL
-        }
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: headerContainer.bottom
+        anchors.leftMargin: Colors.spacingL
+        anchors.rightMargin: Colors.spacingL
+        anchors.topMargin: Colors.spacingM
+        anchors.bottomMargin: Colors.spacingL
         spacing: Colors.spacingL
         visible: root.expanded
     }

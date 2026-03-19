@@ -27,6 +27,7 @@ Item {
     readonly property bool isLauncherWebSection: sectionMode === "launcher-web"
     readonly property bool isLauncherModesSection: sectionMode === "launcher-modes"
     readonly property bool isLauncherRuntimeSection: sectionMode === "launcher-runtime"
+    readonly property bool launcherFilePreviewToggleAvailable: Quickshell.env("QS_ENABLE_UNSTABLE_LAUNCHER_FILE_PREVIEW") === "1"
     readonly property string currentLauncherTabId: isLauncherSearchSection ? "launcher-search"
         : (isLauncherWebSection ? "launcher-web"
         : (isLauncherModesSection ? "launcher-modes"
@@ -589,7 +590,15 @@ Item {
                 disabledText: "Hide dotfiles and hidden directories in file mode."
             }
 
+            SettingsInfoCallout {
+                visible: !root.launcherFilePreviewToggleAvailable
+                iconName: "󰋗"
+                title: "File Preview Temporarily Disabled"
+                body: "The file preview pane is gated off by default while a QuickShell restart issue in files mode is being root-caused. Set QS_ENABLE_UNSTABLE_LAUNCHER_FILE_PREVIEW=1 only for debugging."
+            }
+
             SettingsToggleRow {
+                visible: root.launcherFilePreviewToggleAvailable
                 label: "File Preview Pane"
                 icon: "󰋩"
                 configKey: "launcherFilePreviewEnabled"
