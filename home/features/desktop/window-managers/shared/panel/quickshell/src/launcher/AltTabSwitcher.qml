@@ -10,8 +10,13 @@ Scope {
     id: root
 
     property bool isVisible: false
+    property bool _destroyed: false
+    Component.onDestruction: _destroyed = true
 
-    // Compositor-agnostic MRU window list
+    // Snapshot of window list taken on show(), updated only when a window is closed
+    property var _cachedWindowList: []
+
+    // Compositor-agnostic MRU window list (live — used to detect closed windows)
     readonly property var windowList: {
         var mru = CompositorAdapter.mruWindowIds;
         if (mru.length === 0)
@@ -56,15 +61,32 @@ Scope {
 
     property int selectedIndex: 0
 
-    // Clamp selectedIndex when window list shrinks (e.g. window closed while switcher open)
+    // Only update cache when a window is closed (selected ID missing from live list)
     onWindowListChanged: {
-        if (selectedIndex >= windowList.length)
-            selectedIndex = Math.max(0, windowList.length - 1);
+        if (!isVisible || _cachedWindowList.length === 0)
+            return;
+        var selectedId = selectedIndex >= 0 && selectedIndex < _cachedWindowList.length
+            ? _cachedWindowList[selectedIndex].id : null;
+        if (selectedId !== null) {
+            var found = false;
+            for (var i = 0; i < windowList.length; i++) {
+                if (windowList[i].id === selectedId) { found = true; break; }
+            }
+            if (!found) {
+                // Window was closed — rebuild cache from live list
+                _cachedWindowList = windowList.slice();
+                if (selectedIndex >= _cachedWindowList.length)
+                    selectedIndex = Math.max(0, _cachedWindowList.length - 1);
+                if (_cachedWindowList.length <= 1)
+                    hide();
+            }
+        }
     }
 
     function show() {
         if (windowList.length < 2)
             return;
+        _cachedWindowList = windowList.slice();
         selectedIndex = 1; // Start on second (previous) window
         isVisible = true;
     }
@@ -74,32 +96,31 @@ Scope {
     }
 
     function confirm() {
-        if (selectedIndex >= 0 && selectedIndex < windowList.length) {
-            var win = windowList[selectedIndex];
+        if (selectedIndex >= 0 && selectedIndex < _cachedWindowList.length) {
+            var win = _cachedWindowList[selectedIndex];
             CompositorAdapter.focusWindow(win.id);
         }
         hide();
     }
 
     function closeSelected() {
-        if (selectedIndex >= 0 && selectedIndex < windowList.length) {
-            var win = windowList[selectedIndex];
+        if (selectedIndex >= 0 && selectedIndex < _cachedWindowList.length) {
+            var win = _cachedWindowList[selectedIndex];
             CompositorAdapter.closeWindow(win.id);
         }
-        if (windowList.length <= 1)
-            hide();
+        // Cache update handled by onWindowListChanged
     }
 
     function cycleNext() {
-        if (windowList.length === 0)
+        if (_cachedWindowList.length === 0)
             return;
-        selectedIndex = (selectedIndex + 1) % windowList.length;
+        selectedIndex = (selectedIndex + 1) % _cachedWindowList.length;
     }
 
     function cyclePrev() {
-        if (windowList.length === 0)
+        if (_cachedWindowList.length === 0)
             return;
-        selectedIndex = (selectedIndex - 1 + windowList.length) % windowList.length;
+        selectedIndex = (selectedIndex - 1 + _cachedWindowList.length) % _cachedWindowList.length;
     }
 
     IpcHandler {
@@ -186,6 +207,16 @@ Scope {
                                 }
                             }
 
+                            WheelHandler {
+                                onWheel: event => {
+                                    var delta = event.angleDelta.y;
+                                    if (delta > 0)
+                                        root.cyclePrev();
+                                    else if (delta < 0)
+                                        root.cycleNext();
+                                }
+                            }
+
                             // Dim background
                             Rectangle {
                                 anchors.fill: parent
@@ -204,192 +235,216 @@ Scope {
                                 }
                             }
 
-                            // Centered card row
+                            // Centered card container
                             Item {
                                 anchors.centerIn: parent
-                                width: cardRow.width
-                                height: cardRow.height + titleLabel.height + Colors.spacingM
+                                width: cardFlickable.width
+                                height: cardFlickable.height + titleLabel.height + hintRow.height + Colors.spacingM * 2 + (indexLabel.visible ? indexLabel.height + Colors.spacingS : 0)
 
-                                Row {
-                                    id: cardRow
+                                Flickable {
+                                    id: cardFlickable
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: Colors.spacingM
+                                    width: Math.min(cardRow.implicitWidth, focusItem.width * 0.85)
+                                    height: cardRow.implicitHeight
+                                    contentWidth: cardRow.implicitWidth
+                                    contentHeight: height
+                                    flickableDirection: Flickable.HorizontalFlick
+                                    clip: contentWidth > width
+                                    boundsBehavior: Flickable.StopAtBounds
 
-                                    Repeater {
-                                        model: root.windowList
-
-                                    delegate: Rectangle {
-                                        id: card
-                                        readonly property bool isSelected: index === root.selectedIndex
-                                        width: 120
-                                        height: 100
-                                        radius: Colors.radiusCard
-                                        color: isSelected ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.45)
-                                        border.color: isSelected ? Colors.primary : Colors.border
-                                        border.width: isSelected ? 2 : 1
-                                        scale: isSelected ? 1.15 : 1.0
-                                        Behavior on scale {
-                                            SpringAnimation {
-                                                spring: 5.0
-                                                damping: 0.3
-                                                epsilon: 0.005
-                                            }
+                                    Behavior on contentX {
+                                        NumberAnimation {
+                                            duration: Colors.animMove.duration
+                                            easing.type: Colors.animMove.type
+                                            easing.bezierCurve: Colors.animMove.bezierCurve
                                         }
-                                        Behavior on color {
-                                            enabled: !Colors.isTransitioning
-                                            CAnim {}
-                                        }
+                                    }
 
-                                        gradient: isSelected ? selectedGradient : null
+                                    function ensureVisible(idx) {
+                                        if (idx < 0 || idx >= root._cachedWindowList.length)
+                                            return;
+                                        var cardWidth = 148;
+                                        var spacing = Colors.spacingM;
+                                        var cardX = idx * (cardWidth + spacing);
+                                        var cardRight = cardX + cardWidth;
+                                        if (cardX < contentX)
+                                            contentX = Math.max(0, cardX - spacing);
+                                        else if (cardRight > contentX + width)
+                                            contentX = Math.min(contentWidth - width, cardRight - width + spacing);
+                                    }
 
-                                        Gradient {
-                                            id: selectedGradient
-                                            orientation: Gradient.Vertical
+                                    Row {
+                                        id: cardRow
+                                        spacing: Colors.spacingM
 
-                                            GradientStop {
-                                                position: 0.0
-                                                color: Colors.primaryGhost
-                                            }
+                                        Repeater {
+                                            model: root._cachedWindowList
 
-                                            GradientStop {
-                                                position: 1.0
-                                                color: "transparent"
-                                            }
-                                        }
-
-                                        SharedWidgets.InnerHighlight {
-                                            hoveredOpacity: 0.3
-                                            hovered: isSelected
-                                        }
-
-                                        Column {
-                                            anchors.centerIn: parent
-                                            spacing: Colors.spacingS
-
-                                            SharedWidgets.AppIcon {
-                                                anchors.horizontalCenter: parent.horizontalCenter
-                                                iconName: modelData.app_id || ""
-                                                appName: modelData.title || modelData.app_id || ""
-                                                iconSize: 40
-                                            }
-
-                                            Text {
-                                                anchors.horizontalCenter: parent.horizontalCenter
-                                                width: card.width - Colors.spacingM * 2
-                                                text: modelData.app_id || "Unknown"
-                                                color: card.isSelected ? Colors.text : Colors.textSecondary
-                                                font.pixelSize: Colors.fontSizeXS
-                                                font.family: Colors.fontMono
-                                                horizontalAlignment: Text.AlignHCenter
-                                                elide: Text.ElideRight
-                                            }
-
-                                            Text {
-                                                anchors.horizontalCenter: parent.horizontalCenter
-                                                width: card.width - Colors.spacingM * 2
-                                                text: modelData.title || ""
-                                                visible: text !== "" && text !== (modelData.app_id || "")
-                                                color: Colors.textSecondary
-                                                font.pixelSize: Colors.fontSizeXXS
-                                                horizontalAlignment: Text.AlignHCenter
-                                                elide: Text.ElideRight
-                                            }
-                                        }
-
-                                        // Workspace badge
-                                        Rectangle {
-                                            anchors.top: parent.top
-                                            anchors.right: parent.right
-                                            anchors.margins: Colors.spacingXS
-                                            width: wsBadgeText.implicitWidth + Colors.spacingS * 2
-                                            height: wsBadgeText.implicitHeight + Colors.spacingXS
-                                            radius: Colors.radiusMicro
-                                            color: Colors.withAlpha(Colors.bg, 0.7)
-                                            visible: modelData.workspace_id !== undefined
-
-                                            Text {
-                                                id: wsBadgeText
-                                                anchors.centerIn: parent
-                                                text: CompositorAdapter.workspaceNameById(modelData.workspace_id)
-                                                color: Colors.textSecondary
-                                                font.pixelSize: Colors.fontSizeXXS
-                                            }
-                                        }
-
-                                        // Close button
-                                        Rectangle {
-                                            width: 20
-                                            height: 20
+                                        delegate: Rectangle {
+                                            id: card
+                                            readonly property bool isSelected: index === root.selectedIndex
+                                            width: 148
+                                            height: 120
                                             radius: Colors.radiusCard
-                                            color: Colors.error
-                                            opacity: cardMouse.containsMouse ? 0.9 : 0.0
-                                            visible: opacity > 0
-                                            anchors.top: parent.top
-                                            anchors.left: parent.left
-                                            anchors.margins: Colors.spacingXS
-                                            z: 1
-                                            Behavior on opacity {
-                                                NumberAnimation { duration: Colors.durationFast }
+                                            color: isSelected ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.45)
+                                            border.color: isSelected ? Colors.primary : Colors.border
+                                            border.width: isSelected ? 2 : 1
+                                            scale: isSelected ? 1.08 : 1.0
+                                            layer.enabled: _scaleAnim.running
+                                            Behavior on scale {
+                                                NumberAnimation {
+                                                    id: _scaleAnim
+                                                    duration: Colors.animMove.duration
+                                                    easing.type: Colors.animMove.type
+                                                    easing.bezierCurve: Colors.animMove.bezierCurve
+                                                }
+                                            }
+                                            Behavior on color {
+                                                enabled: !Colors.isTransitioning
+                                                CAnim {}
                                             }
 
-                                            Text {
+                                            gradient: isSelected ? selectedGradient : null
+
+                                            Gradient {
+                                                id: selectedGradient
+                                                orientation: Gradient.Vertical
+
+                                                GradientStop {
+                                                    position: 0.0
+                                                    color: Colors.primaryGhost
+                                                }
+
+                                                GradientStop {
+                                                    position: 1.0
+                                                    color: "transparent"
+                                                }
+                                            }
+
+                                            SharedWidgets.InnerHighlight {
+                                                hoveredOpacity: 0.3
+                                                hovered: isSelected
+                                            }
+
+                                            Column {
                                                 anchors.centerIn: parent
-                                                text: "󰅖"
-                                                color: Colors.text
-                                                font.family: Colors.fontMono
-                                                font.pixelSize: Colors.fontSizeXS
+                                                spacing: Colors.spacingS
+
+                                                SharedWidgets.AppIcon {
+                                                    anchors.horizontalCenter: parent.horizontalCenter
+                                                    iconName: modelData.app_id || ""
+                                                    appName: modelData.title || modelData.app_id || ""
+                                                    iconSize: 52
+                                                }
+
+                                                Text {
+                                                    anchors.horizontalCenter: parent.horizontalCenter
+                                                    width: card.width - Colors.spacingM * 2
+                                                    text: modelData.app_id || "Unknown"
+                                                    color: card.isSelected ? Colors.text : Colors.textSecondary
+                                                    font.pixelSize: Colors.fontSizeSmall
+                                                    font.weight: Font.Medium
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                    elide: Text.ElideRight
+                                                }
+
+                                                Text {
+                                                    anchors.horizontalCenter: parent.horizontalCenter
+                                                    width: card.width - Colors.spacingM * 2
+                                                    text: modelData.title || ""
+                                                    visible: text !== "" && text !== (modelData.app_id || "")
+                                                    color: Colors.textSecondary
+                                                    font.pixelSize: Colors.fontSizeXS
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                    elide: Text.ElideRight
+                                                }
                                             }
 
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                cursorShape: Qt.PointingHandCursor
+                                            // Workspace badge
+                                            Rectangle {
+                                                anchors.top: parent.top
+                                                anchors.right: parent.right
+                                                anchors.margins: Colors.spacingXS
+                                                width: wsBadgeText.implicitWidth + Colors.spacingS * 2
+                                                height: wsBadgeText.implicitHeight + Colors.spacingXS
+                                                radius: Colors.radiusMicro
+                                                color: Colors.withAlpha(Colors.bg, 0.7)
+                                                visible: modelData.workspace_id !== undefined
+
+                                                Text {
+                                                    id: wsBadgeText
+                                                    anchors.centerIn: parent
+                                                    text: CompositorAdapter.workspaceNameById(modelData.workspace_id)
+                                                    color: Colors.textSecondary
+                                                    font.pixelSize: Colors.fontSizeXXS
+                                                }
+                                            }
+
+                                            // Close button
+                                            SharedWidgets.IconButton {
+                                                anchors.top: parent.top
+                                                anchors.left: parent.left
+                                                anchors.margins: Colors.spacingXS
+                                                z: 1
+                                                icon: "󰅖"
+                                                size: 22
+                                                iconSize: Colors.fontSizeXS
+                                                iconColor: Colors.text
+                                                normalColor: Colors.error
+                                                tooltipText: "Close window"
+                                                opacity: cardMouse.containsMouse ? 0.9 : 0.0
+                                                visible: opacity > 0
+                                                Behavior on opacity {
+                                                    NumberAnimation { duration: Colors.durationFast }
+                                                }
                                                 onClicked: {
                                                     root.selectedIndex = index;
                                                     root.closeSelected();
                                                 }
                                             }
-                                        }
 
-                                        MouseArea {
-                                            id: cardMouse
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
+                                            MouseArea {
+                                                id: cardMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
 
-                                            drag.target: card
-                                            drag.axis: Drag.XAndYAxis
-
-                                            onClicked: {
-                                                root.selectedIndex = index;
-                                                root.confirm();
-                                            }
-                                            onEntered: root.selectedIndex = index
-                                        }
-
-                                        Drag.active: cardMouse.drag.active
-                                        Drag.source: ({
-                                                type: "window",
-                                                windowId: modelData.id,
-                                                appId: modelData.app_id
-                                            })
-                                        Drag.hotSpot.x: width / 2
-                                        Drag.hotSpot.y: height / 2
-
-                                        states: [
-                                            State {
-                                                when: cardMouse.drag.active
-                                                ParentChange {
-                                                    target: card
-                                                    parent: focusItem
+                                                onClicked: {
+                                                    root.selectedIndex = index;
+                                                    root.confirm();
                                                 }
-                                                PropertyChanges {
-                                                    target: card
-                                                    opacity: 0.8
-                                                    scale: 0.8
-                                                }
+                                                onEntered: root.selectedIndex = index
                                             }
-                                        ]
+                                        }
+                                        }
                                     }
+                                }
+
+                                // Left edge fade
+                                Rectangle {
+                                    anchors.left: cardFlickable.left
+                                    anchors.top: cardFlickable.top
+                                    anchors.bottom: cardFlickable.bottom
+                                    width: 40
+                                    visible: cardFlickable.contentX > 0
+                                    gradient: Gradient {
+                                        orientation: Gradient.Horizontal
+                                        GradientStop { position: 0.0; color: Colors.withAlpha(Colors.bg, 0.8) }
+                                        GradientStop { position: 1.0; color: "transparent" }
+                                    }
+                                }
+
+                                // Right edge fade
+                                Rectangle {
+                                    anchors.right: cardFlickable.right
+                                    anchors.top: cardFlickable.top
+                                    anchors.bottom: cardFlickable.bottom
+                                    width: 40
+                                    visible: cardFlickable.contentX < cardFlickable.contentWidth - cardFlickable.width - 1
+                                    gradient: Gradient {
+                                        orientation: Gradient.Horizontal
+                                        GradientStop { position: 0.0; color: "transparent" }
+                                        GradientStop { position: 1.0; color: Colors.withAlpha(Colors.bg, 0.8) }
                                     }
                                 }
 
@@ -397,14 +452,72 @@ Scope {
                                 Text {
                                     id: titleLabel
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    anchors.top: cardRow.bottom
+                                    anchors.top: cardFlickable.bottom
                                     anchors.topMargin: Colors.spacingM
                                     width: Math.min(parent.width, 500)
-                                    text: root.selectedIndex >= 0 && root.selectedIndex < root.windowList.length ? (root.windowList[root.selectedIndex].title || "Untitled") : ""
+                                    text: root.selectedIndex >= 0 && root.selectedIndex < root._cachedWindowList.length ? (root._cachedWindowList[root.selectedIndex].title || "Untitled") : ""
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.pixelSize: Colors.fontSizeLarge
+                                    font.weight: Font.Medium
                                     horizontalAlignment: Text.AlignHCenter
                                     elide: Text.ElideRight
+                                }
+
+                                // Index counter (visible with many windows)
+                                Text {
+                                    id: indexLabel
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.top: titleLabel.bottom
+                                    anchors.topMargin: Colors.spacingS
+                                    visible: root._cachedWindowList.length > 5
+                                    text: (root.selectedIndex + 1) + " / " + root._cachedWindowList.length
+                                    color: Colors.textDisabled
+                                    font.pixelSize: Colors.fontSizeXS
+                                }
+
+                                // Keyboard hint strip
+                                Row {
+                                    id: hintRow
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.top: indexLabel.visible ? indexLabel.bottom : titleLabel.bottom
+                                    anchors.topMargin: Colors.spacingM
+                                    spacing: Colors.spacingS
+                                    opacity: 0.6
+
+                                    Repeater {
+                                        model: [
+                                            { key: "Tab", action: "Next" },
+                                            { key: "Enter", action: "Switch" },
+                                            { key: "Del", action: "Close" },
+                                            { key: "Esc", action: "Cancel" }
+                                        ]
+
+                                        delegate: Rectangle {
+                                            required property var modelData
+                                            radius: Colors.radiusMicro
+                                            color: Colors.withAlpha(Colors.surface, 0.5)
+                                            border.color: Colors.border
+                                            border.width: 1
+                                            implicitWidth: hintText.implicitWidth + Colors.spacingS * 2
+                                            implicitHeight: hintText.implicitHeight + Colors.spacingXS
+
+                                            Text {
+                                                id: hintText
+                                                anchors.centerIn: parent
+                                                text: modelData.key + " \u2192 " + modelData.action
+                                                color: Colors.textSecondary
+                                                font.pixelSize: Colors.fontSizeXXS
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Connections {
+                                    target: root
+                                    function onSelectedIndexChanged() {
+                                        if (root._destroyed) return;
+                                        cardFlickable.ensureVisible(root.selectedIndex);
+                                    }
                                 }
                             }
                         }

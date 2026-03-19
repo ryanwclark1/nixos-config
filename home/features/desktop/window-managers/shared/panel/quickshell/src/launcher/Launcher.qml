@@ -53,6 +53,8 @@ PanelWindow {
     readonly property bool sidebarCompact: usableWidth < 720
     readonly property bool tightMode: usableWidth < 560 || usableHeight < 500
     readonly property bool webHintCompact: usableWidth < 760 || usableHeight < 560
+    readonly property bool diagnosticMinimalShell: Quickshell.env("QS_VERIFY_LAUNCHER_MINIMAL") === "1"
+    readonly property bool diagnosticDisableFilePreview: diagnosticMinimalShell || Quickshell.env("QS_VERIFY_LAUNCHER_DISABLE_FILE_PREVIEW") === "1"
 
     anchors {
         top: true
@@ -192,7 +194,7 @@ PanelWindow {
     property var fileIndexBuiltAt: 0
     property var _gitTrackedSet: ({})
     property bool _gitIndexReady: false
-    property bool filePreviewVisible: Config.launcherFilePreviewEnabled
+    property bool filePreviewVisible: !diagnosticDisableFilePreview && Config.launcherFilePreviewEnabled
     property string transientNoticeText: ""
     property bool sidebarOverflowExpanded: false
     property bool shortcutHelpExpanded: false
@@ -3049,6 +3051,10 @@ PanelWindow {
     }
 
     function toggleFilePreview() {
+        if (diagnosticDisableFilePreview) {
+            filePreviewVisible = false;
+            return false;
+        }
         filePreviewVisible = !filePreviewVisible;
         Config.launcherFilePreviewEnabled = filePreviewVisible;
         return true;
@@ -3256,7 +3262,8 @@ PanelWindow {
             spacing: launcherRoot.compactMode ? Colors.paddingSmall : 18
 
             LauncherSidebar {
-                Layout.preferredWidth: launcherRoot.sidebarCompact ? 76 : Math.max(148, Math.min(210, Math.round(hudBox.width * (launcherRoot.compactMode ? 0.2 : 0.22))))
+                visible: !launcherRoot.diagnosticMinimalShell
+                Layout.preferredWidth: visible ? (launcherRoot.sidebarCompact ? 76 : Math.max(148, Math.min(210, Math.round(hudBox.width * (launcherRoot.compactMode ? 0.2 : 0.22))))) : 0
                 Layout.fillHeight: true
                 launcher: launcherRoot
             }

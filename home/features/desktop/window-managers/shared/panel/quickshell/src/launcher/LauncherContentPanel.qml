@@ -12,7 +12,8 @@ Item {
     readonly property alias searchInput: searchField.searchInput
     readonly property color accentColor: launcher.modeAccentColor ? launcher.modeAccentColor : Colors.primary
     readonly property real panelGap: launcher.compactMode ? Colors.spacingS : Colors.spacingXS
-    readonly property bool showAssistBand: !launcher.tightMode && (launcher.prefixQuickModes.length > 0
+    readonly property bool minimalShell: launcher && launcher.diagnosticMinimalShell === true
+    readonly property bool showAssistBand: !minimalShell && !launcher.tightMode && (launcher.prefixQuickModes.length > 0
         || Config.launcherShowModeHints
         || (launcher.mode === "web" && launcher.filteredItems.length > 0)
         || launcher.transientNoticeText !== "")
@@ -184,6 +185,7 @@ Item {
         }
 
         LauncherMetricsBox {
+            visible: !root.minimalShell
             metrics: launcher.launcherMetrics
             mode: launcher.mode
             tightMode: launcher.tightMode
@@ -214,13 +216,13 @@ Item {
                 LauncherHome {
                     Layout.fillWidth: true
                     launcher: root.launcher
-                    visible: launcher.mode === "drun" && launcher.showLauncherHomePanel && !launcher.isModeLoading
+                    visible: !root.minimalShell && launcher.mode === "drun" && launcher.showLauncherHomePanel && !launcher.isModeLoading
                     showHomeSections: true
                 }
 
                 Rectangle {
                     Layout.fillWidth: true
-                    visible: (launcher.mode === "drun" && launcher.showLauncherHomePanel && !launcher.isModeLoading)
+                    visible: (!root.minimalShell && launcher.mode === "drun" && launcher.showLauncherHomePanel && !launcher.isModeLoading)
                         && !(launcher.mode === "orchestrator" && launcher.searchText === "")
                     implicitHeight: 1
                     color: Colors.withAlpha(root.accentColor, 0.12)
