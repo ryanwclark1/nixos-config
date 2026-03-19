@@ -8,13 +8,17 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMinWidth: 340; popupMaxWidth: 420; compactThreshold: 380
-  implicitHeight: Math.min(620, contentCol.implicitHeight + 100)
+  implicitHeight: Math.min(660, contentCol.implicitHeight + 100)
   title: "Model Usage"
   subtitle: ModelUsageService.activeProvider === "claude" ? "Claude Code"
          : ModelUsageService.activeProvider === "gemini" ? "Gemini CLI" : "Codex CLI"
 
+  // Provider-specific surface tint (like MusicMenu album accent)
+  surfaceTint: Colors.withAlpha(root.providerAccent, 0.06)
+
   SharedWidgets.Ref { service: ModelUsageService }
 
+  // ── Provider state ───────────────────────────────
   readonly property bool showClaude: ModelUsageService.activeProvider === "claude"
   readonly property bool showCodex: ModelUsageService.activeProvider === "codex"
   readonly property bool showGemini: ModelUsageService.activeProvider === "gemini"
@@ -23,23 +27,28 @@ BasePopupMenu {
     + (ModelUsageService.geminiEnabled ? 1 : 0)
   readonly property bool showProviderTabs: enabledCount > 1
 
+  // Provider accent — flows through hero, charts, token values
+  readonly property color providerAccent: ModelUsageService.providerColor
+  Behavior on providerAccent { ColorAnimation { duration: Colors.durationNormal } }
+
   // ── Provider tabs ──────────────────────────────────
   headerExtras: [
     Row {
       visible: root.showProviderTabs
-      spacing: Colors.spacingS
+      spacing: Colors.spacingXS
 
       Repeater {
         model: {
           var tabs = [];
-          if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude" });
-          if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex" });
-          if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini" });
+          if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude", icon: "󱜚" });
+          if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex", icon: "" });
+          if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini", icon: "󰫢" });
           return tabs;
         }
         delegate: SharedWidgets.FilterChip {
           required property var modelData
           label: modelData.label
+          icon: modelData.icon
           selected: ModelUsageService.activeProvider === modelData.key
           onClicked: Config.modelUsageActiveProvider = modelData.key
         }
@@ -61,6 +70,99 @@ BasePopupMenu {
     Layout.fillWidth: true
     Layout.fillHeight: true
     columnSpacing: Colors.spacingM
+
+    // ── Hero Summary Card ───────────────────────────
+    Rectangle {
+      Layout.fillWidth: true
+      visible: ModelUsageService.isReady
+      implicitHeight: heroRow.implicitHeight + Colors.spacingLG * 2
+      radius: Colors.radiusCard
+      color: Colors.withAlpha(root.providerAccent, Colors.primaryFaint)
+      border.color: Colors.withAlpha(root.providerAccent, 0.18)
+      border.width: 1
+
+      Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+      Behavior on border.color { ColorAnimation { duration: Colors.durationNormal } }
+
+      SharedWidgets.InnerHighlight { }
+
+      RowLayout {
+        id: heroRow
+        anchors.fill: parent
+        anchors.margins: Colors.spacingLG
+        spacing: Colors.spacingL
+
+        // Large provider icon
+        Rectangle {
+          Layout.preferredWidth: 52
+          Layout.preferredHeight: 52
+          radius: Colors.radiusCard
+          color: Colors.withAlpha(root.providerAccent, Colors.primarySubtle)
+          Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+
+          Text {
+            anchors.centerIn: parent
+            text: ModelUsageService.providerIcon
+            color: root.providerAccent
+            font.family: Colors.fontMono
+            font.pixelSize: Colors.fontSizeHuge
+            Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+          }
+        }
+
+        // Big metric
+        ColumnLayout {
+          Layout.fillWidth: true
+          spacing: 2
+
+          Text {
+            text: String(ModelUsageService.todayPrompts)
+            color: Colors.text
+            font.pixelSize: Colors.fontSizeDisplay
+            font.weight: Font.Bold
+            font.letterSpacing: Colors.letterSpacingTight
+          }
+
+          Text {
+            text: "prompts today"
+            color: Colors.textSecondary
+            font.pixelSize: Colors.fontSizeSmall
+          }
+        }
+
+        // Model badge
+        Rectangle {
+          visible: {
+            if (root.showClaude) return Object.keys(ModelUsageService.claudeTodayTokensByModel).length > 0;
+            if (root.showGemini) return ModelUsageService.geminiModel !== "unknown";
+            return ModelUsageService.codexModel !== "unknown";
+          }
+          Layout.alignment: Qt.AlignTop
+          implicitWidth: modelBadgeText.implicitWidth + Colors.spacingM * 2
+          implicitHeight: modelBadgeText.implicitHeight + Colors.spacingSM * 2
+          radius: height / 2
+          color: Colors.withAlpha(root.providerAccent, Colors.primaryGhost)
+          Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+
+          Text {
+            id: modelBadgeText
+            anchors.centerIn: parent
+            text: {
+              if (root.showClaude) {
+                var keys = Object.keys(ModelUsageService.claudeTodayTokensByModel);
+                return keys.length > 0 ? ModelUsageService.friendlyModelName(keys[0]) : "";
+              }
+              if (root.showGemini) return ModelUsageService.geminiModel;
+              return ModelUsageService.codexModel;
+            }
+            color: root.providerAccent
+            font.pixelSize: Colors.fontSizeXS
+            font.weight: Font.DemiBold
+            Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
+          }
+        }
+      }
+    }
 
     // ── Rate Limit Section (Claude only) ─────────────
     Rectangle {
@@ -100,7 +202,7 @@ BasePopupMenu {
             radius: parent.radius
             color: ModelUsageService.claudeRateLimitPercent >= 90 ? Colors.error
                  : ModelUsageService.claudeRateLimitPercent >= 70 ? Colors.warning
-                 : Colors.accent
+                 : root.providerAccent
 
             Behavior on width { NumberAnimation { duration: Colors.durationMedium } }
           }
@@ -135,9 +237,10 @@ BasePopupMenu {
       }
     }
 
-    // ── Today Section ────────────────────────────────
+    // ── Today Details Section ────────────────────────
     Rectangle {
       Layout.fillWidth: true
+      visible: ModelUsageService.isReady
       implicitHeight: todayCol.implicitHeight + Colors.spacingL * 2
       radius: Colors.radiusCard
       color: Colors.cardSurface
@@ -157,13 +260,6 @@ BasePopupMenu {
           color: Colors.text
           font.pixelSize: Colors.fontSizeMedium
           font.weight: Font.Bold
-        }
-
-        SharedWidgets.InfoRow {
-          label: "Prompts"
-          value: root.showClaude ? String(ModelUsageService.claudeTodayPrompts)
-               : root.showGemini ? String(ModelUsageService.geminiTodayPrompts)
-               : String(ModelUsageService.codexTodayPrompts)
         }
 
         SharedWidgets.InfoRow {
@@ -196,7 +292,7 @@ BasePopupMenu {
             required property var modelData
             label: ModelUsageService.friendlyModelName(modelData.model)
             value: ModelUsageService.formatTokenCount(modelData.count) + " tokens"
-            valueColor: Colors.accent
+            valueColor: root.providerAccent
           }
         }
 
@@ -205,13 +301,13 @@ BasePopupMenu {
           visible: root.showGemini && (ModelUsageService.geminiTodayTokens.input || 0) > 0
           label: "Input Tokens"
           value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.input || 0)
-          valueColor: Colors.accent
+          valueColor: root.providerAccent
         }
         SharedWidgets.InfoRow {
           visible: root.showGemini && (ModelUsageService.geminiTodayTokens.output || 0) > 0
           label: "Output Tokens"
           value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.output || 0)
-          valueColor: Colors.accent
+          valueColor: root.providerAccent
         }
         SharedWidgets.InfoRow {
           visible: root.showGemini && (ModelUsageService.geminiTodayTokens.cached || 0) > 0
@@ -252,7 +348,6 @@ BasePopupMenu {
           font.weight: Font.Bold
         }
 
-        // Simple horizontal bar chart
         Repeater {
           model: root.showGemini ? ModelUsageService.geminiRecentDays
                                  : ModelUsageService.claudeRecentDays
@@ -272,13 +367,23 @@ BasePopupMenu {
               return m;
             }
 
+            readonly property bool isToday: {
+              var now = new Date();
+              var todayStr = now.getFullYear() + "-"
+                + String(now.getMonth() + 1).padStart(2, "0") + "-"
+                + String(now.getDate()).padStart(2, "0");
+              return modelData.date === todayStr;
+            }
+
             Text {
               text: {
+                if (isToday) return "Today";
                 var parts = modelData.date.split("-");
                 return parts.length >= 3 ? parts[1] + "/" + parts[2] : modelData.date;
               }
-              color: Colors.textSecondary
+              color: isToday ? root.providerAccent : Colors.textSecondary
               font.pixelSize: Colors.fontSizeXS
+              font.weight: isToday ? Font.DemiBold : Font.Normal
               Layout.preferredWidth: 40
             }
 
@@ -292,16 +397,17 @@ BasePopupMenu {
                 width: parent.width * Math.min(1, modelData.messageCount / maxCount)
                 height: parent.height
                 radius: parent.radius
-                color: Colors.accent
-                opacity: 0.7 + 0.3 * (modelData.messageCount / maxCount)
+                color: root.providerAccent
+                opacity: isToday ? 1.0 : (0.5 + 0.5 * (modelData.messageCount / maxCount))
 
                 Behavior on width { NumberAnimation { duration: Colors.durationMedium } }
+                Behavior on color { ColorAnimation { duration: Colors.durationNormal } }
               }
             }
 
             Text {
               text: String(modelData.messageCount)
-              color: Colors.text
+              color: isToday ? root.providerAccent : Colors.text
               font.pixelSize: Colors.fontSizeXS
               font.weight: Font.DemiBold
               Layout.preferredWidth: 36
@@ -312,7 +418,7 @@ BasePopupMenu {
       }
     }
 
-    // ── All-Time Model Breakdown ─────────────────────
+    // ── All-Time Model Breakdown (Claude) ────────────
     Rectangle {
       Layout.fillWidth: true
       visible: root.showClaude && Object.keys(ModelUsageService.claudeModelUsage).length > 0
@@ -350,7 +456,7 @@ BasePopupMenu {
         SharedWidgets.InfoRow {
           label: "Total Tokens"
           value: ModelUsageService.formatTokenCount(ModelUsageService.claudeTotalTokens)
-          valueColor: Colors.accent
+          valueColor: root.providerAccent
         }
 
         SharedWidgets.InfoRow {
@@ -385,7 +491,6 @@ BasePopupMenu {
                 });
               }
             }
-            // Sort by total descending
             items.sort(function(a, b) {
               return (b.input + b.output + b.cacheRead) - (a.input + a.output + a.cacheRead);
             });
@@ -429,7 +534,7 @@ BasePopupMenu {
       }
     }
 
-    // ── Gemini All-Time Stats ─────────────────────
+    // ── Gemini All-Time Stats ────────────────────────
     Rectangle {
       Layout.fillWidth: true
       visible: root.showGemini && ModelUsageService.geminiReady
@@ -462,7 +567,7 @@ BasePopupMenu {
         SharedWidgets.InfoRow {
           label: "Total Tokens"
           value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTotalTokens)
-          valueColor: Colors.accent
+          valueColor: root.providerAccent
         }
 
         SharedWidgets.InfoRow {
@@ -524,7 +629,7 @@ BasePopupMenu {
       }
     }
 
-    // ── Codex Info Section ────────────────────────────
+    // ── Codex Info Section ───────────────────────────
     Rectangle {
       Layout.fillWidth: true
       visible: root.showCodex && ModelUsageService.codexReady
@@ -568,13 +673,11 @@ BasePopupMenu {
       }
     }
 
-    // ── Empty state ──────────────────────────────────
+    // ── Empty state ─────────────────────────────────
     SharedWidgets.EmptyState {
       Layout.fillWidth: true
-      visible: (root.showClaude && !ModelUsageService.claudeReady)
-              || (root.showCodex && !ModelUsageService.codexReady)
-              || (root.showGemini && !ModelUsageService.geminiReady)
-      icon: "󰊤"
+      visible: !ModelUsageService.isReady
+      icon: ModelUsageService.providerIcon
       message: root.showClaude ? "No Claude Code data found"
              : root.showGemini ? "No Gemini CLI data found"
              : "No Codex CLI data found"

@@ -61,6 +61,32 @@ QtObject {
   readonly property string displayText: _computeDisplayText()
   readonly property string displayTooltip: _computeTooltip()
 
+  // ── Provider identity ────────────────────────────
+  readonly property string providerIcon: {
+    var p = root.activeProvider;
+    if (p === "claude") return "󱜚";
+    if (p === "gemini") return "󰫢";
+    return "";   // Codex
+  }
+  readonly property color providerColor: {
+    var p = root.activeProvider;
+    if (p === "claude") return "#cc785c";  // Warm terracotta
+    if (p === "gemini") return "#4285F4";  // Google blue
+    return "#22c55e";                       // Green for Codex/OpenAI
+  }
+  readonly property bool isReady: {
+    var p = root.activeProvider;
+    if (p === "claude") return root.claudeReady;
+    if (p === "gemini") return root.geminiReady;
+    return root.codexReady;
+  }
+  readonly property int todayPrompts: {
+    var p = root.activeProvider;
+    if (p === "claude") return root.claudeTodayPrompts;
+    if (p === "gemini") return root.geminiTodayPrompts;
+    return root.codexTodayPrompts;
+  }
+
   property bool _ready: false
   Component.onCompleted: _ready = true
 
@@ -179,7 +205,7 @@ QtObject {
           root.claudeFirstSessionDate = data.firstSessionDate || "";
           root.claudeReady = true;
         } catch (e) {
-          console.warn("ModelUsageService: claude parse error:", e);
+          Logger.w("ModelUsageService", "claude parse error:", e);
           if (!root.claudeReady) root.claudeTodayPrompts = 0;
         }
       }
@@ -247,7 +273,7 @@ QtObject {
           root.codexLatestSession = data.latestSession || {};
           root.codexReady = true;
         } catch (e) {
-          console.warn("ModelUsageService: codex parse error:", e);
+          Logger.w("ModelUsageService", "codex parse error:", e);
           if (!root.codexReady) root.codexTodayPrompts = 0;
         }
       }
@@ -276,7 +302,7 @@ QtObject {
           root.geminiTokensByModel = data.tokensByModel || {};
           root.geminiReady = true;
         } catch (e) {
-          console.warn("ModelUsageService: gemini parse error:", e);
+          Logger.w("ModelUsageService", "gemini parse error:", e);
           if (!root.geminiReady) root.geminiTodayPrompts = 0;
         }
       }

@@ -23,7 +23,9 @@ SharedWidgets.BarPill {
         {
             label: "Switch Provider",
             icon: "󰔡",
-            visible: ModelUsageService.claudeEnabled && ModelUsageService.codexEnabled,
+            visible: (ModelUsageService.claudeEnabled ? 1 : 0)
+                   + (ModelUsageService.codexEnabled ? 1 : 0)
+                   + (ModelUsageService.geminiEnabled ? 1 : 0) > 1,
             action: () => ModelUsageService.switchProvider()
         },
         {
@@ -37,11 +39,13 @@ SharedWidgets.BarPill {
         spacing: Colors.spacingS
 
         Text {
-            text: "󰊤"
-            color: Colors.accent
+            text: ModelUsageService.providerIcon
+            color: ModelUsageService.providerColor
             font.family: Colors.fontMono
             font.pixelSize: Colors.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
+
+            Behavior on color { ColorAnimation { duration: Colors.durationMedium } }
         }
 
         Text {
