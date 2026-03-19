@@ -8,13 +8,17 @@ var _actionLabels = {
     window: "Focus",
     files: "Open", web: "Open", bookmarks: "Open", wallpapers: "Open",
     drun: "Run", run: "Run",
-    system: "Action", nixos: "Action", keybinds: "Action", media: "Action", plugins: "Action",
+    system: "Action", nixos: "Action", keybinds: "Action", media: "Action", plugins: "Action", settings: "Jump",
     ssh: "Connect"
 };
 
 function itemActionLabel(mode, item) {
     if (!item || item.isHint)
         return "";
+    if (String(item.entryKind || "") === "destination")
+        return "Open";
+    if (String(item.entryKind || "") === "settings")
+        return "Jump";
     return _actionLabels[mode] || "";
 }
 
@@ -77,6 +81,14 @@ function buildRecentEntry(mode, item) {
             exec: item.exec || ""
         };
     }
+    if (mode === "settings") {
+        return {
+            name: item.name || "Settings",
+            title: item.breadcrumb || item.title || "",
+            icon: item.icon || "󰒓",
+            openMode: "settings"
+        };
+    }
     return null;
 }
 
@@ -137,6 +149,11 @@ function executeSelection(mode, item, actions) {
         if (item.ipcTarget && item.ipcAction)
             actions.execDetached(["quickshell", "ipc", "call", item.ipcTarget, item.ipcAction]);
         else if (item.action)
+            item.action();
+        if (!actions.showingConfirm)
+            actions.close();
+    } else if (mode === "settings") {
+        if (item.action)
             item.action();
         if (!actions.showingConfirm)
             actions.close();

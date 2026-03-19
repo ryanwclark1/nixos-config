@@ -2,82 +2,101 @@ import QtQuick
 import QtQuick.Layouts
 import "../services"
 
-RowLayout {
+Rectangle {
     id: root
 
-    required property string hintText
+    required property string summaryText
     required property string primaryAction
     required property string secondaryAction
     required property string tertiaryAction
     property bool compact: false
+    property bool helpExpanded: false
 
+    signal helpToggled
+
+    color: Colors.withAlpha(Colors.surface, 0.4)
+    radius: Colors.radiusMedium
+    border.color: Colors.border
+    border.width: 1
     Layout.fillWidth: true
-    spacing: root.compact ? Colors.spacingXS : Colors.paddingSmall
+    implicitHeight: contentColumn.implicitHeight + (root.compact ? Colors.spacingS * 2 : Colors.paddingSmall * 2)
 
-    Text {
-        Layout.fillWidth: true
-        text: root.hintText
-        color: Colors.textSecondary
-        font.pixelSize: root.compact ? Colors.fontSizeXS : Colors.fontSizeSmall
-        elide: Text.ElideRight
-        maximumLineCount: 1
-        wrapMode: Text.NoWrap
-    }
+    ColumnLayout {
+        id: contentColumn
+        anchors.fill: parent
+        anchors.margins: root.compact ? Colors.spacingS : Colors.paddingSmall
+        spacing: root.compact ? Colors.spacingXS : Colors.spacingS
 
-    Row {
-        spacing: root.compact ? Colors.spacingXXS : Colors.spacingXS
-
-        Rectangle {
-            radius: Colors.radiusPill
-            color: Colors.primarySubtle
-            border.color: Colors.primaryRing
-            border.width: 1
-            implicitHeight: root.compact ? 22 : 24
-            implicitWidth: primaryText.implicitWidth + (root.compact ? 12 : 14)
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Colors.spacingS
 
             Text {
-                id: primaryText
-                anchors.centerIn: parent
-                text: root.primaryAction
-                color: Colors.primary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.DemiBold
-            }
-        }
-
-        Rectangle {
-            radius: Colors.radiusPill
-            color: Colors.withAlpha(Colors.textSecondary, 0.08)
-            border.color: Colors.primaryAccent
-            border.width: 1
-            implicitHeight: root.compact ? 22 : 24
-            implicitWidth: secondaryText.implicitWidth + (root.compact ? 12 : 14)
-
-            Text {
-                id: secondaryText
-                anchors.centerIn: parent
-                text: root.secondaryAction
+                Layout.fillWidth: true
+                text: root.summaryText
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.DemiBold
+                font.pixelSize: root.compact ? Colors.fontSizeXS : Colors.fontSizeSmall
+                font.weight: Font.Medium
+                wrapMode: Text.WordWrap
+            }
+
+            Rectangle {
+                radius: Colors.radiusPill
+                color: helpMouse.containsMouse ? Colors.primarySubtle : Colors.withAlpha(Colors.surface, 0.7)
+                border.color: root.helpExpanded ? Colors.primaryRing : Colors.border
+                border.width: 1
+                implicitHeight: root.compact ? 24 : 26
+                implicitWidth: helpLabel.implicitWidth + 18
+
+                Text {
+                    id: helpLabel
+                    anchors.centerIn: parent
+                    text: root.helpExpanded ? "Hide Help" : "Show Help"
+                    color: root.helpExpanded ? Colors.primary : Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.DemiBold
+                }
+
+                MouseArea {
+                    id: helpMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.helpToggled()
+                }
             }
         }
 
-        Rectangle {
-            radius: Colors.radiusPill
-            color: Colors.surface
-            border.color: Colors.primarySubtle
-            border.width: 1
-            implicitHeight: root.compact ? 22 : 24
-            implicitWidth: tertiaryText.implicitWidth + (root.compact ? 12 : 14)
+        Flow {
+            Layout.fillWidth: true
+            visible: root.helpExpanded
+            spacing: root.compact ? Colors.spacingXS : Colors.spacingS
 
-            Text {
-                id: tertiaryText
-                anchors.centerIn: parent
-                text: root.tertiaryAction
-                color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
-                font.weight: Font.DemiBold
+            Repeater {
+                model: [root.primaryAction, root.secondaryAction, root.tertiaryAction].filter(function(textValue) {
+                    return String(textValue || "").trim() !== "";
+                })
+
+                delegate: Rectangle {
+                    required property var modelData
+                    required property int index
+
+                    radius: Colors.radiusPill
+                    color: index === 0 ? Colors.primarySubtle : (index === 1 ? Colors.withAlpha(Colors.textSecondary, 0.08) : Colors.surface)
+                    border.color: index === 0 ? Colors.primaryRing : (index === 1 ? Colors.primaryAccent : Colors.primarySubtle)
+                    border.width: 1
+                    implicitHeight: root.compact ? 24 : 26
+                    implicitWidth: actionLabel.implicitWidth + (root.compact ? 14 : 18)
+
+                    Text {
+                        id: actionLabel
+                        anchors.centerIn: parent
+                        text: modelData
+                        color: index === 0 ? Colors.primary : (index === 1 ? Colors.textSecondary : Colors.textDisabled)
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                    }
+                }
             }
         }
     }

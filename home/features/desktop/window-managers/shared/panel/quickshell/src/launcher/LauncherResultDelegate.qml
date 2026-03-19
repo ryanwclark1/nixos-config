@@ -57,6 +57,10 @@ Rectangle {
     function itemActionLabel(it) {
         if (!it)
             return "";
+        if (String(it.entryKind || "") === "settings")
+            return "Jump";
+        if (String(it.entryKind || "") === "destination")
+            return "Open";
         if (it.ipcTarget && it.ipcAction)
             return "System";
         if (it.isCalc)
@@ -90,12 +94,15 @@ Rectangle {
             return "";
 
         var primary = String(it.name || it.title || "");
+        var breadcrumb = String(it.breadcrumb || "");
         var description = String(it.description || "");
         var fullPath = String(it.fullPath || "");
         var exec = String(it.exec || "");
         var windowAppId = String(it.appId || it.class || "");
         var title = String(it.title || "");
 
+        if (breadcrumb !== "" && breadcrumb !== primary)
+            return breadcrumb;
         if (description !== "" && description !== primary)
             return description;
         if (root.mode === "files") {
