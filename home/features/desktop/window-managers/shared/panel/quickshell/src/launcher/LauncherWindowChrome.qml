@@ -10,14 +10,22 @@ Rectangle {
     required property bool tightMode
     required property string mode
     required property real parentRadius
+    property color accentColor: Colors.primary
+    property string modeLabel: "Launcher"
+    property string heroLabel: "Launcher"
+    property string summaryText: ""
+    property string statusText: ""
+    property string statusIcon: ""
+    property string modePrefix: ""
+    property string modeIcon: "󰍉"
 
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    height: tightMode ? 34 : 44
+    height: tightMode ? 46 : 64
     radius: parentRadius
     color: Colors.withAlpha(Colors.surface, 0.98)
-    border.color: Colors.border
+    border.color: Colors.withAlpha(root.accentColor, 0.28)
     border.width: 1
 
     Rectangle {
@@ -25,71 +33,144 @@ Rectangle {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: 1
-        color: Colors.border
+        color: Colors.withAlpha(root.accentColor, 0.18)
     }
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: root.tightMode ? Colors.spacingS : Colors.spacingM
-        anchors.rightMargin: root.tightMode ? Colors.spacingS : Colors.spacingM
-        spacing: root.tightMode ? Colors.spacingXS : Colors.spacingS
-
-        Row {
-            spacing: Colors.spacingS
-            Repeater {
-                model: [Qt.rgba(0.98, 0.36, 0.31, 0.9), Qt.rgba(0.96, 0.74, 0.28, 0.9), Qt.rgba(0.18, 0.8, 0.44, 0.9)]
-                delegate: Rectangle {
-                    required property color modelData
-                    width: 12
-                    height: 12
-                    radius: width / 2
-                    color: modelData
-                    opacity: 0.9
-                    SharedWidgets.InnerHighlight { highlightOpacity: 0.2 }
-                }
-            }
-        }
-
-        Item { Layout.preferredWidth: Colors.spacingS }
-
-        Text {
-            text: "Launcher"
-            color: Colors.text
-            font.pixelSize: root.tightMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
-            font.weight: Font.Black
-            font.capitalization: Font.AllUppercase
-            font.letterSpacing: Colors.letterSpacingWide
-        }
+        anchors.leftMargin: root.tightMode ? Colors.spacingM : Colors.spacingL
+        anchors.rightMargin: root.tightMode ? Colors.spacingM : Colors.spacingL
+        spacing: root.tightMode ? Colors.spacingS : Colors.spacingM
 
         Rectangle {
-            radius: Colors.radiusPill
-            color: Colors.primaryMarked
-            border.color: Colors.withAlpha(Colors.primary, 0.35)
+            Layout.alignment: Qt.AlignVCenter
+            width: root.tightMode ? 28 : 38
+            height: width
+            radius: root.tightMode ? Colors.radiusMedium : Colors.radiusLarge
+            color: Colors.withAlpha(root.accentColor, root.tightMode ? 0.18 : 0.22)
+            border.color: Colors.withAlpha(root.accentColor, 0.52)
             border.width: 1
-            implicitHeight: root.tightMode ? 22 : 24
-            implicitWidth: chromeModeLabel.implicitWidth + 16
+
+            SharedWidgets.InnerHighlight {
+                highlightOpacity: 0.18
+            }
 
             Text {
-                id: chromeModeLabel
                 anchors.centerIn: parent
-                text: ModeData.modeInfo(root.mode).label
-                color: Colors.primary
-                font.pixelSize: Colors.fontSizeXXS
-                font.weight: Font.Black
-                font.capitalization: Font.AllUppercase
+                text: root.modeIcon
+                color: root.accentColor
+                font.family: Colors.fontMono
+                font.pixelSize: root.tightMode ? Colors.fontSizeLarge : Colors.fontSizeXL
             }
         }
 
-        Item {
+        ColumnLayout {
             Layout.fillWidth: true
+            Layout.alignment: Qt.AlignVCenter
+            spacing: 0
+
+            Text {
+                text: "COMMAND DECK"
+                color: Colors.withAlpha(root.accentColor, 0.9)
+                font.pixelSize: Colors.fontSizeXXS
+                font.weight: Font.Black
+                font.letterSpacing: Colors.letterSpacingExtraWide
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: root.heroLabel
+                color: Colors.text
+                font.pixelSize: root.tightMode ? Colors.fontSizeMedium : Colors.fontSizeXL
+                font.weight: Font.Black
+                font.letterSpacing: root.tightMode ? 0 : Colors.letterSpacingTight
+                elide: Text.ElideRight
+            }
+
+            Text {
+                visible: !root.tightMode && root.summaryText !== ""
+                Layout.fillWidth: true
+                text: root.summaryText
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                elide: Text.ElideRight
+            }
         }
 
-        Text {
-            visible: !root.tightMode
-            text: "V3.0"
-            color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXXS
-            font.weight: Font.Black
+        RowLayout {
+            Layout.alignment: Qt.AlignVCenter
+            spacing: Colors.spacingS
+
+            Rectangle {
+                visible: root.modePrefix !== "" && !root.tightMode
+                radius: Colors.radiusPill
+                color: Colors.withAlpha(root.accentColor, 0.12)
+                border.color: Colors.withAlpha(root.accentColor, 0.34)
+                border.width: 1
+                implicitHeight: 24
+                implicitWidth: prefixLabel.implicitWidth + 16
+
+                Text {
+                    id: prefixLabel
+                    anchors.centerIn: parent
+                    text: root.modePrefix + " prefix"
+                    color: root.accentColor
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.Black
+                }
+            }
+
+            Rectangle {
+                radius: Colors.radiusPill
+                color: Colors.withAlpha(root.accentColor, 0.12)
+                border.color: Colors.withAlpha(root.accentColor, 0.36)
+                border.width: 1
+                implicitHeight: root.tightMode ? 24 : 26
+                implicitWidth: chromeModeLabel.implicitWidth + 18
+
+                Text {
+                    id: chromeModeLabel
+                    anchors.centerIn: parent
+                    text: root.modeLabel
+                    color: root.accentColor
+                    font.pixelSize: Colors.fontSizeXS
+                    font.weight: Font.Black
+                    font.capitalization: Font.AllUppercase
+                    font.letterSpacing: Colors.letterSpacingWide
+                }
+            }
+
+            Rectangle {
+                visible: !root.tightMode && root.statusText !== ""
+                radius: Colors.radiusPill
+                color: Colors.withAlpha(Colors.surface, 0.84)
+                border.color: Colors.border
+                border.width: 1
+                implicitHeight: 26
+                implicitWidth: statusRow.implicitWidth + 16
+
+                RowLayout {
+                    id: statusRow
+                    anchors.centerIn: parent
+                    spacing: Colors.spacingXS
+
+                    Text {
+                        visible: root.statusIcon !== ""
+                        text: root.statusIcon
+                        color: root.accentColor
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeXS
+                    }
+
+                    Text {
+                        text: root.statusText
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeXS
+                        font.weight: Font.DemiBold
+                    }
+                }
+            }
         }
     }
 }
