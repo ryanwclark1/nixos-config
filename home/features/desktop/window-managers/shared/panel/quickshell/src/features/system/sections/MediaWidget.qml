@@ -100,7 +100,7 @@ Rectangle {
                   opacity: 0.8
 
                   Behavior on height {
-                    NumberAnimation { duration: 80; easing.type: Easing.OutCubic }
+                    NumberAnimation { duration: Colors.durationFlash; easing.type: Easing.OutCubic }
                   }
                 }
               }

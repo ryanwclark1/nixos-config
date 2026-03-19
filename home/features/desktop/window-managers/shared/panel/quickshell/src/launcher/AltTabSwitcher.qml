@@ -73,13 +73,6 @@ Scope {
         isVisible = false;
     }
 
-    // Safety-net Escape: works even if focus falls to an unexpected item
-    Shortcut {
-        enabled: root.isVisible
-        sequence: "Escape"
-        onActivated: root.hide()
-    }
-
     function confirm() {
         if (selectedIndex >= 0 && selectedIndex < windowList.length) {
             var win = windowList[selectedIndex];

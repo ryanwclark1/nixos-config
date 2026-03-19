@@ -137,9 +137,11 @@ PanelWindow {
                         if (event.key === Qt.Key_Escape) {
                             root.closeRequested();
                         } else if (event.key === Qt.Key_Down) {
-                            root.selectedIndex = (root.selectedIndex + 1) % root.filteredActions.length;
+                            if (root.filteredActions.length > 0)
+                                root.selectedIndex = (root.selectedIndex + 1) % root.filteredActions.length;
                         } else if (event.key === Qt.Key_Up) {
-                            root.selectedIndex = (root.selectedIndex - 1 + root.filteredActions.length) % root.filteredActions.length;
+                            if (root.filteredActions.length > 0)
+                                root.selectedIndex = (root.selectedIndex - 1 + root.filteredActions.length) % root.filteredActions.length;
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                             root.executeSelected();
                         }

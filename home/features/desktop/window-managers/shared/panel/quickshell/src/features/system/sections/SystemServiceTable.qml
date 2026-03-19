@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
 
@@ -463,87 +464,92 @@ SharedWidgets.CardBase {
                         message: root.trimmedSearch === "" ? "No matching services for the current filter." : "No services matched the current search."
                     }
 
-                    ColumnLayout {
+                    ListView {
+                        id: serviceListView
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
+                        implicitHeight: contentHeight
+                        interactive: false
+                        clip: true
                         visible: root.visibleUnits.length > 0
+                        model: root.visibleUnits
+                        spacing: Colors.spacingXXS
 
-                        Repeater {
-                            model: root.visibleUnits
+                        add: ListTransitions.addFadeHeight
+                        remove: ListTransitions.removeFadeHeight
+                        displaced: ListTransitions.displaced
 
-                            delegate: Rectangle {
-                                required property var modelData
-                                required property int index
-                                readonly property bool selected: index === root.selectedIndex
-                                Layout.fillWidth: true
-                                radius: Colors.radiusSmall
-                                color: selected ? Colors.highlight : "transparent"
-                                border.color: selected ? Colors.primary : "transparent"
-                                border.width: 1
-                                implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
+                        delegate: Rectangle {
+                            required property var modelData
+                            required property int index
+                            readonly property bool selected: index === root.selectedIndex
+                            width: ListView.view.width
+                            radius: Colors.radiusSmall
+                            color: selected ? Colors.highlight : "transparent"
+                            border.color: selected ? Colors.primary : "transparent"
+                            border.width: 1
+                            implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
 
-                                RowLayout {
-                                    id: rowLayout
-                                    anchors.fill: parent
-                                    anchors.margins: Colors.spacingXS
-                                    spacing: Colors.spacingS
+                            RowLayout {
+                                id: rowLayout
+                                anchors.fill: parent
+                                anchors.margins: Colors.spacingXS
+                                spacing: Colors.spacingS
 
-                                    Text {
-                                        Layout.preferredWidth: 70
-                                        text: String(modelData.scope || "").toUpperCase()
-                                        color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.weight: Font.Bold
-                                    }
-
-                                    Text {
-                                        Layout.preferredWidth: 92
-                                        text: String(modelData.active || "").toUpperCase()
-                                        color: root.stateColor(modelData)
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.weight: Font.Bold
-                                        horizontalAlignment: Text.AlignRight
-                                    }
-
-                                    Text {
-                                        Layout.fillWidth: true
-                                        text: String(modelData.name || "service")
-                                        color: Colors.text
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.weight: selected ? Font.DemiBold : Font.Medium
-                                        elide: Text.ElideRight
-                                    }
-
-                                    Text {
-                                        Layout.preferredWidth: 120
-                                        text: String(modelData.sub || "")
-                                        color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.family: Colors.fontMono
-                                        horizontalAlignment: Text.AlignRight
-                                        elide: Text.ElideLeft
-                                    }
+                                Text {
+                                    Layout.preferredWidth: 70
+                                    text: String(modelData.scope || "").toUpperCase()
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.Bold
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        root.selectIndex(index);
-                                        root.focusTable();
-                                    }
+                                Text {
+                                    Layout.preferredWidth: 92
+                                    text: String(modelData.active || "").toUpperCase()
+                                    color: root.stateColor(modelData)
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignRight
                                 }
 
-                                onSelectedChanged: {
-                                    if (selected)
-                                        root.selectedRowItem = this;
-                                    else if (root.selectedRowItem === this)
-                                        root.selectedRowItem = null;
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: String(modelData.name || "service")
+                                    color: Colors.text
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: selected ? Font.DemiBold : Font.Medium
+                                    elide: Text.ElideRight
                                 }
-                                Component.onCompleted: {
-                                    if (selected)
-                                        root.selectedRowItem = this;
+
+                                Text {
+                                    Layout.preferredWidth: 120
+                                    text: String(modelData.sub || "")
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.family: Colors.fontMono
+                                    horizontalAlignment: Text.AlignRight
+                                    elide: Text.ElideLeft
                                 }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    root.selectIndex(index);
+                                    root.focusTable();
+                                }
+                            }
+
+                            onSelectedChanged: {
+                                if (selected)
+                                    root.selectedRowItem = this;
+                                else if (root.selectedRowItem === this)
+                                    root.selectedRowItem = null;
+                            }
+                            Component.onCompleted: {
+                                if (selected)
+                                    root.selectedRowItem = this;
                             }
                         }
                     }

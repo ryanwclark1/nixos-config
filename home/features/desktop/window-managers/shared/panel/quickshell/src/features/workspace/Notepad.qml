@@ -335,19 +335,6 @@ PanelWindow {
     function close() { root.closeRequested(); }
   }
 
-  // Keyboard shortcuts
-  Shortcut {
-    sequence: "Escape"
-    enabled: root.showContent
-    onActivated: root.closeRequested()
-  }
-
-  Shortcut {
-    sequence: "Ctrl+N"
-    enabled: root.showContent
-    onActivated: root.addTab()
-  }
-
   // --- Drag-resize state ---
   property real _dragStartX: 0
   property real _dragStartWidth: 0
@@ -386,6 +373,14 @@ PanelWindow {
     layer.enabled: npSlideAnim.running || npFadeAnim.running
 
     Keys.onEscapePressed: root.closeRequested()
+    Keys.onPressed: event => {
+      if (!root.showContent)
+        return;
+      if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_N) {
+        root.addTab();
+        event.accepted = true;
+      }
+    }
 
     // ----------------------------------------------------------
     //  Left-edge drag handle for resizing
