@@ -252,4 +252,21 @@ Rectangle {
             }
         }
     }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: Colors.primary
+        opacity: selectHighlightPulse.running ? selectHighlightPulse._opacity : 0
+        visible: root.highlighted
+
+        SequentialAnimation {
+            id: selectHighlightPulse
+            property real _opacity: 0
+            running: root.highlighted
+            loops: 2
+            NumberAnimation { target: selectHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: 300; easing.type: Easing.OutCubic }
+            NumberAnimation { target: selectHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: 300; easing.type: Easing.InCubic }
+        }
+    }
 }
