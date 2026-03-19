@@ -500,7 +500,16 @@ Item {
             readonly property bool occupiesSpace: root.itemOccupiesSpace(widgetLoader.item)
             readonly property bool diagnosticsReady: root.diagnosticsReady
             readonly property bool hiddenInVertical: root.vertical && root.isWidgetHiddenInVertical(widgetInstance)
-            readonly property real rawWidgetWidth: Number(widgetLoader.implicitWidth || 0)
+            readonly property real rawWidgetWidth: {
+                var raw = widgetLoader.item ? (widgetLoader.item.implicitWidth || widgetLoader.item.width || 0) : 0;
+                raw = Number(raw);
+                return isNaN(raw) ? 0 : raw;
+            }
+            readonly property real rawWidgetHeight: {
+                var raw = widgetLoader.item ? (widgetLoader.item.implicitHeight || widgetLoader.item.height || 0) : 0;
+                raw = Number(raw);
+                return isNaN(raw) ? 0 : raw;
+            }
             readonly property bool collapseForVerticalOverflow: root.vertical
                 && root.shouldCollapseVerticalOverflow(widgetInstance)
                 && widgetLoader.item
@@ -530,9 +539,9 @@ Item {
             }
             clip: root.vertical
             implicitWidth: contributesLayout ? (root.vertical ? Math.min(root.verticalItemWidthCap, Math.max(root.thickness, rawWidgetWidth)) : rawWidgetWidth) : 0
-            implicitHeight: contributesLayout ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
+            implicitHeight: contributesLayout ? (root.vertical ? rawWidgetHeight : root.thickness) : 0
             width: contributesLayout ? (root.vertical ? Math.min(root.verticalItemWidthCap, Math.max(root.thickness, rawWidgetWidth)) : rawWidgetWidth) : 0
-            height: contributesLayout ? (root.vertical ? widgetLoader.implicitHeight : root.thickness) : 0
+            height: contributesLayout ? (root.vertical ? rawWidgetHeight : root.thickness) : 0
 
             function refreshDiagnosticState() {
                 var detail = "";
