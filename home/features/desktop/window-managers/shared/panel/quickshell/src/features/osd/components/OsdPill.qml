@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import "../../../services"
 
 RowLayout {
@@ -99,13 +98,12 @@ RowLayout {
       function applyValue(mouseX) {
         var ratio = Math.max(0, Math.min(1.0, mouseX / osdTrack.width));
         var value = ratio * root.maxValue;
-        var pct = Math.round(value * 100);
         if (root.osdType === "volume") {
-          Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", pct + "%"]);
+          AudioService.setVolume("@DEFAULT_AUDIO_SINK@", value);
         } else if (root.osdType === "mic") {
-          Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SOURCE@", pct + "%"]);
+          AudioService.setVolume("@DEFAULT_AUDIO_SOURCE@", value);
         } else if (root.osdType === "brightness") {
-          Quickshell.execDetached(["brightnessctl", "set", pct + "%"]);
+          BrightnessService.setBrightness(BrightnessService.primaryMonitor.name, ratio);
         } else if (root.osdType === "kbdbrightness") {
           BrightnessService.setKbdBrightness(value);
         }

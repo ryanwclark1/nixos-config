@@ -348,65 +348,78 @@ Rectangle {
             color: Colors.withAlpha(Colors.border, 0.2)
         }
 
-        // Content area
-        StackLayout {
+        // Content area. Avoid placing Flickable directly in a StackLayout because
+        // repeated width animations and layout polish were causing Qt 6.10 crashes.
+        Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            currentIndex: root._currentType
 
             // 0: Text preview with line numbers
             Flickable {
-                contentWidth: width
-                contentHeight: previewRow.implicitHeight
+                id: previewFlickable
+                anchors.fill: parent
+                visible: root._currentType === 0
                 clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                contentWidth: width
+                contentHeight: previewContent.implicitHeight
 
-                RowLayout {
-                    id: previewRow
-                    width: parent.width
-                    spacing: Colors.spacingXS
+                Item {
+                    id: previewContent
+                    width: previewFlickable.width
+                    implicitHeight: Math.max(lineNumbers.paintedHeight, previewText.paintedHeight)
 
-                    // Line numbers gutter
-                    Text {
-                        Layout.alignment: Qt.AlignTop
-                        text: root._lineNumbers(root._currentContent)
-                        color: Colors.withAlpha(Colors.textDisabled, 0.5)
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.family: Colors.fontMono
-                        lineHeight: 1.3
-                        horizontalAlignment: Text.AlignRight
-                        Layout.preferredWidth: {
-                            var count = (root._currentContent || "").split("\n").length;
-                            return count > 99 ? 24 : count > 9 ? 18 : 12;
+                    Row {
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        width: parent.width
+                        height: parent.implicitHeight
+                        spacing: Colors.spacingXS
+
+                        Text {
+                            id: lineNumbers
+                            text: root._lineNumbers(root._currentContent)
+                            color: Colors.withAlpha(Colors.textDisabled, 0.5)
+                            font.pixelSize: Colors.fontSizeXXS
+                            font.family: Colors.fontMono
+                            lineHeight: 1.3
+                            horizontalAlignment: Text.AlignRight
+                            width: {
+                                var count = (root._currentContent || "").split("\n").length;
+                                return count > 99 ? 24 : count > 9 ? 18 : 12;
+                            }
                         }
-                    }
 
-                    // Gutter separator
-                    Rectangle {
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: 1
-                        color: Colors.withAlpha(Colors.border, 0.15)
-                    }
+                        Rectangle {
+                            id: gutterSeparator
+                            width: 1
+                            height: parent.height
+                            color: Colors.withAlpha(Colors.border, 0.15)
+                        }
 
-                    // Content
-                    Text {
-                        id: previewText
-                        Layout.fillWidth: true
-                        text: root._highlightContent(
-                            root._currentContent,
-                            root.selectedItem ? (root.selectedItem.extension || "") : ""
-                        )
-                        textFormat: Text.RichText
-                        color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.family: Colors.fontMono
-                        wrapMode: Text.WrapAnywhere
-                        lineHeight: 1.3
+                        Text {
+                            id: previewText
+                            width: Math.max(0, previewContent.width - lineNumbers.width - gutterSeparator.width - (Colors.spacingXS * 2))
+                            text: root._highlightContent(
+                                root._currentContent,
+                                root.selectedItem ? (root.selectedItem.extension || "") : ""
+                            )
+                            textFormat: Text.RichText
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeXXS
+                            font.family: Colors.fontMono
+                            wrapMode: Text.WrapAnywhere
+                            lineHeight: 1.3
+                        }
                     }
                 }
             }
 
             // 1: Image preview
             Item {
+                anchors.fill: parent
+                visible: root._currentType === 1
+
                 Image {
                     anchors.fill: parent
                     source: root._currentType === 1 && root._currentPath ? ("file://" + root._currentPath) : ""
@@ -419,6 +432,9 @@ Rectangle {
 
             // 2: Binary info card
             Item {
+                anchors.fill: parent
+                visible: root._currentType === 2
+
                 ColumnLayout {
                     anchors.centerIn: parent
                     spacing: Colors.spacingS
@@ -450,6 +466,9 @@ Rectangle {
 
             // 3: Loading spinner
             Item {
+                anchors.fill: parent
+                visible: root._currentType === 3
+
                 SharedWidgets.LoadingSpinner {
                     anchors.centerIn: parent
                     size: 18
