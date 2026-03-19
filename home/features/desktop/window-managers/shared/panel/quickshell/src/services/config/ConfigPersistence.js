@@ -332,7 +332,10 @@ var _MAPS = {
         ["solidColor", "wallpaperSolidColor"],
         ["useSolidOnStartup", "wallpaperUseSolidOnStartup"],
         ["solidColorsByMonitor", "wallpaperSolidColorsByMonitor"],
-        ["recentSolidColors", "wallpaperRecentSolidColors"]
+        ["recentSolidColors", "wallpaperRecentSolidColors"],
+        ["transitionType", "wallpaperTransitionType"],
+        ["transitionDuration", "wallpaperTransitionDuration"],
+        ["useShellRenderer", "wallpaperUseShellRenderer"]
     ],
     launcher: [
         ["defaultMode", "launcherDefaultMode"],

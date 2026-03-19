@@ -36,6 +36,50 @@ Item {
                 WlrLayershell.layer: WlrLayer.Background
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
+                WallpaperLayer {
+                    id: wallpaperLayer
+                    visible: Config.wallpaperUseShellRenderer
+                    transitionType: Config.wallpaperTransitionType
+                    transitionDuration: Config.wallpaperTransitionDuration
+
+                    // Connect to WallpaperService signals
+                    Connections {
+                        target: WallpaperService
+                        function onWallpaperApplied(imagePath, monitorName) {
+                            // Apply if this is for our monitor or for all monitors
+                            var screenName = modelData.name || "";
+                            if (monitorName === "" || monitorName === screenName) {
+                                wallpaperLayer.showSolid = false;
+                                wallpaperLayer.currentSource = "file://" + imagePath;
+                            }
+                        }
+                        function onSolidColorApplied(colorHex, monitorName) {
+                            var screenName = modelData.name || "";
+                            if (monitorName === "" || monitorName === screenName) {
+                                wallpaperLayer.showSolid = true;
+                                wallpaperLayer.solidColor = "#" + colorHex.slice(0, 6);
+                            }
+                        }
+                    }
+
+                    // Load initial wallpaper from persisted config
+                    Component.onCompleted: {
+                        if (!Config.wallpaperUseShellRenderer) return;
+                        var screenName = modelData.name || "";
+                        var path = WallpaperService.wallpapers[screenName]
+                            || WallpaperService.wallpapers["__all__"] || "";
+                        if (path) {
+                            currentSource = "file://" + path;
+                        }
+                        // Check if solid color is active
+                        var solidHex = WallpaperService.solidColorForMonitor(screenName);
+                        if (solidHex) {
+                            showSolid = true;
+                            solidColor = "#" + solidHex.slice(0, 6);
+                        }
+                    }
+                }
+
                 DesktopWidgets {
                     anchors.left: parent.left
                     anchors.top: parent.top

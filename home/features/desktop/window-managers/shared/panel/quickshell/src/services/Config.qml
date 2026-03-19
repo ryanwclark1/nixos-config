@@ -284,6 +284,9 @@ QtObject {
     property bool wallpaperUseSolidOnStartup: false
     property var wallpaperSolidColorsByMonitor: ({})
     property var wallpaperRecentSolidColors: []
+    property string wallpaperTransitionType: "fade"     // fade | pixelate | wipe | none
+    property int wallpaperTransitionDuration: 1500       // ms
+    property bool wallpaperUseShellRenderer: false       // true = shell renders wallpaper, false = use swww/external
 
     // --- THEME ---
     property string themeName: ""
@@ -718,7 +721,7 @@ QtObject {
             var data = JSON.parse(raw);
             ConfigPersistence.applyData(root, data);
         } catch (e) {
-            console.error("Failed to load config: " + e);
+            Logger.e("Config", "Failed to load config:", e);
             barConfigs = normalizeBarConfigs([], {});
         }
 
@@ -739,9 +742,9 @@ QtObject {
                 root.save();
                 return;
             }
-            console.error("Failed to load config file: " + error);
+            Logger.e("Config", "Failed to load config file:", error);
         }
-        onSaveFailed: error => console.error("Failed to save config file: " + error)
+        onSaveFailed: error => Logger.e("Config", "Failed to save config file:", error)
     }
 
     function save() {
