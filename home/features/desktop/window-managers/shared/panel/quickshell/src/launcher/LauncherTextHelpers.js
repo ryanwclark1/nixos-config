@@ -18,6 +18,8 @@ function emptyStateTitle(mode, clean, fileMinQueryLength, fileRootLabel) {
     }
     if (mode === "ai")
         return "Describe what you want and press Enter";
+    if (mode === "settings")
+        return "Search settings";
     if (mode === "clip")
         return "Clipboard history is empty";
     if (mode === "window")
@@ -36,6 +38,8 @@ function emptyStateSubtitle(mode, clean, fileMinQueryLength, fileRootLabel) {
     }
     if (mode === "ai")
         return "The response will be copied to your clipboard";
+    if (mode === "settings")
+        return "Type a tab, card, or setting label to jump into Settings.";
     if (mode === "clip")
         return "Copy something to populate clipboard history";
     if (mode === "window")
@@ -52,6 +56,8 @@ function emptyPrimaryCta(mode, clean, webPrimaryName, fileRootLabel) {
         return clean !== "" ? "Search " + webPrimaryName : "Open " + webPrimaryName;
     if (mode === "ai")
         return clean.length >= 3 ? "Ask AI" : "Switch to Apps";
+    if (mode === "settings")
+        return "Open Settings";
     if (mode === "run")
         return clean !== "" ? "Run Command" : "Switch to Apps";
     if (mode === "window")
@@ -70,6 +76,8 @@ function emptySecondaryCta(mode, clean, searchText, webSecondaryName) {
         return FileParser.fileQueryLooksLikePath(clean) ? "Open Folder" : (searchText !== "" ? "Clear Query" : "");
     if (mode === "web")
         return clean !== "" ? "Search " + webSecondaryName : "Open " + webSecondaryName;
+    if (mode === "settings")
+        return searchText !== "" ? "Clear Query" : "";
     if (mode === "system")
         return "Open Controls";
     if (mode === "run")
@@ -87,6 +95,8 @@ function emptyPrimaryHint(mode, clean, webPrimaryName, webPrimaryHintName, fileR
         return clean !== "" ? "Search " + hintName + " using the current query." : "Open " + hintName + " homepage.";
     if (mode === "ai")
         return clean.length >= 3 ? "Send prompt to AI helper and show copyable result." : "Switch back to app launcher mode.";
+    if (mode === "settings")
+        return "Open the full Settings surface.";
     if (mode === "run")
         return clean !== "" ? "Execute command directly in shell." : "Switch back to app launcher mode.";
     if (mode === "system")
@@ -107,6 +117,8 @@ function emptyPrimaryHintIcon(mode) {
         return "󰖟";
     if (mode === "ai")
         return "󰚩";
+    if (mode === "settings")
+        return "󰒓";
     if (mode === "run")
         return "󰆍";
     if (mode === "bookmarks")
@@ -123,6 +135,8 @@ function emptySecondaryHint(mode, clean, searchText, webSecondaryName) {
         return FileParser.fileQueryLooksLikePath(clean) ? "Open the folder implied by the current path-like query." : (searchText !== "" ? "Clear the current query text." : "");
     if (mode === "web")
         return clean !== "" ? "Search " + webSecondaryName + " using the current query." : "Open " + webSecondaryName + " homepage.";
+    if (mode === "settings")
+        return searchText !== "" ? "Clear the current query text." : "";
     if (mode === "system")
         return "Open quickshell control center panel.";
     if (mode === "run")
@@ -139,6 +153,8 @@ function emptySecondaryHintIcon(mode, searchText) {
         return "󰉋";
     if (mode === "web")
         return "󰇥";
+    if (mode === "settings")
+        return searchText !== "" ? "󰅖" : "";
     if (mode === "system")
         return "󰒓";
     if (mode === "run")
