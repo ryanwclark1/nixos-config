@@ -62,8 +62,8 @@ ColumnLayout {
                     property real _opacity: 0
                     running: root.highlighted
                     loops: 2
-                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: 300; easing.type: Easing.OutCubic }
-                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: 300; easing.type: Easing.InCubic }
+                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
+                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Colors.durationSlow; easing.type: Easing.InCubic }
                 }
             }
 
