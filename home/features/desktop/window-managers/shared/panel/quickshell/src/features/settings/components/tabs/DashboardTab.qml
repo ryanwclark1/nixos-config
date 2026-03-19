@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Widgets
 import "../../../../services"
 import "../../../../widgets" as SharedWidgets
 import ".."
@@ -43,13 +42,13 @@ Item {
                     RowLayout {
                         Layout.fillWidth: true
                         Text { text: "CPU Usage"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; Layout.fillWidth: true }
-                        Text { text: Math.round(SystemStatus.cpuUsage * 100) + "%"; color: Colors.primary; font.weight: Font.DemiBold }
+                        Text { text: Math.round(SystemStatus.cpuPercent * 100) + "%"; color: Colors.primary; font.weight: Font.DemiBold }
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
                         Text { text: "Memory"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeSmall; Layout.fillWidth: true }
-                        Text { text: Math.round(SystemStatus.memoryUsage * 100) + "%"; color: Colors.primary; font.weight: Font.DemiBold }
+                        Text { text: Math.round(SystemStatus.ramPercent * 100) + "%"; color: Colors.primary; font.weight: Font.DemiBold }
                     }
                 }
             }
@@ -59,7 +58,7 @@ Item {
                 Layout.fillWidth: true
                 title: "Now Playing"
                 iconName: "󰝚"
-                visible: !!MediaService.playing || !!MediaService.hasPlayer
+                visible: MediaService.isPlaying || !!MediaService.currentPlayer
 
                 RowLayout {
                     Layout.fillWidth: true
@@ -128,9 +127,9 @@ Item {
             }
 
             SettingsActionButton {
-                label: "Clear Notifications"
-                iconName: "󰎟"
-                onClicked: NotificationManager.clearAll()
+                label: Config.debug ? "Disable Debug" : "Enable Debug"
+                iconName: "󰃤"
+                onClicked: Config.debug = !Config.debug
             }
         }
 

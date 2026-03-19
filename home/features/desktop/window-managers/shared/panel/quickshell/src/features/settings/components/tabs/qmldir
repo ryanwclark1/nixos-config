@@ -9,6 +9,7 @@ BarWidgetsTab 1.0 BarWidgetsTab.qml
 BarWidgetPickerOverlay 1.0 BarWidgetPickerOverlay.qml
 BarWidgetSettingsOverlay 1.0 BarWidgetSettingsOverlay.qml
 ControlCenterTab 1.0 ControlCenterTab.qml
+DashboardTab 1.0 DashboardTab.qml
 DockTab 1.0 DockTab.qml
 HooksTab 1.0 HooksTab.qml
 HotkeysTab 1.0 HotkeysTab.qml
