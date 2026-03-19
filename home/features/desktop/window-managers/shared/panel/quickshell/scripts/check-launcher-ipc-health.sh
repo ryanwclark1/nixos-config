@@ -5,6 +5,7 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 launcher_qml="${script_dir}/../src/launcher/Launcher.qml"
+launcher_diag_js="${script_dir}/../src/launcher/LauncherDiagnostics.js"
 expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
 
 instance_id=""
@@ -24,7 +25,7 @@ Usage: check-launcher-ipc-health.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 Runs a launcher IPC health probe:
   - validates Launcher IPC methods are discoverable,
   - exercises clearMetrics/redetectFilesBackend/diagnosticReset/filesBackendStatus/drunCategoryState/escapeActionState/diagnosticSetSearchText/diagnosticSetDrunCategoryFilter/invokeEscapeAction,
-  - verifies files backend status payload contract literals in Launcher.qml.
+  - verifies launcher diagnostics payload contract literals in Launcher.qml and LauncherDiagnostics.js.
 In --ci mode, only static contract checks are executed.
 EOF
 }
@@ -239,18 +240,20 @@ ensure_live_instance() {
 }
 
 require_literal() {
-  local needle="$1"
-  local label="$2"
-  if ! rg -n -F -- "$needle" "$launcher_qml" >/dev/null 2>&1; then
+  local file="$1"
+  local needle="$2"
+  local label="$3"
+  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
     status_payload_valid=0
     errors+=("status payload contract missing: ${label}")
   fi
 }
 
 require_pattern() {
-  local pattern="$1"
-  local label="$2"
-  if ! rg -n -U --multiline --pcre2 -- "$pattern" "$launcher_qml" >/dev/null 2>&1; then
+  local file="$1"
+  local pattern="$2"
+  local label="$3"
+  if ! rg -n -U --multiline --pcre2 -- "$pattern" "$file" >/dev/null 2>&1; then
     status_payload_valid=0
     errors+=("status payload contract missing: ${label}")
   fi
@@ -298,34 +301,34 @@ main() {
     checked_actions+=("${action}")
   done
 
-  require_literal 'function clearMetrics() {' "Launcher.clearMetrics IPC mapping"
-  require_literal 'function redetectFilesBackend() {' "Launcher.redetectFilesBackend IPC mapping"
-  require_literal 'function diagnosticReset() {' "Launcher.diagnosticReset IPC mapping"
-  require_pattern 'function filesBackendStatus\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.filesBackendStatusObject\(\)\);\s*\}' "Launcher.filesBackendStatus IPC mapping"
-  require_pattern 'function drunCategoryState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\);\s*\}' "Launcher.drunCategoryState IPC mapping"
-  require_pattern 'function escapeActionState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\);\s*\}' "Launcher.escapeActionState IPC mapping"
-  require_pattern 'function diagnosticSetSearchText\(text: string\)(?:: string)? \{\s*return launcherRoot\.diagnosticSetSearchText\(text\);\s*\}' "Launcher.diagnosticSetSearchText IPC mapping"
-  require_pattern 'function diagnosticSetDrunCategoryFilter\(categoryKey: string\)(?:: string)? \{\s*return launcherRoot\.diagnosticSetDrunCategoryFilter\(categoryKey\);\s*\}' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
-  require_pattern 'function invokeEscapeAction\(\)(?:: string)? \{' "Launcher.invokeEscapeAction IPC mapping"
-  require_literal 'function drunCategoryStateObject() {' "drunCategoryState payload helper"
-  require_literal 'function escapeActionStateObject() {' "escapeActionState payload helper"
-  require_literal 'action = "resetQuery";' "escapeActionState resetQuery branch"
-  require_literal 'action = "resetCategory";' "escapeActionState resetCategory branch"
-  require_literal 'hasQuery: searchText !== "",' "escapeActionState hasQuery field"
-  require_literal 'hasCategoryFilter: drunCategoryFiltersEnabled && mode === "drun" && drunCategoryFilter !== "",' "escapeActionState hasCategoryFilter field"
-  require_literal 'enabled: drunCategoryFiltersEnabled === true,' "drunCategoryState enabled field"
-  require_literal 'activeCount: activeCount,' "drunCategoryState activeCount field"
-  require_literal 'totalCount: totalCount,' "drunCategoryState totalCount field"
-  require_literal 'options: normalized' "drunCategoryState options field"
-  require_literal 'backend: filesBackendLabel,' "backend"
-  require_literal 'metrics: ({' "metrics object"
-  require_literal 'filesResolveAvgMs: resolveAvgMs,' "metrics.filesResolveAvgMs"
-  require_literal 'filesResolveLastMs: resolveLastMs,' "metrics.filesResolveLastMs"
-  require_literal 'filesFdLoads: filesFdLoads,' "metrics.filesFdLoads"
-  require_literal 'filesFindLoads: filesFindLoads,' "metrics.filesFindLoads"
-  require_literal 'cache: ({' "cache object"
-  require_literal 'hits: fileCacheHits,' "cache.hits"
-  require_literal 'misses: fileCacheMisses,' "cache.misses"
+  require_literal "$launcher_qml" 'function clearMetrics() {' "Launcher.clearMetrics IPC mapping"
+  require_literal "$launcher_qml" 'function redetectFilesBackend() {' "Launcher.redetectFilesBackend IPC mapping"
+  require_literal "$launcher_qml" 'function diagnosticReset() {' "Launcher.diagnosticReset IPC mapping"
+  require_pattern "$launcher_qml" 'function filesBackendStatus\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.filesBackendStatusObject\(\)\);\s*\}' "Launcher.filesBackendStatus IPC mapping"
+  require_pattern "$launcher_qml" 'function drunCategoryState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.drunCategoryStateObject\(\)\);\s*\}' "Launcher.drunCategoryState IPC mapping"
+  require_pattern "$launcher_qml" 'function escapeActionState\(\)(?:: string)? \{\s*return JSON\.stringify\(launcherRoot\.escapeActionStateObject\(\)\);\s*\}' "Launcher.escapeActionState IPC mapping"
+  require_pattern "$launcher_qml" 'function diagnosticSetSearchText\(text: string\)(?:: string)? \{\s*return launcherRoot\.diagnosticSetSearchText\(text\);\s*\}' "Launcher.diagnosticSetSearchText IPC mapping"
+  require_pattern "$launcher_qml" 'function diagnosticSetDrunCategoryFilter\(categoryKey: string\)(?:: string)? \{\s*return launcherRoot\.diagnosticSetDrunCategoryFilter\(categoryKey\);\s*\}' "Launcher.diagnosticSetDrunCategoryFilter IPC mapping"
+  require_pattern "$launcher_qml" 'function invokeEscapeAction\(\)(?:: string)? \{' "Launcher.invokeEscapeAction IPC mapping"
+  require_literal "$launcher_qml" 'function drunCategoryStateObject() {' "drunCategoryState payload helper"
+  require_literal "$launcher_qml" 'function escapeActionStateObject() {' "escapeActionState payload helper"
+  require_literal "$launcher_diag_js" 'action = "resetQuery";' "escapeActionState resetQuery branch"
+  require_literal "$launcher_diag_js" 'action = "resetCategory";' "escapeActionState resetCategory branch"
+  require_literal "$launcher_diag_js" 'hasQuery: props.searchText !== "",' "escapeActionState hasQuery field"
+  require_literal "$launcher_diag_js" 'hasCategoryFilter: props.drunCategoryFiltersEnabled && props.mode === "drun" && props.drunCategoryFilter !== "",' "escapeActionState hasCategoryFilter field"
+  require_literal "$launcher_diag_js" 'enabled: props.drunCategoryFiltersEnabled === true,' "drunCategoryState enabled field"
+  require_literal "$launcher_diag_js" 'activeCount: activeCount,' "drunCategoryState activeCount field"
+  require_literal "$launcher_diag_js" 'totalCount: totalCount,' "drunCategoryState totalCount field"
+  require_literal "$launcher_diag_js" 'options: normalized' "drunCategoryState options field"
+  require_literal "$launcher_diag_js" 'backend: props.filesBackendLabel,' "backend"
+  require_literal "$launcher_diag_js" 'metrics: ({' "metrics object"
+  require_literal "$launcher_diag_js" 'filesResolveAvgMs: resolveAvgMs,' "metrics.filesResolveAvgMs"
+  require_literal "$launcher_diag_js" 'filesResolveLastMs: resolveLastMs,' "metrics.filesResolveLastMs"
+  require_literal "$launcher_diag_js" 'filesFdLoads: filesFdLoads,' "metrics.filesFdLoads"
+  require_literal "$launcher_diag_js" 'filesFindLoads: filesFindLoads,' "metrics.filesFindLoads"
+  require_literal "$launcher_diag_js" 'cache: ({' "cache object"
+  require_literal "$launcher_diag_js" 'hits: fileCacheHits,' "cache.hits"
+  require_literal "$launcher_diag_js" 'misses: fileCacheMisses,' "cache.misses"
 
   if (( ci_mode == 1 )); then
     if (( ${#errors[@]} > 0 )); then

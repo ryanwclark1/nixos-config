@@ -14,6 +14,15 @@ repo_shell_pid=""
 repo_shell_service_was_active=0
 repo_shell_env=()
 
+fixture_dir=""
+fixture_root_a=""
+fixture_root_b=""
+fixture_missing_root=""
+fixture_opener=""
+fixture_opener_log=""
+fixture_alpha=""
+fixture_beta=""
+
 pass_count=0
 fail_count=0
 
@@ -23,7 +32,7 @@ Usage: check-launcher-files-runtime.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 
 Validates file-mode launcher runtime behavior:
   - static IPC contract checks for files-mode diagnostics
-  - live openFiles / diagnosticSetSearchText / launcherState / filesBackendStatus probes
+  - live root override, hidden toggle, opener execution, and invalid-root probes
 In --ci mode, only static checks are executed.
 EOF
 }
@@ -92,9 +101,25 @@ cleanup_repo_shell() {
   fi
 }
 
+cleanup_fixtures() {
+  if [[ -n "${instance_id}" ]]; then
+    quickshell ipc --id "${instance_id}" call Launcher diagnosticClearFileOverrides >/dev/null 2>&1 || true
+    quickshell ipc --id "${instance_id}" call Launcher diagnosticSetSearchText "" >/dev/null 2>&1 || true
+    quickshell ipc --id "${instance_id}" call Launcher invokeEscapeAction >/dev/null 2>&1 || true
+  fi
+  if [[ -n "${fixture_dir}" ]]; then
+    rm -rf "${fixture_dir}"
+  fi
+}
+
+cleanup() {
+  cleanup_fixtures
+  cleanup_repo_shell
+}
+
 handle_termination() {
   trap - EXIT TERM INT
-  cleanup_repo_shell
+  cleanup
   exit 124
 }
 
@@ -175,10 +200,10 @@ call_ipc() {
 
 json_probe() {
   local mode="$1"
-  local expected="$2"
+  shift
   node -e '
 const fs = require("node:fs");
-const [mode, expected] = process.argv.slice(1);
+const [mode, ...args] = process.argv.slice(1);
 let raw = fs.readFileSync(0, "utf8").trim();
 let payload = JSON.parse(raw);
 if (typeof payload === "string") payload = JSON.parse(payload);
@@ -187,11 +212,11 @@ function fail(message) {
   process.exit(1);
 }
 if (mode === "launcher-mode") {
-  if (payload.mode !== expected) fail(`mode=${payload.mode}`);
+  if (payload.mode !== args[0]) fail(`mode=${payload.mode}`);
   process.exit(0);
 }
 if (mode === "launcher-query") {
-  if (payload.searchText !== expected) fail(`searchText=${payload.searchText}`);
+  if (payload.searchText !== args[0]) fail(`searchText=${payload.searchText}`);
   if (payload.mode !== "files") fail(`mode=${payload.mode}`);
   process.exit(0);
 }
@@ -204,20 +229,51 @@ if (mode === "backend-status") {
   if (!payload.cache || typeof payload.cache !== "object") fail("cache missing");
   process.exit(0);
 }
+if (mode === "state-root") {
+  if (String(payload.fileSearchRootResolved || "") !== args[0]) fail(`fileSearchRootResolved=${payload.fileSearchRootResolved}`);
+  process.exit(0);
+}
+if (mode === "state-hidden") {
+  const expected = args[0] === "true";
+  if (Boolean(payload.fileSearchShowHidden) !== expected) fail(`fileSearchShowHidden=${payload.fileSearchShowHidden}`);
+  process.exit(0);
+}
+if (mode === "state-query-results-at-least") {
+  if (payload.mode !== "files") fail(`mode=${payload.mode}`);
+  if (String(payload.searchText || "") !== args[0]) fail(`searchText=${payload.searchText}`);
+  if (Number(payload.filteredItemCount || 0) < Number(args[1])) fail(`filteredItemCount=${payload.filteredItemCount}`);
+  process.exit(0);
+}
+if (mode === "state-query-results-exact") {
+  if (payload.mode !== "files") fail(`mode=${payload.mode}`);
+  if (String(payload.searchText || "") !== args[0]) fail(`searchText=${payload.searchText}`);
+  if (Number(payload.filteredItemCount || 0) !== Number(args[1])) fail(`filteredItemCount=${payload.filteredItemCount}`);
+  process.exit(0);
+}
+if (mode === "state-load-error") {
+  if (String(payload.loadState || "") !== "error") fail(`loadState=${payload.loadState}`);
+  if (String(payload.loadMessage || "").indexOf(String(args[0] || "")) === -1) fail(`loadMessage=${payload.loadMessage}`);
+  process.exit(0);
+}
+if (mode === "selection-result") {
+  if (payload.executed !== true) fail(`executed=${payload.executed}`);
+  if (String(payload.target || "") !== args[0]) fail(`target=${payload.target}`);
+  process.exit(0);
+}
 fail(`unknown probe ${mode}`);
-' "$mode" "$expected"
+' "$mode" "$@"
 }
 
 wait_for_probe() {
   local label="$1"
   local command="$2"
   local probe_mode="$3"
-  local probe_value="$4"
+  shift 3
   local deadline=$((SECONDS + 10))
   local payload
   while (( SECONDS < deadline )); do
     payload="$(eval "$command" 2>/dev/null || true)"
-    if [[ -n "${payload}" ]] && printf '%s' "${payload}" | json_probe "${probe_mode}" "${probe_value}" >/dev/null 2>&1; then
+    if [[ -n "${payload}" ]] && printf '%s' "${payload}" | json_probe "${probe_mode}" "$@" >/dev/null 2>&1; then
       pass "$label"
       return 0
     fi
@@ -227,15 +283,61 @@ wait_for_probe() {
   return 1
 }
 
+wait_for_logged_target() {
+  local label="$1"
+  local expected="$2"
+  local deadline=$((SECONDS + 10))
+  local actual=""
+  while (( SECONDS < deadline )); do
+    actual="$(tail -n 1 "${fixture_opener_log}" 2>/dev/null || true)"
+    if [[ "${actual}" == "${expected}" ]]; then
+      pass "$label"
+      return 0
+    fi
+    sleep 0.25
+  done
+  fail "$label"
+  return 1
+}
+
+create_fixtures() {
+  fixture_dir="$(mktemp -d -t qs-launcher-files-XXXXXX)"
+  fixture_root_a="${fixture_dir}/root-a"
+  fixture_root_b="${fixture_dir}/root-b"
+  fixture_missing_root="${fixture_dir}/missing-root"
+  fixture_opener="${fixture_dir}/fixture-opener.sh"
+  fixture_opener_log="${fixture_dir}/opener.log"
+  fixture_alpha="${fixture_root_a}/alpha.txt"
+  fixture_beta="${fixture_root_b}/beta.txt"
+
+  mkdir -p "${fixture_root_a}" "${fixture_root_b}" "${fixture_root_a}/subdir"
+  printf '%s\n' 'alpha fixture' > "${fixture_alpha}"
+  printf '%s\n' 'hidden fixture' > "${fixture_root_a}/.hidden-note"
+  printf '%s\n' 'beta fixture' > "${fixture_beta}"
+  : > "${fixture_opener_log}"
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$1" >> "%s"\n' "${fixture_opener_log}" > "${fixture_opener}"
+  chmod +x "${fixture_opener}"
+}
+
 main() {
   require_cmd quickshell
   require_cmd node
   require_cmd rg
+  require_cmd tail
+
+  trap cleanup EXIT
+  trap handle_termination TERM INT
 
   require_literal "$launcher_qml" 'function openFiles() {' "Launcher.openFiles IPC mapping"
   require_literal "$launcher_qml" 'function filesBackendStatus(): string {' "Launcher.filesBackendStatus IPC mapping"
   require_literal "$launcher_qml" 'function launcherState(): string {' "Launcher.launcherState IPC mapping"
   require_literal "$launcher_qml" 'function diagnosticSetSearchText(text: string): string {' "Launcher.diagnosticSetSearchText IPC mapping"
+  require_literal "$launcher_qml" 'function diagnosticSetFileSearchRoot(rootValue: string): string {' "Launcher.diagnosticSetFileSearchRoot IPC mapping"
+  require_literal "$launcher_qml" 'function diagnosticSetFileShowHidden(value: string): string {' "Launcher.diagnosticSetFileShowHidden IPC mapping"
+  require_literal "$launcher_qml" 'function diagnosticSetFileOpener(command: string): string {' "Launcher.diagnosticSetFileOpener IPC mapping"
+  require_literal "$launcher_qml" 'function diagnosticClearFileOverrides(): string {' "Launcher.diagnosticClearFileOverrides IPC mapping"
+  require_literal "$launcher_qml" 'function diagnosticExecuteEmptyPrimary(): string {' "Launcher.diagnosticExecuteEmptyPrimary IPC mapping"
+  require_literal "$launcher_qml" 'function diagnosticExecuteSelection(): string {' "Launcher.diagnosticExecuteSelection IPC mapping"
 
   if (( ci_mode == 1 )); then
     (( fail_count == 0 ))
@@ -244,8 +346,6 @@ main() {
   fi
 
   if (( repo_shell_mode == 1 )); then
-    trap cleanup_repo_shell EXIT
-    trap handle_termination TERM INT
     start_repo_shell
   elif [[ -z "${instance_id}" ]]; then
     instance_id="$(discover_reachable_instance || true)"
@@ -260,16 +360,62 @@ main() {
   launcher_action_available launcherState || fail "Launcher.launcherState discoverable"
   launcher_action_available filesBackendStatus || fail "Launcher.filesBackendStatus discoverable"
   launcher_action_available diagnosticSetSearchText || fail "Launcher.diagnosticSetSearchText discoverable"
+  launcher_action_available diagnosticSetFileSearchRoot || fail "Launcher.diagnosticSetFileSearchRoot discoverable"
+  launcher_action_available diagnosticSetFileShowHidden || fail "Launcher.diagnosticSetFileShowHidden discoverable"
+  launcher_action_available diagnosticSetFileOpener || fail "Launcher.diagnosticSetFileOpener discoverable"
+  launcher_action_available diagnosticClearFileOverrides || fail "Launcher.diagnosticClearFileOverrides discoverable"
+  launcher_action_available diagnosticExecuteEmptyPrimary || fail "Launcher.diagnosticExecuteEmptyPrimary discoverable"
+  launcher_action_available diagnosticExecuteSelection || fail "Launcher.diagnosticExecuteSelection discoverable"
+
+  create_fixtures
+
+  call_ipc Launcher diagnosticClearFileOverrides >/dev/null
+  call_ipc Launcher diagnosticSetFileSearchRoot "${fixture_root_a}" >/dev/null
+  call_ipc Launcher diagnosticSetFileShowHidden "false" >/dev/null
+  call_ipc Launcher diagnosticSetFileOpener "${fixture_opener}" >/dev/null
 
   call_ipc Launcher openFiles >/dev/null
   wait_for_probe "Launcher enters files mode" "call_ipc Launcher launcherState" "launcher-mode" "files"
+  wait_for_probe "Launcher applies fixture search root" "call_ipc Launcher launcherState" "state-root" "${fixture_root_a}"
+  wait_for_probe "Launcher applies hidden-files override" "call_ipc Launcher launcherState" "state-hidden" "false"
+  wait_for_probe "Launcher exposes files backend status" "call_ipc Launcher filesBackendStatus" "backend-status"
 
-  call_ipc Launcher diagnosticSetSearchText "/nixos" >/dev/null
-  wait_for_probe "Launcher applies files search text" "call_ipc Launcher launcherState" "launcher-query" "/nixos"
-  wait_for_probe "Launcher exposes files backend status" "call_ipc Launcher filesBackendStatus" "backend-status" ""
+  call_ipc Launcher diagnosticSetSearchText "alpha" >/dev/null
+  wait_for_probe "Launcher finds visible fixture in configured root" "call_ipc Launcher launcherState" "state-query-results-at-least" "alpha" "1"
+  wait_for_probe "Launcher selection target resolves to visible fixture" "call_ipc Launcher diagnosticExecuteSelection" "selection-result" "${fixture_alpha}"
+  wait_for_logged_target "Configured opener receives selected file path" "${fixture_alpha}"
 
-  call_ipc Launcher diagnosticSetSearchText "" >/dev/null || true
-  call_ipc Launcher invokeEscapeAction >/dev/null || true
+  call_ipc Launcher openFiles >/dev/null
+  call_ipc Launcher diagnosticSetSearchText "hidden" >/dev/null
+  wait_for_probe "Hidden files stay excluded when override is off" "call_ipc Launcher launcherState" "state-query-results-exact" "hidden" "0"
+
+  call_ipc Launcher diagnosticSetFileShowHidden "true" >/dev/null
+  wait_for_probe "Launcher enables hidden-file override" "call_ipc Launcher launcherState" "state-hidden" "true"
+  call_ipc Launcher diagnosticSetSearchText "hidden" >/dev/null
+  wait_for_probe "Hidden files appear when override is on" "call_ipc Launcher launcherState" "state-query-results-at-least" "hidden" "1"
+
+  call_ipc Launcher diagnosticSetFileSearchRoot "${fixture_root_b}" >/dev/null
+  call_ipc Launcher diagnosticSetFileShowHidden "false" >/dev/null
+  wait_for_probe "Launcher switches to replacement search root" "call_ipc Launcher launcherState" "state-root" "${fixture_root_b}"
+  wait_for_probe "Launcher resets hidden-file override for replacement root" "call_ipc Launcher launcherState" "state-hidden" "false"
+  wait_for_probe "Files backend stays healthy after root switch" "call_ipc Launcher filesBackendStatus" "backend-status"
+
+  call_ipc Launcher openFiles >/dev/null
+  call_ipc Launcher diagnosticSetSearchText "alpha" >/dev/null
+  wait_for_probe "Old-root results are cleared after root switch" "call_ipc Launcher launcherState" "state-query-results-exact" "alpha" "0"
+  call_ipc Launcher diagnosticSetSearchText "beta" >/dev/null
+  wait_for_probe "Replacement root results load correctly" "call_ipc Launcher launcherState" "state-query-results-at-least" "beta" "1"
+
+  call_ipc Launcher diagnosticSetSearchText "no-match-token" >/dev/null
+  wait_for_probe "Empty-state query leaves file mode with zero results" "call_ipc Launcher launcherState" "state-query-results-exact" "no-match-token" "0"
+  call_ipc Launcher diagnosticExecuteEmptyPrimary >/dev/null
+  wait_for_logged_target "Empty-state primary action opens configured root" "${fixture_root_b}"
+
+  call_ipc Launcher diagnosticSetFileSearchRoot "${fixture_missing_root}" >/dev/null
+  wait_for_probe "Launcher exposes missing search root override" "call_ipc Launcher launcherState" "state-root" "${fixture_missing_root}"
+  call_ipc Launcher openFiles >/dev/null
+  call_ipc Launcher diagnosticSetSearchText "missing" >/dev/null
+  wait_for_probe "Invalid search root surfaces an error state" "call_ipc Launcher launcherState" "state-load-error" "Search root unavailable"
 
   printf '[INFO] Launcher files runtime summary: %d pass, %d fail\n' "${pass_count}" "${fail_count}"
   (( fail_count == 0 ))

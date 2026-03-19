@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
+launcher_key_handler_qml="${config_dir}/launcher/LauncherKeyHandler.qml"
 launcher_home_qml="${config_dir}/launcher/LauncherHome.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
@@ -33,7 +34,7 @@ require_pattern() {
 
 # Config/state wiring
 require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: false' "drun category filters config property"
-require_literal "$config_persistence_js" '"drunCategoryFiltersEnabled": config.launcherDrunCategoryFiltersEnabled,' "drun category filters config persistence"
+require_literal "$config_persistence_js" '["drunCategoryFiltersEnabled", "launcherDrunCategoryFiltersEnabled"]' "drun category filters config persistence"
 
 # Settings exposure
 require_literal "$launcher_settings_qml" 'label: "App Category Filters"' "settings category filter toggle label"
@@ -59,14 +60,15 @@ require_literal "$launcher_qml" 'function selectDrunCategorySlot(slot) {' "launc
 require_literal "$launcher_qml" 'function drunCategoryStateObject() {' "launcher category state payload helper"
 require_pattern "$launcher_qml" 'function drunCategoryState\(\)\s*(?::\s*string)?\s*\{' "launcher category state IPC method"
 require_literal "$launcher_qml" 'readonly property string launcherControlHintText: {' "launcher control hint property"
-require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)' "launcher category keyboard handler branch"
-require_literal "$launcher_qml" 'launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab' "launcher category ctrl+tab keyboard handler branch"
+require_literal "$launcher_qml" 'LauncherKeyHandler {' "launcher category key handler wiring"
+require_literal "$launcher_key_handler_qml" 'launcher.drunCategoryFiltersEnabled && launcher.mode === "drun" && (event.modifiers & Qt.AltModifier) && !(event.modifiers & Qt.ControlModifier)' "launcher category keyboard handler branch"
+require_literal "$launcher_key_handler_qml" 'launcher.drunCategoryFiltersEnabled && launcher.mode === "drun" && launcher.showLauncherHome && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Tab' "launcher category ctrl+tab keyboard handler branch"
 require_literal "$launcher_qml" 'var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";' "launcher category clear hint"
 require_literal "$launcher_qml" 'var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded))) ? "Esc: reset/close" : "Esc: close";' "launcher category escape hint"
 require_literal "$launcher_qml" 'return "Alt+←/→/PgUp/PgDn/Home/End/0/Backspace, Ctrl+Tab, or Alt+1..9: categories • " + resultHint + clearHint + "Enter: run • " + escapeHint;' "launcher category keyboard hint"
 require_literal "$launcher_qml" 'function jumpDrunCategoryBoundary(toEnd) {' "launcher category boundary helper"
-require_literal "$launcher_qml" 'else if (event.key === Qt.Key_0 || event.key === Qt.Key_Backspace) {' "launcher category clear branch"
-require_literal "$launcher_qml" 'launcherRoot.showLauncherHome && launcherRoot.drunCategoryFiltersEnabled && launcherRoot.mode === "drun" && launcherRoot.drunCategoryOptions.length > 1' "launcher category chip visibility guard"
+require_literal "$launcher_key_handler_qml" 'else if (event.key === Qt.Key_0 || event.key === Qt.Key_Backspace) {' "launcher category clear branch"
+require_literal "$launcher_home_qml" 'readonly property bool showCategoryFilters: root.showCategoryFiltersSection && root.launcher.showLauncherHome && root.launcher.drunCategoryFiltersEnabled && root.launcher.mode === "drun" && root.launcher.drunCategoryOptions.length > 1' "launcher category chip visibility guard"
 require_literal "$launcher_home_qml" 'readonly property bool categorySummaryExpanded: root.launcher.drunCategorySectionExpanded || root.launcher.drunCategoryFilter !== ""' "launcher home category summary expansion binding"
 require_literal "$launcher_home_qml" 'text: root.launcher.drunCategoryFilter === "" ? "All Apps" : root.launcher.drunCategoryFilterLabel' "launcher home summary pill label"
 require_literal "$launcher_home_qml" 'visible: root.showCategoryChips' "launcher home compact chip visibility"

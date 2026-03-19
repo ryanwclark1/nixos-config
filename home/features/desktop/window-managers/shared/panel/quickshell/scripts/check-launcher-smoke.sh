@@ -15,8 +15,8 @@ usage() {
 Usage: check-launcher-smoke.sh [--id INSTANCE_ID] [--repo-shell] [--ci]
 
 Runs launcher validation gates.
-  default: guardrails + responsive/runtime + ipc-health + benchmarks
-  --ci: guardrails + benchmarks (skips live-session runtime probes)
+  default: guardrails + responsive/runtime + files-runtime + ipc-health + benchmarks
+  --ci: guardrails + static runtime contracts + benchmarks
 EOF
 }
 
@@ -126,17 +126,21 @@ if (( ci_mode == 0 )); then
   fi
   if (( repo_shell_mode == 1 )); then
     run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --repo-shell
+    run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-files-runtime.sh" --repo-shell
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --repo-shell
   elif [[ -n "${instance_id}" ]]; then
     run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --id "${instance_id}"
+    run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-files-runtime.sh" --id "${instance_id}"
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --id "${instance_id}"
   else
     printf '%s\n' "[WARN] No reachable launcher instance found; falling back to static launcher probes and skipping live category/Esc diagnostics." >&2
     run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --ci
+    run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-files-runtime.sh" --ci
     run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --ci
   fi
 else
   run_subcheck "${responsive_timeout_seconds}" "${script_dir}/check-launcher-responsive.sh" --ci
+  run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-files-runtime.sh" --ci
   run_subcheck "${ipc_timeout_seconds}" "${script_dir}/check-launcher-ipc-health.sh" --ci
 fi
 run_subcheck "${benchmarks_timeout_seconds}" "${script_dir}/check-launcher-benchmarks.sh"
