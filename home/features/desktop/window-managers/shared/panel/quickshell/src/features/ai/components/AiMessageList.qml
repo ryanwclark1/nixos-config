@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import "../../../services"
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 // Scrollable message history with streaming indicator and error display.
@@ -253,6 +254,11 @@ Rectangle {
                                         ToastService.showNotice("Copied", "Message copied to clipboard");
                                     }
                                 }
+                                Tooltip {
+                                    text: "Copy message"
+                                    shown: userCopyHover.containsMouse
+                                    preferredSide: Qt.LeftEdge
+                                }
                             }
                             MouseArea {
                                 id: userHoverArea
@@ -313,6 +319,11 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: AiService.regenerateFromMessage(msgDelegate.index)
                                     }
+                                    Tooltip {
+                                        text: "Regenerate response"
+                                        shown: regenHover.containsMouse
+                                        preferredSide: Qt.BottomEdge
+                                    }
                                 }
 
                                 Rectangle {
@@ -335,6 +346,11 @@ Rectangle {
                                             Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", msgDelegate.modelData.content]);
                                             ToastService.showNotice("Copied", "Response copied to clipboard");
                                         }
+                                    }
+                                    Tooltip {
+                                        text: "Copy response"
+                                        shown: assistCopyHover.containsMouse
+                                        preferredSide: Qt.BottomEdge
                                     }
                                 }
                             }
@@ -471,6 +487,11 @@ Rectangle {
                                 retryStateLayer.burst(mouse.x, mouse.y);
                                 AiService.retryLastMessage();
                             }
+                        }
+                        Tooltip {
+                            text: "Retry"
+                            shown: retryHover.containsMouse
+                            preferredSide: Qt.TopEdge
                         }
                     }
                 }

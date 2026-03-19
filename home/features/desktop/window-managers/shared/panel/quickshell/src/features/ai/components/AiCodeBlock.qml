@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../services"
+import "../../../shared"
 
 // Code block for assistant messages with language label and copy button.
 // Instantiated via Loader; the Loader delegate provides `modelData` (blockData).
@@ -56,6 +57,11 @@ Rectangle {
                         ToastService.showNotice("Copied", "Code copied to clipboard");
                     }
                 }
+            }
+            Tooltip {
+                text: "Copy code"
+                shown: codeCopyHover.containsMouse
+                preferredSide: Qt.LeftEdge
             }
         }
     }

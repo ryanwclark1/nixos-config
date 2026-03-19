@@ -325,6 +325,7 @@ PanelWindow {
 
                 // Provider/model picker
                 Rectangle {
+                    id: providerPickerBtn
                     Layout.alignment: Qt.AlignVCenter
                     Layout.rightMargin: Colors.spacingXS
                     Layout.maximumWidth: 140
@@ -353,6 +354,12 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: providerDropdown.visible = !providerDropdown.visible
+                    }
+
+                    SharedWidgets.BarTooltip {
+                        text: "Change AI provider and model"
+                        hovered: providerPickerMouse.containsMouse
+                        anchorItem: providerPickerBtn
                     }
                 }
 
@@ -477,6 +484,7 @@ PanelWindow {
 
                 // Close button
                 Rectangle {
+                    id: closeBtn
                     width: 28
                     height: 28
                     radius: Colors.radiusMedium
@@ -502,6 +510,11 @@ PanelWindow {
                             closeStateLayer.burst(mouse.x, mouse.y);
                             root.closeRequested();
                         }
+                    }
+                    SharedWidgets.BarTooltip {
+                        text: "Close AI Chat"
+                        hovered: closeHover.containsMouse
+                        anchorItem: closeBtn
                     }
                 }
             }
@@ -881,6 +894,7 @@ PanelWindow {
                                         size: 16
                                         iconSize: 10
                                         color: "transparent"
+                                        tooltipText: "Remove attachment"
                                         onClicked: {
                                             root.attachedFiles = root.attachedFiles.filter((_, i) => i !== index);
                                         }

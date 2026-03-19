@@ -293,6 +293,12 @@ RowLayout {
                                 root._closeConversationWithUndo(modelData.id, AiService.isStreaming && AiService.activeConversationId === modelData.id);
                             }
                         }
+
+                        SharedWidgets.BarTooltip {
+                            text: "Close conversation"
+                            hovered: closeTabMouse.containsMouse
+                            anchorItem: closeTabBtn
+                        }
                     }
 
                     MouseArea {
@@ -380,6 +386,7 @@ RowLayout {
     }
 
     Rectangle {
+        id: addConvBtn
         width: 32
         height: 32
         radius: Colors.radiusSmall
@@ -412,6 +419,12 @@ RowLayout {
                 addConvStateLayer.burst(mouse.x, mouse.y);
                 AiService.newConversation();
             }
+        }
+
+        SharedWidgets.BarTooltip {
+            text: "New conversation"
+            hovered: addConvMouse.containsMouse
+            anchorItem: addConvBtn
         }
     }
 
