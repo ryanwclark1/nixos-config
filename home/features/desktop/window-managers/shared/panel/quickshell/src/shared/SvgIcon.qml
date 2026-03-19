@@ -8,10 +8,20 @@ Item {
 
     property string source: ""
     property color color
-    property bool colorize: color != undefined && color != "transparent" && color.toString() !== "#000000" || _forceColorize
+    property bool colorize: color.a > 0 || _forceColorize
     property bool _forceColorize: false
     property string folder: "fluent"
     property int size: 24
+
+    // Support "brands/icon-name.svg" in source — auto-splits folder
+    readonly property string _resolvedFolder: {
+        var idx = source.indexOf("/");
+        return idx > 0 ? source.substring(0, idx) : folder;
+    }
+    readonly property string _resolvedSource: {
+        var idx = source.indexOf("/");
+        return idx > 0 ? source.substring(idx + 1) : source;
+    }
 
     width: size
     height: size
@@ -19,7 +29,7 @@ Item {
     IconImage {
         id: iconImage
         anchors.fill: parent
-        source: root.source ? Qt.resolvedUrl("../assets/icons/" + root.folder + "/" + root.source) : ""
+        source: root._resolvedSource ? Qt.resolvedUrl("../assets/icons/" + root._resolvedFolder + "/" + root._resolvedSource) : ""
         implicitSize: root.size
     }
 
