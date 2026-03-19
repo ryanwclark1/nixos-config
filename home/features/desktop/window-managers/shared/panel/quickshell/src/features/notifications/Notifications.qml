@@ -49,7 +49,7 @@ PanelWindow {
         property var notification: modelData || null
         // Local flag: true after popup timeout expires (hides popup, keeps in center)
         property bool _expired: false
-        visible: notification && !notification.dismissed && !_expired && (!root.manager || !root.manager.dndEnabled || isUrgent) && !_isMuted
+        visible: !!notification && !notification.dismissed && !_expired && (!root.manager || !root.manager.dndEnabled || isUrgent) && !_isMuted
         Layout.preferredWidth: Config.notifWidth
         Layout.preferredHeight: visible ? delegate.height : 0
 
