@@ -149,6 +149,7 @@ PanelWindow {
                     size: 32
                     iconSize: Colors.fontSizeXL
                     tooltipText: "Settings"
+                    tooltipShortcut: "Meta+S"
                     onClicked: {
                         root.closeRequested();
                         openSettingsTimer.restart();

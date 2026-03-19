@@ -142,6 +142,7 @@ PanelWindow {
           size: 32
           icon: "󰅖"
           tooltipText: "Close"
+          tooltipShortcut: "Meta+N"
           onClicked: root.closeRequested()
         }
       }

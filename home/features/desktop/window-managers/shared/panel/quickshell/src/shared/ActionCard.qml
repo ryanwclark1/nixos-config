@@ -12,6 +12,7 @@ Rectangle {
     property bool compact: false
     property bool danger: false
     property string tooltipText: ""
+    property string tooltipShortcut: ""
     signal clicked(real mouseX, real mouseY)
 
     readonly property color effectiveColor: danger ? Colors.error : accentColor
@@ -63,6 +64,7 @@ Rectangle {
 
     Tooltip {
         text: root.tooltipText
+        shortcut: root.tooltipShortcut
         shown: actionMouse.containsMouse && root.tooltipText !== ""
     }
 }

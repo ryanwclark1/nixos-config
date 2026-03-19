@@ -15,6 +15,7 @@ Rectangle {
   property color stateColor: Colors.text
 
   property string tooltipText: ""
+  property string tooltipShortcut: ""
 
   signal clicked(real x, real y)
 
@@ -48,6 +49,7 @@ Rectangle {
 
   Tooltip {
     text: root.tooltipText
+    shortcut: root.tooltipShortcut
     shown: hoverArea.containsMouse && root.tooltipText !== ""
   }
 }

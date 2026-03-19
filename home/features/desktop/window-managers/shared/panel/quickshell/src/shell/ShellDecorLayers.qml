@@ -11,6 +11,7 @@ import "../shared"
 Item {
     id: root
     property bool showBorders: false
+    property bool startupComplete: false
     readonly property bool _backgroundAutoHidden: Config.backgroundAutoHide && CompositorAdapter.hasFullscreenWindow
 
     Dock {
@@ -35,6 +36,14 @@ Item {
                 exclusiveZone: -1
                 WlrLayershell.layer: WlrLayer.Background
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+                opacity: root.startupComplete ? 1.0 : 0.0
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Colors.durationSlow
+                        easing.type: Easing.OutCubic
+                    }
+                }
 
                 WallpaperLayer {
                     id: wallpaperLayer
@@ -142,6 +151,44 @@ Item {
                 required property ShellScreen modelData
                 screen: modelData
                 visible: root.showBorders
+            }
+        }
+    }
+
+    // Debug log overlay — visible when Config.debug is true
+    Loader {
+        active: Config.debug
+        sourceComponent: Component {
+            PanelWindow {
+                id: debugLogWindow
+                screen: Quickshell.screens[0]
+                anchors {
+                    bottom: true
+                    right: true
+                }
+                margins.bottom: 60
+                margins.right: 16
+                implicitWidth: 480
+                implicitHeight: 320
+                color: "transparent"
+                exclusiveZone: 0
+                WlrLayershell.layer: WlrLayer.Overlay
+                WlrLayershell.namespace: "quickshell-debug"
+
+                mask: Region { item: debugOverlay }
+
+                LiveLogOverlay {
+                    id: debugOverlay
+                    anchors.fill: parent
+                    title: "Debug Log"
+                    command: ["journalctl", "--user", "-u", "quickshell", "-f", "--no-pager", "-o", "short-iso"]
+                    running: true
+                }
+
+                Connections {
+                    target: debugOverlay
+                    function onCloseRequested() { Config.debug = false; }
+                }
             }
         }
     }
