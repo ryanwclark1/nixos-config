@@ -57,8 +57,8 @@ Item {
                     SequentialAnimation on opacity {
                         running: SystemStatus.overallStatus !== "healthy"
                         loops: Animation.Infinite
-                        NumberAnimation { from: 0.5; to: 1.0; duration: 800; easing.type: Easing.InOutSine }
-                        NumberAnimation { from: 1.0; to: 0.5; duration: 800; easing.type: Easing.InOutSine }
+                        NumberAnimation { from: 0.5; to: 1.0; duration: Colors.durationLong; easing.type: Easing.InOutSine }
+                        NumberAnimation { from: 1.0; to: 0.5; duration: Colors.durationLong; easing.type: Easing.InOutSine }
                     }
                 }
 

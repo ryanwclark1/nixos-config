@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "ShellCoreHelpers.js" as Helpers
+import "../../../../launcher/LauncherModeData.js" as ModeData
 import "../../../../services"
 import "../../../../widgets" as SharedWidgets
 import ".."
@@ -31,84 +32,15 @@ Item {
     readonly property bool isLauncherRuntimeSection: sectionMode === "launcher-runtime"
 
     // Static data arrays
-    readonly property var launcherModes: [
-        {
-            key: "drun",
-            label: "Apps",
-            icon: "󰀻"
-        },
-        {
-            key: "window",
-            label: "Windows",
-            icon: "󱗼"
-        },
-        {
-            key: "files",
-            label: "Files",
-            icon: "󰈔"
-        },
-        {
-            key: "ai",
-            label: "AI",
-            icon: "󰚩"
-        },
-        {
-            key: "clip",
-            label: "Clipboard",
-            icon: "󰅍"
-        },
-        {
-            key: "emoji",
-            label: "Characters",
-            icon: "󰞅"
-        },
-        {
-            key: "calc",
-            label: "Calc",
-            icon: "󰪚"
-        },
-        {
-            key: "web",
-            label: "Web",
-            icon: "󰖟"
-        },
-        {
-            key: "run",
-            label: "Run",
-            icon: "󰆍"
-        },
-        {
-            key: "system",
-            label: "System",
-            icon: "󰒓"
-        },
-        {
-            key: "keybinds",
-            label: "Keybinds",
-            icon: "󰌌"
-        },
-        {
-            key: "media",
-            label: "Media",
-            icon: "󰝚"
-        },
-        {
-            key: "nixos",
-            label: "NixOS",
-            icon: ""
-        },
-        {
-            key: "wallpapers",
-            label: "Wallpapers",
-            icon: "󰸉"
-        },
-        {
-            key: "bookmarks",
-            label: "Bookmarks",
-            icon: "󰃀"
-        }
-    ]
-    readonly property var launcherDefaultModes: ["drun", "window", "files", "ai", "clip", "emoji", "calc", "web", "run", "system", "keybinds", "media", "nixos", "wallpapers", "bookmarks"]
+    readonly property var launcherModes: ModeData.allKnownModes.map(function(modeKey) {
+        var info = ModeData.modeInfo(modeKey);
+        return {
+            key: modeKey,
+            label: info.label,
+            icon: ModeData.modeIcons[modeKey] || "•"
+        };
+    })
+    readonly property var launcherDefaultModes: ModeData.allKnownModes.slice()
     readonly property var webProviders: {
         var builtIn = [
             { key: "duckduckgo", label: "DuckDuckGo", icon: "󰇥" },
@@ -189,6 +121,15 @@ Item {
     function orderedEnabledModes() {
         return Helpers.orderedEnabledModes(Config, CompositorAdapter, launcherModes);
     }
+    function orderedPrimaryModes() {
+        return Helpers.orderedPrimaryModes(Config, CompositorAdapter, launcherModes);
+    }
+    function orderedAdvancedModes() {
+        return Helpers.orderedAdvancedModes(Config, CompositorAdapter, launcherModes);
+    }
+    function disabledLauncherModes() {
+        return Helpers.disabledLauncherModes(Config, CompositorAdapter, launcherModes);
+    }
     function orderedWebProviders() {
         return Helpers.orderedWebProviders(Config, webProviders, webProviderDefaultOrder);
     }
@@ -212,6 +153,24 @@ Item {
     }
     function moveMode(modeKey, delta) {
         Helpers.moveMode(Config, CompositorAdapter, launcherModes, modeKey, delta);
+    }
+    function movePrimaryMode(modeKey, delta) {
+        Helpers.movePrimaryMode(Config, CompositorAdapter, launcherModes, modeKey, delta);
+    }
+    function moveAdvancedMode(modeKey, delta) {
+        Helpers.moveAdvancedMode(Config, CompositorAdapter, launcherModes, modeKey, delta);
+    }
+    function promoteLauncherMode(modeKey) {
+        Helpers.promoteLauncherMode(Config, CompositorAdapter, launcherModes, modeKey);
+    }
+    function enableLauncherMode(modeKey, asPrimary) {
+        Helpers.enableLauncherMode(Config, CompositorAdapter, launcherModes, modeKey, asPrimary);
+    }
+    function demoteLauncherMode(modeKey) {
+        Helpers.demoteLauncherMode(Config, CompositorAdapter, launcherModes, modeKey);
+    }
+    function disableLauncherMode(modeKey) {
+        Helpers.disableLauncherMode(Config, CompositorAdapter, launcherModes, modeKey);
     }
     function clearModeDragState() {
         Helpers.clearModeDragState(root);
@@ -753,6 +712,7 @@ Item {
                                         compact: true
                                         enabled: webProviderRow.index > 0
                                         iconName: "󰅃"
+                                        label: "↑"
                                         onClicked: root.moveWebProvider(webProviderRow.modelData, -1)
                                     }
 
@@ -760,6 +720,7 @@ Item {
                                         compact: true
                                         enabled: webProviderRow.index < (root.orderedWebProviders().length - 1)
                                         iconName: "󰅀"
+                                        label: "↓"
                                         onClicked: root.moveWebProvider(webProviderRow.modelData, 1)
                                     }
                                 }
@@ -1038,28 +999,14 @@ Item {
         SettingsCard {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
-            title: "Launcher Modes"
+            title: "Launcher Presets"
             iconName: "󰌌"
-            description: "Enable or disable launcher modes and apply preset sets."
+            description: "Choose a focused default set, an extended power-user set, or everything."
 
-            SettingsSectionLabel {
-                text: "ENABLED MODES"
-            }
-
-            Flow {
-                Layout.fillWidth: true
-                spacing: Colors.spacingS
-
-                Repeater {
-                    model: root.supportedLauncherModes()
-                    delegate: SharedWidgets.FilterChip {
-                        required property var modelData
-                        label: modelData.label
-                        icon: modelData.icon
-                        selected: (Array.isArray(Config.launcherEnabledModes) ? Config.launcherEnabledModes : []).indexOf(modelData.key) !== -1
-                        onClicked: root.toggleLauncherMode(modelData.key)
-                    }
-                }
+            SettingsInfoCallout {
+                iconName: "󰛢"
+                title: "Sidebar vs advanced"
+                body: "Primary sidebar modes stay visible in the launcher. Advanced modes stay enabled, but live behind More and their prefixes."
             }
 
             Flow {
@@ -1069,199 +1016,295 @@ Item {
                 SettingsActionButton {
                     width: root.compactMode ? implicitWidth : 0
                     Layout.fillWidth: !root.compactMode
-                    label: "Core Preset"
+                    label: "Focused"
                     compact: true
-                    onClicked: root.applyModePreset("core")
+                    onClicked: root.applyModePreset("focused")
                 }
 
                 SettingsActionButton {
                     width: root.compactMode ? implicitWidth : 0
                     Layout.fillWidth: !root.compactMode
-                    label: "Minimal Preset"
+                    label: "Extended"
                     compact: true
-                    onClicked: root.applyModePreset("minimal")
+                    onClicked: root.applyModePreset("extended")
                 }
 
                 SettingsActionButton {
                     width: root.compactMode ? implicitWidth : 0
                     Layout.fillWidth: !root.compactMode
-                    label: "Full Preset"
+                    label: "All"
                     compact: true
-                    onClicked: root.applyModePreset("full")
+                    onClicked: root.applyModePreset("all")
                 }
             }
         }
 
-        // ----- Mode Order (modes) -------------------------------------------
         SettingsCard {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
-            title: "Mode Order"
-            iconName: "󰑖"
-            description: "Control the order the enabled modes appear in."
+            title: "Primary Sidebar"
+            iconName: "󰍉"
+            description: "These modes stay pinned in the launcher sidebar."
 
-            SettingsSectionLabel {
-                text: "MODE ORDER"
-            }
+            Repeater {
+                model: root.orderedPrimaryModes()
 
-            Column {
-                id: modeOrderList
-                Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                delegate: SettingsListRow {
+                    required property int index
+                    required property var modelData
 
-                Repeater {
-                    model: root.orderedEnabledModes()
-                    delegate: Item {
-                        id: modeRow
-                        width: parent ? parent.width : 0
-                        implicitHeight: modeCard.implicitHeight + (dropBeforeIndicator.visible ? dropBeforeIndicator.height + Colors.spacingXS : 0)
-                        height: implicitHeight
-                        required property int index
-                        required property var modelData
-                        readonly property bool dropBeforeActive: root.dragModeKey !== "" && root.dragModeTargetIndex === index
+                    minimumHeight: root.compactMode ? 82 : 54
 
-                        Rectangle {
-                            id: dropBeforeIndicator
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: parent.top
-                            }
-                            visible: modeRow.dropBeforeActive
-                            height: 10
-                            radius: Colors.radiusXXS
-                            color: Colors.primaryMarked
-                            border.color: Colors.primary
-                            border.width: 1
+                    Rectangle {
+                        implicitWidth: 28
+                        implicitHeight: 28
+                        radius: Colors.radiusCard
+                        color: Colors.surface
+                        border.color: Colors.border
+                        border.width: 1
+                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: root.launcherModeMeta(modelData).icon
+                            color: Colors.primary
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeSmall
                         }
+                    }
 
-                        SettingsListRow {
-                            id: modeCard
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: dropBeforeIndicator.bottom
-                                topMargin: dropBeforeIndicator.visible ? Colors.spacingXS : 0
-                            }
-                            minimumHeight: root.compactMode ? 76 : 46
-                            active: dragHandle.dragActive
-                            opacity: dragHandle.dragActive ? 0.74 : 1.0
-                            onYChanged: {
-                                if (dragHandle.dragActive)
-                                    root.dragModeTargetIndex = root.currentModeDropIndex(modeCard, modeRow.index, modeOrderList);
-                            }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingXS
 
-                            Behavior on y {
-                                enabled: !dragHandle.dragActive
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingS
 
-                                NumberAnimation {
-                                    duration: Colors.durationFast
-                                }
-                            }
-
-                            SettingsDragHandle {
-                                id: dragHandle
-                                Layout.alignment: Qt.AlignTop
-                                dragTarget: modeCard
-                                onPressedChanged: {
-                                    root.dragModeKey = modeRow.modelData;
-                                    root.dragModeTargetIndex = modeRow.index;
-                                }
-                                onReleased: function (wasDragging) {
-                                    var targetIndex = root.dragModeTargetIndex;
-                                    if (wasDragging)
-                                        targetIndex = root.currentModeDropIndex(modeCard, modeRow.index, modeOrderList);
-                                    modeCard.x = 0;
-                                    modeCard.y = 0;
-                                    if (wasDragging) {
-                                        if (!root.moveDraggedMode(targetIndex))
-                                            root.clearModeDragState();
-                                    } else {
-                                        root.clearModeDragState();
-                                    }
-                                }
+                            Text {
+                                text: root.launcherModeMeta(modelData).label
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.weight: Font.DemiBold
                             }
 
                             Rectangle {
-                                implicitWidth: 24
-                                implicitHeight: 24
-                                radius: Colors.radiusCard
-                                color: Colors.surface
-                                border.color: Colors.border
+                                visible: String(ModeData.modeInfo(modelData).prefix || "") !== ""
+                                radius: Colors.radiusPill
+                                color: Colors.primarySubtle
+                                border.color: Colors.primaryRing
                                 border.width: 1
-                                Layout.alignment: Qt.AlignVCenter
+                                implicitHeight: 22
+                                implicitWidth: prefixLabel.implicitWidth + 12
 
                                 Text {
+                                    id: prefixLabel
                                     anchors.centerIn: parent
-                                    text: root.launcherModeMeta(modeRow.modelData).icon
+                                    text: (ModeData.modeInfo(modelData).prefix || "") + " prefix"
                                     color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.DemiBold
                                 }
                             }
+                        }
 
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: Colors.spacingXS
+                        Text {
+                            Layout.fillWidth: true
+                            text: ModeData.modeInfo(modelData).hint || "Launcher mode"
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeXS
+                            wrapMode: Text.WordWrap
+                        }
+                    }
 
-                                Text {
-                                    text: root.launcherModeMeta(modeRow.modelData).label
-                                    color: Colors.text
-                                    font.pixelSize: Colors.fontSizeSmall
-                                    font.weight: Font.DemiBold
-                                    Layout.fillWidth: true
-                                    wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
-                                    elide: root.compactMode ? Text.ElideNone : Text.ElideRight
-                                }
+                    Flow {
+                        spacing: Colors.spacingS
+                        Layout.alignment: Qt.AlignTop
 
-                                Text {
-                                    text: "Drag to reorder, or use the arrow buttons."
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    Layout.fillWidth: true
-                                    wrapMode: Text.WordWrap
-                                }
+                        SettingsActionButton {
+                            compact: true
+                            iconName: "󰅃"
+                            enabled: index > 0
+                            onClicked: root.movePrimaryMode(modelData, -1)
+                        }
 
-                                Flow {
-                                Layout.fillWidth: true
-                                Layout.preferredWidth: parent.width
-                                spacing: Colors.spacingS
+                        SettingsActionButton {
+                            compact: true
+                            iconName: "󰅀"
+                            enabled: index < (root.orderedPrimaryModes().length - 1)
+                            onClicked: root.movePrimaryMode(modelData, 1)
+                        }
 
-                                SettingsActionButton {
-                                    iconName: "󰅃"
-                                    compact: true
-                                    enabled: modeRow.index > 0
-                                    onClicked: root.moveMode(modeRow.modelData, -1)
-                                }
+                        SettingsActionButton {
+                            compact: true
+                            label: "Advanced"
+                            onClicked: root.demoteLauncherMode(modelData)
+                        }
 
-                                SettingsActionButton {
-                                    iconName: "󰅀"
-                                    compact: true
-                                    enabled: modeRow.index < (root.orderedEnabledModes().length - 1)
-                                    onClicked: root.moveMode(modeRow.modelData, 1)
-                                }
-                                }                            }
+                        SettingsActionButton {
+                            compact: true
+                            label: "Disable"
+                            onClicked: root.disableLauncherMode(modelData)
                         }
                     }
                 }
+            }
+        }
 
-                Rectangle {
-                    width: parent ? parent.width : 0
-                    height: 12
-                    radius: Colors.radiusXXS
-                    visible: root.dragModeKey !== "" && root.dragModeTargetIndex === root.orderedEnabledModes().length
-                    color: Colors.primaryMarked
-                    border.color: Colors.primary
-                    border.width: 1
-                }
+        SettingsCard {
+            visible: root.isLauncherModesSection
+            Layout.fillWidth: true
+            title: "Advanced / Prefix"
+            iconName: "󰑖"
+            description: "These modes stay enabled behind More. Prefix-first modes remain one keystroke away."
 
-                Text {
-                    width: parent ? parent.width : 0
-                    visible: root.dragModeKey !== "" && root.dragModeTargetIndex === root.orderedEnabledModes().length
-                    text: "Drop at end of mode order"
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+            SettingsInfoCallout {
+                iconName: "󰛢"
+                title: "Prefix-first modes"
+                body: "Settings, Run, SSH, and Web stay visible under the search field as prefix shortcuts even when they are not pinned in the sidebar."
+            }
+
+            Repeater {
+                model: root.orderedAdvancedModes()
+
+                delegate: SettingsListRow {
+                    required property int index
+                    required property var modelData
+
+                    minimumHeight: root.compactMode ? 84 : 56
+
+                    Rectangle {
+                        implicitWidth: 28
+                        implicitHeight: 28
+                        radius: Colors.radiusCard
+                        color: Colors.surface
+                        border.color: Colors.border
+                        border.width: 1
+                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: root.launcherModeMeta(modelData).icon
+                            color: Colors.primary
+                            font.family: Colors.fontMono
+                            font.pixelSize: Colors.fontSizeSmall
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Colors.spacingXS
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingS
+
+                            Text {
+                                text: root.launcherModeMeta(modelData).label
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeSmall
+                                font.weight: Font.DemiBold
+                            }
+
+                            Rectangle {
+                                visible: String(ModeData.modeInfo(modelData).prefix || "") !== ""
+                                radius: Colors.radiusPill
+                                color: Colors.primarySubtle
+                                border.color: Colors.primaryRing
+                                border.width: 1
+                                implicitHeight: 22
+                                implicitWidth: advancedPrefixLabel.implicitWidth + 12
+
+                                Text {
+                                    id: advancedPrefixLabel
+                                    anchors.centerIn: parent
+                                    text: (ModeData.modeInfo(modelData).prefix || "") + " prefix"
+                                    color: Colors.primary
+                                    font.pixelSize: Colors.fontSizeXS
+                                    font.weight: Font.DemiBold
+                                }
+                            }
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: ModeData.modeInfo(modelData).hint || "Advanced launcher mode"
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeXS
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+
+                    Flow {
+                        spacing: Colors.spacingS
+                        Layout.alignment: Qt.AlignTop
+
+                        SettingsActionButton {
+                            compact: true
+                            iconName: "󰅃"
+                            enabled: index > 0
+                            onClicked: root.moveAdvancedMode(modelData, -1)
+                        }
+
+                        SettingsActionButton {
+                            compact: true
+                            iconName: "󰅀"
+                            enabled: index < (root.orderedAdvancedModes().length - 1)
+                            onClicked: root.moveAdvancedMode(modelData, 1)
+                        }
+
+                        SettingsActionButton {
+                            compact: true
+                            label: "Pin"
+                            onClicked: root.promoteLauncherMode(modelData)
+                        }
+
+                        SettingsActionButton {
+                            compact: true
+                            label: "Disable"
+                            onClicked: root.disableLauncherMode(modelData)
+                        }
+                    }
                 }
+            }
+
+            SettingsInfoCallout {
+                visible: root.orderedAdvancedModes().length === 0
+                iconName: "󰛢"
+                title: "No advanced modes"
+                body: "Enable another launcher mode to keep it available behind More."
+            }
+        }
+
+        SettingsCard {
+            visible: root.isLauncherModesSection
+            Layout.fillWidth: true
+            title: "Disabled Modes"
+            iconName: "󰅚"
+            description: "Disabled modes are hidden from the launcher until you re-enable them."
+
+            Flow {
+                Layout.fillWidth: true
+                spacing: Colors.spacingS
+
+                Repeater {
+                    model: root.disabledLauncherModes()
+
+                    delegate: SharedWidgets.FilterChip {
+                        required property var modelData
+                        label: root.launcherModeMeta(modelData).label
+                        icon: root.launcherModeMeta(modelData).icon
+                        selected: false
+                        onClicked: root.enableLauncherMode(modelData, false)
+                    }
+                }
+            }
+
+            SettingsInfoCallout {
+                visible: root.disabledLauncherModes().length === 0
+                iconName: "󰄬"
+                title: "Everything is enabled"
+                body: "Use disable on a primary or advanced mode if you want to remove it from launcher cycling entirely."
             }
         }
 

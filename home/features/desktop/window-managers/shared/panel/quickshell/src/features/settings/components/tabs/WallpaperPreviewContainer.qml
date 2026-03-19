@@ -39,7 +39,7 @@ Rectangle {
         id: wallpaperPreview
         anchors.fill: parent
         transitionType: Config.wallpaperTransitionType
-        transitionDuration: 400
+        transitionDuration: Colors.durationEmphasis
         onImageLoadError: source => {
             var path = source.toString().replace(/^file:\/\//, "");
             previewContainer.imageUnsupported(path);
