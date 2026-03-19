@@ -6,6 +6,7 @@ import "../widgets" as SharedWidgets
 
 PopupWindow {
   id: root
+  property bool _destroyed: false
   color: "transparent"
 
   // ── Required customization ────────────────────
@@ -46,9 +47,12 @@ PopupWindow {
       && height <= maxLayerTextureSize;
   }
 
+  Component.onDestruction: _destroyed = true
+
   onShowContentChanged: {
     if (showContent && focusOnOpen) {
       Qt.callLater(function() {
+        if (_destroyed) return;
         if (!root.showContent) return;
         if (root.initialFocusTarget && root.initialFocusTarget.forceActiveFocus)
           root.initialFocusTarget.forceActiveFocus();
