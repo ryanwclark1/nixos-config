@@ -29,4 +29,11 @@ describe("Bar Widgets QA contract", () => {
     expect(source).toContain("Bar[[:space:].]+Widgets");
     expect(source).not.toContain("Bar[[:space:]]+Widgets");
   });
+
+  it("captures the Bar Widgets tab with a deep scroll so the first section stays in frame", () => {
+    const source = readFileSync(barWidgetsQaPath, "utf8");
+
+    expect(source).toContain('capture_scroll_y="520"');
+    expect(source).toContain('--scroll-y "${capture_scroll_y}"');
+  });
 });
