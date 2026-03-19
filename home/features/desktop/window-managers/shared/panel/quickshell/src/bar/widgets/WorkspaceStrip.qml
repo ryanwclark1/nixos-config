@@ -7,29 +7,38 @@ Flow {
   id: root
 
   property var state: null
+  property var settings: ({})
   property bool vertical: false
-  property bool showAddButton: true
-  property bool showMiniMap: true
+
+  readonly property bool showAddButton: settings.hasOwnProperty("showAddButton") ? settings.showAddButton : Config.workspaceShowAddButton
+  readonly property bool showMiniMap: settings.hasOwnProperty("showMiniMap") ? settings.showMiniMap : Config.workspaceShowMiniMap
+  readonly property bool showNames: settings.hasOwnProperty("showNames") ? settings.showNames : Config.workspaceShowNames
+  readonly property bool showAppIcons: settings.hasOwnProperty("showAppIcons") ? settings.showAppIcons : Config.workspaceShowAppIcons
+  readonly property bool showWindowCount: settings.hasOwnProperty("showWindowCount") ? settings.showWindowCount : Config.workspaceShowWindowCount
+  readonly property int maxIcons: settings.hasOwnProperty("maxIcons") ? settings.maxIcons : Config.workspaceMaxIcons
+  readonly property string pillSize: settings.hasOwnProperty("pillSize") ? settings.pillSize : Config.workspacePillSize
+  readonly property string style: settings.hasOwnProperty("style") ? settings.style : Config.workspaceStyle
+  readonly property string layout: settings.hasOwnProperty("layout") ? settings.layout : Config.workspaceLayout
+  readonly property string clickBehavior: settings.hasOwnProperty("clickBehavior") ? settings.clickBehavior : Config.workspaceClickBehavior
+
   property color activeColor: Config.workspaceActiveColor !== "" ? Config.workspaceActiveColor : Colors.highlight
   property color inactiveColor: Colors.surface
   property color textColor: Colors.text
   readonly property color urgentColor: Config.workspaceUrgentColor !== "" ? Config.workspaceUrgentColor : Colors.error
 
   // Pill size presets
-  readonly property int pillHeight: Config.workspacePillSize === "compact" ? 16 : (Config.workspacePillSize === "large" ? 28 : 20)
-  readonly property int pillMinWidth: Config.workspacePillSize === "compact" ? 18 : (Config.workspacePillSize === "large" ? 30 : 22)
-  readonly property int pillFontSize: Config.workspacePillSize === "compact" ? Colors.fontSizeXS : (Config.workspacePillSize === "large" ? Colors.fontSizeMedium : Colors.fontSizeSmall)
+  readonly property int pillHeight: pillSize === "compact" ? 16 : (pillSize === "large" ? 28 : 20)
+  readonly property int pillMinWidth: pillSize === "compact" ? 18 : (pillSize === "large" ? 30 : 22)
+  readonly property int pillFontSize: pillSize === "compact" ? Colors.fontSizeXS : (pillSize === "large" ? Colors.fontSizeMedium : Colors.fontSizeSmall)
 
-  readonly property bool isGrid: Config.workspaceLayout === "grid"
+  readonly property bool isGrid: layout === "grid"
   
   flow: vertical ? Flow.TopToBottom : (isGrid ? Flow.LeftToRight : Flow.LeftToRight)
-  Layout.preferredWidth: isGrid ? 100 : -1 // Example constraint for grid
-  
   spacing: Colors.spacingSM
 
   // Helper for click behavior
   function handleWorkspaceClick(wsId) {
-    if (Config.workspaceClickBehavior === "last_window") {
+    if (clickBehavior === "last_window") {
       // Find the last active window on this workspace
       var wsList = root.state ? root.state.workspaces : [];
       var wsData = null;
@@ -97,9 +106,9 @@ Flow {
       readonly property int windowCount: modelData.windows || 0
       property bool dropHighlight: false
 
-      readonly property bool isDots: Config.workspaceStyle === "dots"
-      readonly property bool isStrip: Config.workspaceStyle === "strip"
-      readonly property bool isIcons: Config.workspaceStyle === "icons"
+      readonly property bool isDots: root.style === "dots"
+      readonly property bool isStrip: root.style === "strip"
+      readonly property bool isIcons: root.style === "icons"
 
       radius: isDots ? width / 2 : Colors.radiusXXS
       height: root.pillHeight
@@ -158,7 +167,7 @@ Flow {
             }
             var custom = WorkspaceIdentityService.getWorkspaceName(modelData.id);
             if (custom) return custom;
-            return Config.workspaceShowNames && modelData.name ? modelData.name : String(modelData.id)
+            return root.showNames && modelData.name ? modelData.name : String(modelData.id)
         }
         z: 2
       }
@@ -171,7 +180,7 @@ Flow {
         width: 14; height: 14
         radius: 7
         color: Colors.accent
-        visible: Config.workspaceShowWindowCount && wsPill.windowCount > 0
+        visible: root.showWindowCount && wsPill.windowCount > 0
         z: 3
 
         Text {

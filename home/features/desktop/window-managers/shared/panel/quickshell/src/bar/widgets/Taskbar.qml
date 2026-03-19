@@ -7,7 +7,7 @@ Flow {
   id: root
   spacing: Colors.spacingS
   property bool vertical: false
-  flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
+  flow: vertical ? TopToBottom : LeftToRight
   property var anchorWindow: null
   property int buttonSize: 32
   property int iconSize: 20
