@@ -13,3 +13,4 @@ RecordingBarWidget 1.0 RecordingBarWidget.qml
 PrinterBarWidget 1.0 PrinterBarWidget.qml
 NotificationsBarWidget 1.0 NotificationsBarWidget.qml
 VoxtypeBarWidget 1.0 VoxtypeBarWidget.qml
+BarSurfacePill 1.0 BarSurfacePill.qml
