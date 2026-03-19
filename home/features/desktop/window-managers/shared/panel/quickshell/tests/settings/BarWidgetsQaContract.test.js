@@ -23,6 +23,15 @@ describe("Bar Widgets QA contract", () => {
     expect(source).not.toContain("Left[[:space:]]+Section");
   });
 
+  it("keeps the widget-row OCR tolerant of the current Workspace Switcher and Running Apps glyph output", () => {
+    const source = readFileSync(barWidgetsQaPath, "utf8");
+
+    expect(source).toContain(".{0,2}orkspac.{0,2}[[:space:]]+Switcher");
+    expect(source).toContain("Runn.{0,2}ing[[:space:]]+Apps");
+    expect(source).not.toContain("Workspace[[:space:]]+Switcher");
+    expect(source).not.toContain("Running Apps");
+  });
+
   it("tolerates the current OCR punctuation join in the Bar Widgets heading", () => {
     const source = readFileSync(barWidgetsQaPath, "utf8");
 
