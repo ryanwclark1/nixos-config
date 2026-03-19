@@ -43,12 +43,23 @@ Item {
                     anchors.topMargin: 120
                 }
 
-                BackgroundVisualizer {
+                Loader {
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: parent.height * 0.4
                     visible: Config.backgroundVisualizerEnabled && !root._backgroundAutoHidden
+                    sourceComponent: Config.backgroundUseShaderVisualizer ? shaderVisualizerComponent : standardVisualizerComponent
+                }
+
+                Component {
+                    id: standardVisualizerComponent
+                    BackgroundVisualizer {}
+                }
+
+                Component {
+                    id: shaderVisualizerComponent
+                    BackgroundShaderVisualizer {}
                 }
 
                 BackgroundClock {

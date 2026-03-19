@@ -88,6 +88,16 @@ Item {
     }
 
     function sectionItems(section) {
+        if (Config.barUseModularEntries) {
+            var entries = [];
+            if (section === "left") entries = Config.barLeftEntries;
+            else if (section === "center") entries = Config.barCenterEntries;
+            else if (section === "right") entries = Config.barRightEntries;
+
+            return entries.map(function(type) {
+                return { widgetType: type, enabled: true };
+            });
+        }
         var items = sectionWidgets && sectionWidgets[section] ? sectionWidgets[section] : [];
         return items;
     }
@@ -267,6 +277,8 @@ Item {
             return screenshotComponent;
         if (widgetType === "notifications")
             return notificationsComponent;
+        if (widgetType === "personality")
+            return personalityComponent;
         if (widgetType === "spacer")
             return spacerComponent;
         if (widgetType === "separator")
@@ -1367,6 +1379,13 @@ Item {
                         item.pluginService = PluginService;
                 }
             }
+        }
+    }
+
+    Component {
+        id: personalityComponent
+        SharedWidgets.PersonalityGif {
+            property var widgetInstance: null
         }
     }
 
