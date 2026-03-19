@@ -441,8 +441,8 @@ function rankFileItem(item, cleanLower) {
     score -= Math.min(16, Math.floor(item._relativePathLower.length / 24));
     // Frecency boost from UsageTrackerService
     score += Number(item._fileUsageBoost || 0);
-    // Git-tracked boost
-    if (item._isGitTracked) score += 30;
+    // Git-tracked boost — enough to move a tracked file above an untracked peer
+    if (item._isGitTracked) score += 50;
     return score;
 }
 

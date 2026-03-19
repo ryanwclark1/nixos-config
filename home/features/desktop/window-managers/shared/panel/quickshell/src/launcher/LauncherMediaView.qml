@@ -64,6 +64,7 @@ ColumnLayout {
                             size: root.compactMode ? 26 : 30
                             iconSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             iconColor: Colors.text
+                            tooltipText: "Previous track"
                             onClicked: (modelData._playerRef || modelData).previous()
                         }
                         SharedWidgets.IconButton {
@@ -71,6 +72,7 @@ ColumnLayout {
                             size: root.compactMode ? 30 : 36
                             iconSize: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeHuge
                             iconColor: Colors.primary
+                            tooltipText: (modelData._playerRef || modelData).playbackState === Mpris.Playing ? "Pause" : "Play"
                             onClicked: (modelData._playerRef || modelData).playPause()
                         }
                         SharedWidgets.IconButton {
@@ -78,6 +80,7 @@ ColumnLayout {
                             size: root.compactMode ? 26 : 30
                             iconSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             iconColor: Colors.text
+                            tooltipText: "Next track"
                             onClicked: (modelData._playerRef || modelData).next()
                         }
                     }

@@ -170,6 +170,7 @@ Rectangle {
                         size: 14
                         iconSize: 10
                         iconColor: accentColor
+                        tooltipText: "Clear filter"
                         onClicked: if (root.launcher)
                             root.launcher.setDrunCategoryFilter("")
                     }
@@ -229,6 +230,7 @@ Rectangle {
                 size: 24
                 iconSize: 14
                 iconColor: Colors.textDisabled
+                tooltipText: "Clear search"
                 onClicked: {
                     input.text = "";
                     input.forceActiveFocus();

@@ -192,7 +192,7 @@ PanelWindow {
     property var fileIndexBuiltAt: 0
     property var _gitTrackedSet: ({})
     property bool _gitIndexReady: false
-    property bool filePreviewVisible: true
+    property bool filePreviewVisible: Config.launcherFilePreviewEnabled
     property string transientNoticeText: ""
     property bool sidebarOverflowExpanded: false
     property bool shortcutHelpExpanded: false
@@ -485,6 +485,8 @@ PanelWindow {
         var resultHint = hasResults ? "↑/↓/Ctrl+P/N/PgUp/PgDn/Home/End: results • " : "";
         var clearHint = searchText !== "" ? "Ctrl+L/U: clear • " : "";
         var escapeHint = (searchText !== "" || (drunCategoryFiltersEnabled && mode === "drun" && (drunCategoryFilter !== "" || drunCategorySectionExpanded))) ? "Esc: reset/close" : "Esc: close";
+        if (mode === "files")
+            return resultHint + "Alt+P: " + (filePreviewVisible ? "hide" : "show") + " preview • " + clearHint + "Enter: open • " + escapeHint;
         if (mode === "emoji")
             return resultHint + clearHint + (Config.launcherCharacterPasteOnSelect ? "Enter: copy+paste • Shift+Enter: paste • " : "Enter: copy • Shift+Enter: paste • ") + escapeHint;
         if (drunCategoryFiltersEnabled && mode === "drun" && drunCategoryOptions.length > 1)
@@ -1527,7 +1529,7 @@ PanelWindow {
 
     function updateFileUsageCache(item) {
         if (!item || !item.fullPath) return;
-        item._fileUsageBoost = UsageTrackerService.getUsageScore(item.fullPath) * 1.5;
+        item._fileUsageBoost = UsageTrackerService.getUsageScore(item.fullPath) * 8;
     }
 
     function refreshFileUsageCaches(items) {
@@ -3048,6 +3050,7 @@ PanelWindow {
 
     function toggleFilePreview() {
         filePreviewVisible = !filePreviewVisible;
+        Config.launcherFilePreviewEnabled = filePreviewVisible;
         return true;
     }
 
