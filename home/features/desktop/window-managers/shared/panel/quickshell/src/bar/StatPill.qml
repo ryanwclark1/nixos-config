@@ -152,11 +152,9 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
       }
 
-      Text {
+      SharedWidgets.NumericText {
         text: root.compactValueText
-        color: Colors.text
         font.pixelSize: Colors.fontSizeXS
-        font.weight: Font.DemiBold
         anchors.horizontalCenter: parent.horizontalCenter
       }
     }
@@ -175,11 +173,9 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
       }
 
-      Text {
+      SharedWidgets.NumericText {
         text: root.label + " " + root.valueText
-        color: Colors.text
         font.pixelSize: Colors.fontSizeMedium
-        font.weight: Font.DemiBold
         anchors.verticalCenter: parent.verticalCenter
       }
     }

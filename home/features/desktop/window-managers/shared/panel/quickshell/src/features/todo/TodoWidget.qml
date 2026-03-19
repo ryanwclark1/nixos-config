@@ -114,19 +114,9 @@ Item {
 
       spacing: Colors.spacingXXS
 
-      add: Transition {
-        NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Colors.durationFast }
-        NumberAnimation { property: "height"; from: 0; duration: Colors.durationFast; easing.type: Easing.OutQuad }
-      }
-
-      remove: Transition {
-        NumberAnimation { property: "opacity"; to: 0; duration: Colors.durationFast }
-        NumberAnimation { property: "height"; to: 0; duration: Colors.durationFast; easing.type: Easing.InQuad }
-      }
-
-      displaced: Transition {
-        Anim { property: "y"; duration: Colors.durationMedium }
-      }
+      add: ListTransitions.addFadeHeight
+      remove: ListTransitions.removeFadeHeight
+      displaced: ListTransitions.displaced
 
       delegate: Rectangle {
         id: row

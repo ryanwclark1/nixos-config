@@ -435,7 +435,7 @@ PanelWindow {
                                     Item {
                                         Layout.fillWidth: true
                                     }
-                                    Text {
+                                    SharedWidgets.NumericText {
                                         text: AudioService.outputMuted ? "Muted" : Math.round(AudioService.outputVolume * 100) + "%"
                                         color: Colors.textSecondary
                                         font.pixelSize: Colors.fontSizeXS
@@ -477,7 +477,7 @@ PanelWindow {
                                     Item {
                                         Layout.fillWidth: true
                                     }
-                                    Text {
+                                    SharedWidgets.NumericText {
                                         text: AudioService.inputMuted ? "Muted" : Math.round(AudioService.inputVolume * 100) + "%"
                                         color: Colors.textSecondary
                                         font.pixelSize: Colors.fontSizeXS

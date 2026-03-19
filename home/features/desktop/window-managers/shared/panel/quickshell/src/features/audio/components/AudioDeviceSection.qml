@@ -128,7 +128,7 @@ ColumnLayout {
         spacing: Colors.paddingSmall
         Text { text: deviceCard.isDefault ? "󰄬" : root.icon; color: deviceCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge }
         Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: deviceCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-        Text { text: Math.min(Math.round(modelData.volume * 100), 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
+        NumericText { text: Math.min(Math.round(modelData.volume * 100), 100) + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS }
         Text { visible: !root.compactMode; text: deviceCard.isDefault ? "Default" : "Select"; color: deviceCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
       }
 
