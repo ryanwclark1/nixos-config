@@ -310,7 +310,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Include System Context"
-                icon: "󰒍"
+                icon: "chat.svg"
                 configKey: "aiSystemContext"
                 enabledText: "Hostname, OS, CPU, RAM, and uptime are included as context."
                 disabledText: "No system information is sent to the AI provider."

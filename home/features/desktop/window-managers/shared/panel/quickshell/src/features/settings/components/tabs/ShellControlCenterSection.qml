@@ -56,7 +56,7 @@ Item {
         id: card
         anchors.fill: parent
         title: "Control Center"
-        iconName: "󰖲"
+        iconName: "options.svg"
         description: "Visibility and width of control center modules."
 
         SettingsFieldGrid {

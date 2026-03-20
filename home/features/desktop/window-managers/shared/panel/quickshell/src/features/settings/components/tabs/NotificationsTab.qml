@@ -334,7 +334,7 @@ Item {
 
             SettingsCard {
                 title: "History"
-                iconName: "󰋚"
+                iconName: "arrow-counterclockwise.svg"
                 description: "Retain dismissed notifications in the Notification Center."
 
                 SettingsFieldGrid {

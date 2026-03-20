@@ -140,7 +140,7 @@ Item {
 
             SettingsCard {
                 title: "Capture Delay"
-                iconName: "󰔛"
+                iconName: "clock.svg"
                 description: "Wait before taking the screenshot, useful for capturing menus or tooltips."
 
                 SettingsModeRow {
@@ -183,7 +183,7 @@ Item {
 
             SettingsCard {
                 title: "Screenshot History"
-                iconName: "󰋚"
+                iconName: "arrow-counterclockwise.svg"
                 description: "Number of recent screenshots to retain in the history list."
 
                 SettingsSliderRow {

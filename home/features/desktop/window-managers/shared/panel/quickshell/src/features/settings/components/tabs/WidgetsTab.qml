@@ -15,7 +15,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Desktop Widgets"
-        iconName: "󰖲"
+        iconName: "options.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -95,7 +95,7 @@ Item {
 
             SettingsCard {
                 title: "Widgets"
-                iconName: "󰖲"
+                iconName: "options.svg"
                 description: "Desktop widget visibility, snapping, and edit mode."
 
                 SettingsFieldGrid {

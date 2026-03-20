@@ -113,6 +113,28 @@ Item {
         }
 
         SettingsSectionGroup {
+            title: "Style Presets"
+            description: "Quick-apply curated shell personalities that adjust spacing, radii, and motion."
+
+            SettingsCard {
+                title: "Built-In Presets"
+                iconName: "color-palette.svg"
+                description: "One-click style adjustments. Your colors and layout are preserved."
+
+                Repeater {
+                    model: PresetService.builtinPresets
+                    delegate: SettingsActionButton {
+                        required property var modelData
+                        label: modelData.name
+                        iconName: modelData.icon || ""
+                        description: modelData.description || ""
+                        onClicked: PresetService.loadBuiltinPreset(modelData.id)
+                    }
+                }
+            }
+        }
+
+        SettingsSectionGroup {
             title: "Save Current Configuration"
             description: "Create a named snapshot of the current shell configuration."
 

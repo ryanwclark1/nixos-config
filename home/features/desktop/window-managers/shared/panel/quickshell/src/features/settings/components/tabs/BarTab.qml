@@ -281,7 +281,7 @@ Item {
 
             SettingsCard {
                 title: "Selected Bar"
-                iconName: "󰖲"
+                iconName: "options.svg"
                 description: root.selectedBar ? "Edit edge placement, displays, and bar styling." : "Select a bar to edit."
                 visible: !!root.selectedBar
 

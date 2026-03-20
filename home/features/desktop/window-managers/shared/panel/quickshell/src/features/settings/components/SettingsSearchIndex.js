@@ -18,6 +18,7 @@ var entries = [
     { tabId: "appearance", cardTitle: "Glass Surface", label: "Overlay Opacity", keywords: "glass overlay", type: "slider" },
     { tabId: "appearance", cardTitle: "Glass Surface", label: "Blur", keywords: "blur effects gaussian", type: "mode" },
     { tabId: "appearance", cardTitle: "Glass Surface", label: "Auto Transparency", keywords: "transparency automatic", type: "toggle" },
+    { tabId: "appearance", cardTitle: "Theme Mode", label: "Color Backend", keywords: "pywal matugen material you dynamic color", type: "mode" },
     { tabId: "appearance", cardTitle: "Theme Mode", label: "Dynamic Wallpaper Theming", keywords: "pywal theme wallpaper", type: "toggle" },
     { tabId: "appearance", cardTitle: "Power Management", label: "Automatic Eco Mode", keywords: "eco power battery", type: "toggle" },
     { tabId: "appearance", cardTitle: "Typography", label: "Primary Font Family", keywords: "font family text", type: "text" },

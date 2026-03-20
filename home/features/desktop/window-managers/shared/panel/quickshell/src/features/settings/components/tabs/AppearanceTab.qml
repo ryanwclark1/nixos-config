@@ -18,7 +18,7 @@ Item {
 
         SettingsCard {
             title: "Glass Surface"
-            iconName: "󰖲"
+            iconName: "options.svg"
             description: "Shell-wide blur and tiered transparency settings for bars and menus."
 
             SettingsSliderRow {

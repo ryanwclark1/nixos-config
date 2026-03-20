@@ -50,7 +50,7 @@ Item {
                             value: root.dockPositionLabel
                         },
                         {
-                            icon: "󰖲",
+                            icon: "options.svg",
                             label: "Grouping",
                             value: Config.dockGroupApps ? "Grouped windows" : "Per-window"
                         },
@@ -134,7 +134,7 @@ Item {
                     }
                     SettingsToggleRow {
                         label: "Group Windows"
-                        icon: "󰖲"
+                        icon: "options.svg"
                         configKey: "dockGroupApps"
                     }
                 }

@@ -298,7 +298,7 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Bar Widgets"
-        iconName: "󰖲"
+        iconName: "options.svg"
         subtitle: "Manage the widget composition for each bar independently."
 
         SettingsCard {
