@@ -33,7 +33,7 @@ BasePopupMenu {
     ColumnLayout {
         id: contentCol
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         // ── Capture mode buttons ──────────────────
         SharedWidgets.SectionLabel { label: "CAPTURE MODE" }
@@ -48,7 +48,7 @@ BasePopupMenu {
             delegate: Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
-                radius: Colors.radiusMedium
+                radius: Appearance.radiusMedium
                 color: modeArea.containsMouse ? Colors.primarySubtle : Colors.cardSurface
                 border.color: modeArea.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
@@ -57,15 +57,15 @@ BasePopupMenu {
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingM
-                    spacing: Colors.spacingM
+                    anchors.margins: Appearance.spacingM
+                    spacing: Appearance.spacingM
 
                     Loader {
                         property string _ic: modelData.icon
                         sourceComponent: _ic.endsWith(".svg") ? _smSvg : _smNerd
                     }
-                    Component { id: _smSvg; SharedWidgets.SvgIcon { source: parent._ic; color: Colors.primary; size: Colors.fontSizeXL } }
-                    Component { id: _smNerd; Text { text: parent._ic; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL } }
+                    Component { id: _smSvg; SharedWidgets.SvgIcon { source: parent._ic; color: Colors.primary; size: Appearance.fontSizeXL } }
+                    Component { id: _smNerd; Text { text: parent._ic; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }
 
                     ColumnLayout {
                         Layout.fillWidth: true
@@ -74,14 +74,14 @@ BasePopupMenu {
                         Text {
                             text: modelData.label
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
+                            font.pixelSize: Appearance.fontSizeMedium
                             font.weight: Font.Medium
                         }
 
                         Text {
                             text: modelData.desc
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                         }
                     }
                 }
@@ -110,7 +110,7 @@ BasePopupMenu {
         Rectangle {
             Layout.fillWidth: true
             implicitHeight: 48
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: ocrArea.containsMouse ? Colors.primarySubtle : Colors.cardSurface
             border.color: ocrArea.containsMouse ? Colors.primary : Colors.border
             border.width: 1
@@ -120,14 +120,14 @@ BasePopupMenu {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingM
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingM
 
                 Text {
                     text: "󰗊"
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXL
                 }
 
                 ColumnLayout {
@@ -137,14 +137,14 @@ BasePopupMenu {
                     Text {
                         text: "Extract Text (OCR)"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: Appearance.fontSizeMedium
                         font.weight: Font.Medium
                     }
 
                     Text {
                         text: "Select region and copy text"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                     }
                 }
             }
@@ -169,7 +169,7 @@ BasePopupMenu {
 
         Flow {
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
             visible: OcrService.isAvailable
 
             Repeater {
@@ -194,7 +194,7 @@ BasePopupMenu {
 
         Row {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Repeater {
                 model: [0, 3, 5, 10]
@@ -211,12 +211,12 @@ BasePopupMenu {
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             Text {
                 text: "Edit after capture"
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 Layout.fillWidth: true
             }
 
@@ -228,7 +228,7 @@ BasePopupMenu {
 
         Row {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             visible: Config.screenshotEditAfterCapture
 
             Repeater {
@@ -250,7 +250,7 @@ BasePopupMenu {
         Rectangle {
             Layout.fillWidth: true
             implicitHeight: 48
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: analyzeArea.containsMouse ? Colors.primarySubtle : Colors.cardSurface
             border.color: analyzeArea.containsMouse ? Colors.primary : Colors.border
             border.width: 1
@@ -259,14 +259,14 @@ BasePopupMenu {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingM
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingM
 
                 Text {
                     text: "󰍉"
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXL
                 }
 
                 ColumnLayout {
@@ -276,14 +276,14 @@ BasePopupMenu {
                     Text {
                         text: "Analyze with AI"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: Appearance.fontSizeMedium
                         font.weight: Font.Medium
                     }
 
                     Text {
                         text: "Select region and ask AI about it"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                     }
                 }
             }
@@ -311,12 +311,12 @@ BasePopupMenu {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Rectangle {
                     Layout.preferredWidth: 32
                     Layout.preferredHeight: 32
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: Colors.cardSurface
                     border.color: Colors.border
                     border.width: 1
@@ -340,7 +340,7 @@ BasePopupMenu {
                     Text {
                         text: root._relativeTime(modelData.timestamp)
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         Layout.fillWidth: true
                         elide: Text.ElideRight
                     }
@@ -348,13 +348,13 @@ BasePopupMenu {
                     Text {
                         text: root._modeLabel(modelData.mode || "")
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                     }
                 }
 
                 SharedWidgets.IconButton {
                     icon: "document.svg"
-                    iconSize: Colors.fontSizeMedium
+                    iconSize: Appearance.fontSizeMedium
                     tooltipText: "Open image"
                     onClicked: Quickshell.execDetached(["xdg-open", modelData.path])
                 }
@@ -370,7 +370,7 @@ BasePopupMenu {
 
             SharedWidgets.IconButton {
                 icon: "folder.svg"
-                iconSize: Colors.fontSizeLarge
+                iconSize: Appearance.fontSizeLarge
                 tooltipText: "Open folder"
                 onClicked: ScreenshotService.openScreenshotsFolder()
             }

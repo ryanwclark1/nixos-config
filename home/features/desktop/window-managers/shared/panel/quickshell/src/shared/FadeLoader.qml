@@ -4,7 +4,7 @@ import "../services"
 Loader {
     id: root
     property bool shown: true
-    property int fadeDuration: Colors.durationFast
+    property int fadeDuration: Appearance.durationFast
 
     opacity: shown ? 1 : 0
     visible: opacity > 0

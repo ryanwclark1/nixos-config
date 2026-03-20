@@ -10,14 +10,14 @@ import "../../../widgets" as SharedWidgets
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: contentCol.implicitHeight + Colors.paddingLarge
+  Layout.preferredHeight: contentCol.implicitHeight + Appearance.paddingLarge
   visible: Config.controlCenterShowMediaWidget && activePlayers.length > 0
   color: Colors.cardSurface
-  radius: Colors.radiusMedium
+  radius: Appearance.radiusMedium
   border.color: cardHover.hovered ? Colors.primary : Colors.border
   clip: true
   scale: cardHover.hovered ? 1.01 : 1.0
-  Behavior on scale { NumberAnimation { id: mediaScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
+  Behavior on scale { NumberAnimation { id: mediaScaleAnim; duration: Appearance.durationSlow; easing.type: Easing.OutQuint } }
   Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
   layer.enabled: mediaScaleAnim.running
 
@@ -47,8 +47,8 @@ Rectangle {
   ColumnLayout {
     id: contentCol
     anchors.fill: parent
-    anchors.margins: Colors.spacingM
-    spacing: Colors.paddingMedium
+    anchors.margins: Appearance.spacingM
+    spacing: Appearance.paddingMedium
 
     Repeater {
       id: mprisRepeater
@@ -57,15 +57,15 @@ Rectangle {
       delegate: GridLayout {
         Layout.fillWidth: true
         columns: root.width >= 380 ? 2 : 1
-        columnSpacing: Colors.paddingMedium
-        rowSpacing: Colors.spacingS
+        columnSpacing: Appearance.paddingMedium
+        rowSpacing: Appearance.spacingS
 
         // Album Art
         ClippingWrapperRectangle {
           Layout.preferredWidth: root.width >= 380 ? 70 : 56
           Layout.preferredHeight: root.width >= 380 ? 70 : 56
           Layout.alignment: root.width >= 380 ? Qt.AlignTop : Qt.AlignHCenter
-          radius: Colors.radiusXS
+          radius: Appearance.radiusXS
           color: Colors.surface
 
           Item {
@@ -84,7 +84,7 @@ Rectangle {
               anchors.bottom: parent.bottom
               anchors.horizontalCenter: parent.horizontalCenter
               anchors.bottomMargin: 4
-              spacing: Colors.spacingXXS
+              spacing: Appearance.spacingXXS
               height: 12
               visible: modelData.playbackState === Mpris.Playing && SpectrumService.subscriberCount > 0
 
@@ -100,7 +100,7 @@ Rectangle {
                   opacity: 0.8
 
                   Behavior on height {
-                    NumberAnimation { duration: Colors.durationFlash; easing.type: Easing.OutCubic }
+                    NumberAnimation { duration: Appearance.durationFlash; easing.type: Easing.OutCubic }
                   }
                 }
               }
@@ -110,8 +110,8 @@ Rectangle {
               anchors.centerIn: parent
               text: "󰝚"
               color: Colors.textDisabled
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeIcon
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeIcon
               visible: albumArt.status !== Image.Ready
             }
           }
@@ -120,12 +120,12 @@ Rectangle {
         // Track Info & Controls
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingXXS
+          spacing: Appearance.spacingXXS
 
           Text {
             text: modelData.trackTitle || "Unknown Track"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             font.weight: Font.Bold
             Layout.fillWidth: true
             wrapMode: Text.Wrap
@@ -135,7 +135,7 @@ Rectangle {
           Text {
             text: modelData.trackArtist || "Unknown Artist"
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             Layout.fillWidth: true
             wrapMode: Text.Wrap
             maximumLineCount: 2
@@ -144,9 +144,9 @@ Rectangle {
           // Progress Bar
           Rectangle {
             Layout.fillWidth: true
-            Layout.topMargin: Colors.spacingXS
+            Layout.topMargin: Appearance.spacingXS
             height: mediaProgressHover.containsMouse ? 6 : 4
-            Behavior on height { NumberAnimation { duration: Colors.durationSnap } }
+            Behavior on height { NumberAnimation { duration: Appearance.durationSnap } }
             radius: height / 2
             color: Colors.highlightLight
             visible: modelData.length > 0
@@ -156,7 +156,7 @@ Rectangle {
               width: modelData.length > 0 ? parent.width * (modelData.position / modelData.length) : 0
               radius: parent.radius
               color: Colors.primary
-              Behavior on width { NumberAnimation { duration: Colors.durationNormal } }
+              Behavior on width { NumberAnimation { duration: Appearance.durationNormal } }
             }
 
             MouseArea {
@@ -176,7 +176,7 @@ Rectangle {
 
           // Playback Controls
           RowLayout {
-            spacing: root.width >= 380 ? Colors.spacingLG : Colors.spacingM
+            spacing: root.width >= 380 ? Appearance.spacingLG : Appearance.spacingM
             Layout.alignment: Qt.AlignHCenter
             
             // Previous
@@ -188,8 +188,8 @@ Rectangle {
               Text { 
                 text: "󰒮"
                 color: prevBtn.containsMouse ? Colors.primary : Colors.text
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXL
                 anchors.centerIn: parent
                 Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               }
@@ -212,8 +212,8 @@ Rectangle {
                 Text { 
                   text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
                   color: playBtn.containsMouse ? Colors.background : Colors.text
-                  font.family: Colors.fontMono
-                  font.pixelSize: Colors.fontSizeLarge
+                  font.family: Appearance.fontMono
+                  font.pixelSize: Appearance.fontSizeLarge
                   anchors.centerIn: parent
                   Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                 }
@@ -230,8 +230,8 @@ Rectangle {
               Text { 
                 text: "󰒭"
                 color: nextBtn.containsMouse ? Colors.primary : Colors.text
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXL
                 anchors.centerIn: parent
                 Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               }

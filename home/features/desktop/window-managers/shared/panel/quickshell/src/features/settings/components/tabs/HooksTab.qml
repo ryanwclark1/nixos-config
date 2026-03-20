@@ -41,7 +41,7 @@ Item {
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Repeater {
                     model: [
@@ -70,9 +70,9 @@ Item {
                     delegate: Rectangle {
                         required property var modelData
 
-                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
-                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
-                        radius: Colors.radiusLarge
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Appearance.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Appearance.spacingM * 2
+                        radius: Appearance.radiusLarge
                         color: Colors.withAlpha(Colors.surface, 0.38)
                         border.color: Colors.withAlpha(Colors.primary, 0.14)
                         border.width: 1
@@ -80,8 +80,8 @@ Item {
                         ColumnLayout {
                             id: metricColumn
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
-                            spacing: Colors.spacingXS
+                            anchors.margins: Appearance.spacingM
+                            spacing: Appearance.spacingXS
 
                             SettingsMetricIcon { icon: modelData.icon }
 
@@ -89,9 +89,9 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.label
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Black
-                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                font.letterSpacing: Appearance.letterSpacingExtraWide
                                 wrapMode: Text.WordWrap
                             }
 
@@ -99,7 +99,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.value
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.Bold
                                 wrapMode: Text.WordWrap
                             }
@@ -127,13 +127,13 @@ Item {
                 SettingsListRow {
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
+                        spacing: Appearance.spacingXXS
 
                         Text {
                             Layout.fillWidth: true
                             text: "Open Hooks Directory"
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: Font.DemiBold
                             wrapMode: Text.WordWrap
                         }
@@ -142,7 +142,7 @@ Item {
                             Layout.fillWidth: true
                             text: "Open ~/.config/quickshell/hooks in the default file manager."
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             wrapMode: Text.WordWrap
                         }
                     }
@@ -214,16 +214,16 @@ Item {
                         delegate: ColumnLayout {
                             required property var modelData
                             Layout.fillWidth: true
-                            spacing: Colors.spacingXXS
+                            spacing: Appearance.spacingXXS
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 Rectangle {
                                     width: 8
                                     height: 8
-                                    radius: Colors.radiusXS
+                                    radius: Appearance.radiusXS
                                     color: _hookHasScript(modelData.name) ? Colors.success : Colors.textDisabled
                                 }
 
@@ -234,15 +234,15 @@ Item {
                                     Text {
                                         text: modelData.name
                                         color: Colors.text
-                                        font.pixelSize: Colors.fontSizeMedium
+                                        font.pixelSize: Appearance.fontSizeMedium
                                         font.weight: Font.Medium
-                                        font.family: Colors.fontMono
+                                        font.family: Appearance.fontMono
                                     }
 
                                     Text {
                                         text: modelData.description + (modelData.valueDescription ? " (" + modelData.valueDescription + ")" : "")
                                         color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         Layout.fillWidth: true
                                         elide: Text.ElideRight
                                     }
@@ -251,8 +251,8 @@ Item {
                                 Text {
                                     text: "󰆓"
                                     color: Colors.textSecondary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeLarge
+                                    font.family: Appearance.fontMono
+                                    font.pixelSize: Appearance.fontSizeLarge
 
                                     MouseArea {
                                         id: createTemplateMouse

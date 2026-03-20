@@ -616,7 +616,7 @@ PanelWindow {
     Behavior on launcherOpacity {
         enabled: !_skipOpenAnim
         NumberAnimation {
-            duration: Colors.durationSlow
+            duration: Appearance.durationSlow
             easing.type: Easing.OutQuint
         }
     }
@@ -3210,7 +3210,7 @@ PanelWindow {
         anchors.leftMargin: launcherRoot.edgeMargins.left + launcherRoot.diagnosticViewportOffsetX + Math.max(20, (launcherRoot.usableWidth - width) / 2)
         
         color: Colors.cardSurface
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         border.width: 0
         scale: launcherRoot.scaleValue
         transform: Translate {
@@ -3262,9 +3262,9 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: launcherRoot.tightMode ? Colors.spacingM : Colors.spacingXL
-            anchors.topMargin: launcherRoot.tightMode ? Colors.spacingS : Colors.spacingM
-            spacing: launcherRoot.compactMode ? Colors.paddingSmall : 18
+            anchors.margins: launcherRoot.tightMode ? Appearance.spacingM : Appearance.spacingXL
+            anchors.topMargin: launcherRoot.tightMode ? Appearance.spacingS : Appearance.spacingM
+            spacing: launcherRoot.compactMode ? Appearance.paddingSmall : 18
 
             LauncherSidebar {
                 visible: !launcherRoot.diagnosticMinimalShell

@@ -48,13 +48,13 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             text: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? "󰂯" : "󰂲"
             color: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? Colors.primary : Colors.textDisabled
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -66,7 +66,7 @@ SharedWidgets.BarPill {
                 return root.connectedCount > 0 ? String(root.connectedCount) : "On";
             }
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

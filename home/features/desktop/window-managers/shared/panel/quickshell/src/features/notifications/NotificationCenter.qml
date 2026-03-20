@@ -22,9 +22,9 @@ PanelWindow {
     bottom: true
   }
 
-  margins.top: reservedTop + Colors.spacingS
-  margins.right: reservedRight + Colors.spacingS
-  margins.bottom: reservedBottom + Colors.spacingS
+  margins.top: reservedTop + Appearance.spacingS
+  margins.right: reservedRight + Appearance.spacingS
+  margins.bottom: reservedBottom + Appearance.spacingS
 
   implicitWidth: panelWidth + 20
   color: "transparent"
@@ -77,7 +77,7 @@ PanelWindow {
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     focus: true
 
     transform: Translate {
@@ -85,7 +85,7 @@ PanelWindow {
       Behavior on x {
         NumberAnimation {
           id: ncSlideAnim
-          duration: Colors.durationSlow
+          duration: Appearance.durationSlow
           easing.type: Easing.OutQuint
         }
       }
@@ -93,7 +93,7 @@ PanelWindow {
 
     opacity: root.showContent ? 1.0 : 0.0
     visible: opacity > 0
-    Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: Colors.durationNormal } }
+    Behavior on opacity { NumberAnimation { id: ncFadeAnim; duration: Appearance.durationNormal } }
     layer.enabled: (ncSlideAnim.running || ncFadeAnim.running) && root.allowLayer(width, height)
 
     SharedWidgets.InnerHighlight { highlightOpacity: 0.12 }
@@ -103,25 +103,25 @@ PanelWindow {
 
     ColumnLayout {
       anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: Colors.spacingLG
+      anchors.margins: Appearance.paddingLarge
+      spacing: Appearance.spacingLG
 
       RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
         Text {
           text: "Notifications"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeHuge
+          font.pixelSize: Appearance.fontSizeHuge
           font.weight: Font.DemiBold
-          font.letterSpacing: Colors.letterSpacingTight
+          font.letterSpacing: Appearance.letterSpacingTight
         }
 
         Item { Layout.fillWidth: true }
 
         // DND Toggle
         SharedWidgets.IconButton {
-          size: Colors.iconSizeMedium
+          size: Appearance.iconSizeMedium
           icon: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
           iconColor: root.manager && root.manager.dndEnabled ? Colors.error : Colors.textSecondary
           tooltipText: root.manager && root.manager.dndEnabled ? "Disable do not disturb" : "Do not disturb"
@@ -130,7 +130,7 @@ PanelWindow {
 
         // TTS Toggle
         SharedWidgets.IconButton {
-          size: Colors.iconSizeMedium
+          size: Appearance.iconSizeMedium
           icon: Config.notifTtsEnabled ? "󰗆" : "󰗈"
           iconColor: Config.notifTtsEnabled ? Colors.primary : Colors.textSecondary
           tooltipText: Config.notifTtsEnabled ? "Disable read-aloud" : "Read notifications aloud"
@@ -139,7 +139,7 @@ PanelWindow {
 
         // Stop Speaking — only visible while TTS is active
         SharedWidgets.IconButton {
-          size: Colors.iconSizeMedium
+          size: Appearance.iconSizeMedium
           icon: "stop.svg"
           iconColor: Colors.error
           tooltipText: "Stop speaking"
@@ -149,7 +149,7 @@ PanelWindow {
 
         // Clear all
         SharedWidgets.IconButton {
-          size: Colors.iconSizeMedium
+          size: Appearance.iconSizeMedium
           icon: "archive.svg"
           iconColor: Colors.textDisabled
           tooltipText: "Clear all"
@@ -158,7 +158,7 @@ PanelWindow {
 
         // Close button
         SharedWidgets.IconButton {
-          size: Colors.iconSizeMedium
+          size: Appearance.iconSizeMedium
           icon: "dismiss.svg"
           tooltipText: "Close"
           tooltipShortcut: "Meta+N"
@@ -177,26 +177,26 @@ PanelWindow {
         Layout.fillWidth: true
         height: 44
         color: Colors.cardSurface
-        radius: Colors.radiusMedium
+        radius: Appearance.radiusMedium
         border.color: searchInput.activeFocus ? Colors.primary : Colors.border
         border.width: 1
 
         RowLayout {
           anchors.fill: parent
-          anchors.margins: Colors.spacingM
-          spacing: Colors.spacingS
+          anchors.margins: Appearance.spacingM
+          spacing: Appearance.spacingS
           Text {
             text: "󰍉"
             color: Colors.textDisabled
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
           }
           TextInput {
             id: searchInput
             Layout.fillWidth: true
             verticalAlignment: Text.AlignVCenter
             color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             onVisibleChanged: if (!visible && activeFocus) focus = false
             Keys.onEscapePressed: root.closeRequested()
             onTextChanged: root.searchQuery = text
@@ -205,7 +205,7 @@ PanelWindow {
             Layout.alignment: Qt.AlignVCenter
             text: "Search..."
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             visible: !searchInput.text && !searchInput.activeFocus
           }
         }
@@ -216,12 +216,12 @@ PanelWindow {
         // Shrink when empty so the archive history section gets more space
         readonly property bool _hasTracked: notifList.count > 0
         Layout.fillHeight: _hasTracked
-        Layout.preferredHeight: _hasTracked ? -1 : (_emptyState.visible ? _emptyState.implicitHeight + Colors.spacingL * 2 : 0)
+        Layout.preferredHeight: _hasTracked ? -1 : (_emptyState.visible ? _emptyState.implicitHeight + Appearance.spacingL * 2 : 0)
 
         ListView {
           id: notifList
           anchors.fill: parent
-          spacing: Colors.spacingM; clip: true; focus: true
+          spacing: Appearance.spacingM; clip: true; focus: true
           model: root.manager ? root.manager.notifications : null
 
           property var collapsedGroups: ({})
@@ -235,20 +235,20 @@ PanelWindow {
             id: _emptyState
             anchors.centerIn: parent
             visible: (notifList.count === 0 && root.searchQuery === "") || (root.searchQuery !== "" && notifList.visibleCount === 0)
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             opacity: 0.6
             Text {
               Layout.alignment: Qt.AlignHCenter
               text: root.searchQuery === "" ? "󰂚" : "󰍉"
               color: Colors.textDisabled
               font.pixelSize: 36
-              font.family: Colors.fontMono
+              font.family: Appearance.fontMono
             }
             Text {
               Layout.alignment: Qt.AlignHCenter
               text: root.searchQuery === "" ? "No new notifications" : "No matches found"
               color: Colors.textDisabled
-              font.pixelSize: Colors.fontSizeMedium
+              font.pixelSize: Appearance.fontSizeMedium
               font.weight: Font.Medium
             }
           }
@@ -282,29 +282,29 @@ PanelWindow {
 
             RowLayout {
               anchors.fill: parent
-              anchors.leftMargin: Colors.spacingS
-              spacing: Colors.spacingM
+              anchors.leftMargin: Appearance.spacingS
+              spacing: Appearance.spacingM
 
               MouseArea {
-                Layout.preferredWidth: Colors.iconSizeSmall; Layout.preferredHeight: Colors.iconSizeSmall
+                Layout.preferredWidth: Appearance.iconSizeSmall; Layout.preferredHeight: Appearance.iconSizeSmall
                 hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                 Text {
                   anchors.centerIn: parent; text: isCollapsed ? "󰅂" : "󰅀"; color: Colors.primary
-                  font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
+                  font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge
                 }
                 onClicked: notifList.toggleGroup(section)
               }
 
               Text {
                 text: section || "System"
-                color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Black
-                font.capitalization: Font.AllUppercase; font.letterSpacing: Colors.letterSpacingWide
+                color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Black
+                font.capitalization: Font.AllUppercase; font.letterSpacing: Appearance.letterSpacingWide
               }
 
               Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.4 }
 
               Rectangle {
-                width: 24; height: 18; radius: Colors.radiusSmall; color: Colors.highlight
+                width: 24; height: 18; radius: Appearance.radiusSmall; color: Colors.highlight
                 readonly property int sectionCount: {
                   var count = 0;
                   var notifs = root.manager ? root.manager.notifications : null;
@@ -315,7 +315,7 @@ PanelWindow {
                   }
                   return count;
                 }
-                Text { anchors.centerIn: parent; text: parent.sectionCount; color: Colors.primary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+                Text { anchors.centerIn: parent; text: parent.sectionCount; color: Colors.primary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold }
               }
 
               SharedWidgets.IconButton {
@@ -365,7 +365,7 @@ PanelWindow {
       ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: notifList.count === 0
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
         visible: root.manager && root.manager.archivedNotifications.length > 0
 
         RowLayout {
@@ -373,15 +373,15 @@ PanelWindow {
           Text {
             text: "HISTORY"
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Black
-            font.letterSpacing: Colors.letterSpacingWide
+            font.letterSpacing: Appearance.letterSpacingWide
           }
           Rectangle {
             Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.4
           }
           SharedWidgets.IconButton {
-            size: Colors.iconSizeSmall
+            size: Appearance.iconSizeSmall
             icon: "archive.svg"
             iconColor: Colors.textDisabled
             stateColor: Colors.error
@@ -397,7 +397,7 @@ PanelWindow {
           height: notifList.count === 0 ? -1 : Math.min(contentHeight, 300)
           clip: true
           model: root.manager ? root.manager.archivedNotifications : null
-          spacing: Colors.spacingXS
+          spacing: Appearance.spacingXS
 
           delegate: Rectangle {
             id: archiveDelegate
@@ -405,7 +405,7 @@ PanelWindow {
             height: archiveMatchesSearch ? 54 : 0
             visible: archiveMatchesSearch
             color: Colors.cardSurface
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             opacity: 0.7
             border.color: Colors.border
             border.width: 1
@@ -421,35 +421,35 @@ PanelWindow {
             SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
 
             RowLayout {
-              anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.spacingM
+              anchors.fill: parent; anchors.margins: Appearance.paddingSmall; spacing: Appearance.spacingM
               SharedWidgets.AppIcon {
                 iconName: modelData.appIcon || ""
                 appName: modelData.appName || ""
-                iconSize: Colors.iconSizeSmall
+                iconSize: Appearance.iconSizeSmall
                 fallbackIcon: "󰂚"
               }
               ColumnLayout {
                 Layout.fillWidth: true; spacing: 0
                 RowLayout {
-                  Layout.fillWidth: true; spacing: Colors.spacingS
+                  Layout.fillWidth: true; spacing: Appearance.spacingS
                   Text {
                     Layout.fillWidth: true
                     text: modelData.summary || modelData.appName || "Notification"
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Bold
                     elide: Text.ElideRight
                   }
                   Text {
                     text: archiveDelegate._relativeTime(modelData.timestamp)
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                   }
                 }
                 Text {
                   text: modelData.body || ""
                   color: Colors.textDisabled
-                  font.pixelSize: Colors.fontSizeXXS
+                  font.pixelSize: Appearance.fontSizeXXS
                   elide: Text.ElideRight
                   Layout.fillWidth: true
                   visible: (modelData.body || "") !== ""

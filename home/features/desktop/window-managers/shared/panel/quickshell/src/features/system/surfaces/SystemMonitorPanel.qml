@@ -19,7 +19,7 @@ PanelWindow {
         bottom: true
     }
     margins.top: edgeMargins.top
-    margins.right: Math.max(edgeMargins.right, Colors.spacingS)
+    margins.right: Math.max(edgeMargins.right, Appearance.spacingS)
     margins.bottom: edgeMargins.bottom
 
     implicitWidth: panelWidth
@@ -35,7 +35,7 @@ PanelWindow {
     readonly property int telemetryColumnMinWidth: 320
     readonly property int detailColumnMinWidth: 620
     property int panelWidth: _persist.panelWidth
-    readonly property int panelMinWidth: telemetryColumnMinWidth + detailColumnMinWidth + Colors.spacingM + (Colors.paddingLarge * 2)
+    readonly property int panelMinWidth: telemetryColumnMinWidth + detailColumnMinWidth + Appearance.spacingM + (Appearance.paddingLarge * 2)
     readonly property int panelMaxWidth: 1480
 
     PersistentProperties {
@@ -152,7 +152,7 @@ PanelWindow {
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         focus: true
 
         gradient: SharedWidgets.SurfaceGradient {}
@@ -167,7 +167,7 @@ PanelWindow {
         Behavior on x {
             NumberAnimation {
                 id: slideAnim
-                duration: Colors.durationPanelOpen
+                duration: Appearance.durationPanelOpen
                 easing.type: Easing.OutBack
                 easing.overshoot: 0.6
             }
@@ -175,7 +175,7 @@ PanelWindow {
         Behavior on opacity {
             NumberAnimation {
                 id: fadeAnim
-                duration: Colors.durationPanelClose
+                duration: Appearance.durationPanelClose
             }
         }
         layer.enabled: slideAnim.running || fadeAnim.running
@@ -194,7 +194,7 @@ PanelWindow {
             id: dragHandle
             width: 6
             height: parent.height * 0.18
-            radius: Colors.radiusXS
+            radius: Appearance.radiusXS
             color: dragArea.containsMouse ? Colors.primary : Colors.border
             anchors.left: parent.left
             anchors.leftMargin: -3
@@ -203,7 +203,7 @@ PanelWindow {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Colors.durationFast
+                    duration: Appearance.durationFast
                 }
             }
             Behavior on color {
@@ -234,12 +234,12 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
-            spacing: Colors.spacingM
+            anchors.margins: Appearance.paddingLarge
+            spacing: Appearance.spacingM
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 ColumnLayout {
                     Layout.fillWidth: true
@@ -248,15 +248,15 @@ PanelWindow {
                     Text {
                         text: "System Monitor"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeHuge
+                        font.pixelSize: Appearance.fontSizeHuge
                         font.weight: Font.DemiBold
-                        font.letterSpacing: Colors.letterSpacingTight
+                        font.letterSpacing: Appearance.letterSpacingTight
                     }
 
                     Text {
                         text: "Native telemetry, processes, and services in a standalone panel"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                     }
                 }
 
@@ -317,7 +317,7 @@ PanelWindow {
                 SharedWidgets.IconButton {
                     icon: "arrow-clockwise.svg"
                     size: 34
-                    iconSize: Colors.fontSizeLarge
+                    iconSize: Appearance.fontSizeLarge
                     tooltipText: "Refresh"
                     onClicked: root.refreshAll()
                 }
@@ -325,7 +325,7 @@ PanelWindow {
                 SharedWidgets.IconButton {
                     icon: "dismiss.svg"
                     size: 34
-                    iconSize: Colors.fontSizeLarge
+                    iconSize: Appearance.fontSizeLarge
                     tooltipText: "Close"
                     onClicked: root.closeRequested()
                 }
@@ -341,7 +341,7 @@ PanelWindow {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Item {
                     Layout.minimumWidth: root.telemetryColumnMinWidth
@@ -359,7 +359,7 @@ PanelWindow {
                         ColumnLayout {
                             id: telemetryColumn
                             width: telemetryFlick.width
-                            spacing: Colors.spacingM
+                            spacing: Appearance.spacingM
 
                             CpuWidget {}
                             SystemCpuCores {}
@@ -396,7 +396,7 @@ PanelWindow {
                         ColumnLayout {
                             id: detailColumn
                             width: detailFlick.width
-                            spacing: Colors.spacingM
+                            spacing: Appearance.spacingM
 
                             ProcessWidget {
                                 id: processTable
@@ -428,7 +428,7 @@ PanelWindow {
                     ? "Tab switches sections. Process keys: arrows/j/k move, selection persists across refresh, left/right or h/l collapse tree, r refresh, x term, Delete kill, Space suspend, +/- renice, d details, c/y copy, Enter inspect. Status chips show degraded or stale detail."
                     : "Tab switches sections. Service keys: arrows/j/k move, selection persists across refresh, r restart, s start/stop, Enter or l opens logs. Status chips show degraded or stale unit detail."
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 wrapMode: Text.WordWrap
             }
         }

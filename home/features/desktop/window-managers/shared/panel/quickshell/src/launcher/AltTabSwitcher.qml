@@ -149,7 +149,7 @@ Scope {
 
                 Timer {
                     id: _hideTimer
-                    interval: Colors.durationFast
+                    interval: Appearance.durationFast
                     running: false
                 }
 
@@ -226,7 +226,7 @@ Scope {
                                 layer.enabled: opacity > 0 && opacity < 1
                                 Behavior on opacity {
                                     NumberAnimation {
-                                        duration: Colors.durationFast
+                                        duration: Appearance.durationFast
                                     }
                                 }
 
@@ -240,7 +240,7 @@ Scope {
                             Item {
                                 anchors.centerIn: parent
                                 width: cardFlickable.width
-                                height: cardFlickable.height + titleLabel.height + hintRow.height + Colors.spacingM * 2 + (indexLabel.visible ? indexLabel.height + Colors.spacingS : 0)
+                                height: cardFlickable.height + titleLabel.height + hintRow.height + Appearance.spacingM * 2 + (indexLabel.visible ? indexLabel.height + Appearance.spacingS : 0)
 
                                 Flickable {
                                     id: cardFlickable
@@ -255,9 +255,9 @@ Scope {
 
                                     Behavior on contentX {
                                         NumberAnimation {
-                                            duration: Colors.animMove.duration
-                                            easing.type: Colors.animMove.type
-                                            easing.bezierCurve: Colors.animMove.bezierCurve
+                                            duration: Appearance.animMove.duration
+                                            easing.type: Appearance.animMove.type
+                                            easing.bezierCurve: Appearance.animMove.bezierCurve
                                         }
                                     }
 
@@ -265,7 +265,7 @@ Scope {
                                         if (idx < 0 || idx >= root._cachedWindowList.length)
                                             return;
                                         var cardWidth = 148;
-                                        var spacing = Colors.spacingM;
+                                        var spacing = Appearance.spacingM;
                                         var cardX = idx * (cardWidth + spacing);
                                         var cardRight = cardX + cardWidth;
                                         if (cardX < contentX)
@@ -276,7 +276,7 @@ Scope {
 
                                     Row {
                                         id: cardRow
-                                        spacing: Colors.spacingM
+                                        spacing: Appearance.spacingM
 
                                         Repeater {
                                             model: root._cachedWindowList
@@ -286,7 +286,7 @@ Scope {
                                             readonly property bool isSelected: index === root.selectedIndex
                                             width: 148
                                             height: 120
-                                            radius: Colors.radiusCard
+                                            radius: Appearance.radiusCard
                                             color: isSelected ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.45)
                                             border.color: isSelected ? Colors.primary : Colors.border
                                             border.width: isSelected ? 2 : 1
@@ -295,9 +295,9 @@ Scope {
                                             Behavior on scale {
                                                 NumberAnimation {
                                                     id: _scaleAnim
-                                                    duration: Colors.animMove.duration
-                                                    easing.type: Colors.animMove.type
-                                                    easing.bezierCurve: Colors.animMove.bezierCurve
+                                                    duration: Appearance.animMove.duration
+                                                    easing.type: Appearance.animMove.type
+                                                    easing.bezierCurve: Appearance.animMove.bezierCurve
                                                 }
                                             }
                                             Behavior on color {
@@ -329,7 +329,7 @@ Scope {
 
                                             Column {
                                                 anchors.centerIn: parent
-                                                spacing: Colors.spacingS
+                                                spacing: Appearance.spacingS
 
                                                 SharedWidgets.AppIcon {
                                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -340,10 +340,10 @@ Scope {
 
                                                 Text {
                                                     anchors.horizontalCenter: parent.horizontalCenter
-                                                    width: card.width - Colors.spacingM * 2
+                                                    width: card.width - Appearance.spacingM * 2
                                                     text: modelData.app_id || "Unknown"
                                                     color: card.isSelected ? Colors.text : Colors.textSecondary
-                                                    font.pixelSize: Colors.fontSizeSmall
+                                                    font.pixelSize: Appearance.fontSizeSmall
                                                     font.weight: Font.Medium
                                                     horizontalAlignment: Text.AlignHCenter
                                                     elide: Text.ElideRight
@@ -351,11 +351,11 @@ Scope {
 
                                                 Text {
                                                     anchors.horizontalCenter: parent.horizontalCenter
-                                                    width: card.width - Colors.spacingM * 2
+                                                    width: card.width - Appearance.spacingM * 2
                                                     text: modelData.title || ""
                                                     visible: text !== "" && text !== (modelData.app_id || "")
                                                     color: Colors.textSecondary
-                                                    font.pixelSize: Colors.fontSizeXS
+                                                    font.pixelSize: Appearance.fontSizeXS
                                                     horizontalAlignment: Text.AlignHCenter
                                                     elide: Text.ElideRight
                                                 }
@@ -365,10 +365,10 @@ Scope {
                                             Rectangle {
                                                 anchors.top: parent.top
                                                 anchors.right: parent.right
-                                                anchors.margins: Colors.spacingXS
-                                                width: wsBadgeText.implicitWidth + Colors.spacingS * 2
-                                                height: wsBadgeText.implicitHeight + Colors.spacingXS
-                                                radius: Colors.radiusMicro
+                                                anchors.margins: Appearance.spacingXS
+                                                width: wsBadgeText.implicitWidth + Appearance.spacingS * 2
+                                                height: wsBadgeText.implicitHeight + Appearance.spacingXS
+                                                radius: Appearance.radiusMicro
                                                 color: Colors.withAlpha(Colors.bg, 0.7)
                                                 visible: modelData.workspace_id !== undefined
 
@@ -377,7 +377,7 @@ Scope {
                                                     anchors.centerIn: parent
                                                     text: CompositorAdapter.workspaceNameById(modelData.workspace_id)
                                                     color: Colors.textSecondary
-                                                    font.pixelSize: Colors.fontSizeXXS
+                                                    font.pixelSize: Appearance.fontSizeXXS
                                                 }
                                             }
 
@@ -398,17 +398,17 @@ Scope {
                                             SharedWidgets.IconButton {
                                                 anchors.top: parent.top
                                                 anchors.left: parent.left
-                                                anchors.margins: Colors.spacingXS
+                                                anchors.margins: Appearance.spacingXS
                                                 icon: "dismiss.svg"
                                                 size: 22
-                                                iconSize: Colors.fontSizeXS
+                                                iconSize: Appearance.fontSizeXS
                                                 iconColor: Colors.text
                                                 normalColor: Colors.error
                                                 tooltipText: "Close window"
                                                 opacity: cardMouse.containsMouse ? 0.9 : 0.0
                                                 visible: opacity > 0
                                                 Behavior on opacity {
-                                                    NumberAnimation { duration: Colors.durationFast }
+                                                    NumberAnimation { duration: Appearance.durationFast }
                                                 }
                                                 onClicked: {
                                                     root.selectedIndex = index;
@@ -453,11 +453,11 @@ Scope {
                                     id: titleLabel
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.top: cardFlickable.bottom
-                                    anchors.topMargin: Colors.spacingM
+                                    anchors.topMargin: Appearance.spacingM
                                     width: Math.min(parent.width, 500)
                                     text: root.selectedIndex >= 0 && root.selectedIndex < root._cachedWindowList.length ? (root._cachedWindowList[root.selectedIndex].title || "Untitled") : ""
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeLarge
+                                    font.pixelSize: Appearance.fontSizeLarge
                                     font.weight: Font.Medium
                                     horizontalAlignment: Text.AlignHCenter
                                     elide: Text.ElideRight
@@ -468,11 +468,11 @@ Scope {
                                     id: indexLabel
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.top: titleLabel.bottom
-                                    anchors.topMargin: Colors.spacingS
+                                    anchors.topMargin: Appearance.spacingS
                                     visible: root._cachedWindowList.length > 5
                                     text: (root.selectedIndex + 1) + " / " + root._cachedWindowList.length
                                     color: Colors.textDisabled
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                 }
 
                                 // Keyboard hint strip
@@ -480,8 +480,8 @@ Scope {
                                     id: hintRow
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.top: indexLabel.visible ? indexLabel.bottom : titleLabel.bottom
-                                    anchors.topMargin: Colors.spacingM
-                                    spacing: Colors.spacingS
+                                    anchors.topMargin: Appearance.spacingM
+                                    spacing: Appearance.spacingS
                                     opacity: 0.6
 
                                     Repeater {
@@ -494,19 +494,19 @@ Scope {
 
                                         delegate: Rectangle {
                                             required property var modelData
-                                            radius: Colors.radiusMicro
+                                            radius: Appearance.radiusMicro
                                             color: Colors.withAlpha(Colors.surface, 0.5)
                                             border.color: Colors.border
                                             border.width: 1
-                                            implicitWidth: hintText.implicitWidth + Colors.spacingS * 2
-                                            implicitHeight: hintText.implicitHeight + Colors.spacingXS
+                                            implicitWidth: hintText.implicitWidth + Appearance.spacingS * 2
+                                            implicitHeight: hintText.implicitHeight + Appearance.spacingXS
 
                                             Text {
                                                 id: hintText
                                                 anchors.centerIn: parent
                                                 text: modelData.key + " \u2192 " + modelData.action
                                                 color: Colors.textSecondary
-                                                font.pixelSize: Colors.fontSizeXXS
+                                                font.pixelSize: Appearance.fontSizeXXS
                                             }
                                         }
                                     }

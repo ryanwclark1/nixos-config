@@ -37,31 +37,31 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         // Save: filename text field
         Rectangle {
             Layout.fillWidth: true
             height: 32
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             visible: root.mode === "save"
             color: Colors.cardSurface
             border.color: saveField.activeFocus ? Colors.primary : Colors.border
             border.width: 1
-            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingS
-                spacing: Colors.spacingS
+                anchors.leftMargin: Appearance.spacingM
+                anchors.rightMargin: Appearance.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     text: "󰈙"
                     color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
 
                 TextInput {
@@ -70,7 +70,7 @@ Rectangle {
                     enabled: root.mode === "save" && root.isOpen
                     text: root.saveFileName
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     selectionColor: Colors.withAlpha(Colors.primary, 0.4)
                     clip: true
                     onVisibleChanged: {
@@ -91,14 +91,14 @@ Rectangle {
         // Bottom row: selected path + filter + action buttons
         RowLayout {
             Layout.fillWidth: true
-            spacing: root.compactActions ? Colors.spacingS : Colors.spacingM
+            spacing: root.compactActions ? Appearance.spacingS : Appearance.spacingM
 
             // Selected file or path display
             Rectangle {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
                 height: 30
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
@@ -106,8 +106,8 @@ Rectangle {
 
                 Text {
                     anchors.fill: parent
-                    anchors.leftMargin: Colors.spacingM
-                    anchors.rightMargin: Colors.spacingS
+                    anchors.leftMargin: Appearance.spacingM
+                    anchors.rightMargin: Appearance.spacingS
                     verticalAlignment: Text.AlignVCenter
                     text: root.mode === "open"
                         ? (root.selectedFile.length > 0 ? root.selectedFile : root.currentPath)
@@ -117,7 +117,7 @@ Rectangle {
                             : (root.selectedFile.length > 0 ? root.selectedFile : root.currentPath))
                     color: root.selectedFile.length > 0 || root.saveFileName.length > 0
                         ? Colors.text : Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     elide: Text.ElideLeft
                 }
             }
@@ -127,18 +127,18 @@ Rectangle {
                 visible: root.fileFilters.length > 1 && !root.compactActions
                 height: 30
                 width: filterText.implicitWidth + 28
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: filterHover.containsMouse
                     ? Colors.textWash : Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: Colors.spacingS
-                    anchors.rightMargin: Colors.spacingS
-                    spacing: Colors.spacingXS
+                    anchors.leftMargin: Appearance.spacingS
+                    anchors.rightMargin: Appearance.spacingS
+                    spacing: Appearance.spacingXS
 
                     Text {
                         id: filterText
@@ -146,13 +146,13 @@ Rectangle {
                             ? root.fileFilters[root.activeFilterIndex].label
                             : "All Files"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                     }
                     Text {
                         text: "󰅀"
                         color: Colors.textDisabled
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeSmall
                     }
                 }
 
@@ -170,19 +170,19 @@ Rectangle {
                 Layout.minimumWidth: 96
                 height: 30
                 width: Math.max(Layout.minimumWidth, cancelText.implicitWidth + 24)
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: cancelHover.containsMouse
                     ? Colors.textWash : Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
                 Text {
                     id: cancelText
                     anchors.centerIn: parent
                     text: "Cancel"
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
 
                 MouseArea {
@@ -200,7 +200,7 @@ Rectangle {
                 Layout.minimumWidth: root.mode === "folder" ? (root.compactActions ? 96 : 128) : 96
                 height: 30
                 width: Math.max(Layout.minimumWidth, actionText.implicitWidth + 24)
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
 
                 readonly property bool canConfirm: root.mode === "open"
                     ? root.selectedFile.length > 0
@@ -211,14 +211,14 @@ Rectangle {
                     : Colors.cardSurface
                 border.color: canConfirm ? Colors.primary : Colors.border
                 border.width: 1
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
                 Text {
                     id: actionText
                     anchors.centerIn: parent
                     text: root.mode === "open" ? "Open" : (root.mode === "save" ? "Save" : (root.compactActions ? "Select" : "Select Folder"))
                     color: actionBtn.canConfirm ? Colors.text : Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.Medium
                 }
 

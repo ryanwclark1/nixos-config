@@ -21,12 +21,12 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             color: TodoService.pendingCount > 0 ? Colors.primary : Colors.success
-            font.pixelSize: Colors.fontSizeLarge
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
+            font.family: Appearance.fontMono
             text: TodoService.pendingCount > 0 ? "󰄱" : "󰄵"
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -34,7 +34,7 @@ SharedWidgets.BarPill {
         Text {
             visible: TodoService.pendingCount > 0 && !root.vertical
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             text: String(TodoService.pendingCount)
             anchors.verticalCenter: parent.verticalCenter

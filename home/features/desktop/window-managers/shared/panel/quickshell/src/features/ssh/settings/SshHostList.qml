@@ -40,8 +40,8 @@ Rectangle {
     }
 
     Layout.fillWidth: true
-    implicitHeight: listColumn.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: listColumn.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.modalFieldSurface
     border.color: Colors.border
     border.width: 1
@@ -53,17 +53,17 @@ Rectangle {
     ColumnLayout {
         id: listColumn
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: "Manual Hosts"
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.DemiBold
                 Layout.fillWidth: true
             }
@@ -85,22 +85,22 @@ Rectangle {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingM
-                spacing: Colors.spacingS
+                anchors.leftMargin: Appearance.spacingM
+                anchors.rightMargin: Appearance.spacingM
+                spacing: Appearance.spacingS
 
                 Text {
                     text: "󰍉"
                     color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
 
                 TextInput {
                     id: manualSearchInput
                     Layout.fillWidth: true
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     clip: true
                     text: root.searchQuery
                     onTextChanged: root.searchChanged(text)
@@ -109,7 +109,7 @@ Rectangle {
                         anchors.fill: parent
                         text: "Filter manual hosts..."
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         visible: !manualSearchInput.text && !manualSearchInput.activeFocus
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -130,14 +130,14 @@ Rectangle {
             visible: root.filteredManualHosts.length === 0
             text: root.searchQuery.trim() !== "" ? "No manual hosts match \"" + root.searchQuery + "\"." : "No manual hosts saved yet."
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WordWrap
         }
 
         Column {
             id: hostOrderList
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
 
             Repeater {
                 model: root.filteredManualHosts
@@ -145,7 +145,7 @@ Rectangle {
                 delegate: Item {
                     id: hostRow
                     width: parent ? parent.width : 0
-                    implicitHeight: hostCard.implicitHeight + (hostDropBeforeIndicator.visible ? hostDropBeforeIndicator.height + Colors.spacingXS : 0)
+                    implicitHeight: hostCard.implicitHeight + (hostDropBeforeIndicator.visible ? hostDropBeforeIndicator.height + Appearance.spacingXS : 0)
                     height: implicitHeight
                     required property var modelData
                     readonly property var host: modelData.host
@@ -170,7 +170,7 @@ Rectangle {
                             left: parent.left
                             right: parent.right
                             top: hostDropBeforeIndicator.bottom
-                            topMargin: hostDropBeforeIndicator.visible ? Colors.spacingXS : 0
+                            topMargin: hostDropBeforeIndicator.visible ? Appearance.spacingXS : 0
                         }
                         minimumHeight: 0
                         active: hostRow.editingThisHost
@@ -185,7 +185,7 @@ Rectangle {
                             enabled: !hostDragHandle.dragActive
 
                             NumberAnimation {
-                                duration: Colors.durationFast
+                                duration: Appearance.durationFast
                             }
                         }
 
@@ -215,24 +215,24 @@ Rectangle {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingS
+                            spacing: Appearance.spacingS
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
-                                    spacing: Colors.spacingXXS
+                                    spacing: Appearance.spacingXXS
 
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        spacing: Colors.spacingS
+                                        spacing: Appearance.spacingS
 
                                         Text {
                                             text: hostRow.host.label
                                             color: Colors.text
-                                            font.pixelSize: Colors.fontSizeMedium
+                                            font.pixelSize: Appearance.fontSizeMedium
                                             font.weight: Font.Medium
                                             Layout.fillWidth: true
                                             elide: Text.ElideRight
@@ -249,7 +249,7 @@ Rectangle {
                                     Text {
                                         text: root.sshData.buildDisplayCommand(hostRow.host)
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         Layout.fillWidth: true
                                         wrapMode: Text.WrapAnywhere
                                     }
@@ -257,7 +257,7 @@ Rectangle {
                                     Text {
                                         text: root.reorderDisabled ? "Clear search to reorder hosts." : "Drag to reorder hosts, or use the arrow buttons."
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
                                     }
@@ -267,7 +267,7 @@ Rectangle {
                             Flow {
                                 Layout.fillWidth: true
                                 width: parent.width
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 SharedWidgets.FilterChip {
                                     visible: String(hostRow.host.group || "") !== ""
@@ -299,7 +299,7 @@ Rectangle {
                             Flow {
                                 Layout.fillWidth: true
                                 width: parent.width
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 SettingsActionButton {
                                     compact: true

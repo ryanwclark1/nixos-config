@@ -13,13 +13,13 @@ Item {
   ColumnLayout {
     id: column
     anchors { left: parent.left; right: parent.right; top: parent.top }
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
 
     // ── Add input ────────────────────────────────────────────────────
     Rectangle {
       Layout.fillWidth: true
       implicitHeight: 36
-      radius: Colors.radiusSmall
+      radius: Appearance.radiusSmall
       color: Colors.withAlpha(Colors.text, Colors.textFaint)
       border.color: inputField.activeFocus
         ? Colors.withAlpha(Colors.primary, Colors.primaryRing)
@@ -27,23 +27,23 @@ Item {
       border.width: 1
 
       RowLayout {
-        anchors { fill: parent; leftMargin: Colors.spacingM; rightMargin: Colors.spacingXS }
-        spacing: Colors.spacingXS
+        anchors { fill: parent; leftMargin: Appearance.spacingM; rightMargin: Appearance.spacingXS }
+        spacing: Appearance.spacingXS
 
         Text {
           text: ""
           color: inputField.activeFocus
             ? Colors.withAlpha(Colors.primary, 0.7)
             : Colors.textDisabled
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeSmall
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeSmall
         }
 
         TextInput {
           id: inputField
           Layout.fillWidth: true
           color: Colors.text
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           selectionColor: Colors.withAlpha(Colors.primary, 0.35)
           clip: true
           property string placeholderText: "Add a task…"
@@ -73,7 +73,7 @@ Item {
         SharedWidgets.IconButton {
           icon: ""
           size: 28
-          iconSize: Colors.fontSizeSmall
+          iconSize: Appearance.fontSizeSmall
           iconColor: inputField.text.trim() ? Colors.primary : Colors.textDisabled
           stateColor: Colors.primary
           tooltipText: "Add task"
@@ -85,8 +85,8 @@ Item {
     // ── Empty state ──────────────────────────────────────────────────
     SharedWidgets.EmptyState {
       Layout.fillWidth: true
-      Layout.topMargin: Colors.spacingL
-      Layout.bottomMargin: Colors.spacingL
+      Layout.topMargin: Appearance.spacingL
+      Layout.bottomMargin: Appearance.spacingL
       Layout.alignment: Qt.AlignHCenter
       icon: "checkmark.svg"
       message: "No tasks yet"
@@ -113,7 +113,7 @@ Item {
         return pending.concat(done);
       }
 
-      spacing: Colors.spacingXXS
+      spacing: Appearance.spacingXXS
 
       add: ListTransitions.addFadeHeight
       remove: ListTransitions.removeFadeHeight
@@ -122,8 +122,8 @@ Item {
       delegate: Rectangle {
         id: row
         width: taskList.width
-        implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
-        radius: Colors.radiusXS
+        implicitHeight: rowLayout.implicitHeight + Appearance.spacingXS * 2
+        radius: Appearance.radiusXS
         color: rowHover.containsMouse
           ? Colors.withAlpha(Colors.text, Colors.textWash)
           : "transparent"
@@ -134,24 +134,24 @@ Item {
 
         Behavior on color {
           enabled: !Colors.isTransitioning
-          ColorAnimation { duration: Colors.durationSnap }
+          ColorAnimation { duration: Appearance.durationSnap }
         }
 
         RowLayout {
           id: rowLayout
           anchors {
             fill: parent
-            leftMargin: Colors.spacingXS
-            rightMargin: Colors.spacingXXS
-            topMargin: Colors.spacingXS
-            bottomMargin: Colors.spacingXS
+            leftMargin: Appearance.spacingXS
+            rightMargin: Appearance.spacingXXS
+            topMargin: Appearance.spacingXS
+            bottomMargin: Appearance.spacingXS
           }
-          spacing: Colors.spacingXS
+          spacing: Appearance.spacingXS
 
           // ── Checkbox ─────────────────────────────────────────────
           Rectangle {
             width: 18; height: 18
-            radius: Colors.radiusXXS
+            radius: Appearance.radiusXXS
             color: row.taskDone
               ? Colors.withAlpha(Colors.primary, Colors.primaryStrong)
               : "transparent"
@@ -160,17 +160,17 @@ Item {
               : Colors.withAlpha(Colors.text, 0.35)
             border.width: 1.5
 
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
-            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
+            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
             Text {
               anchors.centerIn: parent
               text: ""
               color: Colors.primary
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeCaption
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeCaption
               opacity: row.taskDone ? 1 : 0
-              Behavior on opacity { NumberAnimation { duration: Colors.durationSnap } }
+              Behavior on opacity { NumberAnimation { duration: Appearance.durationSnap } }
             }
 
             MouseArea {
@@ -187,19 +187,19 @@ Item {
             color: row.taskDone
               ? Colors.textDisabled
               : Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.strikeout: row.taskDone
             wrapMode: Text.WordWrap
             elide: Text.ElideNone
 
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
           }
 
           // ── Delete button ─────────────────────────────────────────
           SharedWidgets.IconButton {
             icon: "dismiss.svg"
-            size: Colors.iconSizeSmall
-            iconSize: Colors.fontSizeXS
+            size: Appearance.iconSizeSmall
+            iconSize: Appearance.fontSizeXS
             iconColor: Colors.textDisabled
             stateColor: Colors.error
             tooltipText: "Delete task"
@@ -221,20 +221,20 @@ Item {
     RowLayout {
       Layout.fillWidth: true
       visible: TodoService.doneCount > 0
-      spacing: Colors.spacingXS
+      spacing: Appearance.spacingXS
 
       Text {
         text: TodoService.doneCount + " completed"
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
       }
 
       Item { Layout.fillWidth: true }
 
       Rectangle {
-        implicitWidth: clearLabel.implicitWidth + Colors.spacingM * 2
+        implicitWidth: clearLabel.implicitWidth + Appearance.spacingM * 2
         implicitHeight: 24
-        radius: Colors.radiusPill
+        radius: Appearance.radiusPill
         color: clearHover.containsMouse
           ? Colors.withAlpha(Colors.error, 0.15)
           : "transparent"
@@ -243,17 +243,17 @@ Item {
           : Colors.withAlpha(Colors.text, Colors.textThin)
         border.width: 1
 
-        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
-        Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
+        Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
         Text {
           id: clearLabel
           anchors.centerIn: parent
           text: "Clear completed"
           color: clearHover.containsMouse ? Colors.error : Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
 
-          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
         }
 
         MouseArea {

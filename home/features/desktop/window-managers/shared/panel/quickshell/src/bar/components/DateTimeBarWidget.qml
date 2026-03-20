@@ -49,19 +49,19 @@ Item {
             visible: root.iconOnly
             text: "󰥔"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeLarge
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
+            font.family: Appearance.fontMono
         }
 
         Row {
             visible: !root.iconOnly
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 1
 
             Text {
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 font.weight: Font.Bold
                 text: Qt.formatDateTime(centerClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
                 anchors.verticalCenter: parent.verticalCenter
@@ -70,7 +70,7 @@ Item {
             Text {
                 visible: root.showDate && Config.timeShowBarDate
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.Medium
                 text: {
                     if (Config.timeBarDateStyle === "month_day")

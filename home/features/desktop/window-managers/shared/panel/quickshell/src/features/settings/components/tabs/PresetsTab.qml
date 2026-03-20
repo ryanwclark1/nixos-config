@@ -49,7 +49,7 @@ Item {
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Repeater {
                     model: [
@@ -73,9 +73,9 @@ Item {
                     delegate: Rectangle {
                         required property var modelData
 
-                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
-                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
-                        radius: Colors.radiusLarge
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Appearance.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Appearance.spacingM * 2
+                        radius: Appearance.radiusLarge
                         color: Colors.withAlpha(Colors.surface, 0.38)
                         border.color: Colors.withAlpha(Colors.primary, 0.14)
                         border.width: 1
@@ -83,8 +83,8 @@ Item {
                         ColumnLayout {
                             id: metricColumn
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
-                            spacing: Colors.spacingXS
+                            anchors.margins: Appearance.spacingM
+                            spacing: Appearance.spacingXS
 
                             SettingsMetricIcon { icon: modelData.icon }
 
@@ -92,9 +92,9 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.label
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Black
-                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                font.letterSpacing: Appearance.letterSpacingExtraWide
                                 wrapMode: Text.WordWrap
                             }
 
@@ -102,7 +102,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.value
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.Bold
                                 wrapMode: Text.WordWrap
                             }
@@ -195,8 +195,8 @@ Item {
                         required property var modelData
                         required property int index
                         Layout.fillWidth: true
-                        implicitHeight: presetContent.implicitHeight + Colors.spacingL * 2
-                        radius: Colors.radiusSmall
+                        implicitHeight: presetContent.implicitHeight + Appearance.spacingL * 2
+                        radius: Appearance.radiusSmall
                         color: Colors.modalFieldSurface
                         border.color: Colors.border
                         border.width: 1
@@ -204,21 +204,21 @@ Item {
                         ColumnLayout {
                             id: presetContent
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingL
-                            spacing: Colors.spacingS
+                            anchors.margins: Appearance.spacingL
+                            spacing: Appearance.spacingS
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingM
+                                spacing: Appearance.spacingM
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
-                                    spacing: Colors.spacingXXS
+                                    spacing: Appearance.spacingXXS
 
                                     Text {
                                         text: modelData.name
                                         color: Colors.text
-                                        font.pixelSize: Colors.fontSizeMedium
+                                        font.pixelSize: Appearance.fontSizeMedium
                                         font.weight: Font.DemiBold
                                         Layout.fillWidth: true
                                         elide: Text.ElideRight
@@ -228,7 +228,7 @@ Item {
                                         visible: (modelData.description || "") !== ""
                                         text: modelData.description || ""
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeSmall
+                                        font.pixelSize: Appearance.fontSizeSmall
                                         Layout.fillWidth: true
                                         elide: Text.ElideRight
                                     }
@@ -238,7 +238,7 @@ Item {
                                             ? new Date(modelData.created * 1000).toLocaleDateString()
                                             : ""
                                         color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         visible: modelData.created > 0
                                     }
                                 }
@@ -246,7 +246,7 @@ Item {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 SettingsActionButton {
                                     label: "Load"

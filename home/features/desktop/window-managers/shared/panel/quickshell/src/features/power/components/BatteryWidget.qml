@@ -6,7 +6,7 @@ import "../BatteryHelpers.js" as BatteryHelpers
 
 Row {
   id: root
-  spacing: Colors.spacingSM
+  spacing: Appearance.spacingSM
   property bool iconOnly: false
 
   property var device: UPower.displayDevice
@@ -32,7 +32,7 @@ Row {
     visible: !root.iconOnly
     text: showBattery && device ? Math.round(device.percentage * 100) + "%" : ""
     color: Colors.text
-    font.pixelSize: Colors.fontSizeSmall
+    font.pixelSize: Appearance.fontSizeSmall
     font.weight: Font.DemiBold
     anchors.verticalCenter: parent.verticalCenter
   }

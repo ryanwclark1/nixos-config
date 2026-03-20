@@ -4,7 +4,7 @@ import "../VpnHelpers.js" as VH
 
 Row {
     id: root
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
 
     property bool iconOnly: false
     property string labelMode: "status"
@@ -37,26 +37,26 @@ Row {
     Text {
         text: "󰖂"
         color: root.statusColor()
-        font.pixelSize: Colors.fontSizeLarge
-        font.family: Colors.fontMono
+        font.pixelSize: Appearance.fontSizeLarge
+        font.family: Appearance.fontMono
         anchors.verticalCenter: parent.verticalCenter
     }
 
     Row {
         visible: !root.iconOnly
-        spacing: Colors.spacingSM
+        spacing: Appearance.spacingSM
         anchors.verticalCenter: parent.verticalCenter
 
         Text {
             text: "Tailscale"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Rectangle {
-            radius: Colors.radiusXS
+            radius: Appearance.radiusXS
             color: Colors.withAlpha(root.statusColor(), 0.14)
             border.color: Colors.withAlpha(root.statusColor(), 0.35)
             border.width: 1
@@ -69,14 +69,14 @@ Row {
                 anchors.centerIn: parent
                 text: root.detailLabel
                 color: root.statusColor()
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.DemiBold
             }
         }
 
         Rectangle {
             visible: root.showOtherCount
-            radius: Colors.radiusXS
+            radius: Appearance.radiusXS
             color: Colors.withAlpha(Colors.accent, 0.14)
             border.color: Colors.withAlpha(Colors.accent, 0.35)
             border.width: 1
@@ -89,7 +89,7 @@ Row {
                 anchors.centerIn: parent
                 text: NetworkService.vpnOtherCount > 1 ? NetworkService.vpnOtherCount + " VPN" : "VPN"
                 color: Colors.accent
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.DemiBold
             }
         }

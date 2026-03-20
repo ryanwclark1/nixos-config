@@ -28,32 +28,32 @@ Rectangle {
         width: Math.min(640, parent.width - 80)
         height: Math.min(560, parent.height - 80)
         anchors.centerIn: parent
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
-            spacing: Colors.spacingM
+            anchors.margins: Appearance.paddingLarge
+            spacing: Appearance.spacingM
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     Layout.fillWidth: true
                     text: "Add Desktop Widget"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeXL
+                    font.pixelSize: Appearance.fontSizeXL
                     font.weight: Font.DemiBold
                 }
 
                 Rectangle {
-                    implicitWidth: closePickerLabel.implicitWidth + Colors.spacingM * 2
+                    implicitWidth: closePickerLabel.implicitWidth + Appearance.spacingM * 2
                     implicitHeight: 32
-                    radius: Colors.radiusMedium
+                    radius: Appearance.radiusMedium
                     color: Colors.cardSurface
                     border.color: Colors.border
                     border.width: 1
@@ -63,7 +63,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: "Close"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Medium
                     }
 
@@ -91,7 +91,7 @@ Rectangle {
                 Column {
                     id: widgetPickerColumn
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Repeater {
                         model: availableWidgets
@@ -99,8 +99,8 @@ Rectangle {
                         delegate: Rectangle {
                             required property var modelData
                             width: parent.width
-                            height: desktopWidgetInfo.implicitHeight + Colors.spacingM * 2
-                            radius: Colors.radiusSmall
+                            height: desktopWidgetInfo.implicitHeight + Appearance.spacingM * 2
+                            radius: Appearance.radiusSmall
                             color: desktopWidgetAddArea.containsMouse ? Colors.highlight : Colors.cardSurface
                             border.color: desktopWidgetAddArea.containsMouse ? Colors.primary : Colors.border
                             border.width: 1
@@ -108,24 +108,24 @@ Rectangle {
                             RowLayout {
                                 id: desktopWidgetInfo
                                 anchors.fill: parent
-                                anchors.margins: Colors.spacingM
-                                spacing: Colors.spacingM
+                                anchors.margins: Appearance.spacingM
+                                spacing: Appearance.spacingM
 
                                 Text {
                                     text: modelData.icon || "󰖲"
                                     color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeLarge
+                                    font.family: Appearance.fontMono
+                                    font.pixelSize: Appearance.fontSizeLarge
                                 }
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
-                                    spacing: Colors.spacingXXS
+                                    spacing: Appearance.spacingXXS
 
                                     Text {
                                         text: modelData.name
                                         color: Colors.text
-                                        font.pixelSize: Colors.fontSizeMedium
+                                        font.pixelSize: Appearance.fontSizeMedium
                                         font.weight: Font.Medium
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
@@ -134,7 +134,7 @@ Rectangle {
                                     Text {
                                         text: String(modelData.source || "") === "plugin" ? "Plugin widget" : "Built-in widget"
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                     }
                                 }
                             }
@@ -157,7 +157,7 @@ Rectangle {
                         visible: availableWidgets.length === 0
                         text: "No desktop widgets match \"" + searchQuery + "\"."
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         wrapMode: Text.WordWrap
                     }
                 }

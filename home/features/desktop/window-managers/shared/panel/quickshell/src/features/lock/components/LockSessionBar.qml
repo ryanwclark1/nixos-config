@@ -10,7 +10,7 @@ RowLayout {
     required property string pendingAction
     required property bool timerActive
     signal actionRequested(string action)
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
 
     SessionButton {
         readonly property var actionMeta: SystemActionRegistry.actionById("logout") || ({})
@@ -51,8 +51,8 @@ RowLayout {
             text: parent.icon
             color: (root.timerActive && root.pendingAction === parent.action) ? Colors.error : Colors.textSecondary
             Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
         }
 
         MouseArea {

@@ -8,14 +8,14 @@ RowLayout {
     property alias text: labelText.text
 
     Layout.fillWidth: true
-    Layout.topMargin: Colors.spacingL
-    Layout.bottomMargin: Colors.spacingS
-    spacing: Colors.spacingS
+    Layout.topMargin: Appearance.spacingL
+    Layout.bottomMargin: Appearance.spacingS
+    spacing: Appearance.spacingS
 
     Rectangle {
         implicitHeight: 24
-        implicitWidth: labelText.implicitWidth + Colors.spacingM * 2
-        radius: Colors.radiusPill
+        implicitWidth: labelText.implicitWidth + Appearance.spacingM * 2
+        radius: Appearance.radiusPill
         color: Colors.primarySubtle
         border.color: Colors.primaryRing
         border.width: 1
@@ -24,9 +24,9 @@ RowLayout {
             id: labelText
             anchors.centerIn: parent
             color: Colors.primary
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Black
-            font.letterSpacing: Colors.letterSpacingExtraWide
+            font.letterSpacing: Appearance.letterSpacingExtraWide
         }
     }
 

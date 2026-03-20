@@ -19,39 +19,39 @@ Rectangle {
     readonly property real valueWidth: Math.max(72, (gridWidth / Math.max(1, gridColumns)) * 0.42)
 
     Layout.fillWidth: true
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: Colors.cardSurface
     border.color: root.accentColor
     border.width: root.hotspot ? 2 : 1
-    implicitHeight: cardColumn.implicitHeight + Colors.spacingS * 2
+    implicitHeight: cardColumn.implicitHeight + Appearance.spacingS * 2
 
     onNormalizedDataChanged: graphCanvas.requestPaint()
 
     ColumnLayout {
         id: cardColumn
         anchors.fill: parent
-        anchors.margins: Colors.spacingS
-        spacing: Colors.spacingXS
+        anchors.margins: Appearance.spacingS
+        spacing: Appearance.spacingXS
 
         RowLayout {
             Layout.fillWidth: true
-            Text { text: root.label; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
+            Text { text: root.label; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Bold; Layout.fillWidth: true; elide: Text.ElideRight }
             Item { Layout.fillWidth: true }
-            Text { text: root.currentFormatted; color: root.accentColor; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; font.family: Colors.fontMono; Layout.maximumWidth: root.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+            Text { text: root.currentFormatted; color: root.accentColor; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Bold; font.family: Appearance.fontMono; Layout.maximumWidth: root.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
         }
 
         RowLayout {
             Layout.fillWidth: true
-            Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+            Text { text: "Peak"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
             Item { Layout.fillWidth: true }
-            Text { text: root.peakFormatted; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: root.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+            Text { text: root.peakFormatted; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.family: Appearance.fontMono; Layout.maximumWidth: root.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
         }
 
         RowLayout {
             Layout.fillWidth: true
-            Text { text: "Max Seen"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+            Text { text: "Max Seen"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
             Item { Layout.fillWidth: true }
-            Text { text: root.maxFormatted; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.family: Colors.fontMono; Layout.maximumWidth: root.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
+            Text { text: root.maxFormatted; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.family: Appearance.fontMono; Layout.maximumWidth: root.valueWidth; horizontalAlignment: Text.AlignRight; elide: Text.ElideLeft }
         }
 
         Canvas {

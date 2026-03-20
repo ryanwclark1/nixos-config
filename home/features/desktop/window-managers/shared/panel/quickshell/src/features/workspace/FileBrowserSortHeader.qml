@@ -25,8 +25,8 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: Colors.spacingM
-        anchors.rightMargin: Colors.spacingM
+        anchors.leftMargin: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingM
         spacing: 0
 
         // Name column header
@@ -37,17 +37,17 @@ Rectangle {
 
             RowLayout {
                 anchors.fill: parent
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 Text {
                     text: "Name"
                     color: root.sortBy === "name" ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
                 Text {
                     text: root.sortBy === "name" ? (root.sortAsc ? "↑" : "↓") : ""
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                 }
             }
             MouseArea {
@@ -67,17 +67,17 @@ Rectangle {
 
             RowLayout {
                 anchors.fill: parent
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 Text {
                     text: "Size"
                     color: root.sortBy === "size" ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
                 Text {
                     text: root.sortBy === "size" ? (root.sortAsc ? "↑" : "↓") : ""
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                 }
             }
             MouseArea {
@@ -98,17 +98,17 @@ Rectangle {
 
             RowLayout {
                 anchors.fill: parent
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 Text {
                     text: "Modified"
                     color: root.sortBy === "date" ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
                 Text {
                     text: root.sortBy === "date" ? (root.sortAsc ? "↑" : "↓") : ""
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                 }
             }
             MouseArea {
@@ -129,17 +129,17 @@ Rectangle {
 
             RowLayout {
                 anchors.fill: parent
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 Text {
                     text: "Type"
                     color: root.sortBy === "type" ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
                 Text {
                     text: root.sortBy === "type" ? (root.sortAsc ? "↑" : "↓") : ""
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                 }
             }
             MouseArea {

@@ -9,7 +9,7 @@ Item {
     // Public API
     property url currentSource: ""
     property string transitionType: "fade"  // fade | pixelate | wipe | none
-    property int transitionDuration: Colors.durationWallpaper
+    property int transitionDuration: Appearance.durationWallpaper
     property color solidColor: "transparent"
     property bool showSolid: false
     property url videoSource: ""

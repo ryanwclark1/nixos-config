@@ -82,8 +82,8 @@ PopupWindow {
   Rectangle {
     id: menuBg
     anchors.fill: parent
-    anchors.margins: Colors.spacingXS
-    radius: Colors.radiusCard
+    anchors.margins: Appearance.spacingXS
+    radius: Appearance.radiusCard
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
@@ -98,8 +98,8 @@ PopupWindow {
     ColumnLayout {
       id: menuColumn
       anchors.fill: parent
-      anchors.margins: Colors.spacingS
-      spacing: Colors.spacingXXS
+      anchors.margins: Appearance.spacingS
+      spacing: Appearance.spacingXXS
 
       // Grouped windows list
       Repeater {
@@ -120,8 +120,8 @@ PopupWindow {
         visible: root.isGrouped && !root.showWorkspaceList
         Layout.fillWidth: true
         Layout.preferredHeight: 1
-        Layout.topMargin: Colors.spacingXS
-        Layout.bottomMargin: Colors.spacingXS
+        Layout.topMargin: Appearance.spacingXS
+        Layout.bottomMargin: Appearance.spacingXS
         color: Colors.border
       }
 
@@ -144,8 +144,8 @@ PopupWindow {
         visible: root.desktopActions.length > 0 && !root.showWorkspaceList
         Layout.fillWidth: true
         Layout.preferredHeight: 1
-        Layout.topMargin: Colors.spacingXS
-        Layout.bottomMargin: Colors.spacingXS
+        Layout.topMargin: Appearance.spacingXS
+        Layout.bottomMargin: Appearance.spacingXS
         color: Colors.border
       }
 
@@ -219,8 +219,8 @@ PopupWindow {
         visible: root.isRunning && !root.showWorkspaceList
         Layout.fillWidth: true
         Layout.preferredHeight: 1
-        Layout.topMargin: Colors.spacingXS
-        Layout.bottomMargin: Colors.spacingXS
+        Layout.topMargin: Appearance.spacingXS
+        Layout.bottomMargin: Appearance.spacingXS
         color: Colors.border
       }
 
@@ -254,7 +254,7 @@ PopupWindow {
 
     Rectangle {
       anchors.fill: parent
-      radius: Colors.radiusXS
+      radius: Appearance.radiusXS
       color: "transparent"
 
       StateLayer {
@@ -265,22 +265,22 @@ PopupWindow {
 
       RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: Colors.paddingSmall
-        anchors.rightMargin: Colors.paddingSmall
-        spacing: Colors.spacingS
+        anchors.leftMargin: Appearance.paddingSmall
+        anchors.rightMargin: Appearance.paddingSmall
+        spacing: Appearance.spacingS
 
         Text {
           text: menuItem.icon
           color: menuItem.isDestructive ? Colors.error : Colors.text
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeMedium
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeMedium
         }
 
         Text {
           Layout.fillWidth: true
           text: menuItem.text
           color: menuItem.isDestructive ? Colors.error : Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           elide: Text.ElideRight
         }
       }

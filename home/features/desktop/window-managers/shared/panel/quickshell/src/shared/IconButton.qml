@@ -7,7 +7,7 @@ Rectangle {
 
   property string icon: ""
   property int size: 30
-  property int iconSize: Colors.fontSizeLarge
+  property int iconSize: Appearance.fontSizeLarge
   property color iconColor: Colors.textSecondary
   property color normalColor: "transparent"
   property color hoverColor: "transparent"
@@ -42,7 +42,7 @@ Rectangle {
     Text {
       text: root.icon
       color: root.iconColor
-      font.family: Colors.fontMono
+      font.family: Appearance.fontMono
       font.pixelSize: root.iconSize
     }
   }

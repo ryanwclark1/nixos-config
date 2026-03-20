@@ -19,7 +19,7 @@ BasePopupMenu {
   backgroundContent: [
     Rectangle {
       anchors.fill: parent
-      radius: Colors.radiusLarge
+      radius: Appearance.radiusLarge
       color: "transparent"
       clip: true
       layer.enabled: MediaService.isPlaying && root.wantVisible
@@ -32,13 +32,13 @@ BasePopupMenu {
         color: root.dominantColor
         opacity: 0.12
         scale: MediaService.isPlaying ? 1.0 : 0.8
-        Behavior on scale { NumberAnimation { duration: Colors.durationAmbient; easing.type: Easing.InOutSine } }
+        Behavior on scale { NumberAnimation { duration: Appearance.durationAmbient; easing.type: Easing.InOutSine } }
 
         SequentialAnimation on opacity {
           running: MediaService.isPlaying && root.wantVisible
           loops: Animation.Infinite
-          NumberAnimation { from: 0.08; to: 0.18; duration: Colors.durationToast; easing.type: Easing.InOutSine }
-          NumberAnimation { from: 0.18; to: 0.08; duration: Colors.durationToast; easing.type: Easing.InOutSine }
+          NumberAnimation { from: 0.08; to: 0.18; duration: Appearance.durationToast; easing.type: Easing.InOutSine }
+          NumberAnimation { from: 0.18; to: 0.08; duration: Appearance.durationToast; easing.type: Easing.InOutSine }
         }
       }
     }
@@ -87,7 +87,7 @@ BasePopupMenu {
         anchors.centerIn: parent
         text: root.player ? (root.player.identity || "") : ""
         color: Colors.textSecondary
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
       }
 
       SharedWidgets.StateLayer {
@@ -127,7 +127,7 @@ BasePopupMenu {
   ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    spacing: Colors.spacingL
+    spacing: Appearance.spacingL
     visible: !!root.player
 
     // Album art (ClippingWrapperRectangle for proper radius clipping)
@@ -140,16 +140,16 @@ BasePopupMenu {
       Rectangle {
         anchors.fill: parent
         anchors.margins: -4
-        radius: Colors.radiusMedium + 4
+        radius: Appearance.radiusMedium + 4
         color: root.dominantColor
         opacity: MediaService.isPlaying ? 0.25 : 0.1
         visible: albumArt.status === Image.Ready
-        Behavior on opacity { NumberAnimation { duration: Colors.durationAmbientShort } }
+        Behavior on opacity { NumberAnimation { duration: Appearance.durationAmbientShort } }
       }
 
       ClippingWrapperRectangle {
         anchors.fill: parent
-        radius: Colors.radiusMedium
+        radius: Appearance.radiusMedium
         color: Colors.surface
         border.color: Colors.withAlpha(root.dominantColor, 0.3)
         border.width: 1
@@ -170,8 +170,8 @@ BasePopupMenu {
             anchors.centerIn: parent
             text: "󰝚"
             color: Colors.textDisabled
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeHuge * 2
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeHuge * 2
             visible: albumArt.status !== Image.Ready
           }
         }
@@ -181,12 +181,12 @@ BasePopupMenu {
     // Track info
     ColumnLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingXXS
+      spacing: Appearance.spacingXXS
 
       Text {
         text: MediaService.trackTitle || "Unknown Track"
         color: Colors.text
-        font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
+        font.pixelSize: root.compactMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL
         font.weight: Font.Bold
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
@@ -196,7 +196,7 @@ BasePopupMenu {
       Text {
         text: MediaService.trackArtist || "Unknown Artist"
         color: Colors.textSecondary
-        font.pixelSize: root.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
+        font.pixelSize: root.compactMode ? Appearance.fontSizeSmall : Appearance.fontSizeMedium
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
         elide: Text.ElideRight
@@ -206,7 +206,7 @@ BasePopupMenu {
     // Seek bar
     ColumnLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingXS
+      spacing: Appearance.spacingXS
       visible: MediaService.trackLength > 0
 
       Item {
@@ -247,15 +247,15 @@ BasePopupMenu {
         Text {
           text: MediaService.positionString
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
-          font.family: Colors.fontMono
+          font.pixelSize: Appearance.fontSizeXS
+          font.family: Appearance.fontMono
         }
         Item { Layout.fillWidth: true }
         Text {
           text: MediaService.lengthString
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
-          font.family: Colors.fontMono
+          font.pixelSize: Appearance.fontSizeXS
+          font.family: Appearance.fontMono
         }
       }
     }
@@ -263,7 +263,7 @@ BasePopupMenu {
     // Transport controls
     RowLayout {
       Layout.alignment: Qt.AlignHCenter
-      spacing: root.compactMode ? Colors.spacingL : Colors.spacingXL
+      spacing: root.compactMode ? Appearance.spacingL : Appearance.spacingXL
 
       SharedWidgets.PulseButton {
         icon: "󰒟"; size: root.compactMode ? 24 : 28; tint: Colors.textSecondary
@@ -280,7 +280,7 @@ BasePopupMenu {
         icon: MediaService.isPlaying ? "󰏤" : "󰐊"
         size: root.compactMode ? 42 : 48; tint: Colors.background
         color: root.dominantColor
-        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
+        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationEmphasis } }
         onClicked: MediaService.playPause()
       }
 
@@ -303,28 +303,28 @@ BasePopupMenu {
     // Volume
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.paddingSmall
+      spacing: Appearance.paddingSmall
 
       Text {
         text: "󰕾"
         color: Colors.textSecondary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeLarge
+        font.family: Appearance.fontMono
+        font.pixelSize: Appearance.fontSizeLarge
       }
 
       Rectangle {
         id: volTrack
         Layout.fillWidth: true
         height: 4
-        radius: Colors.radiusMicro
+        radius: Appearance.radiusMicro
         color: Colors.bgWidget
 
         Rectangle {
           height: parent.height
           width: root.player ? parent.width * Colors.clamp01(root.player.volume) : 0
-          radius: Colors.radiusMicro
+          radius: Appearance.radiusMicro
           color: root.dominantColor
-          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
+          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationEmphasis } }
         }
 
         MouseArea {
@@ -338,8 +338,8 @@ BasePopupMenu {
       Text {
         text: root.player ? Math.round(Colors.clamp01(root.player.volume) * 100) + "%" : "0%"
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
-        font.family: Colors.fontMono
+        font.pixelSize: Appearance.fontSizeXS
+        font.family: Appearance.fontMono
       }
     }
 

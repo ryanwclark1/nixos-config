@@ -29,8 +29,8 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: headerRow.implicitHeight + Colors.spacingS * 2
-        radius: Colors.radiusSmall
+        implicitHeight: headerRow.implicitHeight + Appearance.spacingS * 2
+        radius: Appearance.radiusSmall
         color: "transparent"
 
         StateLayer {
@@ -42,27 +42,27 @@ ColumnLayout {
         RowLayout {
             id: headerRow
             anchors.fill: parent
-            anchors.leftMargin: Colors.spacingS
-            anchors.rightMargin: Colors.spacingS
-            anchors.topMargin: Colors.spacingS
-            anchors.bottomMargin: Colors.spacingS
-            spacing: Colors.spacingS
+            anchors.leftMargin: Appearance.spacingS
+            anchors.rightMargin: Appearance.spacingS
+            anchors.topMargin: Appearance.spacingS
+            anchors.bottomMargin: Appearance.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: "\u{f0140}"
                 color: Colors.textDisabled
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeSmall
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeSmall
                 rotation: root.expanded ? 0 : -90
-                Behavior on rotation { Anim { duration: Colors.durationFast } }
+                Behavior on rotation { Anim { duration: Appearance.durationFast } }
             }
 
             Text {
                 visible: !!root.icon
                 text: root.icon
                 color: Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeMedium
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeMedium
             }
 
             ColumnLayout {
@@ -73,7 +73,7 @@ ColumnLayout {
                     id: headerText
                     text: root.title
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
                 }
@@ -82,12 +82,12 @@ ColumnLayout {
                     visible: !!root.subtitle
                     text: root.subtitle
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     Layout.fillWidth: true
                 }
             }
 
-            Row { id: headerExtrasContainer; spacing: Colors.spacingXS }
+            Row { id: headerExtrasContainer; spacing: Appearance.spacingXS }
         }
 
         MouseArea {

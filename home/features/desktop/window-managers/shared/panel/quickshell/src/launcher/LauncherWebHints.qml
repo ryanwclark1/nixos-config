@@ -19,33 +19,33 @@ Rectangle {
     Column {
         id: webHintColumn
         anchors.fill: parent
-        spacing: root.compact ? 3 : Colors.spacingXS
+        spacing: root.compact ? 3 : Appearance.spacingXS
 
         Text {
             width: parent.width
             text: "WEB CONTROLS"
             color: Colors.withAlpha(root.accentColor, 0.92)
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Black
-            font.letterSpacing: Colors.letterSpacingExtraWide
+            font.letterSpacing: Appearance.letterSpacingExtraWide
         }
 
         Row {
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: "󰖟"
                 color: root.accentColor
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeSmall
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeSmall
             }
 
             Text {
                 width: parent.width - x
                 text: root.primaryEnterHint + " • " + root.secondaryEnterHint + " • " + root.aliasHint
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 wrapMode: Text.WordWrap
             }
         }
@@ -54,7 +54,7 @@ Rectangle {
             width: parent.width
             text: root.hotkeyHint
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WordWrap
         }
     }

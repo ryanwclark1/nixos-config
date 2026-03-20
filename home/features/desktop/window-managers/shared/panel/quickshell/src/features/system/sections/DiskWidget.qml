@@ -50,19 +50,19 @@ SharedWidgets.CardBase {
     ColumnLayout {
         id: diskColumn
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         // Header
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: "DISK"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingWide
+                font.letterSpacing: Appearance.letterSpacingWide
             }
 
             Item { Layout.fillWidth: true }
@@ -79,7 +79,7 @@ SharedWidgets.CardBase {
         // Gauge + stats row
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingL
+            spacing: Appearance.spacingL
 
             ResourceGauge {
                 value: root.primaryPercent
@@ -91,13 +91,13 @@ SharedWidgets.CardBase {
             // Stats column
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 Repeater {
                     model: root.drives
                     delegate: ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXS
+                        spacing: Appearance.spacingXS
 
                         SharedWidgets.InfoRow {
                             Layout.fillWidth: true

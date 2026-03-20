@@ -5,7 +5,7 @@ import "../services"
 Item {
   id: root
   implicitWidth: 340
-  implicitHeight: contentCol.implicitHeight + Colors.paddingLarge
+  implicitHeight: contentCol.implicitHeight + Appearance.paddingLarge
   width: implicitWidth
   height: implicitHeight
   visible: false
@@ -14,7 +14,7 @@ Item {
   property string description: ""
   property string icon: "󰋼"
   property string type: "notice"
-  property int duration: Colors.durationToast
+  property int duration: Appearance.durationToast
   property real progress: 1.0
   property string actionLabel: ""
   property string actionToken: ""
@@ -72,8 +72,8 @@ Item {
   // ── Hide animation ─────────────────────────────
   ParallelAnimation {
     id: hideAnim
-    NumberAnimation { target: root; property: "opacity"; to: 0; duration: Colors.durationNormal; easing.type: Easing.InCubic }
-    NumberAnimation { target: root; property: "scale"; to: 0.9; duration: Colors.durationNormal; easing.type: Easing.InCubic }
+    NumberAnimation { target: root; property: "opacity"; to: 0; duration: Appearance.durationNormal; easing.type: Easing.InCubic }
+    NumberAnimation { target: root; property: "scale"; to: 0.9; duration: Appearance.durationNormal; easing.type: Easing.InCubic }
     onFinished: {
       root.visible = false;
       if (root.actionToken) {
@@ -112,7 +112,7 @@ Item {
     color: Colors.cardSurface
     border.color: root.borderColor
     border.width: 1
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     clip: true
 
     gradient: Gradient {
@@ -139,26 +139,26 @@ Item {
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: parent.top
-      anchors.margins: Colors.spacingM
-      anchors.topMargin: Colors.paddingMedium
-      spacing: Colors.spacingXS
+      anchors.margins: Appearance.spacingM
+      anchors.topMargin: Appearance.paddingMedium
+      spacing: Appearance.spacingXS
 
       Row {
-        spacing: Colors.paddingSmall
+        spacing: Appearance.paddingSmall
         width: parent.width
 
         Text {
           text: root.icon
           color: root.borderColor
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeXL
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeXL
           anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
           text: root.title
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
           width: parent.width - 32
           elide: Text.ElideRight
@@ -168,7 +168,7 @@ Item {
       Text {
         text: root.description
         color: Colors.textSecondary
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         width: parent.width
         wrapMode: Text.Wrap
         visible: text !== ""
@@ -176,9 +176,9 @@ Item {
 
       Rectangle {
         visible: root.actionLabel !== ""
-        width: actionRow.implicitWidth + Colors.spacingM
+        width: actionRow.implicitWidth + Appearance.spacingM
         height: 28
-        radius: Colors.radiusSmall
+        radius: Appearance.radiusSmall
         color: actionMouse.containsMouse ? Colors.primaryGhost : Colors.primarySubtle
         border.color: Colors.withAlpha(Colors.primary, 0.25)
         border.width: 1
@@ -186,19 +186,19 @@ Item {
         Row {
           id: actionRow
           anchors.centerIn: parent
-          spacing: Colors.spacingXS
+          spacing: Appearance.spacingXS
 
           Text {
             text: "󰕌"
             color: Colors.primary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeSmall
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeSmall
           }
 
           Text {
             text: root.actionLabel
             color: Colors.primary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
           }
         }

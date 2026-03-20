@@ -14,14 +14,14 @@ Rectangle {
 
   visible: active
   color: Colors.withAlpha(Colors.background, 0.94)
-  radius: Colors.radiusLarge
+  radius: Appearance.radiusLarge
 
   opacity: active ? 1.0 : 0.0
   Behavior on opacity { Anim {} }
 
   ColumnLayout {
     anchors.centerIn: parent
-    spacing: Colors.spacingXL
+    spacing: Appearance.spacingXL
 
     // Big countdown ring / number
     Item {
@@ -64,16 +64,16 @@ Rectangle {
         anchors.centerIn: parent
         text: root.seconds.toString()
         color: root.seconds <= 5 ? Colors.error : Colors.text
-        font.pixelSize: Colors.fontSizeIcon
+        font.pixelSize: Appearance.fontSizeIcon
         font.weight: Font.Bold
-        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSlow } }
+        Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSlow } }
       }
     }
 
     Text {
       text: "Keep this display configuration?"
       color: Colors.text
-      font.pixelSize: Colors.fontSizeLarge
+      font.pixelSize: Appearance.fontSizeLarge
       font.weight: Font.Bold
       Layout.alignment: Qt.AlignHCenter
     }
@@ -81,27 +81,27 @@ Rectangle {
     Text {
       text: "Reverting in " + root.seconds + " seconds…"
       color: Colors.textSecondary
-      font.pixelSize: Colors.fontSizeSmall
+      font.pixelSize: Appearance.fontSizeSmall
       Layout.alignment: Qt.AlignHCenter
     }
 
     RowLayout {
       Layout.alignment: Qt.AlignHCenter
-      spacing: Colors.spacingL
+      spacing: Appearance.spacingL
 
       // Revert Now
       Rectangle {
         width: 140; height: 44
-        radius: Colors.radiusSmall
+        radius: Appearance.radiusSmall
         color: Colors.withAlpha(Colors.error, 0.12)
         border.color: Colors.error
         border.width: 1
 
         RowLayout {
           anchors.centerIn: parent
-          spacing: Colors.spacingS
-          Text { text: "󰜺"; color: Colors.error; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-          Text { text: "Revert Now"; color: Colors.error; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold }
+          spacing: Appearance.spacingS
+          Text { text: "󰜺"; color: Colors.error; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium }
+          Text { text: "Revert Now"; color: Colors.error; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Bold }
         }
 
         SharedWidgets.StateLayer {
@@ -122,16 +122,16 @@ Rectangle {
       // Keep Changes
       Rectangle {
         width: 150; height: 44
-        radius: Colors.radiusSmall
+        radius: Appearance.radiusSmall
         color: Colors.withAlpha(Colors.secondary, 0.12)
         border.color: Colors.secondary
         border.width: 1
 
         RowLayout {
           anchors.centerIn: parent
-          spacing: Colors.spacingS
-          Text { text: "󰄬"; color: Colors.secondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-          Text { text: "Keep Changes"; color: Colors.secondary; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Bold }
+          spacing: Appearance.spacingS
+          Text { text: "󰄬"; color: Colors.secondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium }
+          Text { text: "Keep Changes"; color: Colors.secondary; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Bold }
         }
 
         SharedWidgets.StateLayer {

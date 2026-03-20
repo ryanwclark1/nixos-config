@@ -28,8 +28,8 @@ Rectangle {
     readonly property bool narrowLayout: width < 420
 
     Layout.fillWidth: true
-    implicitHeight: mainLayout.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: mainLayout.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.modalFieldSurface
     border.color: Colors.border
     border.width: 1
@@ -39,23 +39,23 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             SettingsIconBox { icon: root.icon }
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
+                spacing: Appearance.spacingXXS
 
                 Text {
                     text: root.label
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -65,7 +65,7 @@ Rectangle {
                     visible: root.description !== ""
                     text: root.description
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                 }
@@ -74,7 +74,7 @@ Rectangle {
             Rectangle {
                 width: 24
                 height: 24
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: root.currentValue || "transparent"
                 border.color: Colors.border
                 border.width: 1
@@ -86,7 +86,7 @@ Rectangle {
                 id: colorPill
                 implicitWidth: Math.max(80, selectedText.implicitWidth + 14)
                 implicitHeight: 24
-                radius: Colors.radiusCard
+                radius: Appearance.radiusCard
                 color: Colors.surface
                 border.color: Colors.border
                 border.width: 1
@@ -97,7 +97,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root.currentValue ? root.currentValue.toUpperCase() : root.placeholderText
                     color: root.currentValue ? Colors.primary : Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.DemiBold
                 }
             }
@@ -106,8 +106,8 @@ Rectangle {
         Flow {
             Layout.fillWidth: true
             Layout.preferredWidth: parent.width
-            Layout.leftMargin: (root.icon !== "" && !root.narrowLayout) ? 38 + Colors.spacingM : 0
-            spacing: Colors.spacingS
+            Layout.leftMargin: (root.icon !== "" && !root.narrowLayout) ? 38 + Appearance.spacingM : 0
+            spacing: Appearance.spacingS
 
             SharedWidgets.FilterChip {
                 label: "Default"
@@ -122,7 +122,7 @@ Rectangle {
                     required property var modelData
                     width: 32
                     height: 32
-                    radius: Colors.radiusPill
+                    radius: Appearance.radiusPill
                     color: modelData.color
                     border.color: root.currentValue.toLowerCase() === modelData.value.toLowerCase() ? Colors.text : Colors.border
                     border.width: root.currentValue.toLowerCase() === modelData.value.toLowerCase() ? 2 : 1
@@ -154,7 +154,7 @@ Rectangle {
             Rectangle {
                 width: 100
                 height: 32
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.modalFieldSurface
                 border.color: customInput.activeFocus ? Colors.primary : Colors.border
                 border.width: 1
@@ -166,8 +166,8 @@ Rectangle {
                     anchors.rightMargin: 8
                     verticalAlignment: Text.AlignVCenter
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeSmall
+                    font.family: Appearance.fontMono
                     selectByMouse: true
                     text: root.currentValue.startsWith("#") ? root.currentValue : ""
                     onAccepted: {
@@ -202,8 +202,8 @@ Rectangle {
             property real _opacity: 0
             running: root.highlighted
             loops: 2
-            NumberAnimation { target: colorHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
-            NumberAnimation { target: colorHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Colors.durationSlow; easing.type: Easing.InCubic }
+            NumberAnimation { target: colorHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Appearance.durationSlow; easing.type: Easing.OutCubic }
+            NumberAnimation { target: colorHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Appearance.durationSlow; easing.type: Easing.InCubic }
         }
     }
 }

@@ -15,7 +15,7 @@ Flow {
   property var anchorWindow: null
   property int itemSize: 24
   property int iconSize: 18
-  property int itemSpacing: Colors.spacingS
+  property int itemSpacing: Appearance.spacingS
   visible: SystemTray.items.length > 0
 
   Repeater {
@@ -25,11 +25,11 @@ Flow {
       id: trayItem
       width: root.itemSize
       height: root.itemSize
-      radius: Colors.radiusXXS
+      radius: Appearance.radiusXXS
       color: "transparent"
       scale: mouseArea.containsMouse ? 1.08 : 1.0
 
-      Behavior on scale { Anim { duration: Colors.durationFast } }
+      Behavior on scale { Anim { duration: Appearance.durationFast } }
 
       Image {
         anchors.centerIn: parent
@@ -44,7 +44,7 @@ Flow {
           anchors.centerIn: parent
           text: "󰏘"
           color: Colors.textSecondary
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           visible: parent.status !== Image.Ready
         }
       }

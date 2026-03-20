@@ -3,7 +3,7 @@ import "../services"
 
 Item {
     id: root
-    property int size: Colors.iconSizeSmall
+    property int size: Appearance.iconSizeSmall
     property color color: Colors.primary
 
     width: size
@@ -13,13 +13,13 @@ Item {
         anchors.centerIn: parent
         text: "󰑓"
         color: root.color
-        font.family: Colors.fontMono
+        font.family: Appearance.fontMono
         font.pixelSize: root.size
 
         RotationAnimation on rotation {
             from: 0
             to: 360
-            duration: Colors.durationAmbientShort
+            duration: Appearance.durationAmbientShort
             loops: Animation.Infinite
         }
     }

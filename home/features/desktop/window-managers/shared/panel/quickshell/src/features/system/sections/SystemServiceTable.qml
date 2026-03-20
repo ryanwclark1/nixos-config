@@ -303,18 +303,18 @@ SharedWidgets.CardBase {
             id: serviceColumn
             anchors.left: parent.left
             anchors.right: parent.right
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     text: "SERVICE TABLE"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Bold
-                    font.letterSpacing: Colors.letterSpacingWide
+                    font.letterSpacing: Appearance.letterSpacingWide
                 }
 
                 Item {
@@ -331,7 +331,7 @@ SharedWidgets.CardBase {
                 SharedWidgets.IconButton {
                     icon: "arrow-clockwise.svg"
                     size: 28
-                    iconSize: Colors.fontSizeSmall
+                    iconSize: Appearance.fontSizeSmall
                     iconColor: Colors.textSecondary
                     tooltipText: "Refresh"
                     onClicked: ServiceUnitService.refresh()
@@ -345,7 +345,7 @@ SharedWidgets.CardBase {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 SharedWidgets.FilterChip {
                     label: "Both"
@@ -396,35 +396,35 @@ SharedWidgets.CardBase {
 
             Rectangle {
                 Layout.fillWidth: true
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.cardSurface
                 border.color: keyboardFocused ? Colors.primary : Colors.border
                 border.width: 1
-                implicitHeight: tableColumn.implicitHeight + Colors.spacingS * 2
+                implicitHeight: tableColumn.implicitHeight + Appearance.spacingS * 2
 
                 ColumnLayout {
                     id: tableColumn
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingS
+                    anchors.margins: Appearance.spacingS
+                    spacing: Appearance.spacingS
 
                     Rectangle {
                         Layout.fillWidth: true
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.withAlpha(Colors.highlight, 0.35)
-                        implicitHeight: headerRow.implicitHeight + Colors.spacingXS * 2
+                        implicitHeight: headerRow.implicitHeight + Appearance.spacingXS * 2
 
                         RowLayout {
                             id: headerRow
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingXS
-                            spacing: Colors.spacingS
+                            anchors.margins: Appearance.spacingXS
+                            spacing: Appearance.spacingS
 
                             Text {
                                 Layout.preferredWidth: 70
                                 text: "SCOPE"
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Bold
                             }
 
@@ -432,7 +432,7 @@ SharedWidgets.CardBase {
                                 Layout.preferredWidth: 92
                                 text: "STATE"
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Bold
                                 horizontalAlignment: Text.AlignRight
                             }
@@ -441,7 +441,7 @@ SharedWidgets.CardBase {
                                 Layout.fillWidth: true
                                 text: "UNIT"
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Bold
                             }
 
@@ -449,7 +449,7 @@ SharedWidgets.CardBase {
                                 Layout.preferredWidth: 120
                                 text: "SUBSTATE"
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Bold
                                 horizontalAlignment: Text.AlignRight
                             }
@@ -471,7 +471,7 @@ SharedWidgets.CardBase {
                         clip: true
                         visible: root.visibleUnits.length > 0
                         model: root.visibleUnits
-                        spacing: Colors.spacingXXS
+                        spacing: Appearance.spacingXXS
 
                         add: ListTransitions.addFadeHeight
                         remove: ListTransitions.removeFadeHeight
@@ -482,23 +482,23 @@ SharedWidgets.CardBase {
                             required property int index
                             readonly property bool selected: index === root.selectedIndex
                             width: ListView.view.width
-                            radius: Colors.radiusSmall
+                            radius: Appearance.radiusSmall
                             color: selected ? Colors.highlight : "transparent"
                             border.color: selected ? Colors.primary : "transparent"
                             border.width: 1
-                            implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
+                            implicitHeight: rowLayout.implicitHeight + Appearance.spacingXS * 2
 
                             RowLayout {
                                 id: rowLayout
                                 anchors.fill: parent
-                                anchors.margins: Colors.spacingXS
-                                spacing: Colors.spacingS
+                                anchors.margins: Appearance.spacingXS
+                                spacing: Appearance.spacingS
 
                                 Text {
                                     Layout.preferredWidth: 70
                                     text: String(modelData.scope || "").toUpperCase()
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     font.weight: Font.Bold
                                 }
 
@@ -506,7 +506,7 @@ SharedWidgets.CardBase {
                                     Layout.preferredWidth: 92
                                     text: String(modelData.active || "").toUpperCase()
                                     color: root.stateColor(modelData)
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignRight
                                 }
@@ -515,7 +515,7 @@ SharedWidgets.CardBase {
                                     Layout.fillWidth: true
                                     text: String(modelData.name || "service")
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     font.weight: selected ? Font.DemiBold : Font.Medium
                                     elide: Text.ElideRight
                                 }
@@ -524,8 +524,8 @@ SharedWidgets.CardBase {
                                     Layout.preferredWidth: 120
                                     text: String(modelData.sub || "")
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.family: Colors.fontMono
+                                    font.pixelSize: Appearance.fontSizeXS
+                                    font.family: Appearance.fontMono
                                     horizontalAlignment: Text.AlignRight
                                     elide: Text.ElideLeft
                                 }
@@ -557,17 +557,17 @@ SharedWidgets.CardBase {
 
             Rectangle {
                 Layout.fillWidth: true
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.bgWidget
                 border.color: Colors.border
                 border.width: 1
-                implicitHeight: detailColumn.implicitHeight + Colors.spacingM * 2
+                implicitHeight: detailColumn.implicitHeight + Appearance.spacingM * 2
 
                 ColumnLayout {
                     id: detailColumn
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingM
-                    spacing: Colors.spacingS
+                    anchors.margins: Appearance.spacingM
+                    spacing: Appearance.spacingS
 
                     RowLayout {
                         Layout.fillWidth: true
@@ -575,12 +575,12 @@ SharedWidgets.CardBase {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingXXS
+                            spacing: Appearance.spacingXXS
 
                             Text {
                                 text: root.selectedUnit ? String(root.selectedUnit.name || "service") : ""
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 font.weight: Font.DemiBold
                                 elide: Text.ElideRight
                             }
@@ -588,7 +588,7 @@ SharedWidgets.CardBase {
                             Text {
                                 text: root.selectedUnit ? (String(root.selectedUnit.scope || "").toUpperCase() + "  •  " + String(root.selectedUnit.description || root.selectedUnit.sub || "")) : ""
                                 color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 elide: Text.ElideRight
                             }
                         }
@@ -596,7 +596,7 @@ SharedWidgets.CardBase {
                         Text {
                             text: root.selectedPendingAction !== "" ? ("PENDING  " + root.selectedPendingAction.toUpperCase()) : "READY"
                             color: root.selectedPendingAction !== "" ? Colors.warning : Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.Bold
                         }
                     }
@@ -612,7 +612,7 @@ SharedWidgets.CardBase {
                         Layout.fillWidth: true
                         visible: !!root.selectedUnit
                         width: parent.width
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         SharedWidgets.Chip {
                             icon: "settings.svg"
@@ -633,7 +633,7 @@ SharedWidgets.CardBase {
                         Layout.fillWidth: true
                         visible: !!root.selectedUnit
                         width: parent.width
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         SharedWidgets.FilterChip {
                             label: root.selectedUnit && root.running(root.selectedUnit) ? "Stop" : "Start"

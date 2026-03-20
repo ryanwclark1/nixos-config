@@ -16,7 +16,7 @@ BasePopupMenu {
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.spacingM
+    columnSpacing: Appearance.spacingM
 
     Repeater {
       model: MarketService.marketData || []
@@ -27,32 +27,32 @@ BasePopupMenu {
 
         RowLayout {
           anchors.fill: parent
-          anchors.margins: Colors.spacingM
-          spacing: Colors.spacingM
+          anchors.margins: Appearance.spacingM
+          spacing: Appearance.spacingM
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingXXS
+            spacing: Appearance.spacingXXS
             Text {
               text: modelData.symbol
               color: Colors.text
-              font.pixelSize: Colors.fontSizeLarge
+              font.pixelSize: Appearance.fontSizeLarge
               font.weight: Font.Bold
             }
             Text {
               text: "Last update: " + modelData.time
               color: Colors.textDisabled
-              font.pixelSize: Colors.fontSizeXS
+              font.pixelSize: Appearance.fontSizeXS
             }
           }
 
           ColumnLayout {
             Layout.alignment: Qt.AlignRight
-            spacing: Colors.spacingXXS
+            spacing: Appearance.spacingXXS
             Text {
               text: modelData.close
               color: Colors.text
-              font.pixelSize: Colors.fontSizeLarge
+              font.pixelSize: Appearance.fontSizeLarge
               font.weight: Font.Bold
               Layout.alignment: Qt.AlignRight
             }
@@ -64,12 +64,12 @@ BasePopupMenu {
               Text {
                 text: parent.up ? "▲" : "▼"
                 color: parent.up ? Colors.success : Colors.error
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
               }
               Text {
                 text: Math.abs(parent.change).toFixed(2)
                 color: parent.up ? Colors.success : Colors.error
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.DemiBold
               }
             }
@@ -82,10 +82,10 @@ BasePopupMenu {
         visible: !MarketService.marketData || MarketService.marketData.length === 0
         text: "No market data available. Check your tickers in Settings."
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         horizontalAlignment: Text.AlignHCenter
         Layout.fillWidth: true
-        Layout.margins: Colors.spacingL
+        Layout.margins: Appearance.spacingL
     }
   }
 }

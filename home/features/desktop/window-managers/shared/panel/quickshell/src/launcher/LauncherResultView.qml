@@ -29,7 +29,7 @@ StackLayout {
         currentIndex: root.filteredItems.length > 0 ? 0 : (root.isModeLoading ? 1 : 2)
 
         RowLayout {
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             ListView {
                 id: resultsList
@@ -38,12 +38,12 @@ StackLayout {
                 model: resultsModel
                 clip: true
                 cacheBuffer: 400
-                spacing: root.compactMode ? Colors.spacingXS : Colors.spacingS
+                spacing: root.compactMode ? Appearance.spacingXS : Appearance.spacingS
                 currentIndex: root.filteredItems.length > 0
                     ? Math.min(root.launcher.selectedIndex, root.filteredItems.length - 1)
                     : -1
                 enabled: !root.launcher.showingConfirm
-                topMargin: root.compactMode ? Colors.spacingXXS : Colors.spacingXS
+                topMargin: root.compactMode ? Appearance.spacingXXS : Appearance.spacingXS
                 section.property: "sectionLabel"
                 section.delegate: LauncherSectionHeader {
                     compactMode: root.compactMode
@@ -87,7 +87,7 @@ StackLayout {
 
         Rectangle {
             color: Colors.withAlpha(root.accentColor, 0.08)
-            radius: Colors.radiusXL
+            radius: Appearance.radiusXL
             border.color: Colors.withAlpha(root.accentColor, 0.24)
             border.width: 1
 
@@ -97,7 +97,7 @@ StackLayout {
 
             ColumnLayout {
                 anchors.centerIn: parent
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 SharedWidgets.LoadingSpinner {
                     Layout.alignment: Qt.AlignHCenter
@@ -108,7 +108,7 @@ StackLayout {
                     Layout.alignment: Qt.AlignHCenter
                     text: root.launcher.modeLoadMessage !== "" ? root.launcher.modeLoadMessage : ("Loading " + ModeData.modeInfo(root.mode).label)
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Black
                 }
 
@@ -116,7 +116,7 @@ StackLayout {
                     Layout.alignment: Qt.AlignHCenter
                     text: "Preparing the next result stage"
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                 }
             }
         }

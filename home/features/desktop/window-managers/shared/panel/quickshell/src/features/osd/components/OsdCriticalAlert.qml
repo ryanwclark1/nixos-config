@@ -10,8 +10,8 @@ ColumnLayout {
   required property string osdLabel
 
   anchors.fill: parent
-  anchors.margins: Colors.spacingL
-  spacing: Colors.spacingM
+  anchors.margins: Appearance.spacingL
+  spacing: Appearance.spacingM
 
   Item {
     Layout.alignment: Qt.AlignHCenter
@@ -32,8 +32,8 @@ ColumnLayout {
       anchors.centerIn: parent
       text: root.osdIcon
       color: root.osdColor
-      font.pixelSize: Colors.fontSizeDisplay
-      font.family: Colors.fontMono
+      font.pixelSize: Appearance.fontSizeDisplay
+      font.family: Appearance.fontMono
     }
   }
 
@@ -43,9 +43,9 @@ ColumnLayout {
     wrapMode: Text.NoWrap
     text: root.osdLabel
     color: Colors.text
-    font.pixelSize: Colors.fontSizeXL
+    font.pixelSize: Appearance.fontSizeXL
     font.weight: Font.Black
-    font.family: Colors.fontMono
+    font.family: Appearance.fontMono
   }
 
   Text {
@@ -53,7 +53,7 @@ ColumnLayout {
     horizontalAlignment: Text.AlignHCenter
     text: "Check system load and temperature"
     color: Colors.textSecondary
-    font.pixelSize: Colors.fontSizeSmall
+    font.pixelSize: Appearance.fontSizeSmall
     font.weight: Font.Medium
     elide: Text.ElideRight
   }

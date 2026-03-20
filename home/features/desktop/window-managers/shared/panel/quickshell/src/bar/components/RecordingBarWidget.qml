@@ -27,7 +27,7 @@ SharedWidgets.BarPill {
         }
     ]
     Row {
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Rectangle {
             visible: root.showPulseDot
@@ -42,12 +42,12 @@ SharedWidgets.BarPill {
                 NumberAnimation {
                     from: 1.0
                     to: 0.3
-                    duration: Colors.durationPulse
+                    duration: Appearance.durationPulse
                 }
                 NumberAnimation {
                     from: 0.3
                     to: 1.0
-                    duration: Colors.durationPulse
+                    duration: Appearance.durationPulse
                 }
             }
         }
@@ -56,7 +56,7 @@ SharedWidgets.BarPill {
             visible: !root.iconOnly
             text: "REC"
             color: Colors.error
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             font.weight: Font.Bold
             anchors.verticalCenter: parent.verticalCenter
         }

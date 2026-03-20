@@ -145,14 +145,14 @@ Item {
         Rectangle {
             width: 120
             height: 60
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: Colors.cardSurface
             border.color: Colors.border
             Text {
                 anchors.centerIn: parent
                 text: "Unknown Widget"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
             }
         }
     }

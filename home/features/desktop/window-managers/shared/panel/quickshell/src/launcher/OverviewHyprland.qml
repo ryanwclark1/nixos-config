@@ -9,14 +9,14 @@ import "../widgets" as SharedWidgets
 
 ColumnLayout {
     id: content
-    spacing: Colors.spacingLG
+    spacing: Appearance.spacingLG
 
     signal closeRequested()
 
     Text {
         text: "Workspace Overview"
         color: Colors.text
-        font.pixelSize: Colors.fontSizeIcon
+        font.pixelSize: Appearance.fontSizeIcon
         font.weight: Font.Bold
         Layout.alignment: Qt.AlignHCenter
     }
@@ -27,7 +27,7 @@ ColumnLayout {
         Layout.fillHeight: true
         model: Hyprland.workspaces
         orientation: ListView.Horizontal
-        spacing: Colors.spacingLG
+        spacing: Appearance.spacingLG
         clip: true
 
         delegate: Rectangle {
@@ -37,7 +37,7 @@ ColumnLayout {
             width: 360
             height: workspaceList.height
             color: Colors.withAlpha(Colors.surface, 0.4)
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             border.color: workspaceData.active ? Colors.primary : Colors.border
             border.width: workspaceData.active ? 2 : 1
 
@@ -59,14 +59,14 @@ ColumnLayout {
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.paddingMedium
-                spacing: Colors.paddingSmall
+                anchors.margins: Appearance.paddingMedium
+                spacing: Appearance.paddingSmall
 
                 TextInput {
                     id: wsTitle
                     text: "Workspace " + workspaceData.name
                     color: workspaceData.active ? Colors.primary : Colors.text
-                    font.pixelSize: Colors.fontSizeXL
+                    font.pixelSize: Appearance.fontSizeXL
                     font.weight: Font.Bold
                     Layout.alignment: Qt.AlignHCenter
                     selectByMouse: true
@@ -94,7 +94,7 @@ ColumnLayout {
                     Flow {
                         id: flow
                         width: parent.width
-                        spacing: Colors.paddingSmall
+                        spacing: Appearance.paddingSmall
 
                         Repeater {
                             model: workspaceRect.workspaceData.toplevels
@@ -104,7 +104,7 @@ ColumnLayout {
                                 width: 155
                                 height: 120
                                 color: hoverArea.containsMouse ? Colors.primarySubtle : Colors.highlightLight
-                                radius: Colors.radiusSmall
+                                radius: Appearance.radiusSmall
                                 border.color: hoverArea.containsMouse ? Colors.primary : Colors.border
                                 border.width: 1
                                 Behavior on border.color {
@@ -134,7 +134,7 @@ ColumnLayout {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         color: Colors.surface
-                                        radius: Colors.radiusXS
+                                        radius: Appearance.radiusXS
                                         clip: true
 
                                         ScreencopyView {
@@ -147,16 +147,16 @@ ColumnLayout {
                                         Rectangle {
                                             width: 24
                                             height: 24
-                                            radius: Colors.radiusCard
+                                            radius: Appearance.radiusCard
                                             color: Colors.error
                                             opacity: hoverArea.containsMouse ? 0.9 : 0.0
                                             visible: opacity > 0
                                             anchors.top: parent.top
                                             anchors.right: parent.right
-                                            anchors.margins: Colors.spacingXS
+                                            anchors.margins: Appearance.spacingXS
                                             Behavior on opacity {
                                                 NumberAnimation {
-                                                    duration: Colors.durationFast
+                                                    duration: Appearance.durationFast
                                                 }
                                             }
 
@@ -164,8 +164,8 @@ ColumnLayout {
                                                 anchors.centerIn: parent
                                                 text: "󰅖"
                                                 color: Colors.text
-                                                font.family: Colors.fontMono
-                                                font.pixelSize: Colors.fontSizeMedium
+                                                font.family: Appearance.fontMono
+                                                font.pixelSize: Appearance.fontSizeMedium
                                             }
 
                                             MouseArea {
@@ -182,7 +182,7 @@ ColumnLayout {
                                     Text {
                                         text: modelData.title
                                         color: Colors.text
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         elide: Text.ElideRight
                                         Layout.fillWidth: true
                                         horizontalAlignment: Text.AlignHCenter
@@ -227,7 +227,7 @@ ColumnLayout {
     Text {
         text: "Drag windows to move them between workspaces. Press Escape to close."
         color: Colors.textSecondary
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         Layout.alignment: Qt.AlignHCenter
     }
 }

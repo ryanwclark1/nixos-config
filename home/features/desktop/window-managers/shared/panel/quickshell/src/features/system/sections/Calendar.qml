@@ -10,7 +10,7 @@ Rectangle {
   Layout.fillWidth: true
   Layout.preferredHeight: 300
   color: Colors.cardSurface
-  radius: Colors.radiusLarge
+  radius: Appearance.radiusLarge
   border.color: Colors.border
   clip: true
 
@@ -43,8 +43,8 @@ Rectangle {
   // Month transition: brief opacity dip on the days grid
   SequentialAnimation {
     id: monthTransition
-    NumberAnimation { target: daysGrid; property: "opacity"; to: 0.3; duration: Colors.durationFlash }
-    NumberAnimation { target: daysGrid; property: "opacity"; to: 1.0; duration: Colors.durationFast; easing.type: Easing.OutCubic }
+    NumberAnimation { target: daysGrid; property: "opacity"; to: 0.3; duration: Appearance.durationFlash }
+    NumberAnimation { target: daysGrid; property: "opacity"; to: 1.0; duration: Appearance.durationFast; easing.type: Easing.OutCubic }
   }
 
   function goToday() {
@@ -102,13 +102,13 @@ Rectangle {
 
   ColumnLayout {
     anchors.fill: parent
-    anchors.margins: Colors.paddingMedium
-    spacing: Colors.spacingS
+    anchors.margins: Appearance.paddingMedium
+    spacing: Appearance.spacingS
 
     // Header: Month and Year with navigation
     RowLayout {
       Layout.fillWidth: true
-      Layout.bottomMargin: Colors.spacingS
+      Layout.bottomMargin: Appearance.spacingS
 
       MouseArea {
         width: 32; height: 32
@@ -116,7 +116,7 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.prevMonth()
         Rectangle {
-          anchors.fill: parent; radius: Colors.radiusSmall
+          anchors.fill: parent; radius: Appearance.radiusSmall
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
           Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
@@ -124,8 +124,8 @@ Rectangle {
           anchors.centerIn: parent
           text: "󰍞"
           color: Colors.text
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeLarge
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeLarge
         }
       }
 
@@ -135,7 +135,7 @@ Rectangle {
         id: monthLabel
         text: root.monthName
         color: Colors.text
-        font.pixelSize: Colors.fontSizeLarge
+        font.pixelSize: Appearance.fontSizeLarge
         font.weight: Font.Bold
       }
 
@@ -143,9 +143,9 @@ Rectangle {
       Rectangle {
         visible: root.isCurrentMonth
         width: 6; height: 6
-        radius: Colors.radiusXS3
+        radius: Appearance.radiusXS3
         color: Colors.primary
-        Layout.leftMargin: Colors.spacingXS
+        Layout.leftMargin: Appearance.spacingXS
       }
 
       Item { Layout.fillWidth: true }
@@ -173,7 +173,7 @@ Rectangle {
           anchors.centerIn: parent
           text: "Today"
           color: parent.containsMouse ? Colors.background : Colors.primary
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Bold
           Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
@@ -185,7 +185,7 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.nextMonth()
         Rectangle {
-          anchors.fill: parent; radius: Colors.radiusSmall
+          anchors.fill: parent; radius: Appearance.radiusSmall
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
           Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
@@ -193,8 +193,8 @@ Rectangle {
           anchors.centerIn: parent
           text: "󰍟"
           color: Colors.text
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeLarge
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeLarge
         }
       }
     }
@@ -203,14 +203,14 @@ Rectangle {
     RowLayout {
       Layout.fillWidth: true
       spacing: 0
-      Layout.bottomMargin: Colors.spacingXS
+      Layout.bottomMargin: Appearance.spacingXS
       Repeater {
         model: root.dayHeaders
         delegate: Text {
           Layout.fillWidth: true
           text: modelData
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXXS
+          font.pixelSize: Appearance.fontSizeXXS
           font.weight: Font.Bold
           font.letterSpacing: 1.0
           horizontalAlignment: Text.AlignHCenter
@@ -227,7 +227,7 @@ Rectangle {
       rowSpacing: 4
       columnSpacing: 0
 
-      Behavior on opacity { Anim { duration: Colors.durationFast } }
+      Behavior on opacity { Anim { duration: Appearance.durationFast } }
 
       Repeater {
         model: root.daysModel
@@ -250,7 +250,7 @@ Rectangle {
               color: modelData.isToday ? Colors.background
                 : modelData.currentMonth ? Colors.text
                 : Colors.textDisabled
-              font.pixelSize: Colors.fontSizeSmall
+              font.pixelSize: Appearance.fontSizeSmall
               font.weight: modelData.isToday ? Font.Bold : Font.Normal
               opacity: modelData.currentMonth ? 1.0 : 0.4
             }

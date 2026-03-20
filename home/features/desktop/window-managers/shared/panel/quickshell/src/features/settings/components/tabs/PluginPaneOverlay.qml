@@ -33,9 +33,9 @@ Rectangle {
 
     Rectangle {
         width: Math.min(520, parent.width - 24)
-        height: Math.min(pluginPaneFlick.contentHeight + (Colors.paddingLarge * 2), parent.height - 24)
+        height: Math.min(pluginPaneFlick.contentHeight + (Appearance.paddingLarge * 2), parent.height - 24)
         anchors.centerIn: parent
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         color: Colors.withAlpha(Colors.surface, 0.98)
         border.color: Colors.border
         border.width: 1
@@ -47,24 +47,24 @@ Rectangle {
         Flickable {
             id: pluginPaneFlick
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
+            anchors.margins: Appearance.paddingLarge
             clip: true
             contentHeight: pluginPaneColumn.implicitHeight
 
             ColumnLayout {
                 id: pluginPaneColumn
                 width: parent.width
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
                         Layout.fillWidth: true
                         text: root.pluginPaneTitle
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeXL
+                        font.pixelSize: Appearance.fontSizeXL
                         font.weight: Font.DemiBold
                         wrapMode: Text.WordWrap
                     }
@@ -87,7 +87,7 @@ Rectangle {
                         visible: !!root.selectedPlugin
                         text: root.selectedPlugin ? ("Type: " + root.pluginTypeLabel + " • Author: " + String(root.selectedPlugin.author || "Unknown") + " • Version: " + String(root.selectedPlugin.version || "")) : ""
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         wrapMode: Text.WordWrap
                         Layout.fillWidth: true
                     }

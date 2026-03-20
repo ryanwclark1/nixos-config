@@ -52,9 +52,9 @@ Item {
             center: [],
             right: []
         })
-    readonly property int outerPadding: Colors.spacingM
-    readonly property int sectionSpacing: Colors.spacingS
-    readonly property int runtimeSpacing: Colors.spacingM
+    readonly property int outerPadding: Appearance.spacingM
+    readonly property int sectionSpacing: Appearance.spacingS
+    readonly property int runtimeSpacing: Appearance.spacingM
     readonly property int verticalItemWidthCap: vertical ? Math.max(24, thickness) : 0
     readonly property int verticalBarWidthCap: vertical ? (verticalItemWidthCap + outerPadding * 2) : 0
     readonly property real centerTargetOffset: 0
@@ -319,7 +319,7 @@ Item {
 
     Behavior on _slideOffset {
         NumberAnimation {
-            duration: Colors.durationFast
+            duration: Appearance.durationFast
             easing.type: Easing.InOutQuad
         }
     }
@@ -327,7 +327,7 @@ Item {
     opacity: root._autoHidden ? 0 : 1
     Behavior on opacity {
         NumberAnimation {
-            duration: Colors.durationFast
+            duration: Appearance.durationFast
             easing.type: Easing.InOutQuad
         }
     }
@@ -365,7 +365,7 @@ Item {
             anchors.fill: parent
             anchors.margins: -spread
             z: -1 - index
-            radius: floatingBar ? Colors.radiusMedium + spread : 0
+            radius: floatingBar ? Appearance.radiusMedium + spread : 0
             color: Qt.rgba(0, 0, 0, root.shadowOpacity * baseAlpha)
         }
     }
@@ -374,7 +374,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: root.noBackground ? "transparent" : Colors.bgGlass
-        radius: root.floatingBar ? Colors.radiusMedium : 0
+        radius: root.floatingBar ? Appearance.radiusMedium : 0
         clip: true
 
         gradient: (root.floatingBar && !root.noBackground) ? barGradient : null
@@ -700,19 +700,19 @@ Item {
                 anchors.centerIn: parent
                 text: "󰀪"
                 color: Colors.error
-                font.pixelSize: Colors.fontSizeLarge
-                font.family: Colors.fontMono
+                font.pixelSize: Appearance.fontSizeLarge
+                font.family: Appearance.fontMono
                 SequentialAnimation on opacity {
                     loops: Animation.Infinite
                     NumberAnimation {
                         from: 1.0
                         to: 0.3
-                        duration: Colors.durationMediumSlow
+                        duration: Appearance.durationMediumSlow
                     }
                     NumberAnimation {
                         from: 0.3
                         to: 1.0
-                        duration: Colors.durationMediumSlow
+                        duration: Appearance.durationMediumSlow
                     }
                 }
             }
@@ -1014,7 +1014,7 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
                 SharedWidgets.NetworkWidget {
                     id: networkWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
@@ -1061,7 +1061,7 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
                 SharedWidgets.AudioWidget {
                     id: audioWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
@@ -1153,7 +1153,7 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 SharedWidgets.BatteryWidget {
                     id: batteryWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
@@ -1179,7 +1179,7 @@ Item {
         BarSurfacePill {
             surfaceId: "aiChat"
             iconText: "󰚩"
-            iconSize: Colors.fontSizeLarge
+            iconSize: Appearance.fontSizeLarge
             defaultLabel: "AI"
             tooltipText: "AI Chat"
             panelRef: root
@@ -1191,7 +1191,7 @@ Item {
         BarSurfacePill {
             surfaceId: "notepad"
             iconText: "󰠮"
-            iconSize: Colors.fontSizeLarge
+            iconSize: Appearance.fontSizeLarge
             defaultLabel: "Notes"
             tooltipText: "Notepad"
             panelRef: root
@@ -1218,7 +1218,7 @@ Item {
             anchorWindow: root.anchorWindow
             itemSize: root.widgetIntegerSetting(widgetInstance, "itemSize", 24, 18, 40)
             iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 18, 12, 32)
-            itemSpacing: root.widgetIntegerSetting(widgetInstance, "spacing", Colors.spacingS, 2, 16)
+            itemSpacing: root.widgetIntegerSetting(widgetInstance, "spacing", Appearance.spacingS, 2, 16)
         }
     }
 
@@ -1290,7 +1290,7 @@ Item {
             implicitHeight: root.vertical ? separatorThickness : separatorLength
             width: implicitWidth
             height: implicitHeight
-            radius: Colors.radiusXXXS
+            radius: Appearance.radiusXXXS
             color: Colors.border
             opacity: {
                 var settings = root.widgetSettings(widgetInstance);
@@ -1381,7 +1381,7 @@ Item {
             Text {
                 text: "?"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
             }
         }
     }

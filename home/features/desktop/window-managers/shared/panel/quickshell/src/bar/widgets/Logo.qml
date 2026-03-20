@@ -32,13 +32,13 @@ Item {
     id: statusGlow
     anchors.fill: parent
     anchors.margins: -2
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: root.statusColor
     opacity: SystemStatus.overallStatus === "healthy" ? 0
            : SystemStatus.overallStatus === "warning" ? 0.18
            : 0.3
     visible: opacity > 0
-    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationEmphasis } }
 
     SequentialAnimation on opacity {
         id: pulseAnim
@@ -64,7 +64,7 @@ Item {
   Rectangle {
     id: logoBg
     anchors.fill: parent
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: "transparent"
 
     SharedWidgets.StateLayer {
@@ -78,7 +78,7 @@ Item {
   Row {
     id: logoRow
     anchors.centerIn: parent
-    spacing: Colors.spacingXS
+    spacing: Appearance.spacingXS
 
     Image {
       id: logoImage
@@ -92,8 +92,8 @@ Item {
       anchors.verticalCenter: parent.verticalCenter
       text: "󱄅"
       color: root.statusColor
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeXL
+      font.family: Appearance.fontMono
+      font.pixelSize: Appearance.fontSizeXL
       visible: !logoImage.visible
     }
 
@@ -102,7 +102,7 @@ Item {
       anchors.verticalCenter: parent.verticalCenter
       text: root.labelText
       color: Colors.text
-      font.pixelSize: Colors.fontSizeSmall
+      font.pixelSize: Appearance.fontSizeSmall
       font.weight: Font.DemiBold
     }
   }
@@ -110,7 +110,7 @@ Item {
   scale: mouseArea.containsMouse ? 1.06 : 1.0
   layer.enabled: mouseArea.containsMouse
   Behavior on scale {
-    Anim { duration: Colors.durationFast }
+    Anim { duration: Appearance.durationFast }
   }
 
   MouseArea {

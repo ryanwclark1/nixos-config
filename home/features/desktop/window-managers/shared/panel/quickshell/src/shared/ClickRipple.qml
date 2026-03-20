@@ -7,7 +7,7 @@ Item {
   clip: true
 
   property color color: Qt.rgba(1, 1, 1, 0.12)
-  property int duration: Colors.durationRipple
+  property int duration: Appearance.durationRipple
 
   function burst(x, y) {
     rippleAnim.stop();

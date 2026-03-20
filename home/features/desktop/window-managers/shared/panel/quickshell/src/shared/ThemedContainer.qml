@@ -40,12 +40,12 @@ Rectangle {
 
     function _resolveRadius() {
         switch (variant) {
-        case "popup": return Colors.radiusLarge;
-        case "card": return Colors.radiusMedium;
-        case "elevated": return Colors.radiusCard;
-        case "surface": return Colors.radiusSmall;
-        case "pill": return Colors.radiusPill;
-        default: return Colors.radiusMedium;
+        case "popup": return Appearance.radiusLarge;
+        case "card": return Appearance.radiusMedium;
+        case "elevated": return Appearance.radiusCard;
+        case "surface": return Appearance.radiusSmall;
+        case "pill": return Appearance.radiusPill;
+        default: return Appearance.radiusMedium;
         }
     }
 

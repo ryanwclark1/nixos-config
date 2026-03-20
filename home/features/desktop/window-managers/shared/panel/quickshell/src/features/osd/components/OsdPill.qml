@@ -14,9 +14,9 @@ RowLayout {
   required property bool isLockKey
 
   anchors.fill: parent
-  anchors.leftMargin: Colors.spacingL
-  anchors.rightMargin: Colors.spacingL
-  spacing: Colors.spacingM
+  anchors.leftMargin: Appearance.spacingL
+  anchors.rightMargin: Appearance.spacingL
+  spacing: Appearance.spacingM
 
   function triggerPulse() {
     pillIconPulse.restart();
@@ -26,14 +26,14 @@ RowLayout {
     id: pillIconText
     text: root.osdIcon
     color: root.osdColor
-    font.pixelSize: Colors.fontSizeXL
-    font.family: Colors.fontMono
+    font.pixelSize: Appearance.fontSizeXL
+    font.family: Appearance.fontMono
     scale: 1.0
 
     SequentialAnimation {
       id: pillIconPulse
-      NumberAnimation { target: pillIconText; property: "scale"; to: 1.22; duration: Colors.durationFlash; easing.type: Easing.OutQuad }
-      NumberAnimation { target: pillIconText; property: "scale"; to: 1.0; duration: Colors.durationFast; easing.type: Easing.OutElastic }
+      NumberAnimation { target: pillIconText; property: "scale"; to: 1.22; duration: Appearance.durationFlash; easing.type: Easing.OutQuad }
+      NumberAnimation { target: pillIconText; property: "scale"; to: 1.0; duration: Appearance.durationFast; easing.type: Easing.OutElastic }
     }
   }
 
@@ -42,7 +42,7 @@ RowLayout {
     id: osdTrack
     Layout.fillWidth: true
     Layout.preferredHeight: osdTrackMouse.pressed ? 12 : 6
-    Behavior on Layout.preferredHeight { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutCubic } }
+    Behavior on Layout.preferredHeight { NumberAnimation { duration: Appearance.durationSnap; easing.type: Easing.OutCubic } }
 
     Rectangle {
       anchors.fill: parent
@@ -56,7 +56,7 @@ RowLayout {
       Rectangle {
         x: osdTrack.width * modelData - 1
         y: -1; width: 2; height: osdTrack.height + 2
-        radius: Colors.radiusXXXS
+        radius: Appearance.radiusXXXS
         color: Colors.withAlpha(Colors.text, 0.2)
         visible: (root.currentValue / root.maxValue) < modelData
       }
@@ -71,7 +71,7 @@ RowLayout {
       radius: parent.height / 2
       color: root.osdColor
 
-      Behavior on width { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutCubic } }
+      Behavior on width { NumberAnimation { duration: Appearance.durationSnap; easing.type: Easing.OutCubic } }
     }
 
     // Overdrive marker at 100% when max > 1.0
@@ -81,7 +81,7 @@ RowLayout {
       y: -2
       width: 2
       height: parent.height + 4
-      radius: Colors.radiusXXXS
+      radius: Appearance.radiusXXXS
       color: Colors.borderMedium
     }
 
@@ -117,9 +117,9 @@ RowLayout {
   Text {
     text: root.osdLabel
     color: Colors.text
-    font.pixelSize: Colors.fontSizeMedium
+    font.pixelSize: Appearance.fontSizeMedium
     font.weight: Font.Bold
-    font.family: Colors.fontMono
+    font.family: Appearance.fontMono
     Layout.minimumWidth: 70
     horizontalAlignment: Text.AlignRight
   }

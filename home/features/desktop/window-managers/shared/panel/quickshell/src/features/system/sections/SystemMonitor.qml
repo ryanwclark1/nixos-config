@@ -14,7 +14,7 @@ Item {
 
   Row {
     id: mainRow
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
     anchors.verticalCenter: parent.verticalCenter
 
     // CPU Pill
@@ -26,18 +26,18 @@ Item {
       onClicked: root.statsClicked()
 
       Row {
-        spacing: Colors.spacingSM
+        spacing: Appearance.spacingSM
         Text {
           text: ""
           color: Colors.primary
-          font.pixelSize: Colors.fontSizeLarge
-          font.family: Colors.fontMono
+          font.pixelSize: Appearance.fontSizeLarge
+          font.family: Appearance.fontMono
           anchors.verticalCenter: parent.verticalCenter
         }
         Text {
           text: "CPU " + SystemStatus.cpuUsage
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.DemiBold
           anchors.verticalCenter: parent.verticalCenter
         }
@@ -53,18 +53,18 @@ Item {
       onClicked: root.statsClicked()
 
       Row {
-        spacing: Colors.spacingSM
+        spacing: Appearance.spacingSM
         Text {
           text: ""
           color: Colors.accent
-          font.pixelSize: Colors.fontSizeLarge
-          font.family: Colors.fontMono
+          font.pixelSize: Appearance.fontSizeLarge
+          font.family: Appearance.fontMono
           anchors.verticalCenter: parent.verticalCenter
         }
         Text {
           text: "RAM " + SystemStatus.ramUsage
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.DemiBold
           anchors.verticalCenter: parent.verticalCenter
         }

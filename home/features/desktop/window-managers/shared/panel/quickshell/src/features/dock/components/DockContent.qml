@@ -52,7 +52,7 @@ Item {
     width: root.vertical ? 56 : ((dockLayoutLoader.item ? dockLayoutLoader.item.implicitWidth : 0) + 40)
     height: root.vertical ? ((dockLayoutLoader.item ? dockLayoutLoader.item.implicitHeight : 0) + 40) : 56
     color: Colors.cardSurface
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     border.color: Colors.border
     border.width: 1
 
@@ -76,7 +76,7 @@ Item {
     id: horizontalDockLayout
     Row {
       id: dockLayout
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
 
       Repeater {
         model: root.dockApps
@@ -104,7 +104,7 @@ Item {
     id: verticalDockLayout
     Column {
       id: dockLayout
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
 
       Repeater {
         model: root.dockApps

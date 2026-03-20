@@ -9,8 +9,8 @@ Rectangle {
     readonly property var blockData: parent ? parent.modelData : null
     readonly property int blockIndex: parent ? parent.index : 0
     width: parent ? parent.width : 0
-    height: streamTextBlockEdit.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    height: streamTextBlockEdit.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
@@ -18,12 +18,12 @@ Rectangle {
     TextEdit {
         id: streamTextBlockEdit
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        anchors.rightMargin: Colors.spacingM + 12
+        anchors.margins: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingM + 12
         text: root.blockData ? root.blockData.html : ""
         textFormat: TextEdit.RichText
         color: Colors.text
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
         readOnly: true
         selectByMouse: true
@@ -35,12 +35,12 @@ Rectangle {
     Rectangle {
         width: 2
         height: 16
-        radius: Colors.radiusXXXS
+        radius: Appearance.radiusXXXS
         color: Colors.primary
         anchors.bottom: parent.bottom
         anchors.right: parent.right
-        anchors.bottomMargin: Colors.spacingM
-        anchors.rightMargin: Colors.spacingS
+        anchors.bottomMargin: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingS
         readonly property int streamingBlockCount: {
             // Walk up: root.parent = Loader, root.parent.parent = Column (streaming indicator),
             // then find the Repeater child that has a count property.
@@ -56,7 +56,7 @@ Rectangle {
         opacity: cursorBlink.running && (streamingBlockCount === 0 || root.blockIndex === streamingBlockCount - 1) ? (cursorBlink.cursorVisible ? 1 : 0) : 0
         Behavior on opacity {
             NumberAnimation {
-                duration: Colors.durationFast
+                duration: Appearance.durationFast
             }
         }
 

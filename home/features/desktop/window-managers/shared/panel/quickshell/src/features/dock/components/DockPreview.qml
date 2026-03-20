@@ -28,13 +28,13 @@ PopupWindow {
     anchor.rect.y: vertical
         ? anchorWindow.itemRect(anchorItem).y + (anchorItem.height - height) / 2
         : anchorWindow.itemRect(anchorItem).y - height - Config.popupGap
-    implicitWidth: previewContent.implicitWidth + Colors.paddingLarge * 2
-    implicitHeight: previewContent.implicitHeight + Colors.paddingMedium * 2
+    implicitWidth: previewContent.implicitWidth + Appearance.paddingLarge * 2
+    implicitHeight: previewContent.implicitHeight + Appearance.paddingMedium * 2
     color: "transparent"
 
     Rectangle {
         anchors.fill: parent
-        radius: Colors.radiusMedium
+        radius: Appearance.radiusMedium
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
@@ -42,8 +42,8 @@ PopupWindow {
         ColumnLayout {
             id: previewContent
             anchors.fill: parent
-            anchors.margins: Colors.paddingMedium
-            spacing: Colors.spacingS
+            anchors.margins: Appearance.paddingMedium
+            spacing: Appearance.spacingS
 
             Repeater {
                 model: root.toplevels
@@ -53,7 +53,7 @@ PopupWindow {
                     required property int index
 
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     AppIcon {
                         iconName: root.appIcon
@@ -69,7 +69,7 @@ PopupWindow {
                         Text {
                             text: modelData.title || root.appName
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: Font.DemiBold
                             Layout.fillWidth: true
                             Layout.maximumWidth: 220
@@ -80,7 +80,7 @@ PopupWindow {
                             visible: root.toplevels.length > 1
                             text: "Window " + (index + 1)
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                         }
                     }
 

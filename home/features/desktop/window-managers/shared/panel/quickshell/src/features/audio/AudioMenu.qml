@@ -16,7 +16,7 @@ BasePopupMenu {
   headerExtras: [
     SharedWidgets.IconButton {
       icon: "settings.svg"
-      iconSize: Colors.fontSizeXL
+      iconSize: Appearance.fontSizeXL
       tooltipText: "Open mixer"
       onClicked: Quickshell.execDetached(["pavucontrol"])
     }
@@ -25,7 +25,7 @@ BasePopupMenu {
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.spacingM
+    columnSpacing: Appearance.spacingM
 
     SharedWidgets.AudioDeviceSection {
       Layout.fillWidth: true
@@ -60,7 +60,7 @@ BasePopupMenu {
     // ── Per-app volume ──────────────────────────
     ColumnLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
       visible: AudioService.outputAppNodes.length > 0
 
       SharedWidgets.SectionLabel { label: "APP VOLUME" }
@@ -68,15 +68,15 @@ BasePopupMenu {
       SharedWidgets.ThemedContainer {
         variant: "card"
         Layout.fillWidth: true
-        implicitHeight: appCol.implicitHeight + 2 * Colors.spacingM
+        implicitHeight: appCol.implicitHeight + 2 * Appearance.spacingM
 
         ColumnLayout {
           id: appCol
           anchors.left: parent.left
           anchors.right: parent.right
           anchors.top: parent.top
-          anchors.margins: Colors.spacingM
-          spacing: Colors.spacingS
+          anchors.margins: Appearance.spacingM
+          spacing: Appearance.spacingS
 
           Repeater {
             model: AudioService.outputAppNodes

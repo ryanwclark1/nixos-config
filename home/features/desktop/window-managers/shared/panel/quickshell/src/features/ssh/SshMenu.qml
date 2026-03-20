@@ -15,7 +15,7 @@ BasePopupMenu {
   implicitHeight: compactMode ? 560 : 520
   title: "SSH"
   subtitle: sshData.importBusy ? "Refreshing aliases..." : "Hosts, aliases, and quick actions"
-  contentSpacing: Colors.spacingM
+  contentSpacing: Appearance.spacingM
   focusOnOpen: true
   initialFocusTarget: searchBar.inputItem
 
@@ -119,7 +119,7 @@ BasePopupMenu {
       visible: sshData.importErrors.length > 0
       implicitWidth: errorChipLabel.implicitWidth + 18
       implicitHeight: 24
-      radius: Colors.radiusCard
+      radius: Appearance.radiusCard
       color: Colors.warningLight
 
       Text {
@@ -127,7 +127,7 @@ BasePopupMenu {
         anchors.centerIn: parent
         text: sshData.importErrors.length + " error" + (sshData.importErrors.length !== 1 ? "s" : "")
         color: Colors.warning
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         font.weight: Font.DemiBold
       }
     },
@@ -147,7 +147,7 @@ BasePopupMenu {
   Rectangle {
     Layout.fillWidth: true
     implicitHeight: statusGrid.implicitHeight + 16
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
@@ -158,66 +158,66 @@ BasePopupMenu {
         left: parent.left
         right: parent.right
         top: parent.top
-        margins: Colors.spacingM
+        margins: Appearance.spacingM
       }
       columns: root.compactMode ? 2 : 4
-      columnSpacing: Colors.spacingM
-      rowSpacing: Colors.spacingS
+      columnSpacing: Appearance.spacingM
+      rowSpacing: Appearance.spacingS
 
       ColumnLayout {
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
         Text {
           text: root.filteredHostsResult.length
           color: Colors.text
-          font.pixelSize: Colors.fontSizeHuge
+          font.pixelSize: Appearance.fontSizeHuge
           font.weight: Font.Bold
         }
         Text {
           text: root.hasSearchQuery ? ("matching of " + sshData.mergedHosts.length) : "visible hosts"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Medium
         }
       }
 
       ColumnLayout {
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
         Text {
           text: sshData.manualHosts.length
           color: Colors.text
-          font.pixelSize: Colors.fontSizeHuge
+          font.pixelSize: Appearance.fontSizeHuge
           font.weight: Font.Bold
         }
         Text {
           text: "manual"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Medium
         }
       }
 
       ColumnLayout {
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
         Text {
           text: sshData.importedHosts.length
           color: sshData.enableSshConfigImport ? Colors.primary : Colors.textDisabled
-          font.pixelSize: Colors.fontSizeHuge
+          font.pixelSize: Appearance.fontSizeHuge
           font.weight: Font.Bold
         }
         Text {
           text: "imported"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Medium
         }
       }
 
       ColumnLayout {
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
         Text {
           text: sshData.recentHostLabel() !== "" ? sshData.recentHostLabel() : "None"
           color: sshData.recentHostLabel() !== "" ? Colors.text : Colors.textDisabled
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           font.weight: Font.DemiBold
           elide: Text.ElideRight
           Layout.preferredWidth: root.compactMode ? 120 : 140
@@ -225,7 +225,7 @@ BasePopupMenu {
         Text {
           text: "last connected"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Medium
         }
       }
@@ -249,14 +249,14 @@ BasePopupMenu {
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.spacingS
+    columnSpacing: Appearance.spacingS
 
     SharedWidgets.EmptyState {
       Layout.fillWidth: true
       Layout.topMargin: 32
       visible: !sshData.importBusy && !root.hasHosts
       icon: "server.svg"
-      iconSize: Colors.iconSizeLarge
+      iconSize: Appearance.iconSizeLarge
       message: sshData.enableSshConfigImport ? "No SSH hosts found yet" : "No SSH hosts configured"
     }
 
@@ -265,7 +265,7 @@ BasePopupMenu {
       Layout.fillWidth: true
       text: sshData.enableSshConfigImport ? "Refresh import or add manual hosts in widget settings." : "Enable SSH config import or add manual hosts in widget settings."
       color: Colors.textSecondary
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       wrapMode: Text.WordWrap
       horizontalAlignment: Text.AlignHCenter
     }
@@ -275,7 +275,7 @@ BasePopupMenu {
       Layout.topMargin: 32
       visible: !sshData.importBusy && root.hasHosts && root.hasSearchQuery && !root.hasFilteredHosts
       icon: "search-visual.svg"
-      iconSize: Colors.iconSizeLarge
+      iconSize: Appearance.iconSizeLarge
       message: "No SSH hosts match \"" + root.searchQuery + "\""
     }
 
@@ -284,7 +284,7 @@ BasePopupMenu {
       Layout.fillWidth: true
       text: "Try alias, hostname, user, group, or tag. Manage host entries in Bar Widgets settings."
       color: Colors.textSecondary
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       wrapMode: Text.WordWrap
       horizontalAlignment: Text.AlignHCenter
     }
@@ -292,7 +292,7 @@ BasePopupMenu {
     RowLayout {
       Layout.fillWidth: true
       visible: !sshData.importBusy
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
 
       SharedWidgets.SectionLabel {
         Layout.fillWidth: true
@@ -320,14 +320,14 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
 
           Text {
             Layout.fillWidth: true
             text: String(modelData.subtitle || "")
             visible: text !== ""
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WordWrap
           }
 
@@ -339,7 +339,7 @@ BasePopupMenu {
 
               Layout.fillWidth: true
               implicitHeight: hostLayout.implicitHeight + 20
-              radius: Colors.radiusMedium
+              radius: Appearance.radiusMedium
               color: Colors.cardSurface
               border.color: Colors.border
               border.width: 1
@@ -350,29 +350,29 @@ BasePopupMenu {
                   left: parent.left
                   right: parent.right
                   top: parent.top
-                  margins: Colors.spacingM
+                  margins: Appearance.spacingM
                 }
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 RowLayout {
                   Layout.fillWidth: true
-                  spacing: Colors.spacingS
+                  spacing: Appearance.spacingS
 
                   Text {
                     text: modelData.icon || "󰣀"
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
                   }
 
                   ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingXXS
+                    spacing: Appearance.spacingXXS
 
                     Text {
                       text: String(modelData.label || modelData.alias || modelData.host || "SSH")
                       color: Colors.text
-                      font.pixelSize: Colors.fontSizeMedium
+                      font.pixelSize: Appearance.fontSizeMedium
                       font.weight: Font.DemiBold
                       elide: Text.ElideRight
                       Layout.fillWidth: true
@@ -381,8 +381,8 @@ BasePopupMenu {
                     Text {
                       text: sshData.buildDisplayCommand(modelData)
                       color: Colors.textSecondary
-                      font.pixelSize: Colors.fontSizeXS
-                      font.family: Colors.fontMono
+                      font.pixelSize: Appearance.fontSizeXS
+                      font.family: Appearance.fontMono
                       elide: Text.ElideMiddle
                       Layout.fillWidth: true
                     }
@@ -391,8 +391,8 @@ BasePopupMenu {
                       text: sshData.hostSourceLabel(modelData)
                       visible: text !== ""
                       color: Colors.textDisabled
-                      font.pixelSize: Colors.fontSizeXS
-                      font.family: Colors.fontMono
+                      font.pixelSize: Appearance.fontSizeXS
+                      font.family: Appearance.fontMono
                       elide: Text.ElideMiddle
                       Layout.fillWidth: true
                     }
@@ -402,7 +402,7 @@ BasePopupMenu {
                 Flow {
                   Layout.fillWidth: true
                   width: parent.width
-                  spacing: Colors.spacingS
+                  spacing: Appearance.spacingS
 
                   SharedWidgets.FilterChip {
                     label: modelData.source === "imported" ? "Imported" : "Manual"
@@ -440,7 +440,7 @@ BasePopupMenu {
                 Flow {
                   Layout.fillWidth: true
                   width: parent.width
-                  spacing: Colors.spacingS
+                  spacing: Appearance.spacingS
 
                   SettingsActionButton {
                     compact: true

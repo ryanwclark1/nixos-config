@@ -14,7 +14,7 @@ Rectangle {
 
     visible: root.showingConfirm
     color: Colors.withAlpha(Colors.background, 0.9)
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -22,17 +22,17 @@ Rectangle {
         Text {
             text: root.confirmTitle
             color: Colors.text
-            font.pixelSize: Colors.fontSizeXL
+            font.pixelSize: Appearance.fontSizeXL
             font.bold: true
             Layout.alignment: Qt.AlignHCenter
         }
         RowLayout {
-            spacing: Colors.paddingMedium
+            spacing: Appearance.paddingMedium
             Layout.alignment: Qt.AlignHCenter
             Rectangle {
                 width: 100
                 height: 40
-                radius: Colors.radiusLarge
+                radius: Appearance.radiusLarge
                 color: Colors.error
                 Text {
                     text: "Yes"
@@ -60,7 +60,7 @@ Rectangle {
             Rectangle {
                 width: 100
                 height: 40
-                radius: Colors.radiusLarge
+                radius: Appearance.radiusLarge
                 color: Colors.surface
                 Text {
                     text: "No"

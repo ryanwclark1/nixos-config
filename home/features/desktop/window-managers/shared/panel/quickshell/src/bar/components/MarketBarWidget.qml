@@ -29,13 +29,13 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             text: "󱓗"
             color: Colors.accent
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -43,7 +43,7 @@ SharedWidgets.BarPill {
             visible: PanelHelpers.isSummaryWidgetFull(widgetInstance, vertical) && !!firstSymbol
             text: firstSymbol ? firstSymbol.close : "--"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

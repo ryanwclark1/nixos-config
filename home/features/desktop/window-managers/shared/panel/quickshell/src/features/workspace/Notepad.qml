@@ -19,7 +19,7 @@ PanelWindow {
     bottom: true
   }
   margins.top: edgeMargins.top
-  margins.right: Math.max(edgeMargins.right, Colors.spacingS)
+  margins.right: Math.max(edgeMargins.right, Appearance.spacingS)
   margins.bottom: edgeMargins.bottom
 
   implicitWidth: notepadWidth
@@ -349,7 +349,7 @@ PanelWindow {
     color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
 
     gradient: SharedWidgets.SurfaceGradient {}
 
@@ -362,13 +362,13 @@ PanelWindow {
     Behavior on x {
       NumberAnimation {
         id: npSlideAnim
-        duration: Colors.durationPanelOpen
+        duration: Appearance.durationPanelOpen
         easing.type: Easing.OutBack
         easing.overshoot: 0.6
       }
     }
     Behavior on opacity {
-      NumberAnimation { id: npFadeAnim; duration: Colors.durationPanelClose }
+      NumberAnimation { id: npFadeAnim; duration: Appearance.durationPanelClose }
     }
     layer.enabled: npSlideAnim.running || npFadeAnim.running
 
@@ -389,13 +389,13 @@ PanelWindow {
       id: dragHandle
       width: 6
       height: parent.height * 0.15
-      radius: Colors.radiusXS
+      radius: Appearance.radiusXS
       color: dragArea.containsMouse ? Colors.primary : Colors.border
       anchors.left: parent.left
       anchors.leftMargin: -3
       anchors.verticalCenter: parent.verticalCenter
       opacity: dragArea.containsMouse || dragArea.pressed ? 1.0 : 0.4
-      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+      Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
       Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
       MouseArea {
@@ -421,8 +421,8 @@ PanelWindow {
 
     ColumnLayout {
       anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
-      spacing: Colors.spacingM
+      anchors.margins: Appearance.paddingLarge
+      spacing: Appearance.spacingM
 
       // ---- Header ----
       RowLayout {
@@ -431,9 +431,9 @@ PanelWindow {
         Text {
           text: "󰠮  Notepad"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeXL
+          font.pixelSize: Appearance.fontSizeXL
           font.weight: Font.DemiBold
-          font.letterSpacing: Colors.letterSpacingTight
+          font.letterSpacing: Appearance.letterSpacingTight
         }
 
         Item { Layout.fillWidth: true }
@@ -441,16 +441,16 @@ PanelWindow {
         // Search bar
         Rectangle {
           visible: root.isSearching
-          width: 140; height: 28; radius: Colors.radiusMedium
+          width: 140; height: 28; radius: Appearance.radiusMedium
           color: Colors.cardSurface
           border.color: searchInput.activeFocus ? Colors.primary : Colors.border
           border.width: 1
           
           TextInput {
             id: searchInput
-            anchors.fill: parent; anchors.leftMargin: Colors.paddingSmall; anchors.rightMargin: Colors.paddingSmall
+            anchors.fill: parent; anchors.leftMargin: Appearance.paddingSmall; anchors.rightMargin: Appearance.paddingSmall
             verticalAlignment: Text.AlignVCenter
-            color: Colors.text; font.pixelSize: Colors.fontSizeSmall
+            color: Colors.text; font.pixelSize: Appearance.fontSizeSmall
             text: root.searchQuery
             onTextChanged: root.searchQuery = text
             onVisibleChanged: {
@@ -462,7 +462,7 @@ PanelWindow {
 
         // Search toggle
         SharedWidgets.IconButton {
-          size: 28; radius: Colors.radiusXS
+          size: 28; radius: Appearance.radiusXS
           icon: "search-visual.svg"
           iconColor: root.isSearching ? Colors.primary : Colors.textDisabled
           tooltipText: root.isSearching ? "Hide search" : "Search"
@@ -480,14 +480,14 @@ PanelWindow {
             return words + "w  " + c.length + "c";
           }
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           Layout.alignment: Qt.AlignVCenter
-          Layout.rightMargin: Colors.spacingXS
+          Layout.rightMargin: Appearance.spacingXS
         }
 
         // Open file button
         SharedWidgets.IconButton {
-          size: 28; radius: Colors.radiusXS
+          size: 28; radius: Appearance.radiusXS
           icon: "folder-open.svg"
           tooltipText: "Open file"
           onClicked: root.openFileRequested()
@@ -495,7 +495,7 @@ PanelWindow {
 
         // Save As button
         SharedWidgets.IconButton {
-          size: 28; radius: Colors.radiusXS
+          size: 28; radius: Appearance.radiusXS
           icon: "save.svg"
           tooltipText: "Save as"
           onClicked: root.saveAsRequested(root.activeContent)
@@ -503,7 +503,7 @@ PanelWindow {
 
         // Close button
         SharedWidgets.IconButton {
-          size: 28; radius: Colors.radiusMedium
+          size: 28; radius: Appearance.radiusMedium
           icon: "dismiss.svg"
           tooltipText: "Close"
           onClicked: root.closeRequested()
@@ -513,7 +513,7 @@ PanelWindow {
       // ---- Tab bar ----
       RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingSM
+        spacing: Appearance.spacingSM
 
         // Scrollable tab strip
         Item {
@@ -532,7 +532,7 @@ PanelWindow {
 
             Row {
               id: tabRow
-              spacing: Colors.spacingXS
+              spacing: Appearance.spacingXS
               height: parent.height
 
               Repeater {
@@ -552,12 +552,12 @@ PanelWindow {
                   width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + 36, 140)
                   height: 28
 
-                  Behavior on width { Anim { duration: Colors.durationFast } }
+                  Behavior on width { Anim { duration: Appearance.durationFast } }
 
                   Rectangle {
                     id: tabBg
                     anchors.fill: parent
-                    radius: Colors.radiusXXS
+                    radius: Appearance.radiusXXS
                     color: isActive
                       ? Colors.primaryMid
                       : (hasSearchMatch ? Colors.withAlpha(Colors.accent, 0.12) : Colors.bgWidget)
@@ -577,13 +577,13 @@ PanelWindow {
                   Text {
                     id: tabLabelText
                     anchors.left: parent.left
-                    anchors.leftMargin: Colors.spacingS
+                    anchors.leftMargin: Appearance.spacingS
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: deleteTabBtn.left
-                    anchors.rightMargin: Colors.spacingXS
+                    anchors.rightMargin: Appearance.spacingXS
                     text: modelData.title
                     color: isActive ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: isActive ? Font.DemiBold : Font.Normal
                     elide: Text.ElideRight
                     visible: !tabDelegate.isEditing
@@ -593,12 +593,12 @@ PanelWindow {
                   TextInput {
                     id: tabEditInput
                     anchors.left: parent.left
-                    anchors.leftMargin: Colors.spacingS
+                    anchors.leftMargin: Appearance.spacingS
                     anchors.verticalCenter: parent.verticalCenter
                     width: Math.max(60, contentWidth + 4)
                     text: modelData.title
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.DemiBold
                     visible: tabDelegate.isEditing
                     selectByMouse: true
@@ -633,7 +633,7 @@ PanelWindow {
                     color: "transparent"
                     opacity: (tabMouse.containsMouse || tabDelegate.isActive) && root.tabs.length > 1 ? 1 : 0
                     visible: root.tabs.length > 1
-                    Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+                    Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
 
                     SharedWidgets.StateLayer {
                       id: deleteTabStateLayer
@@ -646,8 +646,8 @@ PanelWindow {
                       anchors.centerIn: parent
                       text: "󰅖"
                       color: deleteTabMouse.containsMouse ? "white" : Colors.textDisabled
-                      font.family: Colors.fontMono
-                      font.pixelSize: Colors.fontSizeXS
+                      font.family: Appearance.fontMono
+                      font.pixelSize: Appearance.fontSizeXS
                     }
                     MouseArea {
                       id: deleteTabMouse
@@ -686,7 +686,7 @@ PanelWindow {
 
         // "+" add tab button
         Rectangle {
-          width: 28; height: 28; radius: Colors.radiusXS
+          width: 28; height: 28; radius: Appearance.radiusXS
           color: Colors.bgWidget
           border.color: Colors.border; border.width: 1
 
@@ -694,7 +694,7 @@ PanelWindow {
             anchors.centerIn: parent
             text: "+"
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeLarge
+            font.pixelSize: Appearance.fontSizeLarge
             font.weight: Font.Light
           }
           SharedWidgets.StateLayer {
@@ -722,7 +722,7 @@ PanelWindow {
         color: Colors.cardSurface
         border.color: notepadText.activeFocus ? Colors.primary : Colors.border
         border.width: notepadText.activeFocus ? 1.5 : 1
-        radius: Colors.radiusMedium
+        radius: Appearance.radiusMedium
         Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
         clip: true
 
@@ -751,8 +751,8 @@ PanelWindow {
             bottomPadding: 12
             text: root.activeContent
             color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeMedium
+            font.family: Appearance.fontMono
             wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
             selectByMouse: true
             selectedTextColor: Colors.background
@@ -763,11 +763,11 @@ PanelWindow {
               anchors.left: parent.left
               anchors.top: parent.top
               anchors.leftMargin: 14
-              anchors.topMargin: Colors.spacingM
+              anchors.topMargin: Appearance.spacingM
               text: "Start typing..."
               color: Colors.textDisabled
-              font.pixelSize: Colors.fontSizeMedium
-              font.family: Colors.fontMono
+              font.pixelSize: Appearance.fontSizeMedium
+              font.family: Appearance.fontMono
               visible: notepadText.text.length === 0 && !notepadText.activeFocus
             }
 
@@ -795,7 +795,7 @@ PanelWindow {
       // ---- Footer: status bar ----
       RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
           text: {
@@ -805,7 +805,7 @@ PanelWindow {
             return lines + " lines  ·  " + words + " words  ·  " + c.length + " chars";
           }
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
         }
 
         Item { Layout.fillWidth: true }
@@ -813,7 +813,7 @@ PanelWindow {
         Text {
           text: root.tabs.length + " tab" + (root.tabs.length !== 1 ? "s" : "")
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
         }
       }
     }

@@ -11,7 +11,7 @@ Item {
     property color colorEnd: Colors.withAlpha(Colors.primary, 0.6)
 
     opacity: SpectrumService.isIdle ? 0 : 1
-    Behavior on opacity { Anim { duration: Colors.durationSlow } }
+    Behavior on opacity { Anim { duration: Appearance.durationSlow } }
 
     ShaderEffect {
         anchors.fill: parent

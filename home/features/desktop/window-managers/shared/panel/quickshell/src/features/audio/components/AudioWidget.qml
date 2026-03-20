@@ -5,7 +5,7 @@ import "../../../shared"
 
 Row {
   id: root
-  spacing: Colors.spacingSM
+  spacing: Appearance.spacingSM
   property bool iconOnly: false
 
   readonly property string tooltipText: {
@@ -38,7 +38,7 @@ Row {
         return Math.round(v * 100) + "%";
     }
     color: Colors.text
-    font.pixelSize: Colors.fontSizeSmall
+    font.pixelSize: Appearance.fontSizeSmall
     font.weight: Font.DemiBold
     anchors.verticalCenter: parent.verticalCenter
   }

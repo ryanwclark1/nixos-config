@@ -70,7 +70,7 @@ Scope {
         Rectangle {
           id: content
           anchors.fill: parent
-          radius: Colors.radiusLarge
+          radius: Appearance.radiusLarge
           color: Colors.cardSurface
           border.color: Colors.border
           border.width: 1
@@ -111,8 +111,8 @@ Scope {
 
           RowLayout {
             anchors.fill: parent
-            anchors.margins: Colors.paddingSmall
-            spacing: Colors.spacingM
+            anchors.margins: Appearance.paddingSmall
+            spacing: Appearance.spacingM
 
             Image {
               Layout.preferredWidth: 60
@@ -128,18 +128,18 @@ Scope {
                 color: "transparent"
                 border.color: Colors.border
                 border.width: 1
-                radius: Colors.radiusXXS
+                radius: Appearance.radiusXXS
               }
             }
 
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: Colors.spacingXS
+              spacing: Appearance.spacingXS
 
               Text {
                 text: MediaService.trackTitle || "No Media"
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.bold: true
                 elide: Text.ElideRight
                 Layout.fillWidth: true
@@ -148,7 +148,7 @@ Scope {
               Text {
                 text: MediaService.trackArtist || "Unknown Artist"
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 elide: Text.ElideRight
                 Layout.fillWidth: true
               }
@@ -161,7 +161,7 @@ Scope {
               verticalAlignment: Text.AlignVCenter
               text: MediaService.isPlaying ? "󰏤" : "󰐊"
               color: Colors.text
-              font.family: Colors.fontMono
+              font.family: Appearance.fontMono
               font.pixelSize: 18
             }
           }

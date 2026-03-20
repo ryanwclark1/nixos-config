@@ -119,8 +119,8 @@ Item {
     Text {
       text: root.icon
       color: root.iconColor
-      font.pixelSize: Colors.fontSizeMedium
-      font.family: Colors.fontMono
+      font.pixelSize: Appearance.fontSizeMedium
+      font.family: Appearance.fontMono
     }
   }
 
@@ -132,14 +132,14 @@ Item {
       Text {
         text: root.icon
         color: root.iconColor
-        font.pixelSize: Colors.fontSizeMedium
-        font.family: Colors.fontMono
+        font.pixelSize: Appearance.fontSizeMedium
+        font.family: Appearance.fontMono
         anchors.horizontalCenter: parent.horizontalCenter
       }
 
       SharedWidgets.NumericText {
         text: root.compactValueText
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         anchors.horizontalCenter: parent.horizontalCenter
       }
     }
@@ -148,19 +148,19 @@ Item {
   Component {
     id: wideContent
     Row {
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
 
       Text {
         text: root.icon
         color: root.iconColor
-        font.pixelSize: Colors.fontSizeLarge
-        font.family: Colors.fontMono
+        font.pixelSize: Appearance.fontSizeLarge
+        font.family: Appearance.fontMono
         anchors.verticalCenter: parent.verticalCenter
       }
 
       SharedWidgets.NumericText {
         text: root.label + " " + root.valueText
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         anchors.verticalCenter: parent.verticalCenter
       }
     }

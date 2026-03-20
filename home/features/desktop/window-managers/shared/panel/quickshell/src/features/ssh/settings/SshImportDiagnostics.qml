@@ -15,7 +15,7 @@ SharedWidgets.CollapsibleSection {
 
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         SettingsInfoCallout {
             Layout.fillWidth: true
@@ -30,8 +30,8 @@ SharedWidgets.CollapsibleSection {
             delegate: Rectangle {
                 required property var modelData
                 Layout.fillWidth: true
-                implicitHeight: errorColumn.implicitHeight + Colors.spacingS * 2
-                radius: Colors.radiusSmall
+                implicitHeight: errorColumn.implicitHeight + Appearance.spacingS * 2
+                radius: Appearance.radiusSmall
                 color: Colors.withAlpha(Colors.warning, 0.08)
                 border.color: Colors.withAlpha(Colors.warning, 0.35)
                 border.width: 1
@@ -39,13 +39,13 @@ SharedWidgets.CollapsibleSection {
                 ColumnLayout {
                     id: errorColumn
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingXXS
+                    anchors.margins: Appearance.spacingS
+                    spacing: Appearance.spacingXXS
 
                     Text {
                         text: String(modelData.message || "Import error")
                         color: Colors.warning
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.DemiBold
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
@@ -54,8 +54,8 @@ SharedWidgets.CollapsibleSection {
                     Text {
                         text: String(modelData.path || "") + (Number(modelData.line || 0) > 0 ? (":" + String(modelData.line || 0)) : "")
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeXS
+                        font.family: Appearance.fontMono
                         Layout.fillWidth: true
                         wrapMode: Text.WrapAnywhere
                     }
@@ -69,8 +69,8 @@ SharedWidgets.CollapsibleSection {
             delegate: Rectangle {
                 required property var modelData
                 Layout.fillWidth: true
-                implicitHeight: skippedColumn.implicitHeight + Colors.spacingS * 2
-                radius: Colors.radiusSmall
+                implicitHeight: skippedColumn.implicitHeight + Appearance.spacingS * 2
+                radius: Appearance.radiusSmall
                 color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
@@ -78,13 +78,13 @@ SharedWidgets.CollapsibleSection {
                 ColumnLayout {
                     id: skippedColumn
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingXXS
+                    anchors.margins: Appearance.spacingS
+                    spacing: Appearance.spacingXXS
 
                     Text {
                         text: "Skipped pattern: " + String(modelData.alias || "")
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.DemiBold
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
@@ -93,8 +93,8 @@ SharedWidgets.CollapsibleSection {
                     Text {
                         text: String(modelData.sourcePath || "") + (Number(modelData.sourceLine || 0) > 0 ? (":" + String(modelData.sourceLine || 0)) : "")
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeXS
+                        font.family: Appearance.fontMono
                         Layout.fillWidth: true
                         wrapMode: Text.WrapAnywhere
                     }

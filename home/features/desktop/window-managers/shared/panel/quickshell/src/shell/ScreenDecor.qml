@@ -13,7 +13,7 @@ Scope {
     // Border properties
     readonly property color _frameColor: Colors.bg
     readonly property int _thickness: 7
-    readonly property int _borderRadius: Colors.radiusSmall
+    readonly property int _borderRadius: Appearance.radiusSmall
 
     Variants {
         model: Quickshell.screens
@@ -94,7 +94,7 @@ Scope {
                 height: root._thickness
                 anchors { top: parent.top; left: parent.left; right: parent.right }
                 color: root._frameColor
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
             }
 
             // Bottom bar
@@ -103,7 +103,7 @@ Scope {
                 height: root._thickness
                 anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
                 color: root._frameColor
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
             }
 
             // Left bar
@@ -113,7 +113,7 @@ Scope {
                 anchors { top: parent.top; bottom: parent.bottom; left: parent.left }
                 anchors.topMargin: root._thickness; anchors.bottomMargin: root._thickness
                 color: root._frameColor
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
             }
 
             // Right bar
@@ -123,7 +123,7 @@ Scope {
                 anchors { top: parent.top; bottom: parent.bottom; right: parent.right }
                 anchors.topMargin: root._thickness; anchors.bottomMargin: root._thickness
                 color: root._frameColor
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
             }
 
             // Border inner corner canvases

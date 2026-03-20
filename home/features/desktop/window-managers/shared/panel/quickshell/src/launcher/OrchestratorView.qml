@@ -5,28 +5,28 @@ import "../features/system/sections" as Modules
 
 ColumnLayout {
     id: root
-    spacing: Colors.spacingXL
+    spacing: Appearance.spacingXL
     Layout.fillWidth: true
     Layout.fillHeight: true
 
     // ── Header ─────────────────────────────────
     RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         ColumnLayout {
             spacing: 0
             Text {
                 text: "SYSTEM ORCHESTRATOR"
                 color: Colors.primary
-                font.pixelSize: Colors.fontSizeIcon
+                font.pixelSize: Appearance.fontSizeIcon
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingTight
+                font.letterSpacing: Appearance.letterSpacingTight
             }
             Text {
                 text: "Unified Command & Control • v7.0"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.Bold
             }
         }
@@ -38,7 +38,7 @@ ColumnLayout {
         Rectangle {
             width: 120
             height: 32
-            radius: Colors.radiusPill
+            radius: Appearance.radiusPill
             color: Colors.withAlpha(SystemStatus.isCritical ? Colors.error : Colors.primary, 0.15)
             border.color: SystemStatus.isCritical ? Colors.error : Colors.primary
             border.width: 1
@@ -47,9 +47,9 @@ ColumnLayout {
                 anchors.centerIn: parent
                 text: SystemStatus.overallStatus.toUpperCase()
                 color: SystemStatus.isCritical ? Colors.error : Colors.text
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingWide
+                font.letterSpacing: Appearance.letterSpacingWide
             }
         }
     }
@@ -59,29 +59,29 @@ ColumnLayout {
         columns: 2
         Layout.fillWidth: true
         Layout.fillHeight: true
-        columnSpacing: Colors.spacingXL
-        rowSpacing: Colors.spacingXL
+        columnSpacing: Appearance.spacingXL
+        rowSpacing: Appearance.spacingXL
 
         // Section 1: Fleet Workspaces
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             color: Colors.withAlpha(Colors.surface, 0.2)
             border.color: Colors.border
             border.width: 1
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.paddingLarge
-                spacing: Colors.spacingM
+                anchors.margins: Appearance.paddingLarge
+                spacing: Appearance.spacingM
 
                 Text {
                     text: "WORKSPACE FLEET"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingWide
+                    font.letterSpacing: Appearance.letterSpacingWide
                 }
 
                 Flickable {
@@ -94,8 +94,8 @@ ColumnLayout {
                     GridLayout {
                         id: wsGrid
                         columns: 2
-                        columnSpacing: Colors.spacingM
-                        rowSpacing: Colors.spacingM
+                        columnSpacing: Appearance.spacingM
+                        rowSpacing: Appearance.spacingM
                         width: parent.width
 
                         Repeater {
@@ -103,20 +103,20 @@ ColumnLayout {
                             delegate: Rectangle {
                                 Layout.fillWidth: true
                                 height: 140
-                                radius: Colors.radiusMedium
+                                radius: Appearance.radiusMedium
                                 color: modelData.is_focused ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.3)
                                 border.color: modelData.is_focused ? Colors.primary : Colors.border
                                 border.width: 1
 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    anchors.margins: Colors.spacingM
-                                    spacing: Colors.spacingS
+                                    anchors.margins: Appearance.spacingM
+                                    spacing: Appearance.spacingS
                                     RowLayout {
                                         Text {
                                             text: modelData.name || modelData.id
                                             color: modelData.is_focused ? Colors.primary : Colors.text
-                                            font.pixelSize: Colors.fontSizeSmall
+                                            font.pixelSize: Appearance.fontSizeSmall
                                             font.weight: Font.Bold
                                         }
                                         Item {
@@ -125,7 +125,7 @@ ColumnLayout {
                                         Text {
                                             text: modelData.windows + " windows"
                                             color: Colors.textDisabled
-                                            font.pixelSize: Colors.fontSizeXXS
+                                            font.pixelSize: Appearance.fontSizeXXS
                                         }
                                     }
 
@@ -133,7 +133,7 @@ ColumnLayout {
                                     Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        radius: Colors.radiusMicro
+                                        radius: Appearance.radiusMicro
                                         color: Colors.withAlpha(Colors.background, 0.4)
                                         clip: true
 
@@ -142,7 +142,7 @@ ColumnLayout {
                                             text: "󱗼"
                                             color: Colors.textDisabled
                                             opacity: 0.2
-                                            font.pixelSize: Colors.fontSizeIcon
+                                            font.pixelSize: Appearance.fontSizeIcon
                                         }
                                     }
                                 }
@@ -157,26 +157,26 @@ ColumnLayout {
         ColumnLayout {
             Layout.preferredWidth: 380
             Layout.fillHeight: true
-            spacing: Colors.spacingXL
+            spacing: Appearance.spacingXL
 
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                radius: Colors.radiusLarge
+                radius: Appearance.radiusLarge
                 color: Colors.withAlpha(Colors.surface, 0.2)
                 border.color: Colors.border
                 border.width: 1
 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: Colors.paddingLarge
-                    spacing: Colors.spacingL
+                    anchors.margins: Appearance.paddingLarge
+                    spacing: Appearance.spacingL
                     Text {
                         text: "TELEMETRY HEATMAP"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.Black
-                        font.letterSpacing: Colors.letterSpacingWide
+                        font.letterSpacing: Appearance.letterSpacingWide
                     }
 
                     Modules.SystemGraphs {
@@ -199,34 +199,34 @@ ColumnLayout {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 220
-                radius: Colors.radiusLarge
+                radius: Appearance.radiusLarge
                 color: Colors.withAlpha(Colors.surface, 0.2)
                 border.color: Colors.accent
                 border.width: 1
 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: Colors.paddingLarge
-                    spacing: Colors.spacingM
+                    anchors.margins: Appearance.paddingLarge
+                    spacing: Appearance.spacingM
                     Text {
                         text: "ACTIVE MISSION"
                         color: Colors.accent
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.Black
-                        font.letterSpacing: Colors.letterSpacingWide
+                        font.letterSpacing: Appearance.letterSpacingWide
                     }
 
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        radius: Colors.radiusXS
+                        radius: Appearance.radiusXS
                         color: Colors.withAlpha(Colors.background, 0.4)
                         Text {
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
+                            anchors.margins: Appearance.spacingM
                             text: AiService.isStreaming ? AiService.streamingContent : (AiService.activeMessages.length > 0 ? AiService.activeMessages[AiService.activeMessages.length - 1].content : "Listening for commands...")
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             wrapMode: Text.Wrap
                             elide: Text.ElideRight
                         }

@@ -144,7 +144,7 @@ Scope {
         Rectangle {
           id: content
           anchors.fill: parent
-          radius: Colors.radiusLarge
+          radius: Appearance.radiusLarge
           color: Colors.cardSurface
           border.color: Colors.border
           border.width: 1
@@ -185,7 +185,7 @@ Scope {
 
           ColumnLayout {
             anchors.centerIn: parent
-            spacing: Colors.spacingLG
+            spacing: Appearance.spacingLG
 
             AppIcon {
               Layout.alignment: Qt.AlignHCenter
@@ -199,8 +199,8 @@ Scope {
               Layout.alignment: Qt.AlignHCenter
               text: root.specialIcon
               color: Colors.primary
-              font.pixelSize: Colors.fontSizeGigantic
-              font.family: Colors.fontMono
+              font.pixelSize: Appearance.fontSizeGigantic
+              font.family: Appearance.fontMono
               visible: root.isSpecial && root.specialIcon !== ""
             }
 
@@ -208,7 +208,7 @@ Scope {
               Layout.alignment: Qt.AlignHCenter
               text: root.workspaceName
               color: Colors.text
-              font.pixelSize: Colors.fontSizeDisplay
+              font.pixelSize: Appearance.fontSizeDisplay
               font.bold: true
             }
           }

@@ -70,19 +70,19 @@ Item {
         }
 
         Row {
-            spacing: Colors.spacingSM
+            spacing: Appearance.spacingSM
 
             Text {
                 text: "󰣀"
                 color: sshData.importErrors.length > 0 ? Colors.warning : Colors.primary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeMedium
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeMedium
             }
 
             Text {
                 text: sshData.importBusy ? "Refreshing..." : sshData.summaryLabel()
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.Medium
             }
         }

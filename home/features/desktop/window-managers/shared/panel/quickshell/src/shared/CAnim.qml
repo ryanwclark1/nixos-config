@@ -2,6 +2,6 @@ import QtQuick
 import "../services"
 
 ColorAnimation {
-    duration: Colors.durationFast
+    duration: Appearance.durationFast
     easing.type: Easing.OutCubic
 }

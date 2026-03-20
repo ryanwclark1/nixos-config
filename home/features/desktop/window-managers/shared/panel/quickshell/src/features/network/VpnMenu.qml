@@ -60,17 +60,17 @@ BasePopupMenu {
     SharedWidgets.ScrollableContent {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        columnSpacing: Colors.spacingM
+        columnSpacing: Appearance.spacingM
 
         Rectangle {
             id: mainStatusCard
             readonly property color _statusClr: root.statusColor(NetworkService.vpnPrimaryStatus)
             Layout.fillWidth: true
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             color: Colors.popupSurface
             border.color: Colors.withAlpha(_statusClr, 0.45)
             border.width: 1
-            implicitHeight: mainStatusLayout.implicitHeight + (Colors.spacingM * 2)
+            implicitHeight: mainStatusLayout.implicitHeight + (Appearance.spacingM * 2)
 
             gradient: SharedWidgets.SurfaceGradient {}
             SharedWidgets.InnerHighlight {}
@@ -78,28 +78,28 @@ BasePopupMenu {
             ColumnLayout {
                 id: mainStatusLayout
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingM
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingM
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
 
                     Text {
                         text: "󰖩"
                         color: mainStatusCard._statusClr
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeHuge
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeHuge
                     }
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
+                        spacing: Appearance.spacingXXS
 
                         Text {
                             text: NetworkService.vpnPrimaryLabel
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeLarge
+                            font.pixelSize: Appearance.fontSizeLarge
                             font.weight: Font.DemiBold
                             Layout.fillWidth: true
                             elide: Text.ElideRight
@@ -108,14 +108,14 @@ BasePopupMenu {
                         Text {
                             text: NetworkService.vpnPrimaryDetail
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             Layout.fillWidth: true
                             elide: Text.ElideRight
                         }
                     }
 
                     Rectangle {
-                        radius: Colors.radiusPill
+                        radius: Appearance.radiusPill
                         color: Colors.withAlpha(mainStatusCard._statusClr, 0.14)
                         border.color: Colors.withAlpha(mainStatusCard._statusClr, 0.38)
                         border.width: 1
@@ -127,7 +127,7 @@ BasePopupMenu {
                             anchors.centerIn: parent
                             text: NetworkService.vpnStatusLabel(NetworkService.vpnPrimaryStatus)
                             color: mainStatusCard._statusClr
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.DemiBold
                         }
                     }
@@ -136,7 +136,7 @@ BasePopupMenu {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SharedWidgets.Chip {
                         visible: NetworkService.tailscaleIp !== ""
@@ -174,7 +174,7 @@ BasePopupMenu {
                 Rectangle {
                     Layout.fillWidth: true
                     implicitHeight: 40
-                    radius: Colors.radiusMedium
+                    radius: Appearance.radiusMedium
                     color: NetworkService.vpnPrimaryStatus === "connected"
                         ? Colors.withAlpha(Colors.error, 0.14)
                         : Colors.primaryStrong
@@ -185,7 +185,7 @@ BasePopupMenu {
                         anchors.centerIn: parent
                         text: NetworkService.vpnPrimaryStatus === "connected" ? "Disconnect Tailscale" : "Connect Tailscale"
                         color: NetworkService.vpnPrimaryStatus === "connected" ? Colors.error : Colors.primary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Medium
                     }
 
@@ -206,7 +206,7 @@ BasePopupMenu {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             visible: NetworkService.vpnOtherCount > 0
 
             SharedWidgets.SectionLabel { label: "Active VPN Profiles" }
@@ -224,7 +224,7 @@ BasePopupMenu {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             visible: NetworkService.vpnInactiveCount > 0
 
             SharedWidgets.SectionLabel { label: "Available VPN Profiles" }
@@ -244,27 +244,27 @@ BasePopupMenu {
             Layout.fillWidth: true
             visible: !NetworkService.vpnHasSavedProfiles
             implicitHeight: 76
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
 
             Column {
                 anchors.centerIn: parent
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 Text {
                     text: "󰖂"
                     color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXL
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Text {
                     text: "No saved NetworkManager VPN profiles"
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
@@ -273,22 +273,22 @@ BasePopupMenu {
         Rectangle {
             Layout.fillWidth: true
             implicitHeight: 56
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingM
-                spacing: Colors.spacingS
+                anchors.leftMargin: Appearance.spacingM
+                anchors.rightMargin: Appearance.spacingM
+                spacing: Appearance.spacingS
 
                 Text {
                     text: "󰖩"
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
                 }
 
                 ColumnLayout {
@@ -298,14 +298,14 @@ BasePopupMenu {
                     Text {
                         text: "Open Networking"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Medium
                     }
 
                     Text {
                         text: "Wi-Fi, routes, and connectivity details"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                     }
                 }
             }

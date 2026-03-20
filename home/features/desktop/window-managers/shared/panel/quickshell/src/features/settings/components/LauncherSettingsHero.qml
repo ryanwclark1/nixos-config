@@ -20,34 +20,34 @@ Rectangle {
     })
 
     Layout.fillWidth: true
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     color: Colors.withAlpha(Colors.primary, 0.08)
     border.color: Colors.primaryMarked
     border.width: 1
-    implicitHeight: heroColumn.implicitHeight + (compactMode ? Colors.spacingM * 2 : Colors.spacingL * 2)
+    implicitHeight: heroColumn.implicitHeight + (compactMode ? Appearance.spacingM * 2 : Appearance.spacingL * 2)
 
     ColumnLayout {
         id: heroColumn
         anchors.fill: parent
-        anchors.margins: compactMode ? Colors.spacingM : Colors.spacingL
-        spacing: Colors.spacingM
+        anchors.margins: compactMode ? Appearance.spacingM : Appearance.spacingL
+        spacing: Appearance.spacingM
 
         Text {
             text: "LAUNCHER CONTROL DECK"
             color: Colors.primary
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Black
-            font.letterSpacing: Colors.letterSpacingExtraWide
+            font.letterSpacing: Appearance.letterSpacingExtraWide
         }
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             Rectangle {
                 width: compactMode ? 42 : 48
                 height: width
-                radius: Colors.radiusLarge
+                radius: Appearance.radiusLarge
                 color: Colors.primarySubtle
                 border.color: Colors.primaryRing
                 border.width: 1
@@ -56,20 +56,20 @@ Rectangle {
                     anchors.centerIn: parent
                     text: tabMeta ? String(tabMeta.icon || "󰍉") : "󰍉"
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL
+                    font.family: Appearance.fontMono
+                    font.pixelSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
                 }
             }
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
+                spacing: Appearance.spacingXXS
 
                 Text {
                     Layout.fillWidth: true
                     text: root.titleText
                     color: Colors.text
-                    font.pixelSize: compactMode ? Colors.fontSizeXL : Colors.fontSizeHuge
+                    font.pixelSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeHuge
                     font.weight: Font.Black
                     wrapMode: Text.WordWrap
                 }
@@ -78,7 +78,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: root.descriptionText
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     wrapMode: Text.WordWrap
                 }
             }
@@ -86,7 +86,7 @@ Rectangle {
 
         Flow {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Repeater {
                 model: root.launcherTabs
@@ -96,7 +96,7 @@ Rectangle {
 
                     readonly property bool selected: String(modelData.id || "") === root.tabId
 
-                    radius: Colors.radiusPill
+                    radius: Appearance.radiusPill
                     color: selected ? Colors.primarySubtle : Colors.withAlpha(Colors.surface, 0.7)
                     border.color: selected ? Colors.primaryRing : Colors.border
                     border.width: 1
@@ -106,19 +106,19 @@ Rectangle {
                     RowLayout {
                         id: tabChipRow
                         anchors.centerIn: parent
-                        spacing: Colors.spacingXS
+                        spacing: Appearance.spacingXS
 
                         Text {
                             text: modelData.icon || "󰍉"
                             color: selected ? Colors.primary : Colors.textSecondary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeXS
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeXS
                         }
 
                         Text {
                             text: modelData.label || ""
                             color: selected ? Colors.primary : Colors.text
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: selected ? Font.Bold : Font.DemiBold
                         }
                     }

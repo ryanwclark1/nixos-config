@@ -6,7 +6,7 @@ Loader {
     id: root
     property string icon: ""
     property color iconColor: Colors.primary
-    property int iconSize: Colors.fontSizeLarge
+    property int iconSize: Appearance.fontSizeLarge
 
     sourceComponent: root.icon.endsWith(".svg") ? _svgComp : _nerdComp
 
@@ -19,7 +19,7 @@ Loader {
         Text {
             text: root.icon
             color: root.iconColor
-            font.family: Colors.fontMono
+            font.family: Appearance.fontMono
             font.pixelSize: root.iconSize
         }
     }

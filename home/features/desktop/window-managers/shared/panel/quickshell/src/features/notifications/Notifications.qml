@@ -16,9 +16,9 @@ PanelWindow {
     right: Config.notifPosition.indexOf("right") !== -1 || Config.notifPosition === "top" || Config.notifPosition === "bottom"
   }
   margins.top: edgeMargins.top
-  margins.right: Math.max(edgeMargins.right, Colors.spacingS)
+  margins.right: Math.max(edgeMargins.right, Appearance.spacingS)
   margins.bottom: edgeMargins.bottom || edgeMargins.top
-  margins.left: Math.max(edgeMargins.left || edgeMargins.right, Colors.spacingS)
+  margins.left: Math.max(edgeMargins.left || edgeMargins.right, Appearance.spacingS)
 
   implicitWidth: Config.notifWidth
   implicitHeight: Math.max(1, col.implicitHeight)
@@ -39,7 +39,7 @@ PanelWindow {
   ColumnLayout {
     id: col
     width: Config.notifWidth
-    spacing: Colors.paddingSmall
+    spacing: Appearance.paddingSmall
 
     Repeater {
       model: root.manager ? root.manager.notifications : null
@@ -92,7 +92,7 @@ PanelWindow {
         }
 
         Timer { id: entranceTimer; onTriggered: entranceAnim.start() }
-        NumberAnimation { id: entranceAnim; target: notifWrapper; property: "entranceProgress"; to: 1.0; duration: Colors.durationEmphasis; easing.type: Easing.OutQuint }
+        NumberAnimation { id: entranceAnim; target: notifWrapper; property: "entranceProgress"; to: 1.0; duration: Appearance.durationEmphasis; easing.type: Easing.OutQuint }
 
         // User-initiated dismiss: removes from both popup and notification center
         function animatedDismiss() {
@@ -124,8 +124,8 @@ PanelWindow {
 
         ParallelAnimation {
           id: dismissAnim
-          NumberAnimation { target: notifWrapper; property: "exitProgress"; to: 0; duration: Colors.durationPanelOpen; easing.type: Easing.InCubic }
-          NumberAnimation { target: notifWrapper; property: "x"; to: notifWrapper.width + 40; duration: Colors.durationPanelOpen; easing.type: Easing.InCubic }
+          NumberAnimation { target: notifWrapper; property: "exitProgress"; to: 0; duration: Appearance.durationPanelOpen; easing.type: Easing.InCubic }
+          NumberAnimation { target: notifWrapper; property: "x"; to: notifWrapper.width + 40; duration: Appearance.durationPanelOpen; easing.type: Easing.InCubic }
           onFinished: {
             if (!notification) return;
             if (notifWrapper._isAutoExpiry) {
@@ -164,7 +164,7 @@ PanelWindow {
             anchors.top: parent.top
             anchors.left: parent.left
             height: 3
-            radius: Colors.radiusXS
+            radius: Appearance.radiusXS
             color: notifWrapper.isUrgent ? Colors.error : Colors.primary
             opacity: 0.6
             width: parent.width * (1.0 - dismissTimer.dismissProgress)

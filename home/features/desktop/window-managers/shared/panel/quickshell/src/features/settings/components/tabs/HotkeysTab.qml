@@ -171,9 +171,9 @@ Item {
                 visible: root.keybindsList.length === 0
                 text: "Loading keybindings…"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: Colors.spacingLG
+                Layout.topMargin: Appearance.spacingLG
             }
 
             Repeater {
@@ -198,13 +198,13 @@ Item {
                         Flow {
                             Layout.fillWidth: true
                             width: parent.width
-                            spacing: Colors.spacingS
+                            spacing: Appearance.spacingS
 
                             Rectangle {
                                 id: chordBadge
                                 implicitWidth: Math.min(parent.width, chordText.implicitWidth + 16)
                                 height: 26
-                                radius: Colors.radiusXXS
+                                radius: Appearance.radiusXXS
                                 color: Colors.highlight
                                 border.color: Colors.primary
                                 border.width: 1
@@ -222,8 +222,8 @@ Item {
                                     }
                                     width: Math.max(0, parent.width - 12)
                                     color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.family: Appearance.fontMono
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     font.weight: Font.DemiBold
                                     elide: Text.ElideRight
                                 }
@@ -232,11 +232,11 @@ Item {
                             Text {
                                 text: modelData.dispatcher
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.DemiBold
                                 width: (root.compactMode || chordBadge.width > parent.width * 0.45)
                                     ? parent.width
-                                    : Math.max(0, parent.width - chordBadge.width - Colors.spacingS)
+                                    : Math.max(0, parent.width - chordBadge.width - Appearance.spacingS)
                                 elide: Text.ElideRight
                             }
                         }
@@ -244,8 +244,8 @@ Item {
                         Text {
                             text: modelData.arg || "—"
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
-                            font.family: modelData.arg ? Colors.fontMono : ""
+                            font.pixelSize: Appearance.fontSizeSmall
+                            font.family: modelData.arg ? Appearance.fontMono : ""
                             Layout.fillWidth: true
                             wrapMode: Text.WrapAnywhere
                         }

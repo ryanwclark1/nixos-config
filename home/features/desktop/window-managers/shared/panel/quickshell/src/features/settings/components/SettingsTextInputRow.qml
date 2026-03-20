@@ -21,26 +21,26 @@ ColumnLayout {
     default property alias actions: actionsRow.data
     readonly property bool narrowLayout: width < 480
 
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
     Layout.fillWidth: true
 
     Text {
         visible: root.label !== ""
         text: root.label
         color: Colors.text
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         font.weight: Font.Medium
     }
 
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Rectangle {
             id: inputContainer
             Layout.fillWidth: true
-            height: Colors.controlRowHeight
-            radius: Colors.radiusSmall
+            height: Appearance.controlRowHeight
+            radius: Appearance.radiusSmall
             color: Colors.modalFieldSurface
             border.color: root.highlighted ? Colors.primary : input.activeFocus ? Colors.primary : Colors.border
             border.width: 1
@@ -62,29 +62,29 @@ ColumnLayout {
                     property real _opacity: 0
                     running: root.highlighted
                     loops: 2
-                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
-                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Colors.durationSlow; easing.type: Easing.InCubic }
+                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Appearance.durationSlow; easing.type: Easing.OutCubic }
+                    NumberAnimation { target: textHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Appearance.durationSlow; easing.type: Easing.InCubic }
                 }
             }
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingM
-                spacing: Colors.spacingS
+                anchors.leftMargin: Appearance.spacingM
+                anchors.rightMargin: Appearance.spacingM
+                spacing: Appearance.spacingS
 
                 Loader {
                     visible: root.leadingIcon !== ""
                     sourceComponent: root.leadingIcon.endsWith(".svg") ? _tiSvg : _tiNerd
                 }
-                Component { id: _tiSvg; SvgIcon { source: root.leadingIcon; color: Colors.textDisabled; size: Colors.fontSizeLarge } }
-                Component { id: _tiNerd; Text { text: root.leadingIcon; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
+                Component { id: _tiSvg; SvgIcon { source: root.leadingIcon; color: Colors.textDisabled; size: Appearance.fontSizeLarge } }
+                Component { id: _tiNerd; Text { text: root.leadingIcon; color: Colors.textDisabled; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
 
                 TextInput {
                     id: input
                     Layout.fillWidth: true
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     clip: true
                     selectByMouse: true
                     selectedTextColor: Colors.text
@@ -108,8 +108,8 @@ ColumnLayout {
                     visible: root.showClearButton && input.text.length > 0
                     text: "󰅖"
                     color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
 
                     MouseArea {
                         anchors.fill: parent
@@ -124,7 +124,7 @@ ColumnLayout {
             id: actionsRow
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
         }
     }
 
@@ -132,6 +132,6 @@ ColumnLayout {
         visible: root.errorText !== ""
         text: root.errorText
         color: Colors.error
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
     }
 }

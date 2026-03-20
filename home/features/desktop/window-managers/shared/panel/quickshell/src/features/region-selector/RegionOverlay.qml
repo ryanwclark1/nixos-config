@@ -151,10 +151,10 @@ PanelWindow {
         Rectangle {
             visible: root.dragging && root.hasRegion
             x: root.regionX + root.regionWidth - width
-            y: root.regionY + root.regionHeight + Colors.spacingS
-            width: dimLabel.implicitWidth + Colors.spacingM * 2
-            height: dimLabel.implicitHeight + Colors.spacingXS * 2
-            radius: Colors.radiusXS
+            y: root.regionY + root.regionHeight + Appearance.spacingS
+            width: dimLabel.implicitWidth + Appearance.spacingM * 2
+            height: dimLabel.implicitHeight + Appearance.spacingXS * 2
+            radius: Appearance.radiusXS
             color: Colors.popupSurface
             border.color: Colors.border
             border.width: 1
@@ -165,8 +165,8 @@ PanelWindow {
                 anchors.centerIn: parent
                 text: Math.round(root.regionWidth) + " x " + Math.round(root.regionHeight)
                 color: Colors.text
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeSmall
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeSmall
             }
         }
     }

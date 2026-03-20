@@ -43,25 +43,25 @@ PanelWindow {
         anchors.centerIn: parent
         width: Math.min(parent.width - 80, 1200)
         height: Math.min(parent.height - 80, 800)
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
-            spacing: Colors.spacingL
+            anchors.margins: Appearance.paddingLarge
+            spacing: Appearance.spacingL
 
             // Header
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Text {
                     text: "Wallhaven"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeXL
+                    font.pixelSize: Appearance.fontSizeXL
                     font.weight: Font.Bold
                 }
 
@@ -69,7 +69,7 @@ PanelWindow {
 
                 SharedWidgets.IconButton {
                     icon: "dismiss.svg"
-                    size: Colors.iconSizeMedium
+                    size: Appearance.iconSizeMedium
                     onClicked: root.closeRequested()
                 }
             }
@@ -77,7 +77,7 @@ PanelWindow {
             // Search bar
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 SharedWidgets.SearchBar {
                     id: searchBar
@@ -93,15 +93,15 @@ PanelWindow {
                 }
 
                 Rectangle {
-                    width: 80; height: Colors.controlRowHeight
-                    radius: Colors.radiusSmall
+                    width: 80; height: Appearance.controlRowHeight
+                    radius: Appearance.radiusSmall
                     color: Colors.primaryStrong
 
                     Text {
                         anchors.centerIn: parent
                         text: "Search"
                         color: Colors.primary
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: Appearance.fontSizeMedium
                         font.weight: Font.DemiBold
                     }
 
@@ -122,7 +122,7 @@ PanelWindow {
                 visible: WallhavenService.error !== ""
                 text: WallhavenService.error
                 color: Colors.error
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 Layout.fillWidth: true
             }
 
@@ -146,8 +146,8 @@ PanelWindow {
                     id: resultsGrid
                     width: parent.width
                     columns: Math.max(1, Math.floor(width / 260))
-                    rowSpacing: Colors.spacingM
-                    columnSpacing: Colors.spacingM
+                    rowSpacing: Appearance.spacingM
+                    columnSpacing: Appearance.spacingM
 
                     Repeater {
                         model: WallhavenService.results
@@ -158,7 +158,7 @@ PanelWindow {
 
                             Layout.fillWidth: true
                             implicitHeight: 180
-                            radius: Colors.radiusSmall
+                            radius: Appearance.radiusSmall
                             color: Colors.cardSurface
                             border.color: thumbHover.containsMouse ? Colors.primary : Colors.border
                             border.width: 1
@@ -176,9 +176,9 @@ PanelWindow {
                             Rectangle {
                                 anchors.bottom: parent.bottom
                                 anchors.right: parent.right
-                                anchors.margins: Colors.spacingXS
-                                height: 20; radius: Colors.radiusXS
-                                width: resText.implicitWidth + Colors.spacingS * 2
+                                anchors.margins: Appearance.spacingXS
+                                height: 20; radius: Appearance.radiusXS
+                                width: resText.implicitWidth + Appearance.spacingS * 2
                                 color: Colors.withAlpha(Colors.background, 0.8)
 
                                 Text {
@@ -186,7 +186,7 @@ PanelWindow {
                                     anchors.centerIn: parent
                                     text: modelData.resolution || ""
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                 }
                             }
 
@@ -199,20 +199,20 @@ PanelWindow {
 
                                 ColumnLayout {
                                     anchors.centerIn: parent
-                                    spacing: Colors.spacingS
+                                    spacing: Appearance.spacingS
 
                                     Text {
                                         text: "\u{F0552}"
                                         color: Colors.primary
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.iconSizeMedium
+                                        font.family: Appearance.fontMono
+                                        font.pixelSize: Appearance.iconSizeMedium
                                         Layout.alignment: Qt.AlignHCenter
                                     }
 
                                     Text {
                                         text: "Download & Apply"
                                         color: Colors.text
-                                        font.pixelSize: Colors.fontSizeMedium
+                                        font.pixelSize: Appearance.fontSizeMedium
                                         font.weight: Font.DemiBold
                                         Layout.alignment: Qt.AlignHCenter
                                     }
@@ -250,28 +250,28 @@ PanelWindow {
             // Pagination
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
                 visible: WallhavenService.totalPages > 1
 
                 Item { Layout.fillWidth: true }
 
                 Rectangle {
-                    width: 70; height: 32; radius: Colors.radiusSmall
+                    width: 70; height: 32; radius: Appearance.radiusSmall
                     color: WallhavenService.currentPage > 1 ? Colors.primaryStrong : Colors.textFaint
-                    Text { anchors.centerIn: parent; text: "Prev"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
+                    Text { anchors.centerIn: parent; text: "Prev"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall }
                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: WallhavenService.prevPage() }
                 }
 
                 Text {
                     text: WallhavenService.currentPage + " / " + WallhavenService.totalPages
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
 
                 Rectangle {
-                    width: 70; height: 32; radius: Colors.radiusSmall
+                    width: 70; height: 32; radius: Appearance.radiusSmall
                     color: WallhavenService.currentPage < WallhavenService.totalPages ? Colors.primaryStrong : Colors.textFaint
-                    Text { anchors.centerIn: parent; text: "Next"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall }
+                    Text { anchors.centerIn: parent; text: "Next"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall }
                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: WallhavenService.nextPage() }
                 }
 

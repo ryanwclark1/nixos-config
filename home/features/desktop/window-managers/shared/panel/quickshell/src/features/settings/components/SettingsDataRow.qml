@@ -14,8 +14,8 @@ Rectangle {
     readonly property bool narrowLayout: width < 420
 
     Layout.fillWidth: true
-    implicitHeight: dataContent.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusXS
+    implicitHeight: dataContent.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusXS
     color: Colors.modalFieldSurface
     border.color: Colors.border
     border.width: 1
@@ -23,16 +23,16 @@ Rectangle {
     ColumnLayout {
         id: dataContent
         anchors.fill: parent
-        anchors.leftMargin: Colors.spacingM
-        anchors.rightMargin: Colors.spacingM
-        anchors.topMargin: Colors.spacingM
-        anchors.bottomMargin: Colors.spacingM
-        spacing: Colors.spacingM
+        anchors.leftMargin: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingM
+        anchors.topMargin: Appearance.spacingM
+        anchors.bottomMargin: Appearance.spacingM
+        spacing: Appearance.spacingM
 
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             Loader {
                 visible: root.iconName !== ""
@@ -40,15 +40,15 @@ Rectangle {
             }
             Component {
                 id: _svgIcon
-                Shared.SvgIcon { source: root.iconName; color: Colors.primary; size: Colors.fontSizeXL }
+                Shared.SvgIcon { source: root.iconName; color: Colors.primary; size: Appearance.fontSizeXL }
             }
             Component {
                 id: _nerdIcon
                 Text {
                     text: root.iconName
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXL
                 }
             }
 
@@ -56,7 +56,7 @@ Rectangle {
                 width: root.narrowLayout ? parent.width : root.labelWidth
                 text: root.label
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 wrapMode: Text.WordWrap
             }
         }
@@ -64,8 +64,8 @@ Rectangle {
         Text {
             text: root.value
             color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
-            font.family: root.monoValue ? Colors.fontMono : ""
+            font.pixelSize: Appearance.fontSizeMedium
+            font.family: root.monoValue ? Appearance.fontMono : ""
             Layout.fillWidth: true
             wrapMode: Text.WrapAnywhere
         }

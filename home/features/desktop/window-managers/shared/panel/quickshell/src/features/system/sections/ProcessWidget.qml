@@ -453,18 +453,18 @@ SharedWidgets.CardBase {
             id: processColumn
             anchors.left: parent.left
             anchors.right: parent.right
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     text: "PROCESS TABLE"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Bold
-                    font.letterSpacing: Colors.letterSpacingWide
+                    font.letterSpacing: Appearance.letterSpacingWide
                 }
 
                 Item {
@@ -481,7 +481,7 @@ SharedWidgets.CardBase {
                 SharedWidgets.IconButton {
                     icon: "arrow-clockwise.svg"
                     size: 28
-                    iconSize: Colors.fontSizeSmall
+                    iconSize: Appearance.fontSizeSmall
                     iconColor: Colors.textSecondary
                     tooltipText: "Refresh"
                     onClicked: ProcessService.refresh()
@@ -495,7 +495,7 @@ SharedWidgets.CardBase {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 SharedWidgets.FilterChip {
                     label: "All"
@@ -556,29 +556,29 @@ SharedWidgets.CardBase {
 
             Rectangle {
                 Layout.fillWidth: true
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.cardSurface
                 border.color: keyboardFocused ? Colors.primary : Colors.border
                 border.width: 1
-                implicitHeight: tableColumn.implicitHeight + Colors.spacingS * 2
+                implicitHeight: tableColumn.implicitHeight + Appearance.spacingS * 2
 
                 ColumnLayout {
                     id: tableColumn
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingS
+                    anchors.margins: Appearance.spacingS
+                    spacing: Appearance.spacingS
 
                     Rectangle {
                         Layout.fillWidth: true
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.withAlpha(Colors.highlight, 0.35)
-                        implicitHeight: headerRow.implicitHeight + Colors.spacingXS * 2
+                        implicitHeight: headerRow.implicitHeight + Appearance.spacingXS * 2
 
                         RowLayout {
                             id: headerRow
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingXS
-                            spacing: Colors.spacingS
+                            anchors.margins: Appearance.spacingXS
+                            spacing: Appearance.spacingS
 
                             Repeater {
                                 model: [
@@ -606,7 +606,7 @@ SharedWidgets.CardBase {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: root.headerLabel(modelData.label, modelData.key)
                                         color: root.sortField === modelData.key ? Colors.primary : Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         font.weight: Font.Bold
                                         elide: Text.ElideRight
                                         horizontalAlignment: modelData.key === "name" ? Text.AlignLeft : Text.AlignRight
@@ -631,7 +631,7 @@ SharedWidgets.CardBase {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
+                        spacing: Appearance.spacingXXS
                         visible: root.visibleProcesses.length > 0
 
                         Repeater {
@@ -641,24 +641,24 @@ SharedWidgets.CardBase {
                                 required property var modelData
                                 readonly property bool selected: (modelData.pid || 0) === root.selectedPid
                                 Layout.fillWidth: true
-                                radius: Colors.radiusSmall
+                                radius: Appearance.radiusSmall
                                 color: selected ? Colors.highlight : "transparent"
                                 border.color: selected ? Colors.primary : "transparent"
                                 border.width: 1
-                                implicitHeight: rowLayout.implicitHeight + Colors.spacingXS * 2
+                                implicitHeight: rowLayout.implicitHeight + Appearance.spacingXS * 2
 
                                 RowLayout {
                                     id: rowLayout
                                     anchors.fill: parent
-                                    anchors.margins: Colors.spacingXS
-                                    spacing: Colors.spacingS
+                                    anchors.margins: Appearance.spacingXS
+                                    spacing: Appearance.spacingS
 
                                     Text {
                                         Layout.preferredWidth: 72
                                         text: String(modelData.pid || 0)
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.family: Colors.fontMono
+                                        font.pixelSize: Appearance.fontSizeXS
+                                        font.family: Appearance.fontMono
                                         horizontalAlignment: Text.AlignRight
                                     }
 
@@ -666,13 +666,13 @@ SharedWidgets.CardBase {
                                         Layout.preferredWidth: 104
                                         text: String(modelData.user || "")
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         elide: Text.ElideRight
                                     }
 
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        spacing: Colors.spacingXS
+                                        spacing: Appearance.spacingXS
 
                                         Item {
                                             Layout.preferredWidth: Math.min(84, Number(modelData._depth || 0) * 12)
@@ -684,7 +684,7 @@ SharedWidgets.CardBase {
                                             enabled: !!modelData._hasChildren
                                             icon: modelData._hasChildren ? (modelData._collapsed ? "󰅀" : "󰅂") : "󰧼"
                                             size: 18
-                                            iconSize: Colors.fontSizeXS
+                                            iconSize: Appearance.fontSizeXS
                                             iconColor: selected ? Colors.primary : Colors.textDisabled
                                             tooltipText: modelData._collapsed ? "Expand" : "Collapse"
                                             onClicked: {
@@ -699,7 +699,7 @@ SharedWidgets.CardBase {
                                             Layout.fillWidth: true
                                             text: String(modelData.name || "process")
                                             color: Colors.text
-                                            font.pixelSize: Colors.fontSizeXS
+                                            font.pixelSize: Appearance.fontSizeXS
                                             font.weight: selected ? Font.DemiBold : Font.Medium
                                             elide: Text.ElideRight
                                         }
@@ -710,8 +710,8 @@ SharedWidgets.CardBase {
                                                 ? ("+" + String(modelData._descendantCount || 0))
                                                 : String(modelData._descendantCount || 0)
                                             color: selected ? Colors.primary : Colors.textDisabled
-                                            font.pixelSize: Colors.fontSizeXS
-                                            font.family: Colors.fontMono
+                                            font.pixelSize: Appearance.fontSizeXS
+                                            font.family: Appearance.fontMono
                                         }
                                     }
 
@@ -719,8 +719,8 @@ SharedWidgets.CardBase {
                                         Layout.preferredWidth: 74
                                         text: Number(modelData.cpu || 0).toFixed(1)
                                         color: Number(modelData.cpu || 0) >= 20 ? Colors.primary : Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.family: Colors.fontMono
+                                        font.pixelSize: Appearance.fontSizeXS
+                                        font.family: Appearance.fontMono
                                         horizontalAlignment: Text.AlignRight
                                     }
 
@@ -728,8 +728,8 @@ SharedWidgets.CardBase {
                                         Layout.preferredWidth: 74
                                         text: Number(modelData.mem || 0).toFixed(1)
                                         color: Number(modelData.mem || 0) >= 10 ? Colors.accent : Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.family: Colors.fontMono
+                                        font.pixelSize: Appearance.fontSizeXS
+                                        font.family: Appearance.fontMono
                                         horizontalAlignment: Text.AlignRight
                                     }
 
@@ -737,8 +737,8 @@ SharedWidgets.CardBase {
                                         Layout.preferredWidth: 92
                                         text: String(modelData.elapsed || "--:--")
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.family: Colors.fontMono
+                                        font.pixelSize: Appearance.fontSizeXS
+                                        font.family: Appearance.fontMono
                                         horizontalAlignment: Text.AlignRight
                                     }
 
@@ -746,8 +746,8 @@ SharedWidgets.CardBase {
                                         Layout.preferredWidth: 70
                                         text: String(modelData.state || "")
                                         color: String(modelData.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.secondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.family: Colors.fontMono
+                                        font.pixelSize: Appearance.fontSizeXS
+                                        font.family: Appearance.fontMono
                                         horizontalAlignment: Text.AlignRight
                                     }
                                 }

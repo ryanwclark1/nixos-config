@@ -37,26 +37,26 @@ Rectangle {
         anchors.left: parent.left
         anchors.topMargin: Math.max(root.overlayInset, (parent.height - height) / 2)
         anchors.leftMargin: Math.max(root.overlayInset, (parent.width - width) / 2)
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
-            spacing: Colors.spacingM
+            anchors.margins: Appearance.paddingLarge
+            spacing: Appearance.spacingM
 
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
-                    width: root.compactMode ? parent.width : Math.max(0, parent.width - closePickerButton.implicitWidth - Colors.spacingS)
+                    width: root.compactMode ? parent.width : Math.max(0, parent.width - closePickerButton.implicitWidth - Appearance.spacingS)
                     text: "Add Widget to " + root.sectionLabelFn(root.addSection)
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeXL
+                    font.pixelSize: Appearance.fontSizeXL
                     font.weight: Font.DemiBold
                     wrapMode: Text.WordWrap
                 }
@@ -87,7 +87,7 @@ Rectangle {
                 Column {
                     id: pickerColumn
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Repeater {
                         model: root.availableWidgets
@@ -100,54 +100,54 @@ Rectangle {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingXXS
+                                spacing: Appearance.spacingXXS
 
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    spacing: Colors.spacingS
+                                    spacing: Appearance.spacingS
 
                                     Text {
                                         text: modelData.label
                                         color: Colors.text
-                                        font.pixelSize: Colors.fontSizeMedium
+                                        font.pixelSize: Appearance.fontSizeMedium
                                         font.weight: Font.Medium
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
                                     }
 
                                     Rectangle {
-                                        radius: Colors.radiusSmall
+                                        radius: Appearance.radiusSmall
                                         color: String(modelData.section || "") === root.addSection ? Colors.primaryStrong : Colors.cardSurface
                                         border.color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.border
                                         border.width: 1
-                                        implicitWidth: sectionBadgeLabel.implicitWidth + Colors.spacingM
-                                        implicitHeight: sectionBadgeLabel.implicitHeight + Colors.spacingXS
+                                        implicitWidth: sectionBadgeLabel.implicitWidth + Appearance.spacingM
+                                        implicitHeight: sectionBadgeLabel.implicitHeight + Appearance.spacingXS
 
                                         Text {
                                             id: sectionBadgeLabel
                                             anchors.centerIn: parent
                                             text: "Best in " + root.sectionLabelFn(String(modelData.section || "right"))
                                             color: String(modelData.section || "") === root.addSection ? Colors.primary : Colors.textSecondary
-                                            font.pixelSize: Colors.fontSizeXS
+                                            font.pixelSize: Appearance.fontSizeXS
                                             font.weight: Font.Medium
                                         }
                                     }
 
                                     Rectangle {
                                         visible: root.verticalBar
-                                        radius: Colors.radiusSmall
+                                        radius: Appearance.radiusSmall
                                         color: Colors.cardSurface
                                         border.color: Colors.border
                                         border.width: 1
-                                        implicitWidth: verticalHintLabel.implicitWidth + Colors.spacingM
-                                        implicitHeight: verticalHintLabel.implicitHeight + Colors.spacingXS
+                                        implicitWidth: verticalHintLabel.implicitWidth + Appearance.spacingM
+                                        implicitHeight: verticalHintLabel.implicitHeight + Appearance.spacingXS
 
                                         Text {
                                             id: verticalHintLabel
                                             anchors.centerIn: parent
                                             text: BarWidgetRegistry.verticalHintLabel(modelData.widgetType)
                                             color: Colors.textSecondary
-                                            font.pixelSize: Colors.fontSizeXS
+                                            font.pixelSize: Appearance.fontSizeXS
                                             font.weight: Font.Medium
                                         }
                                     }
@@ -156,7 +156,7 @@ Rectangle {
                                 Text {
                                     text: modelData.description || ""
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     Layout.fillWidth: true
                                     wrapMode: Text.WordWrap
                                 }
@@ -177,7 +177,7 @@ Rectangle {
                         visible: root.availableWidgets.length === 0
                         text: "No widgets match \"" + root.searchQuery + "\"."
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         wrapMode: Text.WordWrap
                     }
                 }

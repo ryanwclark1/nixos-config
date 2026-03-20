@@ -10,7 +10,7 @@ Rectangle {
     property bool compact: false
 
     implicitHeight: label !== "" ? (compact ? 20 : 24) : (compact ? 8 : 12)
-    radius: Colors.radiusXXS
+    radius: Appearance.radiusXXS
     color: root.active ? Colors.primaryMarked : Colors.withAlpha(Colors.primary, 0.06)
     border.color: root.active ? Colors.primary : Colors.border
     border.width: 1
@@ -23,14 +23,14 @@ Rectangle {
 
     Text {
         anchors.left: parent.left
-        anchors.leftMargin: Colors.spacingS
+        anchors.leftMargin: Appearance.spacingS
         anchors.verticalCenter: parent.verticalCenter
         visible: root.label !== ""
         text: root.label
         color: root.active ? Colors.primary : Colors.textSecondary
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         font.weight: root.active ? Font.Medium : Font.Normal
         elide: Text.ElideRight
-        width: Math.max(0, parent.width - Colors.spacingS * 2)
+        width: Math.max(0, parent.width - Appearance.spacingS * 2)
     }
 }

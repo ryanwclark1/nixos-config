@@ -14,7 +14,7 @@ ColumnLayout {
 
   anchors.fill: parent
   anchors.margins: 18
-  spacing: Colors.paddingSmall
+  spacing: Appearance.paddingSmall
 
   CircularGauge {
     Layout.alignment: Qt.AlignHCenter
@@ -30,17 +30,17 @@ ColumnLayout {
     Layout.alignment: Qt.AlignHCenter
     text: root.osdLabel
     color: Colors.text
-    font.pixelSize: Colors.fontSizeXL
+    font.pixelSize: Appearance.fontSizeXL
     font.weight: Font.Black
-    font.family: Colors.fontMono
+    font.family: Appearance.fontMono
   }
 
   Text {
     Layout.alignment: Qt.AlignHCenter
     text: root.osdType === "kbdbrightness" ? "KBD BRIGHTNESS" : root.osdType.toUpperCase()
     color: root.osdColor
-    font.pixelSize: Colors.fontSizeXS
+    font.pixelSize: Appearance.fontSizeXS
     font.weight: Font.Black
-    font.letterSpacing: Colors.letterSpacingExtraWide
+    font.letterSpacing: Appearance.letterSpacingExtraWide
   }
 }

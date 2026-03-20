@@ -48,7 +48,7 @@ Item {
 
         Row {
             anchors.centerIn: parent
-            spacing: Colors.spacingXXS
+            spacing: Appearance.spacingXXS
             height: 14
 
             Repeater {
@@ -63,7 +63,7 @@ Item {
 
                     Behavior on height {
                         NumberAnimation {
-                            duration: Colors.durationFlash
+                            duration: Appearance.durationFlash
                             easing.type: Easing.OutCubic
                         }
                     }

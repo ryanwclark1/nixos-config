@@ -14,13 +14,13 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        anchors.topMargin: root.compactMode ? Colors.spacingXXS : Colors.spacingXS
-        spacing: root.compactMode ? Colors.spacingXS : Colors.spacingS
+        anchors.topMargin: root.compactMode ? Appearance.spacingXXS : Appearance.spacingXS
+        spacing: root.compactMode ? Appearance.spacingXS : Appearance.spacingS
 
         Rectangle {
             width: compactMode ? 8 : 10
             height: width
-            radius: Colors.radiusPill
+            radius: Appearance.radiusPill
             color: root.accentColor
             Layout.alignment: Qt.AlignVCenter
         }
@@ -28,17 +28,17 @@ Item {
         Text {
             text: root.section
             color: Colors.withAlpha(root.accentColor, 0.94)
-            font.pixelSize: root.compactMode ? Colors.fontSizeXS : Colors.fontSizeSmall
+            font.pixelSize: root.compactMode ? Appearance.fontSizeXS : Appearance.fontSizeSmall
             font.weight: Font.Black
             font.capitalization: Font.AllUppercase
-            font.letterSpacing: Colors.letterSpacingWide
+            font.letterSpacing: Appearance.letterSpacingWide
         }
 
         Rectangle {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter
             implicitHeight: 1
-            radius: Colors.radiusXXXS
+            radius: Appearance.radiusXXXS
             color: Colors.withAlpha(root.accentColor, 0.16)
         }
     }

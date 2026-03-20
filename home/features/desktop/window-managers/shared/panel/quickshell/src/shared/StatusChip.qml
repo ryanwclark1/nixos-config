@@ -11,7 +11,7 @@ Rectangle {
 
   signal clicked()
 
-  radius: Colors.radiusCard
+  radius: Appearance.radiusCard
   color: Colors.withAlpha(root.chipColor, 0.16)
   border.color: Colors.withAlpha(root.chipColor, 0.25)
   border.width: 1
@@ -34,7 +34,7 @@ Rectangle {
     anchors.centerIn: parent
     text: root.text
     color: root.chipColor
-    font.pixelSize: Colors.fontSizeXS
+    font.pixelSize: Appearance.fontSizeXS
     font.weight: Font.Medium
   }
 

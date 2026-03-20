@@ -25,8 +25,8 @@ Rectangle {
     }
 
     Layout.fillWidth: true
-    implicitHeight: mainLayout.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: mainLayout.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.modalFieldSurface
     border.color: Colors.border
     border.width: 1
@@ -36,23 +36,23 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             SettingsIconBox { icon: root.icon }
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
+                spacing: Appearance.spacingXXS
 
                 Text {
                     text: root.label
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -62,7 +62,7 @@ Rectangle {
                     visible: root.description !== ""
                     text: root.description
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                 }
@@ -72,7 +72,7 @@ Rectangle {
                 id: modePill
                 implicitWidth: selectedText.implicitWidth + 14
                 implicitHeight: 24
-                radius: Colors.radiusCard
+                radius: Appearance.radiusCard
                 color: Colors.surface
                 border.color: Colors.border
                 border.width: 1
@@ -83,7 +83,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root._currentLabel()
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.DemiBold
                 }
             }
@@ -92,8 +92,8 @@ Rectangle {
         Flow {
             Layout.fillWidth: true
             Layout.preferredWidth: parent.width
-            Layout.leftMargin: (root.icon !== "" && !root.narrowLayout) ? 38 + Colors.spacingM : 0
-            spacing: Colors.spacingS
+            Layout.leftMargin: (root.icon !== "" && !root.narrowLayout) ? 38 + Appearance.spacingM : 0
+            spacing: Appearance.spacingS
 
             Repeater {
                 model: root.options
@@ -120,8 +120,8 @@ Rectangle {
             property real _opacity: 0
             running: root.highlighted
             loops: 2
-            NumberAnimation { target: modeHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
-            NumberAnimation { target: modeHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Colors.durationSlow; easing.type: Easing.InCubic }
+            NumberAnimation { target: modeHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Appearance.durationSlow; easing.type: Easing.OutCubic }
+            NumberAnimation { target: modeHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Appearance.durationSlow; easing.type: Easing.InCubic }
         }
     }
 }

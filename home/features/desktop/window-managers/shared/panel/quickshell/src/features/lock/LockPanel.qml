@@ -116,7 +116,7 @@ Item {
     RowLayout {
       Layout.fillWidth: true
       Layout.margins: compact ? 20 : 40
-      spacing: Colors.spacingLG
+      spacing: Appearance.spacingLG
 
       // Media controls (optional)
       Loader {
@@ -131,17 +131,17 @@ Item {
       Loader {
         active: Config.lockScreenWeather && !compact && WeatherService.temp !== ""
         sourceComponent: RowLayout {
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
           Text {
             text: Colors.weatherIcon(WeatherService.condition)
             color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeXL
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeXL
           }
           Text {
             text: (WeatherService.temp || "") + " " + (WeatherService.condition || "")
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
           }
         }
       }
@@ -151,8 +151,8 @@ Item {
         visible: UPower.displayDevice && UPower.displayDevice.isPresent
         text: UPower.displayDevice ? "󰁹 " + Math.round(UPower.displayDevice.percentage * 100) + "%" : ""
         color: Colors.textSecondary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeMedium
+        font.family: Appearance.fontMono
+        font.pixelSize: Appearance.fontSizeMedium
       }
 
       // Session buttons (optional)

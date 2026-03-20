@@ -30,12 +30,12 @@ Flow {
   // Pill size presets
   readonly property int pillHeight: pillSize === "compact" ? 16 : (pillSize === "large" ? 28 : 20)
   readonly property int pillMinWidth: pillSize === "compact" ? 18 : (pillSize === "large" ? 30 : 22)
-  readonly property int pillFontSize: pillSize === "compact" ? Colors.fontSizeXS : (pillSize === "large" ? Colors.fontSizeMedium : Colors.fontSizeSmall)
+  readonly property int pillFontSize: pillSize === "compact" ? Appearance.fontSizeXS : (pillSize === "large" ? Appearance.fontSizeMedium : Appearance.fontSizeSmall)
 
   readonly property bool isGrid: layout === "grid"
   
   flow: vertical ? Flow.TopToBottom : (isGrid ? Flow.LeftToRight : Flow.LeftToRight)
-  spacing: Colors.spacingSM
+  spacing: Appearance.spacingSM
 
   // Helper for click behavior
   function handleWorkspaceClick(wsId) {
@@ -111,7 +111,7 @@ Flow {
       readonly property bool isStrip: root.style === "strip"
       readonly property bool isIcons: root.style === "icons"
 
-      radius: isDots ? width / 2 : Colors.radiusXXS
+      radius: isDots ? width / 2 : Appearance.radiusXXS
       height: root.pillHeight
       width: {
         if (isDots) return root.pillHeight;
@@ -123,7 +123,7 @@ Flow {
 
       Behavior on width {
         enabled: !Colors.isTransitioning
-        NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic }
+        NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutCubic }
       }
 
       Behavior on color {
@@ -149,8 +149,8 @@ Flow {
         id: urgentAnim
         running: wsPill.isUrgent
         loops: Animation.Infinite
-        ColorAnimation { to: root.urgentColor; duration: Colors.durationPulse; easing.type: Easing.InOutSine }
-        ColorAnimation { to: Colors.warning;   duration: Colors.durationPulse; easing.type: Easing.InOutSine }
+        ColorAnimation { to: root.urgentColor; duration: Appearance.durationPulse; easing.type: Easing.InOutSine }
+        ColorAnimation { to: Colors.warning;   duration: Appearance.durationPulse; easing.type: Easing.InOutSine }
       }
 
       Text {
@@ -214,7 +214,7 @@ Flow {
             width: Math.max(2, (modelData.w / screenW) * parent.width)
             height: Math.max(2, (modelData.h / screenH) * parent.height)
             
-            radius: Colors.radiusXXXS
+            radius: Appearance.radiusXXXS
             color: wsPill.isActive ? Colors.background : (modelData.active ? Colors.primary : Colors.textSecondary)
             opacity: modelData.active ? 0.8 : 0.4
             border.color: wsPill.isActive ? Colors.background : Colors.border
@@ -247,7 +247,7 @@ Flow {
   Rectangle {
     id: addWsBtn
     width: root.pillMinWidth; height: root.pillHeight
-    radius: Colors.radiusXXS
+    radius: Appearance.radiusXXS
     color: addWsHover.containsMouse ? Colors.primarySubtle : Colors.cardSurface
     border.color: addWsHover.containsMouse ? Colors.primary : Colors.border
     border.width: 1

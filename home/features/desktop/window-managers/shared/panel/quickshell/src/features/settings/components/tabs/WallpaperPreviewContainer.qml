@@ -13,7 +13,7 @@ Rectangle {
 
     Layout.fillWidth: true
     height: 160
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: Colors.bgWidget
     border.color: Colors.border
     border.width: 1
@@ -39,7 +39,7 @@ Rectangle {
         id: wallpaperPreview
         anchors.fill: parent
         transitionType: Config.wallpaperTransitionType
-        transitionDuration: Colors.durationEmphasis
+        transitionDuration: Appearance.durationEmphasis
         onImageLoadError: source => {
             var path = source.toString().replace(/^file:\/\//, "");
             previewContainer.imageUnsupported(path);
@@ -48,21 +48,21 @@ Rectangle {
 
     ColumnLayout {
         anchors.centerIn: parent
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
         visible: !previewContainer.solidPreview
             && (previewContainer.previewPath === "" || wallpaperPreview.currentSource == "")
 
         Text {
             text: "󰸉"
             color: Colors.textDisabled
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeHuge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeHuge
             Layout.alignment: Qt.AlignHCenter
         }
         Text {
             text: previewContainer.previewPath !== "" ? "Loading preview…" : "No wallpaper set"
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             Layout.alignment: Qt.AlignHCenter
         }
     }
@@ -70,9 +70,9 @@ Rectangle {
     Rectangle {
         anchors.centerIn: parent
         visible: previewContainer.solidPreview
-        width: Math.min(previewContainer.width - Colors.spacingM * 4, 220)
+        width: Math.min(previewContainer.width - Appearance.spacingM * 4, 220)
         height: 96
-        radius: Colors.radiusMedium
+        radius: Appearance.radiusMedium
         color: "#" + previewContainer.solidHex.slice(0, 6)
         border.color: Colors.border
         border.width: 1
@@ -81,7 +81,7 @@ Rectangle {
             anchors.centerIn: parent
             text: "Solid #" + previewContainer.solidHex.slice(0, 6).toUpperCase()
             color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             font.weight: Font.Medium
         }
     }
@@ -90,12 +90,12 @@ Rectangle {
         anchors {
             bottom: parent.bottom
             right: parent.right
-            margins: Colors.spacingM
+            margins: Appearance.spacingM
         }
         visible: previewContainer.previewPath !== "" || previewContainer.solidPreview
-        width: Math.min(previewContainer.width - Colors.spacingM * 2, previewName.implicitWidth + 16)
+        width: Math.min(previewContainer.width - Appearance.spacingM * 2, previewName.implicitWidth + 16)
         height: 22
-        radius: Colors.radiusPill
+        radius: Appearance.radiusPill
         color: Qt.rgba(0, 0, 0, 0.55)
 
         Text {
@@ -111,8 +111,8 @@ Rectangle {
                 return parts[parts.length - 1];
             }
             color: "#ffffff"
-            font.pixelSize: Colors.fontSizeXS
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeXS
+            font.family: Appearance.fontMono
             elide: Text.ElideLeft
             maximumLineCount: 1
         }

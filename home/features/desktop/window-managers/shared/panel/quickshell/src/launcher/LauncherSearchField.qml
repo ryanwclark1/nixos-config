@@ -26,7 +26,7 @@ Rectangle {
     // Guardrail baseline retained for static launcher checks.
     // height: 48
     implicitHeight: embedded ? 78 : 52
-    radius: embedded ? Colors.radiusXL : Colors.radiusLarge
+    radius: embedded ? Appearance.radiusXL : Appearance.radiusLarge
     color: embedded ? Colors.withAlpha(Colors.surface, 0.86) : Qt.rgba(0.2, 0.19, 0.2, 0.95)
     border.color: input.activeFocus ? Colors.withAlpha(accentColor, 0.84) : Colors.withAlpha(Colors.borderFocus, embedded ? 0.78 : 1.0)
     border.width: 1
@@ -49,22 +49,22 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.leftMargin: Colors.spacingM
-        anchors.rightMargin: Colors.spacingM
-        anchors.topMargin: embedded ? Colors.spacingS : Colors.spacingM
-        anchors.bottomMargin: embedded ? Colors.spacingS : Colors.spacingM
-        spacing: embedded ? Colors.spacingXS : Colors.spacingS
+        anchors.leftMargin: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingM
+        anchors.topMargin: embedded ? Appearance.spacingS : Appearance.spacingM
+        anchors.bottomMargin: embedded ? Appearance.spacingS : Appearance.spacingM
+        spacing: embedded ? Appearance.spacingXS : Appearance.spacingS
 
         RowLayout {
             visible: root.modeLabel !== "" || root.modeSubtitle !== "" || root.statusText !== ""
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Rectangle {
                 Layout.alignment: Qt.AlignVCenter
                 width: embedded ? 30 : 28
                 height: embedded ? 30 : 28
-                radius: embedded ? Colors.radiusMedium : Colors.radiusSmall
+                radius: embedded ? Appearance.radiusMedium : Appearance.radiusSmall
                 color: Colors.withAlpha(root.accentColor, embedded ? 0.18 : 0.12)
                 border.color: Colors.withAlpha(root.accentColor, 0.4)
                 border.width: 1
@@ -73,8 +73,8 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root.modeIconText
                     color: root.accentColor
-                    font.pixelSize: embedded ? Colors.fontSizeLarge : Colors.fontSizeMedium
-                    font.family: Colors.fontMono
+                    font.pixelSize: embedded ? Appearance.fontSizeLarge : Appearance.fontSizeMedium
+                    font.family: Appearance.fontMono
                 }
             }
 
@@ -87,9 +87,9 @@ Rectangle {
                     visible: root.modeLabel !== ""
                     text: root.modeLabel
                     color: root.accentColor
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingWide
+                    font.letterSpacing: Appearance.letterSpacingWide
                     font.capitalization: Font.AllUppercase
                     elide: Text.ElideRight
                 }
@@ -99,7 +99,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: root.modeSubtitle
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     elide: Text.ElideRight
                 }
             }
@@ -107,7 +107,7 @@ Rectangle {
             Rectangle {
                 visible: root.statusText !== ""
                 Layout.alignment: Qt.AlignVCenter
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.withAlpha(root.accentColor, 0.12)
                 border.color: Colors.withAlpha(root.accentColor, 0.32)
                 border.width: 1
@@ -117,20 +117,20 @@ Rectangle {
                 RowLayout {
                     id: statusSummaryRow
                     anchors.centerIn: parent
-                    spacing: Colors.spacingXS
+                    spacing: Appearance.spacingXS
 
                     Text {
                         visible: root.statusIcon !== ""
                         text: root.statusIcon
                         color: root.accentColor
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeXS
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeXS
                     }
 
                     Text {
                         text: root.statusText
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.DemiBold
                     }
                 }
@@ -139,14 +139,14 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Rectangle {
                 id: categoryBadge
                 readonly property string category: root.launcher ? root.launcher.drunCategoryFilterLabel : ""
                 visible: category !== "" && category !== "All"
                 Layout.alignment: Qt.AlignVCenter
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.withAlpha(accentColor, 0.15)
                 border.color: Colors.withAlpha(accentColor, 0.4)
                 border.width: 1
@@ -155,13 +155,13 @@ Rectangle {
 
                 RowLayout {
                     anchors.centerIn: parent
-                    spacing: Colors.spacingXS
+                    spacing: Appearance.spacingXS
 
                     Text {
                         id: categoryLabel
                         text: categoryBadge.category
                         color: accentColor
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.Bold
                     }
 
@@ -180,7 +180,7 @@ Rectangle {
             Rectangle {
                 visible: root.modePrefix !== ""
                 Layout.alignment: Qt.AlignVCenter
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.withAlpha(root.accentColor, 0.12)
                 border.color: Colors.withAlpha(root.accentColor, 0.3)
                 border.width: 1
@@ -192,8 +192,8 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root.modePrefix
                     color: root.accentColor
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Black
                 }
             }
@@ -202,7 +202,7 @@ Rectangle {
                 id: input
                 Layout.fillWidth: true
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeLarge
+                font.pixelSize: Appearance.fontSizeLarge
                 verticalAlignment: Text.AlignVCenter
                 selectByMouse: true
                 selectionColor: Colors.highlight
@@ -227,7 +227,7 @@ Rectangle {
             SharedWidgets.IconButton {
                 visible: input.text !== ""
                 icon: "dismiss.svg"
-                size: Colors.iconSizeSmall
+                size: Appearance.iconSizeSmall
                 iconSize: 14
                 iconColor: Colors.textDisabled
                 tooltipText: "Clear search"

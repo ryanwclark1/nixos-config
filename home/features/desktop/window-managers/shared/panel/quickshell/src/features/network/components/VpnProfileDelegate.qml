@@ -13,32 +13,32 @@ Rectangle {
     signal actionClicked()
 
     implicitHeight: 56
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: Colors.spacingM
-        anchors.rightMargin: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.leftMargin: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         Text {
             text: "󰖂"
             color: root.isActive ? Colors.accent : Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
         }
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingXXS
+            spacing: Appearance.spacingXXS
 
             Text {
                 text: root.modelData.name || "VPN"
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 font.weight: Font.Medium
                 Layout.fillWidth: true
                 elide: Text.ElideRight
@@ -49,7 +49,7 @@ Rectangle {
                     ? (root.modelData.device !== "" ? (root.modelData.type + " • " + root.modelData.device) : root.modelData.type)
                     : (root.modelData.type || "vpn")
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 Layout.fillWidth: true
                 elide: Text.ElideRight
             }
@@ -57,7 +57,7 @@ Rectangle {
 
         Rectangle {
             readonly property color actionColor: root.isActive ? Colors.error : Colors.primary
-            radius: Colors.radiusPill
+            radius: Appearance.radiusPill
             color: root.actionPending
                 ? Colors.withAlpha(Colors.textSecondary, 0.12)
                 : (root.isActive ? Colors.withAlpha(Colors.error, 0.12) : Colors.primaryAccent)
@@ -73,7 +73,7 @@ Rectangle {
                     ? (root.isActive ? "Disconnecting" : "Connecting")
                     : (root.isActive ? "Disconnect" : "Connect")
                 color: root.actionPending ? Colors.textSecondary : parent.actionColor
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.DemiBold
             }
 

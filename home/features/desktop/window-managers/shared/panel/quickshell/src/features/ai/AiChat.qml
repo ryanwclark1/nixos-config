@@ -24,7 +24,7 @@ PanelWindow {
         bottom: true
     }
     margins.top: edgeMargins.top
-    margins.right: Math.max(edgeMargins.right, Colors.spacingS)
+    margins.right: Math.max(edgeMargins.right, Appearance.spacingS)
     margins.bottom: edgeMargins.bottom
 
     implicitWidth: panelWidth
@@ -100,7 +100,7 @@ PanelWindow {
             textSecondary: Colors.textSecondary,
             primary: Colors.primary,
             bgWidget: Colors.bgWidget,
-            fontMono: Colors.fontMono,
+            fontMono: Appearance.fontMono,
             codeBg: Colors.textFaint
         })
 
@@ -171,7 +171,7 @@ PanelWindow {
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
 
         // Inner highlight
         SharedWidgets.InnerHighlight {
@@ -184,7 +184,7 @@ PanelWindow {
         Behavior on x {
             NumberAnimation {
                 id: slideAnim
-                duration: Colors.durationPanelOpen
+                duration: Appearance.durationPanelOpen
                 easing.type: Easing.OutBack
                 easing.overshoot: 0.6
             }
@@ -192,7 +192,7 @@ PanelWindow {
         Behavior on opacity {
             NumberAnimation {
                 id: fadeAnim
-                duration: Colors.durationPanelClose
+                duration: Appearance.durationPanelClose
             }
         }
         layer.enabled: slideAnim.running || fadeAnim.running
@@ -248,7 +248,7 @@ PanelWindow {
             id: dragHandle
             width: 6
             height: parent.height * 0.15
-            radius: Colors.radiusXS
+            radius: Appearance.radiusXS
             color: dragArea.containsMouse ? Colors.primary : Colors.border
             anchors.left: parent.left
             anchors.leftMargin: -3
@@ -256,7 +256,7 @@ PanelWindow {
             opacity: dragArea.containsMouse || dragArea.pressed ? 1.0 : 0.4
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Colors.durationFast
+                    duration: Appearance.durationFast
                 }
             }
             Behavior on color {
@@ -287,13 +287,13 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
-            spacing: Colors.spacingM
+            anchors.margins: Appearance.paddingLarge
+            spacing: Appearance.spacingM
 
             // ---- Header ----
             RowLayout {
                 Layout.fillWidth: true
-                spacing: root.narrowHeader ? Colors.spacingXS : Colors.spacingS
+                spacing: root.narrowHeader ? Appearance.spacingXS : Appearance.spacingS
                 clip: true
 
                 Text {
@@ -301,9 +301,9 @@ PanelWindow {
                     Layout.minimumWidth: 0
                     text: "󰚩  AI Chat"
                     color: Colors.text
-                    font.pixelSize: root.narrowHeader ? Colors.fontSizeLarge : Colors.fontSizeXL
+                    font.pixelSize: root.narrowHeader ? Appearance.fontSizeLarge : Appearance.fontSizeXL
                     font.weight: Font.DemiBold
-                    font.letterSpacing: Colors.letterSpacingTight
+                    font.letterSpacing: Appearance.letterSpacingTight
                     elide: Text.ElideRight
                     maximumLineCount: 1
                 }
@@ -317,12 +317,12 @@ PanelWindow {
                 Rectangle {
                     id: providerPickerBtn
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.rightMargin: Colors.spacingXS
+                    Layout.rightMargin: Appearance.spacingXS
                     Layout.maximumWidth: 140
-                    width: providerPickerText.implicitWidth + Colors.spacingL
+                    width: providerPickerText.implicitWidth + Appearance.spacingL
                     height: 24
                     visible: !root.compactHeader
-                    radius: Colors.radiusXXS
+                    radius: Appearance.radiusXXS
                     color: providerPickerMouse.containsMouse ? Colors.primaryGhost : "transparent"
                     border.color: providerPickerMouse.containsMouse ? Colors.primaryRing : "transparent"
                     border.width: 1
@@ -332,8 +332,8 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: Providers.providerIcon(AiService.activeProvider) + " " + AiService.activeModel
                         color: providerPickerMouse.containsMouse ? Colors.primary : Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeXS
+                        font.family: Appearance.fontMono
                         elide: Text.ElideRight
                         width: Math.min(implicitWidth, 130)
                     }
@@ -357,15 +357,15 @@ PanelWindow {
                     id: copyAllButton
                     width: 28
                     height: 28
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: "transparent"
                     visible: !root.narrowHeader && AiService.activeMessages.length > 0
                     Text {
                         anchors.centerIn: parent
                         text: "󰆏"
                         color: Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeLarge
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeLarge
                     }
                     SharedWidgets.StateLayer {
                         id: copyAllStateLayer
@@ -399,15 +399,15 @@ PanelWindow {
                     id: clearChatButton
                     width: 28
                     height: 28
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: "transparent"
                     visible: !root.narrowHeader && (AiService.activeMessages.length > 0 || AiService.activeDraftText.length > 0)
                     Text {
                         anchors.centerIn: parent
                         text: "󰃢"
                         color: Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeLarge
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeLarge
                     }
                     SharedWidgets.StateLayer {
                         id: clearChatStateLayer
@@ -435,7 +435,7 @@ PanelWindow {
                     id: newChatButton
                     width: 28
                     height: 28
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: newChatHover.containsMouse ? Colors.primaryGhost : "transparent"
                     border.color: newChatHover.containsMouse ? Colors.primaryRing : "transparent"
                     border.width: 1
@@ -444,8 +444,8 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: "󰐕"
                         color: newChatHover.containsMouse ? Colors.primary : Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeLarge
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeLarge
                     }
                     SharedWidgets.StateLayer {
                         id: newChatStateLayer
@@ -473,14 +473,14 @@ PanelWindow {
                     id: closeBtn
                     width: 28
                     height: 28
-                    radius: Colors.radiusMedium
+                    radius: Appearance.radiusMedium
                     color: "transparent"
                     Text {
                         anchors.centerIn: parent
                         text: "󰅖"
                         color: Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeLarge
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeLarge
                     }
                     SharedWidgets.StateLayer {
                         id: closeStateLayer
@@ -512,8 +512,8 @@ PanelWindow {
             // ---- Command Confirmation ----
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: cmdCol.implicitHeight + Colors.paddingLarge
-                radius: Colors.radiusMedium
+                implicitHeight: cmdCol.implicitHeight + Appearance.paddingLarge
+                radius: Appearance.radiusMedium
                 color: Colors.withAlpha(Colors.accent, 0.12)
                 border.color: Colors.accent
                 border.width: 1
@@ -527,7 +527,7 @@ PanelWindow {
                 }
                 Behavior on scale {
                     NumberAnimation {
-                        duration: Colors.durationSlow
+                        duration: Appearance.durationSlow
                         easing.type: Easing.OutBack
                     }
                 }
@@ -535,21 +535,21 @@ PanelWindow {
                 ColumnLayout {
                     id: cmdCol
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingM
-                    spacing: Colors.spacingS
+                    anchors.margins: Appearance.spacingM
+                    spacing: Appearance.spacingS
 
                     RowLayout {
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
                         Text {
                             text: "󰒓"
                             color: Colors.accent
-                            font.pixelSize: Colors.fontSizeXL
-                            font.family: Colors.fontMono
+                            font.pixelSize: Appearance.fontSizeXL
+                            font.family: Appearance.fontMono
                         }
                         Text {
                             text: "Suggested System Action"
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: Font.Bold
                         }
                     }
@@ -557,21 +557,21 @@ PanelWindow {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: cmdLabel.implicitHeight + 16
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.withAlpha(Colors.background, 0.4)
                         Text {
                             id: cmdLabel
                             anchors.centerIn: parent
                             text: AiService.pendingCommand ? AiService.pendingCommand.label : ""
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
+                            font.pixelSize: Appearance.fontSizeMedium
                             font.weight: Font.Bold
                         }
                     }
 
                     RowLayout {
                         Layout.alignment: Qt.AlignRight
-                        spacing: Colors.spacingM
+                        spacing: Appearance.spacingM
 
                         SettingsActionButton {
                             label: "Cancel"
@@ -595,8 +595,8 @@ PanelWindow {
             // ---- Script Confirmation ----
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: scriptCol.implicitHeight + Colors.paddingLarge
-                radius: Colors.radiusMedium
+                implicitHeight: scriptCol.implicitHeight + Appearance.paddingLarge
+                radius: Appearance.radiusMedium
                 color: Colors.withAlpha(Colors.success, 0.12)
                 border.color: Colors.success
                 border.width: 1
@@ -610,7 +610,7 @@ PanelWindow {
                 }
                 Behavior on scale {
                     NumberAnimation {
-                        duration: Colors.durationSlow
+                        duration: Appearance.durationSlow
                         easing.type: Easing.OutBack
                     }
                 }
@@ -618,21 +618,21 @@ PanelWindow {
                 ColumnLayout {
                     id: scriptCol
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingM
-                    spacing: Colors.spacingS
+                    anchors.margins: Appearance.spacingM
+                    spacing: Appearance.spacingS
 
                     RowLayout {
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
                         Text {
                             text: "󰆍"
                             color: Colors.success
-                            font.pixelSize: Colors.fontSizeXL
-                            font.family: Colors.fontMono
+                            font.pixelSize: Appearance.fontSizeXL
+                            font.family: Appearance.fontMono
                         }
                         Text {
                             text: "Install Shell Script"
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: Font.Bold
                         }
                     }
@@ -640,22 +640,22 @@ PanelWindow {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 32
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.withAlpha(Colors.background, 0.4)
                         Text {
                             anchors.centerIn: parent
                             text: "filename: " + (AiService.pendingScript ? AiService.pendingScript.name : "")
                             color: Colors.success
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.Bold
-                            font.family: Colors.fontMono
+                            font.family: Appearance.fontMono
                         }
                     }
 
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: Math.min(200, scriptPreview.implicitHeight + 16)
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.withAlpha(Colors.background, 0.6)
                         border.color: Colors.withAlpha(Colors.success, 0.2)
                         border.width: 1
@@ -672,8 +672,8 @@ PanelWindow {
                                 width: parent.width
                                 text: AiService.pendingScript ? AiService.pendingScript.content : ""
                                 color: Colors.textSecondary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeXS
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeXS
                                 wrapMode: Text.WrapAnywhere
                             }
                         }
@@ -681,7 +681,7 @@ PanelWindow {
 
                     RowLayout {
                         Layout.alignment: Qt.AlignRight
-                        spacing: Colors.spacingM
+                        spacing: Appearance.spacingM
 
                         SettingsActionButton {
                             label: "Discard"
@@ -703,8 +703,8 @@ PanelWindow {
             // ---- Privacy warning for remote providers ----
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: privacyRow.implicitHeight + Colors.spacingS * 2
-                radius: Colors.radiusXS
+                implicitHeight: privacyRow.implicitHeight + Appearance.spacingS * 2
+                radius: Appearance.radiusXS
                 color: Colors.withAlpha(Colors.warning, 0.08)
                 border.color: Colors.withAlpha(Colors.warning, 0.25)
                 border.width: 1
@@ -713,27 +713,27 @@ PanelWindow {
                 RowLayout {
                     id: privacyRow
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingS
+                    anchors.margins: Appearance.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
                         text: "󰀦"
                         color: Colors.warning
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeMedium
                     }
                     Text {
                         Layout.fillWidth: true
                         text: "Remote provider — avoid sharing sensitive data"
                         color: Colors.withAlpha(Colors.warning, 0.85)
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         wrapMode: Text.WordWrap
                     }
                     Text {
                         text: "󰅖"
                         color: Colors.textDisabled
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeSmall
                         MouseArea {
                             anchors.fill: parent
                             anchors.margins: -4
@@ -760,11 +760,11 @@ PanelWindow {
             // ---- Input area ----
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: inputLayout.implicitHeight + Colors.spacingM * 2
+                implicitHeight: inputLayout.implicitHeight + Appearance.spacingM * 2
                 color: Colors.cardSurface
                 border.color: inputField.activeFocus ? Colors.primary : Colors.border
                 border.width: inputField.activeFocus ? 1.5 : 1
-                radius: Colors.radiusMedium
+                radius: Appearance.radiusMedium
                 clip: true
                 Behavior on border.color {
                     enabled: !Colors.isTransitioning
@@ -774,16 +774,16 @@ PanelWindow {
                 ColumnLayout {
                     id: inputLayout
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingM
-                    spacing: Colors.spacingXS
+                    anchors.margins: Appearance.spacingM
+                    spacing: Appearance.spacingXS
 
                     Flickable {
                         id: inputFlickable
                         Layout.fillWidth: true
-                        Layout.preferredHeight: Math.max(24 + Colors.spacingS * 2, Math.min(120 + Colors.spacingS * 2, inputField.contentHeight + Colors.spacingS * 2))
-                        Layout.maximumHeight: 120 + Colors.spacingS * 2
+                        Layout.preferredHeight: Math.max(24 + Appearance.spacingS * 2, Math.min(120 + Appearance.spacingS * 2, inputField.contentHeight + Appearance.spacingS * 2))
+                        Layout.maximumHeight: 120 + Appearance.spacingS * 2
                         contentWidth: width
-                        contentHeight: Math.max(height, inputField.contentHeight + Colors.spacingS * 2)
+                        contentHeight: Math.max(height, inputField.contentHeight + Appearance.spacingS * 2)
                         flickableDirection: Flickable.VerticalFlick
                         boundsBehavior: Flickable.StopAtBounds
                         clip: true
@@ -796,10 +796,10 @@ PanelWindow {
                         TextEdit {
                             id: inputField
                             width: inputFlickable.width - (inputFlickable.contentHeight > inputFlickable.height ? 12 : 0)
-                            topPadding: Colors.spacingS
-                            bottomPadding: Colors.spacingS
+                            topPadding: Appearance.spacingS
+                            bottomPadding: Appearance.spacingS
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
+                            font.pixelSize: Appearance.fontSizeMedium
                             wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
                             selectByMouse: true
                             selectedTextColor: Colors.background
@@ -810,10 +810,10 @@ PanelWindow {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 1
                                 anchors.top: parent.top
-                                anchors.topMargin: Colors.spacingS
+                                anchors.topMargin: Appearance.spacingS
                                 text: "Type a message..."
                                 color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 visible: inputField.text.length === 0 && !inputField.activeFocus
                             }
 
@@ -829,9 +829,9 @@ PanelWindow {
                                 var cursorBottom = cursorRectangle.y + cursorRectangle.height;
                                 var cursorTop = cursorRectangle.y;
                                 if (cursorBottom > inputFlickable.contentY + inputFlickable.height) {
-                                    inputFlickable.contentY = cursorBottom - inputFlickable.height + Colors.spacingS;
+                                    inputFlickable.contentY = cursorBottom - inputFlickable.height + Appearance.spacingS;
                                 } else if (cursorTop < inputFlickable.contentY) {
-                                    inputFlickable.contentY = Math.max(0, cursorTop - Colors.spacingS);
+                                    inputFlickable.contentY = Math.max(0, cursorTop - Appearance.spacingS);
                                 }
                             }
 
@@ -847,30 +847,30 @@ PanelWindow {
                     // Attached files flow
                     Flow {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
                         visible: root.attachedFiles.length > 0
 
                         Repeater {
                             model: root.attachedFiles
                             delegate: Rectangle {
-                                width: fileText.width + removeButton.width + Colors.spacingM
+                                width: fileText.width + removeButton.width + Appearance.spacingM
                                 height: 24
                                 color: Colors.highlightLight
-                                radius: Colors.radiusSmall
+                                radius: Appearance.radiusSmall
                                 border.color: Colors.primaryRing
                                 border.width: 1
 
                                 RowLayout {
                                     anchors.fill: parent
-                                    anchors.leftMargin: Colors.spacingS
-                                    anchors.rightMargin: Colors.spacingXS
-                                    spacing: Colors.spacingXS
+                                    anchors.leftMargin: Appearance.spacingS
+                                    anchors.rightMargin: Appearance.spacingXS
+                                    spacing: Appearance.spacingXS
 
                                     Text {
                                         id: fileText
                                         text: modelData.name
                                         color: Colors.text
-                                        font.pixelSize: Colors.fontSizeSmall
+                                        font.pixelSize: Appearance.fontSizeSmall
                                         elide: Text.ElideRight
                                         Layout.maximumWidth: 150
                                     }
@@ -893,14 +893,14 @@ PanelWindow {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         // Window context toggle
                         Rectangle {
                             id: windowContextToggle
                             width: 24
                             height: 24
-                            radius: Colors.radiusXXS
+                            radius: Appearance.radiusXXS
                             color: root.includeWindowContext ? Colors.primaryMid : "transparent"
                             border.color: root.includeWindowContext ? Colors.primary : Colors.border
                             border.width: 1
@@ -909,8 +909,8 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 text: "󰖲"
                                 color: root.includeWindowContext ? Colors.primary : Colors.textDisabled
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: winCtxHover
@@ -932,7 +932,7 @@ PanelWindow {
                             id: visualContextToggle
                             width: 24
                             height: 24
-                            radius: Colors.radiusXXS
+                            radius: Appearance.radiusXXS
                             color: root.includeVisualContext ? Colors.primaryMid : "transparent"
                             border.color: root.includeVisualContext ? Colors.primary : Colors.border
                             border.width: 1
@@ -941,8 +941,8 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 text: "󰄀"
                                 color: root.includeVisualContext ? Colors.primary : Colors.textDisabled
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: visualCtxHover
@@ -982,7 +982,7 @@ PanelWindow {
                             id: selectionContextToggle
                             width: 24
                             height: 24
-                            radius: Colors.radiusXXS
+                            radius: Appearance.radiusXXS
                             color: root.includeSelectionContext ? Colors.primaryMid : "transparent"
                             border.color: root.includeSelectionContext ? Colors.primary : Colors.border
                             border.width: 1
@@ -991,8 +991,8 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 text: "󰒅"
                                 color: root.includeSelectionContext ? Colors.primary : Colors.textDisabled
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: selCtxHover
@@ -1014,7 +1014,7 @@ PanelWindow {
                             id: ocrToggle
                             width: 24
                             height: 24
-                            radius: Colors.radiusXXS
+                            radius: Appearance.radiusXXS
                             color: AiService.isOcrBusy ? Colors.withAlpha(Colors.warning, 0.18) : "transparent"
                             border.color: AiService.isOcrBusy ? Colors.warning : Colors.border
                             border.width: 1
@@ -1023,8 +1023,8 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 text: "󰚦"
                                 color: AiService.isOcrBusy ? Colors.warning : Colors.textDisabled
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: ocrHover
@@ -1057,7 +1057,7 @@ PanelWindow {
                             id: systemContextToggle
                             width: 24
                             height: 24
-                            radius: Colors.radiusXXS
+                            radius: Appearance.radiusXXS
                             color: Config.aiSystemContext ? Colors.primaryMid : "transparent"
                             border.color: Config.aiSystemContext ? Colors.primary : Colors.border
                             border.width: 1
@@ -1066,8 +1066,8 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 text: "󰒍"
                                 color: Config.aiSystemContext ? Colors.primary : Colors.textDisabled
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: sysCtxHover
@@ -1094,7 +1094,7 @@ PanelWindow {
                                 return parts.join(" · ");
                             }
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             Layout.alignment: Qt.AlignVCenter
                         }
 
@@ -1106,7 +1106,7 @@ PanelWindow {
                         Rectangle {
                             width: 32
                             height: 28
-                            radius: Colors.radiusXS
+                            radius: Appearance.radiusXS
                             color: AiService.isStreaming ? Colors.withAlpha(Colors.error, 0.18) : (inputField.text.trim().length > 0 ? Colors.primaryMid : "transparent")
                             border.color: AiService.isStreaming ? Colors.error : Colors.primary
                             border.width: AiService.isStreaming || inputField.text.trim().length > 0 ? 1 : 0
@@ -1115,8 +1115,8 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 text: AiService.isStreaming ? "󰅖" : "󰒊"
                                 color: AiService.isStreaming ? Colors.error : Colors.primary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeLarge
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeLarge
                             }
                             SharedWidgets.StateLayer {
                                 id: sendStateLayer
@@ -1145,27 +1145,27 @@ PanelWindow {
             // ---- Footer ----
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
                 visible: !root.narrowFooter
 
                 Text {
                     visible: !root.compactFooter
                     text: Providers.providerLabel(AiService.activeProvider)
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                 }
 
                 Text {
                     visible: !root.compactFooter
                     text: "·"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                 }
 
                 Text {
                     text: AiService.activeModel
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     elide: Text.ElideRight
                     Layout.fillWidth: true
                     Layout.minimumWidth: 0
@@ -1174,7 +1174,7 @@ PanelWindow {
                 Text {
                     text: AiService.conversations.length + " chat" + (AiService.conversations.length !== 1 ? "s" : "")
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     visible: !root.compactFooter
                 }
             }
@@ -1184,7 +1184,7 @@ PanelWindow {
         AiProviderDropdown {
             id: providerDropdown
             anchors.right: parent.right
-            anchors.rightMargin: Colors.paddingLarge
+            anchors.rightMargin: Appearance.paddingLarge
             y: 60
         }
 
@@ -1192,22 +1192,22 @@ PanelWindow {
         Rectangle {
             id: slashHints
             visible: inputField.text.indexOf("/") === 0 && inputField.text.indexOf(" ") === -1 && inputField.activeFocus && !AiService.isStreaming
-            width: parent.width - Colors.paddingLarge * 2
-            height: slashHintsCol.implicitHeight + Colors.spacingS * 2
-            x: Colors.paddingLarge
+            width: parent.width - Appearance.paddingLarge * 2
+            height: slashHintsCol.implicitHeight + Appearance.spacingS * 2
+            x: Appearance.paddingLarge
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 120 + Colors.paddingLarge
+            anchors.bottomMargin: 120 + Appearance.paddingLarge
             color: Colors.bgWidget
             border.color: Colors.border
             border.width: 1
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             z: 10
 
             Column {
                 id: slashHintsCol
                 anchors.fill: parent
-                anchors.margins: Colors.spacingS
-                spacing: Colors.spacingXXS
+                anchors.margins: Appearance.spacingS
+                spacing: Appearance.spacingXXS
 
                 Repeater {
                     model: ScriptModel {
@@ -1226,28 +1226,28 @@ PanelWindow {
                     delegate: Rectangle {
                         required property var modelData
                         required property int index
-                        width: slashHintsCol.width - Colors.spacingS * 2
+                        width: slashHintsCol.width - Appearance.spacingS * 2
                         height: 28
-                        radius: Colors.radiusXXS
+                        radius: Appearance.radiusXXS
                         color: slashItemMouse.containsMouse ? Colors.primaryGhost : "transparent"
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: Colors.spacingS
-                            anchors.rightMargin: Colors.spacingS
-                            spacing: Colors.spacingS
+                            anchors.leftMargin: Appearance.spacingS
+                            anchors.rightMargin: Appearance.spacingS
+                            spacing: Appearance.spacingS
 
                             Text {
                                 text: modelData.cmd
                                 color: Colors.primary
-                                font.pixelSize: Colors.fontSizeSmall
-                                font.family: Colors.fontMono
+                                font.pixelSize: Appearance.fontSizeSmall
+                                font.family: Appearance.fontMono
                                 font.weight: Font.DemiBold
                             }
                             Text {
                                 text: modelData.desc
                                 color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
                             }

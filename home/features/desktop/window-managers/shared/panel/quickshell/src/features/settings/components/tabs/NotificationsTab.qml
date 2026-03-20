@@ -99,7 +99,7 @@ Item {
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Repeater {
                     model: [
@@ -133,9 +133,9 @@ Item {
                     delegate: Rectangle {
                         required property var modelData
 
-                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
-                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
-                        radius: Colors.radiusLarge
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Appearance.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Appearance.spacingM * 2
+                        radius: Appearance.radiusLarge
                         color: Colors.withAlpha(Colors.surface, 0.38)
                         border.color: Colors.withAlpha(Colors.primary, 0.14)
                         border.width: 1
@@ -143,8 +143,8 @@ Item {
                         ColumnLayout {
                             id: metricColumn
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
-                            spacing: Colors.spacingXS
+                            anchors.margins: Appearance.spacingM
+                            spacing: Appearance.spacingXS
 
                             SettingsMetricIcon { icon: modelData.icon }
 
@@ -152,9 +152,9 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.label
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Black
-                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                font.letterSpacing: Appearance.letterSpacingExtraWide
                                 wrapMode: Text.WordWrap
                             }
 
@@ -162,7 +162,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.value
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.Bold
                                 wrapMode: Text.WordWrap
                             }
@@ -259,7 +259,7 @@ Item {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SettingsSliderRow {
                         label: "Low Urgency"
@@ -275,14 +275,14 @@ Item {
                         visible: Config.notifTimeoutLow <= 0
                         text: "Never auto-dismiss"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        leftPadding: Colors.spacingM
+                        font.pixelSize: Appearance.fontSizeXS
+                        leftPadding: Appearance.spacingM
                     }
                 }
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SettingsSliderRow {
                         label: "Normal Urgency"
@@ -298,14 +298,14 @@ Item {
                         visible: Config.notifTimeoutNormal <= 0
                         text: "Never auto-dismiss"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        leftPadding: Colors.spacingM
+                        font.pixelSize: Appearance.fontSizeXS
+                        leftPadding: Appearance.spacingM
                     }
                 }
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SettingsSliderRow {
                         label: "Critical Urgency"
@@ -321,8 +321,8 @@ Item {
                         visible: Config.notifTimeoutCritical <= 0
                         text: "Never auto-dismiss — requires manual action"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        leftPadding: Colors.spacingM
+                        font.pixelSize: Appearance.fontSizeXS
+                        leftPadding: Appearance.spacingM
                     }
                 }
             }
@@ -435,27 +435,27 @@ Item {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
                     enabled: Config.notifTtsEnabled
 
                     Text {
                         text: "Excluded Apps"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.DemiBold
                     }
 
                     Text {
                         text: "Notifications from these apps will not be read aloud."
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         wrapMode: Text.WordWrap
                         Layout.fillWidth: true
                     }
 
                     Flow {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
                         visible: Config.notifTtsExcludedApps && Config.notifTtsExcludedApps.length > 0
 
                         Repeater {
@@ -470,7 +470,7 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         SettingsTextInputRow {
                             id: ttsExcludedAppInput
@@ -508,22 +508,22 @@ Item {
                 ColumnLayout {
                     visible: !Config.notifRules || Config.notifRules.length === 0
                     Layout.fillWidth: true
-                    Layout.topMargin: Colors.spacingS
-                    Layout.bottomMargin: Colors.spacingS
-                    spacing: Colors.spacingS
+                    Layout.topMargin: Appearance.spacingS
+                    Layout.bottomMargin: Appearance.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
                         text: "󰂛"
                         color: Colors.textDisabled
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeHuge
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeHuge
                         Layout.alignment: Qt.AlignHCenter
                     }
 
                     Text {
                         text: "No rules configured"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: Appearance.fontSizeMedium
                         font.weight: Font.DemiBold
                         Layout.alignment: Qt.AlignHCenter
                     }
@@ -531,7 +531,7 @@ Item {
                     Text {
                         text: "Add a rule below to override behaviour per application."
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
@@ -546,13 +546,13 @@ Item {
                         required property int index
 
                         active: false
-                        contentInset: Colors.spacingM
-                        rowSpacing: Colors.spacingS
+                        contentInset: Appearance.spacingM
+                        rowSpacing: Appearance.spacingS
 
                         Rectangle {
                             width: 34
                             height: 34
-                            radius: Colors.radiusSmall
+                            radius: Appearance.radiusSmall
                             color: Colors.withAlpha(Colors.text, 0.07)
                             border.color: Colors.border
                             border.width: 1
@@ -562,8 +562,8 @@ Item {
                                 anchors.centerIn: parent
                                 text: modelData.action === "mute" ? "󰂛" : "󰔛"
                                 color: Colors.textSecondary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeLarge
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeLarge
                             }
                         }
 
@@ -574,7 +574,7 @@ Item {
                             Text {
                                 text: modelData.appName
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.DemiBold
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
@@ -591,7 +591,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: modelData.action === "mute" ? "mute" : "timeout override"
                                     color: Colors.primary
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     font.weight: Font.DemiBold
                                 }
                             }
@@ -616,12 +616,12 @@ Item {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
 
                     Text {
                         text: "Add Rule"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.DemiBold
                     }
 

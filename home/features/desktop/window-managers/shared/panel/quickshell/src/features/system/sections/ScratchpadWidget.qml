@@ -46,12 +46,12 @@ SharedWidgets.CardBase {
     id: col
     Layout.fillWidth: true
     Layout.fillHeight: true
-    spacing: Colors.paddingSmall
+    spacing: Appearance.paddingSmall
 
     Text {
       text: "SPECIAL WORKSPACES"
       color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       font.weight: Font.Bold
       font.capitalization: Font.AllUppercase
     }
@@ -59,7 +59,7 @@ SharedWidgets.CardBase {
     ColumnLayout {
       id: contentCol
       Layout.fillWidth: true
-      spacing: Colors.spacingSM
+      spacing: Appearance.spacingSM
 
       Repeater {
         id: scratchRepeater
@@ -71,23 +71,23 @@ SharedWidgets.CardBase {
           color: scratchHover.containsMouse ? Colors.primarySubtle : Colors.cardSurface
           border.color: Colors.border
           border.width: 1
-          radius: Colors.radiusXXS
-          implicitHeight: scratchRow.implicitHeight + Colors.paddingSmall * 2
+          radius: Appearance.radiusXXS
+          implicitHeight: scratchRow.implicitHeight + Appearance.paddingSmall * 2
           Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
           SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: scratchHover.containsMouse }
 
           RowLayout {
             id: scratchRow
-            anchors.fill: parent; anchors.margins: Colors.paddingSmall; spacing: Colors.paddingSmall
-            Text { text: "󰐃"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium; Layout.alignment: Qt.AlignTop }
+            anchors.fill: parent; anchors.margins: Appearance.paddingSmall; spacing: Appearance.paddingSmall
+            Text { text: "󰐃"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium; Layout.alignment: Qt.AlignTop }
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: Colors.spacingXXS
+              spacing: Appearance.spacingXXS
               Text {
                 text: modelData.title
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 Layout.fillWidth: true
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
@@ -95,11 +95,11 @@ SharedWidgets.CardBase {
               Text {
                 text: modelData.workspace
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.capitalization: Font.Capitalize
               }
             }
-            Text { text: "󰁔"; color: Colors.textDisabled; font.family: Colors.fontMono }
+            Text { text: "󰁔"; color: Colors.textDisabled; font.family: Appearance.fontMono }
           }
 
           SharedWidgets.StateLayer {

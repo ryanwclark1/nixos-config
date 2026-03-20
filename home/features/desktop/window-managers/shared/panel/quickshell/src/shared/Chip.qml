@@ -12,7 +12,7 @@ Rectangle {
   property color bgColor: Colors.withAlpha(root.iconColor, 0.16)
   property color borderColor: Colors.withAlpha(Colors.textDisabled, 0.06)
 
-  radius: Colors.radiusPill
+  radius: Appearance.radiusPill
   color: root.bgColor
   border.color: root.borderColor
   border.width: 1
@@ -22,19 +22,19 @@ Rectangle {
   Row {
     id: row
     anchors.centerIn: parent
-    spacing: Colors.spacingXS
+    spacing: Appearance.spacingXS
 
     Loader {
       visible: root.icon !== ""
       sourceComponent: root.icon.endsWith(".svg") ? _chSvg : _chNerd
     }
-    Component { id: _chSvg; SvgIcon { source: root.icon; color: root.iconColor; size: Colors.fontSizeXS } }
-    Component { id: _chNerd; Text { text: root.icon; color: root.iconColor; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black } }
+    Component { id: _chSvg; SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeXS } }
+    Component { id: _chNerd; Text { text: root.icon; color: root.iconColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black } }
 
     Text {
       text: root.text
       color: root.textColor
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       font.weight: Font.Bold
     }
   }

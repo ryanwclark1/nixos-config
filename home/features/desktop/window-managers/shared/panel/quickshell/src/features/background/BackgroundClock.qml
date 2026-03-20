@@ -20,7 +20,7 @@ Item {
 
     ColumnLayout {
         id: clockLayout
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         anchors.horizontalCenter: root._center || (!root._left && !root._right) ? parent.horizontalCenter : undefined
         anchors.verticalCenter: root._center || (!root._top && !root._bottom) ? parent.verticalCenter : undefined
@@ -28,7 +28,7 @@ Item {
         anchors.bottom: root._bottom ? parent.bottom : undefined
         anchors.left: root._left ? parent.left : undefined
         anchors.right: root._right ? parent.right : undefined
-        anchors.margins: Colors.spacingXL * 2
+        anchors.margins: Appearance.spacingXL * 2
 
         Text {
             id: timeText
@@ -44,10 +44,10 @@ Item {
                 return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
             }
             color: Colors.withAlpha(Colors.text, 0.85)
-            font.pixelSize: Colors.fontSizeMassive
+            font.pixelSize: Appearance.fontSizeMassive
             font.weight: Font.Light
             font.family: Config.fontFamily
-            font.letterSpacing: Colors.letterSpacingTight
+            font.letterSpacing: Appearance.letterSpacingTight
         }
 
         Text {
@@ -58,7 +58,7 @@ Item {
                 return Qt.formatDate(d, "dddd, MMMM d");
             }
             color: Colors.withAlpha(Colors.text, 0.6)
-            font.pixelSize: Colors.fontSizeXL
+            font.pixelSize: Appearance.fontSizeXL
             font.family: Config.fontFamily
         }
     }

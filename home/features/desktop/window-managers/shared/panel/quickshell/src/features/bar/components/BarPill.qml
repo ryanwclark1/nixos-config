@@ -73,7 +73,7 @@ MouseArea {
 
   // Multiplicative scale: hover lifts, press pushes back toward normal
   scale: (containsMouse ? hoverScale : 1.0) * (pressed ? 0.94 : 1.0)
-  Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
+  Behavior on scale { NumberAnimation { duration: Appearance.durationMedium; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
 
   // Y-offset physics: hover lifts, press pushes down
   property real _yOffset: pressed ? 1.5 : (containsMouse ? -0.5 : 0)
@@ -92,7 +92,7 @@ MouseArea {
     border.width: 2
     opacity: root.isActive ? 1.0 : 0.0
     visible: opacity > 0
-    Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
+    Behavior on opacity { NumberAnimation { duration: Appearance.durationNormal } }
   }
 
   Rectangle {
@@ -105,7 +105,7 @@ MouseArea {
     border.width: 1
     opacity: root.isActive ? 1.0 : (root.containsMouse ? 1.0 : 0.8)
     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-    Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+    Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
     Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
     gradient: SurfaceGradient {}
@@ -127,7 +127,7 @@ MouseArea {
       border.color: root.isActive ? Colors.withAlpha("#fff", 0.15) : Colors.borderLight
       border.width: 1
       opacity: root.isActive ? 0.6 : (root.containsMouse ? 0.25 : 0.1)
-      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+      Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
     }
 
     // Shimmer sweep on hover
@@ -153,15 +153,15 @@ MouseArea {
         property: "x"
         from: -60
         to: root.width + 60
-        duration: Colors.durationPulse
+        duration: Appearance.durationPulse
         easing.type: Easing.InOutQuad
       }
 
       SequentialAnimation {
         id: shimmerFade
-        NumberAnimation { target: shimmer; property: "opacity"; to: 1.0; duration: Colors.durationFlash }
+        NumberAnimation { target: shimmer; property: "opacity"; to: 1.0; duration: Appearance.durationFlash }
         PauseAnimation { duration: 440 }
-        NumberAnimation { target: shimmer; property: "opacity"; to: 0.0; duration: Colors.durationFlash }
+        NumberAnimation { target: shimmer; property: "opacity"; to: 0.0; duration: Appearance.durationFlash }
       }
     }
 

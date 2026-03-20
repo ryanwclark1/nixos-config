@@ -124,22 +124,22 @@ SharedWidgets.CardBase {
   ColumnLayout {
     id: updatesLayout
     Layout.fillWidth: true
-    spacing: Colors.paddingMedium
+    spacing: Appearance.paddingMedium
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.paddingMedium
+      spacing: Appearance.paddingMedium
 
       Rectangle {
-        width: 42; height: 42; radius: Colors.radiusPill; color: Colors.secondary
+        width: 42; height: 42; radius: Appearance.radiusPill; color: Colors.secondary
         Layout.alignment: Qt.AlignTop
-        Text { anchors.centerIn: parent; text: "󰚰"; color: Colors.text; font.pixelSize: Colors.fontSizeXL; font.family: Colors.fontMono }
+        Text { anchors.centerIn: parent; text: "󰚰"; color: Colors.text; font.pixelSize: Appearance.fontSizeXL; font.family: Appearance.fontMono }
       }
 
       Text {
         text: "System Updates"
         color: Colors.text
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         font.weight: Font.Bold
         elide: Text.ElideRight
         Layout.fillWidth: true
@@ -147,13 +147,13 @@ SharedWidgets.CardBase {
       }
 
       Rectangle {
-        width: 80; height: 32; radius: Colors.radiusXXS
+        width: 80; height: 32; radius: Appearance.radiusXXS
         color: root.isChecking ? Colors.cardSurface : Colors.primaryMid
         border.color: root.isChecking ? Colors.border : Colors.primary
         border.width: 1
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         scale: refreshHover.pressed ? 0.96 : 1.0
-        Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+        Behavior on scale { NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutBack } }
 
         Rectangle {
           anchors.fill: parent
@@ -188,7 +188,7 @@ SharedWidgets.CardBase {
           anchors.centerIn: parent
           text: root.isChecking ? "..." : "Refresh"
           color: root.isChecking ? Colors.textDisabled : Colors.primary
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           font.weight: Font.DemiBold
         }
       }
@@ -197,7 +197,7 @@ SharedWidgets.CardBase {
     Flow {
       Layout.fillWidth: true
       width: parent.width
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
 
       SharedWidgets.Chip {
         icon: "󱄅"
@@ -217,7 +217,7 @@ SharedWidgets.CardBase {
     Text {
       text: root.statusText
       color: root.lastRunFailed ? Colors.error : (root.isChecking ? Colors.info : Colors.textSecondary)
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       Layout.fillWidth: true
       wrapMode: Text.Wrap
       maximumLineCount: 2
@@ -225,7 +225,7 @@ SharedWidgets.CardBase {
     Text {
       text: root.statusDetail
       color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       Layout.fillWidth: true
       wrapMode: Text.Wrap
       maximumLineCount: 3
@@ -233,7 +233,7 @@ SharedWidgets.CardBase {
     Text {
       text: "Last checked: " + root.lastCheckedText
       color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       Layout.fillWidth: true
       wrapMode: Text.Wrap
       maximumLineCount: 2
@@ -241,7 +241,7 @@ SharedWidgets.CardBase {
     Text {
       text: "Only nix-based updates are currently supported."
       color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       Layout.fillWidth: true
       wrapMode: Text.Wrap
       maximumLineCount: 2

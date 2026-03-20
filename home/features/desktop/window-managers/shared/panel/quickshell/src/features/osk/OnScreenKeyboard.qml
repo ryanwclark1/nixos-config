@@ -35,7 +35,7 @@ PanelWindow {
     exclusiveZone: pinned && isVisible ? oskBg.height + 2 : 0
 
     implicitWidth:  oskBg.width
-    implicitHeight: oskBg.height + Colors.spacingL   // room for shadow
+    implicitHeight: oskBg.height + Appearance.spacingL   // room for shadow
 
     // ── Public API ───────────────────────────────────────────────────────────
     function open()   { root.isVisible = true;  }
@@ -72,27 +72,27 @@ PanelWindow {
             bottom:       parent.bottom
             left:         parent.left
             right:        parent.right
-            bottomMargin: Colors.spacingS
-            leftMargin:   Colors.spacingM
-            rightMargin:  Colors.spacingM
+            bottomMargin: Appearance.spacingS
+            leftMargin:   Appearance.spacingM
+            rightMargin:  Appearance.spacingM
         }
 
         color:        Colors.popupSurface
         border.color: Colors.border
         border.width: 1
-        radius:       Colors.radiusLarge
+        radius:       Appearance.radiusLarge
         focus:        root.isVisible
         Keys.onEscapePressed: root.close()
 
-        implicitWidth:  oskRow.implicitWidth  + Colors.paddingMedium * 2
-        implicitHeight: oskRow.implicitHeight + Colors.paddingMedium * 2
+        implicitWidth:  oskRow.implicitWidth  + Appearance.paddingMedium * 2
+        implicitHeight: oskRow.implicitHeight + Appearance.paddingMedium * 2
 
         // ── Slide-up enter / slide-down exit ─────────────────────────────────
-        property real _slideOffset: root.isVisible ? 0 : implicitHeight + Colors.spacingM
+        property real _slideOffset: root.isVisible ? 0 : implicitHeight + Appearance.spacingM
         Behavior on _slideOffset {
             NumberAnimation {
                 id: _enterAnim
-                duration: Colors.durationPanelOpen
+                duration: Appearance.durationPanelOpen
                 easing.type: Easing.OutCubic
             }
         }
@@ -105,7 +105,7 @@ PanelWindow {
         Behavior on _fadeOpacity {
             NumberAnimation {
                 id: _exitAnim
-                duration: Colors.durationPanelClose
+                duration: Appearance.durationPanelClose
                 easing.type: Easing.OutCubic
             }
         }
@@ -121,23 +121,23 @@ PanelWindow {
 
             anchors {
                 fill:          parent
-                leftMargin:    Colors.paddingMedium
-                rightMargin:   Colors.paddingMedium
-                topMargin:     Colors.paddingMedium
-                bottomMargin:  Colors.paddingMedium
+                leftMargin:    Appearance.paddingMedium
+                rightMargin:   Appearance.paddingMedium
+                topMargin:     Appearance.paddingMedium
+                bottomMargin:  Appearance.paddingMedium
             }
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             // ── Control column (pin + hide) ───────────────────────────────────
             ColumnLayout {
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 Layout.alignment: Qt.AlignVCenter
 
                 // Pin button
                 Rectangle {
                     id: pinBtn
                     width: 40; height: 40
-                    radius: Colors.radiusSmall
+                    radius: Appearance.radiusSmall
                     color: root.pinned ? Colors.primarySubtle : Colors.cardSurface
                     border.color: root.pinned ? Colors.primary : Colors.border
                     border.width: 1
@@ -148,8 +148,8 @@ PanelWindow {
                     Text {
                         anchors.centerIn: parent
                         text: ""
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeMedium
                         color: root.pinned ? Colors.primary : Colors.textSecondary
                         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                     }
@@ -176,7 +176,7 @@ PanelWindow {
                 Rectangle {
                     id: hideBtn
                     width: 40; height: 40
-                    radius: Colors.radiusSmall
+                    radius: Appearance.radiusSmall
                     color: Colors.cardSurface
                     border.color: Colors.border
                     border.width: 1
@@ -184,8 +184,8 @@ PanelWindow {
                     Text {
                         anchors.centerIn: parent
                         text: "󰌌"
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeMedium
                         color: Colors.textSecondary
                     }
 
@@ -211,8 +211,8 @@ PanelWindow {
             // ── Vertical divider ─────────────────────────────────────────────
             Rectangle {
                 Layout.fillHeight: true
-                Layout.topMargin:    Colors.spacingM
-                Layout.bottomMargin: Colors.spacingM
+                Layout.topMargin:    Appearance.spacingM
+                Layout.bottomMargin: Appearance.spacingM
                 implicitWidth: 1
                 color: Colors.border
             }

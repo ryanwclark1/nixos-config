@@ -11,7 +11,7 @@ BasePopupMenu {
   popupMaxWidth: 360; compactThreshold: 350
   implicitHeight: compactMode ? 520 : 480
   title: "Clipboard"
-  contentSpacing: Colors.spacingM
+  contentSpacing: Appearance.spacingM
   focusOnOpen: true
   initialFocusTarget: searchBar.inputItem
 
@@ -126,7 +126,7 @@ BasePopupMenu {
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.spacingS
+    columnSpacing: Appearance.spacingS
 
       Repeater {
         model: ScriptModel { values: root.filteredItemsResult }
@@ -136,8 +136,8 @@ BasePopupMenu {
           required property var modelData
           Layout.fillWidth: true
           readonly property bool isSelected: clipMouse.containsMouse || root.selectedIndex === index
-          implicitHeight: (clipCard.isImage && clipCard.imageSrc !== "") ? 140 : clipContentCol.implicitHeight + Colors.spacingM * 2
-          radius: Colors.radiusMedium
+          implicitHeight: (clipCard.isImage && clipCard.imageSrc !== "") ? 140 : clipContentCol.implicitHeight + Appearance.spacingM * 2
+          radius: Appearance.radiusMedium
           color: isSelected ? Colors.primarySubtle : Colors.cardSurface
           border.color: isSelected ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
           border.width: 1
@@ -172,14 +172,14 @@ BasePopupMenu {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingXS
+            anchors.margins: Appearance.spacingM
+            spacing: Appearance.spacingXS
 
             // Image preview
             Rectangle {
               Layout.fillWidth: true
               Layout.preferredHeight: 100
-              radius: Colors.radiusXS
+              radius: Appearance.radiusXS
               color: Colors.withAlpha(Colors.text, 0.04)
               visible: clipCard.isImage && clipCard.imageSrc !== ""
               clip: true
@@ -206,8 +206,8 @@ BasePopupMenu {
                 anchors.centerIn: parent
                 visible: clipImage.status === Image.Error
                 text: "\uf03e"
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXL
                 color: Colors.withAlpha(Colors.text, 0.3)
               }
             }
@@ -217,8 +217,8 @@ BasePopupMenu {
               Layout.fillWidth: true
               text: clipCard.contentText
               color: Colors.text
-              font.pixelSize: Colors.fontSizeSmall
-              font.family: clipCard.isImage ? Config.fontFamily : Colors.fontMono
+              font.pixelSize: Appearance.fontSizeSmall
+              font.family: clipCard.isImage ? Config.fontFamily : Appearance.fontMono
               wrapMode: Text.WrapAnywhere
               maximumLineCount: 3
               elide: Text.ElideRight
@@ -228,19 +228,19 @@ BasePopupMenu {
             // Footer: character count + delete
             RowLayout {
               Layout.fillWidth: true
-              spacing: Colors.spacingS
+              spacing: Appearance.spacingS
 
               Text {
                 text: clipCard.isImage ? "Image" : (clipCard.charCount + " chars")
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXXS
+                font.pixelSize: Appearance.fontSizeXXS
                 Layout.fillWidth: true
               }
 
               SharedWidgets.IconButton {
                 icon: "delete.svg"
                 size: 22
-                iconSize: Colors.fontSizeSmall
+                iconSize: Appearance.fontSizeSmall
                 iconColor: Colors.textDisabled
                 stateColor: Colors.error
                 tooltipText: "Delete"
@@ -268,8 +268,8 @@ BasePopupMenu {
       // Empty state
       SharedWidgets.EmptyState {
         Layout.fillWidth: true
-        Layout.topMargin: Colors.spacingS
-        Layout.bottomMargin: Colors.spacingS
+        Layout.topMargin: Appearance.spacingS
+        Layout.bottomMargin: Appearance.spacingS
         visible: root.filteredItemsResult.length === 0
         icon: root.isLoadingHistory ? "󰔟" : (root.clipboardError !== "" ? "󰅙" : (root.searchQuery ? "󰍉" : "󰅗"))
         message: root.isLoadingHistory

@@ -34,26 +34,26 @@ Rectangle {
   }
 
   width: parent.width
-  height: root.showContent ? colMain.implicitHeight + Colors.paddingLarge * 2 : 0
+  height: root.showContent ? colMain.implicitHeight + Appearance.paddingLarge * 2 : 0
   opacity: root.showContent ? 1.0 : 0.0
   visible: height > 0
 
   color: root.isUrgent ? Colors.errorLight : Colors.cardSurface
   border.color: root.isUrgent ? Colors.error : Colors.border
   border.width: 1
-  radius: Colors.radiusLarge
+  radius: Appearance.radiusLarge
   clip: true
 
-  Behavior on height { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-  Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
+  Behavior on height { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutCubic } }
+  Behavior on opacity { NumberAnimation { duration: Appearance.durationNormal } }
 
   SharedWidgets.InnerHighlight { highlightOpacity: root.isUrgent ? 0.25 : 0.12 }
 
   SequentialAnimation on border.color {
     running: root.isUrgent
     loops: Animation.Infinite
-    ColorAnimation { from: Colors.error; to: Qt.lighter(Colors.error, 1.4); duration: Colors.durationLong }
-    ColorAnimation { from: Qt.lighter(Colors.error, 1.4); to: Colors.error; duration: Colors.durationLong }
+    ColorAnimation { from: Colors.error; to: Qt.lighter(Colors.error, 1.4); duration: Appearance.durationLong }
+    ColorAnimation { from: Qt.lighter(Colors.error, 1.4); to: Colors.error; duration: Appearance.durationLong }
   }
 
   property var mprisPlayer: {
@@ -87,12 +87,12 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: parent.top
-    anchors.margins: Colors.paddingLarge
-    spacing: Colors.spacingM
+    anchors.margins: Appearance.paddingLarge
+    spacing: Appearance.spacingM
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingM
+      spacing: Appearance.spacingM
 
       SharedWidgets.AppIcon {
         iconName: notification ? notification.appIcon : ""
@@ -109,16 +109,16 @@ Rectangle {
         Text {
           text: notification ? (notification.appName || "Notification") : ""
           color: root.isUrgent ? Colors.error : Colors.textSecondary
-          font.pixelSize: Colors.fontSizeXXS
+          font.pixelSize: Appearance.fontSizeXXS
           font.weight: Font.Black
           font.capitalization: Font.AllUppercase
-          font.letterSpacing: Colors.letterSpacingWide
+          font.letterSpacing: Appearance.letterSpacingWide
         }
 
         Text {
           text: notification ? notification.summary : ""
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
           Layout.fillWidth: true
           elide: Text.ElideRight
@@ -129,13 +129,13 @@ Rectangle {
         visible: !root.isPopup && !!notification && !!notification._receivedAt
         text: notification && notification._receivedAt ? Qt.formatDateTime(notification._receivedAt, "HH:mm") : ""
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
       }
 
       SharedWidgets.IconButton {
         icon: "dismiss.svg"
         size: 28
-        iconSize: Colors.fontSizeLarge
+        iconSize: Appearance.fontSizeLarge
         iconColor: Colors.textDisabled
         stateColor: Colors.error
         tooltipText: "Dismiss"
@@ -147,7 +147,7 @@ Rectangle {
       Layout.fillWidth: true
       text: notification ? notification.body : ""
       color: Colors.textSecondary
-      font.pixelSize: Colors.fontSizeSmall
+      font.pixelSize: Appearance.fontSizeSmall
       wrapMode: Text.Wrap
       visible: !!notification && notification.body !== ""
       maximumLineCount: root.isPopup ? 3 : 10
@@ -158,7 +158,7 @@ Rectangle {
       Layout.fillWidth: true
       Layout.preferredHeight: 160
       visible: root.previewImageSource !== ""
-      radius: Colors.radiusMedium
+      radius: Appearance.radiusMedium
       color: "#33000000"
       clip: true
 
@@ -173,20 +173,20 @@ Rectangle {
     Rectangle {
       Layout.fillWidth: true
       height: 44
-      radius: Colors.radiusMedium
+      radius: Appearance.radiusMedium
       color: Colors.highlightLight
       visible: root.mprisPlayer !== null
 
       RowLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingS
-        spacing: Colors.spacingM
+        anchors.margins: Appearance.spacingS
+        spacing: Appearance.spacingM
 
         Item { Layout.fillWidth: true }
 
         SharedWidgets.IconButton {
           icon: "previous.svg"
-          iconSize: Colors.fontSizeLarge
+          iconSize: Appearance.fontSizeLarge
           tooltipText: "Previous track"
           onClicked: if (root.mprisPlayer) root.mprisPlayer.previous()
         }
@@ -202,7 +202,7 @@ Rectangle {
 
         SharedWidgets.IconButton {
           icon: "next.svg"
-          iconSize: Colors.fontSizeLarge
+          iconSize: Appearance.fontSizeLarge
           tooltipText: "Next track"
           onClicked: if (root.mprisPlayer) root.mprisPlayer.next()
         }
@@ -214,7 +214,7 @@ Rectangle {
     Rectangle {
       Layout.fillWidth: true
       height: 40
-      radius: Colors.radiusSmall
+      radius: Appearance.radiusSmall
       color: Colors.highlightLight
       visible: root.isReplying
       border.color: replyInput.activeFocus ? Colors.primary : Colors.border
@@ -223,10 +223,10 @@ Rectangle {
       TextInput {
         id: replyInput
         anchors.fill: parent
-        anchors.margins: Colors.paddingSmall
+        anchors.margins: Appearance.paddingSmall
         verticalAlignment: Text.AlignVCenter
         color: Colors.text
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         onVisibleChanged: if (!visible && activeFocus) focus = false
         Keys.onReturnPressed: {
           root.replySent(text);
@@ -237,18 +237,18 @@ Rectangle {
 
       Text {
         anchors.fill: parent
-        anchors.leftMargin: Colors.paddingSmall
+        anchors.leftMargin: Appearance.paddingSmall
         verticalAlignment: Text.AlignVCenter
         text: "Type a reply..."
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         visible: !replyInput.text && !replyInput.activeFocus
       }
     }
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
       visible: !root.isReplying && !!notification && !!notification.actions && notification.actions.count > 0
 
       Repeater {
@@ -258,7 +258,7 @@ Rectangle {
           Layout.fillWidth: true
           Layout.preferredHeight: 32
           text: modelData.text || ""
-          fontSize: Colors.fontSizeSmall
+          fontSize: Appearance.fontSizeSmall
           onClicked: {
             var label = (modelData.text || "").toLowerCase();
             if (label.includes("reply")) {
@@ -275,14 +275,14 @@ Rectangle {
     // Screenshot-specific actions
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
       visible: !!(root.notification && root.notification.screenshotPath)
 
       SharedWidgets.Button {
         Layout.fillWidth: true
         Layout.preferredHeight: 32
         text: "󰏫  Edit in " + (Config.screenshotEditor === "satty" ? "Satty" : "Swappy")
-        fontSize: Colors.fontSizeSmall
+        fontSize: Appearance.fontSizeSmall
         onClicked: root._openScreenshotEditor()
       }
 
@@ -290,7 +290,7 @@ Rectangle {
         Layout.fillWidth: true
         Layout.preferredHeight: 32
         text: "󰉋  Open Folder"
-        fontSize: Colors.fontSizeSmall
+        fontSize: Appearance.fontSizeSmall
         onClicked: {
           var dir = root.notification.screenshotPath.substring(0, root.notification.screenshotPath.lastIndexOf("/"));
           Quickshell.execDetached(["xdg-open", dir]);

@@ -31,7 +31,7 @@ Scope {
             NumberAnimation on windowOpacity {
                 id: fadeOut
                 from: 1; to: 0
-                duration: Colors.durationMedium
+                duration: Appearance.durationMedium
                 running: false
                 onFinished: osdWindow.windowOpacity = 1
             }
@@ -50,7 +50,7 @@ Scope {
 
                 ColumnLayout {
                     anchors.centerIn: parent
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
 
                     // Countdown circle
                     Rectangle {
@@ -66,9 +66,9 @@ Scope {
                             anchors.centerIn: parent
                             text: root.remaining
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeDisplay
+                            font.pixelSize: Appearance.fontSizeDisplay
                             font.weight: Font.Bold
-                            font.family: Colors.fontMono
+                            font.family: Appearance.fontMono
 
                             // Scale-bounce on each tick
                             property real animScale: 1.0
@@ -77,7 +77,7 @@ Scope {
                             NumberAnimation on animScale {
                                 id: tickAnim
                                 from: 1.3; to: 1.0
-                                duration: Colors.animFastSpatial.duration
+                                duration: Appearance.animFastSpatial.duration
                                 easing.type: Easing.OutBack
                             }
                         }
@@ -96,7 +96,7 @@ Scope {
                         Layout.alignment: Qt.AlignHCenter
                         text: "Click to cancel"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                     }
                 }
             }

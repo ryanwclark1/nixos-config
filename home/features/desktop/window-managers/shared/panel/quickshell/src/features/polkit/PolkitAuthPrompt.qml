@@ -9,7 +9,7 @@ ColumnLayout {
     required property PolkitPamContext pamContext
     signal submitRequested()
 
-    spacing: Colors.spacingL
+    spacing: Appearance.spacingL
 
     property real shakeOffset: 0
     transform: Translate { x: root.shakeOffset }
@@ -28,9 +28,9 @@ ColumnLayout {
 
     SequentialAnimation {
         id: shakeAnim
-        PropertyAnimation { target: root; property: "shakeOffset"; to: 10; duration: Colors.durationShake }
-        PropertyAnimation { target: root; property: "shakeOffset"; to: -10; duration: Colors.durationShake }
-        PropertyAnimation { target: root; property: "shakeOffset"; to: 0; duration: Colors.durationShake }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: 10; duration: Appearance.durationShake }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: -10; duration: Appearance.durationShake }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: 0; duration: Appearance.durationShake }
     }
 
     // Password input
@@ -38,20 +38,20 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.preferredHeight: 50
         color: Colors.highlightLight
-        radius: Colors.radiusCard
+        radius: Appearance.radiusCard
         border.color: pwInput.activeFocus ? Colors.primary : Colors.border
         border.width: 1
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.paddingSmall
+            anchors.margins: Appearance.spacingM
+            spacing: Appearance.paddingSmall
 
             Text {
                 text: "\u{f0341}"
                 color: Colors.textDisabled
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXL
             }
 
             TextInput {
@@ -59,7 +59,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 verticalAlignment: Text.AlignVCenter
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeXL
+                font.pixelSize: Appearance.fontSizeXL
                 echoMode: TextInput.Password
                 focus: true
 
@@ -72,7 +72,7 @@ ColumnLayout {
 
             // Submit button
             Rectangle {
-                width: 28; height: 28; radius: Colors.radiusMedium
+                width: 28; height: 28; radius: Appearance.radiusMedium
                 color: Colors.withAlpha(Colors.primary, 0.6)
                 visible: pwInput.text.length > 0
 
@@ -80,8 +80,8 @@ ColumnLayout {
                     anchors.centerIn: parent
                     text: "\u{f0054}"
                     color: Colors.background
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
 
                 StateLayer {
@@ -109,7 +109,7 @@ ColumnLayout {
             anchors.centerIn: parent
             text: "Password..."
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeLarge
+            font.pixelSize: Appearance.fontSizeLarge
             visible: !pwInput.text && !pwInput.activeFocus
         }
     }
@@ -119,7 +119,7 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         text: root.pamContext ? root.pamContext.errorMessage : ""
         color: Colors.error
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         font.weight: Font.Medium
         visible: root.pamContext ? root.pamContext.showError : false
     }
@@ -129,7 +129,7 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         text: "Authenticating..."
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         visible: root.pamContext ? root.pamContext.authInProgress : false
     }
 }

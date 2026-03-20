@@ -12,8 +12,8 @@ Rectangle {
     default property alias content: contentColumn.data
 
     Layout.fillWidth: true
-    implicitHeight: contentColumn.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: contentColumn.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.withAlpha(Colors.primary, 0.07)
     border.color: Colors.primaryMarked
     border.width: 1
@@ -24,29 +24,29 @@ Rectangle {
             left: parent.left
             right: parent.right
             top: parent.top
-            margins: Colors.spacingM
+            margins: Appearance.spacingM
         }
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Loader {
                 visible: root.iconName !== ""
                 sourceComponent: root.iconName.endsWith(".svg") ? _ciSvg : _ciNerd
                 Layout.alignment: Qt.AlignTop
             }
-            Component { id: _ciSvg; SvgIcon { source: root.iconName; color: Colors.primary; size: Colors.fontSizeLarge } }
-            Component { id: _ciNerd; Text { text: root.iconName; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
+            Component { id: _ciSvg; SvgIcon { source: root.iconName; color: Colors.primary; size: Appearance.fontSizeLarge } }
+            Component { id: _ciNerd; Text { text: root.iconName; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
 
             Text {
-                width: root.iconName !== "" ? Math.max(0, parent.width - Colors.fontSizeLarge - Colors.spacingS) : parent.width
+                width: root.iconName !== "" ? Math.max(0, parent.width - Appearance.fontSizeLarge - Appearance.spacingS) : parent.width
                 visible: root.title !== ""
                 text: root.title
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 font.weight: Font.DemiBold
                 wrapMode: Text.WordWrap
             }
@@ -56,7 +56,7 @@ Rectangle {
             visible: root.body !== ""
             text: root.body
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
         }

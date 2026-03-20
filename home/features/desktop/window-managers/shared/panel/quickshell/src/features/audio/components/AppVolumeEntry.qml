@@ -17,7 +17,7 @@ RowLayout {
     readonly property bool appMuted: !!(root.appNode && root.appNode.muted)
 
     Layout.fillWidth: true
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
     height: 40
 
     // App icon (Nerd Font fallback if no icon resolved)
@@ -32,8 +32,8 @@ RowLayout {
         }
         visible: !appIconImage.visible
         color: root.appMuted ? Colors.error : Colors.primary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeLarge
+        font.family: Appearance.fontMono
+        font.pixelSize: Appearance.fontSizeLarge
         Layout.preferredWidth: 24
         horizontalAlignment: Text.AlignHCenter
     }
@@ -57,7 +57,7 @@ RowLayout {
     Text {
         text: root.appName
         color: Colors.text
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         elide: Text.ElideRight
         Layout.preferredWidth: 70
         Layout.maximumWidth: 70

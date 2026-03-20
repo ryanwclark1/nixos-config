@@ -100,7 +100,7 @@ Item {
         Flow {
             id: gridLayout
             width: parent.width
-            spacing: Colors.spacingLG
+            spacing: Appearance.spacingLG
 
             Repeater {
                 model: root.keybinds
@@ -121,12 +121,12 @@ Item {
                     }
 
                     visible: filteredBinds.length > 0
-                    width: Math.min(360, gridLayout.width / Math.max(1, Math.floor(gridLayout.width / 360)) - Colors.spacingLG)
-                    height: sectionCol.implicitHeight + Colors.paddingLarge * 2
+                    width: Math.min(360, gridLayout.width / Math.max(1, Math.floor(gridLayout.width / 360)) - Appearance.spacingLG)
+                    height: sectionCol.implicitHeight + Appearance.paddingLarge * 2
                     color: Colors.cardSurface
                     border.color: Colors.border
                     border.width: 1
-                    radius: Colors.radiusMedium
+                    radius: Appearance.radiusMedium
 
                     InnerHighlight { highlightOpacity: 0.08 }
 
@@ -135,17 +135,17 @@ Item {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.top: parent.top
-                        anchors.margins: Colors.paddingLarge
-                        spacing: Colors.spacingS
+                        anchors.margins: Appearance.paddingLarge
+                        spacing: Appearance.spacingS
 
                         // Section title
                         Text {
                             text: modelData.section || "General"
                             color: Colors.primary
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: Font.Black
                             font.capitalization: Font.AllUppercase
-                            font.letterSpacing: Colors.letterSpacingWide
+                            font.letterSpacing: Appearance.letterSpacingWide
                         }
 
                         Rectangle {
@@ -161,18 +161,18 @@ Item {
                             delegate: RowLayout {
                                 required property var modelData
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingM
+                                spacing: Appearance.spacingM
 
                                 // Key chord display
                                 Row {
-                                    spacing: Colors.spacingXXS
+                                    spacing: Appearance.spacingXXS
                                     Repeater {
                                         model: (modelData.keys || "").split("+")
                                         delegate: Rectangle {
                                             required property string modelData
                                             width: keyLabel.implicitWidth + 12
                                             height: 24
-                                            radius: Colors.radiusXS
+                                            radius: Appearance.radiusXS
                                             color: Colors.primaryFaint
                                             border.color: Colors.primarySubtle
                                             border.width: 1
@@ -182,9 +182,9 @@ Item {
                                                 anchors.centerIn: parent
                                                 text: modelData.trim()
                                                 color: Colors.primary
-                                                font.pixelSize: Colors.fontSizeXS
+                                                font.pixelSize: Appearance.fontSizeXS
                                                 font.weight: Font.Bold
-                                                font.family: Colors.fontMono
+                                                font.family: Appearance.fontMono
                                             }
                                         }
                                     }
@@ -195,7 +195,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: modelData.desc || ""
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     elide: Text.ElideRight
                                 }
                             }
@@ -214,7 +214,7 @@ Item {
     ColumnLayout {
         anchors.centerIn: parent
         visible: root.keybinds.length === 0 || (root.searchQuery !== "" && !_hasVisibleSections())
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
         opacity: 0.6
 
         function _hasVisibleSections() {
@@ -236,14 +236,14 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             text: "\u{f030f}"
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeColossal
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeColossal
+            font.family: Appearance.fontMono
         }
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: root.searchQuery === "" ? "Loading keybindings..." : "No matches"
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeLarge
+            font.pixelSize: Appearance.fontSizeLarge
             font.weight: Font.Medium
         }
     }

@@ -63,7 +63,7 @@ SharedWidgets.BarPill {
             return "Omarchy";
         if (iconTheme === "emoji" || iconTheme === "text")
             return "";
-        return Colors.fontMono;
+        return Appearance.fontMono;
     }
 
     tooltipText: statusTooltip
@@ -154,12 +154,12 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             text: root.statusText
             color: root.accentColor
-            font.pixelSize: Colors.fontSizeXL
+            font.pixelSize: Appearance.fontSizeXL
             font.family: root.statusFontFamily
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -168,7 +168,7 @@ SharedWidgets.BarPill {
             visible: !root.iconOnly
             text: root.statusLabel
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

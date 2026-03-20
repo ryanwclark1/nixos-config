@@ -39,7 +39,7 @@ PanelWindow {
         anchors.fill: parent
         color: Colors.overlayScrim
         opacity: root.isVisible ? 1.0 : 0.0
-        Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+        Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
 
         MouseArea {
             anchors.fill: parent
@@ -52,8 +52,8 @@ PanelWindow {
     ElasticNumber {
         id: _elasticScale
         target: root.isVisible ? 1.0 : 0.95
-        fastDuration: Colors.durationSnap
-        slowDuration: Colors.durationPanelOpen
+        fastDuration: Appearance.durationSnap
+        slowDuration: Appearance.durationPanelOpen
         fastWeight: 0.45
     }
 
@@ -66,13 +66,13 @@ PanelWindow {
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
 
         opacity: root.isVisible ? 1.0 : 0.0
         scale: _elasticScale.value
         focus: root.isVisible
         Keys.onEscapePressed: root.close()
-        Behavior on opacity { NumberAnimation { id: _fadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { id: _fadeAnim; duration: Appearance.durationNormal; easing.type: Easing.OutCubic } }
         layer.enabled: _fadeAnim.running || _elasticScale.running
 
         InnerHighlight { highlightOpacity: 0.12 }
@@ -83,20 +83,20 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
-            spacing: Colors.spacingLG
+            anchors.margins: Appearance.paddingLarge
+            spacing: Appearance.spacingLG
 
             // Header
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Text {
                     text: "Keyboard Shortcuts"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeHuge
+                    font.pixelSize: Appearance.fontSizeHuge
                     font.weight: Font.DemiBold
-                    font.letterSpacing: Colors.letterSpacingTight
+                    font.letterSpacing: Appearance.letterSpacingTight
                 }
 
                 Item { Layout.fillWidth: true }
@@ -109,7 +109,7 @@ PanelWindow {
                 }
 
                 IconButton {
-                    size: Colors.iconSizeMedium
+                    size: Appearance.iconSizeMedium
                     icon: "\u{f0156}"
                     tooltipText: "Close"
                     onClicked: root.close()

@@ -16,7 +16,7 @@ Rectangle {
     signal itemDoubleClicked(var entry)
 
     width: parent ? parent.width : 0
-    height: Colors.controlRowHeight
+    height: Appearance.controlRowHeight
 
     color: {
         var isSel = (selectedFile === modelData.path);
@@ -24,7 +24,7 @@ Rectangle {
         if (listItemHover.containsMouse) return Colors.textFaint;
         return index % 2 === 0 ? "transparent" : Colors.cardSurface;
     }
-    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
     // bottom separator
     Rectangle {
@@ -37,9 +37,9 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: Colors.spacingM
-        anchors.rightMargin: Colors.spacingM
-        spacing: Colors.spacingM
+        anchors.leftMargin: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingM
+        spacing: Appearance.spacingM
 
         // Icon
         Item {
@@ -61,8 +61,8 @@ Rectangle {
                 visible: !modelData.isImage
                 text: FBH.fileIcon(modelData)
                 color: modelData.isDir ? Colors.accent : Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeLarge
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeLarge
             }
         }
 
@@ -71,7 +71,7 @@ Rectangle {
             Layout.fillWidth: true
             text: modelData.name
             color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             elide: Text.ElideRight
         }
 
@@ -80,7 +80,7 @@ Rectangle {
             Layout.preferredWidth: 80
             text: modelData.isDir ? "—" : FBH.formatSize(modelData.size)
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             horizontalAlignment: Text.AlignRight
         }
 
@@ -90,7 +90,7 @@ Rectangle {
             Layout.preferredWidth: root.showDetailColumns ? 100 : 0
             text: FBH.formatDate(modelData.mtime)
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             horizontalAlignment: Text.AlignRight
         }
 
@@ -100,7 +100,7 @@ Rectangle {
             Layout.preferredWidth: root.showDetailColumns ? 60 : 0
             text: modelData.isDir ? "folder" : (modelData.extension || "—")
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             horizontalAlignment: Text.AlignRight
             elide: Text.ElideRight
         }

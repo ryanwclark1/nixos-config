@@ -170,10 +170,10 @@ Item {
     Rectangle {
       visible: root.showCompactSearch
       Layout.fillWidth: true
-      Layout.margins: root.tightSpacing ? Colors.spacingM : Colors.spacingL
-      Layout.bottomMargin: root.tightSpacing ? 0 : Colors.spacingS
-      implicitHeight: compactSearchRow.implicitHeight + Colors.spacingM
-      radius: Colors.radiusPill
+      Layout.margins: root.tightSpacing ? Appearance.spacingM : Appearance.spacingL
+      Layout.bottomMargin: root.tightSpacing ? 0 : Appearance.spacingS
+      implicitHeight: compactSearchRow.implicitHeight + Appearance.spacingM
+      radius: Appearance.radiusPill
       color: Colors.modalFieldSurface
       border.color: compactSearchInput.activeFocus ? Colors.primary : Colors.border
       border.width: 1
@@ -181,22 +181,22 @@ Item {
       RowLayout {
         id: compactSearchRow
         anchors.fill: parent
-        anchors.leftMargin: Colors.spacingM
-        anchors.rightMargin: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.leftMargin: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         Text {
           text: "󰍉"
           color: Colors.textDisabled
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeMedium
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeMedium
         }
 
         TextInput {
           id: compactSearchInput
           Layout.fillWidth: true
           color: Colors.text
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           clip: true
           wrapMode: TextInput.Wrap
           onVisibleChanged: {
@@ -219,8 +219,8 @@ Item {
         Text {
           text: "󰅖"
           color: Colors.textDisabled
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeSmall
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeSmall
           visible: compactSearchInput.text.length > 0
 
           MouseArea {
@@ -253,7 +253,7 @@ Item {
 
       SharedWidgets.ScrollableContent {
         anchors.fill: parent
-        columnSpacing: Colors.spacingL
+        columnSpacing: Appearance.spacingL
 
         ColumnLayout {
           Layout.fillWidth: true
@@ -261,18 +261,18 @@ Item {
           Layout.rightMargin: root.tightSpacing ? 20 : 24
           Layout.topMargin: root.tightSpacing ? 20 : 24
           Layout.bottomMargin: root.tightSpacing ? 20 : 24
-          spacing: Colors.spacingL
+          spacing: Appearance.spacingL
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
 
             Text {
               text: "Search Results"
               color: Colors.text
-              font.pixelSize: Colors.fontSizeHuge
+              font.pixelSize: Appearance.fontSizeHuge
               font.weight: Font.Bold
-              font.letterSpacing: Colors.letterSpacingTight
+              font.letterSpacing: Appearance.letterSpacingTight
             }
 
             Text {
@@ -280,7 +280,7 @@ Item {
                 ? root.searchResults.length + " matching settings"
                 : "No matching settings"
               color: Colors.textSecondary
-              font.pixelSize: Colors.fontSizeSmall
+              font.pixelSize: Appearance.fontSizeSmall
               Layout.fillWidth: true
               wrapMode: Text.WordWrap
             }
@@ -292,8 +292,8 @@ Item {
             delegate: Rectangle {
               required property var modelData
               Layout.fillWidth: true
-              implicitHeight: resultColumn.implicitHeight + Colors.spacingM * 2
-              radius: Colors.radiusMedium
+              implicitHeight: resultColumn.implicitHeight + Appearance.spacingM * 2
+              radius: Appearance.radiusMedium
               color: Colors.modalFieldSurface
               border.color: Colors.border
               border.width: 1
@@ -308,17 +308,17 @@ Item {
               ColumnLayout {
                 id: resultColumn
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingS
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingS
 
                 RowLayout {
                   Layout.fillWidth: true
-                  spacing: Colors.spacingM
+                  spacing: Appearance.spacingM
 
                   Rectangle {
                     Layout.preferredWidth: 36
                     Layout.preferredHeight: 36
-                    radius: Colors.radiusSmall
+                    radius: Appearance.radiusSmall
                     color: Colors.primarySubtle
 
                     SettingsMetricIcon { anchors.centerIn: parent; icon: modelData.icon }
@@ -327,7 +327,7 @@ Item {
                   Text {
                     text: modelData.label
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -337,7 +337,7 @@ Item {
                 Text {
                   text: String(modelData.categoryId || "settings").replace(/-/g, " ")
                   color: Colors.textSecondary
-                  font.pixelSize: Colors.fontSizeSmall
+                  font.pixelSize: Appearance.fontSizeSmall
                   Layout.fillWidth: true
                   wrapMode: Text.WordWrap
                 }
@@ -370,7 +370,7 @@ Item {
         anchors.centerIn: parent
         text: "Unknown settings tab"
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
       }
     }
   }

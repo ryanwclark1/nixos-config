@@ -130,7 +130,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.topMargin: Math.max(root.overlayInset, (parent.height - height) / 2)
         anchors.leftMargin: Math.max(root.overlayInset, (parent.width - width) / 2)
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
@@ -138,25 +138,25 @@ Rectangle {
         Flickable {
             id: settingsFlick
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
+            anchors.margins: Appearance.paddingLarge
             clip: true
             contentHeight: settingsColumn.implicitHeight
 
             ColumnLayout {
                 id: settingsColumn
                 width: settingsFlick.width
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
-                        width: root.compactMode ? parent.width : Math.max(0, parent.width - closeSettingsButton.implicitWidth - Colors.spacingS)
+                        width: root.compactMode ? parent.width : Math.max(0, parent.width - closeSettingsButton.implicitWidth - Appearance.spacingS)
                         text: root.editingWidget ? (BarWidgetRegistry.displayName(root.editingWidget.widgetType) + " Settings") : "Widget Settings"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeXL
+                        font.pixelSize: Appearance.fontSizeXL
                         font.weight: Font.DemiBold
                         wrapMode: Text.WordWrap
                     }

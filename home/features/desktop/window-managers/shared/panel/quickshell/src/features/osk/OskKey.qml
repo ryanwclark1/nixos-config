@@ -52,7 +52,7 @@ Rectangle {
     Layout.fillWidth: shape === "space" || shape === "expand"
 
     // ── Appearance ───────────────────────────────────────────────────────────
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: {
         if (isEmpty)
             return "transparent";
@@ -165,8 +165,8 @@ Rectangle {
             visible: isBackspace
             anchors.centerIn: parent
             text: ""
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             color: Colors.text
         }
 
@@ -175,8 +175,8 @@ Rectangle {
             visible: isEnter
             anchors.centerIn: parent
             text: ""
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             color: Colors.text
         }
 
@@ -185,8 +185,8 @@ Rectangle {
             visible: !isBackspace && !isEnter
             anchors.centerIn: parent
             text: _displayLabel
-            font.family: Colors.fontMono
-            font.pixelSize: shape === "fn" ? Colors.fontSizeXS : Colors.fontSizeMedium
+            font.family: Appearance.fontMono
+            font.pixelSize: shape === "fn" ? Appearance.fontSizeXS : Appearance.fontSizeMedium
             font.weight: (isShift && YdotoolService.shiftMode > 0) || _isModToggled
                          ? Font.Bold : Font.Normal
             color: (isShift && YdotoolService.shiftMode > 0) || _isModToggled

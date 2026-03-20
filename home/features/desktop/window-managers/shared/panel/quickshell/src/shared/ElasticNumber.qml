@@ -15,8 +15,8 @@ Item {
     id: root
 
     property real target: 0
-    property int fastDuration: Colors.durationSnap
-    property int slowDuration: Colors.durationSlow
+    property int fastDuration: Appearance.durationSnap
+    property int slowDuration: Appearance.durationSlow
     property real fastWeight: 0.5
 
     readonly property real value: _fast * fastWeight + _slow * (1.0 - fastWeight)

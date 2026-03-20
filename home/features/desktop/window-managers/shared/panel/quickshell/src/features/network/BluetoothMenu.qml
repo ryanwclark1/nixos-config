@@ -144,7 +144,7 @@ BasePopupMenu {
 
     Layout.fillWidth: true
     implicitHeight: visible ? (root.compactMode ? 56 : 46) : 0
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: _cardHover.containsMouse ? Colors.primaryFaint : bgColor
     border.color: borderColor
     border.width: 1
@@ -153,23 +153,23 @@ BasePopupMenu {
 
     RowLayout {
       anchors.fill: parent
-      anchors.margins: Colors.paddingSmall
-      spacing: Colors.paddingSmall
+      anchors.margins: Appearance.paddingSmall
+      spacing: Appearance.paddingSmall
 
       Text {
         text: root.deviceIcon(modelData)
         color: iconColor
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeXL
+        font.family: Appearance.fontMono
+        font.pixelSize: Appearance.fontSizeXL
       }
 
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
         Text {
           text: modelData.name || "Unknown Device"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: nameWeight
           elide: Text.ElideRight
           Layout.fillWidth: true
@@ -177,7 +177,7 @@ BasePopupMenu {
         Text {
           text: modelData.address
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           visible: !!modelData.address
         }
       }
@@ -191,7 +191,7 @@ BasePopupMenu {
       }
 
       SharedWidgets.IconButton {
-        size: 28; radius: Colors.radiusMedium
+        size: 28; radius: Appearance.radiusMedium
         icon: _btCard.actionIcon; stateColor: Colors.error
         tooltipText: _btCard.actionTooltip
         visible: _btCard.showAction
@@ -224,8 +224,8 @@ BasePopupMenu {
         anchors.centerIn: parent
         text: "󰑐"
         color: root.isScanning ? Colors.primary : Colors.textSecondary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeXL
+        font.family: Appearance.fontMono
+        font.pixelSize: Appearance.fontSizeXL
 
         RotationAnimator on rotation {
           from: 0; to: 360
@@ -256,7 +256,7 @@ BasePopupMenu {
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.paddingSmall
+    columnSpacing: Appearance.paddingSmall
 
       // ── EMPTY STATES ──────────────────
       // No adapter
@@ -265,7 +265,7 @@ BasePopupMenu {
         Layout.topMargin: 40
         visible: !root.hasAdapter
         icon: "bluetooth-disabled.svg"
-        iconSize: Colors.iconSizeLarge
+        iconSize: Appearance.iconSizeLarge
         message: "No Bluetooth adapter found"
       }
 
@@ -273,28 +273,28 @@ BasePopupMenu {
       ColumnLayout {
         Layout.fillWidth: true
         visible: root.hasAdapter && !root.effectiveBtEnabled
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
         Layout.topMargin: 40
 
         Text {
           Layout.alignment: Qt.AlignHCenter
           text: "󰂲"
           color: Colors.textDisabled
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeHuge * 2
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeHuge * 2
         }
         Text {
           Layout.alignment: Qt.AlignHCenter
           text: "Bluetooth is off"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
         }
         Rectangle {
           Layout.alignment: Qt.AlignHCenter
           Layout.fillWidth: root.compactMode
           implicitWidth: turnOnLabel.implicitWidth + 24
           implicitHeight: 32
-          radius: Colors.radiusPill
+          radius: Appearance.radiusPill
           color: Colors.primaryStrong
 
           Text {
@@ -302,7 +302,7 @@ BasePopupMenu {
             anchors.centerIn: parent
             text: "Turn On"
             color: Colors.primary
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             font.weight: Font.DemiBold
           }
 
@@ -363,15 +363,15 @@ BasePopupMenu {
       RowLayout {
         Layout.fillWidth: true
         visible: root.isScanning
-        spacing: Colors.spacingS
-        Layout.leftMargin: Colors.spacingXS
+        spacing: Appearance.spacingS
+        Layout.leftMargin: Appearance.spacingXS
 
-        SharedWidgets.LoadingSpinner { size: Colors.fontSizeLarge; color: Colors.textDisabled }
+        SharedWidgets.LoadingSpinner { size: Appearance.fontSizeLarge; color: Colors.textDisabled }
 
         Text {
           text: "Scanning for devices..."
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
         }
       }
 
@@ -390,7 +390,7 @@ BasePopupMenu {
       // No devices found (BT on, not scanning, nothing found)
       SharedWidgets.EmptyState {
         Layout.fillWidth: true
-        Layout.topMargin: Colors.spacingLG
+        Layout.topMargin: Appearance.spacingLG
         visible: root.effectiveBtEnabled && !root.isScanning && root.connectedCount === 0 && root.pairedCount === 0 && root.availableCount === 0
         icon: "bluetooth.svg"
         message: "No devices found"

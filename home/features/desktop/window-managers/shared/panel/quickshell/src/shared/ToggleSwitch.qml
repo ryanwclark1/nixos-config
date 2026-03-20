@@ -63,29 +63,29 @@ Item {
       : 2
 
     Behavior on x {
-      NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 }
+      NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 }
     }
     Behavior on width {
-      NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
+      NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack }
     }
     Behavior on height {
-      NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
+      NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack }
     }
     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
     // Press squish
     scale: mouse.pressed ? 0.88 : 1.0
-    Behavior on scale { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutBack } }
+    Behavior on scale { NumberAnimation { duration: Appearance.durationSnap; easing.type: Easing.OutBack } }
 
     // ── Checkmark icon ────────────────────────────────────────────────────
     Text {
       anchors.centerIn: parent
       text: "󰄬"
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeXS
+      font.family: Appearance.fontMono
+      font.pixelSize: Appearance.fontSizeXS
       color: Colors.primary
       opacity: root.checked ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+      Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
     }
   }
 

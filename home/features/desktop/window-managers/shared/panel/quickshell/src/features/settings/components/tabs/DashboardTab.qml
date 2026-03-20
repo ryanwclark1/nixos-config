@@ -25,7 +25,7 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingL
+                spacing: Appearance.spacingL
 
                 SettingsCard {
                     Layout.fillWidth: true
@@ -34,7 +34,7 @@ Item {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         RowLayout {
                             Layout.fillWidth: true
@@ -42,7 +42,7 @@ Item {
                             Text {
                                 text: "CPU Usage"
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 Layout.fillWidth: true
                             }
 
@@ -59,7 +59,7 @@ Item {
                             Text {
                                 text: "Memory"
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 Layout.fillWidth: true
                             }
 
@@ -80,12 +80,12 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingM
+                        spacing: Appearance.spacingM
 
                         Rectangle {
                             width: 64
                             height: 64
-                            radius: Colors.radiusSmall
+                            radius: Appearance.radiusSmall
                             color: Colors.bgWidget
 
                             Item {
@@ -101,7 +101,7 @@ Item {
                                     visible: !MediaService.trackArtUrl
                                     anchors.centerIn: parent
                                     text: "󰓃"
-                                    font.pixelSize: Colors.iconSizeMedium
+                                    font.pixelSize: Appearance.iconSizeMedium
                                     color: Colors.textDisabled
                                 }
                             }
@@ -109,12 +109,12 @@ Item {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingXXS
+                            spacing: Appearance.spacingXXS
 
                             Text {
                                 text: MediaService.trackTitle || "Not Playing"
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.DemiBold
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
@@ -123,7 +123,7 @@ Item {
                             Text {
                                 text: MediaService.trackArtist || "Unknown Artist"
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
                             }
@@ -139,7 +139,7 @@ Item {
 
             Flow {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 SettingsActionButton {
                     label: "Restart Shell"

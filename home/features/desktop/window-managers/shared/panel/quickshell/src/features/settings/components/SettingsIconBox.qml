@@ -9,9 +9,9 @@ Rectangle {
     property bool active: false
 
     visible: root.icon !== ""
-    width: Colors.controlRowHeight
-    height: Colors.controlRowHeight
-    radius: Colors.radiusSmall
+    width: Appearance.controlRowHeight
+    height: Appearance.controlRowHeight
+    radius: Appearance.radiusSmall
     color: root.active
         ? Colors.primaryAccent
         : Colors.textFaint
@@ -27,15 +27,15 @@ Rectangle {
     }
     Component {
         id: _svgIcon
-        Shared.SvgIcon { source: root.icon; color: root.active ? Colors.primary : Colors.textSecondary; size: Colors.fontSizeXL }
+        Shared.SvgIcon { source: root.icon; color: root.active ? Colors.primary : Colors.textSecondary; size: Appearance.fontSizeXL }
     }
     Component {
         id: _nerdIcon
         Text {
             text: root.icon
             color: root.active ? Colors.primary : Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeXL
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeXL
         }
     }
 }

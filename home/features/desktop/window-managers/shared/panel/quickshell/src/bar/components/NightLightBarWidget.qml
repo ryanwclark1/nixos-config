@@ -26,8 +26,8 @@ SharedWidgets.BarPill {
     Text {
         anchors.centerIn: parent
         color: Colors.warning
-        font.pixelSize: Colors.fontSizeLarge
-        font.family: Colors.fontMono
+        font.pixelSize: Appearance.fontSizeLarge
+        font.family: Appearance.fontMono
         text: "󰌵"
     }
 }

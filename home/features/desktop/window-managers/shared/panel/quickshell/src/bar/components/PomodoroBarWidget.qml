@@ -33,12 +33,12 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             color: PomodoroService.isBreak ? Colors.success : Colors.primary
-            font.pixelSize: Colors.fontSizeLarge
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
+            font.family: Appearance.fontMono
             text: PomodoroService.running ? "󱎫" : "󰔟"
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -46,9 +46,9 @@ SharedWidgets.BarPill {
         Text {
             visible: PomodoroService.running && !root.vertical
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
-            font.family: Colors.fontMono
+            font.family: Appearance.fontMono
             text: PomodoroService.timeDisplay
             anchors.verticalCenter: parent.verticalCenter
         }

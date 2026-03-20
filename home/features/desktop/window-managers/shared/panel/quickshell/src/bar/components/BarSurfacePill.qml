@@ -10,7 +10,7 @@ SharedWidgets.BarPill {
     property string surfaceId: ""
     property string iconText: ""
     property string defaultLabel: ""
-    property real iconSize: Colors.fontSizeXL
+    property real iconSize: Appearance.fontSizeXL
     property string tooltipShortcutText: ""
     property var extraContextActions: []
 
@@ -36,19 +36,19 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             color: Colors.text
             font.pixelSize: root.iconSize
-            font.family: Colors.fontMono
+            font.family: Appearance.fontMono
             text: root.iconText
         }
 
         Text {
             visible: root.panelRef ? !root.panelRef.triggerWidgetIconOnly(root.widgetInstance) : true
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             text: root.panelRef ? root.panelRef.triggerWidgetLabel(root.widgetInstance, root.defaultLabel) : root.defaultLabel
             anchors.verticalCenter: parent.verticalCenter

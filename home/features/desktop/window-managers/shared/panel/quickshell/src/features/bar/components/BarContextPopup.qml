@@ -15,7 +15,7 @@ PopupWindow {
 
     readonly property int itemHeight: 32
     readonly property int separatorHeight: 9
-    readonly property int menuPadding: Colors.spacingXS
+    readonly property int menuPadding: Appearance.spacingXS
     readonly property int menuWidth: 200
     readonly property int maxLayerTextureSize: 4096
 
@@ -47,7 +47,7 @@ PopupWindow {
         root.anchor.window = anchorWin;
 
         var pos = root.barPosition;
-        var gap = Colors.spacingXS;
+        var gap = Appearance.spacingXS;
 
         if (pos === "left" || pos === "right") {
             // Side bars: popup beside the bar, vertically centered on trigger
@@ -113,7 +113,7 @@ PopupWindow {
     Rectangle {
         id: contentRect
         anchors.fill: parent
-        radius: Colors.radiusMedium
+        radius: Appearance.radiusMedium
         color: Colors.popupSurface
         border.color: Colors.border
         border.width: 1
@@ -155,7 +155,7 @@ PopupWindow {
                     Rectangle {
                         visible: modelData.separator === true
                         anchors.centerIn: parent
-                        width: parent.width - Colors.spacingS * 2
+                        width: parent.width - Appearance.spacingS * 2
                         height: 1
                         color: Colors.border
                     }
@@ -164,30 +164,30 @@ PopupWindow {
                     Rectangle {
                         visible: !modelData.separator
                         anchors.fill: parent
-                        radius: Colors.radiusXS
+                        radius: Appearance.radiusXS
                         color: root.focusedIndex === index || itemMouse.containsMouse
                             ? Colors.highlightLight : "transparent"
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: Colors.spacingS
-                            anchors.rightMargin: Colors.spacingS
-                            spacing: Colors.spacingS
+                            anchors.leftMargin: Appearance.spacingS
+                            anchors.rightMargin: Appearance.spacingS
+                            spacing: Appearance.spacingS
 
                             Text {
                                 visible: !!modelData.icon
                                 text: modelData.icon || ""
                                 color: modelData.danger ? Colors.error
                                     : (modelData.disabled ? Colors.textDisabled : Colors.textSecondary)
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeMedium
                             }
 
                             Text {
                                 text: modelData.label || ""
                                 color: modelData.danger ? Colors.error
                                     : (modelData.disabled ? Colors.textDisabled : Colors.text)
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
                             }

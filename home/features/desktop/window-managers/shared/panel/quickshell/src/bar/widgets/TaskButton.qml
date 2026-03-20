@@ -6,7 +6,7 @@ import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: taskItem
-  width: buttonSize; height: buttonSize; radius: Colors.radiusXS
+  width: buttonSize; height: buttonSize; radius: Appearance.radiusXS
   color: actualFocused ? Colors.highlight : "transparent"
   border.color: actualFocused ? Colors.primary : "transparent"; border.width: 1
   clip: true
@@ -43,11 +43,11 @@ Rectangle {
   }
 
   Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-  Behavior on scale { Anim { duration: Colors.durationFast } }
+  Behavior on scale { Anim { duration: Appearance.durationFast } }
 
   // Running indicator dot
   Rectangle {
-    width: 4; height: 4; radius: Colors.radiusMicro; color: taskItem.actualFocused ? Colors.primary : Colors.textDisabled
+    width: 4; height: 4; radius: Appearance.radiusMicro; color: taskItem.actualFocused ? Colors.primary : Colors.textDisabled
     anchors.bottom: parent.bottom; anchors.bottomMargin: 2; anchors.horizontalCenter: parent.horizontalCenter
     visible: showRunningIndicator && isRunning
   }

@@ -20,7 +20,7 @@ Rectangle {
     color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     clip: true
 
     // Inline Component wrappers so Loader.sourceComponent works with the
@@ -41,7 +41,7 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: 1
         contentWidth: width
-        contentHeight: messageColumn.implicitHeight + Colors.paddingLarge
+        contentHeight: messageColumn.implicitHeight + Appearance.paddingLarge
         flickableDirection: Flickable.VerticalFlick
         boundsBehavior: Flickable.StopAtBounds
         clip: true
@@ -53,25 +53,25 @@ Rectangle {
         Column {
             id: messageColumn
             width: messageFlickable.width - (messageFlickable.contentHeight > messageFlickable.height ? 12 : 0)
-            spacing: Colors.spacingS
-            topPadding: Colors.spacingM
-            bottomPadding: Colors.spacingM
-            leftPadding: Colors.spacingM
-            rightPadding: Colors.spacingM
+            spacing: Appearance.spacingS
+            topPadding: Appearance.spacingM
+            bottomPadding: Appearance.spacingM
+            leftPadding: Appearance.spacingM
+            rightPadding: Appearance.spacingM
 
             // Empty state
             Column {
-                width: parent.width - Colors.spacingM * 2
+                width: parent.width - Appearance.spacingM * 2
                 visible: AiService.activeMessages.length === 0 && !AiService.isStreaming
-                spacing: Colors.spacingL
+                spacing: Appearance.spacingL
                 topPadding: 40
 
                 Text {
                     width: parent.width
                     text: "󰚩"
                     color: Colors.primaryRing
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeGigantic
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeGigantic
                     horizontalAlignment: Text.AlignHCenter
                 }
 
@@ -79,7 +79,7 @@ Rectangle {
                     width: parent.width
                     text: "Start a conversation"
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.pixelSize: Appearance.fontSizeLarge
                     font.weight: Font.DemiBold
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -89,16 +89,16 @@ Rectangle {
                     text: "Type a message or use <b>/help</b> for commands"
                     textFormat: Text.RichText
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     horizontalAlignment: Text.AlignHCenter
                 }
 
                 // Quick-start prompt chips
                 Flow {
                     width: parent.width
-                    spacing: Colors.spacingS
-                    leftPadding: Colors.spacingL
-                    rightPadding: Colors.spacingL
+                    spacing: Appearance.spacingS
+                    leftPadding: Appearance.spacingL
+                    rightPadding: Appearance.spacingL
 
                     Repeater {
                         model: [
@@ -110,9 +110,9 @@ Rectangle {
 
                         delegate: Rectangle {
                             required property var modelData
-                            width: qsChipRow.implicitWidth + Colors.spacingL
+                            width: qsChipRow.implicitWidth + Appearance.spacingL
                             height: 30
-                            radius: Colors.radiusPill
+                            radius: Appearance.radiusPill
                             color: qsChipMouse.containsMouse ? Colors.primaryGhost : Colors.textFaint
                             border.color: qsChipMouse.containsMouse ? Colors.primaryRing : Colors.border
                             border.width: 1
@@ -120,18 +120,18 @@ Rectangle {
                             Row {
                                 id: qsChipRow
                                 anchors.centerIn: parent
-                                spacing: Colors.spacingXS
+                                spacing: Appearance.spacingXS
                                 Text {
                                     text: modelData.icon
                                     color: qsChipMouse.containsMouse ? Colors.primary : Colors.textSecondary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.family: Appearance.fontMono
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                                 Text {
                                     text: modelData.label
                                     color: qsChipMouse.containsMouse ? Colors.text : Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
@@ -161,17 +161,17 @@ Rectangle {
                     readonly property bool isError: isAssistant && (modelData.content || "").indexOf("ERROR:") === 0
                     readonly property var contentBlocks: isAssistant ? root.renderBlocksFn(modelData.content) : []
 
-                    width: messageColumn.width - Colors.spacingM * 2
-                    height: isSystem ? systemBubble.height + Colors.spacingXS : msgLayout.implicitHeight + Colors.spacingXS
-                    x: Colors.spacingM
+                    width: messageColumn.width - Appearance.spacingM * 2
+                    height: isSystem ? systemBubble.height + Appearance.spacingXS : msgLayout.implicitHeight + Appearance.spacingXS
+                    x: Appearance.spacingM
 
                     // System message (slash command output)
                     Rectangle {
                         id: systemBubble
                         visible: isSystem
                         width: parent.width
-                        height: visible ? systemText.implicitHeight + Colors.spacingS * 2 : 0
-                        radius: Colors.radiusXS
+                        height: visible ? systemText.implicitHeight + Appearance.spacingS * 2 : 0
+                        radius: Appearance.radiusXS
                         color: Colors.withAlpha(Colors.textDisabled, 0.08)
                         border.color: Colors.withAlpha(Colors.textDisabled, 0.15)
                         border.width: 1
@@ -179,11 +179,11 @@ Rectangle {
                         TextEdit {
                             id: systemText
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingS
+                            anchors.margins: Appearance.spacingS
                             text: isSystem ? root.renderMarkdownFn(modelData.content) : ""
                             textFormat: TextEdit.RichText
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
                             readOnly: true
                             selectByMouse: true
@@ -200,9 +200,9 @@ Rectangle {
                         // User bubble
                         Rectangle {
                             visible: isUser
-                            width: Math.min(parent.width * 0.85, userMsgContent.implicitWidth + Colors.spacingL * 2)
-                            height: visible ? userMsgContent.implicitHeight + Colors.spacingM * 2 : 0
-                            radius: Colors.radiusMedium
+                            width: Math.min(parent.width * 0.85, userMsgContent.implicitWidth + Appearance.spacingL * 2)
+                            height: visible ? userMsgContent.implicitHeight + Appearance.spacingM * 2 : 0
+                            radius: Appearance.radiusMedium
                             color: Colors.highlightLight
                             border.color: Colors.primaryRing
                             border.width: 1
@@ -211,11 +211,11 @@ Rectangle {
                             TextEdit {
                                 id: userMsgContent
                                 anchors.fill: parent
-                                anchors.margins: Colors.spacingM
+                                anchors.margins: Appearance.spacingM
                                 text: isUser ? modelData.content : ""
                                 textFormat: TextEdit.PlainText
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
                                 readOnly: true
                                 selectByMouse: true
@@ -227,7 +227,7 @@ Rectangle {
                             Rectangle {
                                 width: 22
                                 height: 22
-                                radius: Colors.radiusXXS
+                                radius: Appearance.radiusXXS
                                 anchors.top: parent.top
                                 anchors.right: parent.right
                                 anchors.topMargin: 4
@@ -235,14 +235,14 @@ Rectangle {
                                 color: userCopyHover.containsMouse ? Colors.bgWidget : "transparent"
                                 opacity: userHoverArea.containsMouse ? 1 : 0
                                 Behavior on opacity {
-                                    NumberAnimation { duration: Colors.durationFast }
+                                    NumberAnimation { duration: Appearance.durationFast }
                                 }
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰆏"
                                     color: Colors.textSecondary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.family: Appearance.fontMono
+                                    font.pixelSize: Appearance.fontSizeSmall
                                 }
                                 MouseArea {
                                     id: userCopyHover
@@ -273,7 +273,7 @@ Rectangle {
                         Column {
                             visible: isAssistant
                             width: Math.min(parent.width * 0.85, parent.width)
-                            spacing: Colors.spacingXS
+                            spacing: Appearance.spacingXS
 
                             Repeater {
                                 model: contentBlocks
@@ -295,22 +295,22 @@ Rectangle {
 
                             // Regenerate + copy actions row
                             Row {
-                                spacing: Colors.spacingXS
+                                spacing: Appearance.spacingXS
                                 opacity: assistantHoverArea.containsMouse ? 1 : 0
                                 Behavior on opacity {
-                                    NumberAnimation { duration: Colors.durationFast }
+                                    NumberAnimation { duration: Appearance.durationFast }
                                 }
 
                                 Rectangle {
                                     width: 22; height: 22
-                                    radius: Colors.radiusXXS
+                                    radius: Appearance.radiusXXS
                                     color: regenHover.containsMouse ? Colors.bgWidget : "transparent"
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰑐"
                                         color: Colors.textSecondary
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeSmall
+                                        font.family: Appearance.fontMono
+                                        font.pixelSize: Appearance.fontSizeSmall
                                     }
                                     MouseArea {
                                         id: regenHover
@@ -328,14 +328,14 @@ Rectangle {
 
                                 Rectangle {
                                     width: 22; height: 22
-                                    radius: Colors.radiusXXS
+                                    radius: Appearance.radiusXXS
                                     color: assistCopyHover.containsMouse ? Colors.bgWidget : "transparent"
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰆏"
                                         color: Colors.textSecondary
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeSmall
+                                        font.family: Appearance.fontMono
+                                        font.pixelSize: Appearance.fontSizeSmall
                                     }
                                     MouseArea {
                                         id: assistCopyHover
@@ -371,32 +371,32 @@ Rectangle {
 
             // Streaming indicator
             Column {
-                width: messageColumn.width - Colors.spacingM * 2
+                width: messageColumn.width - Appearance.spacingM * 2
                 visible: AiService.isStreaming
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 readonly property var streamingBlocks: root.renderBlocksFn(AiService.streamingContent)
 
                 // Waiting-for-first-token placeholder
                 Rectangle {
                     visible: AiService.isStreaming && AiService.streamingContent.length === 0
                     width: 140
-                    height: Colors.controlRowHeight
-                    radius: Colors.radiusMedium
+                    height: Appearance.controlRowHeight
+                    radius: Appearance.radiusMedium
                     color: Colors.bgGlass
                     border.color: Colors.border
                     border.width: 1
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingS
+                        anchors.margins: Appearance.spacingM
+                        spacing: Appearance.spacingS
                         Text {
                             text: "󰚩"
                             color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeLarge
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeLarge
                             OpacityAnimator on opacity {
-                                from: 0.3; to: 1.0; duration: Colors.durationLong
+                                from: 0.3; to: 1.0; duration: Appearance.durationLong
                                 running: AiService.isStreaming && AiService.streamingContent.length === 0
                                 loops: Animation.Infinite
                             }
@@ -404,7 +404,7 @@ Rectangle {
                         Text {
                             text: "Thinking" + (AiService.streamElapsedSec > 0 ? "... " + AiService.streamElapsedSec + "s" : "...")
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.italic: true
                         }
                     }
@@ -431,20 +431,20 @@ Rectangle {
 
             // Error display
             Item {
-                width: messageColumn.width - Colors.spacingM * 2
-                height: errorRow.height + Colors.spacingXS
+                width: messageColumn.width - Appearance.spacingM * 2
+                height: errorRow.height + Appearance.spacingXS
                 visible: AiService.lastError.length > 0 && !AiService.isStreaming
-                x: Colors.spacingM
+                x: Appearance.spacingM
 
                 RowLayout {
                     id: errorRow
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Rectangle {
                         Layout.fillWidth: true
-                        height: errorText.implicitHeight + Colors.spacingM * 2
-                        radius: Colors.radiusMedium
+                        height: errorText.implicitHeight + Appearance.spacingM * 2
+                        radius: Appearance.radiusMedium
                         color: Colors.withAlpha(Colors.error, 0.12)
                         border.color: Colors.withAlpha(Colors.error, 0.3)
                         border.width: 1
@@ -452,10 +452,10 @@ Rectangle {
                         Text {
                             id: errorText
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
+                            anchors.margins: Appearance.spacingM
                             text: AiService.lastError
                             color: Colors.error
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         }
                     }
@@ -464,14 +464,14 @@ Rectangle {
                     Rectangle {
                         width: 28
                         height: 28
-                        radius: Colors.radiusXS
+                        radius: Appearance.radiusXS
                         color: "transparent"
                         Text {
                             anchors.centerIn: parent
                             text: "󰑐"
                             color: Colors.textSecondary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeLarge
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeLarge
                         }
                         SharedWidgets.StateLayer {
                             id: retryStateLayer

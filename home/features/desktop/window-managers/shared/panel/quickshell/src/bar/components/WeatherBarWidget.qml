@@ -27,13 +27,13 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             text: Colors.weatherIcon(WeatherService.condition)
             color: Colors.accent
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -41,7 +41,7 @@ SharedWidgets.BarPill {
             visible: PanelHelpers.isSummaryWidgetFull(widgetInstance, vertical)
             text: WeatherService.temp
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

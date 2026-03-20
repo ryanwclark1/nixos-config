@@ -27,17 +27,17 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingS
-        spacing: Colors.spacingXXS
+        anchors.margins: Appearance.spacingS
+        spacing: Appearance.spacingXXS
 
         Text {
-            Layout.leftMargin: Colors.spacingS
-            Layout.topMargin: Colors.spacingS
+            Layout.leftMargin: Appearance.spacingS
+            Layout.topMargin: Appearance.spacingS
             text: "QUICK ACCESS"
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             font.weight: Font.Bold
-            font.letterSpacing: Colors.letterSpacingWide
+            font.letterSpacing: Appearance.letterSpacingWide
         }
 
         Repeater {
@@ -49,32 +49,32 @@ Rectangle {
 
                 Layout.fillWidth: true
                 height: 34
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: {
                     var isActive = root.currentPath === modelData.path;
                     if (isActive) return Colors.primaryMarked;
                     if (locHover.containsMouse) return Colors.withAlpha(Colors.text, 0.07);
                     return "transparent";
                 }
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: Colors.spacingM
-                    anchors.rightMargin: Colors.spacingS
-                    spacing: Colors.spacingS
+                    anchors.leftMargin: Appearance.spacingM
+                    anchors.rightMargin: Appearance.spacingS
+                    spacing: Appearance.spacingS
 
                     Loader {
                         property string _ic: modelData.icon
                         property color _co: root.currentPath === modelData.path ? Colors.primary : Colors.textSecondary
                         sourceComponent: _ic.endsWith(".svg") ? _fbSvg : _fbNerd
                     }
-                    Component { id: _fbSvg; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeLarge } }
-                    Component { id: _fbNerd; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
+                    Component { id: _fbSvg; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeLarge } }
+                    Component { id: _fbNerd; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
                     Text {
                         text: modelData.label
                         color: root.currentPath === modelData.path ? Colors.text : Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: Appearance.fontSizeMedium
                         elide: Text.ElideRight
                         Layout.fillWidth: true
                     }
@@ -96,16 +96,16 @@ Rectangle {
             Layout.fillWidth: true
             height: 1
             color: Colors.border
-            Layout.bottomMargin: Colors.spacingS
+            Layout.bottomMargin: Appearance.spacingS
         }
 
         Text {
             Layout.fillWidth: true
-            Layout.leftMargin: Colors.spacingS
-            Layout.bottomMargin: Colors.spacingS
+            Layout.leftMargin: Appearance.spacingS
+            Layout.bottomMargin: Appearance.spacingS
             text: root.currentPath
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WrapAnywhere
             maximumLineCount: 3
             elide: Text.ElideRight

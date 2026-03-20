@@ -168,7 +168,7 @@ QtObject {
 
     // Keep closing popup anchor context alive until the shared popup exit animation
     // has finished, otherwise the window can jump to the default inset mid-fade.
-    readonly property int popupSwitchDelay: Colors.durationNormal + 40
+    readonly property int popupSwitchDelay: Appearance.durationNormal + 40
 
     function currentSurfaceScreen() {
         if (root.activeSurfaceContext && root.activeSurfaceContext.screen)

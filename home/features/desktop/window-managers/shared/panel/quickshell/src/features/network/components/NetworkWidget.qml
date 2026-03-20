@@ -4,7 +4,7 @@ import "../../../widgets"
 
 Row {
     id: root
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
 
     property bool iconOnly: false
     readonly property bool wifiActive: NetworkService.activePrimaryType === "wifi" || NetworkService.activePrimaryType === "802-11-wireless"
@@ -61,20 +61,20 @@ Row {
     Text {
         text: NetworkService.networkIcon()
         color: Colors.primary
-        font.pixelSize: Colors.fontSizeLarge
-        font.family: Colors.fontMono
+        font.pixelSize: Appearance.fontSizeLarge
+        font.family: Appearance.fontMono
         anchors.verticalCenter: parent.verticalCenter
     }
 
     Row {
         visible: !root.iconOnly
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Colors.spacingSM
+        spacing: Appearance.spacingSM
 
         Text {
             text: root.networkName
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             elide: Text.ElideRight
             width: Math.min(contentWidth, 120)

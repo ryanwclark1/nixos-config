@@ -40,24 +40,24 @@ Rectangle {
         color: Colors.bgGlass
         border.color: Colors.border
         border.width: 1
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         anchors.centerIn: parent
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Colors.spacingL
-            spacing: Colors.spacingM
+            anchors.margins: Appearance.spacingL
+            spacing: Appearance.spacingM
 
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
-                    width: root.compactMode ? parent.width : Math.max(0, parent.width - solidPickerCloseButton.implicitWidth - Colors.spacingS)
+                    width: root.compactMode ? parent.width : Math.max(0, parent.width - solidPickerCloseButton.implicitWidth - Appearance.spacingS)
                     text: "Solid Color Picker"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.pixelSize: Appearance.fontSizeLarge
                     font.weight: Font.DemiBold
                     wrapMode: Text.WordWrap
                 }
@@ -73,7 +73,7 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 height: 52
-                radius: Colors.radiusMedium
+                radius: Appearance.radiusMedium
                 color: "#" + root.currentHex.slice(0, 6)
                 border.color: Colors.border
                 border.width: 1
@@ -82,8 +82,8 @@ Rectangle {
                     anchors.centerIn: parent
                     text: "#" + root.currentHex.toUpperCase()
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
+                    font.family: Appearance.fontMono
                     font.weight: Font.Medium
                 }
             }
@@ -131,7 +131,7 @@ Rectangle {
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 SettingsActionButton {
                     label: "Cancel"

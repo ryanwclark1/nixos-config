@@ -212,11 +212,11 @@ Scope {
             color: "transparent"
 
             implicitWidth: screenDelegate.vertical
-                ? (_hasDockApps ? dockContent.implicitWidth + Colors.paddingLarge + 12 : 13)
-                : Math.max(_hasDockApps ? dockContent.implicitWidth + Colors.paddingLarge : 1, 200)
+                ? (_hasDockApps ? dockContent.implicitWidth + Appearance.paddingLarge + 12 : 13)
+                : Math.max(_hasDockApps ? dockContent.implicitWidth + Appearance.paddingLarge : 1, 200)
             implicitHeight: screenDelegate.vertical
-                ? Math.max(_hasDockApps ? dockContent.implicitHeight + Colors.paddingLarge : 1, 200)
-                : (_hasDockApps ? dockContent.implicitHeight + Colors.paddingLarge + 12 : 13)
+                ? Math.max(_hasDockApps ? dockContent.implicitHeight + Appearance.paddingLarge : 1, 200)
+                : (_hasDockApps ? dockContent.implicitHeight + Appearance.paddingLarge + 12 : 13)
 
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "quickshell-dock"
@@ -262,11 +262,11 @@ Scope {
               anchors.rightMargin: screenDelegate.isRight ? 4 : 0
               width: screenDelegate.vertical ? 3 : 60
               height: screenDelegate.vertical ? 60 : 3
-              radius: Colors.radiusMicro
+              radius: Appearance.radiusMicro
               color: Colors.primary
               property real indicatorOpacity: screenDelegate.hidden ? 0.6 : 0.0
               opacity: indicatorOpacity
-              Behavior on indicatorOpacity { NumberAnimation { duration: Colors.durationFast } }
+              Behavior on indicatorOpacity { NumberAnimation { duration: Appearance.durationFast } }
             }
 
             // Dock content, offset 12px from anchored edge

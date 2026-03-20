@@ -7,8 +7,8 @@ GridLayout {
   id: root
   columns: 2
   Layout.fillWidth: true
-  rowSpacing: Colors.paddingSmall
-  columnSpacing: Colors.paddingSmall
+  rowSpacing: Appearance.paddingSmall
+  columnSpacing: Appearance.paddingSmall
 
   property var manager: null
   property bool showContent: false

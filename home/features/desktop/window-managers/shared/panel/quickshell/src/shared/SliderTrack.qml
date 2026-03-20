@@ -39,15 +39,15 @@ Rectangle {
   }
 
   height: sliderMouse.pressed ? 32 : 28
-  Behavior on height { Anim { duration: Colors.durationFast } }
+  Behavior on height { Anim { duration: Appearance.durationFast } }
 
   transform: Scale {
     origin.x: root.width / 2
     origin.y: root.height / 2
     xScale: sliderMouse.pressed ? 1.02 : 1.0
     yScale: sliderMouse.pressed ? 0.96 : 1.0
-    Behavior on xScale { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
-    Behavior on yScale { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
+    Behavior on xScale { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
+    Behavior on yScale { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
   }
   color: sliderMouse.containsMouse ? Colors.surface : Colors.bgWidget
   radius: height / 2
@@ -74,7 +74,7 @@ Rectangle {
     Rectangle {
       x: root.width * modelData - 1
       y: 2; width: 2; height: root.height - 4
-      radius: Colors.radiusXXXS
+      radius: Appearance.radiusXXXS
       color: Colors.withAlpha(Colors.textDisabled, 0.2)
       visible: !root.muted && root.value < modelData
     }
@@ -111,8 +111,8 @@ Rectangle {
       property color _co: root.value > 0.15 ? Colors.background : Colors.text
       sourceComponent: _ic.endsWith(".svg") ? _stSvg : _stNerd
     }
-    Component { id: _stSvg; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeSmall } }
-    Component { id: _stNerd; Text { text: parent._ic; color: parent._co; Behavior on color { enabled: !Colors.isTransitioning; CAnim {} } font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall } }
+    Component { id: _stSvg; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeSmall } }
+    Component { id: _stNerd; Text { text: parent._ic; color: parent._co; Behavior on color { enabled: !Colors.isTransitioning; CAnim {} } font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }
   }
 
   MouseArea {

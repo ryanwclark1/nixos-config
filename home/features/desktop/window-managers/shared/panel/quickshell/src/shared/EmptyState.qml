@@ -7,9 +7,9 @@ ColumnLayout {
     id: root
     property string icon: "󰟢"
     property string message: "Nothing here"
-    property int iconSize: Colors.iconSizeMedium
+    property int iconSize: Appearance.iconSizeMedium
 
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
 
     Loader {
         sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
@@ -24,7 +24,7 @@ ColumnLayout {
         Text {
             text: root.icon
             color: Colors.textDisabled
-            font.family: Colors.fontMono
+            font.family: Appearance.fontMono
             font.pixelSize: root.iconSize
         }
     }
@@ -32,7 +32,7 @@ ColumnLayout {
     Text {
         text: root.message
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         Layout.alignment: Qt.AlignHCenter
     }
 }

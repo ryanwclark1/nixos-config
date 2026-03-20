@@ -90,10 +90,10 @@ Item {
     anchor.gravity: root.popupEdge
     anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
     anchor.margins {
-      top: Colors.spacingS
-      bottom: Colors.spacingS
-      left: Colors.spacingS
-      right: Colors.spacingS
+      top: Appearance.spacingS
+      bottom: Appearance.spacingS
+      left: Appearance.spacingS
+      right: Appearance.spacingS
     }
 
     visible: root.usePopup && root._shown && root.text !== ""
@@ -104,14 +104,14 @@ Item {
     Rectangle {
       id: bubble
 
-      readonly property int paddingH: Colors.spacingM
-      readonly property int paddingV: Colors.spacingXS
+      readonly property int paddingH: Appearance.spacingM
+      readonly property int paddingV: Appearance.spacingXS
 
       implicitWidth: Math.min(280, tooltipRow.implicitWidth + paddingH * 2)
       implicitHeight: tooltipRow.implicitHeight + paddingV * 2
       width: implicitWidth
       height: implicitHeight
-      radius: Colors.radiusXS
+      radius: Appearance.radiusXS
       color: Colors.withAlpha(Colors.surface, 0.95)
       border.color: Colors.border
       border.width: 1
@@ -119,13 +119,13 @@ Item {
       Row {
         id: tooltipRow
         anchors.centerIn: parent
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
           width: Math.min(200, implicitWidth)
           text: root.text
           color: Colors.text
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           wrapMode: Text.WordWrap
           anchors.verticalCenter: parent.verticalCenter
         }
@@ -133,9 +133,9 @@ Item {
         Rectangle {
           visible: root.shortcut !== ""
           anchors.verticalCenter: parent.verticalCenter
-          radius: Colors.radiusMicro
+          radius: Appearance.radiusMicro
           color: Colors.withAlpha(Colors.text, 0.12)
-          width: shortcutLabel.implicitWidth + Colors.spacingXS * 2
+          width: shortcutLabel.implicitWidth + Appearance.spacingXS * 2
           height: shortcutLabel.implicitHeight + 4
 
           Text {
@@ -143,8 +143,8 @@ Item {
             anchors.centerIn: parent
             text: root.shortcut
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeXS
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeXS
+            font.family: Appearance.fontMono
           }
         }
       }

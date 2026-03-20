@@ -45,8 +45,8 @@ Item {
         Text {
             text: "󰒲"
             color: root.inhibitorActive ? Colors.primary : Colors.text
-            font.pixelSize: Colors.fontSizeXL
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeXL
+            font.family: Appearance.fontMono
         }
 
     }

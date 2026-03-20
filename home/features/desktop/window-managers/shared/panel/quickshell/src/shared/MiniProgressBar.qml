@@ -6,7 +6,7 @@ Rectangle {
   id: root
   property real value: 0        // 0.0 – 1.0
   property color barColor: Colors.primary
-  readonly property real safeRadius: typeof Colors.radiusMicro === "number" ? Colors.radiusMicro : 0
+  readonly property real safeRadius: typeof Appearance.radiusMicro === "number" ? Appearance.radiusMicro : 0
 
   Layout.fillWidth: true
   height: 4

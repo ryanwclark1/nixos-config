@@ -30,7 +30,7 @@ SharedWidgets.BarPill {
         }
     ]
     Row {
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
         BoundComponent {
             id: vpnWidgetLoader
             source: Qt.resolvedUrl("../../features/network/components/VpnWidget.qml")
@@ -41,13 +41,13 @@ SharedWidgets.BarPill {
 
         Row {
             visible: !vpnWidgetLoader.item
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: "󰖂"
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeLarge
-                font.family: Colors.fontMono
+                font.pixelSize: Appearance.fontSizeLarge
+                font.family: Appearance.fontMono
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -55,7 +55,7 @@ SharedWidgets.BarPill {
                 visible: !PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
                 text: "VPN"
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.DemiBold
                 anchors.verticalCenter: parent.verticalCenter
             }

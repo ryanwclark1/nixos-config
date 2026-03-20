@@ -7,19 +7,19 @@ ColumnLayout {
     id: root
     required property bool compactMode
 
-    spacing: Colors.spacingM
+    spacing: Appearance.spacingM
     Layout.fillWidth: true
 
     Flow {
         Layout.fillWidth: true
         width: parent.width
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             width: root.compactMode ? parent.width : undefined
             text: "Auto-Cycle Interval"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             font.weight: Font.Medium
             wrapMode: Text.WordWrap
         }
@@ -27,8 +27,8 @@ ColumnLayout {
         Text {
             text: Config.wallpaperCycleInterval === 0 ? "Off" : Config.wallpaperCycleInterval + " min"
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeSmall
+            font.family: Appearance.fontMono
         }
     }
 
@@ -41,15 +41,15 @@ ColumnLayout {
             width: parent.width
             height: 6
             color: Colors.surface
-            radius: Colors.radiusXS
+            radius: Appearance.radiusXS
 
             Rectangle {
                 width: parent.width * (Config.wallpaperCycleInterval / 60)
                 height: parent.height
                 color: Config.wallpaperCycleInterval > 0 ? Colors.primary : Colors.border
-                radius: Colors.radiusXS
+                radius: Appearance.radiusXS
                 Behavior on width {
-                    NumberAnimation { duration: Colors.durationSnap }
+                    NumberAnimation { duration: Appearance.durationSnap }
                 }
                 Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
             }
@@ -65,7 +65,7 @@ ColumnLayout {
             x: Math.max(0, Math.min(parent.width - width, parent.width * (Config.wallpaperCycleInterval / 60) - width / 2))
             anchors.verticalCenter: parent.verticalCenter
             Behavior on x {
-                NumberAnimation { duration: Colors.durationSnap }
+                NumberAnimation { duration: Appearance.durationSnap }
             }
             Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
@@ -95,19 +95,19 @@ ColumnLayout {
     Flow {
         Layout.fillWidth: true
         width: parent.width
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             width: root.compactMode ? parent.width : undefined
             text: "Off"
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
         }
 
         Text {
             text: "60 min"
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
         }
     }
 }

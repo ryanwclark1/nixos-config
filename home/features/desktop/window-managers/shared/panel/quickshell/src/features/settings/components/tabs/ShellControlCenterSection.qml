@@ -91,19 +91,19 @@ Item {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: "Quick Toggles"
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 font.weight: Font.DemiBold
             }
 
             Text {
                 text: "Control toggle visibility and order in the Control Center grid."
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
             }
@@ -111,7 +111,7 @@ Item {
             Column {
                 id: toggleOrderList
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 Repeater {
                     model: root.orderedToggles()
@@ -119,7 +119,7 @@ Item {
                     delegate: Item {
                         id: toggleRow
                         width: parent ? parent.width : 0
-                        implicitHeight: toggleCard.implicitHeight + (toggleDropBeforeIndicator.visible ? toggleDropBeforeIndicator.height + Colors.spacingXS : 0)
+                        implicitHeight: toggleCard.implicitHeight + (toggleDropBeforeIndicator.visible ? toggleDropBeforeIndicator.height + Appearance.spacingXS : 0)
                         height: implicitHeight
                         required property int index
                         required property var modelData
@@ -143,7 +143,7 @@ Item {
                                 left: parent.left
                                 right: parent.right
                                 top: toggleDropBeforeIndicator.bottom
-                                topMargin: toggleDropBeforeIndicator.visible ? Colors.spacingXS : 0
+                                topMargin: toggleDropBeforeIndicator.visible ? Appearance.spacingXS : 0
                             }
                             minimumHeight: root.compactMode ? 78 : 62
                             active: !toggleRow.hidden
@@ -158,7 +158,7 @@ Item {
                                 enabled: !toggleDragHandle.dragActive
 
                                 NumberAnimation {
-                                    duration: Colors.durationFast
+                                    duration: Appearance.durationFast
                                 }
                             }
 
@@ -188,19 +188,19 @@ Item {
                             Text {
                                 text: toggleRow.modelData.icon || "󰖲"
                                 color: toggleRow.hidden ? Colors.textDisabled : Colors.primary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeLarge
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeLarge
                                 Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
                             }
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingXXS
+                                spacing: Appearance.spacingXXS
 
                                 Text {
                                     text: toggleRow.modelData.label || toggleRow.modelData.id
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.pixelSize: Appearance.fontSizeMedium
                                     font.weight: Font.Medium
                                     Layout.fillWidth: true
                                     elide: Text.ElideRight
@@ -209,14 +209,14 @@ Item {
                                 Text {
                                     text: toggleRow.hidden ? "Hidden in Control Center. Drag to stage its position, or use the switch to show it again." : "Visible in Control Center. Drag to reorder, or use the arrow buttons."
                                     color: toggleRow.hidden ? Colors.textDisabled : Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     Layout.fillWidth: true
                                     wrapMode: Text.WordWrap
                                 }
                             }
 
                             RowLayout {
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
                                 Layout.alignment: Qt.AlignTop
 
                                 SettingsActionButton {
@@ -253,20 +253,20 @@ Item {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             visible: PluginService.controlCenterPlugins.length > 0
 
             Text {
                 text: "Plugin Widgets"
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 font.weight: Font.DemiBold
             }
 
             Text {
                 text: "Manage third-party widgets exposed inside the Control Center."
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
             }
@@ -274,7 +274,7 @@ Item {
             Column {
                 id: pluginOrderList
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 Repeater {
                     model: root.orderedPlugins()
@@ -282,7 +282,7 @@ Item {
                     delegate: Item {
                         id: pluginRow
                         width: parent ? parent.width : 0
-                        implicitHeight: pluginCard.implicitHeight + (pluginDropBeforeIndicator.visible ? pluginDropBeforeIndicator.height + Colors.spacingXS : 0)
+                        implicitHeight: pluginCard.implicitHeight + (pluginDropBeforeIndicator.visible ? pluginDropBeforeIndicator.height + Appearance.spacingXS : 0)
                         height: implicitHeight
                         required property int index
                         required property var modelData
@@ -306,7 +306,7 @@ Item {
                                 left: parent.left
                                 right: parent.right
                                 top: pluginDropBeforeIndicator.bottom
-                                topMargin: pluginDropBeforeIndicator.visible ? Colors.spacingXS : 0
+                                topMargin: pluginDropBeforeIndicator.visible ? Appearance.spacingXS : 0
                             }
                             minimumHeight: root.compactMode ? 82 : 66
                             active: !pluginRow.hidden
@@ -321,7 +321,7 @@ Item {
                                 enabled: !pluginDragHandle.dragActive
 
                                 NumberAnimation {
-                                    duration: Colors.durationFast
+                                    duration: Appearance.durationFast
                                 }
                             }
 
@@ -351,7 +351,7 @@ Item {
                             Rectangle {
                                 width: root.compactMode ? 30 : 34
                                 height: width
-                                radius: Colors.radiusSmall
+                                radius: Appearance.radiusSmall
                                 color: pluginRow.hidden ? Colors.textFaint : Colors.primarySubtle
                                 Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
@@ -359,19 +359,19 @@ Item {
                                     anchors.centerIn: parent
                                     text: "󰏗"
                                     color: pluginRow.hidden ? Colors.textDisabled : Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.family: Appearance.fontMono
+                                    font.pixelSize: Appearance.fontSizeMedium
                                 }
                             }
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingXXS
+                                spacing: Appearance.spacingXXS
 
                                 Text {
                                     text: pluginRow.modelData.name || pluginRow.modelData.id
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.pixelSize: Appearance.fontSizeMedium
                                     font.weight: Font.Medium
                                     Layout.fillWidth: true
                                     elide: Text.ElideRight
@@ -380,14 +380,14 @@ Item {
                                 Text {
                                     text: pluginRow.hidden ? "Hidden in Control Center. Drag to stage its slot before showing it again." : "Visible in Control Center. Drag to reorder, or use the arrow buttons."
                                     color: pluginRow.hidden ? Colors.textDisabled : Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     Layout.fillWidth: true
                                     wrapMode: Text.WordWrap
                                 }
                             }
 
                             RowLayout {
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
                                 Layout.alignment: Qt.AlignTop
 
                                 SettingsActionButton {

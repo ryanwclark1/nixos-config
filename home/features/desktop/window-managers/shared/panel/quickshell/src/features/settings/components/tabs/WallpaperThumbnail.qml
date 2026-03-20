@@ -31,21 +31,21 @@ Item {
             target: thumbDelegate
             property: "scale"
             to: 0.92
-            duration: Colors.durationSnap
+            duration: Appearance.durationSnap
             easing.type: Easing.InQuad
         }
         NumberAnimation {
             target: thumbDelegate
             property: "scale"
             to: 1.0
-            duration: Colors.durationSnap
+            duration: Appearance.durationSnap
             easing.type: Easing.OutQuad
         }
     }
 
     Rectangle {
         anchors.fill: parent
-        radius: Colors.radiusSmall
+        radius: Appearance.radiusSmall
         color: isActive ? Colors.highlight : Colors.bgWidget
         border.color: isActive ? Colors.primary : Colors.border
         border.width: isActive ? 2 : 1
@@ -69,7 +69,7 @@ Item {
                     thumbDelegate.imageUnsupported(modelData.path);
             }
             Behavior on opacity {
-                NumberAnimation { duration: Colors.durationNormal }
+                NumberAnimation { duration: Appearance.durationNormal }
             }
         }
 
@@ -77,8 +77,8 @@ Item {
             anchors.centerIn: parent
             text: "󰸉"
             color: Colors.textDisabled
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeHuge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeHuge
             visible: thumbImage.status !== Image.Ready
         }
 
@@ -98,8 +98,8 @@ Item {
                 anchors.centerIn: parent
                 text: "󰄬"
                 color: Colors.text
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXS
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXS
             }
         }
 
@@ -108,7 +108,7 @@ Item {
             color: thumbMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.35) : "transparent"
             Behavior on color {
                 enabled: !Colors.isTransitioning
-                ColorAnimation { duration: Colors.durationSnap }
+                ColorAnimation { duration: Appearance.durationSnap }
             }
         }
 
@@ -117,11 +117,11 @@ Item {
                 bottom: parent.bottom
                 left: parent.left
                 right: parent.right
-                margins: Colors.spacingXS
+                margins: Appearance.spacingXS
             }
             text: modelData.filename
             color: "#ffffff"
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             elide: Text.ElideLeft
             visible: thumbMouse.containsMouse
         }

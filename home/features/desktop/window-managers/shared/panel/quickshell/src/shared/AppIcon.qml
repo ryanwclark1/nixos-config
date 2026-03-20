@@ -10,7 +10,7 @@ Item {
   property string execName: ""
   property string appName: ""
   property var iconCandidates: []
-  property int iconSize: Colors.iconSizeMedium
+  property int iconSize: Appearance.iconSizeMedium
   property var iconMap: null
   property string fallbackIcon: "󰀻"
 
@@ -120,7 +120,7 @@ Item {
     anchors.centerIn: parent
     text: root._fallbackText
     color: Colors.text
-    font.family: Colors.fontMono
+    font.family: Appearance.fontMono
     font.pixelSize: root.iconSize * 0.6
     visible: !iconImage.visible
   }

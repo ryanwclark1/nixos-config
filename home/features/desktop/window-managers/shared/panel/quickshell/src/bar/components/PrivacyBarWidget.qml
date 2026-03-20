@@ -32,7 +32,7 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Rectangle {
             visible: root.showPulseDot
@@ -47,13 +47,13 @@ SharedWidgets.BarPill {
                 NumberAnimation {
                     from: 1.0
                     to: 0.25
-                    duration: Colors.durationPulse
+                    duration: Appearance.durationPulse
                     easing.type: Easing.InOutSine
                 }
                 NumberAnimation {
                     from: 0.25
                     to: 1.0
-                    duration: Colors.durationPulse
+                    duration: Appearance.durationPulse
                     easing.type: Easing.InOutSine
                 }
             }
@@ -62,8 +62,8 @@ SharedWidgets.BarPill {
         Text {
             text: PrivacyService.activeIcon
             color: Colors.warning
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -71,7 +71,7 @@ SharedWidgets.BarPill {
             visible: !root.iconOnly
             text: PrivacyService.activeLabel || "Privacy"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

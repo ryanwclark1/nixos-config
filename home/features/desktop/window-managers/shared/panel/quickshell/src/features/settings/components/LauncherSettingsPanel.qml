@@ -17,8 +17,8 @@ Rectangle {
     readonly property bool _showChevron: root.collapsible
 
     Layout.fillWidth: true
-    implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Colors.spacingL : 0)
-    radius: Colors.radiusLarge
+    implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Appearance.spacingL : 0)
+    radius: Appearance.radiusLarge
     color: Colors.withAlpha(Colors.surface, 0.82)
     border.color: Colors.withAlpha(Colors.primary, 0.18)
     border.width: 1
@@ -41,7 +41,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        implicitHeight: headerColumn.implicitHeight + Colors.spacingM * 2
+        implicitHeight: headerColumn.implicitHeight + Appearance.spacingM * 2
         color: Colors.withAlpha(Colors.primary, 0.05)
 
         ColumnLayout {
@@ -49,34 +49,34 @@ Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingXXS
+            anchors.margins: Appearance.spacingM
+            spacing: Appearance.spacingXXS
 
             Text {
                 text: "LAUNCHER"
                 color: Colors.primary
-                font.pixelSize: Colors.fontSizeXXS
+                font.pixelSize: Appearance.fontSizeXXS
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingExtraWide
+                font.letterSpacing: Appearance.letterSpacingExtraWide
             }
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     visible: root.iconName !== ""
                     text: root.iconName
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
                 }
 
                 Text {
                     Layout.fillWidth: true
                     text: root.title
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.Black
                     wrapMode: Text.WordWrap
                 }
@@ -85,7 +85,7 @@ Rectangle {
                     visible: root._showChevron
                     implicitWidth: 24
                     implicitHeight: 24
-                    radius: Colors.radiusCard
+                    radius: Appearance.radiusCard
                     color: Colors.withAlpha(Colors.text, collapseHover.containsMouse ? 0.14 : 0.08)
                     border.color: Colors.border
                     border.width: 1
@@ -94,8 +94,8 @@ Rectangle {
                         anchors.centerIn: parent
                         text: root.expanded ? "󰅃" : "󰅀"
                         color: Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeSmall
                     }
                 }
             }
@@ -104,7 +104,7 @@ Rectangle {
                 visible: root.description !== ""
                 text: root.description
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
             }
@@ -141,11 +141,11 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: headerContainer.bottom
-        anchors.leftMargin: Colors.spacingL
-        anchors.rightMargin: Colors.spacingL
-        anchors.topMargin: Colors.spacingM
-        anchors.bottomMargin: Colors.spacingL
-        spacing: Colors.spacingL
+        anchors.leftMargin: Appearance.spacingL
+        anchors.rightMargin: Appearance.spacingL
+        anchors.topMargin: Appearance.spacingM
+        anchors.bottomMargin: Appearance.spacingL
+        spacing: Appearance.spacingL
         visible: root.expanded
     }
 }

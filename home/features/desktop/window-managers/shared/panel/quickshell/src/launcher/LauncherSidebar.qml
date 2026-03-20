@@ -12,7 +12,7 @@ Rectangle {
     readonly property var _overflowModes: Array.isArray(root.launcher && root.launcher.overflowModes) ? root.launcher.overflowModes : []
     readonly property color accentColor: root.launcher && root.launcher.modeAccentColor ? root.launcher.modeAccentColor : Colors.primary
 
-    radius: Colors.radiusXL
+    radius: Appearance.radiusXL
     color: Colors.withAlpha(Colors.surface, 0.74)
     border.color: Colors.withAlpha(root.accentColor, 0.18)
     border.width: 1
@@ -33,7 +33,7 @@ Rectangle {
 
         Layout.fillWidth: true
         implicitHeight: compact ? 48 : 52
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         color: active ? Colors.withAlpha(root.accentColor, 0.16) : (hovered ? Colors.withAlpha("#ffffff", 0.04) : "transparent")
         border.color: active ? Colors.withAlpha(root.accentColor, 0.36) : (hovered ? Colors.withAlpha(Colors.border, 0.4) : "transparent")
         border.width: 1
@@ -46,23 +46,23 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             width: active ? 4 : 0
             height: active ? parent.height * 0.52 : 0
-            radius: Colors.radiusPill
+            radius: Appearance.radiusPill
             color: root.accentColor
             opacity: active ? 1 : 0
-            Behavior on width { NumberAnimation { duration: Colors.durationFast } }
-            Behavior on height { NumberAnimation { duration: Colors.durationFast } }
-            Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+            Behavior on width { NumberAnimation { duration: Appearance.durationFast } }
+            Behavior on height { NumberAnimation { duration: Appearance.durationFast } }
+            Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
         }
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: compact ? Colors.spacingXS : Colors.spacingS
-            spacing: compact ? Colors.spacingXS : Colors.paddingMedium
+            anchors.margins: compact ? Appearance.spacingXS : Appearance.spacingS
+            spacing: compact ? Appearance.spacingXS : Appearance.paddingMedium
 
             Rectangle {
                 Layout.preferredWidth: compact ? 34 : 32
                 Layout.preferredHeight: compact ? 34 : 32
-                radius: compact ? Colors.radiusMedium : Colors.radiusSmall
+                radius: compact ? Appearance.radiusMedium : Appearance.radiusSmall
                 color: active ? Colors.withAlpha(root.accentColor, 0.12) : Colors.withAlpha(Colors.surface, 0.78)
                 border.color: active ? Colors.withAlpha(root.accentColor, 0.3) : "transparent"
                 border.width: 1
@@ -72,8 +72,8 @@ Rectangle {
                     anchors.centerIn: parent
                     text: iconText || "•"
                     color: active ? root.accentColor : Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
                 }
             }
 
@@ -82,8 +82,8 @@ Rectangle {
                 Layout.alignment: Qt.AlignHCenter
                 text: iconText || "•"
                 color: active ? root.accentColor : Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXL
             }
 
             ColumnLayout {
@@ -97,7 +97,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: label
                     color: active ? Colors.text : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: active ? Font.Black : Font.DemiBold
                     elide: Text.ElideRight
                 }
@@ -107,8 +107,8 @@ Rectangle {
                     Layout.fillWidth: true
                     text: prefix + " prefix"
                     color: active ? root.accentColor : Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXXS
+                    font.family: Appearance.fontMono
                     font.weight: Font.Bold
                     elide: Text.ElideRight
                 }
@@ -126,32 +126,32 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: root.launcher.sidebarCompact ? Colors.spacingS : Colors.spacingM
-        spacing: root.launcher.sidebarCompact ? Colors.spacingXS : Colors.spacingM
+        anchors.margins: root.launcher.sidebarCompact ? Appearance.spacingS : Appearance.spacingM
+        spacing: root.launcher.sidebarCompact ? Appearance.spacingXS : Appearance.spacingM
 
         Rectangle {
             visible: !root.launcher.sidebarCompact
             Layout.fillWidth: true
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             color: Colors.withAlpha(root.accentColor, 0.1)
             border.color: Colors.withAlpha(root.accentColor, 0.22)
             border.width: 1
-            implicitHeight: railIntro.implicitHeight + (Colors.spacingM * 2)
+            implicitHeight: railIntro.implicitHeight + (Appearance.spacingM * 2)
 
             ColumnLayout {
                 id: railIntro
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingXS
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingXS
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Rectangle {
                         width: 34
                         height: 34
-                        radius: Colors.radiusMedium
+                        radius: Appearance.radiusMedium
                         color: Colors.withAlpha(root.accentColor, 0.18)
                         border.color: Colors.withAlpha(root.accentColor, 0.34)
                         border.width: 1
@@ -160,8 +160,8 @@ Rectangle {
                             anchors.centerIn: parent
                             text: root.launcher.modeHeroIcon
                             color: root.accentColor
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeXL
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeXL
                         }
                     }
 
@@ -172,16 +172,16 @@ Rectangle {
                         Text {
                             text: "NAV RAIL"
                             color: Colors.withAlpha(root.accentColor, 0.92)
-                            font.pixelSize: Colors.fontSizeXXS
+                            font.pixelSize: Appearance.fontSizeXXS
                             font.weight: Font.Black
-                            font.letterSpacing: Colors.letterSpacingExtraWide
+                            font.letterSpacing: Appearance.letterSpacingExtraWide
                         }
 
                         Text {
                             Layout.fillWidth: true
                             text: root.launcher.modeHeroLabel
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: Font.Black
                             elide: Text.ElideRight
                         }
@@ -192,7 +192,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: root.launcher.sidebarOverflowExpanded ? "Advanced modes are open below the primary rail." : "Pinned modes stay visible here while advanced modes live behind More."
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     wrapMode: Text.WordWrap
                 }
             }
@@ -208,15 +208,15 @@ Rectangle {
             ColumnLayout {
                 id: modeColumn
                 width: parent.width
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     visible: !root.launcher.sidebarCompact
                     text: "PRIMARY"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                     font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingExtraWide
+                    font.letterSpacing: Appearance.letterSpacingExtraWide
                 }
 
                 Repeater {
@@ -247,15 +247,15 @@ Rectangle {
                 ColumnLayout {
                     visible: root.launcher.sidebarOverflowExpanded && root._overflowModes.length > 0
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
                         visible: !root.launcher.sidebarCompact
                         text: "ADVANCED MODES"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXXS
+                        font.pixelSize: Appearance.fontSizeXXS
                         font.weight: Font.Black
-                        font.letterSpacing: Colors.letterSpacingExtraWide
+                        font.letterSpacing: Appearance.letterSpacingExtraWide
                     }
 
                     Repeater {
@@ -278,9 +278,9 @@ Rectangle {
 
         Rectangle {
             Layout.fillWidth: true
-            Layout.topMargin: Colors.spacingS
-            implicitHeight: controlsLayout.implicitHeight + (Colors.paddingMedium * 2)
-            radius: Colors.radiusLarge
+            Layout.topMargin: Appearance.spacingS
+            implicitHeight: controlsLayout.implicitHeight + (Appearance.paddingMedium * 2)
+            radius: Appearance.radiusLarge
             color: Colors.withAlpha(Colors.surface, 0.72)
             border.color: Colors.withAlpha(root.accentColor, 0.16)
             border.width: 1
@@ -289,22 +289,22 @@ Rectangle {
             ColumnLayout {
                 id: controlsLayout
                 anchors.fill: parent
-                anchors.margins: Colors.paddingMedium
-                spacing: Colors.spacingXXS
+                anchors.margins: Appearance.paddingMedium
+                spacing: Appearance.spacingXXS
 
                 Text {
                     text: "CONTROL NOTES"
                     color: Colors.withAlpha(root.accentColor, 0.92)
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                     font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingExtraWide
+                    font.letterSpacing: Appearance.letterSpacingExtraWide
                 }
 
                 Text {
                     Layout.fillWidth: true
                     text: String(root.launcher.modeSummaryText || "")
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                     font.weight: Font.DemiBold
                     wrapMode: Text.WordWrap
                 }
@@ -313,7 +313,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: String(root.launcher.overflowHintText || "")
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeCaption
+                    font.pixelSize: Appearance.fontSizeCaption
                     wrapMode: Text.WordWrap
                 }
             }

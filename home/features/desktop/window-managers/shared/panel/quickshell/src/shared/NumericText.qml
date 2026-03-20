@@ -6,7 +6,7 @@ import "../services"
 // Use for stats, clocks, timers, percentages, and any rapidly-changing numbers.
 Text {
     color: Colors.text
-    font.pixelSize: Colors.fontSizeMedium
+    font.pixelSize: Appearance.fontSizeMedium
     font.weight: Font.DemiBold
     font.features: { "tnum": 1 }
 }

@@ -7,7 +7,7 @@ import "../widgets" as SharedWidgets
 
 ColumnLayout {
     id: content
-    spacing: Colors.spacingLG
+    spacing: Appearance.spacingLG
 
     signal closeRequested()
     required property string screenName
@@ -106,20 +106,20 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         Layout.preferredWidth: Math.min(400, content.width * 0.5)
         Layout.preferredHeight: 44
-        radius: Colors.radiusPill
+        radius: Appearance.radiusPill
         color: Colors.surface
         border.color: searchInput.activeFocus ? Colors.primary : Colors.border
         border.width: searchInput.activeFocus ? 2 : 1
 
         Row {
             anchors.centerIn: parent
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: ""
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeLarge
-                font.family: Colors.fontMono
+                font.pixelSize: Appearance.fontSizeLarge
+                font.family: Appearance.fontMono
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -127,7 +127,7 @@ ColumnLayout {
                 id: searchInput
                 width: Math.min(320, content.windowWidth * 0.4)
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 clip: true
                 onTextChanged: content.searchQuery = text.toLowerCase()
                 anchors.verticalCenter: parent.verticalCenter
@@ -144,7 +144,7 @@ ColumnLayout {
                     visible: !searchInput.text
                     text: "Search windows..."
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
             }
         }
@@ -161,7 +161,7 @@ ColumnLayout {
 
         Row {
             id: wsRow
-            spacing: Colors.spacingXL
+            spacing: Appearance.spacingXL
             height: parent.height
 
             Repeater {
@@ -204,9 +204,9 @@ ColumnLayout {
                         });
                     }
 
-                    width: Math.max(280, Math.min(400, content.windowWidth / Math.max(content.screenWorkspaces.length, 1) - Colors.spacingXL))
+                    width: Math.max(280, Math.min(400, content.windowWidth / Math.max(content.screenWorkspaces.length, 1) - Appearance.spacingXL))
                     height: parent.height
-                    radius: Colors.radiusLarge
+                    radius: Appearance.radiusLarge
                     color: Colors.withAlpha(Colors.surface, 0.4)
                     border.color: dropHighlight ? Colors.accent : (isFocused ? Colors.primary : Colors.border)
                     border.width: (dropHighlight || isFocused) ? 2 : 1
@@ -232,14 +232,14 @@ ColumnLayout {
 
                     ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: Colors.paddingMedium
-                        spacing: Colors.spacingM
+                        anchors.margins: Appearance.paddingMedium
+                        spacing: Appearance.spacingM
 
                         // Workspace header
                         Text {
                             text: ws.name || ("Workspace " + (ws.idx || ws.id))
                             color: wsColumn.isFocused ? Colors.primary : Colors.text
-                            font.pixelSize: Colors.fontSizeXL
+                            font.pixelSize: Appearance.fontSizeXL
                             font.weight: Font.Bold
                             Layout.alignment: Qt.AlignHCenter
                         }
@@ -248,7 +248,7 @@ ColumnLayout {
                         Text {
                             text: wsColumn.wsWindows.length + " window" + (wsColumn.wsWindows.length !== 1 ? "s" : "")
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             Layout.alignment: Qt.AlignHCenter
                         }
 
@@ -269,7 +269,7 @@ ColumnLayout {
                             Column {
                                 id: windowCol
                                 width: parent.width
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 Repeater {
                                     model: wsColumn.wsWindows
@@ -278,7 +278,7 @@ ColumnLayout {
                                         id: windowCard
                                         width: windowCol.width
                                         height: 56
-                                        radius: Colors.radiusSmall
+                                        radius: Appearance.radiusSmall
                                         color: modelData.is_focused ? Colors.highlightLight : (cardMouse.containsMouse ? Colors.highlightLight : Colors.withAlpha(Colors.surface, 0.25))
                                         border.color: modelData.is_focused ? Colors.primary : (cardMouse.containsMouse ? Colors.border : "transparent")
                                         border.width: 1
@@ -328,26 +328,26 @@ ColumnLayout {
 
                                         Row {
                                             anchors.fill: parent
-                                            anchors.margins: Colors.spacingS
-                                            spacing: Colors.spacingM
+                                            anchors.margins: Appearance.spacingS
+                                            spacing: Appearance.spacingM
 
                                             SharedWidgets.AppIcon {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 iconName: modelData.app_id || ""
                                                 appName: modelData.title || modelData.app_id || ""
-                                                iconSize: Colors.iconSizeMedium
+                                                iconSize: Appearance.iconSizeMedium
                                             }
 
                                             Column {
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                width: parent.width - Colors.iconSizeMedium - Colors.spacingM * 2 - closeBtn.width
-                                                spacing: Colors.spacingXXS
+                                                width: parent.width - Appearance.iconSizeMedium - Appearance.spacingM * 2 - closeBtn.width
+                                                spacing: Appearance.spacingXXS
 
                                                 Text {
                                                     width: parent.width
                                                     text: modelData.title || "Untitled"
                                                     color: Colors.text
-                                                    font.pixelSize: Colors.fontSizeSmall
+                                                    font.pixelSize: Appearance.fontSizeSmall
                                                     elide: Text.ElideRight
                                                 }
 
@@ -355,7 +355,7 @@ ColumnLayout {
                                                     width: parent.width
                                                     text: modelData.app_id || ""
                                                     color: Colors.textSecondary
-                                                    font.pixelSize: Colors.fontSizeXS
+                                                    font.pixelSize: Appearance.fontSizeXS
                                                     elide: Text.ElideRight
                                                 }
                                             }
@@ -366,11 +366,11 @@ ColumnLayout {
                                             id: closeBtn
                                             anchors.right: parent.right
                                             anchors.top: parent.top
-                                            anchors.margins: Colors.spacingS
+                                            anchors.margins: Appearance.spacingS
                                             text: "󰅙"
                                             color: closeMouse.containsMouse ? Colors.error : Colors.textSecondary
-                                            font.pixelSize: Colors.fontSizeLarge
-                                            font.family: Colors.fontMono
+                                            font.pixelSize: Appearance.fontSizeLarge
+                                            font.family: Appearance.fontMono
                                             visible: cardMouse.containsMouse
 
                                             MouseArea {
@@ -390,9 +390,9 @@ ColumnLayout {
                                     visible: wsColumn.wsWindows.length === 0
                                     text: content.searchQuery ? "No matches" : "Empty"
                                     color: Colors.textDisabled
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    topPadding: Colors.spacingXL
+                                    topPadding: Appearance.spacingXL
                                 }
                             }
                         }

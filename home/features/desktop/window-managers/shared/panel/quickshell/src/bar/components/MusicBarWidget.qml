@@ -52,19 +52,19 @@ SharedWidgets.BarPill {
 
     Behavior on width {
         NumberAnimation {
-            duration: Colors.durationSlow
+            duration: Appearance.durationSlow
             easing.type: Easing.OutCubic
         }
     }
 
     Row {
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             text: "󰝚"
             color: Colors.primary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -79,7 +79,7 @@ SharedWidgets.BarPill {
                 id: musicTitleText
                 text: SystemStatus.activeMprisPlayers.length > 0 ? (SystemStatus.activeMprisPlayers[0].trackTitle || "") : ""
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.DemiBold
                 anchors.verticalCenter: parent.verticalCenter
             }

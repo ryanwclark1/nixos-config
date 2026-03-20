@@ -9,7 +9,7 @@ Rectangle {
 
     implicitWidth: chipRow.implicitWidth + 16
     implicitHeight: 28
-    radius: Colors.radiusPill
+    radius: Appearance.radiusPill
     color: Colors.primaryGhost
     border.color: Colors.border
     border.width: 1
@@ -17,19 +17,19 @@ Rectangle {
     Row {
         id: chipRow
         anchors.centerIn: parent
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             text: root.modelData
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
         }
 
         Text {
             text: "󰅖"
             color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeSmall
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeSmall
 
             MouseArea {
                 anchors.fill: parent

@@ -29,8 +29,8 @@ Item {
         anchors.bottomMargin: 8
         text: root.label
         color: root.color
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         font.weight: Font.Bold
-        font.family: Colors.fontMono
+        font.family: Appearance.fontMono
     }
 }

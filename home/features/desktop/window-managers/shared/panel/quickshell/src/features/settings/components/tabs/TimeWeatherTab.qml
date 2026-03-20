@@ -85,7 +85,7 @@ Item {
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Repeater {
                     model: [
@@ -119,9 +119,9 @@ Item {
                     delegate: Rectangle {
                         required property var modelData
 
-                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
-                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
-                        radius: Colors.radiusLarge
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Appearance.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Appearance.spacingM * 2
+                        radius: Appearance.radiusLarge
                         color: Colors.withAlpha(Colors.surface, 0.38)
                         border.color: Colors.withAlpha(Colors.primary, 0.14)
                         border.width: 1
@@ -129,8 +129,8 @@ Item {
                         ColumnLayout {
                             id: metricColumn
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
-                            spacing: Colors.spacingXS
+                            anchors.margins: Appearance.spacingM
+                            spacing: Appearance.spacingXS
 
                             SettingsMetricIcon { icon: modelData.icon }
 
@@ -138,9 +138,9 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.label
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Black
-                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                font.letterSpacing: Appearance.letterSpacingExtraWide
                                 wrapMode: Text.WordWrap
                             }
 
@@ -148,7 +148,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.value
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.Bold
                                 wrapMode: Text.WordWrap
                             }
@@ -169,8 +169,8 @@ Item {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: root.compactMode ? compactPreview.implicitHeight + Colors.spacingM * 2 : 84
-                    radius: Colors.radiusMedium
+                    implicitHeight: root.compactMode ? compactPreview.implicitHeight + Appearance.spacingM * 2 : 84
+                    radius: Appearance.radiusMedium
                     color: Colors.cardSurface
                     border.color: Colors.border
                     border.width: 1
@@ -178,29 +178,29 @@ Item {
                     RowLayout {
                         id: widePreview
                         anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingM
+                        anchors.margins: Appearance.spacingM
+                        spacing: Appearance.spacingM
                         visible: !root.compactMode
 
                         Rectangle {
                             implicitHeight: 34
-                            implicitWidth: timePreview.implicitWidth + datePreview.implicitWidth + Colors.spacingM * 3
-                            radius: Colors.radiusPill
+                            implicitWidth: timePreview.implicitWidth + datePreview.implicitWidth + Appearance.spacingM * 3
+                            radius: Appearance.radiusPill
                             color: Colors.primaryTint
                             border.color: Colors.withAlpha(Colors.primary, 0.45)
                             border.width: 1
 
                             RowLayout {
                                 anchors.fill: parent
-                                anchors.leftMargin: Colors.spacingM
-                                anchors.rightMargin: Colors.spacingM
-                                spacing: Colors.spacingS
+                                anchors.leftMargin: Appearance.spacingM
+                                anchors.rightMargin: Appearance.spacingM
+                                spacing: Appearance.spacingS
 
                                 Text {
                                     id: timePreview
                                     text: Qt.formatDateTime(previewClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeLarge
+                                    font.pixelSize: Appearance.fontSizeLarge
                                     font.weight: Font.Bold
                                 }
 
@@ -209,7 +209,7 @@ Item {
                                     text: root.barDatePreview(previewClock.date)
                                     visible: text !== ""
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.pixelSize: Appearance.fontSizeMedium
                                 }
                             }
                         }
@@ -220,19 +220,19 @@ Item {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingXXS
+                            spacing: Appearance.spacingXXS
 
                             Text {
                                 text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.DemiBold
                             }
 
                             Text {
                                 text: root.activeLocationSummary()
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
                             }
@@ -242,30 +242,30 @@ Item {
                     ColumnLayout {
                         id: compactPreview
                         anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingS
+                        anchors.margins: Appearance.spacingM
+                        spacing: Appearance.spacingS
                         visible: root.compactMode
 
                         Rectangle {
                             Layout.alignment: Qt.AlignLeft
                             implicitHeight: 34
-                            implicitWidth: timePreviewCompact.implicitWidth + datePreviewCompact.implicitWidth + Colors.spacingM * 3
-                            radius: Colors.radiusPill
+                            implicitWidth: timePreviewCompact.implicitWidth + datePreviewCompact.implicitWidth + Appearance.spacingM * 3
+                            radius: Appearance.radiusPill
                             color: Colors.primaryTint
                             border.color: Colors.withAlpha(Colors.primary, 0.45)
                             border.width: 1
 
                             RowLayout {
                                 anchors.fill: parent
-                                anchors.leftMargin: Colors.spacingM
-                                anchors.rightMargin: Colors.spacingM
-                                spacing: Colors.spacingS
+                                anchors.leftMargin: Appearance.spacingM
+                                anchors.rightMargin: Appearance.spacingM
+                                spacing: Appearance.spacingS
 
                                 Text {
                                     id: timePreviewCompact
                                     text: Qt.formatDateTime(previewClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeLarge
+                                    font.pixelSize: Appearance.fontSizeLarge
                                     font.weight: Font.Bold
                                 }
 
@@ -274,19 +274,19 @@ Item {
                                     text: root.barDatePreview(previewClock.date)
                                     visible: text !== ""
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.pixelSize: Appearance.fontSizeMedium
                                 }
                             }
                         }
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingXXS
+                            spacing: Appearance.spacingXXS
 
                             Text {
                                 text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.DemiBold
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
@@ -295,7 +295,7 @@ Item {
                             Text {
                                 text: root.activeLocationSummary()
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
                             }
@@ -429,7 +429,7 @@ Item {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
 
                     SettingsTextInputRow {
                         label: "City"
@@ -446,13 +446,13 @@ Item {
                     Flow {
                         Layout.fillWidth: true
                         width: parent.width
-                        spacing: Colors.spacingM
+                        spacing: Appearance.spacingM
 
                         SettingsTextInputRow {
                             id: weatherLatInput
                             width: root.compactMode
                                 ? parent.width
-                                : Math.min(parent.width, Math.max(180, (parent.width - Colors.spacingM) / 2))
+                                : Math.min(parent.width, Math.max(180, (parent.width - Appearance.spacingM) / 2))
                             label: "Latitude"
                             placeholderText: "40.7128"
                             leadingIcon: "󰍐"
@@ -469,7 +469,7 @@ Item {
                             id: weatherLonInput
                             width: root.compactMode
                                 ? parent.width
-                                : Math.min(parent.width, Math.max(180, (parent.width - Colors.spacingM) / 2))
+                                : Math.min(parent.width, Math.max(180, (parent.width - Appearance.spacingM) / 2))
                             label: "Longitude"
                             placeholderText: "-74.0060"
                             leadingIcon: "󰍐"
@@ -503,7 +503,7 @@ Item {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
 
                     SettingsTextInputRow {
                         label: "Tickers"

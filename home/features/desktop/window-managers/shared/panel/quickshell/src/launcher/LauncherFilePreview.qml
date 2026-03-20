@@ -12,7 +12,7 @@ Rectangle {
     required property var selectedItem
 
     color: Colors.withAlpha(Colors.surface, 0.6)
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     border.color: Colors.withAlpha(Colors.border, 0.3)
     border.width: 1
     clip: true
@@ -278,19 +278,19 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingS
-        spacing: Colors.spacingXS
+        anchors.margins: Appearance.spacingS
+        spacing: Appearance.spacingXS
 
         // Header: filename + extension pill + size
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
 
             Text {
                 Layout.fillWidth: true
                 text: root.selectedItem ? (root.selectedItem.name || "") : ""
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.DemiBold
                 elide: Text.ElideMiddle
             }
@@ -300,24 +300,24 @@ Rectangle {
                 visible: root._fileSize !== ""
                 text: root._fileSize
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXXS
-                font.family: Colors.fontMono
+                font.pixelSize: Appearance.fontSizeXXS
+                font.family: Appearance.fontMono
             }
 
             Rectangle {
                 visible: !!(root.selectedItem && root.selectedItem.extension)
                 color: Colors.withAlpha(Colors.primary, Colors.primarySubtle)
-                radius: Colors.radiusMicro
-                implicitWidth: extLabel.implicitWidth + Colors.spacingS * 2
-                implicitHeight: extLabel.implicitHeight + Colors.spacingXXS * 2
+                radius: Appearance.radiusMicro
+                implicitWidth: extLabel.implicitWidth + Appearance.spacingS * 2
+                implicitHeight: extLabel.implicitHeight + Appearance.spacingXXS * 2
 
                 Text {
                     id: extLabel
                     anchors.centerIn: parent
                     text: root.selectedItem ? ("." + (root.selectedItem.extension || "")) : ""
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.family: Appearance.fontMono
                 }
             }
         }
@@ -328,8 +328,8 @@ Rectangle {
             visible: root._relativePath !== "" && root._relativePath !== (root.selectedItem ? root.selectedItem.name : "")
             text: root._relativePath
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXXS
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeXXS
+            font.family: Appearance.fontMono
             elide: Text.ElideMiddle
         }
 
@@ -354,14 +354,14 @@ Rectangle {
 
                 Row {
                     anchors.fill: parent
-                    spacing: Colors.spacingXS
+                    spacing: Appearance.spacingXS
 
                     Text {
                         id: lineNumbers
                         text: root._lineNumbers(root._currentContent)
                         color: Colors.withAlpha(Colors.textDisabled, 0.5)
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeXXS
+                        font.family: Appearance.fontMono
                         lineHeight: 1.3
                         horizontalAlignment: Text.AlignRight
                         verticalAlignment: Text.AlignTop
@@ -380,15 +380,15 @@ Rectangle {
 
                     Text {
                         id: previewText
-                        width: Math.max(0, parent.width - lineNumbers.width - gutterSeparator.width - (Colors.spacingXS * 2))
+                        width: Math.max(0, parent.width - lineNumbers.width - gutterSeparator.width - (Appearance.spacingXS * 2))
                         text: root._highlightContent(
                             root._currentContent,
                             root.selectedItem ? (root.selectedItem.extension || "") : ""
                         )
                         textFormat: Text.RichText
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeXXS
+                        font.family: Appearance.fontMono
                         wrapMode: Text.WrapAnywhere
                         lineHeight: 1.3
                         verticalAlignment: Text.AlignTop
@@ -418,21 +418,21 @@ Rectangle {
 
                 ColumnLayout {
                     anchors.centerIn: parent
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
                         text: "󰈔"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeDisplay
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeDisplay
+                        font.family: Appearance.fontMono
                     }
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
                         text: root._currentContent || "Binary"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: Appearance.fontSizeMedium
                         font.weight: Font.DemiBold
                     }
 
@@ -440,7 +440,7 @@ Rectangle {
                         Layout.alignment: Qt.AlignHCenter
                         text: root._fileSize !== "" ? root._fileSize : "Preview not available"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                     }
                 }
             }

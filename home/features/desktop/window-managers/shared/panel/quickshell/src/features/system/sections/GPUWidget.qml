@@ -61,19 +61,19 @@ SharedWidgets.CardBase {
     ColumnLayout {
         id: gpuColumn
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         // Header
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: AMDGPUService.available ? "AMD GPU" : "GPU"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingWide
+                font.letterSpacing: Appearance.letterSpacingWide
             }
 
             Item { Layout.fillWidth: true }
@@ -96,8 +96,8 @@ SharedWidgets.CardBase {
             SharedWidgets.IconButton {
                 visible: AMDGPUService.available
                 icon: root.showProcesses ? "󱗼" : "󱗻"
-                size: Colors.iconSizeSmall
-                iconSize: Colors.fontSizeSmall
+                size: Appearance.iconSizeSmall
+                iconSize: Appearance.fontSizeSmall
                 tooltipText: root.showProcesses ? "Hide GPU processes" : "Show GPU processes"
                 onClicked: root.showProcesses = !root.showProcesses
             }
@@ -106,7 +106,7 @@ SharedWidgets.CardBase {
         // Main stats row
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingL
+            spacing: Appearance.spacingL
 
             ResourceGauge {
                 value: SystemStatus.gpuPercent
@@ -118,7 +118,7 @@ SharedWidgets.CardBase {
             // Core stats column
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
@@ -145,33 +145,33 @@ SharedWidgets.CardBase {
             visible: AMDGPUService.available
             Layout.fillWidth: true
             columns: 2
-            columnSpacing: Colors.spacingM
-            rowSpacing: Colors.spacingXS
+            columnSpacing: Appearance.spacingM
+            rowSpacing: Appearance.spacingXS
             
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
-                Text { text: "Graphics Engine"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+                spacing: Appearance.spacingXXS
+                Text { text: "Graphics Engine"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold }
                 SharedWidgets.MiniProgressBar { value: AMDGPUService.gfxUsage; barColor: Colors.secondary }
             }
             
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
-                Text { text: "Memory Controller"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+                spacing: Appearance.spacingXXS
+                Text { text: "Memory Controller"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold }
                 SharedWidgets.MiniProgressBar { value: AMDGPUService.memUsage; barColor: Colors.accent }
             }
             
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
-                Text { text: "Media Engine"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+                spacing: Appearance.spacingXXS
+                Text { text: "Media Engine"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold }
                 SharedWidgets.MiniProgressBar { value: AMDGPUService.mediaUsage; barColor: Colors.success }
             }
             
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
                 SharedWidgets.InfoRow { label: "Fan"; value: AMDGPUService.fanRpm + " RPM"; Layout.fillWidth: true }
             }
         }
@@ -189,16 +189,16 @@ SharedWidgets.CardBase {
         ColumnLayout {
             visible: root.showProcesses && AMDGPUService.available
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
             
             Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.3 }
             
             Text {
                 text: "TOP GPU PROCESSES"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXXS
+                font.pixelSize: Appearance.fontSizeXXS
                 font.weight: Font.Bold
-                font.letterSpacing: Colors.letterSpacingWide
+                font.letterSpacing: Appearance.letterSpacingWide
             }
             
             Repeater {
@@ -216,12 +216,12 @@ SharedWidgets.CardBase {
                 
                 delegate: RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
                     
                     Text {
                         text: modelData.name
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         elide: Text.ElideRight
                         Layout.fillWidth: true
                     }
@@ -229,16 +229,16 @@ SharedWidgets.CardBase {
                     Text {
                         text: modelData.gfx + "%"
                         color: Colors.secondary
-                        font.pixelSize: Colors.fontSizeSmall
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeSmall
+                        font.family: Appearance.fontMono
                         font.weight: Font.Bold
                     }
                     
                     Text {
                         text: MU.formatBytes(modelData.vram)
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXXS
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeXXS
+                        font.family: Appearance.fontMono
                     }
                 }
             }
@@ -247,7 +247,7 @@ SharedWidgets.CardBase {
                 visible: Object.keys(AMDGPUService.processGpuUsage).length === 0
                 text: "No GPU activity detected"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXXS
+                font.pixelSize: Appearance.fontSizeXXS
                 font.italic: true
             }
         }

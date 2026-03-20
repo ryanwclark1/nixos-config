@@ -149,16 +149,16 @@ SharedWidgets.CardBase {
     ColumnLayout {
         id: unitsColumn
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: "SERVICES"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Bold
             }
 
@@ -169,7 +169,7 @@ SharedWidgets.CardBase {
             SharedWidgets.IconButton {
                 icon: "arrow-clockwise.svg"
                 size: 28
-                iconSize: Colors.fontSizeSmall
+                iconSize: Appearance.fontSizeSmall
                 iconColor: Colors.textSecondary
                 onClicked: ServiceUnitService.refresh()
             }
@@ -183,7 +183,7 @@ SharedWidgets.CardBase {
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SharedWidgets.FilterChip {
                 label: "Failed"
@@ -208,7 +208,7 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             text: ServiceUnitService.userStatus === "ready" ? ("User units  •  showing " + String(root.visibleUserUnits.length)) : (ServiceUnitService.userMessage || "User services unavailable")
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
         }
 
         ListView {
@@ -217,14 +217,14 @@ SharedWidgets.CardBase {
             implicitHeight: contentHeight
             interactive: false
             clip: true
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
             model: root.visibleUserUnits
 
             add: Transition {
-                NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: Colors.durationFast }
+                NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: Appearance.durationFast }
             }
             remove: Transition {
-                NumberAnimation { properties: "opacity"; from: 1; to: 0; duration: Colors.durationFast }
+                NumberAnimation { properties: "opacity"; from: 1; to: 0; duration: Appearance.durationFast }
             }
 
             delegate: Rectangle {
@@ -232,30 +232,30 @@ SharedWidgets.CardBase {
                 required property int index
                 readonly property bool selected: root.selectedUnitScope === "user" && root.selectedUnitName === String(modelData.name || "")
                 width: ListView.view.width
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: selected ? Colors.highlight : Colors.highlightLight
                 border.color: selected ? Colors.primary : Colors.withAlpha(root.stateColor(modelData), 0.65)
                 border.width: 1
-                implicitHeight: unitColumn.implicitHeight + Colors.spacingS * 2
+                implicitHeight: unitColumn.implicitHeight + Appearance.spacingS * 2
 
                 ColumnLayout {
                     id: unitColumn
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingXS
+                    anchors.margins: Appearance.spacingS
+                    spacing: Appearance.spacingXS
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingXXS
+                            spacing: Appearance.spacingXXS
 
                             Text {
                                 text: modelData.name || "service"
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 font.weight: Font.DemiBold
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
@@ -264,7 +264,7 @@ SharedWidgets.CardBase {
                             Text {
                                 text: modelData.description || modelData.sub || ""
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
                             }
@@ -273,14 +273,14 @@ SharedWidgets.CardBase {
                         Text {
                             text: String(modelData.active || "unknown").toUpperCase()
                             color: selected ? Colors.primary : root.stateColor(modelData)
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.Bold
                         }
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         SharedWidgets.FilterChip {
                             label: root.running(modelData) ? "Stop" : "Start"
@@ -306,7 +306,7 @@ SharedWidgets.CardBase {
                         Text {
                             text: ServiceUnitService.pendingActionForUnit("user", modelData.name).toUpperCase()
                             color: Colors.warning
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             visible: ServiceUnitService.isUnitPending("user", modelData.name)
                         }
                     }
@@ -332,10 +332,10 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             visible: ServiceUnitService.userStatus !== "ready"
             color: Colors.bgWidget
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             border.color: Colors.border
             border.width: 1
-            implicitHeight: userUnavailable.implicitHeight + Colors.spacingS * 2
+            implicitHeight: userUnavailable.implicitHeight + Appearance.spacingS * 2
 
             SharedWidgets.EmptyState {
                 id: userUnavailable
@@ -347,22 +347,22 @@ SharedWidgets.CardBase {
 
         Rectangle {
             Layout.fillWidth: true
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: Colors.bgWidget
             border.color: Colors.border
             border.width: 1
-            implicitHeight: systemHeader.implicitHeight + Colors.spacingS * 2
+            implicitHeight: systemHeader.implicitHeight + Appearance.spacingS * 2
 
             RowLayout {
                 id: systemHeader
                 anchors.fill: parent
-                anchors.margins: Colors.spacingS
-                spacing: Colors.spacingS
+                anchors.margins: Appearance.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     text: "SYSTEM UNITS"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Bold
                 }
 
@@ -373,7 +373,7 @@ SharedWidgets.CardBase {
                 Text {
                     text: ServiceUnitService.systemStatus === "ready" ? String(ServiceUnitService.systemUnits.length) : (ServiceUnitService.systemMessage || "unavailable")
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                 }
 
                 SharedWidgets.FilterChip {
@@ -391,14 +391,14 @@ SharedWidgets.CardBase {
             implicitHeight: contentHeight
             interactive: false
             clip: true
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
             model: root.visibleSystemUnits
 
             add: Transition {
-                NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: Colors.durationFast }
+                NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: Appearance.durationFast }
             }
             remove: Transition {
-                NumberAnimation { properties: "opacity"; from: 1; to: 0; duration: Colors.durationFast }
+                NumberAnimation { properties: "opacity"; from: 1; to: 0; duration: Appearance.durationFast }
             }
 
             delegate: Rectangle {
@@ -406,22 +406,22 @@ SharedWidgets.CardBase {
                 required property int index
                 readonly property bool selected: root.selectedUnitScope === "system" && root.selectedUnitName === String(modelData.name || "")
                 width: ListView.view.width
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: selected ? Colors.highlight : Colors.bgWidget
                 border.color: selected ? Colors.primary : Colors.withAlpha(root.stateColor(modelData), 0.55)
                 border.width: 1
-                implicitHeight: systemUnitColumn.implicitHeight + Colors.spacingS * 2
+                implicitHeight: systemUnitColumn.implicitHeight + Appearance.spacingS * 2
 
                 ColumnLayout {
                     id: systemUnitColumn
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
-                    spacing: Colors.spacingXS
+                    anchors.margins: Appearance.spacingS
+                    spacing: Appearance.spacingXS
 
                     Text {
                         text: modelData.name || "service"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Medium
                         Layout.fillWidth: true
                         elide: Text.ElideRight
@@ -430,14 +430,14 @@ SharedWidgets.CardBase {
                     Text {
                         text: (modelData.description || "") + "  •  " + String(modelData.active || "unknown")
                         color: root.stateColor(modelData)
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         Layout.fillWidth: true
                         elide: Text.ElideRight
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         SharedWidgets.FilterChip {
                             label: "Restart"
@@ -482,10 +482,10 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             visible: root.showSystemUnits && !root.systemAvailable
             color: Colors.bgWidget
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             border.color: Colors.border
             border.width: 1
-            implicitHeight: systemUnavailable.implicitHeight + Colors.spacingS * 2
+            implicitHeight: systemUnavailable.implicitHeight + Appearance.spacingS * 2
 
             SharedWidgets.EmptyState {
                 id: systemUnavailable
@@ -498,26 +498,26 @@ SharedWidgets.CardBase {
         Rectangle {
             Layout.fillWidth: true
             visible: !!root.selectedUnit && !root.detailsExpanded
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: Colors.bgWidget
             border.color: Colors.border
             border.width: 1
-            implicitHeight: collapsedUnitRow.implicitHeight + Colors.spacingS * 2
+            implicitHeight: collapsedUnitRow.implicitHeight + Appearance.spacingS * 2
 
             RowLayout {
                 id: collapsedUnitRow
                 anchors.fill: parent
-                anchors.margins: Colors.spacingS
-                spacing: Colors.spacingS
+                anchors.margins: Appearance.spacingS
+                spacing: Appearance.spacingS
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingXXS
+                    spacing: Appearance.spacingXXS
 
                     Text {
                         text: root.selectedUnit ? String(root.selectedUnit.name || "service") : ""
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Medium
                         Layout.fillWidth: true
                         elide: Text.ElideRight
@@ -526,7 +526,7 @@ SharedWidgets.CardBase {
                     Text {
                         text: root.selectedUnit ? ("Details collapsed. Select the row again to reopen " + (root.selectedUnitScope === "system" ? "system" : "user") + " unit actions.") : ""
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
                     }
@@ -535,7 +535,7 @@ SharedWidgets.CardBase {
                 SharedWidgets.IconButton {
                     icon: "add.svg"
                     size: 28
-                    iconSize: Colors.fontSizeSmall
+                    iconSize: Appearance.fontSizeSmall
                     iconColor: Colors.primary
                     onClicked: root.detailsExpanded = true
                 }
@@ -545,26 +545,26 @@ SharedWidgets.CardBase {
         Rectangle {
             Layout.fillWidth: true
             visible: !!root.selectedUnit && root.detailsExpanded
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: Colors.bgWidget
             border.color: Colors.border
             border.width: 1
-            implicitHeight: detailColumn.implicitHeight + Colors.spacingM * 2
+            implicitHeight: detailColumn.implicitHeight + Appearance.spacingM * 2
 
             ColumnLayout {
                 id: detailColumn
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingS
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingS
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingXXS
+                    spacing: Appearance.spacingXXS
 
                     Text {
                         text: root.selectedUnit ? String(root.selectedUnit.name || "service") : ""
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.DemiBold
                         Layout.fillWidth: true
                         elide: Text.ElideRight
@@ -573,7 +573,7 @@ SharedWidgets.CardBase {
                     Text {
                         text: root.selectedUnit ? ((root.selectedUnitScope === "system" ? "SYSTEM" : "USER") + "  •  " + String(root.selectedUnit.description || root.selectedUnit.sub || "service")) : ""
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         Layout.fillWidth: true
                         elide: Text.ElideRight
                     }
@@ -582,7 +582,7 @@ SharedWidgets.CardBase {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SharedWidgets.FilterChip {
                         label: root.selectedUnit && root.running(root.selectedUnit) ? "Stop" : "Start"
@@ -611,7 +611,7 @@ SharedWidgets.CardBase {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SharedWidgets.FilterChip {
                         label: "Reload"
@@ -649,7 +649,7 @@ SharedWidgets.CardBase {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SharedWidgets.Chip {
                         icon: "desktop.svg"
@@ -683,33 +683,33 @@ SharedWidgets.CardBase {
                 Text {
                     text: root.selectedPendingAction !== "" ? ("PENDING  •  " + root.selectedPendingAction.toUpperCase()) : "READY"
                     color: root.selectedPendingAction !== "" ? Colors.warning : Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Bold
                 }
 
                 Text {
                     text: "DETAILS"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Bold
                 }
 
                 Rectangle {
                     Layout.fillWidth: true
                     color: Colors.cardSurface
-                    radius: Colors.radiusSmall
+                    radius: Appearance.radiusSmall
                     border.color: Colors.withAlpha(Colors.border, 0.65)
                     border.width: 1
-                    implicitHeight: detailText.implicitHeight + Colors.spacingS * 2
+                    implicitHeight: detailText.implicitHeight + Appearance.spacingS * 2
 
                     Text {
                         id: detailText
                         anchors.fill: parent
-                        anchors.margins: Colors.spacingS
+                        anchors.margins: Appearance.spacingS
                         text: root.selectedUnit ? ("Description: " + String(root.selectedUnit.description || "n/a") + "\nUnit: " + String(root.selectedUnit.name || "") + "\nState: " + String(root.selectedUnit.active || "unknown") + " / " + String(root.selectedUnit.sub || "unknown") + "\nLoad: " + String(root.selectedUnit.load || "unknown")) : ""
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeXS
+                        font.family: Appearance.fontMono
                         wrapMode: Text.WrapAnywhere
                     }
                 }

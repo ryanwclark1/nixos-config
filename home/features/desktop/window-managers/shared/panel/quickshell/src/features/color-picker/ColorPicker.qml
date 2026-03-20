@@ -130,8 +130,8 @@ PanelWindow {
   SharedWidgets.ElasticNumber {
     id: _cpElasticScale
     target: root.isOpen ? 1.0 : 0.94
-    fastDuration: Colors.durationSnap
-    slowDuration: Colors.durationNormal
+    fastDuration: Appearance.durationSnap
+    slowDuration: Appearance.durationNormal
     fastWeight: 0.45
   }
 
@@ -148,7 +148,7 @@ PanelWindow {
     color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
 
     focus: root.isOpen
     onVisibleChanged: {
@@ -161,7 +161,7 @@ PanelWindow {
 
     opacity: root.isOpen ? 1.0 : 0.0
     scale:   _cpElasticScale.value
-    Behavior on opacity { NumberAnimation { id: cpFadeAnim;  duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: cpFadeAnim;  duration: Appearance.durationMedium; easing.type: Easing.OutCubic } }
     layer.enabled: cpFadeAnim.running || _cpElasticScale.running
 
     // Block background click-through
@@ -176,30 +176,30 @@ PanelWindow {
         top: parent.top
         left: parent.left
         right: parent.right
-        topMargin: Colors.spacingLG
-        leftMargin: Colors.paddingLarge
-        rightMargin: Colors.paddingLarge
+        topMargin: Appearance.spacingLG
+        leftMargin: Appearance.paddingLarge
+        rightMargin: Appearance.paddingLarge
       }
-      spacing: Colors.spacingL
+      spacing: Appearance.spacingL
 
       // ── Header ──────────────────────────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.paddingSmall
+        spacing: Appearance.paddingSmall
 
         Text {
           text: "󰈊"
           color: Colors.primary
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeXL
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeXL
         }
 
         Text {
           text: "Color Picker"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeLarge
+          font.pixelSize: Appearance.fontSizeLarge
           font.weight: Font.Bold
-          font.letterSpacing: Colors.letterSpacingTight
+          font.letterSpacing: Appearance.letterSpacingTight
           Layout.fillWidth: true
         }
 
@@ -423,7 +423,7 @@ PanelWindow {
             y: (parent.height - height) / 2
             width: 12
             height: 12
-            radius: Colors.radiusXXS
+            radius: Appearance.radiusXXS
             color: root.currentColor
             border.color: "white"
             border.width: 2
@@ -448,13 +448,13 @@ PanelWindow {
       // ── Preview + hex input row ────────────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         // Color preview circle
         Rectangle {
           width: 44
           height: 44
-          radius: Colors.radiusXL
+          radius: Appearance.radiusXL
           color: root.currentColor
           border.color: Colors.border
           border.width: 1
@@ -464,29 +464,29 @@ PanelWindow {
         Rectangle {
           Layout.fillWidth: true
           height: 44
-          radius: Colors.radiusSmall
+          radius: Appearance.radiusSmall
           color: Colors.bgWidget
           border.color: hexInput.activeFocus ? Colors.primary : Colors.border
           border.width: 1
           Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
           RowLayout {
-            anchors { fill: parent; leftMargin: Colors.spacingM; rightMargin: Colors.spacingM }
-            spacing: Colors.spacingSM
+            anchors { fill: parent; leftMargin: Appearance.spacingM; rightMargin: Appearance.spacingM }
+            spacing: Appearance.spacingSM
 
             Text {
               text: "#"
               color: Colors.textDisabled
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeMedium
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeMedium
             }
 
             TextInput {
               id: hexInput
               Layout.fillWidth: true
               color: Colors.text
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeMedium
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeMedium
               font.capitalization: Font.AllUppercase
               maximumLength: 7
               text: root.hexValue
@@ -513,7 +513,7 @@ PanelWindow {
         Rectangle {
           width: 44
           height: 44
-          radius: Colors.radiusSmall
+          radius: Appearance.radiusSmall
           color: Colors.bgWidget
           border.color: copyHover.containsMouse ? Colors.primary : Colors.border
           border.width: 1
@@ -522,8 +522,8 @@ PanelWindow {
             anchors.centerIn: parent
             text: clipCopied.running ? "󰄬" : "󰆏"
             color: clipCopied.running ? Colors.primary : Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
           }
 
           readonly property int _copyFeedbackMs: 1500
@@ -559,7 +559,7 @@ PanelWindow {
       // ── RGB sliders ────────────────────────────────────────────────────────
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Repeater {
           model: [
@@ -573,13 +573,13 @@ PanelWindow {
 
           delegate: RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
               text: modelData.label
               color: Qt.hsva(modelData.h, modelData.s, modelData.v, 1.0)
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeSmall
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeSmall
               font.weight: Font.Bold
               Layout.preferredWidth: 12
             }
@@ -587,7 +587,7 @@ PanelWindow {
             Rectangle {
               Layout.fillWidth: true
               height: 6
-              radius: Colors.radiusXS
+              radius: Appearance.radiusXS
               color: Colors.surface
 
               Rectangle {
@@ -621,8 +621,8 @@ PanelWindow {
             Text {
               text: modelData.value
               color: Colors.textDisabled
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeXS
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeXS
               Layout.preferredWidth: 28
               horizontalAlignment: Text.AlignRight
             }
@@ -640,14 +640,14 @@ PanelWindow {
       // ── Preset swatches ────────────────────────────────────────────────────
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
           text: "PRESETS"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Black
-          font.letterSpacing: Colors.letterSpacingExtraWide
+          font.letterSpacing: Appearance.letterSpacingExtraWide
         }
 
         readonly property var presetColors: [
@@ -661,7 +661,7 @@ PanelWindow {
 
         Flow {
           Layout.fillWidth: true
-          spacing: Colors.spacingSM
+          spacing: Appearance.spacingSM
 
           Repeater {
             model: parent.parent.presetColors
@@ -669,13 +669,13 @@ PanelWindow {
             delegate: Rectangle {
               width: 28
               height: 28
-              radius: Colors.radiusXXS
+              radius: Appearance.radiusXXS
               color: modelData
               border.color: Colors.border
               border.width: 1
 
               scale: swatchMouse.containsMouse ? 1.15 : 1.0
-              Behavior on scale { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutBack } }
+              Behavior on scale { NumberAnimation { duration: Appearance.durationSnap; easing.type: Easing.OutBack } }
 
               MouseArea {
                 id: swatchMouse
@@ -692,19 +692,19 @@ PanelWindow {
       // ── Recent colors ──────────────────────────────────────────────────────
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
         visible: Config.recentPickerColors && Config.recentPickerColors.length > 0
 
         Text {
           text: "RECENT"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Black
-          font.letterSpacing: Colors.letterSpacingExtraWide
+          font.letterSpacing: Appearance.letterSpacingExtraWide
         }
 
         Row {
-          spacing: Colors.spacingSM
+          spacing: Appearance.spacingSM
 
           Repeater {
             model: Config.recentPickerColors
@@ -712,13 +712,13 @@ PanelWindow {
             delegate: Rectangle {
               width: 28
               height: 28
-              radius: Colors.radiusXXS
+              radius: Appearance.radiusXXS
               color: modelData
               border.color: Colors.border
               border.width: 1
 
               scale: recentMouse.containsMouse ? 1.15 : 1.0
-              Behavior on scale { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutBack } }
+              Behavior on scale { NumberAnimation { duration: Appearance.durationSnap; easing.type: Easing.OutBack } }
 
               MouseArea {
                 id: recentMouse
@@ -736,12 +736,12 @@ PanelWindow {
       Rectangle {
         Layout.fillWidth: true
         height: 44
-        radius: Colors.radiusMedium
+        radius: Appearance.radiusMedium
         color: Colors.primary
 
         RowLayout {
           anchors.centerIn: parent
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
 
           Rectangle {
             width: 18
@@ -755,9 +755,9 @@ PanelWindow {
           Text {
             text: "Pick " + root.hexValue
             color: Colors.text
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
             font.weight: Font.Bold
-            font.family: Colors.fontMono
+            font.family: Appearance.fontMono
           }
         }
 

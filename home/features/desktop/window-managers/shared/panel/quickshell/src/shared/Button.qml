@@ -5,13 +5,13 @@ Rectangle {
     id: root
 
     property alias text: label.text
-    property real fontSize: Colors.fontSizeMedium
+    property real fontSize: Appearance.fontSizeMedium
     property bool hovered: buttonMouse.containsMouse
     signal clicked
 
-    implicitWidth: Math.max(96, label.implicitWidth + (Colors.spacingM * 2))
+    implicitWidth: Math.max(96, label.implicitWidth + (Appearance.spacingM * 2))
     implicitHeight: 36
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: hovered ? Colors.primaryFaint : Colors.cardSurface
     border.color: hovered ? Colors.primaryRing : Colors.border
     border.width: 1

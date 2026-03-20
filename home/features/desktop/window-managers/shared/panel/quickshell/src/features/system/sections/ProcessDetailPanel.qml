@@ -15,17 +15,17 @@ Rectangle {
     required property int clockTick
 
     Layout.fillWidth: true
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: Colors.bgWidget
     border.color: Colors.border
     border.width: 1
-    implicitHeight: detailColumn.implicitHeight + Colors.spacingM * 2
+    implicitHeight: detailColumn.implicitHeight + Appearance.spacingM * 2
 
     ColumnLayout {
         id: detailColumn
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
@@ -33,12 +33,12 @@ Rectangle {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
+                spacing: Appearance.spacingXXS
 
                 Text {
                     text: root.selectedProcess ? String(root.selectedProcess.name || "process") : ""
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
                 }
@@ -52,15 +52,15 @@ Rectangle {
                            + String(root.selectedProcess.tty || "?"))
                         : ""
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.family: Appearance.fontMono
                 }
             }
 
             Text {
                 text: root.pendingAction !== "" ? ("PENDING  " + root.pendingAction.toUpperCase()) : "READY"
                 color: root.pendingAction !== "" ? Colors.warning : Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Bold
             }
         }
@@ -77,7 +77,7 @@ Rectangle {
             Layout.fillWidth: true
             visible: !!root.selectedProcess
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SharedWidgets.Chip {
                 icon: ""
@@ -87,7 +87,7 @@ Rectangle {
             }
 
             SharedWidgets.Chip {
-                icon: "󰍛"
+                icon: "board.svg"
                 iconColor: Colors.accent
                 text: "RAM " + Number(root.selectedProcess ? root.selectedProcess.mem : 0).toFixed(1) + "%"
                 textColor: Colors.accent
@@ -101,7 +101,7 @@ Rectangle {
             }
 
             SharedWidgets.Chip {
-                icon: "󰥔"
+                icon: "clock.svg"
                 iconColor: Colors.secondary
                 text: root.selectedProcess ? String(root.selectedProcess.elapsed || "--:--") : ""
                 textColor: Colors.secondary
@@ -129,14 +129,14 @@ Rectangle {
             }
 
             SharedWidgets.Chip {
-                icon: "󰈔"
+                icon: "document.svg"
                 iconColor: Colors.textSecondary
                 text: root.selectedProcess ? ("TTY " + String(root.selectedProcess.tty || "?")) : "TTY ?"
                 textColor: Colors.textSecondary
             }
 
             SharedWidgets.Chip {
-                icon: "󰈈"
+                icon: "desktop.svg"
                 iconColor: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.textSecondary
                 text: root.selectedProcess ? ("STATE " + String(root.selectedProcess.state || "?")) : ""
                 textColor: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.textSecondary
@@ -148,7 +148,7 @@ Rectangle {
             Layout.fillWidth: true
             visible: !!root.selectedProcess
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SharedWidgets.FilterChip {
                 label: "TERM"
@@ -176,7 +176,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Inspect"
-                icon: "󰆍"
+                icon: "terminal.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.openProcessInTerminal(root.selectedPid)
@@ -184,7 +184,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Details"
-                icon: "󰋼"
+                icon: "info.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.openProcessDetailsInTerminal(root.selectedPid)
@@ -208,7 +208,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Copy PID"
-                icon: "󰅍"
+                icon: "copy.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.copyPid(root.selectedPid)
@@ -216,7 +216,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Copy Cmd"
-                icon: "󰅍"
+                icon: "copy.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.copyCommand(root.selectedPid)
@@ -224,7 +224,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Copy CWD"
-                icon: "󰉋"
+                icon: "folder.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid) && root.detailData.cwd !== undefined
                 selected: false
                 onClicked: ProcessService.copyCwd(root.selectedPid)
@@ -232,7 +232,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Copy EXE"
-                icon: "󰆍"
+                icon: "terminal.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid) && root.detailData.exe !== undefined
                 selected: false
                 onClicked: ProcessService.copyExe(root.selectedPid)
@@ -243,17 +243,17 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             visible: !!root.selectedProcess
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: Colors.cardSurface
             border.color: Colors.withAlpha(PTH.detailStatusColor(ProcessService.detailStatus, Colors), 0.4)
             border.width: 1
-            implicitHeight: liveDetailColumn.implicitHeight + Colors.spacingM * 2
+            implicitHeight: liveDetailColumn.implicitHeight + Appearance.spacingM * 2
 
             ColumnLayout {
                 id: liveDetailColumn
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingS
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingS
 
                 RowLayout {
                     Layout.fillWidth: true
@@ -261,9 +261,9 @@ Rectangle {
                     Text {
                         text: "LIVE DETAIL"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.Bold
-                        font.letterSpacing: Colors.letterSpacingWide
+                        font.letterSpacing: Appearance.letterSpacingWide
                     }
 
                     Item {
@@ -290,7 +290,7 @@ Rectangle {
                     visible: ProcessService.detailMessage !== ""
                     text: ProcessService.detailMessage
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     wrapMode: Text.WordWrap
                 }
 
@@ -299,14 +299,14 @@ Rectangle {
                     visible: ProcessService.lastActionPid === root.selectedPid && ProcessService.lastActionMessage !== ""
                     text: ProcessService.lastActionMessage + "  •  " + MU.formatAge(ProcessService.lastActionAt, root.clockTick)
                     color: PTH.actionStatusColor(ProcessService.lastActionState, Colors)
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     wrapMode: Text.WordWrap
                 }
 
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SharedWidgets.Chip {
                         icon: "󰞷"
@@ -347,7 +347,7 @@ Rectangle {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SharedWidgets.Chip {
                         icon: "󰓅"
@@ -382,21 +382,21 @@ Rectangle {
                 Rectangle {
                     Layout.fillWidth: true
                     color: Colors.cardSurface
-                    radius: Colors.radiusSmall
+                    radius: Appearance.radiusSmall
                     border.color: Colors.borderFocus
                     border.width: 1
-                    implicitHeight: cwdBlock.implicitHeight + Colors.spacingS * 2
+                    implicitHeight: cwdBlock.implicitHeight + Appearance.spacingS * 2
 
                     ColumnLayout {
                         id: cwdBlock
                         anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        spacing: Colors.spacingXXS
+                        anchors.margins: Appearance.spacingS
+                        spacing: Appearance.spacingXXS
 
                         Text {
                             text: "CWD"
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.Bold
                         }
 
@@ -404,8 +404,8 @@ Rectangle {
                             Layout.fillWidth: true
                             text: PTH.fallbackText(root.detailData.cwd)
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.family: Colors.fontMono
+                            font.pixelSize: Appearance.fontSizeXS
+                            font.family: Appearance.fontMono
                             wrapMode: Text.WrapAnywhere
                         }
                     }
@@ -414,21 +414,21 @@ Rectangle {
                 Rectangle {
                     Layout.fillWidth: true
                     color: Colors.cardSurface
-                    radius: Colors.radiusSmall
+                    radius: Appearance.radiusSmall
                     border.color: Colors.borderFocus
                     border.width: 1
-                    implicitHeight: exeBlock.implicitHeight + Colors.spacingS * 2
+                    implicitHeight: exeBlock.implicitHeight + Appearance.spacingS * 2
 
                     ColumnLayout {
                         id: exeBlock
                         anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        spacing: Colors.spacingXXS
+                        anchors.margins: Appearance.spacingS
+                        spacing: Appearance.spacingXXS
 
                         Text {
                             text: "EXECUTABLE"
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.Bold
                         }
 
@@ -436,8 +436,8 @@ Rectangle {
                             Layout.fillWidth: true
                             text: PTH.fallbackText(root.detailData.exe)
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
-                            font.family: Colors.fontMono
+                            font.pixelSize: Appearance.fontSizeXS
+                            font.family: Appearance.fontMono
                             wrapMode: Text.WrapAnywhere
                         }
                     }
@@ -447,21 +447,21 @@ Rectangle {
                     Layout.fillWidth: true
                     visible: !!root.detailData.openFilePreview && root.detailData.openFilePreview.length > 0
                     color: Colors.cardSurface
-                    radius: Colors.radiusSmall
+                    radius: Appearance.radiusSmall
                     border.color: Colors.borderFocus
                     border.width: 1
-                    implicitHeight: openFilesBlock.implicitHeight + Colors.spacingS * 2
+                    implicitHeight: openFilesBlock.implicitHeight + Appearance.spacingS * 2
 
                     ColumnLayout {
                         id: openFilesBlock
                         anchors.fill: parent
-                        anchors.margins: Colors.spacingS
-                        spacing: Colors.spacingXXS
+                        anchors.margins: Appearance.spacingS
+                        spacing: Appearance.spacingXXS
 
                         Text {
                             text: "OPEN FILES"
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.Bold
                         }
 
@@ -473,8 +473,8 @@ Rectangle {
                                 Layout.fillWidth: true
                                 text: String(modelData.fd || 0) + "  " + PTH.fallbackText(modelData.target)
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
-                                font.family: Colors.fontMono
+                                font.pixelSize: Appearance.fontSizeXS
+                                font.family: Appearance.fontMono
                                 wrapMode: Text.WrapAnywhere
                             }
                         }
@@ -488,19 +488,19 @@ Rectangle {
             Layout.fillWidth: true
             visible: !!root.selectedProcess
             color: Colors.cardSurface
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             border.color: Colors.withAlpha(Colors.border, 0.65)
             border.width: 1
-            implicitHeight: commandText.implicitHeight + Colors.spacingS * 2
+            implicitHeight: commandText.implicitHeight + Appearance.spacingS * 2
 
             Text {
                 id: commandText
                 anchors.fill: parent
-                anchors.margins: Colors.spacingS
+                anchors.margins: Appearance.spacingS
                 text: root.selectedProcess ? String(root.detailData.command || root.selectedProcess.command || root.selectedProcess.name || "") : ""
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
-                font.family: Colors.fontMono
+                font.pixelSize: Appearance.fontSizeXS
+                font.family: Appearance.fontMono
                 wrapMode: Text.WrapAnywhere
             }
         }

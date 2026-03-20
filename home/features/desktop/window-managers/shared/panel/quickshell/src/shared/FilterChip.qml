@@ -37,8 +37,8 @@ Rectangle {
     Text {
       text: "󰄬"
       color: Colors.primary
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeSmall
+      font.family: Appearance.fontMono
+      font.pixelSize: Appearance.fontSizeSmall
       visible: root.selected && root.icon === ""
       anchors.verticalCenter: parent.verticalCenter
     }
@@ -52,15 +52,15 @@ Rectangle {
     }
     Component {
       id: _svgIcon
-      SvgIcon { source: root.icon; color: root.selected ? Colors.primary : Colors.textSecondary; size: Colors.fontSizeMedium }
+      SvgIcon { source: root.icon; color: root.selected ? Colors.primary : Colors.textSecondary; size: Appearance.fontSizeMedium }
     }
     Component {
       id: _nerdIcon
       Text {
         text: root.icon
         color: root.selected ? Colors.primary : Colors.textSecondary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeMedium
+        font.family: Appearance.fontMono
+        font.pixelSize: Appearance.fontSizeMedium
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
       }
     }
@@ -68,7 +68,7 @@ Rectangle {
     Text {
       text: root.label
       color: root.selected ? Colors.primary : Colors.text
-      font.pixelSize: Colors.fontSizeSmall
+      font.pixelSize: Appearance.fontSizeSmall
       font.weight: root.selected ? Font.DemiBold : Font.Normal
       anchors.verticalCenter: parent.verticalCenter
       Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }

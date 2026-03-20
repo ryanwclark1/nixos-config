@@ -37,15 +37,15 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: root.tightMode ? Colors.spacingM : Colors.spacingL
-        anchors.rightMargin: root.tightMode ? Colors.spacingM : Colors.spacingL
-        spacing: root.tightMode ? Colors.spacingS : Colors.spacingM
+        anchors.leftMargin: root.tightMode ? Appearance.spacingM : Appearance.spacingL
+        anchors.rightMargin: root.tightMode ? Appearance.spacingM : Appearance.spacingL
+        spacing: root.tightMode ? Appearance.spacingS : Appearance.spacingM
 
         Rectangle {
             Layout.alignment: Qt.AlignVCenter
             width: root.tightMode ? 28 : 38
             height: width
-            radius: root.tightMode ? Colors.radiusMedium : Colors.radiusLarge
+            radius: root.tightMode ? Appearance.radiusMedium : Appearance.radiusLarge
             color: Colors.withAlpha(root.accentColor, root.tightMode ? 0.18 : 0.22)
             border.color: Colors.withAlpha(root.accentColor, 0.52)
             border.width: 1
@@ -58,8 +58,8 @@ Rectangle {
                 anchors.centerIn: parent
                 text: root.modeIcon
                 color: root.accentColor
-                font.family: Colors.fontMono
-                font.pixelSize: root.tightMode ? Colors.fontSizeLarge : Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: root.tightMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL
             }
         }
 
@@ -71,18 +71,18 @@ Rectangle {
             Text {
                 text: "COMMAND DECK"
                 color: Colors.withAlpha(root.accentColor, 0.9)
-                font.pixelSize: Colors.fontSizeXXS
+                font.pixelSize: Appearance.fontSizeXXS
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingExtraWide
+                font.letterSpacing: Appearance.letterSpacingExtraWide
             }
 
             Text {
                 Layout.fillWidth: true
                 text: root.heroLabel
                 color: Colors.text
-                font.pixelSize: root.tightMode ? Colors.fontSizeMedium : Colors.fontSizeXL
+                font.pixelSize: root.tightMode ? Appearance.fontSizeMedium : Appearance.fontSizeXL
                 font.weight: Font.Black
-                font.letterSpacing: root.tightMode ? 0 : Colors.letterSpacingTight
+                font.letterSpacing: root.tightMode ? 0 : Appearance.letterSpacingTight
                 elide: Text.ElideRight
             }
 
@@ -91,18 +91,18 @@ Rectangle {
                 Layout.fillWidth: true
                 text: root.summaryText
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 elide: Text.ElideRight
             }
         }
 
         RowLayout {
             Layout.alignment: Qt.AlignVCenter
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Rectangle {
                 visible: root.modePrefix !== "" && !root.tightMode
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.withAlpha(root.accentColor, 0.12)
                 border.color: Colors.withAlpha(root.accentColor, 0.34)
                 border.width: 1
@@ -114,14 +114,14 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root.modePrefix + " prefix"
                     color: root.accentColor
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Black
                 }
             }
 
             Rectangle {
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.withAlpha(root.accentColor, 0.12)
                 border.color: Colors.withAlpha(root.accentColor, 0.36)
                 border.width: 1
@@ -133,16 +133,16 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root.modeLabel
                     color: root.accentColor
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Black
                     font.capitalization: Font.AllUppercase
-                    font.letterSpacing: Colors.letterSpacingWide
+                    font.letterSpacing: Appearance.letterSpacingWide
                 }
             }
 
             Rectangle {
                 visible: !root.tightMode && root.statusText !== ""
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.withAlpha(Colors.surface, 0.84)
                 border.color: Colors.border
                 border.width: 1
@@ -152,20 +152,20 @@ Rectangle {
                 RowLayout {
                     id: statusRow
                     anchors.centerIn: parent
-                    spacing: Colors.spacingXS
+                    spacing: Appearance.spacingXS
 
                     Text {
                         visible: root.statusIcon !== ""
                         text: root.statusIcon
                         color: root.accentColor
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeXS
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeXS
                     }
 
                     Text {
                         text: root.statusText
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.DemiBold
                     }
                 }

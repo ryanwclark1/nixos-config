@@ -22,7 +22,7 @@ Item {
     property var _previewTheme: null
     readonly property var _effectivePreviewTheme: root._previewTheme || ThemeService.activeTheme
     readonly property int _themeColumns: (compactMode || themeFlow.width < 700) ? 1 : 2
-    readonly property int _browserViewportHeight: compactMode ? Math.min(560, Math.max(360, themeListColumn.implicitHeight + Colors.spacingL * 2)) : 520
+    readonly property int _browserViewportHeight: compactMode ? Math.min(560, Math.max(360, themeListColumn.implicitHeight + Appearance.spacingL * 2)) : 520
 
     function _refreshThemeResults() {
         _themeResults = ThemeService.searchThemes(themeSearchField ? themeSearchField.text : "", _themeVariantFilter);
@@ -57,7 +57,7 @@ Item {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 SettingsTextInputRow {
                     id: themeSearchField
@@ -70,7 +70,7 @@ Item {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     SharedWidgets.FilterChip {
                         label: "Dark"
@@ -96,14 +96,14 @@ Item {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
                     visible: Config.themeName !== ""
 
                     Text {
                         width: root.compactMode ? parent.width : undefined
                         text: "Active: " + (ThemeService.activeTheme ? ThemeService.activeTheme.name : Config.themeName)
                         color: Colors.primary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.DemiBold
                         wrapMode: Text.WordWrap
                     }
@@ -119,39 +119,39 @@ Item {
                 Text {
                     text: root._themeResults.length + " themes"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                 }
 
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.preferredHeight: root._browserViewportHeight
-                    spacing: Colors.spacingL
+                    spacing: Appearance.spacingL
 
                     Rectangle {
                         Layout.preferredWidth: root.compactMode ? 0 : 360
                         Layout.fillHeight: true
                         visible: !root.compactMode && root._effectivePreviewTheme !== null
-                        radius: Colors.radiusMedium
+                        radius: Appearance.radiusMedium
                         color: Colors.modalFieldSurface
                         border.color: Colors.border
                         border.width: 1
 
                         ColumnLayout {
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingL
-                            spacing: Colors.spacingM
+                            anchors.margins: Appearance.spacingL
+                            spacing: Appearance.spacingM
 
                             Text {
                                 text: "Locked Preview"
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeLarge
+                                font.pixelSize: Appearance.fontSizeLarge
                                 font.weight: Font.DemiBold
                             }
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 176
-                                radius: Colors.radiusMedium
+                                radius: Appearance.radiusMedium
                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base00 : Colors.background
                                 border.color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base03 : Colors.border
                                 border.width: 1
@@ -159,24 +159,24 @@ Item {
 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    anchors.margins: Colors.spacingM
-                                    spacing: Colors.spacingS
+                                    anchors.margins: Appearance.spacingM
+                                    spacing: Appearance.spacingS
 
                                     Rectangle {
                                         Layout.fillWidth: true
                                         height: 24
-                                        radius: Colors.radiusMedium
+                                        radius: Appearance.radiusMedium
                                         color: root._effectivePreviewTheme ? Colors.withAlpha(root._effectivePreviewTheme.palette.base01, 0.8) : Colors.surface
 
                                         RowLayout {
                                             anchors.fill: parent
-                                            anchors.leftMargin: Colors.paddingSmall
-                                            anchors.rightMargin: Colors.paddingSmall
+                                            anchors.leftMargin: Appearance.paddingSmall
+                                            anchors.rightMargin: Appearance.paddingSmall
 
                                             Rectangle {
                                                 width: 12
                                                 height: 12
-                                                radius: Colors.radiusPill
+                                                radius: Appearance.radiusPill
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base0D : Colors.primary
                                             }
 
@@ -187,7 +187,7 @@ Item {
                                             Text {
                                                 text: "12:00"
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
-                                                font.pixelSize: Colors.fontSizeXS
+                                                font.pixelSize: Appearance.fontSizeXS
                                                 font.bold: true
                                             }
                                         }
@@ -196,20 +196,20 @@ Item {
                                     Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        radius: Colors.radiusSmall
+                                        radius: Appearance.radiusSmall
                                         color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base01 : Colors.surface
                                         border.color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base0D : Colors.primary
                                         border.width: 1
 
                                         ColumnLayout {
                                             anchors.fill: parent
-                                            anchors.margins: Colors.paddingSmall
-                                            spacing: Colors.spacingXS
+                                            anchors.margins: Appearance.paddingSmall
+                                            spacing: Appearance.spacingXS
 
                                             Rectangle {
                                                 width: 60
                                                 height: 4
-                                                radius: Colors.radiusXXS
+                                                radius: Appearance.radiusXXS
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
                                                 opacity: 0.6
                                             }
@@ -217,7 +217,7 @@ Item {
                                             Rectangle {
                                                 width: 100
                                                 height: 4
-                                                radius: Colors.radiusXXS
+                                                radius: Appearance.radiusXXS
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base05 : Colors.text
                                                 opacity: 0.3
                                             }
@@ -230,7 +230,7 @@ Item {
                                                 Layout.alignment: Qt.AlignRight
                                                 width: 30
                                                 height: 12
-                                                radius: Colors.radiusXS
+                                                radius: Appearance.radiusXS
                                                 color: root._effectivePreviewTheme ? root._effectivePreviewTheme.palette.base0B : Colors.success
                                             }
                                         }
@@ -240,8 +240,8 @@ Item {
 
                             GridLayout {
                                 columns: 4
-                                columnSpacing: Colors.spacingS
-                                rowSpacing: Colors.spacingS
+                                columnSpacing: Appearance.spacingS
+                                rowSpacing: Appearance.spacingS
 
                                 Repeater {
                                     model: root._effectivePreviewTheme ? [
@@ -280,12 +280,12 @@ Item {
                                     ] : []
 
                                     delegate: Column {
-                                        spacing: Colors.spacingXXS
+                                        spacing: Appearance.spacingXXS
 
                                         Rectangle {
                                             width: 36
                                             height: 36
-                                            radius: Colors.radiusPill
+                                            radius: Appearance.radiusPill
                                             color: modelData.c
                                             border.color: Colors.textThin
                                             border.width: 1
@@ -295,7 +295,7 @@ Item {
                                             width: 36
                                             text: modelData.l
                                             color: Colors.textDisabled
-                                            font.pixelSize: Colors.fontSizeXXS
+                                            font.pixelSize: Appearance.fontSizeXXS
                                             font.weight: Font.Bold
                                             horizontalAlignment: Text.AlignHCenter
                                         }
@@ -306,20 +306,20 @@ Item {
                             Text {
                                 text: root._effectivePreviewTheme ? root._effectivePreviewTheme.name : ""
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeLarge
+                                font.pixelSize: Appearance.fontSizeLarge
                                 font.weight: Font.Bold
                             }
 
                             Text {
                                 text: root._effectivePreviewTheme ? root._effectivePreviewTheme.author : ""
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                             }
 
                             Text {
                                 text: root._effectivePreviewTheme && root._effectivePreviewTheme.id === Config.themeName ? "Currently applied theme" : "Hover any theme card and the preview will stay pinned here."
                                 color: root._effectivePreviewTheme && root._effectivePreviewTheme.id === Config.themeName ? Colors.primary : Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 wrapMode: Text.WordWrap
                                 Layout.fillWidth: true
                             }
@@ -340,7 +340,7 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        radius: Colors.radiusMedium
+                        radius: Appearance.radiusMedium
                         color: Colors.modalFieldSurface
                         border.color: Colors.border
                         border.width: 1
@@ -348,7 +348,7 @@ Item {
                         Flickable {
                             id: themeListFlick
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
+                            anchors.margins: Appearance.spacingM
                             clip: true
                             boundsBehavior: Flickable.DragOverBounds
                             contentHeight: themeListColumn.implicitHeight
@@ -356,27 +356,27 @@ Item {
                             Column {
                                 id: themeListColumn
                                 width: themeListFlick.width
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 Flow {
                                     id: themeFlow
                                     width: parent.width
-                                    spacing: Colors.spacingXS
+                                    spacing: Appearance.spacingXS
 
                                     Repeater {
                                         model: root._themeResults
 
                                         Item {
                                             id: themeCardWrapper
-                                            width: Math.max(Math.min(180, themeFlow.width), Math.floor((themeFlow.width - Colors.spacingXS * (root._themeColumns - 1)) / root._themeColumns))
-                                            height: themeCardLayout.implicitHeight + Colors.spacingS * 2
+                                            width: Math.max(Math.min(180, themeFlow.width), Math.floor((themeFlow.width - Appearance.spacingXS * (root._themeColumns - 1)) / root._themeColumns))
+                                            height: themeCardLayout.implicitHeight + Appearance.spacingS * 2
 
                                             property var _theme: modelData
                                             property bool _themeIsActive: _theme.id === Config.themeName
 
                                             Rectangle {
                                                 anchors.fill: parent
-                                                radius: Colors.radiusSmall
+                                                radius: Appearance.radiusSmall
                                                 color: Colors.modalFieldSurface
                                                 border.color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.border
                                                 border.width: themeCardWrapper._themeIsActive ? 2 : 1
@@ -394,7 +394,7 @@ Item {
 
                                                     Behavior on opacity {
                                                         NumberAnimation {
-                                                            duration: Colors.durationSnap
+                                                            duration: Appearance.durationSnap
                                                         }
                                                     }
                                                 }
@@ -403,29 +403,29 @@ Item {
                                                     id: themeCardLayout
                                                     anchors {
                                                         fill: parent
-                                                        leftMargin: Colors.spacingM
-                                                        rightMargin: Colors.spacingM
-                                                        topMargin: Colors.spacingS
-                                                        bottomMargin: Colors.spacingS
+                                                        leftMargin: Appearance.spacingM
+                                                        rightMargin: Appearance.spacingM
+                                                        topMargin: Appearance.spacingS
+                                                        bottomMargin: Appearance.spacingS
                                                     }
-                                                    spacing: Colors.spacingXS
+                                                    spacing: Appearance.spacingXS
 
                                                     RowLayout {
                                                         Layout.fillWidth: true
-                                                        spacing: Colors.spacingS
+                                                        spacing: Appearance.spacingS
 
                                                         Text {
                                                             text: "󰄬"
                                                             color: Colors.primary
-                                                            font.family: Colors.fontMono
-                                                            font.pixelSize: Colors.fontSizeLarge
+                                                            font.family: Appearance.fontMono
+                                                            font.pixelSize: Appearance.fontSizeLarge
                                                             visible: themeCardWrapper._themeIsActive
                                                         }
 
                                                         Text {
                                                             text: themeCardWrapper._theme.name
                                                             color: themeCardWrapper._themeIsActive ? Colors.primary : Colors.text
-                                                            font.pixelSize: Colors.fontSizeMedium
+                                                            font.pixelSize: Appearance.fontSizeMedium
                                                             font.weight: themeCardWrapper._themeIsActive ? Font.DemiBold : Font.Normal
                                                             elide: Text.ElideRight
                                                             Layout.fillWidth: true
@@ -435,7 +435,7 @@ Item {
                                                     Flow {
                                                         Layout.fillWidth: true
                                                         width: parent.width
-                                                        spacing: Colors.spacingXS
+                                                        spacing: Appearance.spacingXS
 
                                                         Repeater {
                                                             model: [themeCardWrapper._theme.palette.base00, themeCardWrapper._theme.palette.base08, themeCardWrapper._theme.palette.base0B, themeCardWrapper._theme.palette.base0D, themeCardWrapper._theme.palette.base0E, themeCardWrapper._theme.palette.base05]

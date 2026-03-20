@@ -39,7 +39,7 @@ SharedWidgets.CardBase {
     ColumnLayout {
         id: ioColumn
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         RowLayout {
             Layout.fillWidth: true
@@ -47,9 +47,9 @@ SharedWidgets.CardBase {
             Text {
                 text: "I/O HISTORY"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingWide
+                font.letterSpacing: Appearance.letterSpacingWide
                 font.capitalization: Font.AllUppercase
             }
 
@@ -61,7 +61,7 @@ SharedWidgets.CardBase {
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SharedWidgets.Chip {
                 icon: SystemIoTelemetryService.networkHotspot ? "󰀦" : "󰄬"
@@ -83,14 +83,14 @@ SharedWidgets.CardBase {
             visible: SystemIoTelemetryService.telemetryMessage !== ""
             text: SystemIoTelemetryService.telemetryMessage
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WordWrap
         }
 
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SharedWidgets.Chip {
                 visible: SystemIoTelemetryService.selectedInterface !== ""
@@ -123,7 +123,7 @@ SharedWidgets.CardBase {
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Repeater {
                 model: SystemIoTelemetryService.diskDevices || []
@@ -141,8 +141,8 @@ SharedWidgets.CardBase {
             id: metricsGrid
             Layout.fillWidth: true
             columns: width >= 420 ? 2 : 1
-            columnSpacing: Colors.spacingM
-            rowSpacing: Colors.spacingM
+            columnSpacing: Appearance.spacingM
+            rowSpacing: Appearance.spacingM
 
             IoMetricCard {
                 label: "NET DOWN"

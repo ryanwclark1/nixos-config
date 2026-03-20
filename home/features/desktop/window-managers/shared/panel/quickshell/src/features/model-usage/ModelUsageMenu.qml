@@ -29,13 +29,13 @@ BasePopupMenu {
 
   // Provider accent — flows through hero, charts, token values
   property color providerAccent: ModelUsageService.providerColor
-  Behavior on providerAccent { ColorAnimation { duration: Colors.durationNormal } }
+  Behavior on providerAccent { ColorAnimation { duration: Appearance.durationNormal } }
 
   // ── Provider tabs ──────────────────────────────────
   headerExtras: [
     Row {
       visible: root.showProviderTabs
-      spacing: Colors.spacingXS
+      spacing: Appearance.spacingXS
 
       Repeater {
         model: {
@@ -57,7 +57,7 @@ BasePopupMenu {
     SharedWidgets.IconButton {
       icon: "settings.svg"
       size: 28
-      iconSize: Colors.fontSizeLarge
+      iconSize: Appearance.fontSizeLarge
       tooltipText: "Settings"
       onClicked: {
         Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "model-usage"]);
@@ -77,73 +77,73 @@ BasePopupMenu {
 
   SequentialAnimation {
     id: contentFade
-    NumberAnimation { target: scrollContent; property: "opacity"; to: 0; duration: Colors.durationFlash; easing.type: Easing.OutQuad }
-    NumberAnimation { target: scrollContent; property: "opacity"; to: 1; duration: Colors.durationFast; easing.type: Easing.InOutQuad }
+    NumberAnimation { target: scrollContent; property: "opacity"; to: 0; duration: Appearance.durationFlash; easing.type: Easing.OutQuad }
+    NumberAnimation { target: scrollContent; property: "opacity"; to: 1; duration: Appearance.durationFast; easing.type: Easing.InOutQuad }
   }
 
   SharedWidgets.ScrollableContent {
     id: scrollContent
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.spacingM
+    columnSpacing: Appearance.spacingM
     layer.enabled: contentFade.running
 
     // ── Hero Summary Card ───────────────────────────
     Rectangle {
       Layout.fillWidth: true
       visible: ModelUsageService.isReady
-      implicitHeight: heroRow.implicitHeight + Colors.spacingLG * 2
-      radius: Colors.radiusCard
+      implicitHeight: heroRow.implicitHeight + Appearance.spacingLG * 2
+      radius: Appearance.radiusCard
       color: Colors.withAlpha(root.providerAccent, Colors.primaryFaint)
       border.color: Colors.withAlpha(root.providerAccent, 0.18)
       border.width: 1
 
-      Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
-      Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+      Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
+      Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
 
       SharedWidgets.InnerHighlight { }
 
       RowLayout {
         id: heroRow
         anchors.fill: parent
-        anchors.margins: Colors.spacingLG
-        spacing: Colors.spacingL
+        anchors.margins: Appearance.spacingLG
+        spacing: Appearance.spacingL
 
         // Large provider icon
         Rectangle {
           Layout.preferredWidth: 52
           Layout.preferredHeight: 52
-          radius: Colors.radiusCard
+          radius: Appearance.radiusCard
           color: Colors.withAlpha(root.providerAccent, Colors.primarySubtle)
-          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
 
           Text {
             anchors.centerIn: parent
             text: ModelUsageService.providerIcon
             color: root.providerAccent
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeHuge
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeHuge
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
           }
         }
 
         // Big metric
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingXXS
+          spacing: Appearance.spacingXXS
 
           Text {
             text: String(ModelUsageService.todayPrompts)
             color: Colors.text
-            font.pixelSize: Colors.fontSizeDisplay
+            font.pixelSize: Appearance.fontSizeDisplay
             font.weight: Font.Bold
-            font.letterSpacing: Colors.letterSpacingTight
+            font.letterSpacing: Appearance.letterSpacingTight
           }
 
           Text {
             text: "prompts today"
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
           }
         }
 
@@ -155,11 +155,11 @@ BasePopupMenu {
             return ModelUsageService.codexModel !== "unknown";
           }
           Layout.alignment: Qt.AlignTop
-          implicitWidth: modelBadgeText.implicitWidth + Colors.spacingM * 2
-          implicitHeight: modelBadgeText.implicitHeight + Colors.spacingSM * 2
+          implicitWidth: modelBadgeText.implicitWidth + Appearance.spacingM * 2
+          implicitHeight: modelBadgeText.implicitHeight + Appearance.spacingSM * 2
           radius: height / 2
           color: Colors.withAlpha(root.providerAccent, Colors.primaryGhost)
-          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+          Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
 
           Text {
             id: modelBadgeText
@@ -173,9 +173,9 @@ BasePopupMenu {
               return ModelUsageService.codexModel;
             }
             color: root.providerAccent
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             font.weight: Font.DemiBold
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
           }
         }
       }
@@ -186,18 +186,18 @@ BasePopupMenu {
       variant: "card"
       Layout.fillWidth: true
       visible: root.showClaude && ModelUsageService.claudeRateLimitAvailable
-      implicitHeight: rateLimitCol.implicitHeight + Colors.spacingL * 2
+      implicitHeight: rateLimitCol.implicitHeight + Appearance.spacingL * 2
 
       ColumnLayout {
         id: rateLimitCol
         anchors.fill: parent
-        anchors.margins: Colors.spacingL
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
 
         Text {
           text: "Rate Limit"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
         }
 
@@ -216,7 +216,7 @@ BasePopupMenu {
                  : ModelUsageService.claudeRateLimitPercent >= 70 ? Colors.warning
                  : root.providerAccent
 
-            Behavior on width { NumberAnimation { duration: Colors.durationMedium } }
+            Behavior on width { NumberAnimation { duration: Appearance.durationMedium } }
           }
         }
 
@@ -225,7 +225,7 @@ BasePopupMenu {
           Text {
             text: ModelUsageService.claudeRateLimitLabel
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
           }
           Item { Layout.fillWidth: true }
           Text {
@@ -235,7 +235,7 @@ BasePopupMenu {
             color: ModelUsageService.claudeRateLimitPercent >= 90 ? Colors.error
                  : ModelUsageService.claudeRateLimitPercent >= 70 ? Colors.warning
                  : Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
           }
         }
@@ -244,7 +244,7 @@ BasePopupMenu {
           visible: ModelUsageService.claudeRateLimitResetAt !== ""
           text: "Resets in " + ModelUsageService.formatResetTime(ModelUsageService.claudeRateLimitResetAt)
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
         }
       }
     }
@@ -254,18 +254,18 @@ BasePopupMenu {
       variant: "card"
       Layout.fillWidth: true
       visible: ModelUsageService.isReady
-      implicitHeight: todayCol.implicitHeight + Colors.spacingL * 2
+      implicitHeight: todayCol.implicitHeight + Appearance.spacingL * 2
 
       ColumnLayout {
         id: todayCol
         anchors.fill: parent
-        anchors.margins: Colors.spacingL
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
 
         Text {
           text: "Today"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
         }
 
@@ -337,18 +337,18 @@ BasePopupMenu {
       visible: (root.showClaude && ModelUsageService.claudeRecentDays.length > 0)
               || (root.showGemini && ModelUsageService.geminiRecentDays.length > 0)
               || (root.showCodex && ModelUsageService.codexRecentDays.length > 0)
-      implicitHeight: chartCol.implicitHeight + Colors.spacingL * 2
+      implicitHeight: chartCol.implicitHeight + Appearance.spacingL * 2
 
       ColumnLayout {
         id: chartCol
         anchors.fill: parent
-        anchors.margins: Colors.spacingL
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
 
         Text {
           text: "Last 7 Days"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
         }
 
@@ -359,7 +359,7 @@ BasePopupMenu {
 
           RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             required property var modelData
             required property int index
 
@@ -388,7 +388,7 @@ BasePopupMenu {
                 return parts.length >= 3 ? parts[1] + "/" + parts[2] : modelData.date;
               }
               color: isToday ? root.providerAccent : Colors.textSecondary
-              font.pixelSize: Colors.fontSizeXS
+              font.pixelSize: Appearance.fontSizeXS
               font.weight: isToday ? Font.DemiBold : Font.Normal
               Layout.preferredWidth: 40
             }
@@ -396,7 +396,7 @@ BasePopupMenu {
             Rectangle {
               Layout.fillWidth: true
               implicitHeight: 14
-              radius: Colors.radiusXS3
+              radius: Appearance.radiusXS3
               color: Colors.withAlpha(Colors.text, Colors.primaryFaint)
 
               Rectangle {
@@ -406,15 +406,15 @@ BasePopupMenu {
                 color: root.providerAccent
                 opacity: isToday ? 1.0 : (0.5 + 0.5 * (modelData.messageCount / maxCount))
 
-                Behavior on width { NumberAnimation { duration: Colors.durationMedium } }
-                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+                Behavior on width { NumberAnimation { duration: Appearance.durationMedium } }
+                Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
               }
             }
 
             Text {
               text: String(modelData.messageCount)
               color: isToday ? root.providerAccent : Colors.text
-              font.pixelSize: Colors.fontSizeXS
+              font.pixelSize: Appearance.fontSizeXS
               font.weight: Font.DemiBold
               Layout.preferredWidth: 36
               horizontalAlignment: Text.AlignRight
@@ -429,18 +429,18 @@ BasePopupMenu {
       variant: "card"
       Layout.fillWidth: true
       visible: root.showClaude && Object.keys(ModelUsageService.claudeModelUsage).length > 0
-      implicitHeight: allTimeCol.implicitHeight + Colors.spacingL * 2
+      implicitHeight: allTimeCol.implicitHeight + Appearance.spacingL * 2
 
       ColumnLayout {
         id: allTimeCol
         anchors.fill: parent
-        anchors.margins: Colors.spacingL
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
 
         Text {
           text: "All-Time Stats"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
         }
 
@@ -467,12 +467,12 @@ BasePopupMenu {
         }
 
         // Per-model breakdown
-        Item { implicitHeight: Colors.spacingXS; Layout.fillWidth: true }
+        Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
 
         Text {
           text: "Per-Model Breakdown"
           color: Colors.textSecondary
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           font.weight: Font.DemiBold
         }
 
@@ -500,34 +500,34 @@ BasePopupMenu {
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingXXS
+            spacing: Appearance.spacingXXS
             required property var modelData
 
             Text {
               text: ModelUsageService.friendlyModelName(modelData.model)
               color: Colors.text
-              font.pixelSize: Colors.fontSizeSmall
+              font.pixelSize: Appearance.fontSizeSmall
               font.weight: Font.DemiBold
             }
 
             RowLayout {
               Layout.fillWidth: true
-              spacing: Colors.spacingM
+              spacing: Appearance.spacingM
               Text {
                 text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
               }
               Text {
                 text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
               }
               Text {
                 visible: modelData.cacheRead > 0
                 text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cacheRead)
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
               }
             }
           }
@@ -540,18 +540,18 @@ BasePopupMenu {
       variant: "card"
       Layout.fillWidth: true
       visible: root.showGemini && ModelUsageService.geminiReady
-      implicitHeight: geminiAllTimeCol.implicitHeight + Colors.spacingL * 2
+      implicitHeight: geminiAllTimeCol.implicitHeight + Appearance.spacingL * 2
 
       ColumnLayout {
         id: geminiAllTimeCol
         anchors.fill: parent
-        anchors.margins: Colors.spacingL
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
 
         Text {
           text: "All-Time Stats"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
         }
 
@@ -572,13 +572,13 @@ BasePopupMenu {
         }
 
         // Per-model breakdown
-        Item { implicitHeight: Colors.spacingXS; Layout.fillWidth: true }
+        Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
 
         Text {
           visible: Object.keys(ModelUsageService.geminiTokensByModel).length > 1
           text: "Per-Model Breakdown"
           color: Colors.textSecondary
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           font.weight: Font.DemiBold
         }
 
@@ -596,28 +596,28 @@ BasePopupMenu {
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingXXS
+            spacing: Appearance.spacingXXS
             required property var modelData
 
             Text {
               text: modelData.model
               color: Colors.text
-              font.pixelSize: Colors.fontSizeSmall
+              font.pixelSize: Appearance.fontSizeSmall
               font.weight: Font.DemiBold
             }
 
             RowLayout {
               Layout.fillWidth: true
-              spacing: Colors.spacingM
+              spacing: Appearance.spacingM
               Text {
                 text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
               }
               Text {
                 text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
               }
             }
           }
@@ -630,18 +630,18 @@ BasePopupMenu {
       variant: "card"
       Layout.fillWidth: true
       visible: root.showCodex && ModelUsageService.codexReady
-      implicitHeight: codexCol.implicitHeight + Colors.spacingL * 2
+      implicitHeight: codexCol.implicitHeight + Appearance.spacingL * 2
 
       ColumnLayout {
         id: codexCol
         anchors.fill: parent
-        anchors.margins: Colors.spacingL
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
 
         Text {
           text: "Codex CLI"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
         }
 

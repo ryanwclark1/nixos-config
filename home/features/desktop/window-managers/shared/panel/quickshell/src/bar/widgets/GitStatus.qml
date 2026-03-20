@@ -17,7 +17,7 @@ Rectangle {
 
   visible: !!branchName && (looksLikeTerminal || looksLikePath)
 
-  implicitWidth: visible ? gitRow.implicitWidth + Colors.spacingM : 0
+  implicitWidth: visible ? gitRow.implicitWidth + Appearance.spacingM : 0
   implicitHeight: 22
   radius: height / 2
   color: Colors.highlightLight
@@ -42,19 +42,19 @@ Rectangle {
   RowLayout {
     id: gitRow
     anchors.centerIn: parent
-    spacing: Colors.spacingXS
+    spacing: Appearance.spacingXS
 
     Text {
       text: "󰊢"
       color: Colors.primary
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeSmall
+      font.family: Appearance.fontMono
+      font.pixelSize: Appearance.fontSizeSmall
     }
 
     Text {
       text: root.branchName
       color: Colors.text
-      font.pixelSize: Colors.fontSizeXS
+      font.pixelSize: Appearance.fontSizeXS
       font.weight: Font.Bold
     }
   }

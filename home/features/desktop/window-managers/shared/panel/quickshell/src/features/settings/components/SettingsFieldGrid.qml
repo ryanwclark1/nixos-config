@@ -24,7 +24,7 @@ Item {
     anchors.left: parent.left
     anchors.right: parent.right
     columns: root.resolvedColumns
-    columnSpacing: Colors.spacingL
-    rowSpacing: Colors.spacingL
+    columnSpacing: Appearance.spacingL
+    rowSpacing: Appearance.spacingL
   }
 }

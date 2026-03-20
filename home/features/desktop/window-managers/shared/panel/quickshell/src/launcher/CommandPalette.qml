@@ -76,47 +76,47 @@ PanelWindow {
             anchors.fill: parent
             color: Colors.withAlpha(Colors.background, Config.settingsBackdropOpacity)
             opacity: root.showContent ? 1.0 : 0.0
-            Behavior on opacity { NumberAnimation { id: fadeAnim; duration: Colors.durationNormal } }
+            Behavior on opacity { NumberAnimation { id: fadeAnim; duration: Appearance.durationNormal } }
         }
     }
 
     ElasticNumber {
         id: _elasticScale
         target: root.showContent ? 1.0 : 0.95
-        fastDuration: Colors.durationSnap
-        slowDuration: Colors.durationSlow
+        fastDuration: Appearance.durationSnap
+        slowDuration: Appearance.durationSlow
         fastWeight: 0.45
     }
 
     SharedWidgets.ThemedContainer {
         id: paletteBox
         variant: "card"
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         width: 680
-        height: Math.min(500, contentCol.implicitHeight + Colors.paddingLarge * 2)
+        height: Math.min(500, contentCol.implicitHeight + Appearance.paddingLarge * 2)
         anchors.centerIn: parent
         clip: true
 
         opacity: root.showContent ? 1.0 : 0.0
         scale: _elasticScale.value
-        Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutCubic } }
 
         ColumnLayout {
             id: contentCol
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
-            spacing: Colors.spacingL
+            anchors.margins: Appearance.paddingLarge
+            spacing: Appearance.spacingL
 
             // Search Header
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Text {
                     text: "󰍉"
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXL
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXL
                 }
 
                 TextInput {
@@ -124,7 +124,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     focus: root.showContent
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.pixelSize: Appearance.fontSizeLarge
                     font.weight: Font.Medium
                     property string placeholder: "Type a shell action..."
                     
@@ -166,7 +166,7 @@ PanelWindow {
                 Layout.fillHeight: true
                 model: root.filteredActions
                 clip: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 currentIndex: root.selectedIndex
 
                 delegate: Rectangle {
@@ -174,22 +174,22 @@ PanelWindow {
                     required property int index
                     width: resultsList.width
                     height: modelData.description ? 58 : 48
-                    radius: Colors.radiusMedium
+                    radius: Appearance.radiusMedium
                     color: root.selectedIndex === index ? Colors.primarySubtle : "transparent"
                     border.color: root.selectedIndex === index ? Colors.withAlpha(Colors.primary, 0.3) : "transparent"
                     border.width: 1
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: Colors.spacingM
-                        anchors.rightMargin: Colors.spacingM
-                        spacing: Colors.spacingM
+                        anchors.leftMargin: Appearance.spacingM
+                        anchors.rightMargin: Appearance.spacingM
+                        spacing: Appearance.spacingM
 
                         Text {
                             text: modelData.icon
                             color: root.selectedIndex === index ? Colors.primary : Colors.textSecondary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeLarge
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeLarge
                         }
 
                         ColumnLayout {
@@ -199,7 +199,7 @@ PanelWindow {
                             Text {
                                 text: modelData.label
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: root.selectedIndex === index ? Font.Bold : Font.Normal
                                 Layout.fillWidth: true
                             }
@@ -208,7 +208,7 @@ PanelWindow {
                                 visible: !!modelData.description
                                 text: modelData.description || ""
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
                             }
@@ -217,7 +217,7 @@ PanelWindow {
                         Text {
                             text: modelData.category
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXXS
+                            font.pixelSize: Appearance.fontSizeXXS
                             font.weight: Font.Black
                             font.capitalization: Font.AllUppercase
                         }

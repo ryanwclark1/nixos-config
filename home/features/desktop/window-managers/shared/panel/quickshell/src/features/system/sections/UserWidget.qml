@@ -7,9 +7,9 @@ import "../../../widgets" as SharedWidgets
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: userContent.implicitHeight + Colors.paddingMedium * 2
+  Layout.preferredHeight: userContent.implicitHeight + Appearance.paddingMedium * 2
   color: Colors.cardSurface
-  radius: Colors.radiusMedium
+  radius: Appearance.radiusMedium
   border.color: Colors.border
   clip: true
 
@@ -34,31 +34,31 @@ Rectangle {
   RowLayout {
     id: userContent
     anchors.fill: parent
-    anchors.margins: Colors.paddingMedium
-    spacing: Colors.paddingMedium
+    anchors.margins: Appearance.paddingMedium
+    spacing: Appearance.paddingMedium
 
     // User Avatar placeholder
     Rectangle {
       width: 42; height: 42
-      radius: Colors.radiusPill
+      radius: Appearance.radiusPill
       color: Colors.primary
       Layout.alignment: Qt.AlignTop
       Text {
         anchors.centerIn: parent
         text: root.username.charAt(0).toUpperCase()
         color: Colors.text
-        font.pixelSize: Colors.fontSizeXL
+        font.pixelSize: Appearance.fontSizeXL
         font.weight: Font.Bold
       }
     }
 
     ColumnLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingXXS
+      spacing: Appearance.spacingXXS
       Text {
         text: "Welcome back, " + root.username
         color: Colors.text
-        font.pixelSize: Colors.fontSizeLarge
+        font.pixelSize: Appearance.fontSizeLarge
         font.weight: Font.Bold
         Layout.fillWidth: true
         wrapMode: Text.Wrap
@@ -67,7 +67,7 @@ Rectangle {
       Text {
         text: "System Uptime: " + root.uptime
         color: Colors.textSecondary
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         Layout.fillWidth: true
         wrapMode: Text.Wrap
         maximumLineCount: 2

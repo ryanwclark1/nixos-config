@@ -8,9 +8,9 @@ import "../../features/settings/components"
 Rectangle {
     id: root
     implicitWidth: 280
-    implicitHeight: contentCol.implicitHeight + Colors.paddingLarge
+    implicitHeight: contentCol.implicitHeight + Appearance.paddingLarge
     width: implicitWidth
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
@@ -26,45 +26,45 @@ Rectangle {
     ColumnLayout {
         id: contentCol
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingM
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingM
 
         RowLayout {
             Layout.fillWidth: true
-            Text { text: "RESOURCE REAPER"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingWide; Layout.fillWidth: true }
-            Text { text: ProcessService.sortBy.toUpperCase(); color: Colors.primary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
+            Text { text: "RESOURCE REAPER"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingWide; Layout.fillWidth: true }
+            Text { text: ProcessService.sortBy.toUpperCase(); color: Colors.primary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold }
         }
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
 
             Repeater {
                 model: ProcessService.processes ? ProcessService.processes.slice(0, 5) : []
                 delegate: Rectangle {
                     Layout.fillWidth: true
                     height: 36
-                    radius: Colors.radiusSmall
+                    radius: Appearance.radiusSmall
                     color: Colors.cardSurface
                     
                     RowLayout {
-                        anchors.fill: parent; anchors.margins: Colors.spacingS
-                        spacing: Colors.spacingS
+                        anchors.fill: parent; anchors.margins: Appearance.spacingS
+                        spacing: Appearance.spacingS
                         
                         ColumnLayout {
                             spacing: -2; Layout.fillWidth: true
-                            Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold; elide: Text.ElideRight; Layout.fillWidth: true }
-                            Text { text: "PID " + modelData.pid; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS }
+                            Text { text: modelData.name; color: Colors.text; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Bold; elide: Text.ElideRight; Layout.fillWidth: true }
+                            Text { text: "PID " + modelData.pid; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXXS }
                         }
                         
                         Text { 
                             text: (ProcessService.sortBy === "cpu" ? modelData.cpu : modelData.mem) + "%"
-                            color: Colors.primary; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Bold
+                            color: Colors.primary; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Bold
                         }
                         
                         SharedWidgets.IconButton {
                             icon: "dismiss.svg"
-                            size: Colors.iconSizeSmall; iconSize: 12
+                            size: Appearance.iconSizeSmall; iconSize: 12
                             iconColor: Colors.error
                             tooltipText: "Kill process"
                             onClicked: ProcessService.killProcess(modelData.pid)

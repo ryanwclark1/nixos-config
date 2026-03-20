@@ -110,7 +110,7 @@ Item {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
                 visible: Config.displayProfiles.length > 0
 
                 Repeater {
@@ -122,12 +122,12 @@ Item {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingXS
+                            spacing: Appearance.spacingXS
 
                             Text {
                                 text: modelData.name || ("Profile " + (index + 1))
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.DemiBold
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
@@ -142,7 +142,7 @@ Item {
                                     return names.join(", ") || "No monitors";
                                 }
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
                             }
@@ -166,7 +166,7 @@ Item {
                 visible: Config.displayProfiles.length === 0
                 text: "No saved profiles. Use the Display Configuration dialog to save profiles."
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }

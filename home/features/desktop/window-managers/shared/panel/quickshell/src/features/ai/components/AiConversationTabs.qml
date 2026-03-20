@@ -9,15 +9,15 @@ import "../services/AiProviders.js" as Providers
 // close/restore actions, and tab context menus.
 RowLayout {
     id: root
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
 
     property string editingConversationId: ""
     readonly property bool compactMode: width < 420
     readonly property bool narrowMode: width < 320
     readonly property int visibleTabLimit: width < 260 ? 1 : (width < 380 ? 2 : (width < 520 ? 3 : 4))
-    readonly property int reservedWidth: 32 + Colors.spacingS + 32 + Colors.spacingXS + (overflowConversations.length > 0 ? 34 + Colors.spacingS : 0)
+    readonly property int reservedWidth: 32 + Appearance.spacingS + 32 + Appearance.spacingXS + (overflowConversations.length > 0 ? 34 + Appearance.spacingS : 0)
     readonly property int tabStripWidth: Math.max(96, width - reservedWidth)
-    readonly property int tabMaxWidth: Math.max(narrowMode ? 96 : 112, Math.floor(tabStripWidth / Math.max(1, visibleTabLimit)) - Colors.spacingS)
+    readonly property int tabMaxWidth: Math.max(narrowMode ? 96 : 112, Math.floor(tabStripWidth / Math.max(1, visibleTabLimit)) - Appearance.spacingS)
 
     readonly property var _splitConversations: {
         var convs = AiService.conversations.slice();
@@ -114,13 +114,13 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        height: Colors.controlRowHeight
+        height: Appearance.controlRowHeight
         clip: true
 
         Row {
             id: tabRow
             anchors.fill: parent
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             clip: true
 
             Repeater {
@@ -137,12 +137,12 @@ RowLayout {
                     height: 32
 
                     Behavior on width {
-                        Anim { duration: Colors.durationFast }
+                        Anim { duration: Appearance.durationFast }
                     }
 
                     Rectangle {
                         anchors.fill: parent
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: isActive ? Colors.highlightLight : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.05) : "transparent")
                         border.color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.25) : Colors.border)
                         border.width: isActive ? 1.5 : 1
@@ -163,37 +163,37 @@ RowLayout {
                         anchors.bottomMargin: 1.5
                         width: isActive ? parent.width - 20 : 0
                         height: 2
-                        radius: Colors.radiusXXXS
+                        radius: Appearance.radiusXXXS
                         color: Colors.primary
                         opacity: isActive ? 1 : 0
                         visible: width > 0
 
                         Behavior on width {
-                            NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack }
+                            NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack }
                         }
                         Behavior on opacity {
-                            NumberAnimation { duration: Colors.durationFast }
+                            NumberAnimation { duration: Appearance.durationFast }
                         }
                     }
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: Colors.spacingS
+                        anchors.leftMargin: Appearance.spacingS
                         anchors.rightMargin: (closeTabBtn.visible ? closeTabBtn.width + 12 : 8)
-                        spacing: Colors.spacingXS
+                        spacing: Appearance.spacingXS
 
                         Text {
                             text: Providers.providerIcon(modelData.provider)
                             color: isActive ? Colors.primary : Colors.textSecondary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeSmall
                             visible: !tabDelegate.isEditing && !root.narrowMode
                         }
 
                         Rectangle {
                             width: 6
                             height: 6
-                            radius: Colors.radiusXS
+                            radius: Appearance.radiusXS
                             color: Colors.primary
                             visible: isActive && AiService.isStreaming
                             Layout.alignment: Qt.AlignVCenter
@@ -201,7 +201,7 @@ RowLayout {
                             OpacityAnimator on opacity {
                                 from: 0.3
                                 to: 1.0
-                                duration: Colors.durationPulse
+                                duration: Appearance.durationPulse
                                 running: isActive && AiService.isStreaming
                                 loops: Animation.Infinite
                             }
@@ -213,7 +213,7 @@ RowLayout {
                             Layout.minimumWidth: 0
                             text: modelData.title
                             color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.text : Colors.textSecondary)
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: isActive ? Font.DemiBold : Font.Normal
                             elide: Text.ElideRight
                             visible: !tabDelegate.isEditing
@@ -225,12 +225,12 @@ RowLayout {
                     TextInput {
                         id: tabEditInput
                         anchors.left: parent.left
-                        anchors.leftMargin: Colors.spacingS
+                        anchors.leftMargin: Appearance.spacingS
                         anchors.verticalCenter: parent.verticalCenter
                         width: Math.min(Math.max(72, contentWidth + 8), root.tabMaxWidth - 20)
                         text: modelData.title
                         color: Colors.primary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.DemiBold
                         visible: tabDelegate.isEditing
                         selectByMouse: true
@@ -264,7 +264,7 @@ RowLayout {
                         opacity: !root.compactMode && (tabMouse.containsMouse || tabDelegate.isActive) ? 1 : 0
                         visible: opacity > 0
                         Behavior on opacity {
-                            NumberAnimation { duration: Colors.durationFast }
+                            NumberAnimation { duration: Appearance.durationFast }
                         }
 
                         SharedWidgets.StateLayer {
@@ -278,8 +278,8 @@ RowLayout {
                             anchors.centerIn: parent
                             text: "󰅖"
                             color: closeTabMouse.containsMouse ? "white" : Colors.textDisabled
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeXS
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeXS
                         }
 
                         MouseArea {
@@ -311,7 +311,7 @@ RowLayout {
                             if (mouse.button === Qt.RightButton) {
                                 var pos = tabDelegate.mapToItem(root.parent, 0, tabDelegate.height);
                                 tabContextMenu.model = root._buildTabContextModel(modelData);
-                                tabContextMenu.popup(pos.x, pos.y + Colors.spacingXS);
+                                tabContextMenu.popup(pos.x, pos.y + Appearance.spacingXS);
                                 return;
                             }
                             if (!tabDelegate.isEditing)
@@ -337,7 +337,7 @@ RowLayout {
         visible: root.overflowConversations.length > 0
         width: 34
         height: 32
-        radius: Colors.radiusSmall
+        radius: Appearance.radiusSmall
         color: overflowMouse.containsMouse ? Colors.primaryGhost : Colors.bgWidget
         border.color: overflowMouse.containsMouse ? Colors.primary : Colors.border
         border.width: 1
@@ -347,8 +347,8 @@ RowLayout {
             anchors.centerIn: parent
             text: root.narrowMode ? "…" : "󰅁"
             color: overflowMouse.containsMouse ? Colors.primary : Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeSmall
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeSmall
         }
 
         MouseArea {
@@ -372,7 +372,7 @@ RowLayout {
                 }
                 var pos = parent.mapToItem(root.parent, 0, parent.height);
                 overflowMenu.model = model;
-                overflowMenu.popup(pos.x, pos.y + Colors.spacingXS);
+                overflowMenu.popup(pos.x, pos.y + Appearance.spacingXS);
             }
         }
 
@@ -386,18 +386,18 @@ RowLayout {
         id: addConvBtn
         width: 32
         height: 32
-        radius: Colors.radiusSmall
+        radius: Appearance.radiusSmall
         color: addConvMouse.containsMouse ? Colors.primaryGhost : Colors.bgWidget
         border.color: addConvMouse.containsMouse ? Colors.primary : Colors.border
         border.width: 1
         Layout.alignment: Qt.AlignVCenter
-        Layout.rightMargin: Colors.spacingXS
+        Layout.rightMargin: Appearance.spacingXS
 
         Text {
             anchors.centerIn: parent
             text: "+"
             color: addConvMouse.containsMouse ? Colors.primary : Colors.textSecondary
-            font.pixelSize: Colors.fontSizeXL
+            font.pixelSize: Appearance.fontSizeXL
             font.weight: Font.Light
         }
 

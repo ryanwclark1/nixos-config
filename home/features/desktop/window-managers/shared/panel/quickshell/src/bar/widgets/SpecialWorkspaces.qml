@@ -112,8 +112,8 @@ Item {
 
   // ── Sizing ───────────────────────────────────
   readonly property int pillSize: Config.workspacePillSize === "compact" ? 16 : (Config.workspacePillSize === "large" ? 28 : 20)
-  readonly property int pillFont: Config.workspacePillSize === "compact" ? Colors.fontSizeXS : (Config.workspacePillSize === "large" ? Colors.fontSizeMedium : Colors.fontSizeSmall)
-  readonly property int pillSpacing: Colors.spacingSM
+  readonly property int pillFont: Config.workspacePillSize === "compact" ? Appearance.fontSizeXS : (Config.workspacePillSize === "large" ? Appearance.fontSizeMedium : Appearance.fontSizeSmall)
+  readonly property int pillSpacing: Appearance.spacingSM
 
   readonly property int expandedCount: expanded ? specialWorkspaces.length : 0
   readonly property real totalSize: pillSize + (expandedCount > 0 ? pillSpacing + expandedCount * pillSize + (expandedCount - 1) * pillSpacing : 0)
@@ -121,11 +121,11 @@ Item {
   implicitWidth: vertical ? pillSize : totalSize
   implicitHeight: vertical ? totalSize : pillSize
 
-  Behavior on implicitWidth { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-  Behavior on implicitHeight { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+  Behavior on implicitWidth { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutCubic } }
+  Behavior on implicitHeight { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutCubic } }
 
   opacity: hasSpecialWorkspaces ? 1.0 : 0.3
-  Behavior on opacity { NumberAnimation { duration: Colors.durationNormal } }
+  Behavior on opacity { NumberAnimation { duration: Appearance.durationNormal } }
 
   // ── Layout ───────────────────────────────────
   RowLayout {
@@ -139,7 +139,7 @@ Item {
       Layout.alignment: Qt.AlignVCenter
       implicitWidth: root.pillSize
       implicitHeight: root.pillSize
-      radius: Colors.radiusXXS
+      radius: Appearance.radiusXXS
       color: mainMouse.containsMouse ? Colors.highlightLight : (root.isOnSpecial ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
       border.color: root.isOnSpecial ? Colors.primary : Colors.border
       border.width: 1
@@ -154,7 +154,7 @@ Item {
         text: root.mainIcon
         color: root.isOnSpecial ? Colors.primary : Colors.text
         font.pixelSize: root.pillFont
-        font.family: Colors.fontMono
+        font.family: Appearance.fontMono
       }
 
       MouseArea {
@@ -184,7 +184,7 @@ Item {
         Layout.alignment: Qt.AlignVCenter
         implicitWidth: root.showLabels ? Math.max(root.pillSize, wsLabel.implicitWidth + 12) : root.pillSize
         implicitHeight: root.pillSize
-        radius: Colors.radiusXXS
+        radius: Appearance.radiusXXS
         readonly property bool isFocused: root.activeSpecial === modelData.name
 
         color: wsHover.containsMouse ? Colors.highlightLight : (isFocused ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
@@ -199,13 +199,13 @@ Item {
         Row {
           id: wsLabel
           anchors.centerIn: parent
-          spacing: Colors.spacingXS
+          spacing: Appearance.spacingXS
 
           Text {
             text: modelData.icon
             color: wsPill.isFocused ? Colors.primary : Colors.text
             font.pixelSize: root.pillFont
-            font.family: Colors.fontMono
+            font.family: Appearance.fontMono
           }
           Text {
             visible: root.showLabels
@@ -221,7 +221,7 @@ Item {
           anchors.bottom: parent.bottom
           anchors.bottomMargin: 1
           anchors.horizontalCenter: parent.horizontalCenter
-          spacing: Colors.spacingXXS
+          spacing: Appearance.spacingXXS
           visible: modelData.windows > 0 && !root.showLabels
 
           Repeater {
@@ -271,7 +271,7 @@ Item {
       Layout.alignment: Qt.AlignHCenter
       implicitWidth: root.pillSize
       implicitHeight: root.pillSize
-      radius: Colors.radiusXXS
+      radius: Appearance.radiusXXS
       color: mainMouseV.containsMouse ? Colors.highlightLight : (root.isOnSpecial ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
       border.color: root.isOnSpecial ? Colors.primary : Colors.border
       border.width: 1
@@ -282,7 +282,7 @@ Item {
         text: root.mainIcon
         color: root.isOnSpecial ? Colors.primary : Colors.text
         font.pixelSize: root.pillFont
-        font.family: Colors.fontMono
+        font.family: Appearance.fontMono
       }
 
       MouseArea {
@@ -310,7 +310,7 @@ Item {
         Layout.alignment: Qt.AlignHCenter
         implicitWidth: root.pillSize
         implicitHeight: root.pillSize
-        radius: Colors.radiusXXS
+        radius: Appearance.radiusXXS
         readonly property bool isFocused: root.activeSpecial === modelData.name
 
         color: wsHoverV.containsMouse ? Colors.highlightLight : (isFocused ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
@@ -323,7 +323,7 @@ Item {
           text: modelData.icon
           color: parent.isFocused ? Colors.primary : Colors.text
           font.pixelSize: root.pillFont
-          font.family: Colors.fontMono
+          font.family: Appearance.fontMono
         }
 
         MouseArea {

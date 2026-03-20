@@ -20,9 +20,9 @@ Item {
 
   // Grid background
   Rectangle {
-    anchors { fill: parent; margins: Colors.spacingS }
+    anchors { fill: parent; margins: Appearance.spacingS }
     color: Qt.rgba(0, 0, 0, 0.18)
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     border.color: Colors.border
     border.width: 1
 
@@ -52,7 +52,7 @@ Item {
       anchors.centerIn: parent
       text: "Loading monitors…"
       color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeMedium
+      font.pixelSize: Appearance.fontSizeMedium
     }
 
     // Empty state
@@ -61,7 +61,7 @@ Item {
       anchors.centerIn: parent
       text: "No monitors detected"
       color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeMedium
+      font.pixelSize: Appearance.fontSizeMedium
     }
 
     // Monitor rectangles
@@ -96,14 +96,14 @@ Item {
                         ? Colors.primary
                         : (dragArea.containsMouse ? Colors.withAlpha(Colors.primary, 0.5) : Colors.border)
           border.width: monDelegate.isSelected ? 2 : 1
-          radius: Colors.radiusSmall
+          radius: Appearance.radiusSmall
 
           Behavior on color        { enabled: !Colors.isTransitioning; CAnim {} }
           Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
           // Monitor name
           Text {
-            anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: Colors.spacingS }
+            anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: Appearance.spacingS }
             text: monDelegate.modelData.name
             color: monDelegate.isSelected ? Colors.primary : Colors.text
             font.pixelSize: Math.max(9, Math.min(13, monDelegate.height * 0.12))
@@ -121,7 +121,7 @@ Item {
                   + "  @" + monDelegate.modelData.scale.toFixed(2) + "×"
             color: Colors.textSecondary
             font.pixelSize: Math.max(8, Math.min(11, monDelegate.height * 0.10))
-            font.family: Colors.fontMono
+            font.family: Appearance.fontMono
             horizontalAlignment: Text.AlignHCenter
             lineHeight: 1.3
           }
@@ -131,8 +131,8 @@ Item {
             anchors { bottom: parent.bottom; right: parent.right; margins: 5 }
             text: "󰆾"
             color: Colors.withAlpha(Colors.textDisabled, 0.6)
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeXS
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeXS
             visible: monDelegate.height > 40
           }
         }

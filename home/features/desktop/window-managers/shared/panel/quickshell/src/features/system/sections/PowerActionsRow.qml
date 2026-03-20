@@ -7,7 +7,7 @@ import "../../../widgets" as SharedWidgets
 RowLayout {
   id: root
   Layout.fillWidth: true
-  spacing: Colors.paddingSmall
+  spacing: Appearance.paddingSmall
 
   property bool showContent: false
   property int baseIndex: 14
@@ -18,9 +18,9 @@ RowLayout {
   scale: showContent ? 1.0 : 0.96
   transform: Translate { y: showContent ? 0 : 8 }
 
-  Behavior on opacity { SequentialAnimation { id: powerFadeAnim; PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
-  Behavior on scale { SequentialAnimation { id: powerScaleAnim; PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutBack } } }
-  Behavior on transform { SequentialAnimation { PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Colors.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
+  Behavior on opacity { SequentialAnimation { id: powerFadeAnim; PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Appearance.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
+  Behavior on scale { SequentialAnimation { id: powerScaleAnim; PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Appearance.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutBack } } }
+  Behavior on transform { SequentialAnimation { PauseAnimation { duration: showContent ? (root.baseIndex * root.staggerDelay) : 0 } NumberAnimation { duration: Appearance.durationNormal + (root.baseIndex * 20); easing.type: Easing.OutCubic } } }
   layer.enabled: powerFadeAnim.running || powerScaleAnim.running
 
   readonly property int _confirmTimeoutMs: 3000
@@ -45,7 +45,7 @@ RowLayout {
       Layout.fillWidth: true
       height: 40
       color: awaitingConfirm ? Colors.error : Colors.surface
-      radius: Colors.radiusXS
+      radius: Appearance.radiusXS
       border.color: Colors.border
       border.width: 1
       Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
@@ -57,8 +57,8 @@ RowLayout {
         anchors.centerIn: parent
         text: awaitingConfirm ? "Confirm?" : modelData.icon
         color: awaitingConfirm ? Colors.background : Colors.text
-        font.family: awaitingConfirm ? "" : Colors.fontMono
-        font.pixelSize: awaitingConfirm ? Colors.fontSizeSmall : Colors.fontSizeXL
+        font.family: awaitingConfirm ? "" : Appearance.fontMono
+        font.pixelSize: awaitingConfirm ? Appearance.fontSizeSmall : Appearance.fontSizeXL
         font.weight: awaitingConfirm ? Font.Bold : Font.Normal
       }
 

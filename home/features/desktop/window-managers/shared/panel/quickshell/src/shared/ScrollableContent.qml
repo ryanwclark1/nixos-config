@@ -18,7 +18,7 @@ import "../services"
 Item {
   id: root
 
-  property int columnSpacing: Colors.spacingM
+  property int columnSpacing: Appearance.spacingM
   default property alias content: contentColumn.data
   readonly property alias flickable: flick
 
@@ -54,7 +54,7 @@ Item {
     visible: overflow
     opacity: visibleState ? 1.0 : 0.0
 
-    Behavior on opacity { Anim { duration: Colors.durationFast } }
+    Behavior on opacity { Anim { duration: Appearance.durationFast } }
 
     readonly property int _scrollbarHideMs: 1200
 
@@ -99,7 +99,7 @@ Item {
 
       Behavior on y {
         enabled: !thumbDrag.drag.active
-        NumberAnimation { duration: Colors.durationFlash; easing.type: Easing.OutCubic }
+        NumberAnimation { duration: Appearance.durationFlash; easing.type: Easing.OutCubic }
       }
 
       MouseArea {

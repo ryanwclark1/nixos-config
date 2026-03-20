@@ -17,8 +17,8 @@ Rectangle {
     readonly property bool _showChevron: root.collapsible
 
     Layout.fillWidth: true
-    implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Colors.spacingL : 0)
-    radius: Colors.radiusLarge
+    implicitHeight: headerContainer.implicitHeight + (expanded ? contentColumn.implicitHeight + Appearance.spacingL : 0)
+    radius: Appearance.radiusLarge
     color: Colors.withAlpha(Colors.surface, 0.64)
     border.color: Colors.withAlpha(Colors.text, 0.12)
     border.width: 1
@@ -35,7 +35,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        implicitHeight: headerColumn.implicitHeight + Colors.spacingM * 2
+        implicitHeight: headerColumn.implicitHeight + Appearance.spacingM * 2
         color: Colors.withAlpha(Colors.surface, 0.28)
 
         Rectangle {
@@ -51,19 +51,19 @@ Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: Colors.spacingM
-            anchors.leftMargin: Colors.spacingL
-            spacing: Colors.spacingXS
+            anchors.margins: Appearance.spacingM
+            anchors.leftMargin: Appearance.spacingL
+            spacing: Appearance.spacingXS
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Rectangle {
                     visible: root.iconName !== ""
                     Layout.preferredWidth: 28
                     Layout.preferredHeight: 28
-                    radius: Colors.radiusMedium
+                    radius: Appearance.radiusMedium
                     color: Colors.primarySubtle
                     border.color: Colors.primaryRing
                     border.width: 1
@@ -72,15 +72,15 @@ Rectangle {
                         anchors.centerIn: parent
                         sourceComponent: root.iconName.endsWith(".svg") ? _scSvg : _scNerd
                     }
-                    Component { id: _scSvg; SvgIcon { source: root.iconName; color: Colors.primary; size: Colors.fontSizeSmall } }
-                    Component { id: _scNerd; Text { text: root.iconName; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall } }
+                    Component { id: _scSvg; SvgIcon { source: root.iconName; color: Colors.primary; size: Appearance.fontSizeSmall } }
+                    Component { id: _scNerd; Text { text: root.iconName; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }
                 }
 
                 Text {
                     Layout.fillWidth: true
                     text: root.title
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.Black
                     wrapMode: Text.WordWrap
                 }
@@ -89,7 +89,7 @@ Rectangle {
                     visible: root._showChevron
                     implicitWidth: 26
                     implicitHeight: 26
-                    radius: Colors.radiusCard
+                    radius: Appearance.radiusCard
                     color: Colors.withAlpha(Colors.surface, collapseHover.containsMouse ? 0.62 : 0.42)
                     border.color: Colors.border
                     border.width: 1
@@ -98,8 +98,8 @@ Rectangle {
                         anchors.centerIn: parent
                         text: root.expanded ? "󰅃" : "󰅀"
                         color: Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeSmall
                     }
                 }
             }
@@ -108,7 +108,7 @@ Rectangle {
                 visible: root.description !== ""
                 text: root.description
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
             }
@@ -145,11 +145,11 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: headerContainer.bottom
-        anchors.leftMargin: Colors.spacingL
-        anchors.rightMargin: Colors.spacingL
-        anchors.topMargin: Colors.spacingM
-        anchors.bottomMargin: Colors.spacingL
-        spacing: Colors.spacingL
+        anchors.leftMargin: Appearance.spacingL
+        anchors.rightMargin: Appearance.spacingL
+        anchors.topMargin: Appearance.spacingM
+        anchors.bottomMargin: Appearance.spacingL
+        spacing: Appearance.spacingL
         visible: root.expanded
     }
 }

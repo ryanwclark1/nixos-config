@@ -14,7 +14,7 @@ Rectangle {
     signal refresh()
 
     Layout.fillWidth: true
-    height: Colors.controlRowHeight
+    height: Appearance.controlRowHeight
     color: Colors.cardSurface
 
     Rectangle {
@@ -27,21 +27,21 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: Colors.spacingM
-        anchors.rightMargin: Colors.spacingM
-        spacing: Colors.spacingXS
+        anchors.leftMargin: Appearance.spacingM
+        anchors.rightMargin: Appearance.spacingM
+        spacing: Appearance.spacingXS
 
         // Up button
         Rectangle {
-            width: 26; height: 26; radius: Colors.radiusSmall
+            width: 26; height: 26; radius: Appearance.radiusSmall
             color: "transparent"
 
             Text {
                 anchors.centerIn: parent
                 text: "󰁞"
                 color: Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeMedium
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeMedium
             }
             SharedWidgets.StateLayer {
                 id: upSL
@@ -77,12 +77,12 @@ Rectangle {
                     delegate: Row {
                         required property var modelData
                         required property int index
-                        spacing: Colors.spacingXXS
+                        spacing: Appearance.spacingXXS
 
                         Text {
                             text: "›"
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             anchors.verticalCenter: parent.verticalCenter
                             visible: index > 0
                         }
@@ -90,7 +90,7 @@ Rectangle {
                         Rectangle {
                             width: crumbText.implicitWidth + 8
                             height: 22
-                            radius: Colors.radiusSmall
+                            radius: Appearance.radiusSmall
                             color: {
                                 var crumbs = FBH.buildBreadcrumbs(root.currentPath);
                                 var isLast = (index === crumbs.length - 1);
@@ -98,7 +98,7 @@ Rectangle {
                                 if (crumbHover.containsMouse) return Colors.textWash;
                                 return "transparent";
                             }
-                            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+                            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
                             Text {
                                 id: crumbText
@@ -110,7 +110,7 @@ Rectangle {
                                     if (isLast) return Colors.primary;
                                     return Colors.textSecondary;
                                 }
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                             }
 
                             MouseArea {
@@ -128,15 +128,15 @@ Rectangle {
 
         // Refresh button
         Rectangle {
-            width: 26; height: 26; radius: Colors.radiusSmall
+            width: 26; height: 26; radius: Appearance.radiusSmall
             color: "transparent"
 
             Text {
                 anchors.centerIn: parent
                 text: "󰑐"
                 color: Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeMedium
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeMedium
             }
             SharedWidgets.StateLayer {
                 id: refreshSL

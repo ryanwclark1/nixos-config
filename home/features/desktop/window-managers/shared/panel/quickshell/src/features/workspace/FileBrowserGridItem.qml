@@ -18,19 +18,19 @@ Rectangle {
     width: cellWidth
     height: cellWidth + 28
 
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: {
         var isSel = (selectedFile === modelData.path);
         if (isSel) return Colors.withAlpha(Colors.primary, 0.28);
         if (gridItemHover.containsMouse) return Colors.textWash;
         return "transparent";
     }
-    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+    Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingXS
-        spacing: Colors.spacingXS
+        anchors.margins: Appearance.spacingXS
+        spacing: Appearance.spacingXS
 
         // Icon area
         Item {
@@ -39,7 +39,7 @@ Rectangle {
 
             Image {
                 anchors.fill: parent
-                anchors.margins: Colors.spacingXS
+                anchors.margins: Appearance.spacingXS
                 visible: modelData.isImage
                 source: modelData.isImage ? ("file://" + modelData.path) : ""
                 fillMode: Image.PreserveAspectCrop
@@ -52,7 +52,7 @@ Rectangle {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: Colors.radiusSmall - 4
+                    radius: Appearance.radiusSmall - 4
                     color: "transparent"
                     border.color: Colors.withAlpha(Colors.border, 0.5)
                     border.width: 1
@@ -65,7 +65,7 @@ Rectangle {
                 visible: !modelData.isImage
                 text: FBH.fileIcon(modelData)
                 color: modelData.isDir ? Colors.accent : Colors.textSecondary
-                font.family: Colors.fontMono
+                font.family: Appearance.fontMono
                 font.pixelSize: root.cellWidth < 80 ? 28 : 36
             }
         }
@@ -77,7 +77,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             text: modelData.name
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             elide: Text.ElideRight
             maximumLineCount: 1
         }
@@ -101,7 +101,7 @@ Rectangle {
     Rectangle {
         id: dragRect
         visible: Drag.active
-        width: 48; height: 48; radius: Colors.radiusXS
+        width: 48; height: 48; radius: Appearance.radiusXS
         color: Colors.primary
         opacity: 0.8
         z: 999
@@ -113,7 +113,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             text: FBH.fileIcon(modelData)
-            color: "white"; font.pixelSize: Colors.iconSizeSmall; font.family: Colors.fontMono
+            color: "white"; font.pixelSize: Appearance.iconSizeSmall; font.family: Appearance.fontMono
         }
     }
 }

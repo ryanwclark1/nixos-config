@@ -28,8 +28,8 @@ Rectangle {
     }
 
     Layout.fillWidth: true
-    implicitHeight: toggleContent.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: toggleContent.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.modalFieldSurface
     border.color: root._active ? Colors.primary : Colors.border
     border.width: 1
@@ -54,23 +54,23 @@ Rectangle {
     ColumnLayout {
         id: toggleContent
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             SettingsIconBox { icon: root.icon; active: root._active }
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
+                spacing: Appearance.spacingXXS
 
                 Text {
                     text: root.label
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -80,7 +80,7 @@ Rectangle {
                     visible: root.description !== ""
                     text: root.description
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                 }
@@ -96,10 +96,10 @@ Rectangle {
         Text {
             text: root._active ? root.enabledText : root.disabledText
             color: root._active ? Colors.primary : Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
-            leftPadding: root.narrowLayout ? 0 : 38 + Colors.spacingM
+            leftPadding: root.narrowLayout ? 0 : 38 + Appearance.spacingM
         }
     }
 
@@ -126,8 +126,8 @@ Rectangle {
             property real _opacity: 0
             running: root.highlighted
             loops: 2
-            NumberAnimation { target: highlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
-            NumberAnimation { target: highlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Colors.durationSlow; easing.type: Easing.InCubic }
+            NumberAnimation { target: highlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Appearance.durationSlow; easing.type: Easing.OutCubic }
+            NumberAnimation { target: highlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Appearance.durationSlow; easing.type: Easing.InCubic }
         }
     }
 }

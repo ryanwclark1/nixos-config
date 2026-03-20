@@ -7,7 +7,7 @@ ColumnLayout {
     id: root
 
     Layout.fillWidth: true
-    spacing: Colors.spacingXS
+    spacing: Appearance.spacingXS
 
     property string label: "HISTORY"
     property string currentText: ""
@@ -25,18 +25,18 @@ ColumnLayout {
         Text {
             text: root.label
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Bold
-            font.letterSpacing: Colors.letterSpacingWide
+            font.letterSpacing: Appearance.letterSpacingWide
             Layout.fillWidth: true
         }
         Text {
             visible: root.currentText !== ""
             text: root.currentText
             color: root.accentColor
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Bold
-            font.family: Colors.fontMono
+            font.family: Appearance.fontMono
         }
     }
 

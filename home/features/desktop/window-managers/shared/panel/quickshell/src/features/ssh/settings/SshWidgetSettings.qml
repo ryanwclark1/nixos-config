@@ -37,7 +37,7 @@ ColumnLayout {
         return list;
     }
 
-    spacing: Colors.spacingM
+    spacing: Appearance.spacingM
     Layout.fillWidth: true
 
     SshWidgetData {
@@ -167,7 +167,7 @@ ColumnLayout {
     Text {
         text: "SSH Hosts & Import"
         color: Colors.text
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         font.weight: Font.DemiBold
         Layout.fillWidth: true
     }
@@ -175,7 +175,7 @@ ColumnLayout {
     Text {
         text: "Basic SSH pill behavior is configured above with the shared widget settings. This section manages host lists, import diagnostics, and reset actions."
         color: Colors.textSecondary
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         Layout.fillWidth: true
         wrapMode: Text.WordWrap
     }

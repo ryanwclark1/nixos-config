@@ -31,7 +31,7 @@ ThemedContainer {
 
     readonly property int itemHeight: 32
     readonly property int separatorHeight: 9
-    readonly property int menuPadding: Colors.spacingXS
+    readonly property int menuPadding: Appearance.spacingXS
 
     x: popupX
     y: popupY
@@ -43,8 +43,8 @@ ThemedContainer {
 
     scale: showMenu ? 1.0 : 0.9
     opacity: showMenu ? 1.0 : 0.0
-    Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
-    Behavior on opacity { NumberAnimation { duration: Colors.durationSnap } }
+    Behavior on scale { NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
+    Behavior on opacity { NumberAnimation { duration: Appearance.durationSnap } }
 
     layer.enabled: showMenu || opacity > 0
     layer.smooth: true
@@ -128,7 +128,7 @@ ThemedContainer {
                 Rectangle {
                     visible: modelData.separator === true
                     anchors.centerIn: parent
-                    width: parent.width - Colors.spacingS * 2
+                    width: parent.width - Appearance.spacingS * 2
                     height: 1
                     color: Colors.border
                 }
@@ -137,15 +137,15 @@ ThemedContainer {
                 Rectangle {
                     visible: !modelData.separator
                     anchors.fill: parent
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: root.focusedIndex === index || itemMouse.containsMouse
                         ? Colors.highlightLight : "transparent"
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: Colors.spacingS
-                        anchors.rightMargin: Colors.spacingS
-                        spacing: Colors.spacingS
+                        anchors.leftMargin: Appearance.spacingS
+                        anchors.rightMargin: Appearance.spacingS
+                        spacing: Appearance.spacingS
 
                         Loader {
                             visible: !!modelData.icon
@@ -156,15 +156,15 @@ ThemedContainer {
                         }
                         Component {
                             id: _ctxSvg
-                            SvgIcon { source: parent._icon; color: parent._color; size: Colors.fontSizeMedium }
+                            SvgIcon { source: parent._icon; color: parent._color; size: Appearance.fontSizeMedium }
                         }
                         Component {
                             id: _ctxNerd
                             Text {
                                 text: parent._icon
                                 color: parent._color
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.family: Appearance.fontMono
+                                font.pixelSize: Appearance.fontSizeMedium
                             }
                         }
 
@@ -172,7 +172,7 @@ ThemedContainer {
                             text: modelData.label || ""
                             color: modelData.danger ? Colors.error
                                 : (modelData.disabled ? Colors.textDisabled : Colors.text)
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             Layout.fillWidth: true
                             elide: Text.ElideRight
                         }
@@ -181,8 +181,8 @@ ThemedContainer {
                             visible: !!modelData.shortcut
                             text: modelData.shortcut || ""
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
-                            font.family: Colors.fontMono
+                            font.pixelSize: Appearance.fontSizeXS
+                            font.family: Appearance.fontMono
                         }
                     }
 

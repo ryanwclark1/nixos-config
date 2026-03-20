@@ -20,8 +20,8 @@ PanelWindow {
   readonly property bool compactMode: isPortrait || usableWidth < 1024 || usableHeight < 760
   readonly property bool tightSpacing: usableWidth < 720 || usableHeight < 640
   readonly property int sidebarWidth: compactMode ? 72 : 256
-  readonly property real shellPadding: tightSpacing ? Colors.spacingS : Colors.spacingM
-  readonly property real paneGap: compactMode ? Colors.spacingS : Colors.spacingM
+  readonly property real shellPadding: tightSpacing ? Appearance.spacingS : Appearance.spacingM
+  readonly property real paneGap: compactMode ? Appearance.spacingS : Appearance.spacingM
   readonly property int maxLayerTextureSize: 4096
   property string searchQuery: ""
 
@@ -243,8 +243,8 @@ PanelWindow {
   SharedWidgets.ElasticNumber {
     id: _shElasticScale
     target: settingsRoot.isOpen ? 1.0 : 0.95
-    fastDuration: Colors.durationSnap
-    slowDuration: Colors.durationSlow
+    fastDuration: Appearance.durationSnap
+    slowDuration: Appearance.durationSlow
     fastWeight: 0.45
   }
 
@@ -261,7 +261,7 @@ PanelWindow {
     color: Colors.withAlpha(Colors.surface, 0.5)
     border.color: Colors.withAlpha(Colors.text, 0.16)
     border.width: 1
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     clip: true
 
 
@@ -283,7 +283,7 @@ PanelWindow {
 
     opacity: settingsRoot.isOpen ? 1.0 : 0.0
     scale: _shElasticScale.value
-    Behavior on opacity { NumberAnimation { id: shFadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: shFadeAnim; duration: Appearance.durationNormal; easing.type: Easing.OutCubic } }
     layer.enabled: (shFadeAnim.running || _shElasticScale.running) && settingsRoot.allowLayer(width, height)
 
     // Prevent clicks from closing through the box
@@ -297,7 +297,7 @@ PanelWindow {
       Rectangle {
         Layout.preferredWidth: settingsRoot.sidebarWidth
         Layout.fillHeight: true
-        radius: settingsRoot.compactMode ? Colors.radiusMedium : Colors.radiusLarge
+        radius: settingsRoot.compactMode ? Appearance.radiusMedium : Appearance.radiusLarge
         color: Colors.withAlpha(Colors.background, settingsRoot.compactMode ? 0.82 : 0.86)
         border.color: Colors.withAlpha(Colors.text, settingsRoot.compactMode ? 0.16 : 0.12)
         border.width: 1
@@ -328,7 +328,7 @@ PanelWindow {
       Rectangle {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         color: Colors.withAlpha(Colors.surface, settingsRoot.compactMode ? 0.72 : 0.78)
         border.color: Colors.withAlpha(Colors.text, 0.12)
         border.width: 1

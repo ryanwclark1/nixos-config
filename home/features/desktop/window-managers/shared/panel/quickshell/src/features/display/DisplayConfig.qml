@@ -397,8 +397,8 @@ PanelWindow {
   SharedWidgets.ElasticNumber {
     id: _dcElasticScale
     target: displayRoot.isOpen ? 1.0 : 0.95
-    fastDuration: Colors.durationSnap
-    slowDuration: Colors.durationSlow
+    fastDuration: Appearance.durationSnap
+    slowDuration: Appearance.durationSlow
     fastWeight: 0.45
   }
 
@@ -414,7 +414,7 @@ PanelWindow {
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     clip: true
 
     focus: displayRoot.isOpen
@@ -431,7 +431,7 @@ PanelWindow {
 
     opacity: displayRoot.isOpen ? 1.0 : 0.0
     scale: _dcElasticScale.value
-    Behavior on opacity { NumberAnimation { id: dcFadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: dcFadeAnim; duration: Appearance.durationNormal; easing.type: Easing.OutCubic } }
     layer.enabled: dcFadeAnim.running || _dcElasticScale.running
 
     // Eat mouse events so backdrop click doesn't reach through
@@ -447,22 +447,22 @@ PanelWindow {
         Layout.fillWidth: true
         height: 56
         color: "transparent"
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
 
         RowLayout {
-          anchors { fill: parent; leftMargin: Colors.paddingLarge; rightMargin: Colors.spacingL }
-          spacing: Colors.spacingM
+          anchors { fill: parent; leftMargin: Appearance.paddingLarge; rightMargin: Appearance.spacingL }
+          spacing: Appearance.spacingM
 
           Text {
             text: "󰍺"
             color: Colors.primary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeHuge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeHuge
           }
           Text {
             text: "Display Configuration"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeXL
+            font.pixelSize: Appearance.fontSizeXL
             font.weight: Font.Bold
           }
           Item { Layout.fillWidth: true }
@@ -476,8 +476,8 @@ PanelWindow {
               anchors.centerIn: parent
               text: "󰅖"
               color: Colors.textSecondary
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeLarge
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeLarge
             }
             SharedWidgets.StateLayer {
               id: closeSL
@@ -524,19 +524,19 @@ PanelWindow {
       // ── Quick-layout presets ─────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        Layout.leftMargin: Colors.spacingLG
-        Layout.rightMargin: Colors.spacingLG
-        Layout.topMargin: Colors.spacingS
-        Layout.bottomMargin: Colors.spacingXS
-        spacing: Colors.spacingS
+        Layout.leftMargin: Appearance.spacingLG
+        Layout.rightMargin: Appearance.spacingLG
+        Layout.topMargin: Appearance.spacingS
+        Layout.bottomMargin: Appearance.spacingXS
+        spacing: Appearance.spacingS
         visible: displayRoot.monitors.length >= 2
 
         Text {
           text: "LAYOUT"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Black
-          font.letterSpacing: Colors.letterSpacingExtraWide
+          font.letterSpacing: Appearance.letterSpacingExtraWide
         }
 
         Item { Layout.fillWidth: true }
@@ -554,7 +554,7 @@ PanelWindow {
 
             height: 30
             width: presetRow.implicitWidth + 18
-            radius: Colors.radiusXS
+            radius: Appearance.radiusXS
             color: Colors.bgWidget
             border.color: Colors.border
             border.width: 1
@@ -562,17 +562,17 @@ PanelWindow {
             RowLayout {
               id: presetRow
               anchors.centerIn: parent
-              spacing: Colors.spacingXS
+              spacing: Appearance.spacingXS
               Text {
                 text: modelData.icon
                 color: Colors.primary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeSmall
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeSmall
               }
               Text {
                 text: modelData.label
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Medium
               }
             }
@@ -604,13 +604,13 @@ PanelWindow {
       // ── Selected monitor settings ──────────────────────────────
       Item {
         Layout.fillWidth: true
-        implicitHeight: settingsPane.implicitHeight + Colors.paddingLarge
+        implicitHeight: settingsPane.implicitHeight + Appearance.paddingLarge
         visible: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
 
         ColumnLayout {
           id: settingsPane
-          anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingLG }
-          spacing: Colors.spacingML
+          anchors { left: parent.left; right: parent.right; top: parent.top; margins: Appearance.spacingLG }
+          spacing: Appearance.spacingML
 
           // Section label
           Text {
@@ -621,23 +621,23 @@ PanelWindow {
                         : ""))
                   : ""
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             font.weight: Font.Black
-            font.letterSpacing: Colors.letterSpacingExtraWide
+            font.letterSpacing: Appearance.letterSpacingExtraWide
             elide: Text.ElideRight
             Layout.fillWidth: true
           }
 
           RowLayout {
-            spacing: Colors.spacingL
+            spacing: Appearance.spacingL
             Layout.fillWidth: true
 
             // Resolution selector
             ColumnLayout {
-              spacing: Colors.spacingSM
+              spacing: Appearance.spacingSM
               Layout.fillWidth: true
 
-              Text { text: "RESOLUTION"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingExtraWide }
+              Text { text: "RESOLUTION"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
 
               ScrollView {
                 Layout.fillWidth: true
@@ -652,7 +652,7 @@ PanelWindow {
                          : []
                   clip: true
                   orientation: ListView.Horizontal
-                  spacing: Colors.spacingSM
+                  spacing: Appearance.spacingSM
 
                   property string currentRes: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
                                               ? displayRoot._currentResolution(displayRoot.monitors[displayRoot.selectedIndex])
@@ -664,7 +664,7 @@ PanelWindow {
 
                     width: resLabel.implicitWidth + 20
                     height: 34
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: resList.currentRes === modelData
                            ? Colors.highlight : Colors.bgWidget
                     border.color: resList.currentRes === modelData
@@ -677,8 +677,8 @@ PanelWindow {
                       text: modelData
                       color: resList.currentRes === modelData
                              ? Colors.primary : Colors.text
-                      font.pixelSize: Colors.fontSizeSmall
-                      font.family: Colors.fontMono
+                      font.pixelSize: Appearance.fontSizeSmall
+                      font.family: Appearance.fontMono
                       font.weight: Font.DemiBold
                     }
 
@@ -700,10 +700,10 @@ PanelWindow {
 
             // Refresh rate selector
             ColumnLayout {
-              spacing: Colors.spacingSM
+              spacing: Appearance.spacingSM
               Layout.preferredWidth: 180
 
-              Text { text: "REFRESH RATE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingExtraWide }
+              Text { text: "REFRESH RATE"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
 
               ScrollView {
                 Layout.fillWidth: true
@@ -720,7 +720,7 @@ PanelWindow {
                   }
                   clip: true
                   orientation: ListView.Horizontal
-                  spacing: Colors.spacingSM
+                  spacing: Appearance.spacingSM
 
                   property string currentRate: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
                                                ? displayRoot.monitors[displayRoot.selectedIndex].refreshRate.toFixed(2)
@@ -734,7 +734,7 @@ PanelWindow {
 
                     width: rateLabel.implicitWidth + 20
                     height: 34
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: isCurrent ? Colors.highlight : Colors.bgWidget
                     border.color: isCurrent ? Colors.primary : Colors.border
                     border.width: 1
@@ -744,8 +744,8 @@ PanelWindow {
                       anchors.centerIn: parent
                       text: modelData + "Hz"
                       color: isCurrent ? Colors.primary : Colors.text
-                      font.pixelSize: Colors.fontSizeSmall
-                      font.family: Colors.fontMono
+                      font.pixelSize: Appearance.fontSizeSmall
+                      font.family: Appearance.fontMono
                       font.weight: Font.DemiBold
                     }
 
@@ -766,14 +766,14 @@ PanelWindow {
 
             // Scale selector
             ColumnLayout {
-              spacing: Colors.spacingSM
+              spacing: Appearance.spacingSM
               Layout.preferredWidth: 220
 
-              Text { text: "SCALE"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingExtraWide }
+              Text { text: "SCALE"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
 
               Flow {
                 Layout.fillWidth: true
-                spacing: Colors.spacingSM
+                spacing: Appearance.spacingSM
 
                 Repeater {
                   model: ["1.00", "1.25", "1.50", "1.75", "2.00"]
@@ -788,7 +788,7 @@ PanelWindow {
 
                     width: scaleLabel.implicitWidth + 16
                     height: 30
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: isCurrent ? Colors.highlight : Colors.bgWidget
                     border.color: isCurrent ? Colors.primary : Colors.border
                     border.width: 1
@@ -798,8 +798,8 @@ PanelWindow {
                       anchors.centerIn: parent
                       text: modelData + "×"
                       color: isCurrent ? Colors.primary : Colors.text
-                      font.pixelSize: Colors.fontSizeSmall
-                      font.family: Colors.fontMono
+                      font.pixelSize: Appearance.fontSizeSmall
+                      font.family: Appearance.fontMono
                       font.weight: Font.DemiBold
                     }
 
@@ -819,29 +819,29 @@ PanelWindow {
 
             // Position readout
             ColumnLayout {
-              spacing: Colors.spacingSM
+              spacing: Appearance.spacingSM
               Layout.preferredWidth: 110
 
-              Text { text: "POSITION"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Colors.letterSpacingExtraWide }
+              Text { text: "POSITION"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
 
               Rectangle {
                 width: 100; height: 46
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.bgWidget
                 border.color: Colors.border
                 border.width: 1
 
                 ColumnLayout {
                   anchors.centerIn: parent
-                  spacing: Colors.spacingXXS
+                  spacing: Appearance.spacingXXS
 
                   Text {
                     text: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
                           ? ("X: " + displayRoot.monitors[displayRoot.selectedIndex].x)
                           : "X: —"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeSmall
+                    font.family: Appearance.fontMono
                     Layout.alignment: Qt.AlignHCenter
                   }
                   Text {
@@ -849,8 +849,8 @@ PanelWindow {
                           ? ("Y: " + displayRoot.monitors[displayRoot.selectedIndex].y)
                           : "Y: —"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeSmall
+                    font.family: Appearance.fontMono
                     Layout.alignment: Qt.AlignHCenter
                   }
                 }
@@ -866,17 +866,17 @@ PanelWindow {
       // ── Profile buttons ─────────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        Layout.leftMargin: Colors.spacingLG
-        Layout.rightMargin: Colors.spacingLG
-        Layout.topMargin: Colors.spacingS
-        spacing: Colors.spacingS
+        Layout.leftMargin: Appearance.spacingLG
+        Layout.rightMargin: Appearance.spacingLG
+        Layout.topMargin: Appearance.spacingS
+        spacing: Appearance.spacingS
 
         Text {
           text: "PROFILES"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXS
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.Black
-          font.letterSpacing: Colors.letterSpacingExtraWide
+          font.letterSpacing: Appearance.letterSpacingExtraWide
         }
 
         Item { Layout.fillWidth: true }
@@ -884,16 +884,16 @@ PanelWindow {
         // Save Profile
         Rectangle {
           height: 30; width: saveProfileRow.implicitWidth + 20
-          radius: Colors.radiusXS
+          radius: Appearance.radiusXS
           color: Colors.bgWidget
           border.color: Colors.border; border.width: 1
 
           RowLayout {
             id: saveProfileRow
             anchors.centerIn: parent
-            spacing: Colors.spacingXS
-            Text { text: "󰆓"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall }
-            Text { text: "Save"; color: Colors.text; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Medium }
+            spacing: Appearance.spacingXS
+            Text { text: "󰆓"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall }
+            Text { text: "Save"; color: Colors.text; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Medium }
           }
 
           MouseArea {
@@ -914,7 +914,7 @@ PanelWindow {
             required property var modelData
             required property int index
             height: 30; width: loadLabel.implicitWidth + 20
-            radius: Colors.radiusXS
+            radius: Appearance.radiusXS
             color: Colors.bgWidget
             border.color: Colors.border; border.width: 1
 
@@ -923,7 +923,7 @@ PanelWindow {
               anchors.centerIn: parent
               text: modelData.name || ("Profile " + (index + 1))
               color: Colors.text
-              font.pixelSize: Colors.fontSizeXS
+              font.pixelSize: Appearance.fontSizeXS
               font.weight: Font.Medium
             }
 
@@ -940,23 +940,23 @@ PanelWindow {
       // ── Action buttons ─────────────────────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        Layout.margins: Colors.spacingLG
-        spacing: Colors.spacingM
+        Layout.margins: Appearance.spacingLG
+        spacing: Appearance.spacingM
 
         // Reload button
         Rectangle {
           height: 40
           width: 120
-          radius: Colors.radiusSmall
+          radius: Appearance.radiusSmall
           color: Colors.bgWidget
           border.color: Colors.border
           border.width: 1
 
           RowLayout {
             anchors.centerIn: parent
-            spacing: Colors.spacingS
-            Text { text: "󰑐"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-            Text { text: "Reload"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+            spacing: Appearance.spacingS
+            Text { text: "󰑐"; color: Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium }
+            Text { text: "Reload"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Medium }
           }
 
           SharedWidgets.StateLayer {
@@ -979,16 +979,16 @@ PanelWindow {
         Rectangle {
           height: 40
           width: 120
-          radius: Colors.radiusSmall
+          radius: Appearance.radiusSmall
           color: Colors.bgWidget
           border.color: Colors.border
           border.width: 1
 
           RowLayout {
             anchors.centerIn: parent
-            spacing: Colors.spacingS
-            Text { text: "󰅖"; color: Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium }
-            Text { text: "Close"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; font.weight: Font.Medium }
+            spacing: Appearance.spacingS
+            Text { text: "󰅖"; color: Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium }
+            Text { text: "Close"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Medium }
           }
 
           SharedWidgets.StateLayer {
@@ -1009,7 +1009,7 @@ PanelWindow {
         Rectangle {
           height: 40
           width: 140
-          radius: Colors.radiusSmall
+          radius: Appearance.radiusSmall
           color: displayRoot.applyInProgress
                  ? Colors.withAlpha(Colors.primary, 0.4)
                  : Colors.primary
@@ -1017,25 +1017,25 @@ PanelWindow {
 
           RowLayout {
             anchors.centerIn: parent
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             Text {
               text: displayRoot.applyInProgress ? "󰔟" : "󰄬"
               color: Colors.text
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeMedium
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeMedium
 
               // Simple spinning rotation when busy
               NumberAnimation on rotation {
                 running: displayRoot.applyInProgress
                 from: 0; to: 360
-                duration: Colors.durationLong
+                duration: Appearance.durationLong
                 loops: Animation.Infinite
               }
             }
             Text {
               text: displayRoot.applyInProgress ? "Applying…" : "Apply"
               color: Colors.text
-              font.pixelSize: Colors.fontSizeSmall
+              font.pixelSize: Appearance.fontSizeSmall
               font.weight: Font.Bold
             }
           }

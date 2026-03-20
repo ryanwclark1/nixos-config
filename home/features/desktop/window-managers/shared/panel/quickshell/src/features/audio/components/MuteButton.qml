@@ -23,7 +23,7 @@ Rectangle {
     anchors.centerIn: parent
     text: root.muted ? root.mutedIcon : root.icon
     color: root.muted ? Colors.error : Colors.textSecondary
-    font.family: Colors.fontMono
+    font.family: Appearance.fontMono
     font.pixelSize: Math.round(root.size * 0.5)
   }
 

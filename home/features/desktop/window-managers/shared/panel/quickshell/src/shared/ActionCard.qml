@@ -22,9 +22,9 @@ Rectangle {
 
     readonly property color effectiveColor: danger ? Colors.error : accentColor
 
-    width: compact ? actionRow.implicitWidth + Colors.spacingL * 2 : 140
+    width: compact ? actionRow.implicitWidth + Appearance.spacingL * 2 : 140
     height: compact ? 28 : 36
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: Colors.withAlpha(effectiveColor, actionMouse.containsMouse ? 0.18 : 0.10)
     border.color: effectiveColor
     border.width: 1
@@ -32,29 +32,29 @@ Rectangle {
     RowLayout {
         id: actionRow
         anchors.centerIn: parent
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Loader {
             sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
         }
         Component {
             id: _svgIcon
-            SvgIcon { source: root.icon; color: root.effectiveColor; size: root.compact ? Colors.fontSizeSmall : Colors.fontSizeMedium }
+            SvgIcon { source: root.icon; color: root.effectiveColor; size: root.compact ? Appearance.fontSizeSmall : Appearance.fontSizeMedium }
         }
         Component {
             id: _nerdIcon
             Text {
                 text: root.icon
                 color: root.effectiveColor
-                font.family: Colors.fontMono
-                font.pixelSize: root.compact ? Colors.fontSizeSmall : Colors.fontSizeMedium
+                font.family: Appearance.fontMono
+                font.pixelSize: root.compact ? Appearance.fontSizeSmall : Appearance.fontSizeMedium
             }
         }
 
         Text {
             text: root.label
             color: root.effectiveColor
-            font.pixelSize: root.compact ? Colors.fontSizeSmall : Colors.fontSizeSmall
+            font.pixelSize: root.compact ? Appearance.fontSizeSmall : Appearance.fontSizeSmall
             font.weight: Font.Bold
         }
     }

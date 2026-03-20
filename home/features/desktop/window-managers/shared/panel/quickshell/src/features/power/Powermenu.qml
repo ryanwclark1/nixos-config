@@ -139,15 +139,15 @@ PanelWindow {
         anchors.fill: parent
         color: Colors.background
         opacity: root.isVisible ? 0.92 : 0.0
-        Behavior on opacity { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { duration: Appearance.durationSlow; easing.type: Easing.OutCubic } }
       }
     }
 
     SharedWidgets.ElasticNumber {
       id: _pmElasticScale
       target: root.isVisible ? 1.0 : 0.92
-      fastDuration: Colors.durationFast
-      slowDuration: Colors.durationEmphasis
+      fastDuration: Appearance.durationFast
+      slowDuration: Appearance.durationEmphasis
       fastWeight: 0.4
     }
 
@@ -158,12 +158,12 @@ PanelWindow {
       spacing: 64
       scale: _pmElasticScale.value
       opacity: root.isVisible ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } }
+      Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: Appearance.durationEmphasis; easing.type: Easing.OutCubic } }
       layer.enabled: _pmElasticScale.running || pmFadeAnim.running
 
       ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
         Text {
           text: "System Session"
           color: Colors.text
@@ -178,7 +178,7 @@ PanelWindow {
           visible: root.uptimeText !== ""
           text: "system uptime: " + root.uptimeText
           color: Colors.primary
-          font.pixelSize: Colors.fontSizeMedium
+          font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Medium
           Layout.alignment: Qt.AlignHCenter
         }
@@ -211,16 +211,16 @@ PanelWindow {
             opacity: root.isVisible ? 1.0 : 0.0
             scale: root.isVisible ? 1.0 : 0.7
             transform: Translate { y: root.isVisible ? 0 : 30 }
-            Behavior on opacity { SequentialAnimation { id: actionFadeAnim; PauseAnimation { duration: index * 50 } NumberAnimation { duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } } }
+            Behavior on opacity { SequentialAnimation { id: actionFadeAnim; PauseAnimation { duration: index * 50 } NumberAnimation { duration: Appearance.durationEmphasis; easing.type: Easing.OutCubic } } }
             Behavior on scale { SequentialAnimation { id: actionScaleAnim; PauseAnimation { duration: index * 50 } NumberAnimation { duration: 550; easing.type: Easing.OutBack } } }
-            Behavior on transform { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } } }
+            Behavior on transform { SequentialAnimation { PauseAnimation { duration: index * 50 } NumberAnimation { duration: Appearance.durationEmphasis; easing.type: Easing.OutCubic } } }
             layer.enabled: actionFadeAnim.running || actionScaleAnim.running
 
             // Layer 1: Base
             Rectangle {
               id: baseLayer
               anchors.fill: parent
-              radius: Colors.radiusLarge
+              radius: Appearance.radiusLarge
               color: Colors.cardSurface
               border.color: actionItem.isFocused ? actionItem.actionColor : Colors.border
               border.width: actionItem.isFocused ? 3 : 1
@@ -233,23 +233,23 @@ PanelWindow {
             // Layer 2: Pending indicator (circular progress-like)
             Rectangle {
               anchors.fill: parent
-              radius: Colors.radiusLarge
+              radius: Appearance.radiusLarge
               color: actionItem.actionColor
               opacity: actionItem.isPending ? 0.15 : 0.0
-              Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+              Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
             }
 
             ColumnLayout {
               anchors.centerIn: parent
-              spacing: Colors.spacingM
+              spacing: Appearance.spacingM
               Item {
-                width: Colors.iconSizeLarge; height: Colors.iconSizeLarge
+                width: Appearance.iconSizeLarge; height: Appearance.iconSizeLarge
                 Layout.alignment: Qt.AlignHCenter
                 Text {
                   anchors.centerIn: parent
                   text: isPending ? Math.ceil(root.timeRemaining / 1000).toString() : modelData.icon
                   color: actionItem.isFocused ? Colors.text : actionItem.actionColor
-                  font.family: isPending ? "" : Colors.fontMono
+                  font.family: isPending ? "" : Appearance.fontMono
                   font.pixelSize: isPending ? 32 : 44
                   font.weight: isPending ? Font.Bold : Font.Normal
                   Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
@@ -258,7 +258,7 @@ PanelWindow {
               Text {
                 text: modelData.label
                 color: actionItem.isFocused ? Colors.text : Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: actionItem.isFocused ? Font.Bold : Font.Medium
                 Layout.alignment: Qt.AlignHCenter
                 Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
@@ -279,7 +279,7 @@ PanelWindow {
 
       Rectangle {
         Layout.alignment: Qt.AlignHCenter
-        width: 300; height: 40; radius: Colors.radiusLarge
+        width: 300; height: 40; radius: Appearance.radiusLarge
         color: Colors.cardSurface
         visible: root.timerActive
         border.color: Colors.border
@@ -289,7 +289,7 @@ PanelWindow {
           anchors.centerIn: parent
           text: "Click again to confirm, ESC to cancel"
           color: Colors.text
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           font.weight: Font.Medium
         }
       }
@@ -298,7 +298,7 @@ PanelWindow {
         visible: !root.timerActive
         text: "Press ESC to cancel"
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         Layout.alignment: Qt.AlignHCenter
       }
     }

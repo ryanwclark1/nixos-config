@@ -10,8 +10,8 @@ Rectangle {
     signal resetAllRequested()
 
     Layout.fillWidth: true
-    implicitHeight: overviewColumn.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: overviewColumn.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.modalFieldSurface
     border.color: Colors.border
     border.width: 1
@@ -19,13 +19,13 @@ Rectangle {
     ColumnLayout {
         id: overviewColumn
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         Text {
             text: "Overview"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
         }
 
@@ -63,7 +63,7 @@ Rectangle {
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SettingsActionButton {
                 compact: true

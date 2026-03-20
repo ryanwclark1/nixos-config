@@ -107,14 +107,14 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: root.compactMode ? Colors.spacingS : Colors.spacingL
-        spacing: Colors.spacingS
+        anchors.margins: root.compactMode ? Appearance.spacingS : Appearance.spacingL
+        spacing: Appearance.spacingS
 
         // --- Header Section ---
         Item {
             visible: !root.compactMode
             Layout.fillWidth: true
-            implicitHeight: navHeaderColumn.implicitHeight + Colors.spacingS
+            implicitHeight: navHeaderColumn.implicitHeight + Appearance.spacingS
 
             ColumnLayout {
                 id: navHeaderColumn
@@ -146,16 +146,16 @@ Rectangle {
             visible: !root.compactMode
             Layout.fillWidth: true
             implicitHeight: 36
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: Colors.withAlpha(Colors.surface, searchInput.activeFocus ? 0.25 : 0.12)
             border.color: searchInput.activeFocus ? Colors.primary : Colors.withAlpha(Colors.text, 0.06)
             border.width: 1
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingS
-                spacing: Colors.spacingS
+                anchors.leftMargin: Appearance.spacingM
+                anchors.rightMargin: Appearance.spacingS
+                spacing: Appearance.spacingS
 
                 SvgIcon {
                     source: "search-visual.svg"
@@ -168,7 +168,7 @@ Rectangle {
                     id: searchInput
                     Layout.fillWidth: true
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     clip: true
                     verticalAlignment: TextInput.AlignVCenter
                     onVisibleChanged: {
@@ -220,8 +220,8 @@ Rectangle {
             Layout.fillWidth: true
             height: 1
             color: Colors.withAlpha(Colors.text, 0.04)
-            Layout.topMargin: Colors.spacingS
-            Layout.bottomMargin: Colors.spacingS
+            Layout.topMargin: Appearance.spacingS
+            Layout.bottomMargin: Appearance.spacingS
         }
 
         Item {
@@ -244,7 +244,7 @@ Rectangle {
                     id: compactColumn
                     visible: root.compactMode
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Repeater {
                         model: root.compactEntries
@@ -259,7 +259,7 @@ Rectangle {
                                 visible: modelData.type === "tab"
                                 width: 42
                                 height: 42
-                                radius: Colors.radiusLarge
+                                radius: Appearance.radiusLarge
                                 color: root.currentTabId === modelData.id ? Colors.primarySubtle : Colors.withAlpha(Colors.surface, compactTabMouse.containsMouse ? 0.45 : 0.28)
                                 border.color: root.currentTabId === modelData.id ? Colors.primaryRing : Colors.withAlpha(Colors.text, 0.1)
                                 border.width: 1
@@ -288,8 +288,8 @@ Rectangle {
                                     property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
                                     sourceComponent: _ic.endsWith(".svg") ? _cSvg1 : _cNerd1
                                 }
-                                Component { id: _cSvg1; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeLarge } }
-                                Component { id: _cNerd1; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
+                                Component { id: _cSvg1; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeLarge } }
+                                Component { id: _cNerd1; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
 
                                 MouseArea {
                                     id: compactTabMouse
@@ -306,7 +306,7 @@ Rectangle {
 
                             Column {
                                 anchors.centerIn: parent
-                                spacing: Colors.spacingXXS
+                                spacing: Appearance.spacingXXS
                                 visible: modelData.type === "separator"
 
                                 Loader {
@@ -315,8 +315,8 @@ Rectangle {
                                     property color _co: Colors.withAlpha(Colors.textDisabled, 0.85)
                                     sourceComponent: _ic.endsWith(".svg") ? _cSvg2 : _cNerd2
                                 }
-                                Component { id: _cSvg2; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeSmall } }
-                                Component { id: _cNerd2; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall } }
+                                Component { id: _cSvg2; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeSmall } }
+                                Component { id: _cNerd2; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }
 
                                 Rectangle {
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -333,21 +333,21 @@ Rectangle {
                     id: sidebarColumn
                     visible: !root.compactMode
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXS
+                        spacing: Appearance.spacingXS
                         visible: root.isSearching
 
                         Text {
                             visible: root.searchResults.length > 0
                             text: "PAGES"
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXXS
+                            font.pixelSize: Appearance.fontSizeXXS
                             font.weight: Font.Black
-                            font.letterSpacing: Colors.letterSpacingExtraWide
-                            Layout.leftMargin: Colors.spacingXS
+                            font.letterSpacing: Appearance.letterSpacingExtraWide
+                            Layout.leftMargin: Appearance.spacingXS
                         }
 
                         Repeater {
@@ -357,8 +357,8 @@ Rectangle {
                                 required property var modelData
 
                                 Layout.fillWidth: true
-                                implicitHeight: resultColumn.implicitHeight + Colors.spacingS * 2
-                                radius: Colors.radiusLarge
+                                implicitHeight: resultColumn.implicitHeight + Appearance.spacingS * 2
+                                radius: Appearance.radiusLarge
                                 color: root.currentTabId === modelData.id ? Colors.primarySubtle : Colors.withAlpha(Colors.surface, resultMouse.containsMouse ? 0.48 : 0.3)
                                 border.color: root.currentTabId === modelData.id ? Colors.primaryRing : Colors.withAlpha(Colors.text, 0.08)
                                 border.width: 1
@@ -383,28 +383,28 @@ Rectangle {
                                 ColumnLayout {
                                     id: resultColumn
                                     anchors.fill: parent
-                                    anchors.leftMargin: Colors.spacingL
-                                    anchors.rightMargin: Colors.spacingM
-                                    anchors.topMargin: Colors.spacingS
-                                    anchors.bottomMargin: Colors.spacingS
-                                    spacing: Colors.spacingXXS
+                                    anchors.leftMargin: Appearance.spacingL
+                                    anchors.rightMargin: Appearance.spacingM
+                                    anchors.topMargin: Appearance.spacingS
+                                    anchors.bottomMargin: Appearance.spacingS
+                                    spacing: Appearance.spacingXXS
 
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        spacing: Colors.spacingM
+                                        spacing: Appearance.spacingM
 
                                         Loader {
                                             property string _ic: modelData.icon
                                             property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
                                             sourceComponent: _ic.endsWith(".svg") ? _cSvg3 : _cNerd3
                                         }
-                                        Component { id: _cSvg3; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeMedium } }
-                                        Component { id: _cNerd3; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium } }
+                                        Component { id: _cSvg3; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeMedium } }
+                                        Component { id: _cNerd3; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium } }
 
                                         Text {
                                             text: modelData.label
                                             color: root.currentTabId === modelData.id ? Colors.text : Colors.textSecondary
-                                            font.pixelSize: Colors.fontSizeSmall
+                                            font.pixelSize: Appearance.fontSizeSmall
                                             font.weight: root.currentTabId === modelData.id ? Font.Bold : Font.DemiBold
                                             Layout.fillWidth: true
                                             wrapMode: Text.WordWrap
@@ -415,7 +415,7 @@ Rectangle {
                                         Layout.fillWidth: true
                                         text: root.tabSearchSubtitle(modelData)
                                         color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         wrapMode: Text.WordWrap
                                         visible: !!text
                                     }
@@ -438,11 +438,11 @@ Rectangle {
                             visible: root.settingResults.length > 0
                             text: "SETTINGS"
                             color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXXS
+                            font.pixelSize: Appearance.fontSizeXXS
                             font.weight: Font.Black
-                            font.letterSpacing: Colors.letterSpacingExtraWide
-                            Layout.topMargin: Colors.spacingS
-                            Layout.leftMargin: Colors.spacingXS
+                            font.letterSpacing: Appearance.letterSpacingExtraWide
+                            Layout.topMargin: Appearance.spacingS
+                            Layout.leftMargin: Appearance.spacingXS
                         }
 
                         Repeater {
@@ -452,8 +452,8 @@ Rectangle {
                                 required property var modelData
 
                                 Layout.fillWidth: true
-                                implicitHeight: settingResultCol.implicitHeight + Colors.spacingS * 2
-                                radius: Colors.radiusLarge
+                                implicitHeight: settingResultCol.implicitHeight + Appearance.spacingS * 2
+                                radius: Appearance.radiusLarge
                                 color: Colors.withAlpha(Colors.surface, settingResultMouse.containsMouse ? 0.48 : 0.28)
                                 border.color: Colors.withAlpha(Colors.text, 0.08)
                                 border.width: 1
@@ -469,16 +469,16 @@ Rectangle {
                                 ColumnLayout {
                                     id: settingResultCol
                                     anchors.fill: parent
-                                    anchors.leftMargin: Colors.spacingL
-                                    anchors.rightMargin: Colors.spacingM
-                                    anchors.topMargin: Colors.spacingS
-                                    anchors.bottomMargin: Colors.spacingS
-                                    spacing: Colors.spacingXXS
+                                    anchors.leftMargin: Appearance.spacingL
+                                    anchors.rightMargin: Appearance.spacingM
+                                    anchors.topMargin: Appearance.spacingS
+                                    anchors.bottomMargin: Appearance.spacingS
+                                    spacing: Appearance.spacingXXS
 
                                     Text {
                                         text: modelData.label
                                         color: Colors.text
-                                        font.pixelSize: Colors.fontSizeSmall
+                                        font.pixelSize: Appearance.fontSizeSmall
                                         font.weight: Font.DemiBold
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
@@ -491,7 +491,7 @@ Rectangle {
                                             return tabLabel + " > " + modelData.cardTitle;
                                         }
                                         color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
                                     }
@@ -513,22 +513,22 @@ Rectangle {
                         Rectangle {
                             visible: root.searchResults.length === 0 && root.settingResults.length === 0
                             Layout.fillWidth: true
-                            radius: Colors.radiusLarge
+                            radius: Appearance.radiusLarge
                             color: Colors.withAlpha(Colors.surface, 0.3)
                             border.color: Colors.withAlpha(Colors.text, 0.08)
                             border.width: 1
-                            implicitHeight: emptyColumn.implicitHeight + Colors.spacingM * 2
+                            implicitHeight: emptyColumn.implicitHeight + Appearance.spacingM * 2
 
                             ColumnLayout {
                                 id: emptyColumn
                                 anchors.fill: parent
-                                anchors.margins: Colors.spacingM
-                                spacing: Colors.spacingXS
+                                anchors.margins: Appearance.spacingM
+                                spacing: Appearance.spacingXS
 
                                 Text {
                                     text: "No matches"
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.pixelSize: Appearance.fontSizeMedium
                                     font.weight: Font.Bold
                                 }
 
@@ -536,7 +536,7 @@ Rectangle {
                                     Layout.fillWidth: true
                                     text: "Try a tab name, category, or the label of a setting."
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     wrapMode: Text.WordWrap
                                 }
                             }
@@ -557,9 +557,9 @@ Rectangle {
 
                             Rectangle {
                                 Layout.fillWidth: true
-                                radius: Colors.radiusMedium
+                                radius: Appearance.radiusMedium
                                 color: categoryMouse.containsMouse ? Colors.withAlpha(Colors.surface, 0.1) : "transparent"
-                                implicitHeight: Colors.controlRowHeight
+                                implicitHeight: Appearance.controlRowHeight
 
                                 SharedWidgets.StateLayer {
                                     id: categoryState
@@ -572,9 +572,9 @@ Rectangle {
 
                                 RowLayout {
                                     anchors.fill: parent
-                                    anchors.leftMargin: Colors.spacingM
-                                    anchors.rightMargin: Colors.spacingM
-                                    spacing: Colors.spacingS
+                                    anchors.leftMargin: Appearance.spacingM
+                                    anchors.rightMargin: Appearance.spacingM
+                                    spacing: Appearance.spacingS
 
                                     Loader {
                                         property string _ic: modelData.icon
@@ -583,7 +583,7 @@ Rectangle {
                                         sourceComponent: _ic.endsWith(".svg") ? _cSvg4 : _cNerd4
                                     }
                                     Component { id: _cSvg4; SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
-                                    Component { id: _cNerd4; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: 14 } }
+                                    Component { id: _cNerd4; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: 14 } }
 
                                     Text {
                                         text: modelData.label.toUpperCase()
@@ -597,8 +597,8 @@ Rectangle {
                                     Text {
                                         text: expanded ? "󰅀" : "󰅂"
                                         color: Colors.textDisabled
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeCaption
+                                        font.family: Appearance.fontMono
+                                        font.pixelSize: Appearance.fontSizeCaption
                                         opacity: 0.4
                                     }
                                 }
@@ -630,7 +630,7 @@ Rectangle {
 
                                         Layout.fillWidth: true
                                         implicitHeight: 34
-                                        radius: Colors.radiusMedium
+                                        radius: Appearance.radiusMedium
                                         color: root.currentTabId === modelData.id ? Colors.withAlpha(Colors.primary, 0.1) : (tabMouse.containsMouse ? Colors.withAlpha(Colors.surface, 0.08) : "transparent")
 
                                         Rectangle {
@@ -655,9 +655,9 @@ Rectangle {
 
                                         RowLayout {
                                             anchors.fill: parent
-                                            anchors.leftMargin: Colors.spacingXL
-                                            anchors.rightMargin: Colors.spacingM
-                                            spacing: Colors.spacingM
+                                            anchors.leftMargin: Appearance.spacingXL
+                                            anchors.rightMargin: Appearance.spacingM
+                                            spacing: Appearance.spacingM
 
                                             Loader {
                                                 property string _ic: modelData.icon
@@ -666,12 +666,12 @@ Rectangle {
                                                 sourceComponent: _ic.endsWith(".svg") ? _cSvg5 : _cNerd5
                                             }
                                             Component { id: _cSvg5; SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
-                                            Component { id: _cNerd5; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: 14 } }
+                                            Component { id: _cNerd5; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: 14 } }
 
                                             Text {
                                                 text: modelData.label
                                                 color: root.currentTabId === modelData.id ? Colors.text : Colors.textSecondary
-                                                font.pixelSize: Colors.fontSizeSmall
+                                                font.pixelSize: Appearance.fontSizeSmall
                                                 font.weight: root.currentTabId === modelData.id ? Font.Bold : Font.Normal
                                                 Layout.fillWidth: true
                                             }
@@ -707,12 +707,12 @@ Rectangle {
             ColumnLayout {
                 id: footerColumn
                 anchors.fill: parent
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: Colors.controlRowHeight
-                    radius: Colors.radiusMedium
+                    implicitHeight: Appearance.controlRowHeight
+                    radius: Appearance.radiusMedium
                     color: saveMouse.containsMouse ? Colors.primary : Colors.primaryAccent
                     border.color: Colors.withAlpha(Colors.primary, 0.5)
                     border.width: 1
@@ -730,7 +730,7 @@ Rectangle {
                     RowLayout {
                         id: saveButtonRow
                         anchors.centerIn: parent
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         SvgIcon {
                             source: "save.svg"

@@ -5,7 +5,7 @@ Item {
     id: root
     property bool reveal: false
     property bool vertical: true
-    property int animDuration: Colors.durationMedium
+    property int animDuration: Appearance.durationMedium
     clip: true
 
     default property alias content: root.data

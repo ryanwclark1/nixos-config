@@ -14,7 +14,7 @@ Rectangle {
     
     signal closeRequested()
 
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     color: Colors.withAlpha(Colors.surface, 0.98)
     border.color: Colors.border
     border.width: 1
@@ -27,15 +27,15 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Colors.paddingMedium
-        spacing: Colors.spacingM
+        anchors.margins: Appearance.paddingMedium
+        spacing: Appearance.spacingM
 
         RowLayout {
             Layout.fillWidth: true
             Text { 
                 text: "󰆍  " + root.title 
                 color: Colors.primary
-                font.pixelSize: Colors.fontSizeLarge
+                font.pixelSize: Appearance.fontSizeLarge
                 font.weight: Font.Bold
             }
             Item { Layout.fillWidth: true }
@@ -51,7 +51,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: Colors.withAlpha(Colors.background, 0.4)
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             border.color: Colors.border
             border.width: 1
             clip: true
@@ -68,8 +68,8 @@ Rectangle {
                     id: logText
                     width: parent.width
                     color: Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
                     wrapMode: Text.WrapAnywhere
                     text: ""
                     

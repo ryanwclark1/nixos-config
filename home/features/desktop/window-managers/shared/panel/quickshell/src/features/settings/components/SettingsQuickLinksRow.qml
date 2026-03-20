@@ -15,7 +15,7 @@ Flow {
     signal tabRequested(string tabId)
 
     width: parent ? parent.width : implicitWidth
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
     visible: (tabsModel || []).length > 0
 
     Repeater {
@@ -26,41 +26,41 @@ Flow {
 
             readonly property bool selected: String(modelData.id || "") === root.currentTabId
 
-            radius: Colors.radiusPill
+            radius: Appearance.radiusPill
             color: selected ? Colors.primarySubtle : Colors.modalFieldSurface
             border.color: selected ? Colors.primaryRing : Colors.border
             border.width: 1
             implicitHeight: 30
-            implicitWidth: chipRow.implicitWidth + Colors.spacingM * 2
+            implicitWidth: chipRow.implicitWidth + Appearance.spacingM * 2
 
             Behavior on color {
                 enabled: !Colors.isTransitioning
-                ColorAnimation { duration: Colors.durationFast }
+                ColorAnimation { duration: Appearance.durationFast }
             }
 
             RowLayout {
                 id: chipRow
                 anchors.centerIn: parent
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 SharedWidgets.SvgIcon {
                     visible: (modelData.icon || "").endsWith(".svg")
                     source: visible ? (modelData.icon || "") : ""
                     color: selected ? Colors.primary : Colors.textSecondary
-                    size: Colors.fontSizeXS
+                    size: Appearance.fontSizeXS
                 }
                 Text {
                     visible: !!(modelData.icon || "") && !(modelData.icon || "").endsWith(".svg")
                     text: modelData.icon || ""
                     color: selected ? Colors.primary : Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
                 }
 
                 Text {
                     text: modelData.shortLabel || modelData.label || ""
                     color: selected ? Colors.text : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: selected ? Font.Bold : Font.DemiBold
                 }
             }

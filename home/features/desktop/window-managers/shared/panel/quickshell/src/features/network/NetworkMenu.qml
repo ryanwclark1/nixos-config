@@ -40,7 +40,7 @@ BasePopupMenu {
     Rectangle {
       implicitWidth: wifiStatusLabel.implicitWidth + 20
       height: 28
-      radius: Colors.radiusMedium
+      radius: Appearance.radiusMedium
       color: NetworkService.wifiRadioEnabled ? Colors.primaryMid : Colors.chipSurface
       border.color: NetworkService.wifiRadioEnabled ? Colors.primary : Colors.border
       border.width: 1
@@ -49,7 +49,7 @@ BasePopupMenu {
         anchors.centerIn: parent
         text: !NetworkService.wifiDeviceAvailable ? "No Wi-Fi" : (NetworkService.wifiRadioEnabled ? "Wi-Fi Radio On" : "Wi-Fi Radio Off")
         color: NetworkService.wifiRadioEnabled ? Colors.primary : Colors.textSecondary
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         font.weight: Font.Medium
       }
       MouseArea {
@@ -82,13 +82,13 @@ BasePopupMenu {
 
       Column {
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingXS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingXS
         SharedWidgets.SectionLabel { label: modelData.label }
         Text {
           text: modelData.value
           color: Colors.text
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           font.weight: Font.Medium
           width: parent.width
           wrapMode: Text.WrapAnywhere
@@ -105,12 +105,12 @@ BasePopupMenu {
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.spacingM
+    columnSpacing: Appearance.spacingM
 
         // ── NETWORK SUMMARY CARD ──────────────────────────────────────────────
         Rectangle {
           Layout.fillWidth: true
-          radius: Colors.radiusMedium
+          radius: Appearance.radiusMedium
           color: root.isOffline ? Colors.cardSurface : Colors.primaryGhost
           border.color: root.isOffline ? Colors.border : Colors.primarySubtle
           border.width: 1
@@ -121,19 +121,19 @@ BasePopupMenu {
             anchors {
               left: parent.left; right: parent.right
               verticalCenter: parent.verticalCenter
-              margins: Colors.spacingL
+              margins: Appearance.spacingL
             }
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             RowLayout {
               Layout.fillWidth: true
-              spacing: Colors.spacingL
+              spacing: Appearance.spacingL
 
               Text {
                 text: NetworkService.networkIcon()
                 color: root.isOffline ? Colors.textDisabled : Colors.primary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeHuge
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeHuge
                 Layout.alignment: Qt.AlignVCenter
               }
 
@@ -143,7 +143,7 @@ BasePopupMenu {
                 Text {
                   text: NetworkService.activePrimaryName
                   color: root.isOffline ? Colors.textSecondary : Colors.text
-                  font.pixelSize: Colors.fontSizeLarge
+                  font.pixelSize: Appearance.fontSizeLarge
                   font.weight: Font.DemiBold
                   Layout.fillWidth: true
                   elide: Text.ElideRight
@@ -151,7 +151,7 @@ BasePopupMenu {
                 Text {
                   text: NetworkService.networkSubtitle()
                   color: Colors.textDisabled
-                  font.pixelSize: Colors.fontSizeSmall
+                  font.pixelSize: Appearance.fontSizeSmall
                   font.weight: Font.Medium
                   Layout.fillWidth: true
                   elide: Text.ElideRight
@@ -177,7 +177,7 @@ BasePopupMenu {
                         ? "Disconnect Wi-Fi"
                         : (root.primaryIsEthernet ? "Disconnect Ethernet" : "Disconnect"))
                   color: root.isOffline ? Colors.primary : Colors.error
-                  font.pixelSize: Colors.fontSizeXS
+                  font.pixelSize: Appearance.fontSizeXS
                   font.weight: Font.Bold
                   font.capitalization: Font.AllUppercase
                 }
@@ -206,38 +206,38 @@ BasePopupMenu {
             Flow {
               Layout.fillWidth: true
               width: parent.width
-              spacing: Colors.spacingS
+              spacing: Appearance.spacingS
 
               Rectangle {
                 visible: NetworkService.primaryDevice !== ""
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
                 implicitWidth: deviceLabel.implicitWidth + 16
                 implicitHeight: 22
-                Text { id: deviceLabel; anchors.centerIn: parent; text: NetworkService.primaryDevice.toUpperCase(); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
+                Text { id: deviceLabel; anchors.centerIn: parent; text: NetworkService.primaryDevice.toUpperCase(); color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
               }
 
               Rectangle {
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
                 implicitWidth: reachabilityLabel.implicitWidth + 16
                 implicitHeight: 22
-                Text { id: reachabilityLabel; anchors.centerIn: parent; text: NetworkService.connectivityStatus.toUpperCase(); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
+                Text { id: reachabilityLabel; anchors.centerIn: parent; text: NetworkService.connectivityStatus.toUpperCase(); color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold; font.capitalization: Font.AllUppercase }
               }
 
               Rectangle {
                 visible: NetworkService.primarySignal !== ""
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
                 implicitWidth: signalLabel.implicitWidth + 16
                 implicitHeight: 22
-                Text { id: signalLabel; anchors.centerIn: parent; text: NetworkService.signalIcon(NetworkService.primarySignal) + " " + NetworkService.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold; font.family: Colors.fontMono }
+                Text { id: signalLabel; anchors.centerIn: parent; text: NetworkService.signalIcon(NetworkService.primarySignal) + " " + NetworkService.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold; font.family: Appearance.fontMono }
               }
             }
           }
@@ -245,14 +245,14 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
           SharedWidgets.SectionLabel { label: "Overview" }
 
           GridLayout {
             Layout.fillWidth: true
             columns: root.detailColumns
-            columnSpacing: Colors.paddingSmall
-            rowSpacing: Colors.paddingSmall
+            columnSpacing: Appearance.paddingSmall
+            rowSpacing: Appearance.paddingSmall
 
             Repeater {
               model: [
@@ -268,15 +268,15 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
 
           SharedWidgets.SectionLabel { label: "Internet" }
 
           GridLayout {
             Layout.fillWidth: true
             columns: root.detailColumns
-            columnSpacing: Colors.paddingSmall
-            rowSpacing: Colors.paddingSmall
+            columnSpacing: Appearance.paddingSmall
+            rowSpacing: Appearance.paddingSmall
 
             Repeater {
               model: [
@@ -292,7 +292,7 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
 
           SharedWidgets.SectionLabel { label: "Live Traffic" }
           NetworkGraphs { Layout.fillWidth: true }
@@ -300,7 +300,7 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
           visible: NetworkService.tailscaleInstalled || NetworkService.vpnHasSavedProfiles
 
           SharedWidgets.SectionLabel { label: "VPN Hub" }
@@ -308,22 +308,22 @@ BasePopupMenu {
           Rectangle {
             Layout.fillWidth: true
             implicitHeight: 72
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
 
             RowLayout {
               anchors.fill: parent
-              anchors.margins: Colors.spacingM
-              spacing: Colors.spacingS
+              anchors.margins: Appearance.spacingM
+              spacing: Appearance.spacingS
 
               Text {
                 text: "󰖂"
                 color: NetworkService.vpnPrimaryStatus === "connected" ? Colors.success
                   : (NetworkService.vpnPrimaryStatus === "stopped" ? Colors.warning : Colors.textSecondary)
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXL
               }
 
               ColumnLayout {
@@ -333,7 +333,7 @@ BasePopupMenu {
                 Text {
                   text: "Tailscale"
                   color: Colors.text
-                  font.pixelSize: Colors.fontSizeMedium
+                  font.pixelSize: Appearance.fontSizeMedium
                   font.weight: Font.DemiBold
                 }
 
@@ -342,7 +342,7 @@ BasePopupMenu {
                     + (NetworkService.vpnOtherCount > 0 ? " \u2022 " + (NetworkService.vpnOtherCount === 1 ? "1 active profile" : NetworkService.vpnOtherCount + " active profiles") : "")
                     + (NetworkService.vpnInactiveCount > 0 ? " \u2022 " + (NetworkService.vpnInactiveCount === 1 ? "1 saved profile" : NetworkService.vpnInactiveCount + " saved profiles") : "")
                   color: Colors.textSecondary
-                  font.pixelSize: Colors.fontSizeXS
+                  font.pixelSize: Appearance.fontSizeXS
                   Layout.fillWidth: true
                   elide: Text.ElideRight
                 }
@@ -351,7 +351,7 @@ BasePopupMenu {
               Rectangle {
                 width: 86
                 height: 28
-                radius: Colors.radiusMedium
+                radius: Appearance.radiusMedium
                 color: Colors.primaryAccent
                 border.color: Colors.primary
                 border.width: 1
@@ -360,7 +360,7 @@ BasePopupMenu {
                   anchors.centerIn: parent
                   text: "Open Hub"
                   color: Colors.primary
-                  font.pixelSize: Colors.fontSizeSmall
+                  font.pixelSize: Appearance.fontSizeSmall
                   font.weight: Font.Medium
                 }
               }
@@ -377,7 +377,7 @@ BasePopupMenu {
         Rectangle {
           Layout.fillWidth: true
           implicitHeight: 40
-          radius: Colors.radiusMedium
+          radius: Appearance.radiusMedium
           color: Colors.cardSurface
           border.color: detailsMouse.containsMouse ? Colors.primary : Colors.border
           border.width: 1
@@ -385,22 +385,22 @@ BasePopupMenu {
 
           RowLayout {
             anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.spacingS
+            anchors.margins: Appearance.spacingM
+            spacing: Appearance.spacingS
 
             Text {
               text: root.showAdvanced ? "󰅂" : "󰅀"
               color: detailsMouse.containsMouse ? Colors.primary : Colors.textSecondary
               Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeLarge
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeLarge
             }
 
             Text {
               text: root.showAdvanced ? "Hide technical details" : "Show technical details"
               color: detailsMouse.containsMouse ? Colors.primary : Colors.text
               Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-              font.pixelSize: Colors.fontSizeSmall
+              font.pixelSize: Appearance.fontSizeSmall
               font.weight: Font.Medium
             }
 
@@ -409,7 +409,7 @@ BasePopupMenu {
             Text {
               text: root.showAdvanced ? "Less" : "More"
               color: Colors.textSecondary
-              font.pixelSize: Colors.fontSizeXS
+              font.pixelSize: Appearance.fontSizeXS
             }
           }
 
@@ -425,7 +425,7 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
           visible: root.showAdvanced
 
           SharedWidgets.SectionLabel { label: "Technical Details" }
@@ -433,8 +433,8 @@ BasePopupMenu {
           GridLayout {
             Layout.fillWidth: true
             columns: root.detailColumns
-            columnSpacing: Colors.paddingSmall
-            rowSpacing: Colors.paddingSmall
+            columnSpacing: Appearance.paddingSmall
+            rowSpacing: Appearance.paddingSmall
 
             Repeater {
               model: [
@@ -452,7 +452,7 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
           visible: root.showAdvanced && NetworkService.activeConnections.length > 0
 
           SharedWidgets.SectionLabel { label: "Active Connections" }
@@ -462,26 +462,26 @@ BasePopupMenu {
             delegate: Rectangle {
               Layout.fillWidth: true
               implicitHeight: 42
-              radius: Colors.radiusMedium
+              radius: Appearance.radiusMedium
               color: Colors.cardSurface
               border.color: Colors.border
               border.width: 1
 
               RowLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.paddingSmall
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.paddingSmall
                 Text {
                   text: modelData.type === "802-3-ethernet" || modelData.type === "ethernet" ? "󰈀" : (modelData.type === "wifi" || modelData.type === "802-11-wireless" ? "󰖩" : "󰖂")
                   color: Colors.primary
-                  font.family: Colors.fontMono
-                  font.pixelSize: Colors.fontSizeLarge
+                  font.family: Appearance.fontMono
+                  font.pixelSize: Appearance.fontSizeLarge
                 }
                 ColumnLayout {
                   Layout.fillWidth: true
                   spacing: 0
-                  Text { text: modelData.name; color: Colors.text; font.pixelSize: Colors.fontSizeMedium; Layout.fillWidth: true; elide: Text.ElideRight }
-                  Text { text: (modelData.device || "") + (modelData.type ? " \u2022 " + modelData.type : ""); color: Colors.textSecondary; font.pixelSize: Colors.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
+                  Text { text: modelData.name; color: Colors.text; font.pixelSize: Appearance.fontSizeMedium; Layout.fillWidth: true; elide: Text.ElideRight }
+                  Text { text: (modelData.device || "") + (modelData.type ? " \u2022 " + modelData.type : ""); color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXS; Layout.fillWidth: true; elide: Text.ElideRight }
                 }
               }
             }
@@ -490,25 +490,25 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
 
           SharedWidgets.SectionLabel { label: "Available Networks" }
           Text {
             text: NetworkService.wifiNetworks.length === 0 ? "No nearby networks right now" : "Select a network to connect or disconnect"
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
           }
 
           Repeater {
             model: NetworkService.wifiNetworks
             delegate: ColumnLayout {
               width: parent.width
-              spacing: Colors.spacingS
+              spacing: Appearance.spacingS
 
               Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 46
-                radius: Colors.radiusMedium
+                radius: Appearance.radiusMedium
                 color: networkMouse.containsMouse
                   ? Colors.primarySubtle
                   : (modelData.active ? Colors.primaryStrong : Colors.cardSurface)
@@ -519,14 +519,14 @@ BasePopupMenu {
 
                 RowLayout {
                   anchors.fill: parent
-                  anchors.margins: Colors.spacingM
-                  spacing: Colors.paddingSmall
+                  anchors.margins: Appearance.spacingM
+                  spacing: Appearance.paddingSmall
 
                   Text {
                     text: modelData.active ? "󰄬" : NetworkService.signalIcon(modelData.signal)
                     color: modelData.active ? Colors.primary : Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
                   }
 
                   ColumnLayout {
@@ -535,7 +535,7 @@ BasePopupMenu {
                     Text {
                       text: modelData.ssid
                       color: Colors.text
-                      font.pixelSize: Colors.fontSizeMedium
+                      font.pixelSize: Appearance.fontSizeMedium
                       font.weight: modelData.active ? Font.DemiBold : Font.Normal
                       Layout.fillWidth: true
                       elide: Text.ElideRight
@@ -543,7 +543,7 @@ BasePopupMenu {
                     Text {
                       text: (modelData.security || "open") + " \u2022 " + (modelData.signal || "0") + "%"
                       color: Colors.textSecondary
-                      font.pixelSize: Colors.fontSizeXS
+                      font.pixelSize: Appearance.fontSizeXS
                       Layout.fillWidth: true
                       elide: Text.ElideRight
                     }
@@ -552,7 +552,7 @@ BasePopupMenu {
                   Text {
                     text: modelData.active ? "Connected" : "Connect"
                     color: modelData.active ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                   }
                 }
@@ -578,7 +578,7 @@ BasePopupMenu {
                 Layout.fillWidth: true
                 visible: root.selectedSSID === modelData.ssid
                 implicitHeight: visible ? 48 : 0
-                radius: Colors.radiusMedium
+                radius: Appearance.radiusMedium
                 color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
@@ -586,10 +586,10 @@ BasePopupMenu {
                 TextInput {
                   id: passwordInput
                   anchors.fill: parent
-                  anchors.margins: Colors.spacingM
+                  anchors.margins: Appearance.spacingM
                   verticalAlignment: Text.AlignVCenter
                   color: Colors.text
-                  font.pixelSize: Colors.fontSizeMedium
+                  font.pixelSize: Appearance.fontSizeMedium
                   echoMode: TextInput.Password
                   onVisibleChanged: {
                     if (visible) forceActiveFocus();
@@ -604,12 +604,12 @@ BasePopupMenu {
 
                 Text {
                   anchors.fill: parent
-                  anchors.leftMargin: Colors.spacingM
-                  anchors.rightMargin: Colors.spacingM
+                  anchors.leftMargin: Appearance.spacingM
+                  anchors.rightMargin: Appearance.spacingM
                   verticalAlignment: Text.AlignVCenter
                   text: "Enter Wi-Fi password and press Enter"
                   color: Colors.textDisabled
-                  font.pixelSize: Colors.fontSizeSmall
+                  font.pixelSize: Appearance.fontSizeSmall
                   visible: passwordInput.text === "" && !passwordInput.activeFocus
                 }
               }
@@ -619,7 +619,7 @@ BasePopupMenu {
           Rectangle {
             Layout.fillWidth: true
             visible: NetworkService.wifiNetworks.length === 0
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
@@ -627,18 +627,18 @@ BasePopupMenu {
 
             Column {
               anchors.centerIn: parent
-              spacing: Colors.spacingXS
+              spacing: Appearance.spacingXS
               Text {
                 text: NetworkService.wifiDeviceAvailable ? (NetworkService.wifiRadioEnabled ? "󰤮" : "󰖪") : "󰤭"
                 color: Colors.textDisabled
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXL
                 anchors.horizontalCenter: parent.horizontalCenter
               }
               Text {
                 text: !NetworkService.wifiDeviceAvailable ? "No Wi-Fi device detected" : (NetworkService.wifiRadioEnabled ? "No Wi-Fi networks detected" : "Wi-Fi radio is turned off")
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 anchors.horizontalCenter: parent.horizontalCenter
               }
             }

@@ -18,7 +18,7 @@ Rectangle {
 
     implicitHeight: Math.max(compact ? 34 : 40, buttonRow.implicitHeight + (compact ? 12 : 14))
     implicitWidth: buttonRow.implicitWidth + (compact ? 18 : 24)
-    radius: compact ? Colors.radiusSmall : Colors.radiusMedium
+    radius: compact ? Appearance.radiusSmall : Appearance.radiusMedium
     color: root.emphasized ? Colors.primary : Colors.modalFieldSurface
     border.color: root.emphasized ? Colors.primary : Colors.border
     border.width: 1
@@ -44,15 +44,15 @@ Rectangle {
         anchors.rightMargin: compact ? 9 : 12
         anchors.topMargin: compact ? 6 : 7
         anchors.bottomMargin: compact ? 6 : 7
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Loader {
             visible: root.iconName !== ""
             sourceComponent: root.iconName.endsWith(".svg") ? _abSvg : _abNerd
             Layout.alignment: root.label === "" ? Qt.AlignHCenter | Qt.AlignVCenter : Qt.AlignVCenter
         }
-        Component { id: _abSvg; SvgIcon { source: root.iconName; color: root.emphasized ? Colors.text : Colors.textSecondary; size: root.compact ? Colors.fontSizeMedium : Colors.fontSizeLarge } }
-        Component { id: _abNerd; Text { text: root.iconName; color: root.emphasized ? Colors.text : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: root.compact ? Colors.fontSizeMedium : Colors.fontSizeLarge } }
+        Component { id: _abSvg; SvgIcon { source: root.iconName; color: root.emphasized ? Colors.text : Colors.textSecondary; size: root.compact ? Appearance.fontSizeMedium : Appearance.fontSizeLarge } }
+        Component { id: _abNerd; Text { text: root.iconName; color: root.emphasized ? Colors.text : Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: root.compact ? Appearance.fontSizeMedium : Appearance.fontSizeLarge } }
 
         Text {
             id: labelText
@@ -60,7 +60,7 @@ Rectangle {
             Layout.fillWidth: true
             text: root.label
             color: root.emphasized ? Colors.text : Colors.text
-            font.pixelSize: compact ? Colors.fontSizeSmall : Colors.fontSizeMedium
+            font.pixelSize: compact ? Appearance.fontSizeSmall : Appearance.fontSizeMedium
             font.weight: root.emphasized ? Font.Bold : Font.Medium
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter

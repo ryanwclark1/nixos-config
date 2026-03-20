@@ -14,7 +14,7 @@ Rectangle {
 
   Layout.fillWidth: true
   Layout.preferredHeight: 60
-  radius: Colors.radiusMedium
+  radius: Appearance.radiusMedium
   color: active ? Colors.primary : Colors.bgWidget
   border.color: active ? Colors.primary : Colors.border
   border.width: 1
@@ -38,14 +38,14 @@ Rectangle {
 
   opacity: enabled ? 1.0 : 0.4
   scale: toggleMouse.pressed ? 0.96 : 1.0
-  Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+  Behavior on scale { NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutBack } }
   Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
   Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
   RowLayout {
     anchors.fill: parent
-    anchors.margins: Colors.spacingM
-    spacing: Colors.spacingM
+    anchors.margins: Appearance.spacingM
+    spacing: Appearance.spacingM
 
     Rectangle {
       id: iconCircle
@@ -53,30 +53,30 @@ Rectangle {
       radius: height / 2
       color: active ? Colors.withAlpha(Colors.text, 0.2) : Colors.surface
       scale: toggleMouse.containsMouse ? 1.1 : 1.0
-      Behavior on scale { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
+      Behavior on scale { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack } }
 
       Loader {
         anchors.centerIn: parent
         sourceComponent: root.icon.endsWith(".svg") ? _qtSvg : _qtNerd
       }
-      Component { id: _qtSvg; SvgIcon { source: root.icon; color: active ? Colors.text : Colors.primary; size: Colors.fontSizeXL } }
-      Component { id: _qtNerd; Text { text: root.icon; color: active ? Colors.text : Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL } }
+      Component { id: _qtSvg; SvgIcon { source: root.icon; color: active ? Colors.text : Colors.primary; size: Appearance.fontSizeXL } }
+      Component { id: _qtNerd; Text { text: root.icon; color: active ? Colors.text : Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }
     }
 
     Column {
       Layout.fillWidth: true
-      spacing: Colors.spacingXXS
+      spacing: Appearance.spacingXXS
       Text {
         text: root.label
         color: Colors.text
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         font.weight: Font.Bold
         elide: Text.ElideRight
       }
       Text {
         text: active ? "On" : "Off"
         color: active ? Colors.withAlpha(Colors.text, 0.7) : Colors.textSecondary
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
       }
     }
 
@@ -84,10 +84,10 @@ Rectangle {
     Text {
       text: "󰐚"
       color: active ? Colors.withAlpha(Colors.text, 0.4) : Colors.textDisabled
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeSmall
+      font.family: Appearance.fontMono
+      font.pixelSize: Appearance.fontSizeSmall
       opacity: toggleMouse.containsMouse ? 1.0 : 0.0
-      Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+      Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
     }
   }
 

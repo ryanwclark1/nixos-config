@@ -51,8 +51,8 @@ Item {
 
     SequentialAnimation {
         id: bounceAnim
-        NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 0; duration: Colors.durationSnap; easing.type: Easing.OutQuad }
-        NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 4; duration: Colors.durationNormal; easing.type: Easing.OutBounce }
+        NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 0; duration: Appearance.durationSnap; easing.type: Easing.OutQuad }
+        NumberAnimation { target: iconContainer; property: root.vertical ? "x" : "y"; to: 4; duration: Appearance.durationNormal; easing.type: Easing.OutBounce }
     }
 
     onToplevelsChanged: {
@@ -113,16 +113,16 @@ Item {
         transform: Translate {
             x: root.vertical ? 0 : iconContainer.shiftMain
             y: root.vertical ? iconContainer.shiftMain : 0
-            Behavior on x { Anim { duration: Colors.durationFast } }
-            Behavior on y { Anim { duration: Colors.durationFast } }
+            Behavior on x { Anim { duration: Appearance.durationFast } }
+            Behavior on y { Anim { duration: Appearance.durationFast } }
         }
 
         Rectangle {
             anchors.fill: parent
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: "transparent"
             scale: mouseArea.containsMouse ? 1.15 : 1.0
-            Behavior on scale { NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutBack } }
+            Behavior on scale { NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutBack } }
 
             StateLayer {
                 hovered: mouseArea.containsMouse
@@ -233,7 +233,7 @@ Item {
             anchors.centerIn: parent
             text: root.toplevels.length
             color: Colors.background
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Bold
         }
     }

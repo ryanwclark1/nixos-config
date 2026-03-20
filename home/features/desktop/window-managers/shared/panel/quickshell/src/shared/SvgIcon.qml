@@ -12,7 +12,7 @@ Item {
     property bool colorize: color.a > 0 || _forceColorize
     property bool _forceColorize: false
     property string folder: "fluent"
-    property int size: Colors.iconSizeSmall
+    property int size: Appearance.iconSizeSmall
 
     // Support "brands/icon-name.svg" in source — auto-splits folder
     readonly property string _resolvedFolder: {

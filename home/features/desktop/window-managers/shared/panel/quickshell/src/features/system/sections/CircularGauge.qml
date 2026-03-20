@@ -25,8 +25,8 @@ Item {
       anchors.centerIn: parent
       horizontalAlignment: Text.AlignHCenter
       verticalAlignment: Text.AlignVCenter
-      font.family: Colors.fontMono
-      font.pixelSize: Math.max(Colors.fontSizeSmall, innerContent.width * 0.42)
+      font.family: Appearance.fontMono
+      font.pixelSize: Math.max(Appearance.fontSizeSmall, innerContent.width * 0.42)
       color: root.color
     }
   }

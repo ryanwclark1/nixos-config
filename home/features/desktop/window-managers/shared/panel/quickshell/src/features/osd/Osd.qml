@@ -295,7 +295,7 @@ Scope {
         Rectangle {
           id: content
           anchors.fill: parent
-          radius: root.isCriticalAlert ? Colors.radiusLarge : (Config.osdStyle === "pill" ? height / 2 : 28)
+          radius: root.isCriticalAlert ? Appearance.radiusLarge : (Config.osdStyle === "pill" ? height / 2 : 28)
           color: Colors.cardSurface
           border.color: root.osdColor
           border.width: 2

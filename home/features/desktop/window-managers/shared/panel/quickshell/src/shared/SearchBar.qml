@@ -7,32 +7,32 @@ Rectangle {
     property string placeholder: "Search..."
     property alias text: searchInput.text
     readonly property alias inputItem: searchInput
-    property int preferredHeight: Colors.controlRowHeight
+    property int preferredHeight: Appearance.controlRowHeight
 
     Layout.fillWidth: true
     height: preferredHeight
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: Colors.highlightLight
     border.color: searchInput.activeFocus ? Colors.primary : "transparent"
     border.width: 1
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingS
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             text: "󰍉"
             color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeMedium
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeMedium
         }
 
         TextInput {
             id: searchInput
             Layout.fillWidth: true
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             verticalAlignment: Text.AlignVCenter
             onVisibleChanged: if (!visible && activeFocus) focus = false
         }
@@ -40,7 +40,7 @@ Rectangle {
         Text {
             text: root.placeholder
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             visible: !searchInput.text && !searchInput.activeFocus
         }
     }

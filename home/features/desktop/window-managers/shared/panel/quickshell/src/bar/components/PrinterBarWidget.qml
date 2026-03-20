@@ -29,18 +29,18 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             text: "󰐪"
             color: PrinterService.activeJobs > 0 ? Colors.warning : Colors.text
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
             Behavior on color {
                 enabled: !Colors.isTransitioning
                 ColorAnimation {
-                    duration: Colors.durationNormal
+                    duration: Appearance.durationNormal
                 }
             }
         }
@@ -49,7 +49,7 @@ SharedWidgets.BarPill {
             visible: PrinterService.activeJobs > 0 && !root.iconOnly && root.badgeStyle !== "off"
             width: root.badgeStyle === "count" ? printerJobsBadge.contentWidth + 8 : 8
             height: 16
-            radius: root.badgeStyle === "count" ? Colors.radiusXS : 4
+            radius: root.badgeStyle === "count" ? Appearance.radiusXS : 4
             color: Colors.withAlpha(Colors.warning, 0.20)
             anchors.verticalCenter: parent.verticalCenter
 
@@ -58,7 +58,7 @@ SharedWidgets.BarPill {
                 anchors.centerIn: parent
                 text: PrinterService.activeJobs
                 color: Colors.warning
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Bold
                 visible: root.badgeStyle === "count"
             }

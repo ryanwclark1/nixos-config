@@ -5,7 +5,7 @@ Item {
     id: root
 
     property color accentColor: Colors.primary
-    property real parentRadius: Colors.radiusLarge
+    property real parentRadius: Appearance.radiusLarge
     property real opacityValue: 0.78
     readonly property real inset: 1
     readonly property real washRadius: Math.max(0, parentRadius - inset)

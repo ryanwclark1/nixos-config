@@ -8,26 +8,26 @@ ColumnLayout {
     required property var launcher
     property color accentColor: launcher && launcher.modeAccentColor ? launcher.modeAccentColor : Colors.primary
 
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
     visible: launcher.prefixQuickModes.length > 0
 
     RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             text: "PREFIXES"
             color: Colors.withAlpha(root.accentColor, 0.92)
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Black
-            font.letterSpacing: Colors.letterSpacingExtraWide
+            font.letterSpacing: Appearance.letterSpacingExtraWide
         }
 
         Rectangle {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter
             implicitHeight: 1
-            radius: Colors.radiusXXXS
+            radius: Appearance.radiusXXXS
             color: Colors.withAlpha(root.accentColor, 0.18)
         }
     }
@@ -35,7 +35,7 @@ ColumnLayout {
     Flow {
         Layout.fillWidth: true
         width: parent.width
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Repeater {
             model: launcher.prefixQuickModes
@@ -46,7 +46,7 @@ ColumnLayout {
                 readonly property var modeInfo: root.launcher.modeMeta(modelData)
                 readonly property bool active: root.launcher.mode === modelData
 
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: active ? Colors.withAlpha(root.accentColor, 0.18) : Colors.withAlpha(Colors.surface, 0.72)
                 border.color: active ? Colors.withAlpha(root.accentColor, 0.38) : Colors.border
                 border.width: 1
@@ -56,21 +56,21 @@ ColumnLayout {
                 RowLayout {
                     id: prefixRow
                     anchors.centerIn: parent
-                    spacing: Colors.spacingXS
+                    spacing: Appearance.spacingXS
 
                     Text {
                         text: modeInfo.prefix || ""
                         visible: text !== ""
                         color: active ? root.accentColor : Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeXS
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.Black
                     }
 
                     Text {
                         text: modeInfo.label
                         color: active ? root.accentColor : Colors.text
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: active ? Font.Bold : Font.DemiBold
                     }
                 }

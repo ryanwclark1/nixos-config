@@ -40,7 +40,7 @@ PanelWindow {
         }
         Behavior on opacity {
             NumberAnimation {
-                duration: Colors.durationNormal
+                duration: Appearance.durationNormal
                 easing.type: Easing.InOutQuad
             }
         }

@@ -59,7 +59,7 @@ SharedWidgets.CardBase {
     ColumnLayout {
         id: summaryColumn
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         RowLayout {
             Layout.fillWidth: true
@@ -67,9 +67,9 @@ SharedWidgets.CardBase {
             Text {
                 text: "SYSTEM OVERVIEW"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingWide
+                font.letterSpacing: Appearance.letterSpacingWide
                 font.capitalization: Font.AllUppercase
             }
 
@@ -102,7 +102,7 @@ SharedWidgets.CardBase {
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SharedWidgets.Chip {
                 icon: ""
@@ -152,12 +152,12 @@ SharedWidgets.CardBase {
         GridLayout {
             Layout.fillWidth: true
             columns: 3
-            columnSpacing: Colors.spacingM
-            rowSpacing: Colors.spacingS
+            columnSpacing: Appearance.spacingM
+            rowSpacing: Appearance.spacingS
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
@@ -173,7 +173,7 @@ SharedWidgets.CardBase {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
@@ -189,7 +189,7 @@ SharedWidgets.CardBase {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
@@ -207,8 +207,8 @@ SharedWidgets.CardBase {
         GridLayout {
             Layout.fillWidth: true
             columns: 2
-            columnSpacing: Colors.spacingL
-            rowSpacing: Colors.spacingS
+            columnSpacing: Appearance.spacingL
+            rowSpacing: Appearance.spacingS
 
             SharedWidgets.InfoRow {
                 Layout.fillWidth: true

@@ -31,7 +31,7 @@ Rectangle {
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
 
     color: highlighted ? Colors.withAlpha(accentColor, 0.16) : (hovered ? Colors.withAlpha(Colors.surface, 0.82) : "transparent")
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     border.color: highlighted ? Colors.withAlpha(accentColor, 0.38) : (hovered ? Colors.withAlpha(Colors.border, 0.42) : "transparent")
     border.width: 1
     scale: highlighted ? 1.01 : 1.0
@@ -43,7 +43,7 @@ Rectangle {
 
     Behavior on color { enabled: !Colors.isTransitioning && (highlighted || hovered); CAnim {} }
     Behavior on border.color { enabled: !Colors.isTransitioning && (highlighted || hovered); CAnim {} }
-    Behavior on scale { enabled: highlighted || hovered; NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
+    Behavior on scale { enabled: highlighted || hovered; NumberAnimation { duration: Appearance.durationMedium; easing.type: Easing.OutCubic } }
     layer.enabled: highlighted && scale !== 1.0
 
     function highlightMatch(text, query) {
@@ -144,23 +144,23 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: highlighted ? 5 : 0
-        radius: Colors.radiusPill
+        radius: Appearance.radiusPill
         color: root.accentColor
         opacity: highlighted ? 1.0 : 0.0
-        Behavior on width { NumberAnimation { duration: Colors.durationFast } }
-        Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+        Behavior on width { NumberAnimation { duration: Appearance.durationFast } }
+        Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
     }
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: root.compactMode ? Colors.spacingM : Colors.spacingL
-        anchors.rightMargin: root.compactMode ? Colors.spacingS : Colors.spacingM
-        spacing: root.compactMode ? Colors.spacingS : Colors.paddingMedium
+        anchors.leftMargin: root.compactMode ? Appearance.spacingM : Appearance.spacingL
+        anchors.rightMargin: root.compactMode ? Appearance.spacingS : Appearance.spacingM
+        spacing: root.compactMode ? Appearance.spacingS : Appearance.paddingMedium
 
         Rectangle {
             width: root.compactMode ? 34 : 40
             height: root.compactMode ? 34 : 40
-            radius: root.compactMode ? Colors.radiusMedium : Colors.radiusLarge
+            radius: root.compactMode ? Appearance.radiusMedium : Appearance.radiusLarge
             color: highlighted ? Colors.withAlpha(root.accentColor, 0.16) : (hovered ? Colors.withAlpha(Colors.surface, 0.78) : Colors.withAlpha(Colors.surface, 0.66))
             border.color: highlighted ? Colors.withAlpha(root.accentColor, 0.34) : Colors.withAlpha(Colors.border, 0.24)
             border.width: 1
@@ -187,7 +187,7 @@ Rectangle {
                 text: root.highlightMatch(itemData ? itemData.name || itemData.title || "" : "", root.searchText)
                 color: highlighted ? Colors.text : Colors.text
                 textFormat: Text.StyledText
-                font.pixelSize: root.compactMode ? Colors.fontSizeSmall : Colors.fontSizeMedium
+                font.pixelSize: root.compactMode ? Appearance.fontSizeSmall : Appearance.fontSizeMedium
                 font.weight: highlighted ? Font.Bold : Font.DemiBold
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
@@ -199,7 +199,7 @@ Rectangle {
             Text {
                 text: root.itemSecondaryLabel(itemData)
                 color: highlighted ? Colors.withAlpha(root.accentColor, 0.84) : Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
                 maximumLineCount: 1
@@ -210,14 +210,14 @@ Rectangle {
         }
 
         ColumnLayout {
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
             Layout.alignment: Qt.AlignVCenter
             visible: !root.tightMode
 
             Rectangle {
                 property string provider: root.itemProviderLabel(itemData)
                 visible: provider !== ""
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.withAlpha(root.accentColor, highlighted ? 0.14 : 0.08)
                 border.color: Colors.withAlpha(root.accentColor, highlighted ? 0.3 : 0.16)
                 border.width: 1
@@ -229,7 +229,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: parent.provider
                     color: highlighted ? root.accentColor : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
                     width: Math.min(implicitWidth, root.mode === "files" ? (root.compactMode ? 100 : 140) : (root.compactMode ? 82 : 110))
@@ -239,7 +239,7 @@ Rectangle {
             Rectangle {
                 property string action: root.itemActionLabel(itemData)
                 visible: action !== ""
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.withAlpha(Colors.surface, 0.84)
                 border.color: Colors.withAlpha(Colors.border, 0.5)
                 border.width: 1
@@ -251,7 +251,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: parent.action
                     color: highlighted ? Colors.text : Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
                     width: Math.min(implicitWidth, root.compactMode ? 70 : 92)

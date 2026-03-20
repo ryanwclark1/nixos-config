@@ -221,8 +221,8 @@ PanelWindow {
   SharedWidgets.ElasticNumber {
     id: _fbElasticScale
     target: root.isOpen ? 1.0 : 0.95
-    fastDuration: Colors.durationSnap
-    slowDuration: Colors.durationPanelClose
+    fastDuration: Appearance.durationSnap
+    slowDuration: Appearance.durationPanelClose
     fastWeight: 0.45
   }
 
@@ -251,7 +251,7 @@ PanelWindow {
     color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     clip: true
 
     focus: root.isOpen
@@ -280,7 +280,7 @@ PanelWindow {
 
     opacity: root.isOpen ? 1.0 : 0.0
     scale:   _fbElasticScale.value
-    Behavior on opacity { NumberAnimation { id: fbFadeAnim;  duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { id: fbFadeAnim;  duration: Appearance.durationMedium; easing.type: Easing.OutCubic } }
     layer.enabled: fbFadeAnim.running || _fbElasticScale.running
 
     // Block click-through
@@ -316,35 +316,35 @@ PanelWindow {
 
         RowLayout {
           anchors.fill: parent
-          anchors.leftMargin: Colors.paddingLarge
-          anchors.rightMargin: Colors.paddingMedium
-          spacing: Colors.spacingM
+          anchors.leftMargin: Appearance.paddingLarge
+          anchors.rightMargin: Appearance.paddingMedium
+          spacing: Appearance.spacingM
 
           // Title
           Text {
             text: root.title
             color: Colors.text
-            font.pixelSize: Colors.fontSizeLarge
+            font.pixelSize: Appearance.fontSizeLarge
             font.weight: Font.Bold
-            font.letterSpacing: Colors.letterSpacingTight
+            font.letterSpacing: Appearance.letterSpacingTight
           }
 
           Item { Layout.fillWidth: true }
 
           // View-toggle: grid
           Rectangle {
-            width: 30; height: 30; radius: Colors.radiusSmall
+            width: 30; height: 30; radius: Appearance.radiusSmall
             color: root._viewGrid
               ? Colors.highlight
               : "transparent"
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
             Text {
               anchors.centerIn: parent
               text: "󰕴"
               color: root._viewGrid ? Colors.primary : Colors.textSecondary
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeLarge
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeLarge
             }
             SharedWidgets.StateLayer {
               id: gridToggleSL
@@ -363,18 +363,18 @@ PanelWindow {
 
           // View-toggle: list
           Rectangle {
-            width: 30; height: 30; radius: Colors.radiusSmall
+            width: 30; height: 30; radius: Appearance.radiusSmall
             color: !root._viewGrid
               ? Colors.highlight
               : "transparent"
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationSnap } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
             Text {
               anchors.centerIn: parent
               text: "󰕵"
               color: !root._viewGrid ? Colors.primary : Colors.textSecondary
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeLarge
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeLarge
             }
             SharedWidgets.StateLayer {
               id: listToggleSL
@@ -400,8 +400,8 @@ PanelWindow {
               anchors.centerIn: parent
               text: "󰅖"
               color: Colors.textSecondary
-              font.family: Colors.fontMono
-              font.pixelSize: Colors.fontSizeLarge
+              font.family: Appearance.fontMono
+              font.pixelSize: Appearance.fontSizeLarge
             }
             SharedWidgets.StateLayer {
               id: closeSL
@@ -469,14 +469,14 @@ PanelWindow {
 
               ColumnLayout {
                 anchors.centerIn: parent
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                   Layout.alignment: Qt.AlignHCenter
                   text: "󰑐"
                   color: Colors.textDisabled
-                  font.family: Colors.fontMono
-                  font.pixelSize: Colors.fontSizeDisplay
+                  font.family: Appearance.fontMono
+                  font.pixelSize: Appearance.fontSizeDisplay
 
                   RotationAnimator on rotation {
                     running: root._loading
@@ -488,7 +488,7 @@ PanelWindow {
                   Layout.alignment: Qt.AlignHCenter
                   text: "Loading…"
                   color: Colors.textDisabled
-                  font.pixelSize: Colors.fontSizeSmall
+                  font.pixelSize: Appearance.fontSizeSmall
                 }
               }
             }
@@ -518,17 +518,17 @@ PanelWindow {
               Item {
                 id: gridContent
                 width: gridFlick.width
-                implicitHeight: gridFlow.implicitHeight + Colors.paddingMedium * 2
+                implicitHeight: gridFlow.implicitHeight + Appearance.paddingMedium * 2
 
                 Flow {
                   id: gridFlow
                   anchors.top: parent.top
                   anchors.left: parent.left
                   anchors.right: parent.right
-                  anchors.topMargin: Colors.paddingMedium
-                  anchors.leftMargin: Colors.paddingMedium
-                  anchors.rightMargin: Colors.paddingMedium
-                  spacing: Colors.spacingM
+                  anchors.topMargin: Appearance.paddingMedium
+                  anchors.leftMargin: Appearance.paddingMedium
+                  anchors.rightMargin: Appearance.paddingMedium
+                  spacing: Appearance.spacingM
                   readonly property real contentW: Math.max(1, width - anchors.leftMargin - anchors.rightMargin)
                   readonly property int minCols: 3
                   readonly property int maxCols: 8

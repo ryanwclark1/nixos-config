@@ -46,8 +46,8 @@ Rectangle {
     }
 
     Layout.fillWidth: true
-    implicitHeight: mainLayout.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: mainLayout.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.modalFieldSurface
     border.color: root.expanded ? Colors.primary : Colors.border
     border.width: 1
@@ -62,12 +62,12 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             SettingsIconBox {
                 visible: root.icon !== ""
@@ -76,12 +76,12 @@ Rectangle {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXXS
+                spacing: Appearance.spacingXXS
 
                 Text {
                     text: root.label
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -91,7 +91,7 @@ Rectangle {
                     visible: root.description !== ""
                     text: root.description
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                 }
@@ -102,7 +102,7 @@ Rectangle {
             id: triggerButton
             Layout.fillWidth: true
             implicitHeight: 40
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: Colors.surface
             border.color: root.expanded ? Colors.primary : Colors.border
             border.width: 1
@@ -116,31 +116,31 @@ Rectangle {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingM
-                spacing: Colors.spacingS
+                anchors.leftMargin: Appearance.spacingM
+                anchors.rightMargin: Appearance.spacingM
+                spacing: Appearance.spacingS
 
                 Text {
                     visible: root.currentIcon() !== ""
                     text: root.currentIcon()
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
 
                 Text {
                     Layout.fillWidth: true
                     text: root.currentLabel()
                     color: root.currentValue !== "" ? Colors.text : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: root.currentValue !== "" ? Font.Medium : Font.Normal
                     elide: Text.ElideRight
                 }
 
                 Rectangle {
-                    implicitWidth: countText.implicitWidth + Colors.spacingM
+                    implicitWidth: countText.implicitWidth + Appearance.spacingM
                     implicitHeight: 22
-                    radius: Colors.radiusPill
+                    radius: Appearance.radiusPill
                     color: Colors.primaryFaint
                     visible: root.options.length > 0
 
@@ -149,7 +149,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: root.options.length + " options"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXXS
+                        font.pixelSize: Appearance.fontSizeXXS
                         font.weight: Font.DemiBold
                     }
                 }
@@ -157,8 +157,8 @@ Rectangle {
                 Text {
                     text: root.expanded ? "󰅀" : "󰅂"
                     color: Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
             }
 
@@ -177,18 +177,18 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             visible: root.expanded
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
-            implicitHeight: Math.min(optionsList.contentHeight, root.maxMenuHeight) + Colors.spacingXS * 2
+            implicitHeight: Math.min(optionsList.contentHeight, root.maxMenuHeight) + Appearance.spacingXS * 2
 
             ListView {
                 id: optionsList
                 anchors.fill: parent
-                anchors.margins: Colors.spacingXS
+                anchors.margins: Appearance.spacingXS
                 clip: true
-                spacing: Colors.spacingXXS
+                spacing: Appearance.spacingXXS
                 boundsBehavior: Flickable.StopAtBounds
                 implicitHeight: contentHeight
                 model: root.options
@@ -200,7 +200,7 @@ Rectangle {
                     readonly property bool selected: String(modelData.value) === String(root.currentValue)
                     width: optionsList.width
                     height: 34
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: selected
                         ? Colors.primaryAccent
                         : optionMouse.containsMouse
@@ -209,9 +209,9 @@ Rectangle {
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: Colors.spacingS
-                        anchors.rightMargin: Colors.spacingS
-                        spacing: Colors.spacingS
+                        anchors.leftMargin: Appearance.spacingS
+                        anchors.rightMargin: Appearance.spacingS
+                        spacing: Appearance.spacingS
 
                         Loader {
                             visible: !!modelData.icon
@@ -219,14 +219,14 @@ Rectangle {
                             property color _co: optionDelegate.selected ? Colors.primary : Colors.textSecondary
                             sourceComponent: _ic.endsWith(".svg") ? _srSvg : _srNerd
                         }
-                        Component { id: _srSvg; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeMedium } }
-                        Component { id: _srNerd; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium } }
+                        Component { id: _srSvg; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeMedium } }
+                        Component { id: _srNerd; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium } }
 
                         Text {
                             Layout.fillWidth: true
                             text: modelData.label || String(modelData.value || "")
                             color: optionDelegate.selected ? Colors.primary : Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: optionDelegate.selected ? Font.DemiBold : Font.Medium
                             elide: Text.ElideRight
                         }
@@ -235,8 +235,8 @@ Rectangle {
                             visible: optionDelegate.selected
                             text: "󰄬"
                             color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeSmall
                         }
                     }
 
@@ -267,8 +267,8 @@ Rectangle {
             property real _opacity: 0
             running: root.highlighted
             loops: 2
-            NumberAnimation { target: selectHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
-            NumberAnimation { target: selectHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Colors.durationSlow; easing.type: Easing.InCubic }
+            NumberAnimation { target: selectHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Appearance.durationSlow; easing.type: Easing.OutCubic }
+            NumberAnimation { target: selectHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Appearance.durationSlow; easing.type: Easing.InCubic }
         }
     }
 }

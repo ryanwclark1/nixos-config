@@ -38,7 +38,7 @@ Item {
     ColumnLayout {
         id: col
         anchors.fill: parent
-        spacing: Colors.spacingL
+        spacing: Appearance.spacingL
 
         SettingsCard {
             id: card

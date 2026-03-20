@@ -10,8 +10,8 @@ Rectangle {
     id: root
     readonly property var blockData: parent ? parent.modelData : null
     width: parent ? parent.width : 0
-    height: codeHeader.height + codeEdit.implicitHeight + Colors.spacingS * 2
-    radius: Colors.radiusXS
+    height: codeHeader.height + codeEdit.implicitHeight + Appearance.spacingS * 2
+    radius: Appearance.radiusXS
     color: Colors.textFaint
     border.color: Colors.textThin
     border.width: 1
@@ -22,29 +22,29 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: Colors.spacingS
+        anchors.margins: Appearance.spacingS
         height: 22
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             text: (root.blockData && root.blockData.lang) ? root.blockData.lang : "code"
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeXS
+            font.family: Appearance.fontMono
             Layout.fillWidth: true
         }
 
         Rectangle {
             width: 20
             height: 20
-            radius: Colors.radiusMicro
+            radius: Appearance.radiusMicro
             color: codeCopyHover.containsMouse ? Colors.bgWidget : "transparent"
             Text {
                 anchors.centerIn: parent
                 text: "󰆏"
                 color: Colors.textSecondary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXS
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXS
             }
             MouseArea {
                 id: codeCopyHover
@@ -72,13 +72,13 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.margins: Colors.spacingS
-        anchors.topMargin: Colors.spacingXS
+        anchors.margins: Appearance.spacingS
+        anchors.topMargin: Appearance.spacingXS
         text: (root.blockData && root.blockData.highlightedHtml) ? root.blockData.highlightedHtml : (root.blockData ? root.blockData.content : "")
         textFormat: (root.blockData && root.blockData.highlightedHtml) ? TextEdit.RichText : TextEdit.PlainText
         color: Colors.text
-        font.pixelSize: Colors.fontSizeSmall
-        font.family: Colors.fontMono
+        font.pixelSize: Appearance.fontSizeSmall
+        font.family: Appearance.fontMono
         wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
         readOnly: true
         selectByMouse: true

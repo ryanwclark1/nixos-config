@@ -17,8 +17,8 @@ Item {
   Rectangle {
     id: bg
     anchors.fill: parent
-    anchors.margins: -Colors.spacingL
-    radius: Colors.radiusLarge
+    anchors.margins: -Appearance.spacingL
+    radius: Appearance.radiusLarge
     color: Colors.cardSurface
     border.color: Colors.withAlpha(Colors.border, 0.5)
     border.width: 1
@@ -36,7 +36,7 @@ Item {
     Text {
       text: Qt.formatDateTime(clock.date, "HH:mm")
       color: Colors.primary
-      font.pixelSize: Colors.fontSizeMassive
+      font.pixelSize: Appearance.fontSizeMassive
       font.weight: Font.Black
       font.letterSpacing: -4
     }
@@ -44,7 +44,7 @@ Item {
     Text {
       text: Qt.formatDateTime(clock.date, "dddd, MMMM d")
       color: Colors.text
-      font.pixelSize: Colors.fontSizeXXL
+      font.pixelSize: Appearance.fontSizeXXL
       font.weight: Font.Bold
       opacity: 0.9
       Layout.leftMargin: 4

@@ -21,35 +21,35 @@ Item {
     ColumnLayout {
         id: contentColumn
         anchors.fill: parent
-        spacing: root.compact ? Colors.spacingXS : Colors.spacingS
+        spacing: root.compact ? Appearance.spacingXS : Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: "ACTION MAP"
                 color: Colors.withAlpha(root.accentColor, 0.92)
-                font.pixelSize: Colors.fontSizeXXS
+                font.pixelSize: Appearance.fontSizeXXS
                 font.weight: Font.Black
-                font.letterSpacing: Colors.letterSpacingExtraWide
+                font.letterSpacing: Appearance.letterSpacingExtraWide
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
                 implicitHeight: 1
-                radius: Colors.radiusXXXS
+                radius: Appearance.radiusXXXS
                 color: Colors.withAlpha(root.accentColor, 0.18)
             }
         }
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Rectangle {
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.withAlpha(root.accentColor, 0.14)
                 border.color: Colors.withAlpha(root.accentColor, 0.34)
                 border.width: 1
@@ -61,7 +61,7 @@ Item {
                     anchors.centerIn: parent
                     text: root.primaryAction
                     color: root.accentColor
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.DemiBold
                 }
             }
@@ -70,13 +70,13 @@ Item {
                 Layout.fillWidth: true
                 text: root.summaryText
                 color: Colors.textSecondary
-                font.pixelSize: root.compact ? Colors.fontSizeXS : Colors.fontSizeSmall
+                font.pixelSize: root.compact ? Appearance.fontSizeXS : Appearance.fontSizeSmall
                 font.weight: Font.Medium
                 wrapMode: Text.WordWrap
             }
 
             Rectangle {
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: helpMouse.containsMouse ? Colors.withAlpha(root.accentColor, 0.12) : Colors.withAlpha(Colors.surface, 0.7)
                 border.color: root.helpExpanded ? Colors.withAlpha(root.accentColor, 0.34) : Colors.border
                 border.width: 1
@@ -88,7 +88,7 @@ Item {
                     anchors.centerIn: parent
                     text: root.helpExpanded ? "Hide Help" : "Show Help"
                     color: root.helpExpanded ? root.accentColor : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.DemiBold
                 }
 
@@ -105,7 +105,7 @@ Item {
         Flow {
             Layout.fillWidth: true
             visible: root.helpExpanded
-            spacing: root.compact ? Colors.spacingXS : Colors.spacingS
+            spacing: root.compact ? Appearance.spacingXS : Appearance.spacingS
 
             Repeater {
                 model: [root.primaryAction, root.secondaryAction, root.tertiaryAction].filter(function(textValue) {
@@ -116,7 +116,7 @@ Item {
                     required property var modelData
                     required property int index
 
-                    radius: Colors.radiusPill
+                    radius: Appearance.radiusPill
                     color: index === 0 ? Colors.withAlpha(root.accentColor, 0.14) : (index === 1 ? Colors.withAlpha(Colors.textSecondary, 0.08) : Colors.surface)
                     border.color: index === 0 ? Colors.withAlpha(root.accentColor, 0.34) : (index === 1 ? Colors.withAlpha(Colors.textSecondary, 0.16) : Colors.primarySubtle)
                     border.width: 1
@@ -128,7 +128,7 @@ Item {
                         anchors.centerIn: parent
                         text: modelData
                         color: index === 0 ? root.accentColor : (index === 1 ? Colors.textSecondary : Colors.textDisabled)
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.DemiBold
                     }
                 }

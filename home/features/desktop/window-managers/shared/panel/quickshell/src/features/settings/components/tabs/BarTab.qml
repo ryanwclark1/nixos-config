@@ -81,7 +81,7 @@ Item {
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Repeater {
                     model: [
@@ -110,9 +110,9 @@ Item {
                     delegate: Rectangle {
                         required property var modelData
 
-                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
-                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
-                        radius: Colors.radiusLarge
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Appearance.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Appearance.spacingM * 2
+                        radius: Appearance.radiusLarge
                         color: Colors.withAlpha(Colors.surface, 0.38)
                         border.color: Colors.withAlpha(Colors.primary, 0.14)
                         border.width: 1
@@ -120,8 +120,8 @@ Item {
                         ColumnLayout {
                             id: metricColumn
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
-                            spacing: Colors.spacingXS
+                            anchors.margins: Appearance.spacingM
+                            spacing: Appearance.spacingXS
 
                             SettingsMetricIcon { icon: modelData.icon }
 
@@ -129,9 +129,9 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.label
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Black
-                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                font.letterSpacing: Appearance.letterSpacingExtraWide
                                 wrapMode: Text.WordWrap
                             }
 
@@ -139,7 +139,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.value
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.Bold
                                 wrapMode: Text.WordWrap
                             }
@@ -174,7 +174,7 @@ Item {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Repeater {
                         model: Config.barConfigs
@@ -185,12 +185,12 @@ Item {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingXS
+                                spacing: Appearance.spacingXS
 
                                 Text {
                                     text: modelData.name || "Bar"
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.pixelSize: Appearance.fontSizeMedium
                                     font.weight: Font.DemiBold
                                     Layout.fillWidth: true
                                     elide: Text.ElideRight
@@ -198,18 +198,18 @@ Item {
 
                                 Flow {
                                     Layout.fillWidth: true
-                                    spacing: Colors.spacingS
+                                    spacing: Appearance.spacingS
 
                                     Text {
                                         text: Config.sectionLabel("left", modelData.position) + "/" + Config.sectionLabel("center", modelData.position) + "/" + Config.sectionLabel("right", modelData.position)
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                     }
 
                                     Rectangle {
                                         implicitWidth: metaText.implicitWidth + 16
                                         implicitHeight: 24
-                                        radius: Colors.radiusPill
+                                        radius: Appearance.radiusPill
                                         color: Colors.primaryFaint
                                         border.color: Colors.border
                                         border.width: 1
@@ -219,7 +219,7 @@ Item {
                                             anchors.centerIn: parent
                                             text: (modelData.position || "top") + " • " + (modelData.displayMode || "all")
                                             color: Colors.textSecondary
-                                            font.pixelSize: Colors.fontSizeXS
+                                            font.pixelSize: Appearance.fontSizeXS
                                         }
                                     }
                                 }
@@ -228,7 +228,7 @@ Item {
                             Flow {
                                 Layout.fillWidth: true
                                 width: parent.width
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 SettingsActionButton {
                                     compact: true
@@ -386,19 +386,19 @@ Item {
                 ColumnLayout {
                     visible: root.selectedBar && root.selectedBar.displayMode === "specific"
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
                         text: "Specific Displays"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: Appearance.fontSizeMedium
                         font.weight: Font.Medium
                     }
 
                     Flow {
                         Layout.fillWidth: true
                         width: parent.width
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         Repeater {
                             model: Quickshell.screens

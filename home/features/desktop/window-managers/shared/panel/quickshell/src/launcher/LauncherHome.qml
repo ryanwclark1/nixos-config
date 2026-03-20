@@ -10,7 +10,7 @@ ColumnLayout {
     required property var launcher
     property bool showCategoryFiltersSection: true
     property bool showHomeSections: true
-    spacing: Colors.spacingM
+    spacing: Appearance.spacingM
 
     readonly property bool showCategoryFilters: root.showCategoryFiltersSection && root.launcher.showLauncherHome && root.launcher.drunCategoryFiltersEnabled && root.launcher.mode === "drun" && root.launcher.drunCategoryOptions.length > 1
     readonly property bool categorySummaryExpanded: root.launcher.drunCategorySectionExpanded || root.launcher.drunCategoryFilter !== ""
@@ -64,15 +64,15 @@ ColumnLayout {
         ColumnLayout {
             id: categoryColumn
             anchors.fill: parent
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Rectangle {
                     Layout.alignment: Qt.AlignVCenter
-                    radius: Colors.radiusPill
+                    radius: Appearance.radiusPill
                     color: categorySummaryMouse.containsMouse ? Colors.primaryAccent : Colors.withAlpha(Colors.surface, 0.72)
                     border.color: root.launcher.drunCategoryFilter !== "" ? Colors.withAlpha(Colors.primary, 0.55) : Colors.border
                     border.width: 1
@@ -82,27 +82,27 @@ ColumnLayout {
                     RowLayout {
                         id: categorySummaryRow
                         anchors.centerIn: parent
-                        spacing: Colors.spacingXS
+                        spacing: Appearance.spacingXS
 
                         Text {
                             text: root.launcher.drunCategoryFilter === "" ? "󰍉" : "󰌌"
                             color: root.launcher.drunCategoryFilter === "" ? Colors.textSecondary : Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeSmall
                         }
 
                         Text {
                             text: root.launcher.drunCategoryFilter === "" ? "All Apps" : root.launcher.drunCategoryFilterLabel
                             color: root.launcher.drunCategoryFilter === "" ? Colors.text : Colors.primary
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: root.launcher.drunCategoryFilter === "" ? Font.Medium : Font.DemiBold
                         }
 
                         Text {
                             text: root.categorySummaryExpanded ? "󰅀" : "󰅂"
                             color: Colors.textDisabled
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeXS
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeXS
                         }
                     }
 
@@ -120,7 +120,7 @@ ColumnLayout {
                     Layout.alignment: Qt.AlignVCenter
                     text: root.launcher.drunCategoryFilterSummary
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     elide: Text.ElideRight
                 }
             }
@@ -128,7 +128,7 @@ ColumnLayout {
             Flow {
                 Layout.fillWidth: true
                 visible: root.showCategoryChips
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 Repeater {
                     model: root.launcher.drunCategoryOptions
@@ -149,56 +149,56 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: root.showHomeSections
         columns: root.useSplitColumns ? 2 : 1
-        rowSpacing: Colors.spacingL
-        columnSpacing: Colors.spacingL
+        rowSpacing: Appearance.spacingL
+        columnSpacing: Appearance.spacingL
 
         // Recent Apps Grid
         SharedWidgets.ThemedContainer {
             variant: "card"
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             showGradient: true
             customHighlightOpacity: 0.12
             Layout.fillWidth: true
             visible: root.showRecentItems
             clip: true
-            implicitHeight: recentLayout.implicitHeight + (Colors.paddingLarge * 2)
+            implicitHeight: recentLayout.implicitHeight + (Appearance.paddingLarge * 2)
 
             ColumnLayout {
                 id: recentLayout
                 anchors.fill: parent
-                anchors.margins: Colors.paddingLarge
-                spacing: Colors.spacingM
+                anchors.margins: Appearance.paddingLarge
+                spacing: Appearance.spacingM
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
                     Text {
                         text: "RECENT"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXXS
+                        font.pixelSize: Appearance.fontSizeXXS
                         font.weight: Font.Black
-                        font.letterSpacing: Colors.letterSpacingWide
+                        font.letterSpacing: Appearance.letterSpacingWide
                     }
                     Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.4 }
                     Text {
                         text: root.launcher.recentItems.length
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXXS
+                        font.pixelSize: Appearance.fontSizeXXS
                         font.weight: Font.Bold
                     }
                 }
 
                 Flow {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
                     flow: Flow.LeftToRight
 
                     Repeater {
                         model: root.launcher.recentItems
                         delegate: Rectangle {
-                            width: (recentLayout.width - (Colors.spacingM * 3)) / 4
+                            width: (recentLayout.width - (Appearance.spacingM * 3)) / 4
                             height: 94
-                            radius: Colors.radiusLarge
+                            radius: Appearance.radiusLarge
                             readonly property bool hovered: recentHover.containsMouse
                             readonly property bool selected: root.isSelected(modelData)
                             
@@ -206,19 +206,19 @@ ColumnLayout {
                             border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : "transparent")
                             border.width: 1
                             scale: hovered ? 1.04 : 1.0
-                            Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
+                            Behavior on scale { NumberAnimation { duration: Appearance.durationMedium; easing.type: Easing.OutCubic } }
                             Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
                             ColumnLayout {
                                 anchors.centerIn: parent
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
                                 width: parent.width - 16
 
                                 Rectangle {
                                     Layout.alignment: Qt.AlignHCenter
                                     width: 44
                                     height: 44
-                                    radius: Colors.radiusMedium
+                                    radius: Appearance.radiusMedium
                                     color: Colors.surface
                                     border.color: Colors.withAlpha(Colors.primary, 0.15)
                                     border.width: 1
@@ -236,7 +236,7 @@ ColumnLayout {
                                     Layout.fillWidth: true
                                     text: root.primaryText(modelData)
                                     color: selected ? Colors.primary : Colors.text
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     font.weight: selected ? Font.Bold : Font.Medium
                                     horizontalAlignment: Text.AlignHCenter
                                     elide: Text.ElideRight
@@ -260,29 +260,29 @@ ColumnLayout {
         // Suggested Apps List
         SharedWidgets.ThemedContainer {
             variant: "card"
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             showGradient: true
             customHighlightOpacity: 0.12
             Layout.fillWidth: true
             visible: root.showSuggestions
             clip: true
-            implicitHeight: suggestionColumn.implicitHeight + (Colors.paddingLarge * 2)
+            implicitHeight: suggestionColumn.implicitHeight + (Appearance.paddingLarge * 2)
 
             ColumnLayout {
                 id: suggestionColumn
                 anchors.fill: parent
-                anchors.margins: Colors.paddingLarge
-                spacing: Colors.spacingM
+                anchors.margins: Appearance.paddingLarge
+                spacing: Appearance.spacingM
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
                     Text {
                         text: "SUGGESTED"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXXS
+                        font.pixelSize: Appearance.fontSizeXXS
                         font.weight: Font.Black
-                        font.letterSpacing: Colors.letterSpacingWide
+                        font.letterSpacing: Appearance.letterSpacingWide
                     }
                     Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.4 }
                 }
@@ -293,7 +293,7 @@ ColumnLayout {
                         Layout.fillWidth: true
                         implicitHeight: 46
                         clip: true
-                        radius: Colors.radiusMedium
+                        radius: Appearance.radiusMedium
                         readonly property bool hovered: suggestionHover.containsMouse
                         readonly property bool selected: root.isSelected(modelData)
                         
@@ -303,17 +303,17 @@ ColumnLayout {
                         scale: selected ? 1.01 : (hovered ? 1.005 : 1.0)
 
                         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-                        Behavior on scale { NumberAnimation { duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
+                        Behavior on scale { NumberAnimation { duration: Appearance.durationMedium; easing.type: Easing.OutCubic } }
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingS
-                            spacing: Colors.paddingMedium
+                            anchors.margins: Appearance.spacingS
+                            spacing: Appearance.paddingMedium
 
                             Rectangle {
                                 implicitWidth: 32
                                 implicitHeight: 32
-                                radius: Colors.radiusSmall
+                                radius: Appearance.radiusSmall
                                 color: Colors.surface
                                 border.color: Colors.primaryGhost
                                 border.width: 1
@@ -340,7 +340,7 @@ ColumnLayout {
                                 Text {
                                     text: root.primaryText(modelData)
                                     color: selected ? Colors.primary : Colors.text
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     font.weight: selected ? Font.Bold : Font.DemiBold
                                     elide: Text.ElideRight
                                     wrapMode: Text.NoWrap
@@ -351,7 +351,7 @@ ColumnLayout {
                                 Text {
                                     text: root.secondaryText(modelData) || "Frequently used"
                                     color: selected ? Colors.withAlpha(Colors.primary, 0.8) : Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXXS
+                                    font.pixelSize: Appearance.fontSizeXXS
                                     elide: Text.ElideRight
                                     wrapMode: Text.NoWrap
                                     maximumLineCount: 1
@@ -360,7 +360,7 @@ ColumnLayout {
                             }
 
                             Rectangle {
-                                radius: Colors.radiusPill
+                                radius: Appearance.radiusPill
                                 color: selected ? Colors.primarySubtle : Colors.highlight
                                 border.color: selected ? Colors.primaryRing : Colors.border
                                 border.width: 1
@@ -372,7 +372,7 @@ ColumnLayout {
                                     anchors.centerIn: parent
                                     text: (modelData._usage || 0) + "x"
                                     color: selected ? Colors.primary : Colors.textDisabled
-                                    font.pixelSize: Colors.fontSizeXXS
+                                    font.pixelSize: Appearance.fontSizeXXS
                                     font.weight: Font.Black
                                 }
                             }

@@ -23,7 +23,7 @@ Item {
   Rectangle {
     anchors.fill: parent
     anchors.margins: -4
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: "transparent"
     border.color: DesktopWidgetRegistry.editMode ? Colors.primary : "transparent"
     border.width: DesktopWidgetRegistry.editMode ? 2 : 0
@@ -75,7 +75,7 @@ Item {
     anchors.rightMargin: -8
     anchors.bottomMargin: -8
     width: 16; height: 16
-    radius: Colors.radiusXS
+    radius: Appearance.radiusXS
     color: Colors.primary
     opacity: scaleArea.containsMouse ? 1.0 : 0.6
 
@@ -83,8 +83,8 @@ Item {
       anchors.centerIn: parent
       text: "󰁌"
       color: Colors.background
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeXS
+      font.family: Appearance.fontMono
+      font.pixelSize: Appearance.fontSizeXS
     }
 
     MouseArea {
@@ -135,7 +135,7 @@ Item {
       if (root.y + below + height <= root.parent.height - menuInset) return below;
       return Math.max(minY, maxY);
     }
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
@@ -144,8 +144,8 @@ Item {
     Column {
       id: menuCol
       anchors.fill: parent
-      anchors.margins: Colors.spacingS
-      spacing: Colors.spacingXXS
+      anchors.margins: Appearance.spacingS
+      spacing: Appearance.spacingXXS
 
       ContextMenuItem {
         text: "Reset Size"
@@ -205,14 +205,14 @@ Item {
 
     Rectangle {
       anchors.fill: parent
-      radius: Colors.radiusXXS
+      radius: Appearance.radiusXXS
       color: itemMa.containsMouse ? Colors.highlight : "transparent"
 
       Text {
         anchors.centerIn: parent
         text: parent.parent.text
         color: parent.parent.isDestructive ? Colors.error : Colors.text
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
       }
 
       MouseArea {

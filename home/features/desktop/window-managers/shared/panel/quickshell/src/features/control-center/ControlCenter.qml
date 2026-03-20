@@ -23,9 +23,9 @@ PanelWindow {
         bottom: true
     }
 
-    margins.top: reservedTop + Colors.spacingS
-    margins.right: reservedRight + Colors.spacingS
-    margins.bottom: reservedBottom + Colors.spacingS
+    margins.top: reservedTop + Appearance.spacingS
+    margins.right: reservedRight + Appearance.spacingS
+    margins.bottom: reservedBottom + Appearance.spacingS
 
     implicitWidth: panelWidth + 20 // Extra room for shadow/animation
     color: "transparent"
@@ -54,7 +54,7 @@ PanelWindow {
     }
 
     function entranceDuration(index) {
-        return Colors.durationSlow
+        return Appearance.durationSlow
     }
 
     function entranceDelay(index) {
@@ -99,7 +99,7 @@ PanelWindow {
         color: Colors.bgGlass
         border.color: Colors.border
         border.width: 1
-        radius: Colors.radiusLarge
+        radius: Appearance.radiusLarge
         clip: true
 
         // Slide animation from right
@@ -108,7 +108,7 @@ PanelWindow {
             Behavior on x {
                 NumberAnimation {
                     id: ccSlideAnim
-                    duration: Colors.durationSlow
+                    duration: Appearance.durationSlow
                     easing.type: Easing.OutQuint
                 }
             }
@@ -119,7 +119,7 @@ PanelWindow {
         Behavior on opacity {
             NumberAnimation {
                 id: ccFadeAnim
-                duration: Colors.durationNormal
+                duration: Appearance.durationNormal
             }
         }
 
@@ -130,24 +130,24 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Colors.paddingLarge
-            spacing: Colors.spacingXL
+            anchors.margins: Appearance.paddingLarge
+            spacing: Appearance.spacingXL
             RowLayout {
                 Layout.fillWidth: true
                 Text {
                     text: "Command Center"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeHuge
+                    font.pixelSize: Appearance.fontSizeHuge
                     font.weight: Font.DemiBold
-                    font.letterSpacing: Colors.letterSpacingTight
+                    font.letterSpacing: Appearance.letterSpacingTight
                 }
                 Item {
                     Layout.fillWidth: true
                 }
                 SharedWidgets.IconButton {
                     icon: "settings.svg"
-                    size: Colors.iconSizeMedium
-                    iconSize: Colors.fontSizeXL
+                    size: Appearance.iconSizeMedium
+                    iconSize: Appearance.fontSizeXL
                     tooltipText: "Settings"
                     tooltipShortcut: "Meta+S"
                     onClicked: {
@@ -157,8 +157,8 @@ PanelWindow {
                 }
                 SharedWidgets.IconButton {
                     icon: "dismiss.svg"
-                    size: Colors.iconSizeMedium
-                    iconSize: Colors.fontSizeXL
+                    size: Appearance.iconSizeMedium
+                    iconSize: Appearance.fontSizeXL
                     tooltipText: "Close"
                     onClicked: root.closeRequested()
                 }
@@ -193,12 +193,12 @@ PanelWindow {
                     ColumnLayout {
                         id: mainCol
                         width: parent.width
-                        spacing: Colors.spacingXL
+                        spacing: Appearance.spacingXL
 
                         // --- Group 1: Essential Tools ---
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingLG
+                            spacing: Appearance.spacingLG
                             opacity: root.entranceOpacity(0)
                             scale: root.entranceScale(0)
                             transform: Translate { y: root.entranceY(0) }
@@ -212,7 +212,7 @@ PanelWindow {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
                                 visible: Config.controlCenterShowQuickLinks
 
                                 Repeater {
@@ -235,7 +235,7 @@ PanelWindow {
                             // Quick Toggles Grid
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
                                 
                                 SharedWidgets.SectionLabel {
                                     label: "QUICK TOGGLES"
@@ -249,13 +249,13 @@ PanelWindow {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
                                 visible: PluginService.visibleControlCenterPlugins.length > 0
 
                                 Text {
                                     text: "PLUGINS"
                                     color: Colors.textDisabled
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     font.weight: Font.Bold
                                 }
 
@@ -292,7 +292,7 @@ PanelWindow {
                         // --- Group 2: Active Session ---
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingLG
+                            spacing: Appearance.spacingLG
                             opacity: root.entranceOpacity(1)
                             scale: root.entranceScale(1)
                             transform: Translate { y: root.entranceY(1) }
@@ -327,7 +327,7 @@ PanelWindow {
                         // --- Group 3: System Controls ---
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingLG
+                            spacing: Appearance.spacingLG
                             opacity: root.entranceOpacity(2)
                             scale: root.entranceScale(2)
                             transform: Translate { y: root.entranceY(2) }
@@ -338,7 +338,7 @@ PanelWindow {
                             // Sliders
                             ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.paddingMedium
+                            spacing: Appearance.paddingMedium
                             opacity: root.entranceOpacity(7)
                             scale: root.entranceScale(7)
                             transform: Translate { y: root.entranceY(7) }
@@ -349,21 +349,21 @@ PanelWindow {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingSM
+                                spacing: Appearance.spacingSM
 
                                 Repeater {
                                     model: BrightnessService.monitors
                                     delegate: ColumnLayout {
                                         required property var modelData
                                         Layout.fillWidth: true
-                                        spacing: Colors.spacingSM
+                                        spacing: Appearance.spacingSM
                                         RowLayout {
                                             Layout.fillWidth: true
                                             Text {
                                                 text: "󰃠  " + (BrightnessService.hasMultipleMonitors
                                                     ? modelData.name.toUpperCase() : "BRIGHTNESS")
                                                 color: Colors.textDisabled
-                                                font.pixelSize: Colors.fontSizeXS
+                                                font.pixelSize: Appearance.fontSizeXS
                                                 font.weight: Font.Bold
                                             }
                                             Item { Layout.fillWidth: true }
@@ -371,7 +371,7 @@ PanelWindow {
                                                 text: modelData.available
                                                     ? Math.round(modelData.brightness * 100) + "%" : "Unavailable"
                                                 color: modelData.available ? Colors.textSecondary : Colors.warning
-                                                font.pixelSize: Colors.fontSizeXS
+                                                font.pixelSize: Appearance.fontSizeXS
                                             }
                                         }
                                         SharedWidgets.SliderTrack {
@@ -390,14 +390,14 @@ PanelWindow {
                                     visible: BrightnessService.monitors.length === 0
                                     text: "No brightness devices detected"
                                     color: Colors.textDisabled
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     Layout.fillWidth: true
                                 }
 
                                 // Keyboard backlight slider
                                 ColumnLayout {
                                     Layout.fillWidth: true
-                                    spacing: Colors.spacingSM
+                                    spacing: Appearance.spacingSM
                                     visible: BrightnessService.kbdAvailable
 
                                     RowLayout {
@@ -405,14 +405,14 @@ PanelWindow {
                                         Text {
                                             text: "󰌌  KEYBOARD"
                                             color: Colors.textDisabled
-                                            font.pixelSize: Colors.fontSizeXS
+                                            font.pixelSize: Appearance.fontSizeXS
                                             font.weight: Font.Bold
                                         }
                                         Item { Layout.fillWidth: true }
                                         Text {
                                             text: Math.round(BrightnessService.kbdDevice.brightness * 100) + "%"
                                             color: Colors.textSecondary
-                                            font.pixelSize: Colors.fontSizeXS
+                                            font.pixelSize: Appearance.fontSizeXS
                                         }
                                     }
                                     SharedWidgets.SliderTrack {
@@ -426,13 +426,13 @@ PanelWindow {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingSM
+                                spacing: Appearance.spacingSM
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Text {
                                         text: "󰕾  OUTPUT"
                                         color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         font.weight: Font.Bold
                                     }
                                     Item {
@@ -441,18 +441,18 @@ PanelWindow {
                                     SharedWidgets.NumericText {
                                         text: AudioService.outputMuted ? "Muted" : Math.round(AudioService.outputVolume * 100) + "%"
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                     }
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    spacing: Colors.paddingSmall
+                                    spacing: Appearance.paddingSmall
                                     SharedWidgets.MuteButton {
                                         target: "@DEFAULT_AUDIO_SINK@"
                                         muted: AudioService.outputMuted
                                         icon: "󰕾"
                                         mutedIcon: "󰝟"
-                                        size: Colors.iconSizeMedium
+                                        size: Appearance.iconSizeMedium
                                         showBorder: true
                                     }
                                     SharedWidgets.SliderTrack {
@@ -468,13 +468,13 @@ PanelWindow {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingSM
+                                spacing: Appearance.spacingSM
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Text {
                                         text: "󰍬  INPUT"
                                         color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         font.weight: Font.Bold
                                     }
                                     Item {
@@ -483,18 +483,18 @@ PanelWindow {
                                     SharedWidgets.NumericText {
                                         text: AudioService.inputMuted ? "Muted" : Math.round(AudioService.inputVolume * 100) + "%"
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                     }
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    spacing: Colors.paddingSmall
+                                    spacing: Appearance.paddingSmall
                                     SharedWidgets.MuteButton {
                                         target: "@DEFAULT_AUDIO_SOURCE@"
                                         muted: AudioService.inputMuted
                                         icon: "󰍬"
                                         mutedIcon: "󰍭"
-                                        size: Colors.iconSizeMedium
+                                        size: Appearance.iconSizeMedium
                                         showBorder: true
                                     }
                                     SharedWidgets.SliderTrack {
@@ -511,7 +511,7 @@ PanelWindow {
 
                         RowLayout {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingM
+                            spacing: Appearance.spacingM
                             opacity: root.entranceOpacity(8)
                             scale: root.entranceScale(8)
                             transform: Translate { y: root.entranceY(8) }
@@ -523,22 +523,22 @@ PanelWindow {
                                 Layout.fillWidth: true
                                 height: 60
                                 color: Colors.bgWidget
-                                radius: Colors.radiusSmall
+                                radius: Appearance.radiusSmall
                                 border.color: Colors.border
                                 border.width: 1
                                 Column {
                                     anchors.centerIn: parent
-                                    spacing: Colors.spacingXXS
+                                    spacing: Appearance.spacingXXS
                                     Text {
                                         text: "CPU TEMP"
                                         color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         font.weight: Font.Bold
                                     }
                                     Text {
                                         text: SystemStatus.cpuTemp
                                         color: Colors.primary
-                                        font.pixelSize: Colors.fontSizeLarge
+                                        font.pixelSize: Appearance.fontSizeLarge
                                         font.weight: Font.Bold
                                     }
                                 }
@@ -547,22 +547,22 @@ PanelWindow {
                                 Layout.fillWidth: true
                                 height: 60
                                 color: Colors.bgWidget
-                                radius: Colors.radiusSmall
+                                radius: Appearance.radiusSmall
                                 border.color: Colors.border
                                 border.width: 1
                                 Column {
                                     anchors.centerIn: parent
-                                    spacing: Colors.spacingXXS
+                                    spacing: Appearance.spacingXXS
                                     Text {
                                         text: "GPU TEMP"
                                         color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         font.weight: Font.Bold
                                     }
                                     Text {
                                         text: SystemStatus.gpuTemp
                                         color: Colors.accent
-                                        font.pixelSize: Colors.fontSizeLarge
+                                        font.pixelSize: Appearance.fontSizeLarge
                                         font.weight: Font.Bold
                                     }
                                 }

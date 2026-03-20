@@ -28,7 +28,7 @@ Column {
     property string dropEndText: "Drop at end"
     property string dragHintText: "Drag to reorder"
 
-    spacing: Colors.spacingXS
+    spacing: Appearance.spacingXS
 
     Repeater {
         model: root.modeModel
@@ -36,7 +36,7 @@ Column {
         delegate: Item {
             id: modeRow
             width: parent ? parent.width : 0
-            implicitHeight: modeCard.implicitHeight + (dropBeforeIndicator.visible ? dropBeforeIndicator.height + Colors.spacingXS : 0)
+            implicitHeight: modeCard.implicitHeight + (dropBeforeIndicator.visible ? dropBeforeIndicator.height + Appearance.spacingXS : 0)
             height: implicitHeight
             required property int index
             required property var modelData
@@ -59,7 +59,7 @@ Column {
                     left: parent.left
                     right: parent.right
                     top: dropBeforeIndicator.bottom
-                    topMargin: dropBeforeIndicator.visible ? Colors.spacingXS : 0
+                    topMargin: dropBeforeIndicator.visible ? Appearance.spacingXS : 0
                 }
                 minimumHeight: root.compactMode ? 82 : 54
                 dragging: dragHandle.dragActive
@@ -73,7 +73,7 @@ Column {
                     enabled: !dragHandle.dragActive
 
                     NumberAnimation {
-                        duration: Colors.durationFast
+                        duration: Appearance.durationFast
                     }
                 }
 
@@ -105,7 +105,7 @@ Column {
                 Rectangle {
                     implicitWidth: 28
                     implicitHeight: 28
-                    radius: Colors.radiusCard
+                    radius: Appearance.radiusCard
                     color: Colors.surface
                     border.color: Colors.border
                     border.width: 1
@@ -115,29 +115,29 @@ Column {
                         anchors.centerIn: parent
                         text: root.modeMetaFn ? root.modeMetaFn(modeRow.modelData).icon : ""
                         color: Colors.primary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeSmall
                     }
                 }
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingXS
+                    spacing: Appearance.spacingXS
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingS
+                        spacing: Appearance.spacingS
 
                         Text {
                             text: root.modeMetaFn ? root.modeMetaFn(modeRow.modelData).label : ""
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: Font.DemiBold
                         }
 
                         Rectangle {
                             visible: String(ModeData.modeInfo(modeRow.modelData).prefix || "") !== ""
-                            radius: Colors.radiusPill
+                            radius: Appearance.radiusPill
                             color: Colors.primarySubtle
                             border.color: Colors.primaryRing
                             border.width: 1
@@ -149,7 +149,7 @@ Column {
                                 anchors.centerIn: parent
                                 text: (ModeData.modeInfo(modeRow.modelData).prefix || "") + " prefix"
                                 color: Colors.primary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.DemiBold
                             }
                         }
@@ -159,7 +159,7 @@ Column {
                         Layout.fillWidth: true
                         text: ModeData.modeInfo(modeRow.modelData).hint || "Launcher mode"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         wrapMode: Text.WordWrap
                     }
 
@@ -167,13 +167,13 @@ Column {
                         Layout.fillWidth: true
                         text: root.dragHintText
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         wrapMode: Text.WordWrap
                     }
                 }
 
                 Flow {
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
                     Layout.alignment: Qt.AlignTop
 
                     SettingsActionButton {
@@ -217,6 +217,6 @@ Column {
         visible: root.reorderState && root.reorderState.active && root.reorderState.targetListId === root.listId && root.reorderState.targetIndex === root.modeModel.length
         text: root.dropEndText
         color: Colors.textSecondary
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
     }
 }

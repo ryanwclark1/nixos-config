@@ -5,7 +5,7 @@ import "../../services"
 
 Item {
   id: root
-  property int spacing: Colors.spacingS
+  property int spacing: Appearance.spacingS
   property bool vertical: false
   property var anchorWindow: null
   property int buttonSize: 32

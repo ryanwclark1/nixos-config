@@ -6,7 +6,7 @@ import "../services"
 Item {
   id: root
 
-  property real pad: Colors.paddingMedium
+  property real pad: Appearance.paddingMedium
   property real hoverScale: 1.01
 
   default property alias content: container.data
@@ -27,11 +27,11 @@ Item {
     id: card
     anchors.fill: parent
     color: "transparent"
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     clip: true
 
     scale: cardHover.hovered ? root.hoverScale : 1.0
-    Behavior on scale { NumberAnimation { id: cardScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutQuint } }
+    Behavior on scale { NumberAnimation { id: cardScaleAnim; duration: Appearance.durationSlow; easing.type: Easing.OutQuint } }
     layer.enabled: cardScaleAnim.running
 
     Rectangle {

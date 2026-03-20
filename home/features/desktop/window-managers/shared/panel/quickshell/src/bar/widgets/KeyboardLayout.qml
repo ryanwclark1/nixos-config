@@ -29,8 +29,8 @@ SharedWidgets.BarPill {
     anchors.centerIn: parent
     text: (root.vertical || root.labelMode !== "full") ? root.layoutName.substring(0, 3).toUpperCase() : root.layoutName
     color: Colors.text
-    font.pixelSize: Colors.fontSizeSmall
-    font.family: Colors.fontMono
-    font.letterSpacing: Colors.letterSpacingWide
+    font.pixelSize: Appearance.fontSizeSmall
+    font.family: Appearance.fontMono
+    font.letterSpacing: Appearance.letterSpacingWide
   }
 }

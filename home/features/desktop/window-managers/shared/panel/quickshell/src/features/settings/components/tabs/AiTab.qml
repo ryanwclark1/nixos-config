@@ -95,11 +95,11 @@ Item {
             ColumnLayout {
                 visible: Config.aiProvider === "ollama"
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
                         Layout.fillWidth: true
@@ -107,7 +107,7 @@ Item {
                             ? "Available models: " + AiService.availableModels.length
                             : "Available models"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Medium
                         wrapMode: Text.WordWrap
                     }
@@ -175,7 +175,7 @@ Item {
             ColumnLayout {
                 visible: Config.aiProvider === "anthropic"
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 property bool _remember: Config.aiAnthropicKey !== ""
                 SettingsSecretInputRow {
                     label: "Anthropic API Key"
@@ -197,7 +197,7 @@ Item {
             ColumnLayout {
                 visible: Config.aiProvider === "openai" || Config.aiProvider === "custom"
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 property bool _remember: Config.aiOpenaiKey !== ""
                 SettingsSecretInputRow {
                     label: "OpenAI API Key"
@@ -219,7 +219,7 @@ Item {
             ColumnLayout {
                 visible: Config.aiProvider === "gemini"
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 property bool _remember: Config.aiGeminiKey !== ""
                 SettingsSecretInputRow {
                     label: "Gemini API Key"

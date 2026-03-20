@@ -12,7 +12,7 @@ ColumnLayout {
     required property bool compactMode
     required property bool tightMode
 
-    spacing: root.compactMode ? Colors.paddingSmall : Colors.paddingMedium
+    spacing: root.compactMode ? Appearance.paddingSmall : Appearance.paddingMedium
 
     Repeater {
         model: root.mediaPlayers
@@ -20,18 +20,18 @@ ColumnLayout {
             Layout.fillWidth: true
             height: root.tightMode ? 96 : (root.compactMode ? 108 : 120)
             color: Colors.bgWidget
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             border.color: Colors.border
             border.width: 1
 
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: root.compactMode ? Colors.spacingM : Colors.paddingMedium
-                spacing: root.compactMode ? Colors.paddingSmall : Colors.paddingMedium
+                anchors.margins: root.compactMode ? Appearance.spacingM : Appearance.paddingMedium
+                spacing: root.compactMode ? Appearance.paddingSmall : Appearance.paddingMedium
                 ClippingWrapperRectangle {
                     width: root.compactMode ? 72 : 90
                     height: root.compactMode ? 72 : 90
-                    radius: Colors.radiusXS
+                    radius: Appearance.radiusXS
                     color: Colors.surface
                     Image {
                         source: modelData.trackArtUrl || ""
@@ -45,24 +45,24 @@ ColumnLayout {
                     Text {
                         text: modelData.trackTitle || "Unknown"
                         color: Colors.text
-                        font.pixelSize: root.compactMode ? Colors.fontSizeMedium : Colors.fontSizeLarge
+                        font.pixelSize: root.compactMode ? Appearance.fontSizeMedium : Appearance.fontSizeLarge
                         font.weight: Font.Bold
                         elide: Text.ElideRight
                     }
                     Text {
                         text: modelData.trackArtist || "Unknown"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                     }
                     Item {
                         Layout.fillHeight: true
                     }
                     RowLayout {
-                        spacing: root.compactMode ? Colors.paddingSmall : Colors.paddingMedium
+                        spacing: root.compactMode ? Appearance.paddingSmall : Appearance.paddingMedium
                         SharedWidgets.IconButton {
                             icon: "previous.svg"
                             size: root.compactMode ? 26 : 30
-                            iconSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
+                            iconSize: root.compactMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL
                             iconColor: Colors.text
                             tooltipText: "Previous track"
                             onClicked: (modelData._playerRef || modelData).previous()
@@ -70,7 +70,7 @@ ColumnLayout {
                         SharedWidgets.IconButton {
                             icon: (modelData._playerRef || modelData).playbackState === Mpris.Playing ? "󰏤" : "󰐊"
                             size: root.compactMode ? 30 : 36
-                            iconSize: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeHuge
+                            iconSize: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeHuge
                             iconColor: Colors.primary
                             tooltipText: (modelData._playerRef || modelData).playbackState === Mpris.Playing ? "Pause" : "Play"
                             onClicked: (modelData._playerRef || modelData).playPause()
@@ -78,7 +78,7 @@ ColumnLayout {
                         SharedWidgets.IconButton {
                             icon: "next.svg"
                             size: root.compactMode ? 26 : 30
-                            iconSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
+                            iconSize: root.compactMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL
                             iconColor: Colors.text
                             tooltipText: "Next track"
                             onClicked: (modelData._playerRef || modelData).next()

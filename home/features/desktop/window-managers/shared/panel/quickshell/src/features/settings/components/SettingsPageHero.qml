@@ -26,11 +26,11 @@ Rectangle {
     readonly property var relatedTabs: SettingsRegistry.relatedTabsFor(tabId, compactMode ? 3 : 4)
 
     Layout.fillWidth: true
-    radius: Colors.radiusLarge
+    radius: Appearance.radiusLarge
     color: Colors.withAlpha(Colors.surface, 0.7)
     border.color: Colors.withAlpha(Colors.primary, 0.18)
     border.width: 1
-    implicitHeight: heroColumn.implicitHeight + (compactMode ? Colors.spacingM * 2 : Colors.spacingL * 2)
+    implicitHeight: heroColumn.implicitHeight + (compactMode ? Appearance.spacingM * 2 : Appearance.spacingL * 2)
     clip: true
 
     SharedWidgets.InnerHighlight { highlightOpacity: 0.1 }
@@ -39,25 +39,25 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: Math.max(parent.radius + Colors.spacingL, heroColumn.implicitHeight * 0.45)
+        height: Math.max(parent.radius + Appearance.spacingL, heroColumn.implicitHeight * 0.45)
         color: Colors.withAlpha(Colors.primary, 0.05)
     }
 
     ColumnLayout {
         id: heroColumn
         anchors.fill: parent
-        anchors.margins: compactMode ? Colors.spacingM : Colors.spacingL
-        spacing: compactMode ? Colors.spacingS : Colors.spacingM
+        anchors.margins: compactMode ? Appearance.spacingM : Appearance.spacingL
+        spacing: compactMode ? Appearance.spacingS : Appearance.spacingM
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             Rectangle {
                 Layout.alignment: Qt.AlignTop
                 width: compactMode ? 44 : 52
                 height: width
-                radius: Colors.radiusLarge
+                radius: Appearance.radiusLarge
                 color: Colors.primarySubtle
                 border.color: Colors.primaryRing
                 border.width: 1
@@ -68,38 +68,38 @@ Rectangle {
                 }
                 Component {
                     id: _heroSvgIcon
-                    SharedWidgets.SvgIcon { source: root.resolvedIcon; color: Colors.primary; size: compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL }
+                    SharedWidgets.SvgIcon { source: root.resolvedIcon; color: Colors.primary; size: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL }
                 }
                 Component {
                     id: _heroNerdIcon
                     Text {
                         text: root.resolvedIcon
                         color: Colors.primary
-                        font.family: Colors.fontMono
-                        font.pixelSize: compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL
+                        font.family: Appearance.fontMono
+                        font.pixelSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
                     }
                 }
             }
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 Text {
                     text: root.eyebrowText.toUpperCase()
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                     font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingExtraWide
+                    font.letterSpacing: Appearance.letterSpacingExtraWide
                 }
 
                 Text {
                     Layout.fillWidth: true
                     text: root.resolvedTitle
                     color: Colors.text
-                    font.pixelSize: compactMode ? Colors.fontSizeXL : Colors.fontSizeHuge
+                    font.pixelSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeHuge
                     font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingTight
+                    font.letterSpacing: Appearance.letterSpacingTight
                     wrapMode: Text.WordWrap
                 }
 
@@ -107,7 +107,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: root.resolvedSubtitle
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     wrapMode: Text.WordWrap
                     visible: !!text
                 }
@@ -118,7 +118,7 @@ Rectangle {
             Layout.fillWidth: true
             text: root.eyebrowDetail
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WordWrap
             visible: !!text
         }

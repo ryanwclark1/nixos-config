@@ -105,15 +105,15 @@ PanelWindow {
                 anchors.fill: parent
                 color: Colors.background
                 opacity: root.isVisible ? 0.85 : 0.0
-                Behavior on opacity { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutCubic } }
+                Behavior on opacity { NumberAnimation { duration: Appearance.durationSlow; easing.type: Easing.OutCubic } }
             }
         }
 
         SharedWidgets.ElasticNumber {
             id: _polkitElasticScale
             target: root.isVisible ? 1.0 : 0.92
-            fastDuration: Colors.durationFast
-            slowDuration: Colors.durationEmphasis
+            fastDuration: Appearance.durationFast
+            slowDuration: Appearance.durationEmphasis
             fastWeight: 0.4
         }
 
@@ -122,14 +122,14 @@ PanelWindow {
             id: card
             anchors.centerIn: parent
             width: 420
-            implicitHeight: cardContent.implicitHeight + 2 * Colors.paddingLarge
-            radius: Colors.radiusLarge
+            implicitHeight: cardContent.implicitHeight + 2 * Appearance.paddingLarge
+            radius: Appearance.radiusLarge
             color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
             scale: _polkitElasticScale.value
             opacity: root.isVisible ? 1.0 : 0.0
-            Behavior on opacity { NumberAnimation { id: fadeAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } }
+            Behavior on opacity { NumberAnimation { id: fadeAnim; duration: Appearance.durationEmphasis; easing.type: Easing.OutCubic } }
             layer.enabled: _polkitElasticScale.running || fadeAnim.running
 
             SharedWidgets.InnerHighlight { highlightOpacity: 0.12 }
@@ -140,17 +140,17 @@ PanelWindow {
                     left: parent.left
                     right: parent.right
                     top: parent.top
-                    margins: Colors.paddingLarge
+                    margins: Appearance.paddingLarge
                 }
-                spacing: Colors.spacingL
+                spacing: Appearance.spacingL
 
                 // Shield icon
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     text: "\u{f0552}"
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeGigantic
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeGigantic
                 }
 
                 // Title
@@ -158,9 +158,9 @@ PanelWindow {
                     Layout.alignment: Qt.AlignHCenter
                     text: "Authentication Required"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeHuge
+                    font.pixelSize: Appearance.fontSizeHuge
                     font.weight: Font.Bold
-                    font.letterSpacing: Colors.letterSpacingTight
+                    font.letterSpacing: Appearance.letterSpacingTight
                 }
 
                 // Auth message
@@ -169,7 +169,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     text: root.authMessage || "An application is requesting elevated privileges."
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -180,8 +180,8 @@ PanelWindow {
                     Layout.fillWidth: true
                     text: root.actionId
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.family: Appearance.fontMono
                     wrapMode: Text.WrapAnywhere
                     horizontalAlignment: Text.AlignHCenter
                     visible: root.actionId !== ""
@@ -190,14 +190,14 @@ PanelWindow {
                 // Identity display
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
                     visible: root.identities.length > 0
 
                     Text {
                         text: "\u{f0004}"
                         color: Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeMedium
                     }
 
                     Text {
@@ -211,7 +211,7 @@ PanelWindow {
                             return parts.join(", ");
                         }
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: Appearance.fontSizeMedium
                         font.weight: Font.Medium
                     }
                 }
@@ -239,13 +239,13 @@ PanelWindow {
                 // Buttons
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
 
                     // Cancel button
                     Rectangle {
                         Layout.fillWidth: true
                         height: 40
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.highlightLight
                         border.color: Colors.border
                         border.width: 1
@@ -254,7 +254,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             text: "Cancel"
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeMedium
+                            font.pixelSize: Appearance.fontSizeMedium
                             font.weight: Font.Medium
                         }
 
@@ -277,7 +277,7 @@ PanelWindow {
                     Rectangle {
                         Layout.fillWidth: true
                         height: 40
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: pamContext.attemptsExhausted
                             ? Colors.highlightLight
                             : Colors.withAlpha(Colors.primary, 0.15)
@@ -290,7 +290,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             text: "Authenticate"
                             color: pamContext.attemptsExhausted ? Colors.textDisabled : Colors.primary
-                            font.pixelSize: Colors.fontSizeMedium
+                            font.pixelSize: Appearance.fontSizeMedium
                             font.weight: Font.Bold
                         }
 

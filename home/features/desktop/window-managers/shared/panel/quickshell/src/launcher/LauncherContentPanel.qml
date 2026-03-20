@@ -11,7 +11,7 @@ Item {
 
     readonly property alias searchInput: searchField.searchInput
     readonly property color accentColor: launcher.modeAccentColor ? launcher.modeAccentColor : Colors.primary
-    readonly property real panelGap: launcher.compactMode ? Colors.spacingS : Colors.spacingXS
+    readonly property real panelGap: launcher.compactMode ? Appearance.spacingS : Appearance.spacingXS
     readonly property bool minimalShell: launcher && launcher.diagnosticMinimalShell === true
     readonly property bool showAssistBand: !minimalShell && !launcher.tightMode && (launcher.prefixQuickModes.length > 0
         || Config.launcherShowModeHints
@@ -24,12 +24,12 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             color: Colors.withAlpha(Colors.surface, 0.78)
             border.color: Colors.withAlpha(root.accentColor, 0.26)
             border.width: 1
             clip: true
-            implicitHeight: deckColumn.implicitHeight + (launcher.tightMode ? Colors.spacingM * 2 : Colors.spacingL * 2)
+            implicitHeight: deckColumn.implicitHeight + (launcher.tightMode ? Appearance.spacingM * 2 : Appearance.spacingL * 2)
 
             SharedWidgets.InnerHighlight {
                 highlightOpacity: 0.16
@@ -45,8 +45,8 @@ Item {
             ColumnLayout {
                 id: deckColumn
                 anchors.fill: parent
-                anchors.margins: launcher.tightMode ? Colors.spacingM : Colors.spacingL
-                spacing: launcher.compactMode ? Colors.spacingS : Colors.spacingM
+                anchors.margins: launcher.tightMode ? Appearance.spacingM : Appearance.spacingL
+                spacing: launcher.compactMode ? Appearance.spacingS : Appearance.spacingM
 
                 LauncherSearchField {
                     id: searchField
@@ -119,7 +119,7 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true
                     visible: root.showAssistBand
-                    spacing: launcher.compactMode ? Colors.spacingS : Colors.spacingM
+                    spacing: launcher.compactMode ? Appearance.spacingS : Appearance.spacingM
 
                     LauncherPrefixStrip {
                         Layout.fillWidth: true
@@ -162,18 +162,18 @@ Item {
                         Layout.fillWidth: true
                         visible: launcher.transientNoticeText !== "" && !launcher.tightMode
                         color: Colors.withAlpha(root.accentColor, 0.12)
-                        radius: Colors.radiusLarge
+                        radius: Appearance.radiusLarge
                         border.color: Colors.withAlpha(root.accentColor, 0.3)
                         border.width: 1
-                        implicitHeight: transientNoticeLabel.implicitHeight + (Colors.spacingS * 2)
+                        implicitHeight: transientNoticeLabel.implicitHeight + (Appearance.spacingS * 2)
 
                         Text {
                             id: transientNoticeLabel
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingS
+                            anchors.margins: Appearance.spacingS
                             text: launcher.transientNoticeText
                             color: root.accentColor
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.DemiBold
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
@@ -199,7 +199,7 @@ Item {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             color: Colors.withAlpha(Colors.surface, 0.72)
             border.color: Colors.withAlpha(root.accentColor, 0.18)
             border.width: 1
@@ -210,8 +210,8 @@ Item {
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: launcher.tightMode ? Colors.spacingM : Colors.spacingL
-                spacing: launcher.compactMode ? Colors.spacingS : Colors.spacingM
+                anchors.margins: launcher.tightMode ? Appearance.spacingM : Appearance.spacingL
+                spacing: launcher.compactMode ? Appearance.spacingS : Appearance.spacingM
 
                 LauncherHome {
                     Layout.fillWidth: true

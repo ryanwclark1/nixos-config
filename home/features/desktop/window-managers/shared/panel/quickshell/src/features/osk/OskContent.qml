@@ -19,7 +19,7 @@ Item {
     ColumnLayout {
         id: keyRows
         anchors.fill: parent
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Repeater {
             model: root._layout.keys
@@ -27,7 +27,7 @@ Item {
             delegate: RowLayout {
                 id: keyRow
                 required property var modelData
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 Repeater {
                     model: modelData

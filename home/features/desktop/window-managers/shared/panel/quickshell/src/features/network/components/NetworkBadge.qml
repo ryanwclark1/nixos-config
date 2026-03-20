@@ -10,7 +10,7 @@ Rectangle {
     property color borderColor: Colors.withAlpha(badgeColor, 0.35)
     property int fontWeight: Font.DemiBold
 
-    radius: Colors.radiusXS
+    radius: Appearance.radiusXS
     color: Colors.withAlpha(badgeColor, 0.14)
     border.color: root.borderColor
     border.width: 1
@@ -23,7 +23,7 @@ Rectangle {
         anchors.centerIn: parent
         text: root.text
         color: root.textColor
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         font.weight: root.fontWeight
     }
 }

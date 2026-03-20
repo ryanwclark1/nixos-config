@@ -17,17 +17,17 @@ Rectangle {
     required property var fallbackTextFn
 
     Layout.fillWidth: true
-    radius: Colors.radiusSmall
+    radius: Appearance.radiusSmall
     color: Colors.cardSurface
     border.color: Colors.withAlpha(root.detailStatusColorFn(ServiceUnitService.detailStatus), 0.4)
     border.width: 1
-    implicitHeight: liveDetailColumn.implicitHeight + Colors.spacingM * 2
+    implicitHeight: liveDetailColumn.implicitHeight + Appearance.spacingM * 2
 
     ColumnLayout {
         id: liveDetailColumn
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
@@ -35,9 +35,9 @@ Rectangle {
             Text {
                 text: "LIVE UNIT DETAIL"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Bold
-                font.letterSpacing: Colors.letterSpacingWide
+                font.letterSpacing: Appearance.letterSpacingWide
             }
 
             Item {
@@ -64,7 +64,7 @@ Rectangle {
             visible: ServiceUnitService.detailMessage !== ""
             text: ServiceUnitService.detailMessage
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WordWrap
         }
 
@@ -76,14 +76,14 @@ Rectangle {
                 && ServiceUnitService.lastActionMessage !== ""
             text: ServiceUnitService.lastActionMessage + "  •  " + MU.formatAge(ServiceUnitService.lastActionAt, root.clockTick)
             color: root.actionStatusColorFn(ServiceUnitService.lastActionState)
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WordWrap
         }
 
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SharedWidgets.Chip {
                 icon: "󰈐"
@@ -124,21 +124,21 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             color: Colors.cardSurface
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             border.color: Colors.borderFocus
             border.width: 1
-            implicitHeight: fragmentBlock.implicitHeight + Colors.spacingS * 2
+            implicitHeight: fragmentBlock.implicitHeight + Appearance.spacingS * 2
 
             ColumnLayout {
                 id: fragmentBlock
                 anchors.fill: parent
-                anchors.margins: Colors.spacingS
-                spacing: Colors.spacingXXS
+                anchors.margins: Appearance.spacingS
+                spacing: Appearance.spacingXXS
 
                 Text {
                     text: "FRAGMENT PATH"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Bold
                 }
 
@@ -146,8 +146,8 @@ Rectangle {
                     Layout.fillWidth: true
                     text: root.fallbackTextFn(root.detailData.fragmentPath)
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.family: Appearance.fontMono
                     wrapMode: Text.WrapAnywhere
                 }
             }
@@ -156,21 +156,21 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             color: Colors.cardSurface
-            radius: Colors.radiusSmall
+            radius: Appearance.radiusSmall
             border.color: Colors.borderFocus
             border.width: 1
-            implicitHeight: logsBlock.implicitHeight + Colors.spacingS * 2
+            implicitHeight: logsBlock.implicitHeight + Appearance.spacingS * 2
 
             ColumnLayout {
                 id: logsBlock
                 anchors.fill: parent
-                anchors.margins: Colors.spacingS
-                spacing: Colors.spacingXXS
+                anchors.margins: Appearance.spacingS
+                spacing: Appearance.spacingXXS
 
                 Text {
                     text: "RECENT LOGS"
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Bold
                 }
 
@@ -179,8 +179,8 @@ Rectangle {
                     visible: !root.detailData.recentLogs || root.detailData.recentLogs.length === 0
                     text: "Unavailable"
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.family: Appearance.fontMono
                 }
 
                 Repeater {
@@ -191,8 +191,8 @@ Rectangle {
                         Layout.fillWidth: true
                         text: String(modelData || "")
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeXS
+                        font.family: Appearance.fontMono
                         wrapMode: Text.WrapAnywhere
                     }
                 }

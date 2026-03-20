@@ -8,7 +8,7 @@ import "../../../widgets" as SharedWidgets
 ColumnLayout {
     id: root
     Layout.fillWidth: true
-    spacing: Colors.spacingM
+    spacing: Appearance.spacingM
 
     property bool showContent: false
     property int baseIndex: 15
@@ -28,7 +28,7 @@ ColumnLayout {
                 duration: showContent ? (root.baseIndex * root.staggerDelay) : 0
             }
             NumberAnimation {
-                duration: Colors.durationNormal + (root.baseIndex * 20)
+                duration: Appearance.durationNormal + (root.baseIndex * 20)
                 easing.type: Easing.OutCubic
             }
         }
@@ -40,7 +40,7 @@ ColumnLayout {
                 duration: showContent ? (root.baseIndex * root.staggerDelay) : 0
             }
             NumberAnimation {
-                duration: Colors.durationNormal + (root.baseIndex * 20)
+                duration: Appearance.durationNormal + (root.baseIndex * 20)
                 easing.type: Easing.OutBack
             }
         }
@@ -51,7 +51,7 @@ ColumnLayout {
                 duration: showContent ? (root.baseIndex * root.staggerDelay) : 0
             }
             NumberAnimation {
-                duration: Colors.durationNormal + (root.baseIndex * 20)
+                duration: Appearance.durationNormal + (root.baseIndex * 20)
                 easing.type: Easing.OutCubic
             }
         }
@@ -61,46 +61,46 @@ ColumnLayout {
     Text {
         text: "DEVOPS & SERVICES"
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         font.weight: Font.Bold
-        font.letterSpacing: Colors.letterSpacingWide
+        font.letterSpacing: Appearance.letterSpacingWide
     }
 
     // ── Summary Row ────────────────────────────
     RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         // Docker Summary
         Rectangle {
             Layout.fillWidth: true
             height: 54
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: Colors.cardSurface
             border.color: ServiceUnitService.dockerStatus === "ready" ? Colors.border : Colors.warning
             border.width: 1
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.paddingSmall
+                anchors.margins: Appearance.paddingSmall
                 Text {
                     text: "󰡨"
                     color: ServiceUnitService.dockerContainers.length > 0 ? Colors.primary : Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXL
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXL
+                    font.family: Appearance.fontMono
                 }
                 Column {
                     Layout.fillWidth: true
                     Text {
                         text: ServiceUnitService.dockerContainers.length + " Docker"
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Bold
                     }
                     Text {
                         visible: ServiceUnitService.dockerStatus !== "ready"
                         text: ServiceUnitService.dockerStatus === "missing" ? "Missing" : "Error"
                         color: Colors.warning
-                        font.pixelSize: Colors.fontSizeCaption
+                        font.pixelSize: Appearance.fontSizeCaption
                     }
                 }
             }
@@ -110,18 +110,18 @@ ColumnLayout {
         Rectangle {
             Layout.fillWidth: true
             height: 54
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: Colors.cardSurface
             border.color: ServiceUnitService.sshStatus === "ready" ? Colors.border : Colors.warning
             border.width: 1
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: Colors.paddingSmall
+                anchors.margins: Appearance.paddingSmall
                 Text {
                     text: "󰣀"
                     color: ServiceUnitService.sshActiveCount > 0 ? Colors.accent : Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXL
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXL
+                    font.family: Appearance.fontMono
                 }
                 Column {
                     Layout.fillWidth: true
@@ -144,14 +144,14 @@ ColumnLayout {
                             return parts.join(" · ") || (count + " SSH");
                         }
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Bold
                     }
                     Text {
                         visible: ServiceUnitService.sshStatus !== "ready"
                         text: ServiceUnitService.sshStatus === "missing" ? "Missing" : "Error"
                         color: Colors.warning
-                        font.pixelSize: Colors.fontSizeCaption
+                        font.pixelSize: Appearance.fontSizeCaption
                     }
                 }
             }
@@ -161,7 +161,7 @@ ColumnLayout {
     // ── Active Item List ────────────────────────
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
         visible: ServiceUnitService.dockerContainers.length > 0 || ServiceUnitService.sshActiveCount > 0
 
         Repeater {
@@ -169,30 +169,30 @@ ColumnLayout {
             delegate: Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 42
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
                 RowLayout {
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
+                    anchors.margins: Appearance.spacingS
                     Text {
                         text: "󰡨"
                         color: Colors.primary
-                        font.pixelSize: Colors.fontSizeLarge
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeLarge
+                        font.family: Appearance.fontMono
                     }
                     Text {
                         text: modelData.name
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.DemiBold
                         elide: Text.ElideRight
                         Layout.fillWidth: true
                     }
 
                     Row {
-                        spacing: Colors.spacingXXS
+                        spacing: Appearance.spacingXXS
                         SharedWidgets.IconButton {
                             icon: "terminal.svg"
                             size: 28
@@ -227,7 +227,7 @@ ColumnLayout {
                 required property var modelData
                 Layout.fillWidth: true
                 implicitHeight: 42
-                radius: Colors.radiusSmall
+                radius: Appearance.radiusSmall
                 color: Colors.cardSurface
                 border.color: Colors.border
                 border.width: 1
@@ -247,17 +247,17 @@ ColumnLayout {
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.margins: Colors.spacingS
+                    anchors.margins: Appearance.spacingS
                     Text {
                         text: typeIcon
                         color: Colors.accent
-                        font.pixelSize: Colors.fontSizeLarge
-                        font.family: Colors.fontMono
+                        font.pixelSize: Appearance.fontSizeLarge
+                        font.family: Appearance.fontMono
                     }
                     Text {
                         text: sessionLabel + (sessionCount > 1 ? " ×" + sessionCount : "")
                         color: Colors.text
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.DemiBold
                         elide: Text.ElideRight
                         Layout.fillWidth: true
@@ -266,7 +266,7 @@ ColumnLayout {
                         visible: sessionType !== "ssh"
                         text: sessionType.toUpperCase()
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXXS
+                        font.pixelSize: Appearance.fontSizeXXS
                         font.weight: Font.Medium
                     }
 
@@ -304,7 +304,7 @@ ColumnLayout {
         visible: ServiceUnitService.dockerContainers.length === 0 && ServiceUnitService.sshActiveCount === 0
         text: "No active containers or sessions"
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         Layout.alignment: Qt.AlignHCenter
     }
 }

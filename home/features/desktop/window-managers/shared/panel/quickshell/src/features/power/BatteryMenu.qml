@@ -67,22 +67,22 @@ BasePopupMenu {
   ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    spacing: Colors.spacingM
+    spacing: Appearance.spacingM
     visible: root.hasBattery
 
     // Battery status card
     Rectangle {
       Layout.fillWidth: true
       implicitHeight: root.compactMode ? 102 : 90
-      radius: Colors.radiusMedium
+      radius: Appearance.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
       border.width: 1
 
       RowLayout {
         anchors.fill: parent
-        anchors.margins: root.compactMode ? Colors.spacingM : Colors.spacingL
-        spacing: root.compactMode ? Colors.spacingM : Colors.spacingL
+        anchors.margins: root.compactMode ? Appearance.spacingM : Appearance.spacingL
+        spacing: root.compactMode ? Appearance.spacingM : Appearance.spacingL
 
         CircularGauge {
           value: root.device ? root.device.percentage : 0
@@ -94,25 +94,25 @@ BasePopupMenu {
 
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: Colors.spacingXXS
+          spacing: Appearance.spacingXXS
 
           Text {
             text: root.device ? Math.round(root.device.percentage * 100) + "%" : "—"
             color: root.batteryColor
-            font.pixelSize: Colors.fontSizeIcon
+            font.pixelSize: Appearance.fontSizeIcon
             font.weight: Font.Bold
           }
 
           Text {
             text: root.batteryStateText
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeMedium
+            font.pixelSize: Appearance.fontSizeMedium
           }
 
           Text {
             text: root.timeRemainingText
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             visible: root.timeRemainingText !== ""
           }
         }
@@ -122,8 +122,8 @@ BasePopupMenu {
     // Power details grid
     Rectangle {
       Layout.fillWidth: true
-      implicitHeight: detailsGrid.implicitHeight + Colors.paddingLarge
-      radius: Colors.radiusMedium
+      implicitHeight: detailsGrid.implicitHeight + Appearance.paddingLarge
+      radius: Appearance.radiusMedium
       color: Colors.cardSurface
       border.color: Colors.border
       border.width: 1
@@ -131,28 +131,28 @@ BasePopupMenu {
       GridLayout {
         id: detailsGrid
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
+        anchors.margins: Appearance.spacingM
         columns: root.detailColumns
-        rowSpacing: Colors.spacingS
-        columnSpacing: Colors.spacingM
+        rowSpacing: Appearance.spacingS
+        columnSpacing: Appearance.spacingM
 
         SharedWidgets.SectionLabel { label: "POWER"; Layout.columnSpan: root.detailColumns }
 
-        Text { text: "Energy rate"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium }
+        Text { text: "Energy rate"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeMedium }
         Text {
           text: root.device && root.device.energyRate ? root.device.energyRate.toFixed(1) + " W" : "—"
-          color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium
+          color: Colors.text; font.pixelSize: Appearance.fontSizeMedium; font.weight: Font.Medium
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
 
-        Text { text: "Capacity"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium }
+        Text { text: "Capacity"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeMedium }
         Text {
           text: root.device && root.device.energyFull ? root.device.energyFull.toFixed(1) + " Wh" : "—"
-          color: Colors.text; font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium
+          color: Colors.text; font.pixelSize: Appearance.fontSizeMedium; font.weight: Font.Medium
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
 
-        Text { text: "Health"; color: Colors.textSecondary; font.pixelSize: Colors.fontSizeMedium }
+        Text { text: "Health"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeMedium }
         Text {
           text: root.device && root.device.energyFullDesign > 0
             ? Math.round((root.device.energyFull / root.device.energyFullDesign) * 100) + "%"
@@ -162,7 +162,7 @@ BasePopupMenu {
             var health = root.device.energyFull / root.device.energyFullDesign;
             return health > 0.8 ? Colors.primary : (health > 0.5 ? Colors.accent : Colors.error);
           }
-          font.pixelSize: Colors.fontSizeMedium; font.weight: Font.Medium
+          font.pixelSize: Appearance.fontSizeMedium; font.weight: Font.Medium
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
       }
@@ -177,7 +177,7 @@ BasePopupMenu {
 
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
       visible: PowerProfileService.available
 
       Repeater {
@@ -201,7 +201,7 @@ BasePopupMenu {
       visible: PowerProfileService.availabilityKnown && !PowerProfileService.available
       text: "powerprofilesctl is not available on this system."
       color: Colors.textDisabled
-      font.pixelSize: Colors.fontSizeSmall
+      font.pixelSize: Appearance.fontSizeSmall
       wrapMode: Text.WordWrap
     }
 

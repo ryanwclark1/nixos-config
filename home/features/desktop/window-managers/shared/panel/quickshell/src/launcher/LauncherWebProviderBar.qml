@@ -18,19 +18,19 @@ Rectangle {
     Column {
         id: providerFlowContainer
         anchors.fill: parent
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             color: Colors.withAlpha(root.accentColor, 0.92)
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Black
-            font.letterSpacing: Colors.letterSpacingExtraWide
+            font.letterSpacing: Appearance.letterSpacingExtraWide
             text: "ACTIVE PROVIDERS"
         }
 
         Flow {
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Repeater {
                 model: root.providers
@@ -40,7 +40,7 @@ Rectangle {
 
                     readonly property bool selected: String(modelData.key || "") === root.selectedKey
                     color: selected ? Colors.withAlpha(root.accentColor, 0.16) : Colors.withAlpha(Colors.surface, 0.72)
-                    radius: Colors.radiusPill
+                    radius: Appearance.radiusPill
                     border.color: selected ? Colors.withAlpha(root.accentColor, 0.4) : Colors.border
                     border.width: 1
                     implicitHeight: 28
@@ -52,7 +52,7 @@ Rectangle {
                         width: Math.min(implicitWidth, parent.width - 18)
                         text: (modelData.icon || "󰖟") + " " + (modelData.name || "")
                         color: parent.selected ? root.accentColor : Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.DemiBold
                         elide: Text.ElideRight
                     }

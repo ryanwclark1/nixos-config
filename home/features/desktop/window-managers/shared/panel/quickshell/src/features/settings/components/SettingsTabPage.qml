@@ -32,7 +32,7 @@ SharedWidgets.ScrollableContent {
     default property alias pageContent: contentColumn.data
 
     anchors.fill: parent
-    columnSpacing: Colors.spacingXL
+    columnSpacing: Appearance.spacingXL
 
     ColumnLayout {
         id: contentColumn
@@ -41,7 +41,7 @@ SharedWidgets.ScrollableContent {
         Layout.rightMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
         Layout.topMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
         Layout.bottomMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
-        spacing: Colors.spacingXL
+        spacing: Appearance.spacingXL
 
         SettingsPageHero {
             Layout.fillWidth: true

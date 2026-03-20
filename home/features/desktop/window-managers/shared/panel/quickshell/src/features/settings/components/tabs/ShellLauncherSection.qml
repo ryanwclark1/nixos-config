@@ -294,39 +294,39 @@ Item {
         id: launcherColumn
         anchors.left: parent.left
         anchors.right: parent.right
-        spacing: Colors.spacingL
+        spacing: Appearance.spacingL
 
         Rectangle {
             visible: root.isLauncherSection || root.isLauncherGeneralSection || root.isLauncherSearchSection || root.isLauncherWebSection || root.isLauncherModesSection || root.isLauncherRuntimeSection
             Layout.fillWidth: true
-            radius: Colors.radiusLarge
+            radius: Appearance.radiusLarge
             color: Colors.withAlpha(Colors.primary, 0.08)
             border.color: Colors.primaryMarked
             border.width: 1
-            implicitHeight: launcherHeroColumn.implicitHeight + (root.compactMode ? Colors.spacingM * 2 : Colors.spacingL * 2)
+            implicitHeight: launcherHeroColumn.implicitHeight + (root.compactMode ? Appearance.spacingM * 2 : Appearance.spacingL * 2)
 
             ColumnLayout {
                 id: launcherHeroColumn
                 anchors.fill: parent
-                anchors.margins: root.compactMode ? Colors.spacingM : Colors.spacingL
-                spacing: Colors.spacingM
+                anchors.margins: root.compactMode ? Appearance.spacingM : Appearance.spacingL
+                spacing: Appearance.spacingM
 
                 Text {
                     text: "LAUNCHER CONTROL DECK"
                     color: Colors.primary
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                     font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingExtraWide
+                    font.letterSpacing: Appearance.letterSpacingExtraWide
                 }
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
 
                     Rectangle {
                         width: root.compactMode ? 42 : 48
                         height: width
-                        radius: Colors.radiusLarge
+                        radius: Appearance.radiusLarge
                         color: Colors.primarySubtle
                         border.color: Colors.primaryRing
                         border.width: 1
@@ -337,28 +337,28 @@ Item {
                         }
                         Component {
                             id: _launcherSvgIcon
-                            SharedWidgets.SvgIcon { source: root.launcherHeroMeta.icon; color: Colors.primary; size: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL }
+                            SharedWidgets.SvgIcon { source: root.launcherHeroMeta.icon; color: Colors.primary; size: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL }
                         }
                         Component {
                             id: _launcherNerdIcon
                             Text {
                                 text: root.launcherHeroMeta.icon
                                 color: Colors.primary
-                                font.family: Colors.fontMono
-                                font.pixelSize: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL
+                                font.family: Appearance.fontMono
+                                font.pixelSize: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
                             }
                         }
                     }
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
+                        spacing: Appearance.spacingXXS
 
                         Text {
                             Layout.fillWidth: true
                             text: root.launcherHeroMeta.label
                             color: Colors.text
-                            font.pixelSize: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeHuge
+                            font.pixelSize: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeHuge
                             font.weight: Font.Black
                             wrapMode: Text.WordWrap
                         }
@@ -367,7 +367,7 @@ Item {
                             Layout.fillWidth: true
                             text: root.launcherHeroMeta.description
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             wrapMode: Text.WordWrap
                         }
                     }
@@ -376,7 +376,7 @@ Item {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Repeater {
                         model: root.launcherHeroTabs
@@ -394,7 +394,7 @@ Item {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Repeater {
                         model: root.launcherHeroMeta.chips
@@ -771,7 +771,7 @@ Item {
 
             Flow {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Repeater {
                     model: root.webProviders
@@ -788,14 +788,14 @@ Item {
             Column {
                 id: webProviderOrderList
                 Layout.fillWidth: true
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
 
                 Repeater {
                     model: root.orderedWebProviders()
                     delegate: Item {
                         id: webProviderRow
                         width: parent ? parent.width : 0
-                        implicitHeight: webProviderCard.implicitHeight + (webDropBeforeIndicator.visible ? webDropBeforeIndicator.height + Colors.spacingXS : 0)
+                        implicitHeight: webProviderCard.implicitHeight + (webDropBeforeIndicator.visible ? webDropBeforeIndicator.height + Appearance.spacingXS : 0)
                         height: implicitHeight
                         required property int index
                         required property var modelData
@@ -818,7 +818,7 @@ Item {
                                 left: parent.left
                                 right: parent.right
                                 top: webDropBeforeIndicator.bottom
-                                topMargin: webDropBeforeIndicator.visible ? Colors.spacingXS : 0
+                                topMargin: webDropBeforeIndicator.visible ? Appearance.spacingXS : 0
                             }
                             minimumHeight: root.compactMode ? 76 : 44
                             active: webDragHandle.dragActive
@@ -833,7 +833,7 @@ Item {
                                 enabled: !webDragHandle.dragActive
 
                                 NumberAnimation {
-                                    duration: Colors.durationFast
+                                    duration: Appearance.durationFast
                                 }
                             }
 
@@ -867,13 +867,13 @@ Item {
                                 color: Colors.surface
                                 implicitHeight: 24
                                 implicitWidth: 24
-                                radius: Colors.radiusCard
+                                radius: Appearance.radiusCard
 
                                 Text {
                                     anchors.centerIn: parent
                                     color: Colors.primary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.family: Appearance.fontMono
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     text: {
                                         for (var i = 0; i < root.webProviders.length; ++i) {
                                             if (root.webProviders[i].key === webProviderRow.modelData)
@@ -886,12 +886,12 @@ Item {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Colors.spacingXS
+                                spacing: Appearance.spacingXS
 
                                 Text {
                                     Layout.fillWidth: true
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    font.pixelSize: Appearance.fontSizeSmall
                                     font.weight: Font.DemiBold
                                     wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
                                     elide: root.compactMode ? Text.ElideNone : Text.ElideRight
@@ -907,7 +907,7 @@ Item {
                                 Text {
                                     text: "Drag to reorder, or use the arrow buttons."
                                     color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
+                                    font.pixelSize: Appearance.fontSizeXS
                                     Layout.fillWidth: true
                                     wrapMode: Text.WordWrap
                                 }
@@ -915,7 +915,7 @@ Item {
                                 Flow {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: parent.width
-                                    spacing: Colors.spacingS
+                                    spacing: Appearance.spacingS
 
                                     SettingsActionButton {
                                         compact: true
@@ -949,7 +949,7 @@ Item {
                     visible: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
                     text: "Drop at end of provider order"
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                 }
             }
         }
@@ -1027,12 +1027,12 @@ Item {
                     Layout.fillWidth: true
                     required property int index
                     required property var modelData
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Rectangle {
                         implicitWidth: 24
                         implicitHeight: 24
-                        radius: Colors.radiusCard
+                        radius: Appearance.radiusCard
                         color: Colors.surface
                         border.color: Colors.border
                         border.width: 1
@@ -1040,27 +1040,27 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.family: Appearance.fontMono
+                            font.pixelSize: Appearance.fontSizeSmall
                             text: customEngineRow.modelData.icon || "󰖟"
                         }
                     }
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
+                        spacing: Appearance.spacingXXS
 
                         Text {
                             text: customEngineRow.modelData.name + " (" + customEngineRow.modelData.key + ")"
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             font.weight: Font.DemiBold
                         }
 
                         Text {
                             text: customEngineRow.modelData.exec
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             Layout.fillWidth: true
                             elide: Text.ElideRight
                         }
@@ -1169,7 +1169,7 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 SettingsActionButton {
                     Layout.fillWidth: true
@@ -1187,7 +1187,7 @@ Item {
                 visible: Config.launcherWebBangsLastSync !== ""
                 text: "Last synced: " + Config.launcherWebBangsLastSync
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 Layout.fillWidth: true
             }
 
@@ -1195,7 +1195,7 @@ Item {
                 visible: Config.launcherWebBangsLastSync === "" && Config.launcherWebBangsEnabled
                 text: "Bang database not yet synced. Click 'Sync' to download."
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 Layout.fillWidth: true
             }
         }
@@ -1216,7 +1216,7 @@ Item {
 
             Flow {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 SettingsActionButton {
                     width: root.compactMode ? implicitWidth : 0
@@ -1322,7 +1322,7 @@ Item {
 
             Flow {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Repeater {
                     model: root.disabledLauncherModes()
@@ -1407,7 +1407,7 @@ Item {
 
             Flow {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 SettingsActionButton {
                     width: root.compactMode ? implicitWidth : 0

@@ -21,7 +21,7 @@ Rectangle {
     signal secondaryClicked
 
     color: Colors.withAlpha(Colors.surface, 0.34)
-    radius: Colors.radiusXL
+    radius: Appearance.radiusXL
     border.color: Colors.withAlpha(root.accentColor, 0.18)
     border.width: 1
     Layout.fillWidth: true
@@ -29,14 +29,14 @@ Rectangle {
 
     ColumnLayout {
         anchors.centerIn: parent
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
         width: Math.min(parent.width - 64, 520)
 
         Rectangle {
             Layout.alignment: Qt.AlignHCenter
             width: 76
             height: 76
-            radius: Colors.radiusPill
+            radius: Appearance.radiusPill
             color: Colors.withAlpha(root.accentColor, 0.12)
             border.color: Colors.withAlpha(root.accentColor, 0.28)
             border.width: 1
@@ -45,24 +45,24 @@ Rectangle {
                 anchors.centerIn: parent
                 text: root.icon
                 color: root.accentColor
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeHuge
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeHuge
             }
         }
 
         Text {
             text: "READY FOR INPUT"
             color: Colors.withAlpha(root.accentColor, 0.92)
-            font.pixelSize: Colors.fontSizeXXS
+            font.pixelSize: Appearance.fontSizeXXS
             font.weight: Font.Black
-            font.letterSpacing: Colors.letterSpacingExtraWide
+            font.letterSpacing: Appearance.letterSpacingExtraWide
             Layout.alignment: Qt.AlignHCenter
         }
 
         Text {
             text: root.title
             color: Colors.text
-            font.pixelSize: Colors.fontSizeXL
+            font.pixelSize: Appearance.fontSizeXL
             font.weight: Font.Black
             Layout.alignment: Qt.AlignHCenter
             horizontalAlignment: Text.AlignHCenter
@@ -71,7 +71,7 @@ Rectangle {
         Text {
             text: root.subtitle
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             Layout.alignment: Qt.AlignHCenter
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
@@ -80,11 +80,11 @@ Rectangle {
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Colors.spacingS
-            Layout.topMargin: Colors.spacingS
+            spacing: Appearance.spacingS
+            Layout.topMargin: Appearance.spacingS
 
             Rectangle {
-                radius: Colors.radiusLarge
+                radius: Appearance.radiusLarge
                 color: root.accentColor
                 implicitHeight: 40
                 implicitWidth: emptyPrimaryText.implicitWidth + 34
@@ -94,7 +94,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root.primaryCta
                     color: Colors.surface
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Bold
                 }
 
@@ -108,7 +108,7 @@ Rectangle {
 
             Rectangle {
                 visible: root.secondaryCta !== ""
-                radius: Colors.radiusLarge
+                radius: Appearance.radiusLarge
                 color: Colors.withAlpha(Colors.surface, 0.74)
                 border.color: Colors.withAlpha(root.accentColor, 0.18)
                 border.width: 1
@@ -120,7 +120,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root.secondaryCta
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Bold
                 }
 
@@ -135,8 +135,8 @@ Rectangle {
 
         ColumnLayout {
             Layout.fillWidth: true
-            Layout.topMargin: Colors.spacingM
-            spacing: Colors.spacingS
+            Layout.topMargin: Appearance.spacingM
+            spacing: Appearance.spacingS
             visible: root.primaryHint !== "" || root.secondaryHint !== ""
 
             Rectangle {
@@ -148,20 +148,20 @@ Rectangle {
             RowLayout {
                 Layout.fillWidth: true
                 visible: root.primaryHint !== ""
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     text: root.primaryHintIcon
                     color: root.accentColor
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeSmall
                     visible: text !== ""
                 }
 
                 Text {
                     text: root.primaryHint
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
                 }
@@ -170,20 +170,20 @@ Rectangle {
             RowLayout {
                 Layout.fillWidth: true
                 visible: root.secondaryHint !== ""
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Text {
                     text: root.secondaryHintIcon
                     color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeSmall
                     visible: text !== ""
                 }
 
                 Text {
                     text: root.secondaryHint
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
                 }

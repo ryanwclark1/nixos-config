@@ -6,9 +6,9 @@ import "../../../widgets" as SharedWidgets
 Rectangle {
   id: root
   Layout.fillWidth: true
-  Layout.preferredHeight: weatherContent.implicitHeight + Colors.paddingMedium * 2
+  Layout.preferredHeight: weatherContent.implicitHeight + Appearance.paddingMedium * 2
   color: Colors.cardSurface
-  radius: Colors.radiusLarge
+  radius: Appearance.radiusLarge
   border.color: Colors.border
   clip: true
 
@@ -22,29 +22,29 @@ Rectangle {
   RowLayout {
     id: weatherContent
     anchors.fill: parent
-    anchors.margins: Colors.paddingMedium
-    spacing: Colors.paddingMedium
+    anchors.margins: Appearance.paddingMedium
+    spacing: Appearance.paddingMedium
 
     Text {
       text: Colors.weatherIcon(WeatherService.condition)
       color: Colors.accent
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeIcon
+      font.family: Appearance.fontMono
+      font.pixelSize: Appearance.fontSizeIcon
     }
 
     ColumnLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingXXS
+      spacing: Appearance.spacingXXS
       Text {
         text: WeatherService.temp
         color: Colors.text
-        font.pixelSize: Colors.fontSizeXL
+        font.pixelSize: Appearance.fontSizeXL
         font.weight: Font.Bold
       }
       Text {
         text: (WeatherService.condition || "Unknown") + " in " + (WeatherService.location || "Local")
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         Layout.fillWidth: true
         wrapMode: Text.Wrap
         maximumLineCount: 2

@@ -22,8 +22,8 @@ Rectangle {
     signal fieldChanged(string field, string value)
 
     Layout.fillWidth: true
-    implicitHeight: editorColumn.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: editorColumn.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.modalFieldSurface
     border.color: root.formError !== "" ? Colors.error : (root.isEditingExisting ? Colors.primary : Colors.border)
     border.width: 1
@@ -31,17 +31,17 @@ Rectangle {
     ColumnLayout {
         id: editorColumn
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingS
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingS
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: root.isEditingExisting ? "Edit Host" : "Host Editor"
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.DemiBold
                 Layout.fillWidth: true
             }
@@ -59,7 +59,7 @@ Rectangle {
                 ? "Update the selected manual host. Cancel returns to list mode without saving."
                 : "Create a new manual SSH host entry. Save persists only when the draft validates."
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             wrapMode: Text.WordWrap
         }
 
@@ -116,7 +116,7 @@ Rectangle {
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SettingsActionButton {
                 compact: true

@@ -20,25 +20,25 @@ ColumnLayout {
 
     default property alias actions: actionsRow.data
 
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
     Layout.fillWidth: true
 
     Text {
         visible: root.label !== ""
         text: root.label
         color: Colors.text
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         font.weight: Font.Medium
     }
 
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Rectangle {
             Layout.fillWidth: true
-            height: Colors.controlRowHeight
-            radius: Colors.radiusSmall
+            height: Appearance.controlRowHeight
+            radius: Appearance.radiusSmall
             color: Colors.modalFieldSurface
             border.color: input.activeFocus ? Colors.primary : Colors.border
             border.width: 1
@@ -50,22 +50,22 @@ ColumnLayout {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingM
-                spacing: Colors.spacingS
+                anchors.leftMargin: Appearance.spacingM
+                anchors.rightMargin: Appearance.spacingM
+                spacing: Appearance.spacingS
 
                 Loader {
                     visible: root.leadingIcon !== ""
                     sourceComponent: root.leadingIcon.endsWith(".svg") ? _siSvg : _siNerd
                 }
-                Component { id: _siSvg; SvgIcon { source: root.leadingIcon; color: Colors.textDisabled; size: Colors.fontSizeLarge } }
-                Component { id: _siNerd; Text { text: root.leadingIcon; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
+                Component { id: _siSvg; SvgIcon { source: root.leadingIcon; color: Colors.textDisabled; size: Appearance.fontSizeLarge } }
+                Component { id: _siNerd; Text { text: root.leadingIcon; color: Colors.textDisabled; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
 
                 TextInput {
                     id: input
                     Layout.fillWidth: true
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     clip: true
                     selectByMouse: true
                     selectedTextColor: Colors.text
@@ -90,8 +90,8 @@ ColumnLayout {
                 Text {
                     text: root.secretVisible ? "󰈈" : "󰈉"
                     color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
 
                     MouseArea {
                         anchors.fill: parent
@@ -104,8 +104,8 @@ ColumnLayout {
                     visible: root.showClearButton && input.text.length > 0
                     text: "󰅖"
                     color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
 
                     MouseArea {
                         anchors.fill: parent
@@ -120,7 +120,7 @@ ColumnLayout {
             id: actionsRow
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
         }
     }
 
@@ -128,6 +128,6 @@ ColumnLayout {
         visible: root.errorText !== ""
         text: root.errorText
         color: Colors.error
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
     }
 }

@@ -37,16 +37,16 @@ Rectangle {
 
   SequentialAnimation {
     id: pulseAnim
-    NumberAnimation { target: pulse; property: "opacity"; from: 0.0; to: 1.0; duration: Colors.durationFlash }
-    NumberAnimation { target: pulse; property: "scale"; from: 0.6; to: 1.25; duration: Colors.durationFast; easing.type: Easing.OutCubic }
-    NumberAnimation { target: pulse; property: "opacity"; from: 1.0; to: 0.0; duration: Colors.durationFast }
+    NumberAnimation { target: pulse; property: "opacity"; from: 0.0; to: 1.0; duration: Appearance.durationFlash }
+    NumberAnimation { target: pulse; property: "scale"; from: 0.6; to: 1.25; duration: Appearance.durationFast; easing.type: Easing.OutCubic }
+    NumberAnimation { target: pulse; property: "opacity"; from: 1.0; to: 0.0; duration: Appearance.durationFast }
     ScriptAction { script: { pulse.scale = 0.6 } }
   }
 
   Text {
     anchors.centerIn: parent
     text: root.icon
-    font.family: Colors.fontMono
+    font.family: Appearance.fontMono
     font.pixelSize: root.size * 0.58
     color: root.tint
     opacity: mouse.pressed ? 0.75 : 0.95
@@ -65,5 +65,5 @@ Rectangle {
 
   // Squish on press
   scale: mouse.pressed ? 0.90 : 1.0
-  Behavior on scale { NumberAnimation { duration: Colors.durationSnap; easing.type: Easing.OutBack } }
+  Behavior on scale { NumberAnimation { duration: Appearance.durationSnap; easing.type: Easing.OutBack } }
 }

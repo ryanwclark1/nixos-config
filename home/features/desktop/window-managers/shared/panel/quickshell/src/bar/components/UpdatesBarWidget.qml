@@ -55,19 +55,19 @@ Item {
         tooltipText: "System updates"
 
         Row {
-            spacing: Colors.spacingXS
+            spacing: Appearance.spacingXS
             Text {
                 text: root.updatesIcon
                 color: Colors.accent
-                font.pixelSize: Colors.fontSizeXL
-                font.family: Colors.fontMono
+                font.pixelSize: Appearance.fontSizeXL
+                font.family: Appearance.fontMono
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
                 visible: !root.iconOnly
                 text: root.updatesCount
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.DemiBold
                 anchors.verticalCenter: parent.verticalCenter
             }

@@ -46,7 +46,7 @@ BasePopupMenu {
     headerExtras: SharedWidgets.IconButton {
         icon: "info.svg"
         size: 30
-        iconSize: Colors.fontSizeLarge
+        iconSize: Appearance.fontSizeLarge
         iconColor: Colors.primary
         tooltipText: "Open system monitor"
         onClicked: {
@@ -78,7 +78,7 @@ BasePopupMenu {
     SharedWidgets.ScrollableContent {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        columnSpacing: Colors.paddingSmall
+        columnSpacing: Appearance.paddingSmall
 
         SharedWidgets.SectionLabel {
             label: "ACTIONS"

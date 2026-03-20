@@ -12,51 +12,51 @@ Rectangle {
 
   Layout.fillWidth: true
   implicitHeight: 44
-  radius: Colors.radiusMedium
+  radius: Appearance.radiusMedium
   color: root.active
     ? Colors.withAlpha(Colors.warning, 0.10)
     : Colors.cardSurface
   border.color: root.active ? Colors.withAlpha(Colors.warning, 0.3) : Colors.border
   border.width: 1
-  Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+  Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
 
   RowLayout {
     anchors.fill: parent
-    anchors.margins: Colors.spacingM
-    spacing: Colors.paddingSmall
+    anchors.margins: Appearance.spacingM
+    spacing: Appearance.paddingSmall
 
     Loader {
       sourceComponent: root.icon.endsWith(".svg") ? _pSvg : _pNerd
     }
-    Component { id: _pSvg; Shared.SvgIcon { source: root.icon; color: root.active ? Colors.warning : Colors.textDisabled; size: Colors.fontSizeXL } }
-    Component { id: _pNerd; Text { text: root.icon; color: root.active ? Colors.warning : Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL } }
+    Component { id: _pSvg; Shared.SvgIcon { source: root.icon; color: root.active ? Colors.warning : Colors.textDisabled; size: Appearance.fontSizeXL } }
+    Component { id: _pNerd; Text { text: root.icon; color: root.active ? Colors.warning : Colors.textDisabled; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }
 
     Text {
       text: root.label
       color: Colors.text
-      font.pixelSize: Colors.fontSizeMedium
+      font.pixelSize: Appearance.fontSizeMedium
       Layout.fillWidth: true
     }
 
     // Blinking active indicator
     Rectangle {
-      width: 8; height: 8; radius: Colors.radiusXS
+      width: 8; height: 8; radius: Appearance.radiusXS
       color: root.active ? Colors.warning : Colors.textDisabled
       opacity: root.active ? 1.0 : 0.3
-      Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationNormal } }
+      Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
 
       SequentialAnimation on opacity {
         running: root.active
         loops: Animation.Infinite
-        NumberAnimation { from: 1.0; to: 0.3; duration: Colors.durationPulse; easing.type: Easing.InOutSine }
-        NumberAnimation { from: 0.3; to: 1.0; duration: Colors.durationPulse; easing.type: Easing.InOutSine }
+        NumberAnimation { from: 1.0; to: 0.3; duration: Appearance.durationPulse; easing.type: Easing.InOutSine }
+        NumberAnimation { from: 0.3; to: 1.0; duration: Appearance.durationPulse; easing.type: Easing.InOutSine }
       }
     }
 
     Text {
       text: root.active ? "Active" : "Idle"
       color: root.active ? Colors.warning : Colors.textDisabled
-      font.pixelSize: Colors.fontSizeSmall
+      font.pixelSize: Appearance.fontSizeSmall
       font.weight: Font.Medium
     }
   }

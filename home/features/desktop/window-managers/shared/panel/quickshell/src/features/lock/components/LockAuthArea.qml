@@ -14,7 +14,7 @@ ColumnLayout {
     signal cancelRequested()
     signal unlockRequested()
 
-    spacing: Colors.spacingL
+    spacing: Appearance.spacingL
 
     property real shakeOffset: 0
     transform: Translate { x: root.shakeOffset }
@@ -33,15 +33,15 @@ ColumnLayout {
 
     SequentialAnimation {
         id: shakeAnim
-        PropertyAnimation { target: root; property: "shakeOffset"; to: 10; duration: Colors.durationShake }
-        PropertyAnimation { target: root; property: "shakeOffset"; to: -10; duration: Colors.durationShake }
-        PropertyAnimation { target: root; property: "shakeOffset"; to: 0; duration: Colors.durationShake }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: 10; duration: Appearance.durationShake }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: -10; duration: Appearance.durationShake }
+        PropertyAnimation { target: root; property: "shakeOffset"; to: 0; duration: Appearance.durationShake }
     }
 
     // Fingerprint status
     ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
         visible: root.lockContext && root.lockContext.fprintAvailable && Config.lockScreenFingerprint
 
         Text {
@@ -57,15 +57,15 @@ ColumnLayout {
                 default: return Colors.textDisabled;
                 }
             }
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeDisplay
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeDisplay
 
             SequentialAnimation on opacity {
                 id: fprintPulse
                 running: root.lockContext && root.lockContext.fprintStatus === "scanning"
                 loops: Animation.Infinite
-                NumberAnimation { to: 0.4; duration: Colors.durationPulse }
-                NumberAnimation { to: 1.0; duration: Colors.durationPulse }
+                NumberAnimation { to: 0.4; duration: Appearance.durationPulse }
+                NumberAnimation { to: 1.0; duration: Appearance.durationPulse }
             }
         }
 
@@ -82,7 +82,7 @@ ColumnLayout {
             }
             color: root.lockContext && root.lockContext.fprintStatus === "scanning"
                 ? Colors.textSecondary : Colors.error
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             visible: text !== ""
         }
     }
@@ -92,20 +92,20 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.preferredHeight: 50
         color: Colors.highlightLight
-        radius: Colors.radiusCard
+        radius: Appearance.radiusCard
         border.color: pwInput.activeFocus ? Colors.primary : Colors.border
         border.width: 1
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: Colors.spacingM
-            spacing: Colors.paddingSmall
+            anchors.margins: Appearance.spacingM
+            spacing: Appearance.paddingSmall
 
             Text {
                 text: "󰌾"
                 color: Colors.textDisabled
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeXL
             }
 
             TextInput {
@@ -113,7 +113,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 verticalAlignment: Text.AlignVCenter
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeXL
+                font.pixelSize: Appearance.fontSizeXL
                 echoMode: TextInput.Password
                 focus: true
 
@@ -135,7 +135,7 @@ ColumnLayout {
 
             // Submit button
             Rectangle {
-                width: 28; height: 28; radius: Colors.radiusMedium
+                width: 28; height: 28; radius: Appearance.radiusMedium
                 color: Colors.withAlpha(Colors.primary, 0.6)
                 visible: pwInput.text.length > 0
 
@@ -143,8 +143,8 @@ ColumnLayout {
                     anchors.centerIn: parent
                     text: "󰁔"
                     color: Colors.background
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
 
                 StateLayer {
@@ -172,7 +172,7 @@ ColumnLayout {
             anchors.centerIn: parent
             text: "Unlock..."
             color: Colors.textDisabled
-            font.pixelSize: Colors.fontSizeLarge
+            font.pixelSize: Appearance.fontSizeLarge
             visible: !pwInput.text && !pwInput.activeFocus
         }
     }
@@ -182,7 +182,7 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         text: root.lockContext ? root.lockContext.errorMessage : ""
         color: Colors.error
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         font.weight: Font.Medium
         visible: root.lockContext ? root.lockContext.showError : false
     }
@@ -192,7 +192,7 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         text: "Authenticating..."
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         visible: root.lockContext ? root.lockContext.unlockInProgress : false
     }
 
@@ -202,7 +202,7 @@ ColumnLayout {
         visible: root.timerActive
         width: countdownRow.implicitWidth + 24
         height: 36
-        radius: Colors.radiusPill
+        radius: Appearance.radiusPill
         color: Colors.errorLight
         border.color: Colors.error
         border.width: 1
@@ -210,17 +210,17 @@ ColumnLayout {
         RowLayout {
             id: countdownRow
             anchors.centerIn: parent
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Text {
                 text: root.pendingAction.charAt(0).toUpperCase() + root.pendingAction.slice(1) + " in " + Math.ceil(root.timeRemaining / 1000) + "s"
                 color: Colors.error
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 font.weight: Font.Medium
             }
 
             Rectangle {
-                width: 20; height: 20; radius: Colors.radiusSmall
+                width: 20; height: 20; radius: Appearance.radiusSmall
                 color: "transparent"
                 border.color: Colors.error; border.width: 1
 
@@ -235,8 +235,8 @@ ColumnLayout {
                     anchors.centerIn: parent
                     text: "󰅖"
                     color: Colors.error
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXS
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
                 }
 
                 MouseArea {

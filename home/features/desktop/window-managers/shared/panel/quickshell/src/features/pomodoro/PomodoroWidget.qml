@@ -8,10 +8,10 @@ import "../../widgets" as SharedWidgets
 ThemedContainer {
   id: root
   variant: "card"
-  radius: Colors.radiusCard
+  radius: Appearance.radiusCard
 
   implicitWidth: 280
-  implicitHeight: column.implicitHeight + Colors.spacingL * 2
+  implicitHeight: column.implicitHeight + Appearance.spacingL * 2
 
   // ── Derived state ────────────────────────────
   readonly property color lapColor: PomodoroService.isBreak ? Colors.success : Colors.primary
@@ -23,33 +23,33 @@ ThemedContainer {
     anchors {
       left: parent.left; right: parent.right
       top: parent.top
-      margins: Colors.spacingL
+      margins: Appearance.spacingL
     }
-    spacing: Colors.spacingM
+    spacing: Appearance.spacingM
 
     // ── Status label ─────────────────────────
     RowLayout {
       Layout.fillWidth: true
-      spacing: Colors.spacingS
+      spacing: Appearance.spacingS
 
       Text {
         text: root.lapLabel
         color: root.lapColor
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         font.weight: Font.Black
-        font.letterSpacing: Colors.letterSpacingWide
+        font.letterSpacing: Appearance.letterSpacingWide
       }
 
       Item { Layout.fillWidth: true }
 
       // Cycle dots
       Row {
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
         Repeater {
           model: PomodoroService.cyclesBeforeLongBreak
           delegate: Rectangle {
             width: 6; height: 6
-            radius: Colors.radiusXS3
+            radius: Appearance.radiusXS3
             color: index < PomodoroService.cycle
               ? Colors.primary
               : Colors.withAlpha(Colors.text, Colors.textFaint * 2)
@@ -103,7 +103,7 @@ ThemedContainer {
             sweepAngle: PomodoroService.progress * 360
 
             Behavior on sweepAngle {
-              NumberAnimation { duration: Colors.durationFast; easing.type: Easing.OutQuad }
+              NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutQuad }
             }
           }
         }
@@ -112,25 +112,25 @@ ThemedContainer {
       // Time display
       ColumnLayout {
         anchors.centerIn: parent
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
 
         Text {
           Layout.alignment: Qt.AlignHCenter
           text: PomodoroService.timeDisplay
           color: Colors.text
-          font.pixelSize: Colors.fontSizeHuge
+          font.pixelSize: Appearance.fontSizeHuge
           font.weight: Font.Bold
-          font.family: Colors.fontMono
-          font.letterSpacing: Colors.letterSpacingTight
+          font.family: Appearance.fontMono
+          font.letterSpacing: Appearance.letterSpacingTight
         }
 
         Text {
           Layout.alignment: Qt.AlignHCenter
           text: PomodoroService.running ? "running" : "paused"
           color: Colors.withAlpha(Colors.text, Colors.textThin)
-          font.pixelSize: Colors.fontSizeXXS
+          font.pixelSize: Appearance.fontSizeXXS
           font.weight: Font.Medium
-          font.letterSpacing: Colors.letterSpacingWide
+          font.letterSpacing: Appearance.letterSpacingWide
         }
       }
     }
@@ -138,8 +138,8 @@ ThemedContainer {
     // ── Controls ─────────────────────────────
     RowLayout {
       Layout.fillWidth: true
-      Layout.topMargin: Colors.spacingXS
-      spacing: Colors.spacingS
+      Layout.topMargin: Appearance.spacingXS
+      spacing: Appearance.spacingS
 
       Item { Layout.fillWidth: true }
 
@@ -147,7 +147,7 @@ ThemedContainer {
       SharedWidgets.IconButton {
         icon: ""
         size: 34
-        iconSize: Colors.fontSizeMedium
+        iconSize: Appearance.fontSizeMedium
         iconColor: Colors.textSecondary
         stateColor: Colors.text
         tooltipText: "Reset timer"
@@ -158,7 +158,7 @@ ThemedContainer {
       SharedWidgets.IconButton {
         icon: PomodoroService.running ? "" : ""
         size: 44
-        iconSize: Colors.fontSizeXL
+        iconSize: Appearance.fontSizeXL
         iconColor: root.lapColor
         stateColor: root.lapColor
         normalColor: Colors.withAlpha(root.lapColor, Colors.primaryFaint)
@@ -171,7 +171,7 @@ ThemedContainer {
       SharedWidgets.IconButton {
         icon: "next.svg"
         size: 34
-        iconSize: Colors.fontSizeMedium
+        iconSize: Appearance.fontSizeMedium
         iconColor: Colors.textSecondary
         stateColor: Colors.text
         tooltipText: "Skip"

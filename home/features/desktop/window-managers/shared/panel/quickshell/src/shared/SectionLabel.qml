@@ -10,7 +10,7 @@ Text {
   property string label: ""
   text: label
   color: Colors.textSecondary
-  font.pixelSize: Colors.fontSizeXS
+  font.pixelSize: Appearance.fontSizeXS
   font.weight: Font.Bold
   font.letterSpacing: 0.5
 }

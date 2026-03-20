@@ -36,23 +36,23 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Colors.spacingS
+        spacing: Appearance.spacingS
 
         Text {
             text: ModelUsageService.providerIcon
             color: ModelUsageService.providerColor
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeLarge
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
 
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationMedium } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationMedium } }
         }
 
         Text {
             visible: PanelHelpers.isSummaryWidgetFull(widgetInstance, vertical)
             text: ModelUsageService.displayText
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

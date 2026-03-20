@@ -24,7 +24,7 @@ BasePopupMenu {
   Rectangle {
     Layout.fillWidth: true
     implicitHeight: 50
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: RecordingService.isRecording ? Colors.errorLight : Colors.cardSurface
     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
     border.color: RecordingService.isRecording ? Colors.error : Colors.border
@@ -33,18 +33,18 @@ BasePopupMenu {
 
     RowLayout {
       anchors.fill: parent
-      anchors.margins: Colors.spacingM
-      spacing: Colors.paddingSmall
+      anchors.margins: Appearance.spacingM
+      spacing: Appearance.paddingSmall
 
       Rectangle {
-        width: 12; height: 12; radius: Colors.radiusXXS
+        width: 12; height: 12; radius: Appearance.radiusXXS
         color: RecordingService.isRecording ? Colors.error : Colors.textDisabled
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         SequentialAnimation on opacity {
           running: RecordingService.isRecording
           loops: Animation.Infinite
-          NumberAnimation { from: 1.0; to: 0.3; duration: Colors.durationPulse }
-          NumberAnimation { from: 0.3; to: 1.0; duration: Colors.durationPulse }
+          NumberAnimation { from: 1.0; to: 0.3; duration: Appearance.durationPulse }
+          NumberAnimation { from: 0.3; to: 1.0; duration: Appearance.durationPulse }
         }
       }
 
@@ -52,7 +52,7 @@ BasePopupMenu {
         text: RecordingService.isRecording ? "Recording" : "Idle"
         color: RecordingService.isRecording ? Colors.error : Colors.text
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-        font.pixelSize: Colors.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeMedium
         font.weight: Font.DemiBold
       }
 
@@ -62,17 +62,17 @@ BasePopupMenu {
         text: RecordingService.elapsedText
         color: RecordingService.isRecording ? Colors.error : Colors.textDisabled
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-        font.pixelSize: Colors.fontSizeLarge
+        font.pixelSize: Appearance.fontSizeLarge
         font.weight: Font.Bold
-        font.family: Colors.fontMono
+        font.family: Appearance.fontMono
       }
     }
   }
 
   Rectangle {
     Layout.fillWidth: true
-    implicitHeight: defaultsCol.implicitHeight + Colors.spacingM * 2
-    radius: Colors.radiusMedium
+    implicitHeight: defaultsCol.implicitHeight + Appearance.spacingM * 2
+    radius: Appearance.radiusMedium
     color: Colors.cardSurface
     border.color: Colors.border
     border.width: 1
@@ -80,13 +80,13 @@ BasePopupMenu {
     ColumnLayout {
       id: defaultsCol
       anchors.fill: parent
-      anchors.margins: Colors.spacingM
-      spacing: Colors.spacingXS
+      anchors.margins: Appearance.spacingM
+      spacing: Appearance.spacingXS
 
       Text {
         text: "DEFAULTS"
         color: Colors.textDisabled
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         font.weight: Font.Bold
       }
 
@@ -96,7 +96,7 @@ BasePopupMenu {
           + "  •  " + Config.recordingFps + " FPS  •  "
           + RecordingService.qualityLabel(Config.recordingQuality)
         color: Colors.text
-        font.pixelSize: Colors.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall
         font.weight: Font.Medium
         wrapMode: Text.Wrap
       }
@@ -109,7 +109,7 @@ BasePopupMenu {
           + "  •  "
           + (Config.recordingIncludeMicrophoneAudio ? "Microphone" : "No microphone")
         color: Colors.textSecondary
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         wrapMode: Text.Wrap
       }
     }
@@ -119,14 +119,14 @@ BasePopupMenu {
   GridLayout {
     Layout.fillWidth: true
     columns: root.compactMode ? 1 : 3
-    columnSpacing: Colors.paddingSmall
-    rowSpacing: Colors.paddingSmall
+    columnSpacing: Appearance.paddingSmall
+    rowSpacing: Appearance.paddingSmall
     visible: !RecordingService.isRecording
 
     Rectangle {
       Layout.fillWidth: true
       implicitHeight: 44
-      radius: Colors.radiusMedium
+      radius: Appearance.radiusMedium
       color: Colors.cardSurface
       border.color: fullscreenHover.containsMouse ? Colors.primary : Colors.border
       border.width: 1
@@ -134,9 +134,9 @@ BasePopupMenu {
 
       ColumnLayout {
         anchors.centerIn: parent
-        spacing: Colors.spacingXXS
-        Text { text: "󰍹"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
-        Text { text: "Fullscreen"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
+        spacing: Appearance.spacingXXS
+        Text { text: "󰍹"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
+        Text { text: "Fullscreen"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
       }
 
       SharedWidgets.StateLayer {
@@ -157,7 +157,7 @@ BasePopupMenu {
     Rectangle {
       Layout.fillWidth: true
       implicitHeight: 44
-      radius: Colors.radiusMedium
+      radius: Appearance.radiusMedium
       color: Colors.cardSurface
       border.color: regionHover.containsMouse ? Colors.primary : Colors.border
       border.width: 1
@@ -165,9 +165,9 @@ BasePopupMenu {
 
       ColumnLayout {
         anchors.centerIn: parent
-        spacing: Colors.spacingXXS
-        Text { text: "󰹑"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
-        Text { text: "Portal"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
+        spacing: Appearance.spacingXXS
+        Text { text: "󰹑"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
+        Text { text: "Portal"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
       }
 
       SharedWidgets.StateLayer {
@@ -188,7 +188,7 @@ BasePopupMenu {
     Rectangle {
       Layout.fillWidth: true
       implicitHeight: 44
-      radius: Colors.radiusMedium
+      radius: Appearance.radiusMedium
       color: Colors.cardSurface
       border.color: legacyRegionHover.containsMouse ? Colors.primary : Colors.border
       border.width: 1
@@ -196,9 +196,9 @@ BasePopupMenu {
 
       ColumnLayout {
         anchors.centerIn: parent
-        spacing: Colors.spacingXXS
-        Text { text: "󰩬"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
-        Text { text: "Region"; color: Colors.text; font.pixelSize: Colors.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
+        spacing: Appearance.spacingXXS
+        Text { text: "󰩬"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
+        Text { text: "Region"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
       }
 
       SharedWidgets.StateLayer {
@@ -223,8 +223,8 @@ BasePopupMenu {
   GridLayout {
     Layout.fillWidth: true
     columns: root.compactMode ? 1 : 3
-    columnSpacing: Colors.paddingSmall
-    rowSpacing: Colors.paddingSmall
+    columnSpacing: Appearance.paddingSmall
+    rowSpacing: Appearance.paddingSmall
     visible: !RecordingService.isRecording
 
     Repeater {
@@ -252,8 +252,8 @@ BasePopupMenu {
       delegate: Rectangle {
         required property var modelData
         Layout.fillWidth: true
-        implicitHeight: Colors.controlRowHeight
-        radius: Colors.radiusMedium
+        implicitHeight: Appearance.controlRowHeight
+        radius: Appearance.radiusMedium
         color: modelData.active ? Colors.primaryMid : Colors.cardSurface
         border.color: modelData.active ? Colors.primary : Colors.border
         border.width: 1
@@ -262,8 +262,8 @@ BasePopupMenu {
           anchors.centerIn: parent
           text: modelData.icon + "  " + modelData.label
           color: modelData.active ? Colors.primary : Colors.textSecondary
-          font.family: Colors.fontMono
-          font.pixelSize: Colors.fontSizeXS
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeXS
           font.weight: Font.DemiBold
         }
 
@@ -291,7 +291,7 @@ BasePopupMenu {
   Rectangle {
     Layout.fillWidth: true
     implicitHeight: 44
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     visible: RecordingService.isRecording
     color: stopHover.containsMouse ? Qt.darker(Colors.error, 1.1) : Colors.error
     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
@@ -300,9 +300,9 @@ BasePopupMenu {
       anchors.centerIn: parent
       text: "󰓛  Stop Recording"
       color: Colors.background
-      font.pixelSize: Colors.fontSizeMedium
+      font.pixelSize: Appearance.fontSizeMedium
       font.weight: Font.DemiBold
-      font.family: Colors.fontMono
+      font.family: Appearance.fontMono
     }
 
     MouseArea {

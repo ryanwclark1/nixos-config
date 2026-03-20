@@ -343,7 +343,7 @@ Item {
         // Monitor selector (shown only when >1 monitor)
         ColumnLayout {
             visible: root.wallpaperMonitorNames.length > 1
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
             Layout.fillWidth: true
 
             SettingsSectionLabel { text: "MONITOR" }
@@ -365,10 +365,10 @@ Item {
 
         Flow {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Rectangle {
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.bgWidget
                 border.color: Colors.border
                 border.width: 1
@@ -388,13 +388,13 @@ Item {
                         return "Source: None";
                     }
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.family: Appearance.fontMono
                 }
             }
 
             Rectangle {
-                radius: Colors.radiusPill
+                radius: Appearance.radiusPill
                 color: Colors.bgWidget
                 border.color: Colors.border
                 border.width: 1
@@ -406,8 +406,8 @@ Item {
                     anchors.centerIn: parent
                     text: "Target: " + (root.wallpaperSelectedMonitor === "__all__" ? "All monitors" : root.wallpaperSelectedMonitor)
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.family: Appearance.fontMono
                 }
             }
         }
@@ -421,7 +421,7 @@ Item {
         // Quick action buttons
         Flow {
             Layout.fillWidth: true
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
 
             Repeater {
                 model: [
@@ -459,7 +459,7 @@ Item {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SettingsTextInputRow {
                 Layout.fillWidth: true
@@ -528,7 +528,7 @@ Item {
 
             Flow {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Repeater {
                     model: [
@@ -540,7 +540,7 @@ Item {
                         required property string modelData
                         width: 24
                         height: 24
-                        radius: Colors.radiusXXS
+                        radius: Appearance.radiusXXS
                         color: "#" + modelData
                         border.color: Colors.border
                         border.width: 1
@@ -560,13 +560,13 @@ Item {
 
             Flow {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
                 visible: (Config.wallpaperRecentSolidColors || []).length > 0
 
                 Text {
                     text: "Recent:"
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
 
@@ -583,7 +583,7 @@ Item {
                         required property string modelData
                         width: 20
                         height: 20
-                        radius: Colors.radiusXXS
+                        radius: Appearance.radiusXXS
                         color: "#" + modelData.slice(0, 6)
                         border.color: Colors.border
                         border.width: 1
@@ -692,7 +692,7 @@ Item {
 
         Flow {
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SettingsActionButton {
                 width: root.compactMode ? implicitWidth : 0
@@ -778,7 +778,7 @@ Item {
         Flow {
             Layout.fillWidth: true
             width: parent.width
-            spacing: Colors.spacingM
+            spacing: Appearance.spacingM
             visible: !WallpaperService.scanning
 
             SharedWidgets.EmptyState {
@@ -799,13 +799,13 @@ Item {
         ColumnLayout {
             visible: WallpaperService.scanning
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             SharedWidgets.LoadingSpinner { Layout.alignment: Qt.AlignHCenter }
             Text {
                 text: "Scanning directories…"
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 Layout.alignment: Qt.AlignHCenter
             }
         }
@@ -813,7 +813,7 @@ Item {
         Flow {
             visible: !WallpaperService.scanning && WallpaperService.availableWallpapers.length > 0
             Layout.fillWidth: true
-            spacing: Colors.spacingS
+            spacing: Appearance.spacingS
 
             Repeater {
                 model: WallpaperService.availableWallpapers
@@ -843,8 +843,8 @@ Item {
                     required property string modelData
                     text: "  " + modelData
                     color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
-                    font.family: Colors.fontMono
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.family: Appearance.fontMono
                     Layout.fillWidth: true
                     elide: Text.ElideLeft
                 }

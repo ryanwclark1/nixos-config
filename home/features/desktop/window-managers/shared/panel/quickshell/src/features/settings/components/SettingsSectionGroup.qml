@@ -12,18 +12,18 @@ ColumnLayout {
     default property alias content: bodyColumn.data
 
     Layout.fillWidth: true
-    spacing: Colors.spacingS
+    spacing: Appearance.spacingS
 
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
         visible: !!root.title || !!root.description
 
         Text {
             Layout.fillWidth: true
             text: root.title
             color: Colors.text
-            font.pixelSize: Colors.fontSizeLarge
+            font.pixelSize: Appearance.fontSizeLarge
             font.weight: Font.Black
             wrapMode: Text.WordWrap
             visible: !!text
@@ -33,7 +33,7 @@ ColumnLayout {
             Layout.fillWidth: true
             text: root.description
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             wrapMode: Text.WordWrap
             visible: !!text
         }
@@ -42,6 +42,6 @@ ColumnLayout {
     ColumnLayout {
         id: bodyColumn
         Layout.fillWidth: true
-        spacing: Colors.spacingL
+        spacing: Appearance.spacingL
     }
 }

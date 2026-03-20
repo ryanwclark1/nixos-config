@@ -324,7 +324,7 @@ Item {
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 Repeater {
                     model: [
@@ -355,9 +355,9 @@ Item {
                     delegate: Rectangle {
                         required property var modelData
 
-                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
-                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
-                        radius: Colors.radiusLarge
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Appearance.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Appearance.spacingM * 2
+                        radius: Appearance.radiusLarge
                         color: Colors.withAlpha(Colors.surface, 0.38)
                         border.color: Colors.withAlpha(Colors.primary, 0.14)
                         border.width: 1
@@ -365,8 +365,8 @@ Item {
                         ColumnLayout {
                             id: metricColumn
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
-                            spacing: Colors.spacingXS
+                            anchors.margins: Appearance.spacingM
+                            spacing: Appearance.spacingXS
 
                             SettingsMetricIcon { icon: modelData.icon }
 
@@ -374,9 +374,9 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.label
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 font.weight: Font.Black
-                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                font.letterSpacing: Appearance.letterSpacingExtraWide
                                 wrapMode: Text.WordWrap
                             }
 
@@ -384,7 +384,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: modelData.value
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
+                                font.pixelSize: Appearance.fontSizeMedium
                                 font.weight: Font.Bold
                                 wrapMode: Text.WordWrap
                             }
@@ -406,16 +406,16 @@ Item {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingM
+                    spacing: Appearance.spacingM
 
                     ColumnLayout {
-                        spacing: Colors.spacingXXS
-                        width: root.compactMode ? parent.width : Math.max(0, parent.width - scanPluginsButton.implicitWidth - copyDiagnosticsButton.implicitWidth - saveDiagnosticsButton.implicitWidth - (Colors.spacingM * 3))
+                        spacing: Appearance.spacingXXS
+                        width: root.compactMode ? parent.width : Math.max(0, parent.width - scanPluginsButton.implicitWidth - copyDiagnosticsButton.implicitWidth - saveDiagnosticsButton.implicitWidth - (Appearance.spacingM * 3))
 
                         Text {
                             text: PluginService.plugins.length + " plugin" + (PluginService.plugins.length !== 1 ? "s" : "") + " found"
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
+                            font.pixelSize: Appearance.fontSizeMedium
                             font.weight: Font.Medium
                         }
 
@@ -424,14 +424,14 @@ Item {
                                 return p.enabled;
                             }).length + " enabled"
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                         }
 
                         Text {
                             visible: Object.keys(PluginService.pluginErrors || ({})).length > 0
                             text: Object.keys(PluginService.pluginErrors || ({})).length + " invalid plugin manifest" + (Object.keys(PluginService.pluginErrors || ({})).length !== 1 ? "s" : "")
                             color: Colors.warning
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                         }
                     }
 
@@ -463,19 +463,19 @@ Item {
                 Flow {
                     Layout.fillWidth: true
                     width: parent.width
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Rectangle {
                         implicitWidth: activeCount.implicitWidth + 12
                         height: 20
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.withAlpha(Colors.success, 0.16)
                         Text {
                             id: activeCount
                             anchors.centerIn: parent
                             text: "active " + root.pluginStatusSummary().active
                             color: Colors.success
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.DemiBold
                         }
                     }
@@ -483,14 +483,14 @@ Item {
                     Rectangle {
                         implicitWidth: degradedCount.implicitWidth + 12
                         height: 20
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.warningLight
                         Text {
                             id: degradedCount
                             anchors.centerIn: parent
                             text: "degraded " + root.pluginStatusSummary().degraded
                             color: Colors.warning
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.DemiBold
                         }
                     }
@@ -498,14 +498,14 @@ Item {
                     Rectangle {
                         implicitWidth: failedCount.implicitWidth + 12
                         height: 20
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.withAlpha(Colors.error, 0.16)
                         Text {
                             id: failedCount
                             anchors.centerIn: parent
                             text: "failed " + root.pluginStatusSummary().failed
                             color: Colors.error
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.DemiBold
                         }
                     }
@@ -513,14 +513,14 @@ Item {
                     Rectangle {
                         implicitWidth: disabledCount.implicitWidth + 12
                         height: 20
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.borderLight
                         Text {
                             id: disabledCount
                             anchors.centerIn: parent
                             text: "disabled " + root.pluginStatusSummary().disabled
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                             font.weight: Font.DemiBold
                         }
                     }
@@ -529,27 +529,27 @@ Item {
                 ColumnLayout {
                     visible: PluginService.plugins.length === 0
                     Layout.fillWidth: true
-                    Layout.topMargin: Colors.spacingXL
-                    spacing: Colors.spacingM
+                    Layout.topMargin: Appearance.spacingXL
+                    spacing: Appearance.spacingM
 
                     Text {
                         text: "󰏗"
                         color: Colors.textDisabled
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeHuge
+                        font.family: Appearance.fontMono
+                        font.pixelSize: Appearance.fontSizeHuge
                         Layout.alignment: Qt.AlignHCenter
                     }
                     Text {
                         text: "No plugins found"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeLarge
+                        font.pixelSize: Appearance.fontSizeLarge
                         font.weight: Font.DemiBold
                         Layout.alignment: Qt.AlignHCenter
                     }
                     Text {
                         text: "Add a folder with manifest.json to get started"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         Layout.alignment: Qt.AlignHCenter
                     }
                 }
@@ -559,15 +559,15 @@ Item {
 
                     delegate: SettingsListRow {
                         active: modelData.enabled
-                        radius: Colors.radiusMedium
-                        contentInset: Colors.spacingM
-                        rowSpacing: root.compactMode ? Colors.spacingS : Colors.spacingM
+                        radius: Appearance.radiusMedium
+                        contentInset: Appearance.spacingM
+                        rowSpacing: root.compactMode ? Appearance.spacingS : Appearance.spacingM
                         minimumHeight: root.compactMode ? 92 : 66
 
                         Rectangle {
                             width: root.compactMode ? 32 : 38
                             height: root.compactMode ? 32 : 38
-                            radius: Colors.radiusSmall
+                            radius: Appearance.radiusSmall
                             color: modelData.enabled ? Colors.primarySubtle : Colors.textFaint
                             Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
@@ -575,8 +575,8 @@ Item {
                                 anchors.centerIn: parent
                                 text: root.pluginTypeIcon(modelData.type)
                                 color: modelData.enabled ? Colors.primary : Colors.textDisabled
-                                font.family: Colors.fontMono
-                                font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
+                                font.family: Appearance.fontMono
+                                font.pixelSize: root.compactMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL
                                 Behavior on color {
                                     enabled: !Colors.isTransitioning
                                     CAnim {}
@@ -591,12 +591,12 @@ Item {
                             Flow {
                                 Layout.fillWidth: true
                                 width: parent.width
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 Text {
                                     text: modelData.name
                                     color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.pixelSize: Appearance.fontSizeMedium
                                     font.weight: Font.DemiBold
                                     width: parent.width
                                     elide: Text.ElideRight
@@ -607,7 +607,7 @@ Item {
                             Flow {
                                 Layout.fillWidth: true
                                 width: parent.width
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 Rectangle {
                                     implicitWidth: verLabel.implicitWidth + 10
@@ -619,8 +619,8 @@ Item {
                                         anchors.centerIn: parent
                                         text: "v" + modelData.version
                                         color: Colors.textSecondary
-                                        font.pixelSize: Colors.fontSizeXS
-                                        font.family: Colors.fontMono
+                                        font.pixelSize: Appearance.fontSizeXS
+                                        font.family: Appearance.fontMono
                                     }
                                 }
 
@@ -634,7 +634,7 @@ Item {
                                         anchors.centerIn: parent
                                         text: root.pluginTypeLabel(modelData.type)
                                         color: root.pluginTypeAccent(modelData.type)
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         font.weight: Font.DemiBold
                                     }
                                 }
@@ -660,7 +660,7 @@ Item {
                                             var severity = root.statusSeverity(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
                                             return root.severityColor(severity);
                                         }
-                                        font.pixelSize: Colors.fontSizeXS
+                                        font.pixelSize: Appearance.fontSizeXS
                                         font.weight: Font.DemiBold
                                     }
                                 }
@@ -670,20 +670,20 @@ Item {
                                 visible: modelData.description.length > 0
                                 text: modelData.description
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
                             }
                             Text {
                                 text: "by " + modelData.author
                                 color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                             }
 
                             Flow {
                                 Layout.fillWidth: true
                                 width: parent.width
-                                spacing: Colors.spacingS
+                                spacing: Appearance.spacingS
 
                                 SettingsActionButton {
                                     visible: PluginService.pluginSupportsControlCenterDetail(modelData.id)
@@ -706,7 +706,7 @@ Item {
                                 visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].message || "") !== ""
                                 text: (PluginService.pluginStatuses[modelData.id].code ? ("[" + PluginRuntimeCatalog.errorLabel(PluginService.pluginStatuses[modelData.id].code) + "] ") : "") + String(PluginService.pluginStatuses[modelData.id].message || "")
                                 color: Colors.warning
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
                             }
@@ -715,7 +715,7 @@ Item {
                                 visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].code || "") !== "" && String(PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code) || "") !== ""
                                 text: PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code)
                                 color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
                             }
@@ -724,7 +724,7 @@ Item {
                                 visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].updatedAt || "") !== ""
                                 text: "updated " + String(PluginService.pluginStatuses[modelData.id].updatedAt || "")
                                 color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
                             }
@@ -739,7 +739,7 @@ Item {
                                     return root.statusDescription(status);
                                 }
                                 color: Colors.textDisabled
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 Layout.fillWidth: true
                                 wrapMode: Text.WordWrap
                             }
@@ -761,13 +761,13 @@ Item {
                 ColumnLayout {
                     visible: root.pluginErrorEntries().length > 0
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
-                    Layout.topMargin: Colors.spacingM
+                    spacing: Appearance.spacingS
+                    Layout.topMargin: Appearance.spacingM
 
                     Text {
                         text: "Invalid plugin manifests"
                         color: Colors.warning
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.DemiBold
                     }
 
@@ -777,7 +777,7 @@ Item {
                         delegate: Rectangle {
                             required property var modelData
                             Layout.fillWidth: true
-                            radius: Colors.radiusSmall
+                            radius: Appearance.radiusSmall
                             color: Colors.withAlpha(Colors.warning, 0.10)
                             border.color: Colors.withAlpha(Colors.warning, 0.35)
                             border.width: 1
@@ -789,7 +789,7 @@ Item {
                                 anchors.margins: 7
                                 text: modelData.id + ": " + (modelData.code !== "" ? ("[" + modelData.code + "] ") : "") + modelData.error
                                 color: Colors.warning
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 wrapMode: Text.WordWrap
                             }
                         }
@@ -815,7 +815,7 @@ Item {
                     Text {
                         text: "Each plugin is a folder containing a manifest.json and one or more QML entry points."
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         wrapMode: Text.WordWrap
                         Layout.fillWidth: true
                     }
@@ -823,7 +823,7 @@ Item {
                     Text {
                         text: "Manifest fields: id, name, description, author, version, type, permissions, entryPoints { barWidget|desktopWidget|launcherProvider|daemon|settings }"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
+                        font.pixelSize: Appearance.fontSizeSmall
                         wrapMode: Text.WordWrap
                         Layout.fillWidth: true
                     }
@@ -831,7 +831,7 @@ Item {
                     Text {
                         text: "Reference schema: src/plugins/manifest.schema.json"
                         color: Colors.textDisabled
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         wrapMode: Text.WordWrap
                         Layout.fillWidth: true
                     }

@@ -7,7 +7,7 @@ Item {
 
     opacity: SpectrumService.isIdle ? 0 : 1
 
-    Behavior on opacity { Anim { duration: Colors.durationSlow } }
+    Behavior on opacity { Anim { duration: Appearance.durationSlow } }
 
     Ref { service: SpectrumService }
 
@@ -27,14 +27,14 @@ Item {
             width: barWidth - 1
             height: value * root.height
             anchors.bottom: parent.bottom
-            radius: Colors.radiusMicro
+            radius: Appearance.radiusMicro
 
             gradient: Gradient {
                 GradientStop { position: 0.0; color: Colors.withAlpha(Colors.secondary, 0.4) }
                 GradientStop { position: 1.0; color: Colors.withAlpha(Colors.primary, 0.6) }
             }
 
-            Behavior on height { Anim { duration: Colors.durationSnap } }
+            Behavior on height { Anim { duration: Appearance.durationSnap } }
         }
     }
 }

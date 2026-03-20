@@ -41,7 +41,7 @@ Item {
                     opacity: root.startupComplete ? 1.0 : 0.0
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Colors.durationSlow
+                            duration: Appearance.durationSlow
                             easing.type: Easing.OutCubic
                         }
                     }

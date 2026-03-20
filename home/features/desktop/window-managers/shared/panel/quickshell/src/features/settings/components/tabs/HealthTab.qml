@@ -47,7 +47,7 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 Rectangle {
                     width: 12
@@ -58,15 +58,15 @@ Item {
                     SequentialAnimation on opacity {
                         running: SystemStatus.overallStatus !== "healthy"
                         loops: Animation.Infinite
-                        NumberAnimation { from: 0.5; to: 1.0; duration: Colors.durationLong; easing.type: Easing.InOutSine }
-                        NumberAnimation { from: 1.0; to: 0.5; duration: Colors.durationLong; easing.type: Easing.InOutSine }
+                        NumberAnimation { from: 0.5; to: 1.0; duration: Appearance.durationLong; easing.type: Easing.InOutSine }
+                        NumberAnimation { from: 1.0; to: 0.5; duration: Appearance.durationLong; easing.type: Easing.InOutSine }
                     }
                 }
 
                 Text {
                     text: root.statusLabel
                     color: root.statusColor
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.pixelSize: Appearance.fontSizeLarge
                     font.weight: Font.Bold
                 }
             }
@@ -107,8 +107,8 @@ Item {
 
                 delegate: Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: incidentCol.implicitHeight + Colors.spacingM * 2
-                    radius: Colors.radiusXS
+                    implicitHeight: incidentCol.implicitHeight + Appearance.spacingM * 2
+                    radius: Appearance.radiusXS
                     color: Colors.withAlpha(Colors.warning, 0.08)
                     border.color: Colors.withAlpha(Colors.warning, 0.2)
                     border.width: 1
@@ -116,13 +116,13 @@ Item {
                     ColumnLayout {
                         id: incidentCol
                         anchors.fill: parent
-                        anchors.margins: Colors.spacingM
-                        spacing: Colors.spacingXS
+                        anchors.margins: Appearance.spacingM
+                        spacing: Appearance.spacingXS
 
                         Text {
                             text: modelData.signature || "Unknown incident"
                             color: Colors.warning
-                            font.pixelSize: Colors.fontSizeMedium
+                            font.pixelSize: Appearance.fontSizeMedium
                             font.weight: Font.DemiBold
                             wrapMode: Text.WordWrap
                             Layout.fillWidth: true
@@ -132,7 +132,7 @@ Item {
                             visible: !!(modelData.message || modelData.description)
                             text: modelData.message || modelData.description || ""
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: Appearance.fontSizeSmall
                             wrapMode: Text.WordWrap
                             Layout.fillWidth: true
                         }
@@ -144,7 +144,7 @@ Item {
                 visible: SystemStatus.activeIncidents.length === 0
                 text: "All checks passed — no incidents to display."
                 color: Colors.textDisabled
-                font.pixelSize: Colors.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall
             }
         }
 

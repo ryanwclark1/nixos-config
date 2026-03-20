@@ -9,8 +9,8 @@ Rectangle {
 
     property bool active: false
     property real activeBackgroundAlpha: 0.07
-    property int contentInset: Colors.spacingM
-    property int rowSpacing: Colors.spacingM
+    property int contentInset: Appearance.spacingM
+    property int rowSpacing: Appearance.spacingM
     property int minimumHeight: 0
     property bool highlighted: false
     property bool dragging: false
@@ -19,7 +19,7 @@ Rectangle {
 
     Layout.fillWidth: true
     implicitHeight: Math.max(minimumHeight, contentRow.implicitHeight + contentInset * 2)
-    radius: Colors.radiusXS
+    radius: Appearance.radiusXS
     color: root.dragging ? Colors.withAlpha(Colors.primary, 0.12) : (root.active ? Colors.primarySubtle : Colors.cardSurface)
     border.color: (root.dragging || root.dropTargeted) ? Colors.primary : (root.active ? Colors.primary : Colors.border)
     border.width: 1
@@ -59,8 +59,8 @@ Rectangle {
             property real _opacity: 0
             running: root.highlighted
             loops: 2
-            NumberAnimation { target: listHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Colors.durationSlow; easing.type: Easing.OutCubic }
-            NumberAnimation { target: listHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Colors.durationSlow; easing.type: Easing.InCubic }
+            NumberAnimation { target: listHighlightPulse; property: "_opacity"; from: 0; to: 0.2; duration: Appearance.durationSlow; easing.type: Easing.OutCubic }
+            NumberAnimation { target: listHighlightPulse; property: "_opacity"; from: 0.2; to: 0; duration: Appearance.durationSlow; easing.type: Easing.InCubic }
         }
     }
 }

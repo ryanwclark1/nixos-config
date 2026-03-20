@@ -17,7 +17,7 @@ PopupWindow {
   default property alias content: contentSlot.data
   property string subtitle: ""
   property color surfaceTint: "transparent"
-  property int contentSpacing: Colors.spacingML
+  property int contentSpacing: Appearance.spacingML
   property string preferredEdge: "top"
   property bool focusOnOpen: true
   // focusTarget: if set, receives focus when the menu opens instead of the surface.
@@ -115,20 +115,20 @@ PopupWindow {
     }
 
     Behavior on opacity { Anim { id: _opacAnim } }
-    Behavior on scale { NumberAnimation { id: _scaleAnim; duration: Colors.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
+    Behavior on scale { NumberAnimation { id: _scaleAnim; duration: Appearance.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
     Behavior on transform { Anim {} }
 
     layer.enabled: (_opacAnim.running || _scaleAnim.running) && root.allowLayer(width, height)
 
     ColumnLayout {
       anchors.fill: parent
-      anchors.margins: Colors.paddingLarge
+      anchors.margins: Appearance.paddingLarge
       spacing: root.contentSpacing
 
       // ── Header row ──────────────────────────
       RowLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         ColumnLayout {
           Layout.fillWidth: true
@@ -136,7 +136,7 @@ PopupWindow {
           Text {
             text: root.title
             color: Colors.text
-            font.pixelSize: Colors.fontSizeXL
+            font.pixelSize: Appearance.fontSizeXL
             font.weight: Font.Bold
             Layout.fillWidth: true
             elide: Text.ElideRight
@@ -145,7 +145,7 @@ PopupWindow {
             visible: root.subtitle !== ""
             text: root.subtitle
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             Layout.fillWidth: true
             elide: Text.ElideRight
           }
@@ -154,13 +154,13 @@ PopupWindow {
         // Slot for extra header widgets (buttons, chips, etc.)
         Row {
           id: headerExtrasSlot
-          spacing: Colors.spacingS
+          spacing: Appearance.spacingS
         }
 
         SharedWidgets.IconButton {
           icon: "dismiss.svg"
-          size: Colors.iconSizeMedium
-          iconSize: Colors.fontSizeXL
+          size: Appearance.iconSizeMedium
+          iconSize: Appearance.fontSizeXL
           iconColor: Colors.textDisabled
           stateColor: Colors.error
           tooltipText: "Close"

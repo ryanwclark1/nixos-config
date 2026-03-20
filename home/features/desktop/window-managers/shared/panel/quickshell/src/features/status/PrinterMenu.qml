@@ -9,7 +9,7 @@ BasePopupMenu {
   popupMaxWidth: 380; compactThreshold: 360
   implicitHeight: compactMode ? 540 : 480
   title: "Printers"
-  contentSpacing: Colors.spacingM
+  contentSpacing: Appearance.spacingM
 
   // Subscribe to PrinterService while this menu is alive
   SharedWidgets.Ref { service: PrinterService }
@@ -25,7 +25,7 @@ BasePopupMenu {
       visible: PrinterService.activeJobs > 0
       implicitWidth: jobsChipLabel.implicitWidth + 18
       implicitHeight: 24
-      radius: Colors.radiusCard
+      radius: Appearance.radiusCard
       color: Colors.warningLight
 
       Text {
@@ -33,7 +33,7 @@ BasePopupMenu {
         anchors.centerIn: parent
         text: PrinterService.activeJobs + " job" + (PrinterService.activeJobs !== 1 ? "s" : "")
         color: Colors.warning
-        font.pixelSize: Colors.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXS
         font.weight: Font.DemiBold
       }
     },
@@ -50,7 +50,7 @@ BasePopupMenu {
     visible: PrinterService.hasPrinters
     Layout.fillWidth: true
     implicitHeight: statusGrid.implicitHeight + 32
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: Colors.primaryGhost
     border.color: Colors.primarySubtle
     border.width: 1
@@ -61,26 +61,26 @@ BasePopupMenu {
         left: parent.left
         right: parent.right
         verticalCenter: parent.verticalCenter
-        leftMargin: Colors.spacingL
-        rightMargin: Colors.spacingL
+        leftMargin: Appearance.spacingL
+        rightMargin: Appearance.spacingL
       }
       columns: root.compactMode ? 1 : (PrinterService.activeJobs > 0 ? 3 : 2)
-      columnSpacing: Colors.spacingL
-      rowSpacing: Colors.spacingS
+      columnSpacing: Appearance.spacingL
+      rowSpacing: Appearance.spacingS
 
       ColumnLayout {
         spacing: 0
         Text {
           text: PrinterService.printers.length
           color: Colors.primary
-          font.pixelSize: Colors.fontSizeHuge
+          font.pixelSize: Appearance.fontSizeHuge
           font.weight: Font.Bold
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
         }
         Text {
           text: "printer" + (PrinterService.printers.length !== 1 ? "s" : "")
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXXS
+          font.pixelSize: Appearance.fontSizeXXS
           font.weight: Font.Bold
           font.capitalization: Font.AllUppercase
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
@@ -89,18 +89,18 @@ BasePopupMenu {
 
       ColumnLayout {
         Layout.fillWidth: true
-        spacing: Colors.spacingXXS
+        spacing: Appearance.spacingXXS
         Text {
           text: "System Default"
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXXS
+          font.pixelSize: Appearance.fontSizeXXS
           font.weight: Font.Bold
           font.capitalization: Font.AllUppercase
         }
         Text {
           text: PrinterService.defaultPrinter || "None set"
           color: PrinterService.defaultPrinter ? Colors.text : Colors.textDisabled
-          font.pixelSize: Colors.fontSizeSmall
+          font.pixelSize: Appearance.fontSizeSmall
           font.weight: Font.Medium
           elide: Text.ElideRight
           Layout.fillWidth: true
@@ -113,14 +113,14 @@ BasePopupMenu {
         Text {
           text: PrinterService.activeJobs
           color: Colors.warning
-          font.pixelSize: Colors.fontSizeHuge
+          font.pixelSize: Appearance.fontSizeHuge
           font.weight: Font.Bold
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
         }
         Text {
           text: "active job" + (PrinterService.activeJobs !== 1 ? "s" : "")
           color: Colors.textDisabled
-          font.pixelSize: Colors.fontSizeXXS
+          font.pixelSize: Appearance.fontSizeXXS
           font.weight: Font.Bold
           font.capitalization: Font.AllUppercase
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignHCenter
@@ -133,7 +133,7 @@ BasePopupMenu {
   SharedWidgets.ScrollableContent {
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Colors.spacingS
+    columnSpacing: Appearance.spacingS
 
         // Empty state — no printers detected
         SharedWidgets.EmptyState {
@@ -141,7 +141,7 @@ BasePopupMenu {
           Layout.topMargin: 40
           visible: !PrinterService.hasPrinters
           icon: "print.svg"
-          iconSize: Colors.iconSizeLarge
+          iconSize: Appearance.iconSizeLarge
           message: "No printers configured"
         }
 
@@ -159,7 +159,7 @@ BasePopupMenu {
 
             Layout.fillWidth: true
             implicitHeight: cardContent.implicitHeight + 20
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
 
             readonly property bool isDefault: modelData.name === PrinterService.defaultPrinter
             readonly property bool isDisabled: modelData.status === "disabled"
@@ -185,14 +185,14 @@ BasePopupMenu {
               anchors {
                 left: parent.left; right: parent.right
                 top: parent.top
-                margins: Colors.spacingM
+                margins: Appearance.spacingM
               }
-              spacing: Colors.spacingS
+              spacing: Appearance.spacingS
 
               // Top row: icon + name + status badge
               RowLayout {
                 Layout.fillWidth: true
-                spacing: Colors.spacingM
+                spacing: Appearance.spacingM
 
                 // Printer icon
                 Text {
@@ -200,19 +200,19 @@ BasePopupMenu {
                   color: printerCard.isDisabled ? Colors.textDisabled
                        : printerCard.isPrinting ? Colors.warning
                        : Colors.primary
-                  font.family: Colors.fontMono
-                  font.pixelSize: Colors.fontSizeHuge
+                  font.family: Appearance.fontMono
+                  font.pixelSize: Appearance.fontSizeHuge
                   Layout.alignment: Qt.AlignVCenter
                 }
 
                 ColumnLayout {
                   Layout.fillWidth: true
-                  spacing: Colors.spacingXXS
+                  spacing: Appearance.spacingXXS
 
                   // Printer name + default badge
                   RowLayout {
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     // Default badge (placed BEFORE name to avoid right-side collision)
                     Rectangle {
@@ -227,7 +227,7 @@ BasePopupMenu {
                         anchors.centerIn: parent
                         text: "Default"
                         color: Colors.primary
-                        font.pixelSize: Colors.fontSizeXXS
+                        font.pixelSize: Appearance.fontSizeXXS
                         font.weight: Font.Bold
                         font.capitalization: Font.AllUppercase
                       }
@@ -236,7 +236,7 @@ BasePopupMenu {
                     Text {
                       text: modelData.name
                       color: printerCard.isDisabled ? Colors.textSecondary : Colors.text
-                      font.pixelSize: Colors.fontSizeMedium
+                      font.pixelSize: Appearance.fontSizeMedium
                       font.weight: Font.DemiBold
                       elide: Text.ElideRight
                       Layout.fillWidth: true
@@ -247,7 +247,7 @@ BasePopupMenu {
                   Text {
                     text: modelData.statusText
                     color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     elide: Text.ElideRight
                     Layout.fillWidth: true
                   }
@@ -273,7 +273,7 @@ BasePopupMenu {
                     color: printerCard.isDisabled ? Colors.textDisabled
                          : printerCard.isPrinting ? Colors.warning
                          : Colors.success
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Medium
                   }
                 }
@@ -283,7 +283,7 @@ BasePopupMenu {
               Flow {
                 Layout.fillWidth: true
                 width: parent.width
-                spacing: Colors.spacingS
+                spacing: Appearance.spacingS
 
                 // Set Default button (hidden when already default)
                 Rectangle {
@@ -298,7 +298,7 @@ BasePopupMenu {
                     anchors.centerIn: parent
                     text: "Set Default"
                     color: setDefaultHover.containsMouse ? Colors.primary : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Medium
                     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                   }
@@ -337,7 +337,7 @@ BasePopupMenu {
                     anchors.centerIn: parent
                     text: "Test Page"
                     color: testPageHover.containsMouse ? Colors.accent : Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Medium
                     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                   }
@@ -376,7 +376,7 @@ BasePopupMenu {
                     anchors.centerIn: parent
                     text: "Cancel Jobs"
                     color: cancelJobsHover.containsMouse ? Colors.error : Colors.withAlpha(Colors.error, 0.70)
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Medium
                     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                   }
@@ -415,7 +415,7 @@ BasePopupMenu {
                     anchors.centerIn: parent
                     text: printerCard.isDisabled ? "Enable" : "Disable"
                     color: printerCard.isDisabled ? Colors.success : Colors.warning
-                    font.pixelSize: Colors.fontSizeXS
+                    font.pixelSize: Appearance.fontSizeXS
                     font.weight: Font.Medium
                   }
 

@@ -15,15 +15,15 @@ Rectangle {
 
     Layout.fillWidth: true
     implicitHeight: 68
-    radius: Colors.radiusMedium
+    radius: Appearance.radiusMedium
     color: Colors.bgWidget
     border.color: Colors.border
     border.width: 1
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Colors.spacingM
-        spacing: Colors.spacingM
+        anchors.margins: Appearance.spacingM
+        spacing: Appearance.spacingM
 
         Rectangle {
             Layout.preferredWidth: 36
@@ -35,8 +35,8 @@ Rectangle {
                 anchors.centerIn: parent
                 sourceComponent: root.icon.endsWith(".svg") ? _qlSvg : _qlNerd
             }
-            Component { id: _qlSvg; Shared.SvgIcon { source: root.icon; color: Colors.primary; size: Colors.fontSizeXL } }
-            Component { id: _qlNerd; Text { text: root.icon; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL } }
+            Component { id: _qlSvg; Shared.SvgIcon { source: root.icon; color: Colors.primary; size: Appearance.fontSizeXL } }
+            Component { id: _qlNerd; Text { text: root.icon; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }
         }
 
         ColumnLayout {
@@ -46,7 +46,7 @@ Rectangle {
             Text {
                 text: title
                 color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium
                 font.weight: Font.DemiBold
                 Layout.fillWidth: true
                 elide: Text.ElideRight
@@ -55,7 +55,7 @@ Rectangle {
             Text {
                 text: subtitle
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 Layout.fillWidth: true
                 elide: Text.ElideRight
             }
@@ -64,8 +64,8 @@ Rectangle {
         Text {
             text: "󰄮"
             color: Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: Colors.fontSizeMedium
+            font.family: Appearance.fontMono
+            font.pixelSize: Appearance.fontSizeMedium
         }
     }
 

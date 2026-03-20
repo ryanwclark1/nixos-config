@@ -17,7 +17,7 @@ Rectangle {
     anchors.bottomMargin: edgeMargins.bottom + 20
     width: editRow.implicitWidth + 40
     height: 48
-    radius: Colors.radiusXL
+    radius: Appearance.radiusXL
     color: Colors.bgGlass
     border.color: Colors.primary
     border.width: 2
@@ -25,7 +25,7 @@ Rectangle {
     RowLayout {
         id: editRow
         anchors.centerIn: parent
-        spacing: Colors.spacingL
+        spacing: Appearance.spacingL
 
         // Add Widget button
         Item {
@@ -35,18 +35,18 @@ Rectangle {
             RowLayout {
                 id: addRow
                 anchors.centerIn: parent
-                spacing: Colors.spacingSM
+                spacing: Appearance.spacingSM
 
                 Text {
                     text: "󰐕"
                     color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeLarge
                 }
                 Text {
                     text: "Add Widget"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.Medium
                 }
             }
@@ -69,7 +69,7 @@ Rectangle {
         Rectangle {
             Layout.preferredWidth: snapRow.implicitWidth + 16
             Layout.preferredHeight: 28
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: gridSnap ? Colors.primaryTint : "transparent"
             border.color: gridSnap ? Colors.primary : Colors.border
             border.width: 1
@@ -77,17 +77,17 @@ Rectangle {
             RowLayout {
                 id: snapRow
                 anchors.centerIn: parent
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 Text {
                     text: "󰕰"
                     color: Colors.text
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
                 Text {
                     text: "Grid"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                 }
             }
 
@@ -109,7 +109,7 @@ Rectangle {
         Rectangle {
             Layout.preferredWidth: exitRow.implicitWidth + 16
             Layout.preferredHeight: 28
-            radius: Colors.radiusMedium
+            radius: Appearance.radiusMedium
             color: Colors.errorLight
             border.color: Colors.error
             border.width: 1
@@ -117,17 +117,17 @@ Rectangle {
             RowLayout {
                 id: exitRow
                 anchors.centerIn: parent
-                spacing: Colors.spacingXS
+                spacing: Appearance.spacingXS
                 Text {
                     text: "󰅖"
                     color: Colors.error
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeMedium
                 }
                 Text {
                     text: "Done"
                     color: Colors.error
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.pixelSize: Appearance.fontSizeSmall
                 }
             }
 

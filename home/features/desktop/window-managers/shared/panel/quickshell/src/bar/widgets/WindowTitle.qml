@@ -26,12 +26,12 @@ Item {
     RowLayout {
         id: contentRow
         anchors.centerIn: parent
-        spacing: Colors.spacingM
+        spacing: Appearance.spacingM
 
         // ── App Icon ───────────────────────────────
         Rectangle {
             visible: root.showAppIcon
-            width: 22; height: 22; radius: Colors.radiusXXS
+            width: 22; height: 22; radius: Appearance.radiusXXS
             color: Colors.cardSurface
             border.color: Colors.border; border.width: 1
 
@@ -48,7 +48,7 @@ Item {
         Text {
             Layout.maximumWidth: root.maxTitleWidth
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             elide: Text.ElideRight
             text: root.activeTitle
@@ -66,26 +66,26 @@ Item {
             id: mediaContext
             visible: root.showMediaContext && !!MediaService.currentPlayer && MediaService.trackTitle !== ""
 
-            implicitWidth: visible ? mediaRow.implicitWidth + Colors.spacingM : 0
+            implicitWidth: visible ? mediaRow.implicitWidth + Appearance.spacingM : 0
             implicitHeight: 22
             radius: implicitHeight / 2
             color: Colors.withAlpha(MediaService.artAccentColor, 0.15)
             border.color: Colors.withAlpha(MediaService.artAccentColor, 0.3)
             border.width: 1
             
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
-            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Colors.durationEmphasis } }
+            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationEmphasis } }
+            Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationEmphasis } }
 
             RowLayout {
                 id: mediaRow
                 anchors.centerIn: parent
-                spacing: Colors.spacingSM
+                spacing: Appearance.spacingSM
 
                 Text {
                     text: MediaService.isPlaying ? "󰏤" : "󰐊"
                     color: MediaService.artAccentColor
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeSmall
 
                     MouseArea {
                         anchors.fill: parent
@@ -97,7 +97,7 @@ Item {
                 Text {
                     text: MediaService.trackTitle
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS
                     font.weight: Font.Bold
                     elide: Text.ElideRight
                     Layout.maximumWidth: 120
@@ -106,8 +106,8 @@ Item {
                 Text {
                     text: "󰒭"
                     color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeSmall
+                    font.family: Appearance.fontMono
+                    font.pixelSize: Appearance.fontSizeSmall
 
                     MouseArea {
                         anchors.fill: parent

@@ -2,6 +2,6 @@ import QtQuick
 import "../services"
 
 NumberAnimation {
-    duration: Colors.durationNormal
+    duration: Appearance.durationNormal
     easing.type: Easing.OutCubic
 }

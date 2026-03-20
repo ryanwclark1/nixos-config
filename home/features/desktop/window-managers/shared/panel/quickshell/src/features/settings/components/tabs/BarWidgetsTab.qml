@@ -344,7 +344,7 @@ Item {
                         ? "Manual edits preserve this layout until you reapply the preset."
                         : "Preset state follows the bar orientation until you customize the widget list.")
                 color: Colors.textSecondary
-                font.pixelSize: Colors.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
@@ -373,13 +373,13 @@ Item {
                 ColumnLayout {
                     id: sectionColumn
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    spacing: Appearance.spacingS
 
                     Text {
                         Layout.fillWidth: true
                         text: root.sectionWidgets(sectionKey).length > 0 ? "Current widgets: " + root.sectionWidgets(sectionKey).length : "Current widgets: none"
                         color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
+                        font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.Medium
                         wrapMode: Text.WordWrap
                     }
@@ -387,11 +387,11 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         visible: root.sectionWidgets(sectionKey).length === 0
-                        radius: Colors.radiusSmall
+                        radius: Appearance.radiusSmall
                         color: Colors.withAlpha(Colors.primary, 0.06)
                         border.color: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? Colors.primary : Colors.border
                         border.width: root.dragReorderEnabled && root.dragTargetSection === sectionKey && root.dragTargetIndex === 0 ? 2 : 1
-                        implicitHeight: emptyDropColumn.implicitHeight + Colors.spacingM * 2
+                        implicitHeight: emptyDropColumn.implicitHeight + Appearance.spacingM * 2
 
                         DropArea {
                             anchors.fill: parent
@@ -411,20 +411,20 @@ Item {
                         Column {
                             id: emptyDropColumn
                             anchors.fill: parent
-                            anchors.margins: Colors.spacingM
-                            spacing: Colors.spacingXS
+                            anchors.margins: Appearance.spacingM
+                            spacing: Appearance.spacingXS
 
                             Text {
                                 text: (root.dragReorderEnabled && root.dragSourceIndex >= 0) ? "Drop widget here" : "No widgets in this section yet"
                                 color: Colors.text
-                                font.pixelSize: Colors.fontSizeSmall
+                                font.pixelSize: Appearance.fontSizeSmall
                                 font.weight: Font.Medium
                             }
 
                             Text {
                                 text: (root.dragReorderEnabled && root.dragSourceIndex >= 0) ? "Release to move the dragged widget into " + root.sectionLabel(sectionKey).toLowerCase() + "." : "Add one below, then drag it into place or use the arrow buttons."
                                 color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeXS
+                                font.pixelSize: Appearance.fontSizeXS
                                 wrapMode: Text.WordWrap
                             }
                         }
@@ -436,7 +436,7 @@ Item {
                             id: widgetRow
                             Layout.fillWidth: true
                             width: sectionColumn.width
-                            implicitHeight: cardLayout.implicitHeight + Colors.spacingM * 2
+                            implicitHeight: cardLayout.implicitHeight + Appearance.spacingM * 2
                             height: implicitHeight
                             required property int index
                             readonly property string sectionKey: widgetSectionCard.sectionKey
@@ -472,8 +472,8 @@ Item {
                             Rectangle {
                                 id: card
                                 anchors.fill: parent
-                                implicitHeight: cardLayout.implicitHeight + Colors.spacingM * 2
-                                radius: Colors.radiusSmall
+                                implicitHeight: cardLayout.implicitHeight + Appearance.spacingM * 2
+                                radius: Appearance.radiusSmall
                                 color: Colors.modalFieldSurface
                                 border.color: Colors.border
                                 border.width: 1
@@ -483,7 +483,7 @@ Item {
                                     enabled: !dragHandle.dragActive
 
                                     NumberAnimation {
-                                        duration: Colors.durationFast
+                                        duration: Appearance.durationFast
                                     }
                                 }
 
@@ -493,36 +493,36 @@ Item {
                                         left: parent.left
                                         right: parent.right
                                         top: parent.top
-                                        margins: Colors.spacingM
+                                        margins: Appearance.spacingM
                                     }
-                                    spacing: Colors.spacingS
+                                    spacing: Appearance.spacingS
 
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        spacing: Colors.spacingS
+                                        spacing: Appearance.spacingS
 
                                         Text {
                                             text: "󰆾"
                                             color: Colors.textDisabled
-                                            font.family: Colors.fontMono
-                                            font.pixelSize: Colors.fontSizeLarge
+                                            font.family: Appearance.fontMono
+                                            font.pixelSize: Appearance.fontSizeLarge
                                         }
 
                                         Text {
                                             text: BarWidgetRegistry.displayIcon(widgetRow.widgetInstance.widgetType)
                                             color: Colors.primary
-                                            font.family: Colors.fontMono
-                                            font.pixelSize: Colors.fontSizeLarge
+                                            font.family: Appearance.fontMono
+                                            font.pixelSize: Appearance.fontSizeLarge
                                         }
 
                                         ColumnLayout {
                                             Layout.fillWidth: true
-                                            spacing: Colors.spacingXXS
+                                            spacing: Appearance.spacingXXS
 
                                             Text {
                                                 text: BarWidgetRegistry.displayName(widgetRow.widgetInstance.widgetType)
                                                 color: Colors.text
-                                                font.pixelSize: Colors.fontSizeMedium
+                                                font.pixelSize: Appearance.fontSizeMedium
                                                 font.weight: Font.Medium
                                                 Layout.fillWidth: true
                                                 wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
@@ -532,7 +532,7 @@ Item {
                                             Text {
                                                 text: BarWidgetRegistry.description(widgetRow.widgetInstance.widgetType)
                                                 color: Colors.textSecondary
-                                                font.pixelSize: Colors.fontSizeXS
+                                                font.pixelSize: Appearance.fontSizeXS
                                                 Layout.fillWidth: true
                                                 wrapMode: Text.WordWrap
                                             }
@@ -540,7 +540,7 @@ Item {
                                             Text {
                                                 text: root.dragReorderEnabled ? "Drag to reorder within or across sections, or use the arrow buttons." : "Use the arrow buttons to reorder within this section."
                                                 color: Colors.textSecondary
-                                                font.pixelSize: Colors.fontSizeXS
+                                                font.pixelSize: Appearance.fontSizeXS
                                                 Layout.fillWidth: true
                                                 wrapMode: Text.WordWrap
                                             }
@@ -550,7 +550,7 @@ Item {
                                     Flow {
                                         Layout.fillWidth: true
                                         width: parent.width
-                                        spacing: Colors.spacingS
+                                        spacing: Appearance.spacingS
 
                                         SharedWidgets.FilterChip {
                                             label: widgetRow.widgetInstance.enabled === false ? "Hidden" : "Visible"
@@ -620,8 +620,8 @@ Item {
                                 anchors {
                                     top: parent.top
                                     right: parent.right
-                                    topMargin: Colors.spacingS
-                                    rightMargin: Colors.spacingS
+                                    topMargin: Appearance.spacingS
+                                    rightMargin: Appearance.spacingS
                                 }
                                 enabled: root.dragReorderEnabled
                                 visible: root.dragReorderEnabled
@@ -674,7 +674,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: root.dragReorderEnabled && root.dragSourceIndex >= 0 ? "Drop at end of " + root.sectionLabel(sectionKey).toLowerCase() : ""
                             color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeXS
+                            font.pixelSize: Appearance.fontSizeXS
                         }
                     }
                 }

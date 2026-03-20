@@ -18,7 +18,7 @@ Loader {
                 model: Math.min(root.toplevels.length, 3)
                 Rectangle {
                     required property int index
-                    width: 4; height: 4; radius: Colors.radiusMicro
+                    width: 4; height: 4; radius: Appearance.radiusMicro
                     color: {
                         if (!root.isFocused) return Colors.textSecondary;
                         var active = CompositorAdapter.activeWindow;
@@ -40,7 +40,7 @@ Loader {
                 model: Math.min(root.toplevels.length, 3)
                 Rectangle {
                     required property int index
-                    width: 4; height: 4; radius: Colors.radiusMicro
+                    width: 4; height: 4; radius: Appearance.radiusMicro
                     color: {
                         if (!root.isFocused) return Colors.textSecondary;
                         var active = CompositorAdapter.activeWindow;

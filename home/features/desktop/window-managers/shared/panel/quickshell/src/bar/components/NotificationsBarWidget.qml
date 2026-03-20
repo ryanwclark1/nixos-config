@@ -47,19 +47,19 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Colors.spacingXS
+        spacing: Appearance.spacingXS
 
         Text {
             color: Colors.text
-            font.pixelSize: Colors.fontSizeXL
-            font.family: Colors.fontMono
+            font.pixelSize: Appearance.fontSizeXL
+            font.family: Appearance.fontMono
             text: root.hasDnd ? "󰂛" : "󰂚"
         }
 
         Text {
             visible: !root.iconOnly && root.hasDnd
             color: Colors.textSecondary
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             text: "DND"
             anchors.verticalCenter: parent.verticalCenter
@@ -68,7 +68,7 @@ SharedWidgets.BarPill {
         Text {
             visible: !root.iconOnly && !root.hasDnd && root.hasUnread && root.badgeStyle === "count"
             color: Colors.text
-            font.pixelSize: Colors.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.DemiBold
             text: String(root.unreadCount)
             anchors.verticalCenter: parent.verticalCenter
@@ -94,7 +94,7 @@ SharedWidgets.BarPill {
             visible: root.badgeStyle === "count"
             text: String(root.unreadCount)
             color: Colors.text
-            font.pixelSize: Colors.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS
             font.weight: Font.Bold
         }
     }
