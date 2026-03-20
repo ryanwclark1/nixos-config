@@ -213,13 +213,14 @@ Rectangle {
                         anchors.rightMargin: Colors.spacingS
                         spacing: Colors.spacingS
 
-                        Text {
+                        Loader {
                             visible: !!modelData.icon
-                            text: modelData.icon || ""
-                            color: optionDelegate.selected ? Colors.primary : Colors.textSecondary
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeMedium
+                            property string _ic: modelData.icon || ""
+                            property color _co: optionDelegate.selected ? Colors.primary : Colors.textSecondary
+                            sourceComponent: _ic.endsWith(".svg") ? _srSvg : _srNerd
                         }
+                        Component { id: _srSvg; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeMedium } }
+                        Component { id: _srNerd; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium } }
 
                         Text {
                             Layout.fillWidth: true
