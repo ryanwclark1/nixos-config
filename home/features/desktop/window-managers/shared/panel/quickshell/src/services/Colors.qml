@@ -239,15 +239,24 @@ QtObject {
     readonly property int spacingM: scaledMetric(12, _spacingScale, 8)
     readonly property int spacingL: scaledMetric(16, _spacingScale, 10)
     readonly property int spacingLG: scaledMetric(20, _spacingScale, 12)
+    readonly property int spacingML: scaledMetric(14, _spacingScale, 10)
     readonly property int spacingXL: scaledMetric(24, _spacingScale, 16)
+
+    readonly property int controlRowHeight: scaledMetric(38, _spacingScale, 28)
 
     readonly property int paddingSmall: scaledMetric(8, _spacingScale, 4)
     readonly property int paddingMedium: scaledMetric(12, _spacingScale, 8)
     readonly property int paddingLarge: scaledMetric(20, _spacingScale, 12)
 
+    // --- ICON SIZES (scale with spacing, not font) ---
+    readonly property int iconSizeSmall: scaledMetric(24, _spacingScale, 18)
+    readonly property int iconSizeMedium: scaledMetric(32, _spacingScale, 24)
+    readonly property int iconSizeLarge: scaledMetric(48, _spacingScale, 36)
+
     readonly property int radiusXXXS: scaledMetric(1, _radiusScale, 1)
     readonly property int radiusXXS: scaledMetric(2, _radiusScale, 1)
     readonly property int radiusMicro: radiusXXS
+    readonly property int radiusXS3: scaledMetric(3, _radiusScale, 2)
     readonly property int radiusXS: scaledMetric(4, _radiusScale, 2)
     readonly property int radiusSmall: scaledMetric(8, _radiusScale, 4)
     readonly property int radiusMedium: scaledMetric(12, _radiusScale, 6)
