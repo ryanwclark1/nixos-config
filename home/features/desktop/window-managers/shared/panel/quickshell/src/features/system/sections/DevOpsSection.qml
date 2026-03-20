@@ -100,7 +100,7 @@ ColumnLayout {
                         visible: ServiceUnitService.dockerStatus !== "ready"
                         text: ServiceUnitService.dockerStatus === "missing" ? "Missing" : "Error"
                         color: Colors.warning
-                        font.pixelSize: 10
+                        font.pixelSize: Colors.fontSizeCaption
                     }
                 }
             }
@@ -151,7 +151,7 @@ ColumnLayout {
                         visible: ServiceUnitService.sshStatus !== "ready"
                         text: ServiceUnitService.sshStatus === "missing" ? "Missing" : "Error"
                         color: Colors.warning
-                        font.pixelSize: 10
+                        font.pixelSize: Colors.fontSizeCaption
                     }
                 }
             }
