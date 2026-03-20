@@ -140,7 +140,7 @@ PanelWindow {
         // Stop Speaking — only visible while TTS is active
         SharedWidgets.IconButton {
           size: 32
-          icon: "󰓛"
+          icon: "stop.svg"
           iconColor: Colors.error
           tooltipText: "Stop speaking"
           visible: !!(root.manager && root.manager.ttsSpeaking)

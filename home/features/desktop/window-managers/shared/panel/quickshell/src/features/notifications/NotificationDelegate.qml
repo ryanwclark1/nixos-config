@@ -185,7 +185,7 @@ Rectangle {
         Item { Layout.fillWidth: true }
 
         SharedWidgets.IconButton {
-          icon: "󰒮"
+          icon: "previous.svg"
           iconSize: Colors.fontSizeLarge
           tooltipText: "Previous track"
           onClicked: if (root.mprisPlayer) root.mprisPlayer.previous()
@@ -201,7 +201,7 @@ Rectangle {
         }
 
         SharedWidgets.IconButton {
-          icon: "󰒭"
+          icon: "next.svg"
           iconSize: Colors.fontSizeLarge
           tooltipText: "Next track"
           onClicked: if (root.mprisPlayer) root.mprisPlayer.next()
