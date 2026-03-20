@@ -71,6 +71,7 @@ ThemedContainer 1.0 ../shared/ThemedContainer.qml
 Toast 1.0 ../shared/Toast.qml
 ToastOverlay 1.0 ../shared/ToastOverlay.qml
 TodoWidget 1.0 ../features/todo/TodoWidget.qml
+Tooltip 1.0 ../shared/Tooltip.qml
 ToggleSwitch 1.0 ../shared/ToggleSwitch.qml
 TrayWidget 1.0 ../features/bar/components/TrayWidget.qml
 WavyProgress 1.0 ../shared/WavyProgress.qml

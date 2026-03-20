@@ -260,12 +260,11 @@ Item {
                                         cursorShape: Qt.PointingHandCursor
                                         hoverEnabled: true
                                         onClicked: _createTemplate(modelData.name, modelData.valueDescription)
+                                    }
 
-                                        SharedWidgets.BarTooltip {
-                                            anchorItem: createTemplateMouse
-                                            hovered: createTemplateMouse.containsMouse
-                                            text: "Create template script"
-                                        }
+                                    SharedWidgets.Tooltip {
+                                        text: "Create template script"
+                                        shown: createTemplateMouse.containsMouse
                                     }
                                 }
                             }
