@@ -405,19 +405,19 @@ Item {
                 if (!Config.barUseModularEntries) return;
 
                 var availableWidgets = [
-                    { label: "Logo/Launcher", type: "logo", icon: "󰓩" },
-                    { label: "Workspaces", type: "workspaces", icon: "󰏘" },
-                    { label: "Window Title", type: "windowTitle", icon: "󰖲" },
-                    { label: "Clock/Date", type: "dateTime", icon: "󰥔" },
-                    { label: "Media Bar", type: "mediaBar", icon: "󰓃" },
+                    { label: "Logo/Launcher", type: "logo", icon: "app-generic.svg" },
+                    { label: "Workspaces", type: "workspaces", icon: "color-palette.svg" },
+                    { label: "Window Title", type: "windowTitle", icon: "options.svg" },
+                    { label: "Clock/Date", type: "dateTime", icon: "clock.svg" },
+                    { label: "Media Bar", type: "mediaBar", icon: "music-note-2.svg" },
                     { label: "System Tray", type: "tray", icon: "settings.svg" },
-                    { label: "Notifications", type: "notifications", icon: "󰂚" },
-                    { label: "Audio", type: "audio", icon: "󰕾" },
-                    { label: "Network", type: "network", icon: "󰛳" },
-                    { label: "Battery", type: "battery", icon: "󰁹" },
-                    { label: "Personality", type: "personality", icon: "󰄛" },
-                    { label: "Spacer", type: "spacer", icon: "󰏫" },
-                    { label: "Separator", type: "separator", icon: "󰏫" }
+                    { label: "Notifications", type: "notifications", icon: "alert.svg" },
+                    { label: "Audio", type: "audio", icon: "speaker.svg" },
+                    { label: "Network", type: "network", icon: "ethernet.svg" },
+                    { label: "Battery", type: "battery", icon: "battery-full.svg" },
+                    { label: "Personality", type: "personality", icon: "people.svg" },
+                    { label: "Spacer", type: "spacer", icon: "subtract.svg" },
+                    { label: "Separator", type: "separator", icon: "subtract.svg" }
                 ];
 
                 function makeSectionMenu(section) {
