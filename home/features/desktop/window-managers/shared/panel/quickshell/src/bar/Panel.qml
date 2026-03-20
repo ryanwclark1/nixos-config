@@ -1045,7 +1045,7 @@ Item {
             contextActions: [
                 {
                     label: AudioService.outputMuted ? "Unmute" : "Mute",
-                    icon: AudioService.outputMuted ? "󰖁" : "󰕾",
+                    icon: AudioService.outputMuted ? "speaker-mute.svg" : "speaker-2-filled.svg",
                     action: () => AudioService.toggleMute("@DEFAULT_AUDIO_SINK@", AudioService.outputMuted)
                 },
                 {

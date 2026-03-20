@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import "../system/sections"
 import "../../shared" as Shared
 import "../../services"
+import "../../services/IconHelpers.js" as IconHelpers
 import "../../widgets" as SharedWidgets
 
 PanelWindow {
@@ -144,7 +145,7 @@ PanelWindow {
           // TTS Toggle
           SharedWidgets.IconButton {
             size: Appearance.iconSizeMedium
-            icon: Config.notifTtsEnabled ? "󰗆" : "󰗈"
+            icon: IconHelpers.speechToggleIcon(Config.notifTtsEnabled)
             iconColor: Config.notifTtsEnabled ? Colors.primary : Colors.textSecondary
             tooltipText: Config.notifTtsEnabled ? "Disable read-aloud" : "Read notifications aloud"
             onClicked: Config.notifTtsEnabled = !Config.notifTtsEnabled
@@ -163,7 +164,7 @@ PanelWindow {
           // DND Toggle
           SharedWidgets.IconButton {
             size: Appearance.iconSizeMedium
-            icon: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
+            icon: IconHelpers.doNotDisturbIcon(root.manager && root.manager.dndEnabled)
             iconColor: root.manager && root.manager.dndEnabled ? Colors.error : Colors.textSecondary
             tooltipText: root.manager && root.manager.dndEnabled ? "Disable do not disturb" : "Do not disturb"
             onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled

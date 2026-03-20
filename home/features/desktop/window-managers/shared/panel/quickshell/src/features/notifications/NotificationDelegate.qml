@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
 import "../../services"
+import "../../services/IconHelpers.js" as IconHelpers
 import "../../widgets" as SharedWidgets
 
 Rectangle {
@@ -194,7 +195,7 @@ Rectangle {
         SharedWidgets.IconButton {
           size: 34
           color: Colors.primary
-          icon: root.mprisPlayer && root.mprisPlayer.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
+          icon: IconHelpers.transportToggleIcon(root.mprisPlayer && root.mprisPlayer.playbackState === Mpris.Playing)
           iconColor: Colors.background
           tooltipText: root.mprisPlayer && root.mprisPlayer.playbackState === Mpris.Playing ? "Pause" : "Play"
           onClicked: if (root.mprisPlayer) root.mprisPlayer.playPause()

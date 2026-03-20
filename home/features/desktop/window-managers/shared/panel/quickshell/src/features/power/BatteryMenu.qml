@@ -20,16 +20,7 @@ BasePopupMenu {
 
   readonly property string batteryStateText: BatteryHelpers.stateText(device, UPower)
 
-  readonly property string batteryIcon: {
-    if (!device) return "󰂑";
-    if (device.state === UPower.DeviceStateCharging) return "󰂄";
-    if (device.percentage > 0.9) return "󰁹";
-    if (device.percentage > 0.7) return "󰂀";
-    if (device.percentage > 0.5) return "󰁿";
-    if (device.percentage > 0.3) return "󰁾";
-    if (device.percentage > 0.2) return "󰁽";
-    return "󰂃";
-  }
+  readonly property string batteryIcon: BatteryHelpers.iconName(device, UPower)
 
   readonly property color batteryColor: {
     if (!device) return Colors.textDisabled;
