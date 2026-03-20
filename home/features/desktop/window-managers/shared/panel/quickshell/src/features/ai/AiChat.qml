@@ -587,7 +587,7 @@ PanelWindow {
 
                         SettingsActionButton {
                             label: "Cancel"
-                            iconName: "󰅖"
+                            iconName: "dismiss.svg"
                             compact: true
                             enabled: !AiService.isCommandRunning
                             onClicked: AiService.cancelPendingCommand()
@@ -696,14 +696,14 @@ PanelWindow {
 
                         SettingsActionButton {
                             label: "Discard"
-                            iconName: "󰅖"
+                            iconName: "dismiss.svg"
                             compact: true
                             onClicked: AiService.cancelPendingScript()
                         }
 
                         SettingsActionButton {
                             label: "Install to ~/.local/bin"
-                            iconName: "󰄬"
+                            iconName: "checkmark.svg"
                             compact: true
                             onClicked: AiService.installPendingScript()
                         }

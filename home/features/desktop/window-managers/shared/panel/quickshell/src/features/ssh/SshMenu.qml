@@ -302,7 +302,7 @@ BasePopupMenu {
 
       SettingsActionButton {
         compact: true
-        iconName: "󰒓"
+        iconName: "settings.svg"
         label: "Edit Hosts"
         onClicked: root.openBarWidgetSettings()
       }
@@ -444,7 +444,7 @@ BasePopupMenu {
 
                   SettingsActionButton {
                     compact: true
-                    iconName: "󰆍"
+                    iconName: "terminal.svg"
                     label: "Connect"
                     onClicked: {
                       sshData.connectHost(modelData);
@@ -454,7 +454,7 @@ BasePopupMenu {
 
                   SettingsActionButton {
                     compact: true
-                    iconName: "󰅍"
+                    iconName: "copy.svg"
                     label: "Copy Cmd"
                     onClicked: {
                       sshData.copyHostCommand(modelData);
@@ -464,7 +464,7 @@ BasePopupMenu {
 
                   SettingsActionButton {
                     compact: true
-                    iconName: "󰌹"
+                    iconName: "copy.svg"
                     label: "Copy Alias"
                     visible: sshData.hostAliasText(modelData) !== ""
                     onClicked: sshData.copyHostAlias(modelData)
@@ -472,7 +472,7 @@ BasePopupMenu {
 
                   SettingsActionButton {
                     compact: true
-                    iconName: "󰇖"
+                    iconName: "copy.svg"
                     label: "Copy Host"
                     visible: sshData.hostNameText(modelData) !== ""
                     onClicked: sshData.copyHostName(modelData)
@@ -480,7 +480,7 @@ BasePopupMenu {
 
                   SettingsActionButton {
                     compact: true
-                    iconName: "󰞇"
+                    iconName: "copy.svg"
                     label: "Copy User@Host"
                     visible: sshData.hostUserHostText(modelData) !== "" && sshData.hostUserHostText(modelData) !== sshData.hostNameText(modelData)
                     onClicked: sshData.copyHostUserHost(modelData)
@@ -488,7 +488,7 @@ BasePopupMenu {
 
                   SettingsActionButton {
                     compact: true
-                    iconName: "󰈔"
+                    iconName: "document.svg"
                     label: "Copy Source"
                     visible: sshData.hostSourceLabel(modelData) !== ""
                     onClicked: sshData.copyHostSourcePath(modelData)

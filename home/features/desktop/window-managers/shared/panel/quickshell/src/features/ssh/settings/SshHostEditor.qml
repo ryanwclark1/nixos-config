@@ -120,21 +120,21 @@ Rectangle {
 
             SettingsActionButton {
                 compact: true
-                iconName: "󰐕"
+                iconName: "save.svg"
                 label: root.isEditingExisting ? "Save Changes" : "Save Host"
                 onClicked: root.save()
             }
 
             SettingsActionButton {
                 compact: true
-                iconName: "󰜉"
+                iconName: "delete.svg"
                 label: "Clear"
                 onClicked: root.clear()
             }
 
             SettingsActionButton {
                 compact: true
-                iconName: "󰗼"
+                iconName: "dismiss.svg"
                 label: "Cancel"
                 visible: root.isEditingExisting
                 onClicked: root.cancel()

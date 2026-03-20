@@ -119,7 +119,7 @@ Rectangle {
         SettingsInfoCallout {
             Layout.fillWidth: true
             visible: root.reorderDisabled && root.sshData.manualHosts.length > 0
-            iconName: "󰌑"
+            iconName: "lock-closed.svg"
             title: "Reordering paused while filtering"
             body: "Clear search to drag hosts or use the up and down buttons."
         }
@@ -310,7 +310,7 @@ Rectangle {
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰏬"
+                                    iconName: "delete.svg"
                                     label: "Down"
                                     enabled: !root.reorderDisabled && hostRow.hostIndex < (root.sshData.manualHosts.length - 1)
                                     onClicked: root.moveHost(hostRow.hostIndex, 1)

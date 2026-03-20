@@ -39,7 +39,7 @@ Rectangle {
         SettingsDataRow {
             Layout.fillWidth: true
             label: "Imported Aliases"
-            iconName: "󰮔"
+            iconName: "download.svg"
             value: String(root.sshData.importedHosts.length)
             monoValue: false
         }
@@ -47,7 +47,7 @@ Rectangle {
         SettingsDataRow {
             Layout.fillWidth: true
             label: "Skipped Patterns"
-            iconName: "󰇘"
+            iconName: "filter.svg"
             value: String(root.sshData.skippedPatternEntries.length)
             monoValue: false
         }
@@ -74,7 +74,7 @@ Rectangle {
 
             SettingsActionButton {
                 compact: true
-                iconName: "󰩺"
+                iconName: "download.svg"
                 label: "Reset All"
                 onClicked: root.resetAllRequested()
             }
