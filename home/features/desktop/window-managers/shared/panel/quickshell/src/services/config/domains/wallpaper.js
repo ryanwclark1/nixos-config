@@ -15,5 +15,10 @@ var maps = [
     ["transitionDuration", "wallpaperTransitionDuration"],
     ["useShellRenderer", "wallpaperUseShellRenderer"],
     ["dynamicEnabled", "wallpaperDynamicEnabled"],
-    ["dynamicManifest", "wallpaperDynamicManifest"]
+    ["dynamicManifest", "wallpaperDynamicManifest"],
+    ["videoEnabled", "wallpaperVideoEnabled"],
+    ["videoPath", "wallpaperVideoPath"],
+    ["wallhavenApiKey", "wallhavenApiKey"],
+    ["wallhavenLastQuery", "wallhavenLastQuery"],
+    ["wallhavenDownloadDir", "wallhavenDownloadDir"]
 ]

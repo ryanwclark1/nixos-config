@@ -298,6 +298,13 @@ QtObject {
     property bool wallpaperUseShellRenderer: false       // true = shell renders wallpaper, false = use swww/external
     property bool wallpaperDynamicEnabled: false
     property string wallpaperDynamicManifest: ""         // path to manifest.json
+    property bool wallpaperVideoEnabled: false
+    property string wallpaperVideoPath: ""               // path to video file
+
+    // --- WALLHAVEN ---
+    property string wallhavenApiKey: ""                  // optional API key for NSFW/favorites
+    property string wallhavenLastQuery: ""
+    property string wallhavenDownloadDir: (Quickshell.env("HOME") || "/home") + "/Pictures/Wallhaven"
 
     // --- COLOR BACKEND ---
     property string colorBackend: "pywal"  // pywal | matugen | dynamic

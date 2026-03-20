@@ -452,6 +452,21 @@ QtObject {
         function onWallpaperDynamicManifestChanged() {
             root.config.scheduleSave();
         }
+        function onWallpaperVideoEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallpaperVideoPathChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallhavenApiKeyChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallhavenLastQueryChanged() {
+            root.config.scheduleSave();
+        }
+        function onWallhavenDownloadDirChanged() {
+            root.config.scheduleSave();
+        }
         function onGlassOpacityBaseChanged() {
             root.config.scheduleSave();
         }
