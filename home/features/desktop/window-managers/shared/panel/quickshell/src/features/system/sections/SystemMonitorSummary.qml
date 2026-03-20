@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
 
@@ -85,14 +86,14 @@ SharedWidgets.CardBase {
             }
 
             SharedWidgets.Chip {
-                icon: SystemStatus.isCritical ? "󰀦" : "󰄬"
+                icon: IconHelpers.healthStatusIcon(SystemStatus.isCritical)
                 iconColor: SystemStatus.isCritical ? Colors.error : Colors.success
                 text: SystemStatus.isCritical ? "Attention" : "Healthy"
                 textColor: SystemStatus.isCritical ? Colors.error : Colors.success
             }
 
             SharedWidgets.Chip {
-                icon: SystemIoTelemetryService.telemetryStatus === "degraded" ? "󰀦" : "󰄬"
+                icon: IconHelpers.healthStatusIcon(SystemIoTelemetryService.telemetryStatus === "degraded")
                 iconColor: SystemIoTelemetryService.telemetryStatus === "degraded" ? Colors.warning : Colors.textSecondary
                 text: "I/O " + SystemIoTelemetryService.telemetryStatus.toUpperCase()
                 textColor: SystemIoTelemetryService.telemetryStatus === "degraded" ? Colors.warning : Colors.textSecondary
@@ -134,7 +135,7 @@ SharedWidgets.CardBase {
 
             SharedWidgets.Chip {
                 visible: SystemIoTelemetryService.selectedInterface !== ""
-                icon: SystemIoTelemetryService.networkHotspot ? "󰀦" : "󰈀"
+                icon: IconHelpers.degradedStatusIcon(SystemIoTelemetryService.networkHotspot, "ethernet.svg")
                 iconColor: SystemIoTelemetryService.networkHotspot ? Colors.warning : Colors.primary
                 text: "NET PEAK " + MU.formatRate(Math.max(SystemIoTelemetryService.peakNetworkDown, SystemIoTelemetryService.peakNetworkUp))
                 textColor: SystemIoTelemetryService.networkHotspot ? Colors.warning : Colors.primary
@@ -142,7 +143,7 @@ SharedWidgets.CardBase {
 
             SharedWidgets.Chip {
                 visible: SystemIoTelemetryService.selectedDiskDevice !== ""
-                icon: SystemIoTelemetryService.diskHotspot ? "󰀦" : "󰋊"
+                icon: IconHelpers.degradedStatusIcon(SystemIoTelemetryService.diskHotspot, "hard-drive.svg")
                 iconColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.info
                 text: "DISK PEAK " + MU.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
                 textColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.info

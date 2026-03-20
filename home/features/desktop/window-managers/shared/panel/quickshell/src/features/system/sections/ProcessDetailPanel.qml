@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
 import "ProcessTableHelpers.js" as PTH
@@ -271,14 +272,14 @@ Rectangle {
                     }
 
                     SharedWidgets.Chip {
-                        icon: ProcessService.detailBusy ? "󰑐" : "󰄬"
+                        icon: IconHelpers.busyStatusIcon(ProcessService.detailBusy)
                         iconColor: PTH.detailStatusColor(ProcessService.detailStatus, Colors)
                         text: ProcessService.detailStatus.toUpperCase()
                         textColor: PTH.detailStatusColor(ProcessService.detailStatus, Colors)
                     }
 
                     SharedWidgets.Chip {
-                        icon: ProcessService.detailDegraded ? "󰀦" : "󰥔"
+                        icon: IconHelpers.updatedStatusIcon(ProcessService.detailDegraded)
                         iconColor: ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary
                         text: "Updated " + MU.formatAge(ProcessService.detailLastUpdatedMs, root.clockTick)
                         textColor: ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary

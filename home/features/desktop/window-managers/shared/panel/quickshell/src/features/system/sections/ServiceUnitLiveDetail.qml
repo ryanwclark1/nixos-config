@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
 
@@ -45,14 +46,14 @@ Rectangle {
             }
 
             SharedWidgets.Chip {
-                icon: ServiceUnitService.detailBusy ? "󰑐" : "󰄬"
+                icon: IconHelpers.busyStatusIcon(ServiceUnitService.detailBusy)
                 iconColor: root.detailStatusColorFn(ServiceUnitService.detailStatus)
                 text: ServiceUnitService.detailStatus.toUpperCase()
                 textColor: root.detailStatusColorFn(ServiceUnitService.detailStatus)
             }
 
             SharedWidgets.Chip {
-                icon: ServiceUnitService.detailDegraded ? "󰀦" : "󰥔"
+                icon: IconHelpers.updatedStatusIcon(ServiceUnitService.detailDegraded)
                 iconColor: ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary
                 text: "Updated " + MU.formatAge(ServiceUnitService.detailLastUpdatedMs, root.clockTick)
                 textColor: ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary

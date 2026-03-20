@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
 
@@ -64,7 +65,7 @@ SharedWidgets.CardBase {
             spacing: Appearance.spacingS
 
             SharedWidgets.Chip {
-                icon: SystemIoTelemetryService.networkHotspot ? "󰀦" : "󰄬"
+                icon: IconHelpers.healthStatusIcon(SystemIoTelemetryService.networkHotspot || SystemIoTelemetryService.diskHotspot)
                 iconColor: SystemIoTelemetryService.networkHotspot || SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.success
                 text: SystemIoTelemetryService.telemetryStatus.toUpperCase()
                 textColor: SystemIoTelemetryService.networkHotspot || SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.success
@@ -94,7 +95,7 @@ SharedWidgets.CardBase {
 
             SharedWidgets.Chip {
                 visible: SystemIoTelemetryService.selectedInterface !== ""
-                icon: SystemIoTelemetryService.networkDegraded ? "󰀦" : "󰈀"
+                icon: IconHelpers.degradedStatusIcon(SystemIoTelemetryService.networkDegraded, "ethernet.svg")
                 iconColor: SystemIoTelemetryService.networkDegraded ? Colors.warning : Colors.primary
                 text: String(SystemIoTelemetryService.selectedInterface || "").toUpperCase() + "  " + MU.formatAge(SystemIoTelemetryService.networkLastSampleMs, root._clockTick)
                 textColor: SystemIoTelemetryService.networkDegraded ? Colors.warning : Colors.primary
@@ -102,7 +103,7 @@ SharedWidgets.CardBase {
 
             SharedWidgets.Chip {
                 visible: SystemIoTelemetryService.selectedDiskDevice !== ""
-                icon: SystemIoTelemetryService.diskDegraded ? "󰀦" : "󰋊"
+                icon: IconHelpers.degradedStatusIcon(SystemIoTelemetryService.diskDegraded, "hard-drive.svg")
                 iconColor: SystemIoTelemetryService.diskDegraded ? Colors.warning : Colors.info
                 text: String(SystemIoTelemetryService.selectedDiskDevice || "").toUpperCase() + "  " + MU.formatAge(SystemIoTelemetryService.diskLastSampleMs, root._clockTick)
                 textColor: SystemIoTelemetryService.diskDegraded ? Colors.warning : Colors.info

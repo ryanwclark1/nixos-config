@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import "../sections"
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
@@ -261,14 +262,14 @@ PanelWindow {
                 }
 
                 SharedWidgets.Chip {
-                    icon: SystemStatus.isCritical ? "󰀦" : "󰄬"
+                    icon: IconHelpers.healthStatusIcon(SystemStatus.isCritical)
                     iconColor: SystemStatus.isCritical ? Colors.error : Colors.success
                     text: SystemStatus.isCritical ? "Hot / busy" : "Stable"
                     textColor: SystemStatus.isCritical ? Colors.error : Colors.success
                 }
 
                 SharedWidgets.Chip {
-                    icon: ProcessService.detailDegraded ? "󰀦" : "󰍉"
+                    icon: IconHelpers.degradedStatusIcon(ProcessService.detailDegraded, "window-multiple.svg")
                     iconColor: ProcessService.detailStatus === "error" || ProcessService.detailStatus === "terminated"
                         ? Colors.error
                         : (ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary)
@@ -279,7 +280,7 @@ PanelWindow {
                 }
 
                 SharedWidgets.Chip {
-                    icon: ServiceUnitService.detailDegraded ? "󰀦" : "󰒓"
+                    icon: IconHelpers.degradedStatusIcon(ServiceUnitService.detailDegraded, "settings.svg")
                     iconColor: ServiceUnitService.detailStatus === "error" || ServiceUnitService.detailStatus === "missing"
                         ? Colors.error
                         : (ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary)
@@ -290,7 +291,7 @@ PanelWindow {
                 }
 
                 SharedWidgets.Chip {
-                    icon: SystemIoTelemetryService.telemetryStatus === "degraded" ? "󰀦" : "󰋊"
+                    icon: IconHelpers.degradedStatusIcon(SystemIoTelemetryService.telemetryStatus === "degraded", "hard-drive.svg")
                     iconColor: SystemIoTelemetryService.telemetryStatus === "degraded"
                         ? Colors.warning
                         : (SystemIoTelemetryService.telemetryStatus === "missing" ? Colors.error : Colors.textSecondary)
