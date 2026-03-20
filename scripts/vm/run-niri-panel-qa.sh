@@ -448,6 +448,34 @@ copy_artifacts_home() {
   vm_scp -r "administrator@127.0.0.1:${vm_output_dir}/." "${output_dir}/"
 }
 
+assert_headless_skip_markers() {
+  local settings_log="${output_dir}/settings-qa.log"
+
+  case "${capture_mode}" in
+    settings-qa|gate) ;;
+    *)
+      return 0
+      ;;
+  esac
+
+  if [[ ! -f "${settings_log}" ]]; then
+    echo "[ERROR] Expected settings QA log at ${settings_log}" >&2
+    return 1
+  fi
+
+  rg -Fq "[SKIP] Bar Widgets first-open visual capture skipped: Niri session exposes no wl_output in this headless VM." "${settings_log}" || {
+    echo "[ERROR] Missing headless Niri Bar Widgets skip marker in ${settings_log}" >&2
+    return 1
+  }
+
+  rg -Fq "[INFO] Skipping runtime warning regression artifact capture: Niri session exposes no wl_output in this headless VM." "${settings_log}" || {
+    echo "[ERROR] Missing headless Niri runtime-warning skip marker in ${settings_log}" >&2
+    return 1
+  }
+
+  echo "[INFO] Verified headless Niri skip markers in ${settings_log}"
+}
+
 write_summary() {
   local remote_exit="$1"
   local overall_status="pass"
@@ -455,6 +483,12 @@ write_summary() {
   local settings_status="n/a"
   local runtime_exit_value=""
   local settings_exit_value=""
+  local summary_mode=""
+  local summary_overall=""
+  local summary_runtime=""
+  local summary_settings=""
+  local summary_output_dir=""
+  local summary_ssh_port=""
 
   if [[ -f "${output_dir}/gate-status.env" ]]; then
     # shellcheck disable=SC1090
@@ -478,30 +512,37 @@ write_summary() {
     overall_status="fail"
   fi
 
+  summary_mode="${capture_mode:-unknown}"
+  summary_overall="${overall_status:-fail}"
+  summary_runtime="${runtime_status:-n/a}"
+  summary_settings="${settings_status:-n/a}"
+  summary_output_dir="${output_dir:-}"
+  summary_ssh_port="${ssh_port:-}"
+
   cat > "${output_dir}/summary.json" <<EOF
 {
   "vm": "niri",
-  "mode": "${capture_mode}",
-  "status": "${overall_status}",
+  "mode": "${summary_mode}",
+  "status": "${summary_overall}",
   "remoteExit": ${remote_exit},
-  "runtimeStatus": "${runtime_status}",
-  "settingsStatus": "${settings_status}",
-  "sshPort": "${ssh_port}",
-  "artifactDir": "${output_dir}",
-  "launcherLog": "${output_dir}/launcher.log"
+  "runtimeStatus": "${summary_runtime}",
+  "settingsStatus": "${summary_settings}",
+  "sshPort": "${summary_ssh_port}",
+  "artifactDir": "${summary_output_dir}",
+  "launcherLog": "${summary_output_dir}/launcher.log"
 }
 EOF
 
   printf '%s\n' \
     '# Niri VM QA Summary' \
     '' \
-    "- mode: \`${capture_mode}\`" \
-    "- status: \`${overall_status}\`" \
+    "- mode: \`${summary_mode}\`" \
+    "- status: \`${summary_overall}\`" \
     "- remote exit: \`${remote_exit}\`" \
-    "- runtime: \`${runtime_status}\`" \
-    "- settings: \`${settings_status}\`" \
-    "- artifacts: \`${output_dir}\`" \
-    "- launcher log: \`${output_dir}/launcher.log\`" \
+    "- runtime: \`${summary_runtime}\`" \
+    "- settings: \`${summary_settings}\`" \
+    "- artifacts: \`${summary_output_dir}\`" \
+    "- launcher log: \`${summary_output_dir}/launcher.log\`" \
     > "${output_dir}/summary.md"
 }
 
@@ -535,6 +576,11 @@ remote_exit=$?
 set -e
 copy_artifacts_home || true
 cp "${launcher_log}" "${output_dir}/launcher.log"
+if ! assert_headless_skip_markers; then
+  if (( remote_exit == 0 )); then
+    remote_exit=1
+  fi
+fi
 write_summary "${remote_exit}"
 
 echo "[INFO] Host review artifacts saved to ${output_dir}"
