@@ -11,25 +11,31 @@ Item {
 
     readonly property alias searchInput: searchField.searchInput
     readonly property color accentColor: launcher.modeAccentColor ? launcher.modeAccentColor : Colors.primary
-    readonly property real panelGap: launcher.compactMode ? Appearance.spacingS : Appearance.spacingXS
+    readonly property real panelGap: launcher.compactMode ? Appearance.spacingXS : Appearance.spacingS
     readonly property bool minimalShell: launcher && launcher.diagnosticMinimalShell === true
     readonly property bool showAssistBand: !minimalShell && !launcher.tightMode && (launcher.prefixQuickModes.length > 0
-        || Config.launcherShowModeHints
+        || launcher.effectiveShowModeHints
         || (launcher.mode === "web" && launcher.filteredItems.length > 0)
         || launcher.transientNoticeText !== "")
+    readonly property real searchDeckHeight: searchDeckShell.visible ? searchDeckShell.height : 0
+    readonly property real utilityBandHeight: utilityBandBox.visible ? utilityBandBox.height : 0
+    readonly property real metricsHeight: metricsBox.visible ? metricsBox.height : 0
+    readonly property real homeHeight: homePanel.visible ? homePanel.height : 0
+    readonly property real resultsHeight: resultView.visible ? resultView.height : (orchestratorView.visible ? orchestratorView.height : 0)
 
     ColumnLayout {
         anchors.fill: parent
         spacing: root.panelGap
 
         Rectangle {
+            id: searchDeckShell
             Layout.fillWidth: true
             radius: Appearance.radiusLarge
             color: Colors.withAlpha(Colors.surface, 0.78)
-            border.color: Colors.withAlpha(root.accentColor, 0.26)
+            border.color: Colors.withAlpha(root.accentColor, 0.24)
             border.width: 1
             clip: true
-            implicitHeight: deckColumn.implicitHeight + (launcher.tightMode ? Appearance.spacingM * 2 : Appearance.spacingL * 2)
+            implicitHeight: searchDeckColumn.implicitHeight + (launcher.tightMode ? Appearance.spacingS * 2 : Appearance.spacingM * 2)
 
             SharedWidgets.InnerHighlight {
                 highlightOpacity: 0.16
@@ -43,10 +49,10 @@ Item {
             }
 
             ColumnLayout {
-                id: deckColumn
+                id: searchDeckColumn
                 anchors.fill: parent
-                anchors.margins: launcher.tightMode ? Appearance.spacingM : Appearance.spacingL
-                spacing: launcher.compactMode ? Appearance.spacingS : Appearance.spacingM
+                anchors.margins: launcher.tightMode ? Appearance.spacingS : Appearance.spacingM
+                spacing: Appearance.spacingXS
 
                 LauncherSearchField {
                     id: searchField
@@ -110,74 +116,78 @@ Item {
                 }
 
                 Rectangle {
+                    id: utilityBandBox
                     Layout.fillWidth: true
                     visible: root.showAssistBand
-                    implicitHeight: 1
-                    color: Colors.withAlpha(root.accentColor, 0.16)
-                }
+                    radius: Appearance.radiusLarge
+                    color: Colors.withAlpha(Colors.surface, 0.46)
+                    border.color: Colors.withAlpha(root.accentColor, 0.18)
+                    border.width: 1
+                    implicitHeight: utilityBandColumn.implicitHeight + (launcher.compactMode ? Appearance.spacingS * 2 : Appearance.spacingM * 2)
 
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    visible: root.showAssistBand
-                    spacing: launcher.compactMode ? Appearance.spacingS : Appearance.spacingM
+                    ColumnLayout {
+                        id: utilityBandColumn
+                        anchors.fill: parent
+                        anchors.margins: launcher.compactMode ? Appearance.spacingS : Appearance.spacingM
+                        spacing: Appearance.spacingXS
 
-                    LauncherPrefixStrip {
-                        Layout.fillWidth: true
-                        launcher: root.launcher
-                        accentColor: root.accentColor
-                        visible: launcher.prefixQuickModes.length > 0
-                    }
+                        LauncherPrefixStrip {
+                            launcher: root.launcher
+                            accentColor: root.accentColor
+                            visible: launcher.prefixQuickModes.length > 0
+                        }
 
-                    LauncherActionLegend {
-                        visible: Config.launcherShowModeHints
-                        summaryText: launcher.modeSummaryText
-                        primaryAction: launcher.legendPrimaryAction
-                        secondaryAction: launcher.legendSecondaryAction
-                        tertiaryAction: launcher.legendTertiaryAction
-                        compact: launcher.compactMode || launcher.webHintCompact
-                        accentColor: root.accentColor
-                        helpExpanded: launcher.shortcutHelpExpanded
-                        onHelpToggled: launcher.shortcutHelpExpanded = !launcher.shortcutHelpExpanded
-                    }
+                        LauncherActionLegend {
+                            visible: launcher.effectiveShowModeHints
+                            summaryText: launcher.modeSummaryText
+                            primaryAction: launcher.legendPrimaryAction
+                            secondaryAction: launcher.legendSecondaryAction
+                            tertiaryAction: launcher.legendTertiaryAction
+                            compact: true
+                            accentColor: root.accentColor
+                            helpExpanded: launcher.shortcutHelpExpanded
+                            onHelpToggled: launcher.shortcutHelpExpanded = !launcher.shortcutHelpExpanded
+                        }
 
-                    LauncherWebProviderBar {
-                        visible: launcher.mode === "web" && launcher.filteredItems.length > 0
-                        providers: launcher.configuredWebProviders()
-                        selectedKey: launcher.selectedWebProviderKey
-                        accentColor: root.accentColor
-                        onProviderSelected: key => launcher.selectWebProviderByKey(key)
-                    }
+                        LauncherWebProviderBar {
+                            visible: launcher.mode === "web" && launcher.filteredItems.length > 0
+                            providers: launcher.configuredWebProviders()
+                            selectedKey: launcher.selectedWebProviderKey
+                            accentColor: root.accentColor
+                            onProviderSelected: key => launcher.selectWebProviderByKey(key)
+                        }
 
-                    LauncherWebHints {
-                        visible: Config.launcherShowModeHints && launcher.mode === "web"
-                        primaryEnterHint: launcher.webPrimaryEnterHint
-                        secondaryEnterHint: launcher.webSecondaryEnterHint
-                        aliasHint: launcher.webAliasHint
-                        hotkeyHint: launcher.webHotkeyHint
-                        accentColor: root.accentColor
-                        compact: launcher.webHintCompact
-                    }
+                        LauncherWebHints {
+                            visible: launcher.effectiveShowModeHints && launcher.mode === "web"
+                            primaryEnterHint: launcher.webPrimaryEnterHint
+                            secondaryEnterHint: launcher.webSecondaryEnterHint
+                            aliasHint: launcher.webAliasHint
+                            hotkeyHint: launcher.webHotkeyHint
+                            accentColor: root.accentColor
+                            compact: true
+                        }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        visible: launcher.transientNoticeText !== "" && !launcher.tightMode
-                        color: Colors.withAlpha(root.accentColor, 0.12)
-                        radius: Appearance.radiusLarge
-                        border.color: Colors.withAlpha(root.accentColor, 0.3)
-                        border.width: 1
-                        implicitHeight: transientNoticeLabel.implicitHeight + (Appearance.spacingS * 2)
+                        Rectangle {
+                            Layout.fillWidth: true
+                            visible: launcher.transientNoticeText !== "" && !launcher.tightMode
+                            color: Colors.withAlpha(root.accentColor, 0.12)
+                            radius: Appearance.radiusLarge
+                            border.color: Colors.withAlpha(root.accentColor, 0.3)
+                            border.width: 1
+                            implicitHeight: transientNoticeLabel.implicitHeight + (Appearance.spacingXS * 2)
 
-                        Text {
-                            id: transientNoticeLabel
-                            anchors.fill: parent
-                            anchors.margins: Appearance.spacingS
-                            text: launcher.transientNoticeText
-                            color: root.accentColor
-                            font.pixelSize: Appearance.fontSizeXS
-                            font.weight: Font.DemiBold
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            wrapMode: Text.WordWrap
+                            Text {
+                                id: transientNoticeLabel
+                                anchors.fill: parent
+                                anchors.margins: Appearance.spacingXS
+                                text: launcher.transientNoticeText
+                                color: root.accentColor
+                                font.pixelSize: Appearance.fontSizeXS
+                                font.weight: Font.DemiBold
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                wrapMode: Text.WordWrap
+                            }
                         }
                     }
                 }
@@ -185,10 +195,11 @@ Item {
         }
 
         LauncherMetricsBox {
-            visible: !root.minimalShell
+            id: metricsBox
             metrics: launcher.launcherMetrics
             mode: launcher.mode
             tightMode: launcher.tightMode
+            showMetrics: !root.minimalShell && launcher.effectiveShowRuntimeMetrics
             filesBackendLabel: launcher.filesBackendLabel
             filesCacheStatsLabel: launcher.filesCacheStatsLabel
             modeMetricFn: launcher.modeMetric
@@ -210,10 +221,11 @@ Item {
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: launcher.tightMode ? Appearance.spacingM : Appearance.spacingL
-                spacing: launcher.compactMode ? Appearance.spacingS : Appearance.spacingM
+                anchors.margins: launcher.tightMode ? Appearance.spacingS : Appearance.spacingM
+                spacing: launcher.compactMode ? Appearance.spacingXS : Appearance.spacingS
 
                 LauncherHome {
+                    id: homePanel
                     Layout.fillWidth: true
                     launcher: root.launcher
                     visible: !root.minimalShell && launcher.mode === "drun" && launcher.showLauncherHomePanel && !launcher.isModeLoading
@@ -222,19 +234,20 @@ Item {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    visible: (!root.minimalShell && launcher.mode === "drun" && launcher.showLauncherHomePanel && !launcher.isModeLoading)
-                        && !(launcher.mode === "orchestrator" && launcher.searchText === "")
+                    visible: homePanel.visible && !(launcher.mode === "orchestrator" && launcher.searchText === "")
                     implicitHeight: 1
                     color: Colors.withAlpha(root.accentColor, 0.12)
                 }
 
                 OrchestratorView {
+                    id: orchestratorView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     visible: launcher.mode === "orchestrator" && launcher.searchText === ""
                 }
 
                 LauncherResultView {
+                    id: resultView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     launcher: root.launcher

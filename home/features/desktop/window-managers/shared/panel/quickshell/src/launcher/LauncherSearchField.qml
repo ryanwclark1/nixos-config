@@ -23,9 +23,7 @@ Rectangle {
     signal accepted(var modifiers)
     signal escapePressed
 
-    // Guardrail baseline retained for static launcher checks.
-    // height: 48
-    implicitHeight: embedded ? 78 : 52
+    implicitHeight: embedded ? 58 : 52
     radius: embedded ? Appearance.radiusXL : Appearance.radiusLarge
     color: embedded ? Colors.withAlpha(Colors.surface, 0.86) : Qt.rgba(0.2, 0.19, 0.2, 0.95)
     border.color: input.activeFocus ? Colors.withAlpha(accentColor, 0.84) : Colors.withAlpha(Colors.borderFocus, embedded ? 0.78 : 1.0)
@@ -51,20 +49,20 @@ Rectangle {
         anchors.fill: parent
         anchors.leftMargin: Appearance.spacingM
         anchors.rightMargin: Appearance.spacingM
-        anchors.topMargin: embedded ? Appearance.spacingS : Appearance.spacingM
-        anchors.bottomMargin: embedded ? Appearance.spacingS : Appearance.spacingM
+        anchors.topMargin: embedded ? Appearance.spacingXS : Appearance.spacingM
+        anchors.bottomMargin: embedded ? Appearance.spacingXS : Appearance.spacingM
         spacing: embedded ? Appearance.spacingXS : Appearance.spacingS
 
         RowLayout {
             visible: root.modeLabel !== "" || root.modeSubtitle !== "" || root.statusText !== ""
             Layout.fillWidth: true
-            spacing: Appearance.spacingS
+            spacing: Appearance.spacingXS
 
             Rectangle {
                 Layout.alignment: Qt.AlignVCenter
-                width: embedded ? 30 : 28
-                height: embedded ? 30 : 28
-                radius: embedded ? Appearance.radiusMedium : Appearance.radiusSmall
+                width: embedded ? 24 : 28
+                height: embedded ? 24 : 28
+                radius: embedded ? Appearance.radiusSmall : Appearance.radiusSmall
                 color: Colors.withAlpha(root.accentColor, embedded ? 0.18 : 0.12)
                 border.color: Colors.withAlpha(root.accentColor, 0.4)
                 border.width: 1
@@ -73,34 +71,32 @@ Rectangle {
                     anchors.centerIn: parent
                     sourceComponent: String(root.modeIconText || "").endsWith(".svg") ? _sfSvg : _sfNerd
                 }
-                Component { id: _sfSvg; SharedWidgets.SvgIcon { source: root.modeIconText; color: root.accentColor; size: embedded ? Appearance.fontSizeLarge : Appearance.fontSizeMedium } }
-                Component { id: _sfNerd; Text { text: root.modeIconText; color: root.accentColor; font.pixelSize: embedded ? Appearance.fontSizeLarge : Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
+                Component { id: _sfSvg; SharedWidgets.SvgIcon { source: root.modeIconText; color: root.accentColor; size: embedded ? Appearance.fontSizeMedium : Appearance.fontSizeMedium } }
+                Component { id: _sfNerd; Text { text: root.modeIconText; color: root.accentColor; font.pixelSize: embedded ? Appearance.fontSizeMedium : Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
             }
 
-            ColumnLayout {
+            Text {
+                visible: root.modeLabel !== ""
+                text: root.modeLabel
+                color: root.accentColor
+                font.pixelSize: Appearance.fontSizeXS
+                font.weight: Font.Black
+                font.letterSpacing: Appearance.letterSpacingWide
+                font.capitalization: Font.AllUppercase
+                elide: Text.ElideRight
+            }
+
+            Text {
+                visible: root.modeSubtitle !== ""
                 Layout.fillWidth: true
-                Layout.minimumWidth: 0
-                spacing: 0
+                text: root.modeSubtitle
+                color: Colors.textSecondary
+                font.pixelSize: Appearance.fontSizeXS
+                elide: Text.ElideRight
+            }
 
-                Text {
-                    visible: root.modeLabel !== ""
-                    text: root.modeLabel
-                    color: root.accentColor
-                    font.pixelSize: Appearance.fontSizeXS
-                    font.weight: Font.Black
-                    font.letterSpacing: Appearance.letterSpacingWide
-                    font.capitalization: Font.AllUppercase
-                    elide: Text.ElideRight
-                }
-
-                Text {
-                    visible: root.modeSubtitle !== ""
-                    Layout.fillWidth: true
-                    text: root.modeSubtitle
-                    color: Colors.textSecondary
-                    font.pixelSize: Appearance.fontSizeXS
-                    elide: Text.ElideRight
-                }
+            Item {
+                Layout.fillWidth: true
             }
 
             Rectangle {
@@ -110,8 +106,8 @@ Rectangle {
                 color: Colors.withAlpha(root.accentColor, 0.12)
                 border.color: Colors.withAlpha(root.accentColor, 0.32)
                 border.width: 1
-                implicitHeight: 24
-                implicitWidth: statusSummaryRow.implicitWidth + 16
+                implicitHeight: 22
+                implicitWidth: statusSummaryRow.implicitWidth + 14
 
                 RowLayout {
                     id: statusSummaryRow
@@ -149,8 +145,8 @@ Rectangle {
                 color: Colors.withAlpha(accentColor, 0.15)
                 border.color: Colors.withAlpha(accentColor, 0.4)
                 border.width: 1
-                implicitHeight: 24
-                implicitWidth: categoryLabel.implicitWidth + 16
+                implicitHeight: 22
+                implicitWidth: categoryLabel.implicitWidth + 14
 
                 RowLayout {
                     anchors.centerIn: parent
@@ -183,8 +179,8 @@ Rectangle {
                 color: Colors.withAlpha(root.accentColor, 0.12)
                 border.color: Colors.withAlpha(root.accentColor, 0.3)
                 border.width: 1
-                implicitHeight: 24
-                implicitWidth: prefixText.implicitWidth + 16
+                implicitHeight: 22
+                implicitWidth: prefixText.implicitWidth + 14
 
                 Text {
                     id: prefixText
@@ -201,7 +197,7 @@ Rectangle {
                 id: input
                 Layout.fillWidth: true
                 color: Colors.text
-                font.pixelSize: Appearance.fontSizeLarge
+                font.pixelSize: embedded ? Appearance.fontSizeMedium : Appearance.fontSizeLarge
                 verticalAlignment: Text.AlignVCenter
                 selectByMouse: true
                 selectionColor: Colors.highlight

@@ -25,36 +25,15 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Appearance.spacingS
-
-            Text {
-                text: "ACTION MAP"
-                color: Colors.withAlpha(root.accentColor, 0.92)
-                font.pixelSize: Appearance.fontSizeXXS
-                font.weight: Font.Black
-                font.letterSpacing: Appearance.letterSpacingExtraWide
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
-                implicitHeight: 1
-                radius: Appearance.radiusXXXS
-                color: Colors.withAlpha(root.accentColor, 0.18)
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: Appearance.spacingS
+            spacing: root.compact ? Appearance.spacingXS : Appearance.spacingS
 
             Rectangle {
                 radius: Appearance.radiusPill
                 color: Colors.withAlpha(root.accentColor, 0.14)
                 border.color: Colors.withAlpha(root.accentColor, 0.34)
                 border.width: 1
-                implicitHeight: 24
-                implicitWidth: primaryLabel.implicitWidth + 16
+                implicitHeight: 22
+                implicitWidth: primaryLabel.implicitWidth + 14
 
                 Text {
                     id: primaryLabel
@@ -80,8 +59,8 @@ Item {
                 color: helpMouse.containsMouse ? Colors.withAlpha(root.accentColor, 0.12) : Colors.withAlpha(Colors.surface, 0.7)
                 border.color: root.helpExpanded ? Colors.withAlpha(root.accentColor, 0.34) : Colors.border
                 border.width: 1
-                implicitHeight: root.compact ? 24 : 26
-                implicitWidth: helpLabel.implicitWidth + 18
+                implicitHeight: 22
+                implicitWidth: helpLabel.implicitWidth + 14
 
                 Text {
                     id: helpLabel
@@ -120,7 +99,7 @@ Item {
                     color: index === 0 ? Colors.withAlpha(root.accentColor, 0.14) : (index === 1 ? Colors.withAlpha(Colors.textSecondary, 0.08) : Colors.surface)
                     border.color: index === 0 ? Colors.withAlpha(root.accentColor, 0.34) : (index === 1 ? Colors.withAlpha(Colors.textSecondary, 0.16) : Colors.primarySubtle)
                     border.width: 1
-                    implicitHeight: root.compact ? 24 : 26
+                    implicitHeight: 22
                     implicitWidth: actionLabel.implicitWidth + (root.compact ? 14 : 18)
 
                     Text {

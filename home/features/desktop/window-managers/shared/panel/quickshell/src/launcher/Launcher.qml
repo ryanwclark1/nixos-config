@@ -7,6 +7,7 @@ import Quickshell.Bluetooth
 import Quickshell.Services.Mpris
 import "../services"
 import "../services/ShellUtils.js" as SU
+import "../services/ClipboardDisplayHelpers.js" as ClipboardDisplay
 import "../shared"
 import "../widgets" as SharedWidgets
 import "LauncherModeData.js" as ModeData
@@ -55,6 +56,9 @@ PanelWindow {
     readonly property bool webHintCompact: usableWidth < 760 || usableHeight < 560
     readonly property bool diagnosticMinimalShell: Quickshell.env("QS_VERIFY_LAUNCHER_MINIMAL") === "1"
     readonly property bool diagnosticDisableFilePreview: diagnosticMinimalShell || Quickshell.env("QS_VERIFY_LAUNCHER_DISABLE_FILE_PREVIEW") === "1"
+    readonly property bool diagnosticForceHomeSections: Quickshell.env("QS_VERIFY_LAUNCHER_FORCE_HOME_SECTIONS") === "1"
+    readonly property bool diagnosticForceModeHints: Quickshell.env("QS_VERIFY_LAUNCHER_FORCE_MODE_HINTS") === "1"
+    readonly property bool diagnosticForceRuntimeMetrics: Quickshell.env("QS_VERIFY_LAUNCHER_FORCE_RUNTIME_METRICS") === "1"
     // File preview remains opt-in until the Qt 6.10 layout/restart issue is fully root-caused.
     readonly property bool filePreviewSupported: Quickshell.env("QS_ENABLE_UNSTABLE_LAUNCHER_FILE_PREVIEW") === "1"
     readonly property bool filePreviewRuntimeEnabled: filePreviewSupported && !diagnosticDisableFilePreview
@@ -265,8 +269,8 @@ PanelWindow {
             || normalized.indexOf("not a directory") !== -1
             || normalized.indexOf("cannot access") !== -1;
         if (unavailable) {
-            setModeHint("Search root unavailable", "Check File Search Root: " + fileSearchRootLabel, "󰅚");
-            completeModeLoad("files", false, "Search root unavailable");
+            setModeHint("Search directory unavailable", "Check Default Search Directory: " + fileSearchRootLabel, "󰅚");
+            completeModeLoad("files", false, "Search directory unavailable");
             return;
         }
         var summary = detail !== "" ? detail.split("\n")[0] : "Check helper command output and logs.";
@@ -331,7 +335,9 @@ PanelWindow {
     property real globalLastMouseX: 0
     property real globalLastMouseY: 0
 
-    readonly property bool showLauncherHome: Config.launcherShowHomeSections && searchText === "" && (mode === "drun" || mode === "files")
+    readonly property bool effectiveShowModeHints: diagnosticForceModeHints || Config.launcherShowModeHints
+    readonly property bool effectiveShowRuntimeMetrics: diagnosticForceRuntimeMetrics || Config.launcherShowRuntimeMetrics
+    readonly property bool showLauncherHome: (diagnosticForceHomeSections || Config.launcherShowHomeSections) && searchText === "" && (mode === "drun" || mode === "files")
     readonly property bool showLauncherHomePanel: showLauncherHome && mode !== "orchestrator"
     readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled
     readonly property bool isModeLoading: modeLoadState === "loading"
@@ -411,11 +417,15 @@ PanelWindow {
     readonly property string emptyPrimaryHintIcon: TextHelpers.emptyPrimaryHintIcon(mode)
     readonly property string emptySecondaryHint: TextHelpers.emptySecondaryHint(mode, _cleanSearch, searchText, _webSecondaryName)
     readonly property string emptySecondaryHintIcon: TextHelpers.emptySecondaryHintIcon(mode, searchText)
-    readonly property string activeModeHintText: mode === "emoji" ? ("Search characters with " + characterTrigger) : (ModeData.modeInfo(mode).hint || "Search...")
+    readonly property string activeModeHintText: mode === "emoji"
+        ? ("Search characters with " + characterTrigger)
+        : (mode === "files" ? TextHelpers.fileModeHint(fileSearchRootLabel) : (ModeData.modeInfo(mode).hint || "Search..."))
     readonly property string modeSummaryText: {
         var info = ModeData.modeInfo(mode);
         var prefix = String(info.prefix || "");
-        var hint = String(info.hint || "Search...");
+        var hint = mode === "files"
+            ? TextHelpers.fileModeHint(fileSearchRootLabel)
+            : String(info.hint || "Search...");
         return info.label + (prefix !== "" ? (" • " + prefix + " prefix") : "") + " • " + hint;
     }
     readonly property string overflowHintText: {
@@ -1177,10 +1187,8 @@ PanelWindow {
                 _tagFileItemsGit(items);
             else
                 _buildGitIndex(rootDir);
-            if (mode === "files" && ModeData.stripModePrefix(searchText).trim().length >= Config.launcherFileMinQueryLength)
+            if (mode === "files")
                 loadFiles();
-            else if (mode === "files" && modeLoadState === "loading")
-                completeModeLoad("files", true, "");
         }
         // Estimate line count cheaply: raw length > ~500KB likely means >10k lines
         if (raw && raw.length > 500000) {
@@ -1768,7 +1776,9 @@ PanelWindow {
         loadCached("wallpapers", DependencyService.resolveCommand("qs-wallpapers"), JSON.parse);
     }
     function loadKeybinds() {
-        loadCached("keybinds", DependencyService.resolveCommand("qs-keybinds"), JSON.parse);
+        loadCached("keybinds", DependencyService.resolveCommand("qs-keybinds"), function(raw) {
+            return Executor.normalizeKeybindItems(JSON.parse(raw));
+        });
     }
     function loadBookmarks() {
         loadCached("bookmarks", DependencyService.resolveCommand("qs-bookmarks"), JSON.parse);
@@ -1777,12 +1787,7 @@ PanelWindow {
 
     function clipModeItems(items) {
         return (Array.isArray(items) ? items : []).map(function (it) {
-            return {
-                id: it.id,
-                name: it.content,
-                title: it.content,
-                icon: "copy.svg"
-            };
+            return ClipboardDisplay.launcherItem(it);
         });
     }
     function loadEmojis() {
@@ -1846,7 +1851,9 @@ PanelWindow {
             },
             "keybinds": {
                 command: DependencyService.resolveCommand("qs-keybinds"),
-                parse: JSON.parse
+                parse: function(raw) {
+                    return Executor.normalizeKeybindItems(JSON.parse(raw));
+                }
             },
             "bookmarks": {
                 command: DependencyService.resolveCommand("qs-bookmarks"),
@@ -2088,7 +2095,13 @@ PanelWindow {
             hudY: hudBox.y + yOffset,
             hudWidth: hudBox.width,
             hudHeight: hudBox.height,
-            hudScale: scaleValue
+            hudScale: scaleValue,
+            windowChromeHeight: windowChrome.height,
+            searchDeckHeight: contentPanel.searchDeckHeight,
+            utilityBandHeight: contentPanel.utilityBandHeight,
+            metricsHeight: contentPanel.metricsHeight,
+            homeHeight: contentPanel.homeHeight,
+            resultsHeight: contentPanel.resultsHeight
         });
     }
 
@@ -2200,6 +2213,13 @@ PanelWindow {
         var startedAt = Date.now();
         var rootDir = fileSearchRootResolved;
         var maxResults = Math.max(20, Config.launcherFileMaxResults);
+
+        if (!fileIndexReady && fileIndexItems.length === 0) {
+            allItems = [];
+            filteredItems = [];
+            resetFilterCache();
+            selectedIndex = 0;
+        }
 
         // Index-first: always use in-memory index when available
         if (fileIndexReady && fileIndexItems.length > 0) {
@@ -2544,7 +2564,8 @@ PanelWindow {
             _lastFilterQuery = state.cleanLower;
             _lastFilterCategory = drunCategoryFilter;
             _lastFilterCandidates = state.scoredItems.slice();
-            filteredItems = decorateResultSections(state.scoredItems.slice(0, Config.launcherMaxResults));
+            var finalLimit = mode === "files" ? Math.max(20, Config.launcherFileMaxResults) : Config.launcherMaxResults;
+            filteredItems = decorateResultSections(state.scoredItems.slice(0, finalLimit));
             selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
             _filterChunking = false;
             _filterChunkState = null;
@@ -2554,7 +2575,8 @@ PanelWindow {
             if (state.scoredItems.length > 0) {
                 var partial = state.scoredItems.slice();
                 partial.sort(Search.compareByScoreOnly);
-                filteredItems = decorateResultSections(partial.slice(0, Config.launcherMaxResults));
+                var partialLimit = mode === "files" ? Math.max(20, Config.launcherFileMaxResults) : Config.launcherMaxResults;
+                filteredItems = decorateResultSections(partial.slice(0, partialLimit));
                 selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
             }
             filterChunkTimer.restart();
@@ -2640,6 +2662,9 @@ PanelWindow {
 
         var clean = String(actualSearch || "");
         var cleanLower = clean.toLowerCase();
+        var modeResultLimit = mode === "files"
+            ? Math.max(20, Config.launcherFileMaxResults)
+            : Config.launcherMaxResults;
         var canReusePreviousCandidates = (mode === "drun" || mode === "files")
                 && cleanLower !== ""
                 && _lastFilterMode === mode
@@ -2649,19 +2674,8 @@ PanelWindow {
         var sourceItems = canReusePreviousCandidates ? _lastFilterCandidates : allItems;
 
         if (clean === "" && mode === "files") {
-            // Empty query in files mode: show recently-opened files sorted by frecency
             resetFilterCache();
-            var recentFiles = [];
-            for (var rf = 0; rf < allItems.length; ++rf) {
-                var rfItem = allItems[rf];
-                var boost = Number(rfItem._fileUsageBoost || 0);
-                if (boost > 0.01) {
-                    rfItem._score = boost * 100;
-                    recentFiles.push(rfItem);
-                }
-            }
-            recentFiles.sort(Search.compareByScoreThenDepth);
-            filteredItems = decorateResultSections(recentFiles.slice(0, Config.launcherMaxResults));
+            filteredItems = decorateResultSections(Search.browseFileItems(allItems, modeResultLimit));
             selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
             recordFilterMetric(Date.now() - startedAt);
             return;
@@ -2681,7 +2695,7 @@ PanelWindow {
             filteredItems = decorateResultSections(baseItems);
         } else {
             var scoredItems = [];
-            var filesScanCap = mode === "files" ? Math.max(500, Config.launcherMaxResults * 8) : 0;
+            var filesScanCap = mode === "files" ? Math.max(500, modeResultLimit * 8) : 0;
             if (mode === "files" && cleanLower !== "" && sourceItems.length >= 15000) {
                 _startChunkedFilter(sourceItems, clean, cleanLower, filesScanCap, startedAt);
                 return;
@@ -2725,7 +2739,7 @@ PanelWindow {
             _lastFilterQuery = cleanLower;
             _lastFilterCategory = drunCategoryFilter;
             _lastFilterCandidates = scoredItems;
-            filteredItems = decorateResultSections(scoredItems.slice(0, Config.launcherMaxResults));
+            filteredItems = decorateResultSections(scoredItems.slice(0, modeResultLimit));
         }
         selectedIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
         if (mode === "web" && webContext && webContext.providerKey !== "")
@@ -3070,12 +3084,12 @@ PanelWindow {
 
     Rectangle {
         id: hudBox
-        width: Math.min(1120, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))
-        height: Math.min(980, Math.max(520, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 28)))
+        width: Math.min(1180, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 20 : 32)))
+        height: Math.min(1040, Math.max(520, launcherRoot.usableHeight - (launcherRoot.tightMode ? 20 : 24)))
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.topMargin: launcherRoot.edgeMargins.top + launcherRoot.diagnosticViewportOffsetY + Math.max(20, (launcherRoot.usableHeight - height) / 2)
-        anchors.leftMargin: launcherRoot.edgeMargins.left + launcherRoot.diagnosticViewportOffsetX + Math.max(20, (launcherRoot.usableWidth - width) / 2)
+        anchors.topMargin: launcherRoot.edgeMargins.top + launcherRoot.diagnosticViewportOffsetY + Math.max(16, (launcherRoot.usableHeight - height) / 2)
+        anchors.leftMargin: launcherRoot.edgeMargins.left + launcherRoot.diagnosticViewportOffsetX + Math.max(16, (launcherRoot.usableWidth - width) / 2)
         
         color: Colors.cardSurface
         radius: Appearance.radiusLarge
@@ -3130,9 +3144,9 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: launcherRoot.tightMode ? Appearance.spacingM : Appearance.spacingXL
-            anchors.topMargin: launcherRoot.tightMode ? Appearance.spacingS : Appearance.spacingM
-            spacing: launcherRoot.compactMode ? Appearance.paddingSmall : 18
+            anchors.margins: launcherRoot.tightMode ? Appearance.spacingS : Appearance.spacingL
+            anchors.topMargin: launcherRoot.tightMode ? Appearance.spacingXS : Appearance.spacingS
+            spacing: launcherRoot.compactMode ? Appearance.spacingS : Appearance.spacingM
 
             LauncherSidebar {
                 visible: !launcherRoot.diagnosticMinimalShell

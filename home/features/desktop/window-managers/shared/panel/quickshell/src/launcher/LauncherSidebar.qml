@@ -282,7 +282,7 @@ Rectangle {
             color: Colors.withAlpha(Colors.surface, 0.72)
             border.color: Colors.withAlpha(root.accentColor, 0.16)
             border.width: 1
-            visible: Config.launcherShowModeHints && !root.launcher.sidebarCompact
+            visible: root.launcher.effectiveShowModeHints && !root.launcher.sidebarCompact
 
             ColumnLayout {
                 id: controlsLayout

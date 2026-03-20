@@ -22,7 +22,7 @@ Rectangle {
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    height: tightMode ? 46 : 64
+    height: tightMode ? 46 : 52
     radius: parentRadius
     color: Colors.withAlpha(Colors.surface, 0.98)
     border.width: 0
@@ -43,9 +43,9 @@ Rectangle {
 
         Rectangle {
             Layout.alignment: Qt.AlignVCenter
-            width: root.tightMode ? 28 : 38
+            width: root.tightMode ? 28 : 34
             height: width
-            radius: root.tightMode ? Appearance.radiusMedium : Appearance.radiusLarge
+            radius: root.tightMode ? Appearance.radiusMedium : Appearance.radiusMedium
             color: Colors.withAlpha(root.accentColor, root.tightMode ? 0.18 : 0.22)
             border.color: Colors.withAlpha(root.accentColor, 0.52)
             border.width: 1
@@ -79,14 +79,14 @@ Rectangle {
                 Layout.fillWidth: true
                 text: root.heroLabel
                 color: Colors.text
-                font.pixelSize: root.tightMode ? Appearance.fontSizeMedium : Appearance.fontSizeXL
+                font.pixelSize: root.tightMode ? Appearance.fontSizeMedium : Appearance.fontSizeLarge
                 font.weight: Font.Black
                 font.letterSpacing: root.tightMode ? 0 : Appearance.letterSpacingTight
                 elide: Text.ElideRight
             }
 
             Text {
-                visible: !root.tightMode && root.summaryText !== ""
+                visible: false
                 Layout.fillWidth: true
                 text: root.summaryText
                 color: Colors.textSecondary

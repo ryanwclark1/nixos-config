@@ -25,10 +25,18 @@ Rectangle {
     signal secondaryActionRequested(var sourceItem, real localX, real localY)
 
     width: ListView.view ? ListView.view.width : (parent ? parent.width : 0)
-    height: tightMode ? 54 : (compactMode ? 60 : 70)
+    height: tightMode ? 52 : (compactMode ? 56 : 64)
 
     readonly property bool highlighted: ListView.isCurrentItem
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
+    readonly property bool showsClipboardImage: root.mode === "clip" && !!(itemData && itemData.clipIsImage)
+    readonly property string clipboardImageSource: {
+        if (!showsClipboardImage || !itemData || !itemData.id)
+            return "";
+        void ClipboardHistoryService._imageGeneration;
+        var path = ClipboardHistoryService.imagePath(itemData.id);
+        return path !== "" ? ("file://" + path) : "";
+    }
 
     color: highlighted ? Colors.withAlpha(accentColor, 0.16) : (hovered ? Colors.withAlpha(Colors.surface, 0.82) : "transparent")
     radius: Appearance.radiusLarge
@@ -153,27 +161,42 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: root.compactMode ? Appearance.spacingM : Appearance.spacingL
+        anchors.leftMargin: root.compactMode ? Appearance.spacingS : Appearance.spacingM
         anchors.rightMargin: root.compactMode ? Appearance.spacingS : Appearance.spacingM
-        spacing: root.compactMode ? Appearance.spacingS : Appearance.paddingMedium
+        spacing: root.compactMode ? Appearance.spacingS : Appearance.spacingM
 
         Rectangle {
-            width: root.compactMode ? 34 : 40
-            height: root.compactMode ? 34 : 40
-            radius: root.compactMode ? Appearance.radiusMedium : Appearance.radiusLarge
+            width: root.compactMode ? 32 : 36
+            height: root.compactMode ? 32 : 36
+            radius: root.compactMode ? Appearance.radiusMedium : Appearance.radiusMedium
             color: highlighted ? Colors.withAlpha(root.accentColor, 0.16) : (hovered ? Colors.withAlpha(Colors.surface, 0.78) : Colors.withAlpha(Colors.surface, 0.66))
             border.color: highlighted ? Colors.withAlpha(root.accentColor, 0.34) : Colors.withAlpha(Colors.border, 0.24)
             border.width: 1
+            clip: root.showsClipboardImage
+
+            Image {
+                id: clipboardPreview
+                anchors.fill: parent
+                anchors.margins: 2
+                visible: root.showsClipboardImage && source !== "" && status !== Image.Error
+                source: root.clipboardImageSource
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                cache: false
+                sourceSize.width: root.compactMode ? 64 : 80
+                sourceSize.height: root.compactMode ? 64 : 80
+            }
 
             SharedWidgets.AppIcon {
                 anchors.centerIn: parent
+                visible: !root.showsClipboardImage || clipboardPreview.source === "" || clipboardPreview.status === Image.Error
                 iconName: root.itemIconName(itemData)
                 desktopId: itemData ? String(itemData.desktopId || "") : ""
                 appId: itemData ? String(itemData.appId || itemData.class || "") : ""
                 execName: itemData ? String(itemData.exec || "") : ""
                 appName: itemData ? String(itemData.name || itemData.title || "") : ""
                 iconMap: root.iconMap
-                iconSize: root.compactMode ? 19 : 22
+                iconSize: root.compactMode ? 18 : 20
                 fallbackIcon: root.itemFallbackIcon(itemData)
             }
         }
@@ -221,7 +244,7 @@ Rectangle {
                 color: Colors.withAlpha(root.accentColor, highlighted ? 0.14 : 0.08)
                 border.color: Colors.withAlpha(root.accentColor, highlighted ? 0.3 : 0.16)
                 border.width: 1
-                implicitHeight: 20
+                implicitHeight: 18
                 implicitWidth: providerBadgeText.implicitWidth + 12
 
                 Text {
@@ -243,7 +266,7 @@ Rectangle {
                 color: Colors.withAlpha(Colors.surface, 0.84)
                 border.color: Colors.withAlpha(Colors.border, 0.5)
                 border.width: 1
-                implicitHeight: 20
+                implicitHeight: 18
                 implicitWidth: actionBadgeText.implicitWidth + 12
 
                 Text {

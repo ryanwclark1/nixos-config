@@ -43,7 +43,7 @@ StackLayout {
                     ? Math.min(root.launcher.selectedIndex, root.filteredItems.length - 1)
                     : -1
                 enabled: !root.launcher.showingConfirm
-                topMargin: root.compactMode ? Appearance.spacingXXS : Appearance.spacingXS
+                topMargin: 0
                 section.property: "sectionLabel"
                 section.delegate: LauncherSectionHeader {
                     compactMode: root.compactMode

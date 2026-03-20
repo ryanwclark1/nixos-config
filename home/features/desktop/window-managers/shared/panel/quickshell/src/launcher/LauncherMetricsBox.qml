@@ -9,6 +9,7 @@ Rectangle {
     required property var metrics
     required property string mode
     required property bool tightMode
+    required property bool showMetrics
     required property string filesBackendLabel
     required property string filesCacheStatsLabel
     required property var modeMetricFn
@@ -17,46 +18,57 @@ Rectangle {
     signal resetRequested()
 
     Layout.fillWidth: true
-    visible: Config.launcherShowRuntimeMetrics && !root.tightMode
+    visible: root.showMetrics && !root.tightMode
     color: Colors.withAlpha(Colors.surface, 0.76)
     radius: Appearance.radiusLarge
     border.color: Colors.withAlpha(root.accentColor, 0.18)
     border.width: 1
-    implicitHeight: metricsLayout.implicitHeight + (Appearance.spacingM * 2)
+    readonly property var modeStats: root.modeMetricFn(root.mode)
+    readonly property string summaryText: {
+        var parts = [
+            "opens " + (root.metrics.opens || 0),
+            ModeData.modeInfo(root.mode).label + " avg " + (modeStats.avgLoadMs || 0) + "ms",
+            "filter avg " + (root.metrics.avgFilterMs || 0) + "ms",
+            "failures " + (modeStats.failures || 0)
+        ];
+        if (root.mode === "files")
+            parts.push("backend " + root.filesBackendLabel);
+        return parts.join(" • ");
+    }
+    implicitHeight: metricsLayout.implicitHeight + (Appearance.spacingS * 2)
 
     RowLayout {
         id: metricsLayout
         anchors.fill: parent
-        anchors.margins: Appearance.spacingM
-        spacing: Appearance.spacingM
+        anchors.margins: Appearance.spacingS
+        spacing: Appearance.spacingS
 
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Appearance.spacingXXS
+        Rectangle {
+            radius: Appearance.radiusPill
+            color: Colors.withAlpha(root.accentColor, 0.12)
+            border.color: Colors.withAlpha(root.accentColor, 0.3)
+            border.width: 1
+            implicitHeight: 22
+            implicitWidth: metricsTitle.implicitWidth + 14
 
             Text {
+                id: metricsTitle
+                anchors.centerIn: parent
                 text: "Launcher Metrics"
                 color: root.accentColor
-                font.pixelSize: Appearance.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.Black
             }
+        }
 
-            Text {
-                Layout.fillWidth: true
-                text: "opens " + root.metrics.opens + " • cache " + root.metrics.cacheHits + "/" + root.metrics.cacheMisses + " • failures " + root.metrics.commandFailures + " • filter avg " + (root.metrics.avgFilterMs || 0) + "ms" + " / last " + (root.metrics.lastFilterMs || 0) + "ms" + (root.mode === "files" ? (" • backend " + root.filesBackendLabel + " • fd/find " + (root.metrics.filesFdLoads || 0) + "/" + (root.metrics.filesFindLoads || 0) + " • fd " + (root.metrics.filesFdAvgMs || 0) + "/" + (root.metrics.filesFdLastMs || 0) + "ms" + " • find " + (root.metrics.filesFindAvgMs || 0) + "/" + (root.metrics.filesFindLastMs || 0) + "ms" + " • resolve " + (root.metrics.filesResolveAvgMs || 0) + "/" + (root.metrics.filesResolveLastMs || 0) + "ms") : "")
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
-                wrapMode: Text.WordWrap
-            }
-
-            Text {
-                readonly property var modeStats: root.modeMetricFn(root.mode)
-                Layout.fillWidth: true
-                text: ModeData.modeInfo(root.mode).label + ": avg " + modeStats.avgLoadMs + "ms" + " • last " + modeStats.lastLoadMs + "ms" + " • failures " + modeStats.failures + (root.mode === "files" ? (" • cache " + root.filesCacheStatsLabel) : "")
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
-                wrapMode: Text.WordWrap
-            }
+        Text {
+            Layout.fillWidth: true
+            text: root.summaryText
+            color: Colors.textSecondary
+            font.pixelSize: Appearance.fontSizeXS
+            font.weight: Font.Medium
+            elide: Text.ElideRight
+            maximumLineCount: 1
         }
 
         Rectangle {
@@ -64,8 +76,15 @@ Rectangle {
             color: Colors.withAlpha(root.accentColor, 0.12)
             border.color: Colors.withAlpha(root.accentColor, 0.3)
             border.width: 1
-            implicitHeight: 28
-            implicitWidth: metricResetText.implicitWidth + 18
+            implicitHeight: 24
+            implicitWidth: metricResetText.implicitWidth + 16
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.resetRequested()
+            }
 
             Text {
                 id: metricResetText
@@ -74,13 +93,6 @@ Rectangle {
                 color: root.accentColor
                 font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.DemiBold
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.resetRequested()
             }
         }
     }
