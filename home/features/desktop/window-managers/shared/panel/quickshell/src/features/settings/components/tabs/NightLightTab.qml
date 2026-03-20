@@ -22,7 +22,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Enable Night Light"
-                icon: "󰖔"
+                icon: "weather-moon.svg"
                 checked: Config.nightLightEnabled
                 enabledText: "Night light is active"
                 disabledText: "Night light is off"
@@ -52,7 +52,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Auto Schedule"
-                icon: "󰔠"
+                icon: "clock.svg"
                 checked: Config.nightLightAutoSchedule
                 enabledText: "Night light follows the configured schedule"
                 disabledText: "Schedule is disabled"
@@ -128,7 +128,7 @@ Item {
 
             SettingsTextInputRow {
                 label: "Latitude"
-                leadingIcon: "󰍎"
+                leadingIcon: "compass.svg"
                 text: Config.nightLightLatitude
                 placeholderText: "e.g. 40.7128"
                 onSubmitted: v => Config.nightLightLatitude = v.trim()
@@ -136,7 +136,7 @@ Item {
 
             SettingsTextInputRow {
                 label: "Longitude"
-                leadingIcon: "󰍎"
+                leadingIcon: "compass.svg"
                 text: Config.nightLightLongitude
                 placeholderText: "e.g. -74.0060"
                 onSubmitted: v => Config.nightLightLongitude = v.trim()

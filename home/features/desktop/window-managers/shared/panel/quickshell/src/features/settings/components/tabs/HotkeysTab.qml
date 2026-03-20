@@ -146,7 +146,7 @@ Item {
                 id: keybindsSearchField
                 Layout.fillWidth: true
                 placeholderText: "Search keybindings..."
-                leadingIcon: "󰍉"
+                leadingIcon: "search-visual.svg"
                 onTextEdited: value => root.keybindsFilter = value.toLowerCase()
             }
 

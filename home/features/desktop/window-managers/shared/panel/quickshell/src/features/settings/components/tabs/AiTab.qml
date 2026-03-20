@@ -186,7 +186,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "Remember key"
-                    icon: "󰆓"
+                    icon: "save.svg"
                     checked: parent._remember
                     enabledText: "Key is persisted to disk."
                     disabledText: "Key is session-only (default, cleared on restart)."
@@ -208,7 +208,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "Remember key"
-                    icon: "󰆓"
+                    icon: "save.svg"
                     checked: parent._remember
                     enabledText: "Key is persisted to disk."
                     disabledText: "Key is session-only (default, cleared on restart)."
@@ -230,7 +230,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "Remember key"
-                    icon: "󰆓"
+                    icon: "save.svg"
                     checked: parent._remember
                     enabledText: "Key is persisted to disk."
                     disabledText: "Key is session-only (default, cleared on restart)."

@@ -63,7 +63,7 @@ Item {
                     id: themeSearchField
                     Layout.fillWidth: true
                     placeholderText: "Search themes..."
-                    leadingIcon: "󰍉"
+                    leadingIcon: "search-visual.svg"
                     onTextEdited: _themeRefreshTimer.restart()
                 }
 

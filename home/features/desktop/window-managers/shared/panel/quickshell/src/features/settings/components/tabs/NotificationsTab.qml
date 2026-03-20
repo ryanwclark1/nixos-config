@@ -114,7 +114,7 @@ Item {
                             value: root._timeoutLabel(Config.notifTimeoutNormal)
                         },
                         {
-                            icon: "󰋚",
+                            icon: "arrow-counterclockwise.svg",
                             label: "History",
                             value: root._historySummary
                         },
@@ -248,7 +248,7 @@ Item {
 
                     SettingsToggleRow {
                         label: "Privacy Mode"
-                        icon: "󰒇"
+                        icon: "eye-off.svg"
                         checked: Config.notifPrivacyMode
                         enabledText: "Notification body hidden in popups"
                         disabledText: "Full body shown in popups"
@@ -347,7 +347,7 @@ Item {
 
                     SettingsToggleRow {
                         label: "Notification History"
-                        icon: "󰋚"
+                        icon: "arrow-counterclockwise.svg"
                         checked: Config.notifHistoryEnabled
                         enabledText: "Dismissed notifications are saved"
                         disabledText: "Dismissed notifications are discarded"
