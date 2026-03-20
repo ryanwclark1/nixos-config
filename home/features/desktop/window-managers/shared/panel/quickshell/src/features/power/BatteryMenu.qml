@@ -58,7 +58,7 @@ BasePopupMenu {
 
     SharedWidgets.EmptyState {
       anchors.centerIn: parent
-      icon: "󰂑"
+      icon: "battery-full.svg"
       message: "No battery detected"
     }
   }

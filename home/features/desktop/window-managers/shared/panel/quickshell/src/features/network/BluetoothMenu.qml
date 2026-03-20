@@ -264,7 +264,7 @@ BasePopupMenu {
         Layout.fillWidth: true
         Layout.topMargin: 40
         visible: !root.hasAdapter
-        icon: "󰂲"
+        icon: "bluetooth-disabled.svg"
         iconSize: 48
         message: "No Bluetooth adapter found"
       }
@@ -392,7 +392,7 @@ BasePopupMenu {
         Layout.fillWidth: true
         Layout.topMargin: Colors.spacingLG
         visible: root.effectiveBtEnabled && !root.isScanning && root.connectedCount === 0 && root.pairedCount === 0 && root.availableCount === 0
-        icon: "󰂯"
+        icon: "bluetooth.svg"
         message: "No devices found"
       }
   }

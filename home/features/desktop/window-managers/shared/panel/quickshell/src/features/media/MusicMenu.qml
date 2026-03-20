@@ -118,7 +118,7 @@ BasePopupMenu {
 
     SharedWidgets.EmptyState {
       anchors.centerIn: parent
-      icon: "󰝚"
+      icon: "music-note-2.svg"
       message: "No music playing"
     }
   }
