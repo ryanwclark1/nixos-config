@@ -195,8 +195,6 @@ Rectangle {
                     radius: 9
                     color: Colors.withAlpha(Colors.text, clearSearchMouse.containsMouse ? 0.15 : 0.08)
 
-                    Text {
-                        anchors.centerIn: parent
                     Shared.SvgIcon {
                         anchors.centerIn: parent
                         source: "dismiss.svg"
