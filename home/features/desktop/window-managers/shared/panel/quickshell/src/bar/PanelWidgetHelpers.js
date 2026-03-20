@@ -1,89 +1,16 @@
 .pragma library
-
-var VERTICAL_HIDE_WIDGETS = [
-    "windowTitle",
-    "ssh"
-];
-
-var VERTICAL_SHORT_LABEL_WIDGETS = [
-    "keyboardLayout"
-];
-
-var VERTICAL_COMPACT_WIDGETS = [
-    "cpuStatus",
-    "ramStatus",
-    "gpuStatus",
-    "diskStatus",
-    "networkStatus"
-];
-
-var VERTICAL_ICON_WIDGETS = [
-    "logo",
-    "dateTime",
-    "updates",
-    "modelUsage",
-    "weather",
-    "market",
-    "vpn",
-    "network",
-    "bluetooth",
-    "audio",
-    "music",
-    "privacy",
-    "voxtype",
-    "recording",
-    "battery",
-    "printer",
-    "notifications",
-    "aiChat",
-    "notepad",
-    "controlCenter",
-    "clipboard",
-    "screenshot"
-];
-
-var VERTICAL_NATIVE_WIDGETS = [
-    "workspaces",
-    "specialWorkspaces",
-    "taskbar",
-    "tray",
-    "cava",
-    "idleInhibitor",
-    "mediaBar",
-    "spacer",
-    "separator"
-];
-
-function widgetTypeName(widgetInstance) {
-    return widgetInstance ? String(widgetInstance.widgetType || "") : "";
-}
-
-function _typeInList(widgetType, values) {
-    return values.indexOf(widgetType) !== -1;
-}
+.import "VerticalWidgetPolicy.js" as VerticalWidgetPolicy
 
 function verticalWidgetBehavior(widgetInstance) {
-    var widgetType = widgetTypeName(widgetInstance);
-
-    if (_typeInList(widgetType, VERTICAL_HIDE_WIDGETS))
-        return "hidden";
-    if (_typeInList(widgetType, VERTICAL_SHORT_LABEL_WIDGETS))
-        return "short-label";
-    if (_typeInList(widgetType, VERTICAL_COMPACT_WIDGETS))
-        return "compact";
-    if (_typeInList(widgetType, VERTICAL_ICON_WIDGETS))
-        return "icon";
-    if (_typeInList(widgetType, VERTICAL_NATIVE_WIDGETS))
-        return "native";
-    return "unverified";
+    return VerticalWidgetPolicy.verticalWidgetBehavior(widgetInstance);
 }
 
 function isWidgetHiddenInVertical(widgetInstance) {
-    return verticalWidgetBehavior(widgetInstance) === "hidden";
+    return VerticalWidgetPolicy.isWidgetHiddenInVertical(widgetInstance);
 }
 
 function shouldCollapseVerticalOverflow(widgetInstance) {
-    return verticalWidgetBehavior(widgetInstance) === "unverified";
+    return VerticalWidgetPolicy.shouldCollapseVerticalOverflow(widgetInstance);
 }
 
 function widgetSettings(widgetInstance) {

@@ -617,6 +617,9 @@ QtObject {
     function addBarWidget(barId, section, widgetType, initialSettings) {
         return _barMgr.addBarWidget(barId, section, widgetType, initialSettings);
     }
+    function applyBarWidgetPreset(barId, presetName) {
+        return _barMgr.applyBarWidgetPreset(barId, presetName);
+    }
     function removeBarWidget(barId, section, instanceId) {
         return _barMgr.removeBarWidget(barId, section, instanceId);
     }

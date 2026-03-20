@@ -35,6 +35,16 @@ function createConfig(overrides = {}) {
 describe("ConfigPersistence round trip", () => {
   it("round-trips representative settings domains through buildData/applyData", () => {
     const source = createConfig({
+      barConfigs: [
+        {
+          id: "bar-vertical",
+          name: "Side Bar",
+          position: "left",
+          widgetPreset: "vertical-balanced",
+          sectionWidgets: { left: [], center: [], right: [] },
+        },
+      ],
+      selectedBarId: "bar-vertical",
       controlCenterWidth: 520,
       themeAutoScheduleEnabled: true,
       themeAutoScheduleMode: "sunrise_sunset",
@@ -118,6 +128,16 @@ describe("ConfigPersistence round trip", () => {
 
     applyData(applied, data);
 
+    expect(applied.selectedBarId).toBe("bar-vertical");
+    expect(applied.barConfigs).toEqual([
+      {
+        id: "bar-vertical",
+        name: "Side Bar",
+        position: "left",
+        widgetPreset: "vertical-balanced",
+        sectionWidgets: { left: [], center: [], right: [] },
+      },
+    ]);
     expect(applied.controlCenterWidth).toBe(520);
     expect(applied.themeAutoScheduleMode).toBe("sunrise_sunset");
     expect(applied.themeAutoLatitude).toBe("41.88");

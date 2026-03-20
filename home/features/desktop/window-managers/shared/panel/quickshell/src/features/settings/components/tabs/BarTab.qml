@@ -91,7 +91,7 @@ Item {
                             value: root.selectedBarName
                         },
                         {
-                            icon: "󰐕",
+                            icon: "add.svg",
                             label: "Configured Bars",
                             value: root.barCount + " / " + Config.maxBars
                         },
@@ -101,7 +101,7 @@ Item {
                             value: root.selectedBarPositionLabel
                         },
                         {
-                            icon: "󰍹",
+                            icon: "desktop.svg",
                             label: "Display Scope",
                             value: root.selectedBarDisplaySummary
                         }

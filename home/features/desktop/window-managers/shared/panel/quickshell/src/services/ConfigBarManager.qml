@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import "BarPresetPolicy.js" as BarPresetPolicy
 
 // Internal helper for Config — manages bar configurations, widget instances,
 // screen assignment, conflict detection, and legacy bar migration.
@@ -13,40 +14,22 @@ QtObject {
   // ── Widget instance creation ─────────────────
 
   function defaultBarSectionWidgets() {
-    return {
-      left: [
-        createWidgetInstance("logo"),
-        createWidgetInstance("workspaces"),
-        createWidgetInstance("windowTitle"),
-        createWidgetInstance("taskbar"),
-        createWidgetInstance("cpuStatus"),
-        createWidgetInstance("ramStatus")
-      ],
-      center: [
-        createWidgetInstance("dateTime"),
-        createWidgetInstance("mediaBar"),
-        createWidgetInstance("updates"),
-        createWidgetInstance("idleInhibitor")
-      ],
-      right: [
-        createWidgetInstance("weather"),
-        createWidgetInstance("network"),
-        createWidgetInstance("bluetooth"),
-        createWidgetInstance("audio"),
-        createWidgetInstance("music"),
-        createWidgetInstance("privacy"),
-        createWidgetInstance("recording"),
-        createWidgetInstance("battery"),
-        createWidgetInstance("printer"),
-        createWidgetInstance("aiChat"),
-        createWidgetInstance("notepad"),
-        createWidgetInstance("controlCenter"),
-        createWidgetInstance("tray"),
-        createWidgetInstance("clipboard"),
-        createWidgetInstance("keyboardLayout"),
-        createWidgetInstance("notifications")
-      ]
-    };
+    return createPresetSectionWidgets(BarPresetPolicy.HORIZONTAL_DEFAULT_PRESET);
+  }
+
+  function createPresetSectionWidgets(presetName) {
+    var presetSections = BarPresetPolicy.presetSectionWidgetTypes(presetName);
+    var sections = ["left", "center", "right"];
+    var created = { left: [], center: [], right: [] };
+
+    for (var i = 0; i < sections.length; ++i) {
+      var section = sections[i];
+      var widgetTypes = presetSections[section] || [];
+      for (var j = 0; j < widgetTypes.length; ++j)
+        created[section].push(createWidgetInstance(widgetTypes[j]));
+    }
+
+    return created;
   }
 
   function generateId(prefix) {
@@ -95,6 +78,7 @@ QtObject {
         break;
       }
     }
+    var widgetPreset = BarPresetPolicy.defaultPresetForPosition(selectedPosition);
     return {
       id: generateId("bar"),
       name: name || (barIndex === 1 ? "Main Bar" : ("Bar " + barIndex)),
@@ -106,7 +90,8 @@ QtObject {
       floating: config.barFloating,
       margin: config.barMargin,
       opacity: config.barOpacity,
-      sectionWidgets: defaultBarSectionWidgets()
+      widgetPreset: widgetPreset,
+      sectionWidgets: createPresetSectionWidgets(widgetPreset)
     };
   }
 
@@ -312,14 +297,33 @@ QtObject {
     };
   }
 
+  function widgetDefaultSettings(widgetType) {
+    return BarWidgetRegistry && BarWidgetRegistry.defaultSettings
+      ? BarWidgetRegistry.defaultSettings(widgetType)
+      : {};
+  }
+
+  function resolveWidgetPreset(position, storedPresetName, sectionWidgets) {
+    return BarPresetPolicy.resolvePresetForBar(position, storedPresetName, sectionWidgets, widgetDefaultSettings);
+  }
+
   // ── Bar config normalization ─────────────────
 
   function normalizeBarConfig(bar, index) {
+    var normalizedPosition = isValidEdge(bar && bar.position) ? bar.position : "top";
+    var storedWidgetPreset = bar && bar.widgetPreset !== undefined ? String(bar.widgetPreset) : "";
+    var normalizedSectionWidgets = migrateCavaWidget(normalizeSectionWidgets(bar && bar.sectionWidgets ? bar.sectionWidgets : defaultBarSectionWidgets()));
+    var resolvedWidgetPreset = resolveWidgetPreset(normalizedPosition, storedWidgetPreset, normalizedSectionWidgets);
+    if (storedWidgetPreset === ""
+        && BarPresetPolicy.isAutoManagedPreset(resolvedWidgetPreset)
+        && !BarPresetPolicy.matchesPresetSectionWidgets(normalizedSectionWidgets, resolvedWidgetPreset, widgetDefaultSettings)) {
+      normalizedSectionWidgets = createPresetSectionWidgets(resolvedWidgetPreset);
+    }
     var normalized = {
       id: bar && bar.id ? bar.id : generateId("bar"),
       name: bar && bar.name ? bar.name : (index === 0 ? "Main Bar" : ("Bar " + (index + 1))),
       enabled: bar && bar.enabled !== undefined ? !!bar.enabled : true,
-      position: isValidEdge(bar && bar.position) ? bar.position : "top",
+      position: normalizedPosition,
       displayMode: bar && (bar.displayMode === "primary" || bar.displayMode === "specific") ? bar.displayMode : "all",
       displayTargets: bar && Array.isArray(bar.displayTargets) ? bar.displayTargets.slice() : [],
       height: Math.max(24, parseInt(bar && bar.height !== undefined ? bar.height : config.barHeight, 10) || config.barHeight),
@@ -335,7 +339,8 @@ QtObject {
       shadowOpacity: Math.max(0.0, Math.min(1.0, Number(bar && bar.shadowOpacity !== undefined ? bar.shadowOpacity : 0.3) || 0.3)),
       fontScale: Math.max(0.5, Math.min(2.0, Number(bar && bar.fontScale !== undefined ? bar.fontScale : 1.0) || 1.0)),
       iconScale: Math.max(0.5, Math.min(2.0, Number(bar && bar.iconScale !== undefined ? bar.iconScale : 1.0) || 1.0)),
-      sectionWidgets: migrateCavaWidget(normalizeSectionWidgets(bar && bar.sectionWidgets ? bar.sectionWidgets : defaultBarSectionWidgets()))
+      widgetPreset: resolvedWidgetPreset,
+      sectionWidgets: normalizedSectionWidgets
     };
 
     return normalized;
@@ -536,6 +541,18 @@ QtObject {
     for (var i = 0; i < keys.length; ++i)
       updated[keys[i]] = patch[keys[i]];
 
+    var currentPreset = BarPresetPolicy.isAutoManagedPreset(barConfig.widgetPreset)
+      ? String(barConfig.widgetPreset)
+      : "";
+    var positionChanged = patch && patch.position !== undefined
+      && String(patch.position || "") !== String(barConfig.position || "");
+    var patchControlsPreset = patch && (patch.widgetPreset !== undefined || patch.sectionWidgets !== undefined);
+    if (positionChanged && currentPreset !== "" && !patchControlsPreset) {
+      var targetPreset = BarPresetPolicy.defaultPresetForPosition(updated.position);
+      updated.widgetPreset = targetPreset;
+      updated.sectionWidgets = createPresetSectionWidgets(targetPreset);
+    }
+
     if (updated.displayMode !== "specific") updated.displayTargets = [];
     updated = normalizeBarConfig(updated, 0);
     if (barConflictDetails(updated)) return false;
@@ -553,6 +570,7 @@ QtObject {
 
     var updated = cloneBar(barConfig);
     if (!updated.sectionWidgets) updated.sectionWidgets = { left: [], center: [], right: [] };
+    updated.widgetPreset = BarPresetPolicy.CUSTOM_PRESET;
 
     updated.sectionWidgets[section] = [];
     var source = Array.isArray(widgets) ? widgets : [];
@@ -560,6 +578,18 @@ QtObject {
       updated.sectionWidgets[section].push(normalizeWidgetInstance(source[i]));
 
     return replaceBarConfig(updated);
+  }
+
+  function applyBarWidgetPreset(barId, presetName) {
+    var barConfig = barById(barId);
+    var normalizedPreset = String(presetName || "");
+    if (!barConfig || !BarPresetPolicy.isAutoManagedPreset(normalizedPreset))
+      return false;
+
+    return updateBarConfig(barId, {
+      widgetPreset: normalizedPreset,
+      sectionWidgets: createPresetSectionWidgets(normalizedPreset)
+    });
   }
 
   function addBarWidget(barId, section, widgetType, initialSettings) {

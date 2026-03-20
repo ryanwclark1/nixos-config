@@ -203,6 +203,10 @@ describe("vertical widget policy", () => {
     expect(verticalWidgetBehavior({ widgetType: "keyboardLayout" })).toBe("short-label");
     expect(verticalWidgetBehavior({ widgetType: "cpuStatus" })).toBe("compact");
     expect(verticalWidgetBehavior({ widgetType: "weather" })).toBe("icon");
+    expect(verticalWidgetBehavior({ widgetType: "pomodoro" })).toBe("icon");
+    expect(verticalWidgetBehavior({ widgetType: "todo" })).toBe("icon");
+    expect(verticalWidgetBehavior({ widgetType: "gameMode" })).toBe("icon");
+    expect(verticalWidgetBehavior({ widgetType: "nightLight" })).toBe("icon");
     expect(verticalWidgetBehavior({ widgetType: "workspaces" })).toBe("native");
   });
 

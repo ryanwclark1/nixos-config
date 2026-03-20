@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import "../../../services" as Services
+import "../../../bar/VerticalWidgetPolicy.js" as VerticalWidgetPolicy
 
 QtObject {
   id: root
@@ -287,39 +288,11 @@ QtObject {
   }
 
   function verticalBehavior(widgetType) {
-    var type = String(widgetType || "");
-
-    if (type === "windowTitle" || type === "ssh")
-      return "hidden";
-    if (type === "keyboardLayout")
-      return "short-label";
-    if (type === "cpuStatus" || type === "ramStatus" || type === "gpuStatus" || type === "diskStatus" || type === "networkStatus")
-      return "compact";
-    if (type === "logo" || type === "dateTime" || type === "updates" || type === "modelUsage" || type === "weather"
-        || type === "market" || type === "vpn" || type === "network" || type === "bluetooth" || type === "audio"
-        || type === "music" || type === "privacy" || type === "voxtype" || type === "recording" || type === "battery"
-        || type === "printer" || type === "notifications" || type === "aiChat" || type === "notepad"
-        || type === "controlCenter" || type === "clipboard" || type === "screenshot")
-      return "icon";
-    if (type === "workspaces" || type === "specialWorkspaces" || type === "taskbar" || type === "tray"
-        || type === "cava" || type === "idleInhibitor" || type === "mediaBar" || type === "spacer" || type === "separator")
-      return "native";
-    return "unverified";
+    return VerticalWidgetPolicy.verticalWidgetBehavior(widgetType);
   }
 
   function verticalHintLabel(widgetType) {
-    var behavior = verticalBehavior(widgetType);
-    if (behavior === "hidden")
-      return "Vertical: Hidden";
-    if (behavior === "short-label")
-      return "Vertical: Short Label";
-    if (behavior === "compact")
-      return "Vertical: Compact";
-    if (behavior === "icon")
-      return "Vertical: Icon";
-    if (behavior === "native")
-      return "Vertical: Native";
-    return "Vertical: Unverified";
+    return VerticalWidgetPolicy.verticalHintLabel(widgetType);
   }
 
   function _isVerticalBarContext(barPositionOrVertical) {

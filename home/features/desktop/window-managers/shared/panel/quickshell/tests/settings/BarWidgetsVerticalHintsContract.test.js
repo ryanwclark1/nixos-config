@@ -19,6 +19,10 @@ const registryPath = resolve(
   quickshellRoot,
   "src/features/bar/registry/BarWidgetRegistry.qml"
 );
+const verticalPolicyPath = resolve(
+  quickshellRoot,
+  "src/bar/VerticalWidgetPolicy.js"
+);
 
 describe("Bar widgets vertical hints contract", () => {
   it("shows a vertical-mode callout and forwards bar position to summary chips", () => {
@@ -28,6 +32,9 @@ describe("Bar widgets vertical hints contract", () => {
     expect(source).toContain('title: "Vertical bar mode"');
     expect(source).toContain("BarWidgetRegistry.summaryChips(widgetRow.widgetInstance, root.selectedBarPosition)");
     expect(source).toContain("verticalBar: root.selectedBarVertical");
+    expect(source).toContain('import "BarWidgetPickerPolicy.js" as BarWidgetPickerPolicy');
+    expect(source).toContain('Config.applyBarWidgetPreset(root.selectedBar.id, "vertical-balanced")');
+    expect(source).toContain("return BarWidgetPickerPolicy.sortPickerItems(items, addSection, selectedBarVertical);");
   });
 
   it("shows vertical hints in the picker overlay", () => {
@@ -39,11 +46,14 @@ describe("Bar widgets vertical hints contract", () => {
 
   it("defines vertical hint labels in the widget registry", () => {
     const source = readFileSync(registryPath, "utf8");
+    const policySource = readFileSync(verticalPolicyPath, "utf8");
 
     expect(source).toContain("function verticalBehavior(widgetType)");
     expect(source).toContain("function verticalHintLabel(widgetType)");
-    expect(source).toContain('return "Vertical: Hidden"');
-    expect(source).toContain('return "Vertical: Icon"');
-    expect(source).toContain('return "Vertical: Unverified"');
+    expect(source).toContain('import "../../../bar/VerticalWidgetPolicy.js" as VerticalWidgetPolicy');
+    expect(source).toContain("return VerticalWidgetPolicy.verticalHintLabel(widgetType);");
+    expect(policySource).toContain('return "Vertical: Hidden"');
+    expect(policySource).toContain('return "Vertical: Icon"');
+    expect(policySource).toContain('return "Vertical: Unverified"');
   });
 });

@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import "../../../../services"
 import "../../../../widgets" as SharedWidgets
 import ".."
+import "BarWidgetPickerPolicy.js" as BarWidgetPickerPolicy
 
 Item {
     id: root
@@ -43,6 +44,8 @@ Item {
     }
     readonly property string selectedBarPosition: (selectedBar && selectedBar.position) ? String(selectedBar.position) : "top"
     readonly property bool selectedBarVertical: Config.isVerticalBar(selectedBarPosition)
+    readonly property string selectedBarWidgetPreset: (selectedBar && selectedBar.widgetPreset) ? String(selectedBar.widgetPreset) : ""
+    readonly property bool selectedBarAutoManaged: selectedBarWidgetPreset === "horizontal-default" || selectedBarWidgetPreset === "vertical-balanced"
     readonly property var currentSectionWidgets: {
         var bar = selectedBar;
         var sections = (bar && bar.sectionWidgets) ? bar.sectionWidgets : {};
@@ -162,14 +165,19 @@ Item {
         var items = BarWidgetRegistry.search(widgetSearchQuery, "");
         if (!addSection)
             return items;
+        return BarWidgetPickerPolicy.sortPickerItems(items, addSection, selectedBarVertical);
+    }
 
-        return items.slice().sort(function (a, b) {
-            var aScore = String(a.section || "") === addSection ? 0 : 1;
-            var bScore = String(b.section || "") === addSection ? 0 : 1;
-            if (aScore !== bScore)
-                return aScore - bScore;
-            return String(a.label || "").localeCompare(String(b.label || ""));
-        });
+    function selectedPresetSummary() {
+        if (!selectedBarVertical)
+            return "";
+        if (selectedBarWidgetPreset === "vertical-balanced")
+            return "Current preset: Vertical Balanced";
+        if (selectedBarWidgetPreset === "custom")
+            return "Current preset: Custom";
+        if (selectedBarAutoManaged)
+            return "Current preset: Auto-managed";
+        return "Current preset: Custom";
     }
 
     function openWidgetSettings(section, instanceId) {
@@ -324,7 +332,31 @@ Item {
         SettingsInfoCallout {
             visible: root.selectedBarVertical
             title: "Vertical bar mode"
-            body: "Left and right bars stay narrow. Text-heavy widgets are forced to icon or compact layouts, and unsupported widgets are hidden or collapsed if they are too wide."
+            body: root.selectedBarWidgetPreset === "custom"
+                ? root.selectedPresetSummary() + ". This bar keeps your manual widget composition. Text-heavy widgets still fall back to compact or icon layouts where supported."
+                : root.selectedPresetSummary() + ". Left and right bars stay narrow. Text-heavy widgets are forced to icon or compact layouts, and unsupported widgets are hidden or collapsed if they are too wide."
+
+            Text {
+                visible: root.selectedBarVertical
+                text: root.selectedBarWidgetPreset === "vertical-balanced"
+                    ? "Using the balanced sidebar preset."
+                    : (root.selectedBarWidgetPreset === "custom"
+                        ? "Manual edits preserve this layout until you reapply the preset."
+                        : "Preset state follows the bar orientation until you customize the widget list.")
+                color: Colors.textSecondary
+                font.pixelSize: Colors.fontSizeXS
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            SettingsActionButton {
+                visible: root.selectedBarVertical && root.selectedBarWidgetPreset === "custom" && !!root.selectedBar
+                compact: true
+                emphasized: true
+                iconName: "arrow-clockwise.svg"
+                label: "Apply Vertical Preset"
+                onClicked: Config.applyBarWidgetPreset(root.selectedBar.id, "vertical-balanced")
+            }
         }
 
         Repeater {
