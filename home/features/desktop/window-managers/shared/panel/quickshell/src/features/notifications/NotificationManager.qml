@@ -16,7 +16,7 @@ Item {
   property var archivedNotifications: []
   property string statePath: Quickshell.statePath("notifications.json")
 
-  // Screenshot notification tracking
+  // Screenshot notification tracking — keyed by body text, value = { path, ts }
   property var _pendingScreenshotPaths: ({})
 
   // Rate limiting — prevent notification floods from misbehaving apps
@@ -26,6 +26,12 @@ Item {
   Timer {
     interval: 1000; running: true; repeat: true
     onTriggered: root._ingressCount = 0
+  }
+
+  // Prune stale pending screenshot entries that were never matched
+  Timer {
+    interval: 30000; running: true; repeat: true
+    onTriggered: root._pruneStaleScreenshotPaths()
   }
 
   Timer {
@@ -63,21 +69,20 @@ Item {
         }
         notif.tracked = true;
 
-        // Detect screenshot notifications and tag them
-        if (notif.appName === "Screenshot" || (notif.summary || "").indexOf("Screenshot") !== -1) {
-          var bodyText = (notif.body || "").trim();
-          // Match "Saved to /path/..." pattern from ScreenshotService
-          var pathMatch = bodyText.match(/^Saved to (.+?) and copied/);
-          var bodyPath = pathMatch ? pathMatch[1] : bodyText;
-          if (root._pendingScreenshotPaths[bodyPath]) {
-            notif.screenshotPath = bodyPath;
-            var next = Object.assign({}, root._pendingScreenshotPaths);
-            delete next[bodyPath];
-            root._pendingScreenshotPaths = next;
-          }
+        // Detect screenshot notifications — match by full body text key
+        var bodyKey = (notif.body || "").trim();
+        var pending = root._pendingScreenshotPaths[bodyKey];
+        if (pending) {
+          notif.screenshotPath = pending.path;
+          var next = Object.assign({}, root._pendingScreenshotPaths);
+          delete next[bodyKey];
+          root._pendingScreenshotPaths = next;
         }
 
-        root._maybeSpeakNotification(notif);
+        // TTS: skip screenshot notifications (reading file paths is not useful)
+        if (!notif.screenshotPath)
+          root._maybeSpeakNotification(notif);
+
         root._scheduleSave();
       }
     }
@@ -195,14 +200,34 @@ Item {
   // ── Screenshot Notification ────────────────
 
   function _sendScreenshotNotification(filePath) {
+    var body = "Saved to " + filePath + " and copied to clipboard";
     Quickshell.execDetached([
       "notify-send", "-i", "camera-photo",
       "-a", "Screenshot",
+      "-h", "string:image-path:" + filePath,
       "Screenshot captured",
-      "Saved to " + filePath + " and copied to clipboard"
+      body
     ]);
+    // Key by the exact body text so onNotification can match without parsing
     var next = Object.assign({}, _pendingScreenshotPaths);
-    next[filePath] = { path: filePath, ts: Date.now() };
+    next[body] = { path: filePath, ts: Date.now() };
     _pendingScreenshotPaths = next;
+  }
+
+  function _pruneStaleScreenshotPaths() {
+    var cutoff = Date.now() - 30000;
+    var changed = false;
+    var next = {};
+    var keys = Object.keys(root._pendingScreenshotPaths);
+    for (var i = 0; i < keys.length; i++) {
+      var entry = root._pendingScreenshotPaths[keys[i]];
+      if (entry.ts > cutoff) {
+        next[keys[i]] = entry;
+      } else {
+        changed = true;
+      }
+    }
+    if (changed)
+      root._pendingScreenshotPaths = next;
   }
 }

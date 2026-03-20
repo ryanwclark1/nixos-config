@@ -22,6 +22,17 @@ Rectangle {
   signal actionInvoked(var action)
   signal replySent(string text)
 
+  function _openScreenshotEditor() {
+    if (!root.notification || !root.notification.screenshotPath) return;
+    var editor = Config.screenshotEditor !== "none" ? Config.screenshotEditor : "swappy";
+    var path = root.notification.screenshotPath;
+    if (editor === "satty")
+      Quickshell.execDetached(["satty", "--filename", path]);
+    else
+      Quickshell.execDetached(["swappy", "-f", path]);
+    root.dismissRequested();
+  }
+
   width: parent.width
   height: root.showContent ? colMain.implicitHeight + Colors.paddingLarge * 2 : 0
   opacity: root.showContent ? 1.0 : 0.0
@@ -122,7 +133,7 @@ Rectangle {
       }
 
       SharedWidgets.IconButton {
-        icon: "󰅖"
+        icon: "dismiss.svg"
         size: 28
         iconSize: Colors.fontSizeLarge
         iconColor: Colors.textDisabled
@@ -272,15 +283,7 @@ Rectangle {
         Layout.preferredHeight: 32
         text: "󰏫  Edit in " + (Config.screenshotEditor === "satty" ? "Satty" : "Swappy")
         fontSize: Colors.fontSizeSmall
-        onClicked: {
-          var editor = Config.screenshotEditor !== "none" ? Config.screenshotEditor : "swappy";
-          var path = root.notification.screenshotPath;
-          if (editor === "satty")
-            Quickshell.execDetached(["satty", "--filename", path]);
-          else
-            Quickshell.execDetached(["swappy", "-f", path]);
-          root.dismissRequested();
-        }
+        onClicked: root._openScreenshotEditor()
       }
 
       SharedWidgets.Button {
@@ -313,13 +316,7 @@ Rectangle {
       if (mouse.button === Qt.RightButton) {
         root.dismissRequested();
       } else if (mouse.button === Qt.LeftButton && root.isPopup && root.notification && root.notification.screenshotPath) {
-        var editor = Config.screenshotEditor !== "none" ? Config.screenshotEditor : "swappy";
-        var path = root.notification.screenshotPath;
-        if (editor === "satty")
-          Quickshell.execDetached(["satty", "--filename", path]);
-        else
-          Quickshell.execDetached(["swappy", "-f", path]);
-        root.dismissRequested();
+        root._openScreenshotEditor();
       }
     }
     onPressed: function(mouse) {

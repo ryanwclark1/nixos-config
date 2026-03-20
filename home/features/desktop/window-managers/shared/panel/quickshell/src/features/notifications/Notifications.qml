@@ -63,6 +63,9 @@ PanelWindow {
               if (rules[i].timeout !== undefined) return rules[i].timeout;
             }
           }
+          // Screenshot notifications get extra time for click-to-edit
+          if (notification.screenshotPath)
+            return Math.max(Config.notifTimeoutNormal, 8000);
           if (notification.urgency === NotificationUrgency.Critical) return Config.notifTimeoutCritical;
           if (notification.urgency === NotificationUrgency.Low) return Config.notifTimeoutLow;
           return Config.notifTimeoutNormal;

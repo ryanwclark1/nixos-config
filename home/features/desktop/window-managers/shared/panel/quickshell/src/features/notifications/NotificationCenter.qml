@@ -149,7 +149,7 @@ PanelWindow {
         // Close button
         SharedWidgets.IconButton {
           size: 32
-          icon: "󰅖"
+          icon: "dismiss.svg"
           tooltipText: "Close"
           tooltipShortcut: "Meta+N"
           onClicked: root.closeRequested()
@@ -309,7 +309,7 @@ PanelWindow {
               }
 
               SharedWidgets.IconButton {
-                size: 28; icon: "󰅖"; iconColor: Colors.textDisabled
+                size: 28; icon: "dismiss.svg"; iconColor: Colors.textDisabled
                 stateColor: Colors.error
                 tooltipText: "Dismiss group"
                 onClicked: if (root.manager) root.manager.dismissAll(section)
