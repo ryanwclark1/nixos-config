@@ -43,6 +43,18 @@ function targetIndexFromMappedY(mappedY, itemExtent, spacing, count) {
     return value;
 }
 
+function mappedListY(cardItem, listItem, dragOffsetY) {
+    if (!cardItem || !listItem)
+        return 0;
+    return cardItem.mapToItem(listItem, 0, cardItem.y + (Number(dragOffsetY) || 0)).y;
+}
+
+function currentListDropIndex(cardItem, rowIndex, listItem, count, dragOffsetY) {
+    if (!cardItem || !listItem)
+        return rowIndex;
+    return targetIndexFromMappedY(mappedListY(cardItem, listItem, dragOffsetY), cardItem.height, listItem.spacing, count);
+}
+
 function normalizedTargetIndex(fromIndex, targetIndex, listLength) {
     var boundedTarget = clampIndex(targetIndex, Math.max(0, Number(listLength) || 0));
     if (fromIndex < boundedTarget)
