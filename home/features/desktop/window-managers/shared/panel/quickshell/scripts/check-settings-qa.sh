@@ -21,9 +21,10 @@ check-bar-widgets-first-open.sh. Use --skip-switch if the current repo state is
 already deployed, or --repo-shell to run the stack against a repo-shell instance
 without deploying Home Manager.
 
-When --output-dir is set, it is treated as the bundle root. Bar Widgets review
-artifacts are written to PATH/bar-widgets-first-open and runtime/settings matrix
-artifacts are written to PATH/panel-qa-matrix.
+When --output-dir is set, it is treated as the preserved bundle root for the
+Bar Widgets first-open review artifacts at PATH/bar-widgets-first-open.
+The broader runtime/settings matrix remains available through
+check-settings-guardrails.sh and check-runtime-warning-regressions.sh.
 EOF
 }
 
@@ -58,7 +59,6 @@ guardrail_args=()
 
 if [[ -n "${output_dir}" ]]; then
   first_open_args+=(--output-dir "${output_dir}/bar-widgets-first-open")
-  guardrail_args+=(--runtime-output-dir "${output_dir}/panel-qa-matrix")
 fi
 
 if (( repo_shell_mode == 1 )); then
@@ -73,7 +73,7 @@ bash "${script_dir}/check-bar-widgets-first-open.sh" "${first_open_args[@]}"
 # Settings QA already exercises launcher-adjacent settings tabs during the
 # smoke step above, and the Bar Widgets first-open gate already performs the
 # deep scroll capture that has been flaky in the VM.
-bash "${script_dir}/check-settings-guardrails.sh" --skip-responsive --skip-launcher --skip-settings-deep "${guardrail_args[@]}"
+bash "${script_dir}/check-settings-guardrails.sh" --skip-responsive --skip-runtime-capture --skip-launcher --skip-settings-deep "${guardrail_args[@]}"
 bash "${script_dir}/check-widget-picker-search.sh"
 bash "${script_dir}/check-bar-widget-reorder.sh"
 

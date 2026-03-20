@@ -5,6 +5,7 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 quickshell_root="$(CDPATH= cd -- "${script_dir}/.." >/dev/null && pwd)"
 config_root="${quickshell_root}/src"
 skip_responsive=0
+skip_runtime_capture=0
 runtime_output_dir=""
 
 source "${script_dir}/graphics-session-env.sh"
@@ -33,6 +34,10 @@ main() {
     case "$1" in
       --skip-responsive)
         skip_responsive=1
+        shift
+        ;;
+      --skip-runtime-capture)
+        skip_runtime_capture=1
         shift
         ;;
       --runtime-output-dir)
@@ -71,7 +76,9 @@ main() {
   if (( ${#runtime_args[@]} == 0 )); then
     runtime_args=(--repo-shell)
   fi
-  if niri_headless_without_outputs; then
+  if (( skip_runtime_capture == 1 )); then
+    printf '%s\n' "[INFO] Skipping runtime warning regression artifact capture."
+  elif niri_headless_without_outputs; then
     printf '%s\n' "[INFO] Skipping runtime warning regression artifact capture: Niri session exposes no wl_output in this headless VM."
   else
     runtime_warning_args=(--workspace current --skip-surfaces)
