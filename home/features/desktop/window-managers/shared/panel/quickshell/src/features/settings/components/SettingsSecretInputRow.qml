@@ -59,8 +59,7 @@ ColumnLayout {
                     sourceComponent: root.leadingIcon.endsWith(".svg") ? _siSvg : _siNerd
                 }
                 Component { id: _siSvg; SvgIcon { source: root.leadingIcon; color: Colors.textDisabled; size: Colors.fontSizeLarge } }
-                Component { id: _siNerd; Text { text: root.leadingIcon; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge
-                }
+                Component { id: _siNerd; Text { text: root.leadingIcon; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
 
                 TextInput {
                     id: input
