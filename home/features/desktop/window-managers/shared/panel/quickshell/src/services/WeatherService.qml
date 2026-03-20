@@ -124,6 +124,30 @@ QtObject {
   }
 
   function refresh() {
+    if (Config.weatherProvider === "wttr") {
+      _refreshWttr();
+    } else {
+      _refreshOpenMeteo();
+    }
+  }
+
+  function _refreshWttr() {
+    var source = _sourceByPriority();
+    if (source.kind === "none") {
+      _setUnavailableState("Location not configured");
+      return;
+    }
+
+    var base = source.target ? ("https://wttr.in/" + source.target) : "https://wttr.in/";
+    var unitFlag = _unitMode === "imperial" ? "&u" : "";
+    var url = base + "?format=j1" + unitFlag;
+
+    weatherProc.command = ["curl", "-s", "--compressed", "--max-time", "15",
+      "-H", "User-Agent: quickshell-weather/1.0", url];
+    if (!weatherProc.running) weatherProc.running = true;
+  }
+
+  function _refreshOpenMeteo() {
     var city = String(Config.weatherCityQuery || "").trim();
     if (city.length > 0) {
       _geocode(city);
