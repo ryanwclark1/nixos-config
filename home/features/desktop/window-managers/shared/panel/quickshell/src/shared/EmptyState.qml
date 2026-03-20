@@ -7,7 +7,7 @@ ColumnLayout {
     id: root
     property string icon: "󰟢"
     property string message: "Nothing here"
-    property int iconSize: 32
+    property int iconSize: Colors.iconSizeMedium
 
     spacing: Colors.spacingS
 

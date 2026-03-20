@@ -7,7 +7,7 @@ Rectangle {
     property string placeholder: "Search..."
     property alias text: searchInput.text
     readonly property alias inputItem: searchInput
-    property int preferredHeight: 38
+    property int preferredHeight: Colors.controlRowHeight
 
     Layout.fillWidth: true
     height: preferredHeight

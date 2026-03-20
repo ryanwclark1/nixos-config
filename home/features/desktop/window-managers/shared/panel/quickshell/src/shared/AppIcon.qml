@@ -10,7 +10,7 @@ Item {
   property string execName: ""
   property string appName: ""
   property var iconCandidates: []
-  property int iconSize: 32
+  property int iconSize: Colors.iconSizeMedium
   property var iconMap: null
   property string fallbackIcon: "󰀻"
 

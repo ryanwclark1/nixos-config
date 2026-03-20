@@ -17,7 +17,7 @@ PopupWindow {
   default property alias content: contentSlot.data
   property string subtitle: ""
   property color surfaceTint: "transparent"
-  property int contentSpacing: 14
+  property int contentSpacing: Colors.spacingML
   property string preferredEdge: "top"
   property bool focusOnOpen: true
   // focusTarget: if set, receives focus when the menu opens instead of the surface.
@@ -159,7 +159,7 @@ PopupWindow {
 
         SharedWidgets.IconButton {
           icon: "dismiss.svg"
-          size: 32
+          size: Colors.iconSizeMedium
           iconSize: Colors.fontSizeXL
           iconColor: Colors.textDisabled
           stateColor: Colors.error

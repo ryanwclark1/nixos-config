@@ -3,7 +3,7 @@ import "../services"
 
 Item {
     id: root
-    property int size: 24
+    property int size: Colors.iconSizeSmall
     property color color: Colors.primary
 
     width: size
