@@ -79,6 +79,14 @@ PanelWindow {
         }
     }
 
+    ElasticNumber {
+        id: _elasticScale
+        target: root.showContent ? 1.0 : 0.95
+        fastDuration: Colors.durationSnap
+        slowDuration: Colors.durationSlow
+        fastWeight: 0.45
+    }
+
     SharedWidgets.ThemedContainer {
         id: paletteBox
         variant: "card"
@@ -89,9 +97,8 @@ PanelWindow {
         clip: true
 
         opacity: root.showContent ? 1.0 : 0.0
-        scale: root.showContent ? 1.0 : 0.95
+        scale: _elasticScale.value
         Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutBack } }
 
         ColumnLayout {
             id: contentCol
