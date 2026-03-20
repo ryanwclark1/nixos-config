@@ -48,7 +48,7 @@ Item {
 
         Row {
             anchors.centerIn: parent
-            spacing: 2
+            spacing: Colors.spacingXXS
             height: 14
 
             Repeater {

@@ -221,7 +221,7 @@ Item {
           anchors.bottom: parent.bottom
           anchors.bottomMargin: 1
           anchors.horizontalCenter: parent.horizontalCenter
-          spacing: 2
+          spacing: Colors.spacingXXS
           visible: modelData.windows > 0 && !root.showLabels
 
           Repeater {
