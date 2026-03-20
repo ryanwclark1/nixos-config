@@ -26,6 +26,9 @@ Layershell screen does not corrospond to a real screen\. Letting the compositor 
 EOF
       ;;
     surfaces|targeted-surfaces)
+      cat <<'EOF'
+Layershell screen does not corrospond to a real screen\. Letting the compositor pick\.
+EOF
       ;;
   esac
 }

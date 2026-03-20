@@ -187,7 +187,7 @@ resolve_hyprland_instance() {
 pick_capture_workspace() {
   local used
   local candidate
-  for candidate in $(seq 9101 9199); do
+  for candidate in $(seq 9001 9099); do
     used="$(hypr workspaces -j | jq --arg candidate "${candidate}" 'map(select((.name // "") == $candidate or ((.id | tostring) == $candidate))) | length')"
     if [[ "${used}" == "0" ]]; then
       printf '%s\n' "${candidate}"

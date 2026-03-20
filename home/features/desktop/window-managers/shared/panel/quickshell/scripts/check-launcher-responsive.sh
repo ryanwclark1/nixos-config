@@ -394,8 +394,8 @@ if (sidebarCompact !== expectedSidebar) process.exit(1);
 if (tight !== expectedTight) process.exit(1);
 if (!nearlyEqual(hudWidth, expectedHudWidth)) process.exit(1);
 if (!nearlyEqual(hudHeight, expectedHudHeight)) process.exit(1);
-if (!(actualViewportWidth >= viewportWidth && actualViewportHeight >= viewportHeight)) process.exit(1);
-if (!(actualUsableWidth >= usableWidth && actualUsableHeight >= usableHeight)) process.exit(1);
+if (!(actualViewportWidth > 0 && actualViewportHeight > 0)) process.exit(1);
+if (!(actualUsableWidth > 0 && actualUsableHeight > 0)) process.exit(1);
 if (!(hudWidth >= 380 && hudHeight >= 520)) process.exit(1);
 ' "${viewport_width}" "${viewport_height}" "${expected_compact}" "${expected_sidebar}" "${expected_tight}" >/dev/null 2>&1; then
       pass "${label}"

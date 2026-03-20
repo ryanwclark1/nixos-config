@@ -13,6 +13,7 @@ repo_shell_env=()
 run_settings=1
 run_surfaces=1
 run_multibar=1
+run_launcher=1
 settings_timeout_seconds="${QS_VERIFY_SETTINGS_TIMEOUT_SECONDS:-150}"
 surfaces_timeout_seconds="${QS_VERIFY_SURFACES_TIMEOUT_SECONDS:-150}"
 warnings_timeout_seconds="${QS_VERIFY_WARNINGS_TIMEOUT_SECONDS:-900}"
@@ -57,6 +58,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --skip-launcher)
+      run_launcher=0
       shift
       ;;
     -h|--help)
@@ -352,7 +354,7 @@ main() {
     args+=(--id "${instance_id}")
   fi
 
-  if (( run_settings == 0 && run_surfaces == 0 && run_multibar == 0 )); then
+  if (( run_settings == 0 && run_surfaces == 0 && run_multibar == 0 && run_launcher == 0 )); then
     printf 'Nothing to run. Remove at least one --skip-* flag.\n' >&2
     exit 2
   fi
@@ -388,7 +390,11 @@ main() {
     if [[ -n "${instance_id}" ]]; then
       args+=(--id "${instance_id}")
     fi
-    run_step_timeout "Running targeted runtime warning regressions" "${warnings_timeout_seconds}" "${script_dir}/check-runtime-warning-regressions.sh" "${args[@]}"
+    warning_args=("${args[@]}")
+    if (( run_launcher == 0 )); then
+      warning_args+=(--skip-launcher)
+    fi
+    run_step_timeout "Running targeted runtime warning regressions" "${warnings_timeout_seconds}" "${script_dir}/check-runtime-warning-regressions.sh" "${warning_args[@]}"
   fi
 
   if (( run_multibar == 1 )); then
