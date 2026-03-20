@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../shared"
 import "../../services"
+import "../../services/IconHelpers.js" as IconHelpers
 import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
@@ -61,10 +62,10 @@ BasePopupMenu {
               spacing: 4
               property real change: modelData.close - modelData.open
               property bool up: change >= 0
-              Text {
-                text: parent.up ? "▲" : "▼"
+              SharedWidgets.SvgIcon {
+                source: IconHelpers.trendIndicatorIcon(parent.up)
                 color: parent.up ? Colors.success : Colors.error
-                font.pixelSize: Appearance.fontSizeSmall
+                size: Appearance.fontSizeSmall
               }
               Text {
                 text: Math.abs(parent.change).toFixed(2)

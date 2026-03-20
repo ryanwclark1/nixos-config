@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
+import "../../services/IconHelpers.js" as IconHelpers
+import "../../widgets" as SharedWidgets
 
 Rectangle {
     id: root
@@ -44,10 +46,11 @@ Rectangle {
                     font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
-                Text {
-                    text: root.sortBy === "name" ? (root.sortAsc ? "↑" : "↓") : ""
+                SharedWidgets.SvgIcon {
+                    visible: root.sortBy === "name"
+                    source: IconHelpers.sortIndicatorIcon(root.sortAsc)
                     color: Colors.primary
-                    font.pixelSize: Appearance.fontSizeSmall
+                    size: Appearance.fontSizeSmall
                 }
             }
             MouseArea {
@@ -74,10 +77,11 @@ Rectangle {
                     font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
-                Text {
-                    text: root.sortBy === "size" ? (root.sortAsc ? "↑" : "↓") : ""
+                SharedWidgets.SvgIcon {
+                    visible: root.sortBy === "size"
+                    source: IconHelpers.sortIndicatorIcon(root.sortAsc)
                     color: Colors.primary
-                    font.pixelSize: Appearance.fontSizeSmall
+                    size: Appearance.fontSizeSmall
                 }
             }
             MouseArea {
@@ -105,10 +109,11 @@ Rectangle {
                     font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
-                Text {
-                    text: root.sortBy === "date" ? (root.sortAsc ? "↑" : "↓") : ""
+                SharedWidgets.SvgIcon {
+                    visible: root.sortBy === "date"
+                    source: IconHelpers.sortIndicatorIcon(root.sortAsc)
                     color: Colors.primary
-                    font.pixelSize: Appearance.fontSizeSmall
+                    size: Appearance.fontSizeSmall
                 }
             }
             MouseArea {
@@ -136,10 +141,11 @@ Rectangle {
                     font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                 }
-                Text {
-                    text: root.sortBy === "type" ? (root.sortAsc ? "↑" : "↓") : ""
+                SharedWidgets.SvgIcon {
+                    visible: root.sortBy === "type"
+                    source: IconHelpers.sortIndicatorIcon(root.sortAsc)
                     color: Colors.primary
-                    font.pixelSize: Appearance.fontSizeSmall
+                    size: Appearance.fontSizeSmall
                 }
             }
             MouseArea {

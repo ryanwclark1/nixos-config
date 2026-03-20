@@ -218,7 +218,7 @@ function normalizeCustomEngines(list) {
             name: name,
             exec: exec,
             home: String(entry.home || ""),
-            icon: String(entry.icon || "󰖟")
+            icon: String(entry.icon || "globe-search.svg")
         });
     }
     return out;

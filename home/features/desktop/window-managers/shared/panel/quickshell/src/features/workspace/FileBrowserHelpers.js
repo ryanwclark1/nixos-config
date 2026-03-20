@@ -1,5 +1,7 @@
 .pragma library
 
+.import "../../services/FileIconHelpers.js" as FileIconHelpers
+
 // ── Parsing ────────────────────────────────────────────────────────────────────
 
 function parseStatOutput(raw) {
@@ -108,18 +110,5 @@ function formatDate(ts) {
 // ── File icons ─────────────────────────────────────────────────────────────────
 
 function fileIcon(entry) {
-    if (entry.isDir) return "󰉋";
-    var ext = entry.extension;
-    if (["jpg","jpeg","png","webp","gif","bmp","svg","tiff","avif"].indexOf(ext) >= 0) return "󰋩";
-    if (["mp4","mkv","mov","avi","webm","flv"].indexOf(ext) >= 0) return "󰈫";
-    if (["mp3","flac","wav","ogg","aac","opus"].indexOf(ext) >= 0) return "󰝚";
-    if (["pdf"].indexOf(ext) >= 0) return "󰈦";
-    if (["zip","tar","gz","bz2","xz","7z","rar","zst"].indexOf(ext) >= 0) return "󰗄";
-    if (["sh","bash","zsh","fish"].indexOf(ext) >= 0) return "󰆍";
-    if (["js","ts","jsx","tsx","py","rs","go","c","cpp","h","java","rb","cs"].indexOf(ext) >= 0) return "󰴭";
-    if (["txt","md","rst","log"].indexOf(ext) >= 0) return "󰈙";
-    if (["json","yaml","yml","toml","xml","ini","conf"].indexOf(ext) >= 0) return "󰘦";
-    if (["nix"].indexOf(ext) >= 0) return "󱄅";
-    if (["html","css","scss"].indexOf(ext) >= 0) return "󰌒";
-    return "󰈔";
+    return FileIconHelpers.iconForFile(entry.name || "", entry.extension, entry.isDir ? "dir" : "file");
 }

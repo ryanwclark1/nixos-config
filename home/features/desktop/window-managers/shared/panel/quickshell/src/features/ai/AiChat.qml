@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
 import "../../services"
+import "../../services/IconHelpers.js" as IconHelpers
 import "services/AiProviders.js" as Providers
 import "services/AiMarkdown.js" as Markdown
 import "services/AiProviderProfiles.js" as Profiles
@@ -595,7 +596,7 @@ PanelWindow {
 
                         SettingsActionButton {
                             label: AiService.isCommandRunning ? "Running..." : "Execute"
-                            iconName: AiService.isCommandRunning ? "󰦖" : "󰐊"
+                            iconName: IconHelpers.commandExecuteIcon(AiService.isCommandRunning)
                             compact: true
                             enabled: !AiService.isCommandRunning
                             onClicked: AiService.executePendingCommand()
