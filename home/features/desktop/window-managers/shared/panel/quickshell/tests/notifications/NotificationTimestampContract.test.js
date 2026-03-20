@@ -10,6 +10,7 @@ const quickshellRoot = resolve(__dirname, "..", "..");
 const managerPath = resolve(quickshellRoot, "src/features/notifications/NotificationManager.qml");
 const delegatePath = resolve(quickshellRoot, "src/features/notifications/NotificationDelegate.qml");
 const centerPath = resolve(quickshellRoot, "src/features/notifications/NotificationCenter.qml");
+const popupsPath = resolve(quickshellRoot, "src/features/notifications/Notifications.qml");
 
 // The Quickshell v0.2.1 Notification/NotificationAction C++ API:
 //   Notification: appName, summary, body, appIcon, urgency, actions, image,
@@ -29,9 +30,15 @@ describe("Notification API contract", () => {
     expect(source).not.toContain("notification.time");
   });
 
-  it("NotificationCenter uses sendInlineReply, not nonexistent invoke", () => {
+  it("NotificationCenter uses sendInlineReply, not nonexistent invoke on Notification", () => {
     const source = readFileSync(centerPath, "utf8");
     expect(source).toContain("notification.sendInlineReply(text)");
+    expect(source).not.toContain("notification.invoke(text)");
+  });
+
+  it("Notifications popup uses sendInlineReply, not nonexistent invoke on Notification", () => {
+    const source = readFileSync(popupsPath, "utf8");
+    expect(source).toContain("sendInlineReply(text)");
     expect(source).not.toContain("notification.invoke(text)");
   });
 

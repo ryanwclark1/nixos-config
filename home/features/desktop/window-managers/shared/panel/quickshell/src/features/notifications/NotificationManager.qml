@@ -61,6 +61,7 @@ Item {
       actionsSupported: true
       bodySupported: true
       imageSupported: true
+      inlineReplySupported: true
 
       onNotification: function(notif) {
         if (++root._ingressCount > root._maxIngressPerSecond) {

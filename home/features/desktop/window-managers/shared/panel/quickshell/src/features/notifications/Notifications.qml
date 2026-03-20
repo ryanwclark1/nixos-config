@@ -154,7 +154,7 @@ PanelWindow {
           }
           onReplySent: function(text) {
             if (notifWrapper.notification)
-              notifWrapper.notification.invoke(text);
+              notifWrapper.notification.sendInlineReply(text);
             notifWrapper.animatedDismiss();
           }
 
