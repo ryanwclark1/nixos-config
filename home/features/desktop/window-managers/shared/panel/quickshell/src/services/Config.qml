@@ -356,6 +356,13 @@ QtObject {
     property var pluginSettings: ({})
     property bool pluginHotReload: true
 
+    // --- PANELS ---
+    property var enabledPanels: [
+        "notifCenter", "controlCenter", "notepad", "aiChat",
+        "commandPalette", "powerMenu", "colorPicker", "displayConfig",
+        "fileBrowser", "systemMonitor"
+    ]
+
     // --- HOOKS ---
     property bool hooksEnabled: true
     property var hookPaths: ({})
@@ -450,6 +457,10 @@ QtObject {
         if (resolved.startsWith("/") || resolved.startsWith("file://"))
             return resolved.startsWith("file://") ? resolved : "file://" + resolved;
         return resolved;
+    }
+
+    function isPanelEnabled(panelId) {
+        return enabledPanels.indexOf(panelId) !== -1;
     }
 
     function applyRuntimeSettings() {

@@ -2,7 +2,7 @@
 
 var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
 
-var CURRENT_VERSION = 3;
+var CURRENT_VERSION = 4;
 
 var _EXTRA_SECTION_KEYS = {
     controlCenter: {
@@ -46,6 +46,16 @@ var _MIGRATIONS = [
             delete data.glass.opacity;
             delete data.glass.settingsSurfaceOpacity;
         }
+    },
+    // v3 → v4: Add enabledPanels default.
+    function(data) {
+        if (!data.panels) data.panels = {};
+        if (data.panels.enabledPanels === undefined)
+            data.panels.enabledPanels = [
+                "notifCenter", "controlCenter", "notepad", "aiChat",
+                "commandPalette", "powerMenu", "colorPicker", "displayConfig",
+                "fileBrowser", "systemMonitor"
+            ];
     }
 ];
 
@@ -322,6 +332,9 @@ var _MAPS = {
         ["batLockTimeout", "powerBatLockTimeout"],
         ["batSuspendTimeout", "powerBatSuspendTimeout"],
         ["batSuspendAction", "powerBatSuspendAction"]
+    ],
+    panels: [
+        ["enabledPanels", "enabledPanels"]
     ],
     hooks: [
         ["enabled", "hooksEnabled"],
