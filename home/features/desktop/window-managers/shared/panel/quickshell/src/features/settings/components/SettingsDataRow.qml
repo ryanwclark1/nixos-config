@@ -36,7 +36,7 @@ Rectangle {
 
             Loader {
                 visible: root.iconName !== ""
-                sourceComponent: root.iconName.endsWith(".svg") ? _svgIcon : _nerdIcon
+                sourceComponent: String(root.iconName).endsWith(".svg") ? _svgIcon : _nerdIcon
             }
             Component {
                 id: _svgIcon

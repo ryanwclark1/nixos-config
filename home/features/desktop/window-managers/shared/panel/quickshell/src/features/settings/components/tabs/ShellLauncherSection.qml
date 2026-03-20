@@ -333,7 +333,7 @@ Item {
 
                         Loader {
                             anchors.centerIn: parent
-                            sourceComponent: root.launcherHeroMeta.icon.endsWith(".svg") ? _launcherSvgIcon : _launcherNerdIcon
+                            sourceComponent: String(root.launcherHeroMeta.icon).endsWith(".svg") ? _launcherSvgIcon : _launcherNerdIcon
                         }
                         Component {
                             id: _launcherSvgIcon

@@ -35,7 +35,7 @@ Rectangle {
 
             Loader {
                 visible: root.iconName !== ""
-                sourceComponent: root.iconName.endsWith(".svg") ? _ciSvg : _ciNerd
+                sourceComponent: String(root.iconName).endsWith(".svg") ? _ciSvg : _ciNerd
                 Layout.alignment: Qt.AlignTop
             }
             Component { id: _ciSvg; SvgIcon { source: root.iconName; color: Colors.primary; size: Appearance.fontSizeLarge } }

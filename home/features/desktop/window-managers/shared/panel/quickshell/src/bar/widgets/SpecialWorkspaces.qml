@@ -151,7 +151,7 @@ Item {
 
       Loader {
         anchors.centerIn: parent
-        sourceComponent: root.mainIcon.endsWith(".svg") ? _mainSvgV : _mainNerdV
+        sourceComponent: String(root.mainIcon).endsWith(".svg") ? _mainSvgV : _mainNerdV
       }
       Component { id: _mainSvgV; SharedWidgets.SvgIcon { source: root.mainIcon; color: root.isOnSpecial ? Colors.primary : Colors.text; size: root.pillFont } }
       Component { id: _mainNerdV; Text { text: root.mainIcon; color: root.isOnSpecial ? Colors.primary : Colors.text; font.pixelSize: root.pillFont; font.family: Appearance.fontMono } }
@@ -278,7 +278,7 @@ Item {
 
       Loader {
         anchors.centerIn: parent
-        sourceComponent: root.mainIcon.endsWith(".svg") ? _mainSvg : _mainNerd
+        sourceComponent: String(root.mainIcon).endsWith(".svg") ? _mainSvg : _mainNerd
       }
       Component { id: _mainSvg; SharedWidgets.SvgIcon { source: root.mainIcon; color: root.isOnSpecial ? Colors.primary : Colors.text; size: root.pillFont } }
       Component { id: _mainNerd; Text { text: root.mainIcon; color: root.isOnSpecial ? Colors.primary : Colors.text; font.pixelSize: root.pillFont; font.family: Appearance.fontMono } }

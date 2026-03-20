@@ -70,7 +70,7 @@ Rectangle {
 
                     Loader {
                         anchors.centerIn: parent
-                        sourceComponent: root.iconName.endsWith(".svg") ? _scSvg : _scNerd
+                        sourceComponent: String(root.iconName).endsWith(".svg") ? _scSvg : _scNerd
                     }
                     Component { id: _scSvg; SvgIcon { source: root.iconName; color: Colors.primary; size: Appearance.fontSizeSmall } }
                     Component { id: _scNerd; Text { text: root.iconName; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }

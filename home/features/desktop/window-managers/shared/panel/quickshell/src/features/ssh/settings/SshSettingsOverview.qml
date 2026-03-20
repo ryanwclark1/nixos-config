@@ -32,7 +32,7 @@ Rectangle {
         SettingsDataRow {
             Layout.fillWidth: true
             label: "Import Root"
-            iconName: "󰈔"
+            iconName: "document.svg"
             value: root.sshData.importRootPath
         }
 
@@ -55,7 +55,7 @@ Rectangle {
         SettingsDataRow {
             Layout.fillWidth: true
             label: "Import Errors"
-            iconName: "󰅚"
+            iconName: "error.svg"
             value: String(root.sshData.importErrors.length)
             monoValue: false
         }
@@ -67,7 +67,7 @@ Rectangle {
 
             SettingsActionButton {
                 compact: true
-                iconName: "󰑐"
+                iconName: "arrow-clockwise.svg"
                 label: "Reset State"
                 onClicked: root.resetStateRequested()
             }

@@ -8,7 +8,7 @@ Loader {
     property color iconColor: Colors.primary
     property int iconSize: Appearance.fontSizeLarge
 
-    sourceComponent: root.icon.endsWith(".svg") ? _svgComp : _nerdComp
+    sourceComponent: String(root.icon).endsWith(".svg") ? _svgComp : _nerdComp
 
     Component {
         id: _svgComp

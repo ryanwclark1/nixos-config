@@ -70,7 +70,7 @@ Rectangle {
 
                 Loader {
                     anchors.centerIn: parent
-                    sourceComponent: (iconText || "").endsWith(".svg") ? _mbSvgI : _mbNerdI
+                    sourceComponent: String(iconText || "").endsWith(".svg") ? _mbSvgI : _mbNerdI
                 }
                 Component { id: _mbSvgI; SharedWidgets.SvgIcon { source: iconText; color: active ? root.accentColor : Colors.textSecondary; size: Appearance.fontSizeLarge } }
                 Component { id: _mbNerdI; Text { text: iconText || "•"; color: active ? root.accentColor : Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
@@ -79,7 +79,7 @@ Rectangle {
             Loader {
                 visible: compact
                 Layout.alignment: Qt.AlignHCenter
-                sourceComponent: (iconText || "").endsWith(".svg") ? _mbSvgC : _mbNerdC
+                sourceComponent: String(iconText || "").endsWith(".svg") ? _mbSvgC : _mbNerdC
             }
             Component { id: _mbSvgC; SharedWidgets.SvgIcon { source: iconText; color: active ? root.accentColor : Colors.textSecondary; size: Appearance.fontSizeXL } }
             Component { id: _mbNerdC; Text { text: iconText || "•"; color: active ? root.accentColor : Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }
@@ -157,7 +157,7 @@ Rectangle {
 
                         Loader {
                             anchors.centerIn: parent
-                            sourceComponent: (root.launcher.modeHeroIcon || "").endsWith(".svg") ? _heroSvg : _heroNerd
+                            sourceComponent: String(root.launcher.modeHeroIcon || "").endsWith(".svg") ? _heroSvg : _heroNerd
                         }
                         Component { id: _heroSvg; SharedWidgets.SvgIcon { source: root.launcher.modeHeroIcon; color: root.accentColor; size: Appearance.fontSizeXL } }
                         Component { id: _heroNerd; Text { text: root.launcher.modeHeroIcon; color: root.accentColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }

@@ -48,7 +48,7 @@ Rectangle {
       active: root.icon !== ""
       visible: active
       anchors.verticalCenter: parent.verticalCenter
-      sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
+      sourceComponent: String(root.icon).endsWith(".svg") ? _svgIcon : _nerdIcon
     }
     Component {
       id: _svgIcon

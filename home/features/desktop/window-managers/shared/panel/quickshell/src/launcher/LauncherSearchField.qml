@@ -71,7 +71,7 @@ Rectangle {
 
                 Loader {
                     anchors.centerIn: parent
-                    sourceComponent: (root.modeIconText || "").endsWith(".svg") ? _sfSvg : _sfNerd
+                    sourceComponent: String(root.modeIconText || "").endsWith(".svg") ? _sfSvg : _sfNerd
                 }
                 Component { id: _sfSvg; SharedWidgets.SvgIcon { source: root.modeIconText; color: root.accentColor; size: embedded ? Appearance.fontSizeLarge : Appearance.fontSizeMedium } }
                 Component { id: _sfNerd; Text { text: root.modeIconText; color: root.accentColor; font.pixelSize: embedded ? Appearance.fontSizeLarge : Appearance.fontSizeMedium; font.family: Appearance.fontMono } }

@@ -154,7 +154,7 @@ Item {
             SettingsTextInputRow {
                 visible: Config.aiProvider === "custom"
                 label: "Custom Endpoint"
-                leadingIcon: "󰌘"
+                leadingIcon: "terminal.svg"
                 placeholderText: "https://api.example.com"
                 text: Config.aiCustomEndpoint
                 onTextEdited: value => Config.aiCustomEndpoint = value
@@ -241,14 +241,14 @@ Item {
 
         SettingsCard {
             title: "Endpoint Override"
-            iconName: "󰌘"
+            iconName: "terminal.svg"
             description: "Per-provider base URL. Saved independently for each provider."
             collapsible: true
             expanded: false
 
             SettingsTextInputRow {
                 label: "Base URL for " + Config.aiProvider
-                leadingIcon: "󰌘"
+                leadingIcon: "terminal.svg"
                 placeholderText: Profiles.isLocalProvider(Config.aiProvider, "") ? "http://localhost:11434" : "https://api.example.com"
                 text: {
                     var profile = Profiles.loadProfile(Config.aiProviderProfiles, Config.aiProvider);
@@ -336,7 +336,7 @@ Item {
 
         SettingsCard {
             title: "Limits"
-            iconName: "󰎞"
+            iconName: "bookmark.svg"
             description: "Conversation history limits to manage storage."
 
             SettingsSliderRow {

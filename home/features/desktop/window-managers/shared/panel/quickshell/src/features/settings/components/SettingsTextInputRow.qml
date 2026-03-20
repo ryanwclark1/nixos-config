@@ -75,7 +75,7 @@ ColumnLayout {
 
                 Loader {
                     visible: root.leadingIcon !== ""
-                    sourceComponent: root.leadingIcon.endsWith(".svg") ? _tiSvg : _tiNerd
+                    sourceComponent: String(root.leadingIcon).endsWith(".svg") ? _tiSvg : _tiNerd
                 }
                 Component { id: _tiSvg; SvgIcon { source: root.leadingIcon; color: Colors.textDisabled; size: Appearance.fontSizeLarge } }
                 Component { id: _tiNerd; Text { text: root.leadingIcon; color: Colors.textDisabled; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }

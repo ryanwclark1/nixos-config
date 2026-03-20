@@ -311,7 +311,7 @@ Item {
 
         SettingsCard {
             title: "Active Bar"
-            iconName: "󰕮"
+            iconName: "widgets.svg"
             description: root.selectedBar ? "Choose which bar to manage before editing sections below." : "Create a bar first."
 
             SettingsSelectRow {

@@ -69,7 +69,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Bar Layout"
-        iconName: "󰕮"
+        iconName: "widgets.svg"
         subtitle: "Manage independent bars, monitor assignment, and per-bar layout settings."
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
@@ -155,12 +155,12 @@ Item {
 
             SettingsCard {
                 title: "Modular Layout"
-                iconName: "󰕮"
+                iconName: "widgets.svg"
                 description: "Enable true dynamic layout arrays. (Experimental)"
 
                 SettingsToggleRow {
                     label: "Use Modular Entries"
-                    icon: "󰕮"
+                    icon: "widgets.svg"
                     configKey: "barUseModularEntries"
                     enabledText: "Uses barLeftEntries, etc. from config.json"
                     disabledText: "Uses legacy barLeftEntries, etc. from config.json"
@@ -169,7 +169,7 @@ Item {
 
             SettingsCard {
                 title: "Bar Configurations"
-                iconName: "󰕮"
+                iconName: "widgets.svg"
                 description: "Select, add, and remove up to four independent bars."
 
                 ColumnLayout {

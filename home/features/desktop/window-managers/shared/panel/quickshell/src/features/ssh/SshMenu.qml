@@ -360,7 +360,7 @@ BasePopupMenu {
 
                   Loader {
                     property string _ic: modelData.icon || "󰣀"
-                    sourceComponent: _ic.endsWith(".svg") ? _shSvg : _shNerd
+                    sourceComponent: String(_ic).endsWith(".svg") ? _shSvg : _shNerd
                   }
                   Component { id: _shSvg; SvgIcon { source: parent._ic; color: Colors.primary; size: Appearance.fontSizeLarge } }
                   Component { id: _shNerd; Text { text: parent._ic; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }

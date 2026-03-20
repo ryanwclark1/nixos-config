@@ -62,7 +62,7 @@ BasePopupMenu {
 
                     Loader {
                         property string _ic: modelData.icon
-                        sourceComponent: _ic.endsWith(".svg") ? _smSvg : _smNerd
+                        sourceComponent: String(_ic).endsWith(".svg") ? _smSvg : _smNerd
                     }
                     Component { id: _smSvg; SharedWidgets.SvgIcon { source: parent._ic; color: Colors.primary; size: Appearance.fontSizeXL } }
                     Component { id: _smNerd; Text { text: parent._ic; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }

@@ -109,7 +109,7 @@ Rectangle {
       visible: root.muted || root.value > root.minVisibleValue
       property string _ic: root.muted ? root.mutedIcon : root.icon
       property color _co: root.value > 0.15 ? Colors.background : Colors.text
-      sourceComponent: _ic.endsWith(".svg") ? _stSvg : _stNerd
+      sourceComponent: String(_ic).endsWith(".svg") ? _stSvg : _stNerd
     }
     Component { id: _stSvg; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeSmall } }
     Component { id: _stNerd; Text { text: parent._ic; color: parent._co; Behavior on color { enabled: !Colors.isTransitioning; CAnim {} } font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }

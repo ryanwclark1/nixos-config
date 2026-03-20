@@ -152,7 +152,7 @@ ThemedContainer {
                             property string _icon: modelData.icon || ""
                             property color _color: modelData.danger ? Colors.error
                                 : (modelData.disabled ? Colors.textDisabled : Colors.textSecondary)
-                            sourceComponent: _icon.endsWith(".svg") ? _ctxSvg : _ctxNerd
+                            sourceComponent: String(_icon).endsWith(".svg") ? _ctxSvg : _ctxNerd
                         }
                         Component {
                             id: _ctxSvg

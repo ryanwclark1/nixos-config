@@ -119,7 +119,7 @@ Item {
                             value: root._historySummary
                         },
                         {
-                            icon: "󰗆",
+                            icon: "speaker.svg",
                             label: "Speech",
                             value: root._ttsSummary
                         },
@@ -374,12 +374,12 @@ Item {
 
             SettingsCard {
                 title: "Text-to-Speech"
-                iconName: "󰗆"
+                iconName: "speaker.svg"
                 description: "Read incoming notifications aloud using a TTS engine."
 
                 SettingsToggleRow {
                     label: "Enable TTS"
-                    icon: "󰗆"
+                    icon: "speaker.svg"
                     checked: Config.notifTtsEnabled
                     enabledText: "Notifications are read aloud"
                     disabledText: "TTS is off"
@@ -422,7 +422,7 @@ Item {
 
                 SettingsActionButton {
                     label: "Test Voice"
-                    iconName: "󰐊"
+                    iconName: "play.svg"
                     enabled: Config.notifTtsEnabled
                     onClicked: Quickshell.execDetached([
                         "qs-tts-speak",

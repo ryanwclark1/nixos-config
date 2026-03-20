@@ -64,7 +64,7 @@ Rectangle {
 
                 Loader {
                     anchors.centerIn: parent
-                    sourceComponent: root.resolvedIcon.endsWith(".svg") ? _heroSvgIcon : _heroNerdIcon
+                    sourceComponent: String(root.resolvedIcon).endsWith(".svg") ? _heroSvgIcon : _heroNerdIcon
                 }
                 Component {
                     id: _heroSvgIcon

@@ -119,7 +119,7 @@ Item {
   Loader {
     anchors.centerIn: parent
     visible: !iconImage.visible
-    sourceComponent: root._fallbackText.endsWith(".svg") ? _svgFallback : _nerdFallback
+    sourceComponent: String(root._fallbackText).endsWith(".svg") ? _svgFallback : _nerdFallback
   }
 
   Component {

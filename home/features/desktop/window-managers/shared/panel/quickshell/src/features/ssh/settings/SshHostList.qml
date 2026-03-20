@@ -303,7 +303,7 @@ Rectangle {
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰏫"
+                                    iconName: "edit.svg"
                                     label: "Up"
                                     enabled: !root.reorderDisabled && hostRow.hostIndex > 0
                                     onClicked: root.moveHost(hostRow.hostIndex, -1)
@@ -319,21 +319,21 @@ Rectangle {
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰏫"
+                                    iconName: "edit.svg"
                                     label: "Edit"
                                     onClicked: root.editHost(hostRow.hostIndex)
                                 }
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰑕"
+                                    iconName: "rename.svg"
                                     label: "Duplicate"
                                     onClicked: root.duplicateHost(hostRow.hostIndex)
                                 }
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰅖"
+                                    iconName: "dismiss.svg"
                                     label: "Remove"
                                     onClicked: root.removeHost(hostRow.hostIndex)
                                 }

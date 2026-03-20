@@ -67,7 +67,7 @@ Rectangle {
                     Loader {
                         property string _ic: modelData.icon
                         property color _co: root.currentPath === modelData.path ? Colors.primary : Colors.textSecondary
-                        sourceComponent: _ic.endsWith(".svg") ? _fbSvg : _fbNerd
+                        sourceComponent: String(_ic).endsWith(".svg") ? _fbSvg : _fbNerd
                     }
                     Component { id: _fbSvg; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeLarge } }
                     Component { id: _fbNerd; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }

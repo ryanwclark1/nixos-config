@@ -56,7 +56,7 @@ Rectangle {
 
             Loader {
                 anchors.centerIn: parent
-                sourceComponent: (root.modeIcon || "").endsWith(".svg") ? _chromeSvg : _chromeNerd
+                sourceComponent: String(root.modeIcon || "").endsWith(".svg") ? _chromeSvg : _chromeNerd
             }
             Component { id: _chromeSvg; SharedWidgets.SvgIcon { source: root.modeIcon; color: root.accentColor; size: root.tightMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL } }
             Component { id: _chromeNerd; Text { text: root.modeIcon; color: root.accentColor; font.family: Appearance.fontMono; font.pixelSize: root.tightMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL } }
@@ -155,7 +155,7 @@ Rectangle {
 
                     Loader {
                         visible: root.statusIcon !== ""
-                        sourceComponent: (root.statusIcon || "").endsWith(".svg") ? _statusSvg : _statusNerd
+                        sourceComponent: String(root.statusIcon || "").endsWith(".svg") ? _statusSvg : _statusNerd
                     }
                     Component { id: _statusSvg; SharedWidgets.SvgIcon { source: root.statusIcon; color: root.accentColor; size: Appearance.fontSizeXS } }
                     Component { id: _statusNerd; Text { text: root.statusIcon; color: root.accentColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXS } }

@@ -118,7 +118,7 @@ Item {
     id: iconContent
     Loader {
       anchors.centerIn: parent
-      sourceComponent: root.icon.endsWith(".svg") ? _iconSvg : _iconNerd
+      sourceComponent: String(root.icon).endsWith(".svg") ? _iconSvg : _iconNerd
     }
   }
 
@@ -129,7 +129,7 @@ Item {
 
       Loader {
         anchors.horizontalCenter: parent.horizontalCenter
-        sourceComponent: root.icon.endsWith(".svg") ? _compactSvg : _compactNerd
+        sourceComponent: String(root.icon).endsWith(".svg") ? _compactSvg : _compactNerd
       }
 
       SharedWidgets.NumericText {
@@ -147,7 +147,7 @@ Item {
 
       Loader {
         anchors.verticalCenter: parent.verticalCenter
-        sourceComponent: root.icon.endsWith(".svg") ? _wideSvg : _wideNerd
+        sourceComponent: String(root.icon).endsWith(".svg") ? _wideSvg : _wideNerd
       }
 
       SharedWidgets.NumericText {

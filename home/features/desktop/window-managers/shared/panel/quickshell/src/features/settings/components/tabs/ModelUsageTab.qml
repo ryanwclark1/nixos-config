@@ -47,7 +47,7 @@ Item {
 
         SettingsCard {
             title: "Display"
-            iconName: "󰕮"
+            iconName: "widgets.svg"
             description: "Choose which provider and metric to show in the bar widget."
 
             SettingsModeRow {

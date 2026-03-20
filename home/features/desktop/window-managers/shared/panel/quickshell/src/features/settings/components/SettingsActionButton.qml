@@ -48,7 +48,7 @@ Rectangle {
 
         Loader {
             visible: root.iconName !== ""
-            sourceComponent: root.iconName.endsWith(".svg") ? _abSvg : _abNerd
+            sourceComponent: String(root.iconName).endsWith(".svg") ? _abSvg : _abNerd
             Layout.alignment: root.label === "" ? Qt.AlignHCenter | Qt.AlignVCenter : Qt.AlignVCenter
         }
         Component { id: _abSvg; SvgIcon { source: root.iconName; color: root.emphasized ? Colors.text : Colors.textSecondary; size: root.compact ? Appearance.fontSizeMedium : Appearance.fontSizeLarge } }

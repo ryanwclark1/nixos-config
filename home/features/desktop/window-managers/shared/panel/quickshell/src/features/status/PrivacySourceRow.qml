@@ -26,7 +26,7 @@ Rectangle {
     spacing: Appearance.paddingSmall
 
     Loader {
-      sourceComponent: root.icon.endsWith(".svg") ? _pSvg : _pNerd
+      sourceComponent: String(root.icon).endsWith(".svg") ? _pSvg : _pNerd
     }
     Component { id: _pSvg; Shared.SvgIcon { source: root.icon; color: root.active ? Colors.warning : Colors.textDisabled; size: Appearance.fontSizeXL } }
     Component { id: _pNerd; Text { text: root.icon; color: root.active ? Colors.warning : Colors.textDisabled; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }

@@ -44,13 +44,13 @@ Flow {
                 spacing: Appearance.spacingXS
 
                 SharedWidgets.SvgIcon {
-                    visible: (modelData.icon || "").endsWith(".svg")
+                    visible: String(modelData.icon || "").endsWith(".svg")
                     source: visible ? (modelData.icon || "") : ""
                     color: selected ? Colors.primary : Colors.textSecondary
                     size: Appearance.fontSizeXS
                 }
                 Text {
-                    visible: !!(modelData.icon || "") && !(modelData.icon || "").endsWith(".svg")
+                    visible: !!(modelData.icon || "") && !String(modelData.icon || "").endsWith(".svg")
                     text: modelData.icon || ""
                     color: selected ? Colors.primary : Colors.textSecondary
                     font.family: Appearance.fontMono

@@ -286,7 +286,7 @@ Rectangle {
                                     anchors.centerIn: parent
                                     property string _ic: modelData.icon
                                     property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
-                                    sourceComponent: _ic.endsWith(".svg") ? _cSvg1 : _cNerd1
+                                    sourceComponent: String(_ic).endsWith(".svg") ? _cSvg1 : _cNerd1
                                 }
                                 Component { id: _cSvg1; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeLarge } }
                                 Component { id: _cNerd1; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
@@ -313,7 +313,7 @@ Rectangle {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     property string _ic: modelData.icon
                                     property color _co: Colors.withAlpha(Colors.textDisabled, 0.85)
-                                    sourceComponent: _ic.endsWith(".svg") ? _cSvg2 : _cNerd2
+                                    sourceComponent: String(_ic).endsWith(".svg") ? _cSvg2 : _cNerd2
                                 }
                                 Component { id: _cSvg2; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeSmall } }
                                 Component { id: _cNerd2; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }
@@ -397,7 +397,7 @@ Rectangle {
                                         Loader {
                                             property string _ic: modelData.icon
                                             property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
-                                            sourceComponent: _ic.endsWith(".svg") ? _cSvg3 : _cNerd3
+                                            sourceComponent: String(_ic).endsWith(".svg") ? _cSvg3 : _cNerd3
                                         }
                                         Component { id: _cSvg3; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeMedium } }
                                         Component { id: _cNerd3; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium } }
@@ -584,7 +584,7 @@ Rectangle {
                                         property string _ic: modelData.icon
                                         property color _co: expanded ? Colors.primary : Colors.textSecondary
                                         opacity: 1.0
-                                        sourceComponent: _ic.endsWith(".svg") ? _cSvg4 : _cNerd4
+                                        sourceComponent: String(_ic).endsWith(".svg") ? _cSvg4 : _cNerd4
                                     }
                                     Component { id: _cSvg4; SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
                                     Component { id: _cNerd4; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: 14 } }
@@ -667,7 +667,7 @@ Rectangle {
                                                 property string _ic: modelData.icon
                                                 property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
                                                 opacity: 1.0
-                                                sourceComponent: _ic.endsWith(".svg") ? _cSvg5 : _cNerd5
+                                                sourceComponent: String(_ic).endsWith(".svg") ? _cSvg5 : _cNerd5
                                             }
                                             Component { id: _cSvg5; SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
                                             Component { id: _cNerd5; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: 14 } }

@@ -12,13 +12,13 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
-        iconName: "󰕮"
+        iconName: "widgets.svg"
         tabId: root.tabId
         title: "Workspaces"
 
         SettingsCard {
             description: "Control which workspaces are shown and how they appear."
-            iconName: "󰕮"
+            iconName: "widgets.svg"
             title: "Workspace Display"
 
             SettingsToggleRow {

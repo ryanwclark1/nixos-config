@@ -12,7 +12,7 @@ ColumnLayout {
     spacing: Appearance.spacingS
 
     Loader {
-        sourceComponent: root.icon.endsWith(".svg") ? _svgIcon : _nerdIcon
+        sourceComponent: String(root.icon).endsWith(".svg") ? _svgIcon : _nerdIcon
         Layout.alignment: Qt.AlignHCenter
     }
     Component {

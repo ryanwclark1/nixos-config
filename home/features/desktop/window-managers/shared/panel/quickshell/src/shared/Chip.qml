@@ -26,7 +26,7 @@ Rectangle {
 
     Loader {
       visible: root.icon !== ""
-      sourceComponent: root.icon.endsWith(".svg") ? _chSvg : _chNerd
+      sourceComponent: String(root.icon).endsWith(".svg") ? _chSvg : _chNerd
     }
     Component { id: _chSvg; SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeXS } }
     Component { id: _chNerd; Text { text: root.icon; color: root.iconColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black } }
