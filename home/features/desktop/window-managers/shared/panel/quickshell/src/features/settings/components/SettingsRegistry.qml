@@ -473,7 +473,7 @@ QtObject {
             shortLabel: "Dock",
             description: "Configure dock behavior, layout, and pinned destinations.",
             pageStyle: "surface",
-            icon: "󰍜",
+            icon: "apps.svg",
             categoryId: "surfaces",
             order: 30,
             component: "DockTab.qml",

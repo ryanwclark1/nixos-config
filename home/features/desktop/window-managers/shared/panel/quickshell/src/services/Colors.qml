@@ -278,6 +278,13 @@ QtObject {
     readonly property int durationPanelClose: Math.round(260 * _animScale)
     readonly property int durationPanelOpen: Math.round(320 * _animScale)
     readonly property int durationLong: Math.round(800 * _animScale)
+    readonly property int durationRipple: Math.round(450 * _animScale)
+    readonly property int durationMediumSlow: Math.round(500 * _animScale)
+    readonly property int durationAmbientShort: Math.round(1000 * _animScale)
+    readonly property int durationAmbient: Math.round(2000 * _animScale)
+    readonly property int durationMarquee: Math.round(5000 * _animScale)
+    readonly property int durationWallpaper: Math.round(1500 * _animScale)
+    readonly property int durationToast: 3000
 
     // --- ANIMATION EASING PRESETS ---
     // Named bezier-curve presets for consistent motion across the shell.
@@ -314,6 +321,7 @@ QtObject {
     readonly property real letterSpacingExtraWide: 1.2
 
     // --- TYPOGRAPHY TOKENS ---
+    readonly property int fontSizeCaption: scaledMetric(10, _fontScale, 9)
     readonly property int fontSizeXXS: scaledMetric(8, _fontScale, 7)
     readonly property int fontSizeXS: scaledMetric(12, _fontScale, 10)
     readonly property int fontSizeSmall: scaledMetric(13, _fontScale, 11)
@@ -324,6 +332,9 @@ QtObject {
     readonly property int fontSizeXXL: scaledMetric(26, _fontScale, 18)
     readonly property int fontSizeHuge: scaledMetric(32, _fontScale, 20)
     readonly property int fontSizeDisplay: scaledMetric(28, _fontScale, 20)
+    readonly property int fontSizeGigantic: scaledMetric(48, _fontScale, 32)
+    readonly property int fontSizeColossal: scaledMetric(64, _fontScale, 40)
+    readonly property int fontSizeMassive: scaledMetric(96, _fontScale, 56)
 
     function withAlpha(c, a) {
         if (c === undefined || c === null || c === "")
