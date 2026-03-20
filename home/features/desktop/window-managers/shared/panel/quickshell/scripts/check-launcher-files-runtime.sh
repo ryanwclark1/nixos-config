@@ -8,6 +8,8 @@ launcher_qml="${config_root}/launcher/Launcher.qml"
 launcher_ipc_handler_qml="${config_root}/launcher/LauncherIpcHandler.qml"
 expected_config="$(realpath "${config_root}/shell.qml" 2>/dev/null || printf '%s' "${config_root}/shell.qml")"
 
+source "${script_dir}/graphics-session-env.sh"
+
 instance_id=""
 ci_mode=0
 repo_shell_mode=0
@@ -125,51 +127,7 @@ handle_termination() {
 }
 
 populate_repo_shell_env() {
-  local line key value
-  local has_wayland_session=0
-  local found_graphics_env=0
-  repo_shell_env=()
-  repo_shell_env+=("PATH=${script_dir}:${PATH}")
-  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
-  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE DISPLAY; do
-    value="${!key:-}"
-    if [[ -n "${value}" ]]; then
-      repo_shell_env+=("${key}=${value}")
-      case "${key}" in
-        HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
-          found_graphics_env=1
-          ;;&
-        WAYLAND_DISPLAY|NIRI_SOCKET)
-          has_wayland_session=1
-          ;;
-      esac
-    fi
-  done
-  if (( found_graphics_env == 0 )); then
-    while IFS= read -r line; do
-      [[ "${line}" == *=* ]] || continue
-      key="${line%%=*}"
-      value="${line#*=}"
-      case "${key}" in
-        HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE|DISPLAY)
-          if [[ -n "${value}" ]]; then
-            repo_shell_env+=("${key}=${value}")
-            case "${key}" in
-              HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
-                found_graphics_env=1
-                ;;&
-              WAYLAND_DISPLAY|NIRI_SOCKET)
-                has_wayland_session=1
-                ;;
-            esac
-          fi
-          ;;
-      esac
-    done < <(systemctl --user show-environment 2>/dev/null || true)
-  fi
-  if (( has_wayland_session == 1 )); then
-    repo_shell_env+=("QT_QPA_PLATFORM=wayland")
-  fi
+  build_repo_shell_env_array repo_shell_env "PATH=${script_dir}:${PATH}" "QS_DISABLE_NOTIFICATION_SERVER=1"
 }
 
 start_repo_shell() {
