@@ -24,7 +24,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Dock"
-        iconName: "󰍜"
+        iconName: "apps.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -116,7 +116,7 @@ Item {
 
             SettingsCard {
                 title: "Behavior"
-                iconName: "󰍜"
+                iconName: "apps.svg"
                 description: "Dock visibility and grouping behavior."
 
                 SettingsFieldGrid {

@@ -159,6 +159,27 @@ Scope {
 
         readonly property int _dockShowDelayMs: 100
         readonly property int _dockHideDelayMs: 500
+        readonly property string _screenName: (modelData && modelData.name) || ""
+
+        onDockHoveredChanged: {
+          if (autoHide)
+            AutoHideCoordinator.setHovered(_screenName, "dock", dockHovered || peekHovered);
+        }
+        onPeekHoveredChanged: {
+          if (autoHide)
+            AutoHideCoordinator.setHovered(_screenName, "dock", dockHovered || peekHovered);
+        }
+
+        Connections {
+          target: AutoHideCoordinator
+          function onAnyHoveredChanged() {
+            if (!screenDelegate.autoHide || !screenDelegate.hidden) return;
+            if (AutoHideCoordinator.anyHovered(screenDelegate._screenName)) {
+              screenDelegate.hidden = false;
+              hideTimer.stop();
+            }
+          }
+        }
 
         Timer {
           id: showTimer
@@ -170,7 +191,8 @@ Scope {
           id: hideTimer
           interval: screenDelegate._dockHideDelayMs
           onTriggered: {
-            if (!screenDelegate.dockHovered && !screenDelegate.peekHovered)
+            if (!screenDelegate.dockHovered && !screenDelegate.peekHovered
+                && !AutoHideCoordinator.anyHovered(screenDelegate._screenName))
               screenDelegate.hidden = true;
           }
         }

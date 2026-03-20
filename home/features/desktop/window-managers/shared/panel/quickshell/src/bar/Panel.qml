@@ -267,21 +267,39 @@ Item {
     }
 
     // ── Auto-hide logic ─────────────────────────
+    readonly property string _autoHideSourceId: "bar-" + ((barConfig && barConfig.id) || "default")
+    readonly property string _autoHideScreenName: (screenRef && screenRef.name) || ""
+
     Timer {
         id: autoHideTimer
         interval: root.autoHideDelay
         onTriggered: {
-            if (root.autoHide && !root._hovered)
+            if (root.autoHide && !root._hovered && !AutoHideCoordinator.anyHovered(root._autoHideScreenName))
                 root._autoHidden = true;
         }
     }
 
+    Connections {
+        target: AutoHideCoordinator
+        function onAnyHoveredChanged() {
+            if (!root.autoHide || !root._autoHidden) return;
+            if (AutoHideCoordinator.anyHovered(root._autoHideScreenName)) {
+                root._autoHidden = false;
+                autoHideTimer.stop();
+            }
+        }
+    }
+
     onAutoHideChanged: {
-        if (!autoHide)
+        if (!autoHide) {
             root._autoHidden = false;
+            AutoHideCoordinator.removeSource(_autoHideScreenName, _autoHideSourceId);
+        }
     }
 
     on_HoveredChanged: {
+        if (autoHide)
+            AutoHideCoordinator.setHovered(_autoHideScreenName, _autoHideSourceId, _hovered);
         if (_hovered) {
             root._autoHidden = false;
             autoHideTimer.stop();
@@ -689,12 +707,12 @@ Item {
                     NumberAnimation {
                         from: 1.0
                         to: 0.3
-                        duration: 500
+                        duration: Colors.durationMediumSlow
                     }
                     NumberAnimation {
                         from: 0.3
                         to: 1.0
-                        duration: 500
+                        duration: Colors.durationMediumSlow
                     }
                 }
             }
