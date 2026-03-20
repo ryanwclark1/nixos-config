@@ -299,6 +299,9 @@ QtObject {
     property bool wallpaperDynamicEnabled: false
     property string wallpaperDynamicManifest: ""         // path to manifest.json
 
+    // --- COLOR BACKEND ---
+    property string colorBackend: "pywal"  // pywal | matugen | dynamic
+
     // --- THEME ---
     property string themeName: ""
     property bool themeAutoScheduleEnabled: false

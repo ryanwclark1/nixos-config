@@ -13,6 +13,7 @@ var maps = [
     ["spacingScale", "spacingScale", _num1],
     ["uiDensityScale", "uiDensityScale", _num1],
     ["animationSpeedScale", "animationSpeedScale", _num1],
+    ["colorBackend", "colorBackend", _strDef],
     ["autoEcoMode", "autoEcoMode"],
     ["personalityGifEnabled", "personalityGifEnabled"],
     ["personalityGifPath", "personalityGifPath", _strDef],

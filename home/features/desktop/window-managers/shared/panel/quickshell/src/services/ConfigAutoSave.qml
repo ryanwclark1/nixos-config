@@ -464,6 +464,9 @@ QtObject {
         function onUseDynamicThemingChanged() {
             root.config.scheduleSave();
         }
+        function onColorBackendChanged() {
+            root.config.scheduleSave();
+        }
         function onAutoEcoModeChanged() {
             root.config.scheduleSave();
         }

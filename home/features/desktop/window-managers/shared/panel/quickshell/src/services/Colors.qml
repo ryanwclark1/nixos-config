@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "color/MaterialColorAdapter.js" as MatugenAdapter
 
 QtObject {
     id: colors
@@ -134,12 +135,8 @@ QtObject {
 
     property Connections _configConn: Connections {
         target: Config
-        function onUseDynamicThemingChanged() {
-            if (Config.useDynamicTheming)
-                colors.applyDynamicPalette();
-            else
-                colors.reloadColors();
-        }
+        function onUseDynamicThemingChanged() { colors._applyColorBackend(); }
+        function onColorBackendChanged() { colors._applyColorBackend(); }
     }
 
     property Timer _transitionTimer: Timer {
@@ -150,16 +147,61 @@ QtObject {
     property Connections _wallpaperConn: Connections {
         target: WallpaperService
         function onWallpapersChanged() {
-            if (Config.useDynamicTheming)
-                colors.applyDynamicPalette();
+            if (Config.useDynamicTheming || Config.colorBackend === "matugen")
+                colors._applyColorBackend();
         }
     }
 
+    property FileView _matugenColorsFile: FileView {
+        path: Quickshell.env("HOME") + "/.cache/matugen/colors.json"
+        blockLoading: true
+        printErrors: false
+        watchChanges: true
+        onTextChanged: { if (Config.colorBackend === "matugen") colors._loadMatugenColors(); }
+        onLoaded: { if (Config.colorBackend === "matugen") colors._loadMatugenColors(); }
+    }
+
+    property Process _matugenProc: Process {
+        running: false
+        stdout: SplitParser { onRead: line => {} }
+        onExited: (code, status) => {
+            if (code === 0) colors._matugenColorsFile.reload();
+            else Logger.w("Colors", "matugen exited with code", code);
+        }
+    }
+
+    function _generateMatugenColors() {
+        var keys = Object.keys(WallpaperService.wallpapers);
+        var wallpaper = WallpaperService.wallpapers["__all__"]
+            || (keys.length > 0 ? WallpaperService.wallpapers[keys[0]] : "");
+        if (!wallpaper) return;
+        var outPath = (Quickshell.env("HOME") || "/home") + "/.cache/matugen/colors.json";
+        _matugenProc.command = ["sh", "-c",
+            'mkdir -p "$(dirname "$2")" && matugen image "$1" --json hex --dry-run > "$2"',
+            "sh", wallpaper, outPath];
+        _matugenProc.running = true;
+    }
+
+    function _loadMatugenColors() {
+        var raw = _matugenColorsFile.text();
+        if (!raw) return;
+        var scheme = MatugenAdapter.parseMatugenOutput(raw);
+        if (!scheme) { Logger.w("Colors", "Failed to parse matugen colors"); return; }
+        isTransitioning = true;
+        _transitionTimer.restart();
+        MatugenAdapter.applyScheme(scheme, colors);
+    }
+
+    function _applyColorBackend() {
+        if (_themeActive) return;
+        var backend = Config.colorBackend || "pywal";
+        if (backend === "matugen") _generateMatugenColors();
+        else if (backend === "dynamic" || Config.useDynamicTheming) applyDynamicPalette();
+        else reloadColors();
+    }
+
     Component.onCompleted: {
-        if (Config.useDynamicTheming)
-            colors.applyDynamicPalette();
-        else
-            colors.reloadColors();
+        colors._applyColorBackend();
         Qt.callLater(function() { colors.skipTransition = false; });
     }
 
@@ -267,68 +309,6 @@ QtObject {
     }
     function clampScale(scale, min) {
         return Math.max(min, Math.min(2.5, scale));
-    }
-
-    // ── Container variant definitions ─────────────
-    // Returns a fresh object with current color values for the given variant.
-    // Used by ThemedContainer to auto-apply visual treatment.
-    function containerVariant(name) {
-        switch (name) {
-        case "popup":
-            return {
-                color: popupSurface,
-                borderColor: border,
-                borderWidth: 1,
-                radius: radiusLarge,
-                gradient: true,
-                highlightOpacity: 0.15
-            };
-        case "card":
-            return {
-                color: cardSurface,
-                borderColor: border,
-                borderWidth: 1,
-                radius: radiusMedium,
-                gradient: false,
-                highlightOpacity: 0.1
-            };
-        case "elevated":
-            return {
-                color: chipSurface,
-                borderColor: border,
-                borderWidth: 1,
-                radius: radiusCard,
-                gradient: false,
-                highlightOpacity: 0.08
-            };
-        case "surface":
-            return {
-                color: Qt.alpha(surface, opacitySurface),
-                borderColor: "transparent",
-                borderWidth: 0,
-                radius: radiusSmall,
-                gradient: true,
-                highlightOpacity: 0
-            };
-        case "pill":
-            return {
-                color: Qt.alpha(surface, opacityOverlay),
-                borderColor: border,
-                borderWidth: 1,
-                radius: radiusPill,
-                gradient: true,
-                highlightOpacity: 0.08
-            };
-        default:
-            return {
-                color: cardSurface,
-                borderColor: border,
-                borderWidth: 1,
-                radius: radiusMedium,
-                gradient: false,
-                highlightOpacity: 0.1
-            };
-        }
     }
 
     function weatherIcon(condition) {
