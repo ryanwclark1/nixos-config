@@ -112,26 +112,18 @@ Rectangle {
             visible: !root.compactMode
             Layout.fillWidth: true
             radius: Colors.radiusLarge
-            color: Colors.withAlpha(Colors.surface, 0.44)
-            border.color: Colors.withAlpha(Colors.primary, 0.16)
+            color: Colors.withAlpha(Colors.surface, 0.24)
+            border.color: Colors.withAlpha(Colors.text, 0.08)
             border.width: 1
             implicitHeight: navHeaderColumn.implicitHeight + Colors.spacingM * 2
 
-            SharedWidgets.InnerHighlight { highlightOpacity: 0.1 }
+            SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
 
             ColumnLayout {
                 id: navHeaderColumn
                 anchors.fill: parent
                 anchors.margins: Colors.spacingM
-                spacing: Colors.spacingXS
-
-                Text {
-                    text: "SETTINGS HUB"
-                    color: Colors.primary
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingExtraWide
-                }
+                spacing: Colors.spacingXXS
 
                 Text {
                     Layout.fillWidth: true
@@ -143,13 +135,12 @@ Rectangle {
                 }
 
                 Text {
-                    Layout.fillWidth: true
-                    text: root.currentCategoryMeta && root.currentCategoryMeta.description
-                        ? String(root.currentCategoryMeta.description)
-                        : "Search pages or drill into categories from the rail."
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
-                    wrapMode: Text.WordWrap
+                    text: "QUICKSHELL HUB"
+                    color: Colors.primary
+                    font.pixelSize: 10
+                    font.weight: Font.Bold
+                    font.letterSpacing: 1.2
+                    opacity: 0.8
                 }
             }
         }
@@ -158,87 +149,69 @@ Rectangle {
             visible: !root.compactMode
             Layout.fillWidth: true
             implicitHeight: searchBarColumn.implicitHeight + Colors.spacingS * 2
-            radius: Colors.radiusLarge
-            color: Colors.withAlpha(Colors.surface, 0.36)
-            border.color: searchInput.activeFocus ? Colors.primary : Colors.withAlpha(Colors.text, 0.16)
+            radius: Colors.radiusMedium
+            color: Colors.withAlpha(Colors.surface, 0.16)
+            border.color: searchInput.activeFocus ? Colors.primary : Colors.withAlpha(Colors.text, 0.08)
             border.width: 1
 
-            ColumnLayout {
+            RowLayout {
                 id: searchBarColumn
                 anchors.fill: parent
                 anchors.leftMargin: Colors.spacingM
                 anchors.rightMargin: Colors.spacingM
-                anchors.topMargin: Colors.spacingS
-                anchors.bottomMargin: Colors.spacingS
-                spacing: Colors.spacingXS
+                spacing: Colors.spacingS
 
                 Text {
-                    text: "SEARCH"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingExtraWide
+                    text: "󰍉"
+                    color: searchInput.activeFocus ? Colors.primary : Colors.textDisabled
+                    font.family: Colors.fontMono
+                    font.pixelSize: Colors.fontSizeMedium
                 }
 
-                RowLayout {
+                TextInput {
+                    id: searchInput
                     Layout.fillWidth: true
-                    spacing: Colors.spacingS
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeSmall
+                    clip: true
+                    onVisibleChanged: {
+                        if (!visible && activeFocus)
+                            focus = false;
+                    }
+                    onTextChanged: {
+                        if (text !== root.searchQuery)
+                            root.searchQueryEdited(text);
+                    }
 
                     Text {
-                        text: "󰍉"
+                        text: "Search..."
                         color: Colors.textDisabled
+                        font.pixelSize: parent.font.pixelSize
+                        visible: !parent.text && !parent.activeFocus
+                    }
+                }
+
+                Rectangle {
+                    visible: searchInput.text.length > 0
+                    implicitWidth: 18
+                    implicitHeight: 18
+                    radius: Colors.radiusPill
+                    color: Colors.withAlpha(Colors.surface, clearSearchMouse.containsMouse ? 0.6 : 0.3)
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "󰅖"
+                        color: Colors.textSecondary
                         font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeMedium
+                        font.pixelSize: 10
                     }
 
-                    TextInput {
-                        id: searchInput
-                        Layout.fillWidth: true
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
-                        clip: true
-                        wrapMode: TextInput.Wrap
-                        onVisibleChanged: {
-                            if (!visible && activeFocus)
-                                focus = false;
-                        }
-                        onTextChanged: {
-                            if (text !== root.searchQuery)
-                                root.searchQueryEdited(text);
-                        }
-
-                        Text {
-                            text: "Search pages or settings"
-                            color: Colors.textDisabled
-                            font.pixelSize: parent.font.pixelSize
-                            visible: !parent.text && !parent.activeFocus
-                        }
-                    }
-
-                    Rectangle {
-                        visible: searchInput.text.length > 0
-                        implicitWidth: 22
-                        implicitHeight: 22
-                        radius: Colors.radiusPill
-                        color: Colors.withAlpha(Colors.surface, clearSearchMouse.containsMouse ? 0.65 : 0.45)
-                        border.color: Colors.border
-                        border.width: 1
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: "󰅖"
-                            color: Colors.textDisabled
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeXS
-                        }
-
-                        MouseArea {
-                            id: clearSearchMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.searchQueryEdited("")
-                        }
+                    MouseArea {
+                        id: clearSearchMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.searchQueryEdited("")
                     }
                 }
             }
@@ -570,13 +543,13 @@ Rectangle {
                             readonly property bool expanded: !!root.expandedCategories[modelData.id]
 
                             Layout.fillWidth: true
-                            spacing: Colors.spacingXS
+                            spacing: 2
 
                             Rectangle {
                                 Layout.fillWidth: true
-                                radius: Colors.radiusLarge
-                                color: expanded ? Colors.withAlpha(Colors.primary, 0.08) : Colors.withAlpha(Colors.surface, 0.22)
-                                border.color: expanded ? Colors.withAlpha(Colors.primary, 0.18) : Colors.withAlpha(Colors.text, 0.08)
+                                radius: Colors.radiusMedium
+                                color: expanded ? Colors.withAlpha(Colors.surface, 0.12) : "transparent"
+                                border.color: expanded ? Colors.withAlpha(Colors.text, 0.06) : "transparent"
                                 border.width: 1
                                 implicitHeight: categoryColumn.implicitHeight + Colors.spacingS * 2
 
@@ -586,52 +559,39 @@ Rectangle {
                                     hovered: categoryMouse.containsMouse
                                     pressed: categoryMouse.pressed
                                     stateColor: Colors.primary
+                                    opacity: 0.4
                                 }
 
-                                ColumnLayout {
+                                RowLayout {
                                     id: categoryColumn
                                     anchors.fill: parent
                                     anchors.leftMargin: Colors.spacingM
                                     anchors.rightMargin: Colors.spacingM
-                                    anchors.topMargin: Colors.spacingS
-                                    anchors.bottomMargin: Colors.spacingS
-                                    spacing: Colors.spacingXXS
+                                    spacing: Colors.spacingS
 
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        spacing: Colors.spacingS
-
-                                        Text {
-                                            text: expanded ? "󰅀" : "󰅂"
-                                            color: Colors.textDisabled
-                                            font.family: Colors.fontMono
-                                            font.pixelSize: Colors.fontSizeSmall
-                                        }
-
-                                        Text {
-                                            text: modelData.icon
-                                            color: expanded ? Colors.primary : Colors.textSecondary
-                                            font.family: Colors.fontMono
-                                            font.pixelSize: Colors.fontSizeMedium
-                                        }
-
-                                        Text {
-                                            text: modelData.label
-                                            color: Colors.text
-                                            font.pixelSize: Colors.fontSizeSmall
-                                            font.weight: Font.Black
-                                            Layout.fillWidth: true
-                                            wrapMode: Text.WordWrap
-                                        }
+                                    Text {
+                                        text: modelData.icon
+                                        color: expanded ? Colors.primary : Colors.textSecondary
+                                        font.family: Colors.fontMono
+                                        font.pixelSize: Colors.fontSizeMedium
                                     }
 
                                     Text {
+                                        text: modelData.label
+                                        color: Colors.text
+                                        font.pixelSize: 11
+                                        font.weight: Font.Black
+                                        font.letterSpacing: 0.5
                                         Layout.fillWidth: true
-                                        text: root.categoryDescription(modelData)
-                                        color: Colors.textDisabled
-                                        font.pixelSize: Colors.fontSizeXS
                                         wrapMode: Text.WordWrap
-                                        visible: !!text
+                                    }
+
+                                    Text {
+                                        text: expanded ? "󰅀" : "󰅂"
+                                        color: Colors.textDisabled
+                                        font.family: Colors.fontMono
+                                        font.pixelSize: 10
+                                        opacity: 0.6
                                     }
                                 }
 
@@ -647,89 +607,77 @@ Rectangle {
                                 }
                             }
 
-                            Rectangle {
+                            ColumnLayout {
                                 Layout.fillWidth: true
                                 visible: expanded
-                                radius: Colors.radiusLarge
-                                color: Colors.withAlpha(Colors.surface, 0.24)
-                                border.color: Colors.withAlpha(Colors.text, 0.08)
-                                border.width: 1
-                                implicitHeight: categoryTabsColumn.implicitHeight + Colors.spacingS * 2
+                                spacing: 2
+                                Layout.leftMargin: 4
 
-                                ColumnLayout {
-                                    id: categoryTabsColumn
-                                    anchors.fill: parent
-                                    anchors.leftMargin: Colors.spacingS
-                                    anchors.rightMargin: Colors.spacingS
-                                    anchors.topMargin: Colors.spacingS
-                                    anchors.bottomMargin: Colors.spacingS
-                                    spacing: Colors.spacingXXS
+                                Repeater {
+                                    model: expanded ? categoryTabs : []
 
-                                    Repeater {
-                                        model: expanded ? categoryTabs : []
+                                    delegate: Rectangle {
+                                        required property var modelData
 
-                                        delegate: Rectangle {
-                                            required property var modelData
+                                        Layout.fillWidth: true
+                                        implicitHeight: 32
+                                        radius: Colors.radiusSmall
+                                        color: root.currentTabId === modelData.id ? Colors.withAlpha(Colors.primary, 0.12) : (tabMouse.containsMouse ? Colors.withAlpha(Colors.surface, 0.12) : "transparent")
+                                        border.color: root.currentTabId === modelData.id ? Colors.withAlpha(Colors.primary, 0.24) : "transparent"
+                                        border.width: 1
 
-                                            Layout.fillWidth: true
-                                            implicitHeight: tabRow.implicitHeight + Colors.spacingS * 2
-                                            radius: Colors.radiusMedium
-                                            color: root.currentTabId === modelData.id ? Colors.primarySubtle : Colors.withAlpha(Colors.surface, tabMouse.containsMouse ? 0.45 : 0.18)
-                                            border.color: root.currentTabId === modelData.id ? Colors.primaryRing : "transparent"
-                                            border.width: 1
+                                        Rectangle {
+                                            visible: root.currentTabId === modelData.id
+                                            anchors.left: parent.left
+                                            anchors.top: parent.top
+                                            anchors.bottom: parent.bottom
+                                            anchors.margins: 6
+                                            width: 3
+                                            radius: 1.5
+                                            color: Colors.primary
+                                        }
 
-                                            Rectangle {
-                                                anchors.left: parent.left
-                                                anchors.top: parent.top
-                                                anchors.bottom: parent.bottom
-                                                width: 3
-                                                color: root.currentTabId === modelData.id ? Colors.primary : "transparent"
+                                        SharedWidgets.StateLayer {
+                                            id: tabState
+                                            anchors.fill: parent
+                                            hovered: tabMouse.containsMouse
+                                            pressed: tabMouse.pressed
+                                            visible: root.currentTabId !== modelData.id
+                                            stateColor: Colors.primary
+                                            opacity: 0.3
+                                        }
+
+                                        RowLayout {
+                                            anchors.fill: parent
+                                            anchors.leftMargin: Colors.spacingL
+                                            anchors.rightMargin: Colors.spacingM
+                                            spacing: Colors.spacingM
+
+                                            Text {
+                                                text: modelData.icon
+                                                color: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
+                                                font.family: Colors.fontMono
+                                                font.pixelSize: Colors.fontSizeMedium
+                                                opacity: root.currentTabId === modelData.id ? 1.0 : 0.7
                                             }
 
-                                            SharedWidgets.StateLayer {
-                                                id: tabState
-                                                anchors.fill: parent
-                                                hovered: tabMouse.containsMouse
-                                                pressed: tabMouse.pressed
-                                                visible: root.currentTabId !== modelData.id
-                                                stateColor: Colors.primary
+                                            Text {
+                                                text: modelData.label
+                                                color: root.currentTabId === modelData.id ? Colors.text : Colors.textSecondary
+                                                font.pixelSize: Colors.fontSizeSmall
+                                                font.weight: root.currentTabId === modelData.id ? Font.Bold : Font.Normal
+                                                Layout.fillWidth: true
                                             }
+                                        }
 
-                                            RowLayout {
-                                                id: tabRow
-                                                anchors.fill: parent
-                                                anchors.leftMargin: Colors.spacingL
-                                                anchors.rightMargin: Colors.spacingM
-                                                anchors.topMargin: Colors.spacingS
-                                                anchors.bottomMargin: Colors.spacingS
-                                                spacing: Colors.spacingM
-
-                                                Text {
-                                                    text: modelData.icon
-                                                    color: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
-                                                    font.family: Colors.fontMono
-                                                    font.pixelSize: Colors.fontSizeMedium
-                                                }
-
-                                                Text {
-                                                    text: modelData.label
-                                                    color: root.currentTabId === modelData.id ? Colors.text : Colors.textSecondary
-                                                    font.pixelSize: Colors.fontSizeSmall
-                                                    font.weight: root.currentTabId === modelData.id ? Font.Bold : Font.DemiBold
-                                                    Layout.fillWidth: true
-                                                    wrapMode: Text.WordWrap
-                                                }
-                                            }
-
-                                            MouseArea {
-                                                id: tabMouse
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: (mouse) => {
-                                                    tabState.burst(mouse.x, mouse.y);
-                                                    root.selectTab(modelData.id);
-                                                }
+                                        MouseArea {
+                                            id: tabMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: (mouse) => {
+                                                tabState.burst(mouse.x, mouse.y);
+                                                root.selectTab(modelData.id);
                                             }
                                         }
                                     }
@@ -746,37 +694,24 @@ Rectangle {
 
         Rectangle {
             Layout.fillWidth: true
-            radius: root.compactMode ? Colors.radiusLarge : Colors.radiusXL
-            color: Colors.withAlpha(Colors.surface, 0.44)
-            border.color: Colors.withAlpha(Colors.primary, 0.18)
+            radius: root.compactMode ? Colors.radiusLarge : Colors.radiusLarge
+            color: Colors.withAlpha(Colors.surface, 0.16)
+            border.color: Colors.withAlpha(Colors.text, 0.06)
             border.width: 1
             implicitHeight: footerColumn.implicitHeight + Colors.spacingS * 2
 
             ColumnLayout {
                 id: footerColumn
                 anchors.fill: parent
-                anchors.leftMargin: Colors.spacingS
-                anchors.rightMargin: Colors.spacingS
-                anchors.topMargin: Colors.spacingS
-                anchors.bottomMargin: Colors.spacingS
+                anchors.margins: Colors.spacingS
                 spacing: Colors.spacingS
-
-                Text {
-                    visible: !root.compactMode
-                    text: "SESSION ACTION"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXXS
-                    font.weight: Font.Black
-                    font.letterSpacing: Colors.letterSpacingExtraWide
-                    Layout.leftMargin: Colors.spacingXS
-                }
 
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: saveButtonRow.implicitHeight + Colors.spacingS * 2
-                    radius: root.compactMode ? Colors.radiusLarge : Colors.radiusPill
+                    implicitHeight: 36
+                    radius: root.compactMode ? Colors.radiusMedium : Colors.radiusMedium
                     color: Colors.primaryAccent
-                    border.color: Colors.primary
+                    border.color: Colors.withAlpha(Colors.primary, 0.4)
                     border.width: 1
 
                     SharedWidgets.StateLayer {
@@ -784,6 +719,7 @@ Rectangle {
                         hovered: saveMouse.containsMouse
                         pressed: saveMouse.pressed
                         stateColor: Colors.primary
+                        opacity: 0.2
                     }
 
                     RowLayout {
@@ -802,7 +738,7 @@ Rectangle {
                             visible: !root.compactMode
                             text: "Save & Close"
                             color: Colors.text
-                            font.pixelSize: Colors.fontSizeSmall
+                            font.pixelSize: 11
                             font.weight: Font.Bold
                         }
                     }

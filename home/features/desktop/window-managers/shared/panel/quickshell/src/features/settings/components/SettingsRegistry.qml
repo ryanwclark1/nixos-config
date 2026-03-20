@@ -753,6 +753,14 @@ QtObject {
         return out;
     }
 
+    function findDeclaredTab(tabId) {
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].id === tabId)
+                return tabs[i];
+        }
+        return null;
+    }
+
     function sortedCategories() {
         return categories.slice().sort(function(a, b) {
             return (a.order || 0) - (b.order || 0);
@@ -862,7 +870,9 @@ QtObject {
     }
 
     function searchSettings(query) {
-        return SearchIndex.searchSettings(query);
+        return SearchIndex.searchSettings(query).filter(function(result) {
+            return findTab(result.tabId) !== null;
+        });
     }
 
     function validateRegistry() {
@@ -903,7 +913,7 @@ QtObject {
         if (!findTab(defaultTabId))
             Logger.w("SettingsRegistry", "defaultTabId '" + defaultTabId + "' not found");
 
-        SearchIndex.validateIndex(findTab);
+        SearchIndex.validateIndex(findDeclaredTab);
     }
 
     Component.onCompleted: validateRegistry()

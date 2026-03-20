@@ -111,7 +111,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Default"
-                icon: "󰑐"
+                icon: "arrow-clockwise.svg"
                 selected: root.currentValue === ""
                 onClicked: root.colorSelected("")
             }
