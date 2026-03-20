@@ -54,6 +54,8 @@ Item {
                         visible: Config.wallpaperUseShellRenderer
                         transitionType: Config.wallpaperTransitionType
                         transitionDuration: Config.wallpaperTransitionDuration
+                        showVideo: Config.wallpaperVideoEnabled && Config.wallpaperVideoPath !== ""
+                        videoSource: showVideo ? "file://" + Config.wallpaperVideoPath : ""
 
                         // Connect to WallpaperService signals
                         Connections {

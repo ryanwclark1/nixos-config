@@ -60,7 +60,7 @@ ColumnLayout {
                     RowLayout {
                         spacing: root.compactMode ? Colors.paddingSmall : Colors.paddingMedium
                         SharedWidgets.IconButton {
-                            icon: "󰒮"
+                            icon: "previous.svg"
                             size: root.compactMode ? 26 : 30
                             iconSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             iconColor: Colors.text
@@ -76,7 +76,7 @@ ColumnLayout {
                             onClicked: (modelData._playerRef || modelData).playPause()
                         }
                         SharedWidgets.IconButton {
-                            icon: "󰒭"
+                            icon: "next.svg"
                             size: root.compactMode ? 26 : 30
                             iconSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
                             iconColor: Colors.text

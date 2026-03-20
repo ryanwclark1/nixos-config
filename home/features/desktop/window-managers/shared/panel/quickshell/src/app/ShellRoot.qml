@@ -21,6 +21,7 @@ import "../features/power"
 import "../features/region-selector"
 import "../features/system/surfaces"
 import "../features/settings"
+import "../features/wallhaven"
 import "../features/workspace"
 import "../services"
 import "../shell"
@@ -71,6 +72,7 @@ Scope {
     readonly property bool cavaPopupVisible: root.isSurfaceOpen("cavaPopup")
     readonly property bool aiChatVisible: root.isSurfaceOpen("aiChat")
     readonly property bool commandPaletteVisible: root.isSurfaceOpen("commandPalette")
+    readonly property bool wallhavenBrowserVisible: root.isSurfaceOpen("wallhavenBrowser")
 
     function currentSurfaceScreen() {
         return surfaceService.currentSurfaceScreen();
@@ -417,6 +419,15 @@ Scope {
         onIsOpenChanged: fileFlow.handleFileBrowserOpenChanged(isOpen)
         onFileSelected: filePath => fileFlow.handleFileSelected(filePath)
         onFolderSelected: folderPath => fileFlow.handleFolderSelected(folderPath)
+    }
+
+    LazyLoader {
+        active: root.wallhavenBrowserVisible
+        WallhavenBrowser {
+            id: wallhavenBrowser
+            isOpen: root.wallhavenBrowserVisible
+            onCloseRequested: root.closeSurface("wallhavenBrowser")
+        }
     }
 
     Cheatsheet {
