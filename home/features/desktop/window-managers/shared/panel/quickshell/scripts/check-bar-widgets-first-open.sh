@@ -293,6 +293,7 @@ capture_until_visible() {
       --id "${instance_id}" \
       --tab bar-widgets \
       --scroll-y "${capture_scroll_y}" \
+      --workspace current \
       --output "${output_path}"
     mean="$(image_mean "${output_path}")"
     if awk "BEGIN { exit !(${mean} > 0.02) }"; then
