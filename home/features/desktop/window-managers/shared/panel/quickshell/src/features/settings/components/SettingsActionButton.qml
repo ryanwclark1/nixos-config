@@ -9,6 +9,7 @@ Rectangle {
 
     property string label: ""
     property string iconName: ""
+    property string description: ""
     property bool emphasized: false
     property bool compact: false
     property bool enabled: true

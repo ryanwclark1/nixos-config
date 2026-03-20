@@ -65,6 +65,8 @@ Item {
                 label: "Auto Transparency"
                 icon: "color-palette.svg"
                 configKey: "autoTransparency"
+                enabledText: "Panels, popups, and cards adapt to wallpaper"
+                disabledText: "Surfaces use manual glass opacity values"
             }
         }
 
