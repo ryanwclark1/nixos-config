@@ -255,11 +255,6 @@ let
     ${builtins.readFile ./scripts/capture-panel-matrix.sh}
   '';
 
-  qsCliScript = pkgs.writeShellScriptBin "qs" ''
-    PATH="${pkgs.quickshell}/bin:${qsRofiScript}/bin:${runScript}/bin:${wallpaperScript}/bin:${keybindsScript}/bin:${aiScript}/bin:${aiStreamScript}/bin:${modelUsageScript}/bin:${bangSyncScript}/bin:${bangSearchScript}/bin:${bookmarksScript}/bin:${screenshotScript}/bin:${ttsSpeakScript}/bin:${ocrScript}/bin:${networkScript}/bin:${healthCheckScript}/bin:${pluginDoctorScript}/bin:$PATH"
-    ${builtins.readFile ./scripts/qs-cli.sh}
-  '';
-
   qsCompletionZsh = pkgs.runCommand "qs-zsh-completion" {} ''
     mkdir -p $out/share/zsh/site-functions
     cp ${./scripts/qs-completion.zsh} $out/share/zsh/site-functions/_qs
@@ -418,7 +413,11 @@ EOF
     home.file.".local/bin/qs" = {
       force = true;
       executable = true;
-      source = "${qsCliScript}/bin/qs";
+      text = ''
+        #!/usr/bin/env bash
+        PATH="${pkgs.quickshell}/bin:${qsRofiScript}/bin:${runScript}/bin:${wallpaperScript}/bin:${keybindsScript}/bin:${aiScript}/bin:${aiStreamScript}/bin:${modelUsageScript}/bin:${bangSyncScript}/bin:${bangSearchScript}/bin:${bookmarksScript}/bin:${screenshotScript}/bin:${ttsSpeakScript}/bin:${ocrScript}/bin:${networkScript}/bin:${healthCheckScript}/bin:${pluginDoctorScript}/bin:$PATH"
+        ${builtins.readFile ./scripts/qs-cli.sh}
+      '';
     };
 
     home.file.".local/bin/qs-screenshot" = {
