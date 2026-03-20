@@ -42,7 +42,13 @@ Run these before merging compositor-related changes:
 
 ```bash
 make quickshell-checks
+make quickshell-test
 ```
+
+`make quickshell-checks` uses the VM-backed exhaustive path across both
+Hyprland and Niri. `make quickshell-test` runs the focused Vitest suite in both
+VMs as well. Use `make quickshell-checks-host` or `make quickshell-test-host`
+only when you intentionally want the host path.
 
 Equivalent direct scripts:
 

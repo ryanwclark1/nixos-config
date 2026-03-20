@@ -255,6 +255,16 @@ let
     ${builtins.readFile ./scripts/capture-panel-matrix.sh}
   '';
 
+  qsCliScript = pkgs.writeShellScriptBin "qs" ''
+    PATH="${pkgs.quickshell}/bin:${qsRofiScript}/bin:${runScript}/bin:${wallpaperScript}/bin:${keybindsScript}/bin:${aiScript}/bin:${aiStreamScript}/bin:${modelUsageScript}/bin:${bangSyncScript}/bin:${bangSearchScript}/bin:${bookmarksScript}/bin:${screenshotScript}/bin:${ttsSpeakScript}/bin:${ocrScript}/bin:${networkScript}/bin:${healthCheckScript}/bin:${pluginDoctorScript}/bin:$PATH"
+    ${builtins.readFile ./scripts/qs-cli.sh}
+  '';
+
+  qsCompletionZsh = pkgs.runCommand "qs-zsh-completion" {} ''
+    mkdir -p $out/share/zsh/site-functions
+    cp ${./scripts/qs-completion.zsh} $out/share/zsh/site-functions/_qs
+  '';
+
   # Build-time theme manifest: converts 177 base24 YAML themes into a single JSON file
   themeManifest = pkgs.runCommand "quickshell-theme-manifest" {
     nativeBuildInputs = [ pkgs.yq-go pkgs.jq ];
@@ -287,6 +297,10 @@ let
       python3 # Needed for various scripts (Niri binds parser, etc.)
       ydotool # On-screen keyboard input injection
       matugen # Material You color generation (optional backend)
+
+      # Unified CLI dispatcher
+      qsCliScript
+      qsCompletionZsh
 
       # Quickshell utility scripts
       qsRofiScript

@@ -233,7 +233,7 @@ update-package-status:
 	@./scripts/update-packages.sh status
 
 
-.PHONY: quickshell-guard quickshell-fixtures quickshell-smoke quickshell-checks quickshell-checks-host
+.PHONY: quickshell-guard quickshell-fixtures quickshell-smoke quickshell-checks quickshell-checks-host quickshell-test quickshell-test-host quickshell-test-niri quickshell-test-hyprland
 
 quickshell-guard:
 	bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/check-compositor-guards.sh
@@ -252,7 +252,16 @@ quickshell-checks-host:
 	PLUGIN_LOCAL_QUICKSHELL_USE_VM=0 bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/quickshell-verify.sh
 
 quickshell-test:
+	bash ./scripts/vm/run-quickshell-test-vm.sh --vm both
+
+quickshell-test-host:
 	cd ./home/features/desktop/window-managers/shared/panel/quickshell && npx vitest run --config tests/vitest.config.js
+
+quickshell-test-niri:
+	bash ./scripts/vm/run-quickshell-test-vm.sh --vm niri
+
+quickshell-test-hyprland:
+	bash ./scripts/vm/run-quickshell-test-vm.sh --vm hyprland
 
 niri-vm-build:
 	bash ./scripts/vm/launch-niri-test-vm.sh --build-only
