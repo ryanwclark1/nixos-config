@@ -54,10 +54,12 @@ ThemedContainer {
         popupY = my
         focusedIndex = -1
         showMenu = true
+        FocusGrabManager.requestGrab("contextMenu", function() { root.close(); });
         forceActiveFocus()
     }
 
     function close() {
+        FocusGrabManager.releaseGrab("contextMenu");
         showMenu = false
         focusedIndex = -1
     }

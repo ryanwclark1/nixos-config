@@ -103,18 +103,29 @@ QtObject {
     readonly property real autoGlassOpacity: {
         var x = _wallpaperVibrancy;
         var y = 0.5768 * x * x - 0.759 * x + 0.2896;
-        return Math.max(0, Math.min(0.22, y));
+        return Math.max(0, Math.min(0.40, y));
     }
 
+    // Effective opacity tiers — auto-transparency adjusts all tiers proportionally
+    property real _effectiveOpacityBase: autoTransparencyEnabled
+        ? Math.min(opacityBase, 1.0 - autoGlassOpacity) : opacityBase
+    property real _effectiveOpacitySurface: autoTransparencyEnabled
+        ? Math.min(opacitySurface, _effectiveOpacityBase + 0.06) : opacitySurface
+    property real _effectiveOpacityOverlay: autoTransparencyEnabled
+        ? Math.min(opacityOverlay, _effectiveOpacitySurface + 0.04) : opacityOverlay
+    Behavior on _effectiveOpacityBase { enabled: !colors.skipTransition; NumberAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on _effectiveOpacitySurface { enabled: !colors.skipTransition; NumberAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+    Behavior on _effectiveOpacityOverlay { enabled: !colors.skipTransition; NumberAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
+
     // --- GLASSMORPHISM ---
-    readonly property real bgOpacity: autoTransparencyEnabled ? (1.0 - autoGlassOpacity) : opacityBase
+    readonly property real bgOpacity: _effectiveOpacityBase
     readonly property color bgGlass: withAlpha(background, bgOpacity)
     readonly property color bgWidget: _isLight ? Qt.rgba(0, 0, 0, 0.06) : Qt.rgba(1, 1, 1, 0.08)
     readonly property color bg: background
 
     // --- GRADIENTS & DEPTH ---
-    readonly property color surfaceGradientStart: withAlpha(surface, opacitySurface)
-    readonly property color surfaceGradientEnd: withAlpha(surface, opacitySurface * 0.95)
+    readonly property color surfaceGradientStart: withAlpha(surface, _effectiveOpacitySurface)
+    readonly property color surfaceGradientEnd: withAlpha(surface, _effectiveOpacitySurface * 0.95)
     readonly property color borderLight: withAlpha(text, 0.12)
     readonly property color borderDark: withAlpha("#000000", 0.25)
     readonly property color borderMedium: withAlpha(text, 0.4)       // Subtle separator / divider
@@ -128,9 +139,9 @@ QtObject {
     readonly property color overlayScrim: Qt.rgba(0, 0, 0, 0.45)
 
     // --- POPUP SURFACES (shared across all menus) ---
-    readonly property color popupSurface: withAlpha(surface, opacityBase)
-    readonly property color cardSurface: withAlpha(surface, opacitySurface)
-    readonly property color chipSurface: withAlpha(surface, opacityOverlay)
+    readonly property color popupSurface: withAlpha(surface, _effectiveOpacityBase)
+    readonly property color cardSurface: withAlpha(surface, _effectiveOpacitySurface)
+    readonly property color chipSurface: withAlpha(surface, _effectiveOpacityOverlay)
     readonly property color modalFieldSurface: chipSurface
 
     property Connections _configConn: Connections {
