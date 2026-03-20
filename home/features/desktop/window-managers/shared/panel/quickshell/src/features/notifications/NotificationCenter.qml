@@ -137,10 +137,20 @@ PanelWindow {
           onClicked: Config.notifTtsEnabled = !Config.notifTtsEnabled
         }
 
+        // Stop Speaking — only visible while TTS is active
+        SharedWidgets.IconButton {
+          size: 32
+          icon: "󰓛"
+          iconColor: Colors.error
+          tooltipText: "Stop speaking"
+          visible: !!(root.manager && root.manager.ttsSpeaking)
+          onClicked: if (root.manager) root.manager.stopSpeaking()
+        }
+
         // Clear all
         SharedWidgets.IconButton {
           size: 32
-          icon: "󰎟"
+          icon: "archive.svg"
           iconColor: Colors.textDisabled
           tooltipText: "Clear all"
           onClicked: if (root.manager) root.manager.dismissAll()
@@ -372,7 +382,7 @@ PanelWindow {
           }
           SharedWidgets.IconButton {
             size: 24
-            icon: "󰎟"
+            icon: "archive.svg"
             iconColor: Colors.textDisabled
             stateColor: Colors.error
             tooltipText: "Clear history"

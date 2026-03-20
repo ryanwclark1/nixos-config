@@ -68,6 +68,7 @@ Item {
           return;
         }
         notif.tracked = true;
+        notif._receivedAt = new Date();
 
         // Detect screenshot notifications — match by full body text key
         var bodyKey = (notif.body || "").trim();
@@ -176,6 +177,17 @@ Item {
 
   // ── TTS Read-Aloud ─────────────────────────
 
+  readonly property bool ttsSpeaking: _ttsProc.running
+
+  property Process _ttsProc: Process {
+    running: false
+    onExited: {} // no-op, running becomes false automatically
+  }
+
+  function stopSpeaking() {
+    _ttsProc.running = false;
+  }
+
   function _maybeSpeakNotification(notif) {
     if (!Config.notifTtsEnabled || root.dndEnabled) return;
     var appName = (notif.appName || "").toLowerCase();
@@ -188,13 +200,16 @@ Item {
     text = text.replace(/<[^>]*>/g, "").trim();
     if (!text) return;
     if (text.length > 300) text = text.substring(0, 300);
-    Quickshell.execDetached([
+    // Kill previous speech, then start new
+    _ttsProc.running = false;
+    _ttsProc.command = [
       "qs-tts-speak",
       "--rate=" + Config.notifTtsRate,
       "--volume=" + Config.notifTtsVolume,
       "--engine=" + Config.notifTtsEngine,
       text
-    ]);
+    ];
+    _ttsProc.running = true;
   }
 
   // ── Screenshot Notification ────────────────
