@@ -7,6 +7,7 @@ Item {
     id: root
 
     default property alias rowContent: rowCard.rowContent
+    property alias overlayChildren: overlayLayer.data
 
     property var reorderState: null
     property string listId: ""
@@ -71,6 +72,17 @@ Item {
         }
         active: root.dropBeforeActive
         visible: root.dropBeforeActive
+    }
+
+    Item {
+        id: overlayLayer
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: dropBeforeIndicator.bottom
+            topMargin: dropBeforeIndicator.visible ? Appearance.spacingXS : 0
+            bottom: parent.bottom
+        }
     }
 
     SettingsListRow {

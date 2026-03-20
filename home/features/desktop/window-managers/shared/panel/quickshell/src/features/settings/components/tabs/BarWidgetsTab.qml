@@ -463,21 +463,36 @@ Item {
                             beginDragFn: function(listId, itemId, index) {
                                 root.beginWidgetDrag(listId, itemId, index);
                             }
+                            overlayChildren: [
+                                DropArea {
+                                    anchors.fill: parent
+                                    enabled: root.dragReorderEnabled
+                                    keys: ["bar-widget"]
+                                    onEntered: function (drag) {
+                                        root.setWidgetDropTarget(widgetRow.sectionKey, widgetRow.index);
+                                    }
+                                    onExited: {
+                                        root.clearWidgetDropTarget(widgetRow.sectionKey, widgetRow.index);
+                                    }
+                                    onDropped: function (drop) {
+                                        root.moveDraggedWidget(widgetRow.sectionKey, widgetRow.index);
+                                    }
+                                },
 
-                            DropArea {
-                                anchors.fill: parent
-                                enabled: root.dragReorderEnabled
-                                keys: ["bar-widget"]
-                                onEntered: function (drag) {
-                                    root.setWidgetDropTarget(widgetRow.sectionKey, widgetRow.index);
+                                Item {
+                                    id: dragProxy
+                                    width: widgetRow.width
+                                    height: widgetRow.height
+                                    visible: false
+                                    x: widgetRow.dragOffsetX
+                                    y: widgetRow.dragOffsetY
+                                    Drag.active: root.dragReorderEnabled && widgetRow.dragging
+                                    Drag.source: dragProxy
+                                    Drag.hotSpot.x: width / 2
+                                    Drag.hotSpot.y: height / 2
+                                    Drag.keys: ["bar-widget"]
                                 }
-                                onExited: {
-                                    root.clearWidgetDropTarget(widgetRow.sectionKey, widgetRow.index);
-                                }
-                                onDropped: function (drop) {
-                                    root.moveDraggedWidget(widgetRow.sectionKey, widgetRow.index);
-                                }
-                            }
+                            ]
 
                             SharedWidgets.SvgIcon {
                                 source: BarWidgetRegistry.displayIcon(widgetRow.widgetInstance.widgetType)
@@ -566,20 +581,6 @@ Item {
                                         onClicked: root.removeWidget(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)
                                     }
                                 }
-                            }
-
-                            Item {
-                                id: dragProxy
-                                width: widgetRow.width
-                                height: widgetRow.height
-                                visible: false
-                                x: widgetRow.dragOffsetX
-                                y: widgetRow.dragOffsetY
-                                Drag.active: root.dragReorderEnabled && widgetRow.dragging
-                                Drag.source: dragProxy
-                                Drag.hotSpot.x: width / 2
-                                Drag.hotSpot.y: height / 2
-                                Drag.keys: ["bar-widget"]
                             }
                         }
                     }

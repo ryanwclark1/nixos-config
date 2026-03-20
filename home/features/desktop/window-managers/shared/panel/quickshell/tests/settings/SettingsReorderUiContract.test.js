@@ -56,6 +56,7 @@ describe("settings reorder UI contract", () => {
   it("keeps bar widgets on the shared inline handle instead of a duplicate reorder glyph", () => {
     const source = readFileSync(barWidgetsPath, "utf8");
 
+    expect(source).toContain("overlayChildren: [");
     expect(source).toContain("onDragReleased:");
     expect(source).not.toContain('source: "re-order-dots-vertical.svg"');
   });
