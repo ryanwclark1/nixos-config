@@ -31,8 +31,8 @@ Rectangle {
     }
 
     Rectangle {
-        width: Math.min(root.compactMode ? 560 : 640, parent.width - root.overlayInset * 2)
-        height: Math.min(560, parent.height - root.overlayInset * 2)
+        width: Math.min(root.compactMode ? 560 : 760, parent.width - root.overlayInset * 2)
+        height: Math.min(680, parent.height - root.overlayInset * 2)
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: Math.max(root.overlayInset, (parent.height - height) / 2)

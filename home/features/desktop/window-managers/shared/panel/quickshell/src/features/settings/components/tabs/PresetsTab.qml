@@ -71,7 +71,7 @@ Item {
             SharedWidgets.EmptyState {
                 visible: PresetService.presets.length === 0
                 Layout.fillWidth: true
-                icon: "󰆓"
+                icon: "save.svg"
                 message: "No presets saved yet"
             }
 

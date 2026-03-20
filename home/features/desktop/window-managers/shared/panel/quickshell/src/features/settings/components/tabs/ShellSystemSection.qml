@@ -22,24 +22,24 @@ Item {
 
             SettingsToggleRow {
                 label: "Floating Bar"
-                icon: "󰖲"
+                icon: "settings.svg"
                 configKey: "barFloating"
             }
             SettingsToggleRow {
                 label: "Blur Effects"
-                icon: "󰃠"
+                icon: "weather-sunny.svg"
                 configKey: "blurEnabled"
             }
             SettingsToggleRow {
                 label: "Debug Logging"
-                icon: "󰃤"
+                icon: "bug.svg"
                 configKey: "debug"
             }
         }
 
         SettingsSliderRow {
             label: "Notification Width"
-            icon: "󰂚"
+            icon: "alert.svg"
             min: 280
             max: 520
             value: Config.notifWidth
@@ -48,7 +48,7 @@ Item {
 
         SettingsSliderRow {
             label: "Popup Duration"
-            icon: "󰔛"
+            icon: "timer.svg"
             min: 2000
             max: 10000
             step: 500

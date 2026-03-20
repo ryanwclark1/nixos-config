@@ -729,7 +729,7 @@ Item {
 
             SharedWidgets.EmptyState {
                 visible: WallpaperService.availableWallpapers.length === 0
-                icon: "󰸉"
+                icon: "image.svg"
                 message: "No wallpapers found in search directories"
                 width: parent.width
             }

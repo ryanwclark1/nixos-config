@@ -19,6 +19,30 @@ Item {
         return !isNaN(v) && v >= -180 && v <= 180;
     }
 
+    readonly property string _timeFormatSummary: Config.timeUse24Hour ? "24-hour" : "12-hour"
+    readonly property string _dateSummary: {
+        if (!Config.timeShowBarDate)
+            return "Hidden in bar";
+        if (Config.timeBarDateStyle === "month_day")
+            return "Month + Day";
+        if (Config.timeBarDateStyle === "weekday_month_day")
+            return "Weekday + Date";
+        return "Weekday";
+    }
+    readonly property string _weatherUnitsSummary: Config.weatherUnits === "imperial" ? "Imperial (F)" : "Metric (C)"
+    readonly property int _marketTickerCount: {
+        var raw = String(Config.marketTickers || "").trim();
+        if (raw === "")
+            return 0;
+        var parts = raw.split(/[\s,]+/);
+        var count = 0;
+        for (var i = 0; i < parts.length; i++) {
+            if (parts[i])
+                count += 1;
+        }
+        return count;
+    }
+
     function barDatePreview(now) {
         if (!Config.timeShowBarDate)
             return "";
@@ -47,337 +71,445 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
+        settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Time & Weather"
         iconName: "󰔛"
+        compactMode: root.compactMode
+        tightSpacing: root.tightSpacing
 
-        SettingsCard {
-            title: "Preview"
-            iconName: "󰇙"
-            description: "Live preview for your top bar clock and the Date & Time menu weather strip."
+        SettingsSectionGroup {
+            title: "Time & Weather Overview"
+            description: "Clock format, weather source, active location, and market coverage visible before editing individual controls."
 
-            Rectangle {
+            Flow {
                 Layout.fillWidth: true
-                implicitHeight: root.compactMode ? compactPreview.implicitHeight + Colors.spacingM * 2 : 84
-                radius: Colors.radiusMedium
-                color: Colors.cardSurface
-                border.color: Colors.border
-                border.width: 1
+                width: parent.width
+                spacing: Colors.spacingM
 
-                RowLayout {
-                    id: widePreview
-                    anchors.fill: parent
-                    anchors.margins: Colors.spacingM
-                    spacing: Colors.spacingM
-                    visible: !root.compactMode
+                Repeater {
+                    model: [
+                        {
+                            icon: "󰅐",
+                            label: "Clock",
+                            value: root._timeFormatSummary + (Config.timeShowSeconds ? " / seconds" : "")
+                        },
+                        {
+                            icon: "󰃭",
+                            label: "Bar Date",
+                            value: root._dateSummary
+                        },
+                        {
+                            icon: "󰖐",
+                            label: "Weather",
+                            value: root._weatherUnitsSummary
+                        },
+                        {
+                            icon: "󰍎",
+                            label: "Location",
+                            value: root.activeLocationSummary()
+                        },
+                        {
+                            icon: "󱓗",
+                            label: "Markets",
+                            value: root._marketTickerCount + " ticker" + (root._marketTickerCount === 1 ? "" : "s")
+                        }
+                    ]
 
-                    Rectangle {
-                        implicitHeight: 34
-                        implicitWidth: timePreview.implicitWidth + datePreview.implicitWidth + Colors.spacingM * 3
-                        radius: Colors.radiusPill
-                        color: Colors.primaryTint
-                        border.color: Colors.withAlpha(Colors.primary, 0.45)
+                    delegate: Rectangle {
+                        required property var modelData
+
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
+                        radius: Colors.radiusLarge
+                        color: Colors.withAlpha(Colors.surface, 0.38)
+                        border.color: Colors.withAlpha(Colors.primary, 0.14)
                         border.width: 1
 
-                        RowLayout {
+                        ColumnLayout {
+                            id: metricColumn
                             anchors.fill: parent
-                            anchors.leftMargin: Colors.spacingM
-                            anchors.rightMargin: Colors.spacingM
-                            spacing: Colors.spacingS
+                            anchors.margins: Colors.spacingM
+                            spacing: Colors.spacingXS
 
                             Text {
-                                id: timePreview
-                                text: Qt.formatDateTime(previewClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
-                                color: Colors.text
+                                text: modelData.icon
+                                color: Colors.primary
+                                font.family: Colors.fontMono
                                 font.pixelSize: Colors.fontSizeLarge
-                                font.weight: Font.Bold
                             }
 
                             Text {
-                                id: datePreview
-                                text: root.barDatePreview(previewClock.date)
-                                visible: text !== ""
+                                Layout.fillWidth: true
+                                text: modelData.label
                                 color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Black
+                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.value
+                                color: Colors.text
                                 font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.Bold
+                                wrapMode: Text.WordWrap
                             }
                         }
                     }
+                }
+            }
+        }
 
-                    Item {
-                        Layout.fillWidth: true
+        SettingsSectionGroup {
+            title: "Live Preview"
+            description: "Preview the clock chip and weather strip as you tune the bar display."
+
+            SettingsCard {
+                title: "Preview"
+                iconName: "󰇙"
+                description: "Live preview for your top bar clock and the Date & Time menu weather strip."
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    implicitHeight: root.compactMode ? compactPreview.implicitHeight + Colors.spacingM * 2 : 84
+                    radius: Colors.radiusMedium
+                    color: Colors.cardSurface
+                    border.color: Colors.border
+                    border.width: 1
+
+                    RowLayout {
+                        id: widePreview
+                        anchors.fill: parent
+                        anchors.margins: Colors.spacingM
+                        spacing: Colors.spacingM
+                        visible: !root.compactMode
+
+                        Rectangle {
+                            implicitHeight: 34
+                            implicitWidth: timePreview.implicitWidth + datePreview.implicitWidth + Colors.spacingM * 3
+                            radius: Colors.radiusPill
+                            color: Colors.primaryTint
+                            border.color: Colors.withAlpha(Colors.primary, 0.45)
+                            border.width: 1
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: Colors.spacingM
+                                anchors.rightMargin: Colors.spacingM
+                                spacing: Colors.spacingS
+
+                                Text {
+                                    id: timePreview
+                                    text: Qt.formatDateTime(previewClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
+                                    color: Colors.text
+                                    font.pixelSize: Colors.fontSizeLarge
+                                    font.weight: Font.Bold
+                                }
+
+                                Text {
+                                    id: datePreview
+                                    text: root.barDatePreview(previewClock.date)
+                                    visible: text !== ""
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Colors.fontSizeMedium
+                                }
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingXXS
+
+                            Text {
+                                text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.DemiBold
+                            }
+
+                            Text {
+                                text: root.activeLocationSummary()
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeSmall
+                                elide: Text.ElideRight
+                                Layout.fillWidth: true
+                            }
+                        }
                     }
 
                     ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
+                        id: compactPreview
+                        anchors.fill: parent
+                        anchors.margins: Colors.spacingM
+                        spacing: Colors.spacingS
+                        visible: root.compactMode
 
-                        Text {
-                            text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
-                            font.weight: Font.DemiBold
+                        Rectangle {
+                            Layout.alignment: Qt.AlignLeft
+                            implicitHeight: 34
+                            implicitWidth: timePreviewCompact.implicitWidth + datePreviewCompact.implicitWidth + Colors.spacingM * 3
+                            radius: Colors.radiusPill
+                            color: Colors.primaryTint
+                            border.color: Colors.withAlpha(Colors.primary, 0.45)
+                            border.width: 1
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: Colors.spacingM
+                                anchors.rightMargin: Colors.spacingM
+                                spacing: Colors.spacingS
+
+                                Text {
+                                    id: timePreviewCompact
+                                    text: Qt.formatDateTime(previewClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
+                                    color: Colors.text
+                                    font.pixelSize: Colors.fontSizeLarge
+                                    font.weight: Font.Bold
+                                }
+
+                                Text {
+                                    id: datePreviewCompact
+                                    text: root.barDatePreview(previewClock.date)
+                                    visible: text !== ""
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Colors.fontSizeMedium
+                                }
+                            }
                         }
 
-                        Text {
-                            text: root.activeLocationSummary()
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
-                            elide: Text.ElideRight
+                        ColumnLayout {
                             Layout.fillWidth: true
+                            spacing: Colors.spacingXXS
+
+                            Text {
+                                text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.DemiBold
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                text: root.activeLocationSummary()
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeSmall
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
                         }
                     }
+                }
+            }
+        }
+
+        SettingsSectionGroup {
+            title: "Clock Format"
+            description: "Control how time and date appear in the bar."
+
+            SettingsCard {
+                title: "Time Format"
+                iconName: "󰔛"
+                description: "Clock format and bar date display options."
+
+                SettingsFieldGrid {
+                    maximumColumns: root.compactMode ? 1 : 2
+
+                    SettingsToggleRow {
+                        label: "24-Hour Clock"
+                        icon: "󰅐"
+                        configKey: "timeUse24Hour"
+                    }
+                    SettingsToggleRow {
+                        label: "Show Seconds"
+                        icon: "󰔟"
+                        configKey: "timeShowSeconds"
+                    }
+                    SettingsToggleRow {
+                        label: "Show Date In Bar"
+                        icon: "󰃭"
+                        configKey: "timeShowBarDate"
+                    }
+                }
+
+                SettingsModeRow {
+                    label: "Bar Date Style"
+                    icon: "󰃭"
+                    currentValue: Config.timeBarDateStyle
+                    options: [
+                        {
+                            value: "weekday_short",
+                            label: "Weekday"
+                        },
+                        {
+                            value: "month_day",
+                            label: "Month + Day"
+                        },
+                        {
+                            value: "weekday_month_day",
+                            label: "Weekday + Date"
+                        }
+                    ]
+                    onModeSelected: modeValue => Config.timeBarDateStyle = modeValue
+                }
+            }
+        }
+
+        SettingsSectionGroup {
+            title: "Weather & Location"
+            description: "Units, priority order, and location inputs used by the weather surfaces."
+
+            SettingsCard {
+                title: "Weather & Location"
+                iconName: "󰖔"
+                description: "Weather units, source priority, and location inputs."
+
+                SettingsModeRow {
+                    label: "Units"
+                    icon: "󰔄"
+                    currentValue: Config.weatherUnits
+                    options: [
+                        {
+                            value: "metric",
+                            label: "Metric (C)"
+                        },
+                        {
+                            value: "imperial",
+                            label: "Imperial (F)"
+                        }
+                    ]
+                    onModeSelected: modeValue => Config.weatherUnits = modeValue
+                }
+
+                SettingsModeRow {
+                    label: "Location Priority"
+                    icon: "󰍎"
+                    currentValue: Config.weatherLocationPriority
+                    options: [
+                        {
+                            value: "latlon_city_auto",
+                            label: "LatLon > City > Auto"
+                        },
+                        {
+                            value: "city_auto_latlon",
+                            label: "City > Auto > LatLon"
+                        },
+                        {
+                            value: "auto_city_latlon",
+                            label: "Auto > City > LatLon"
+                        }
+                    ]
+                    onModeSelected: modeValue => Config.weatherLocationPriority = modeValue
+                }
+
+                SettingsToggleRow {
+                    label: "Auto Location"
+                    icon: "󰍹"
+                    configKey: "weatherAutoLocation"
                 }
 
                 ColumnLayout {
-                    id: compactPreview
-                    anchors.fill: parent
-                    anchors.margins: Colors.spacingM
-                    spacing: Colors.spacingS
-                    visible: root.compactMode
-
-                    Rectangle {
-                        Layout.alignment: Qt.AlignLeft
-                        implicitHeight: 34
-                        implicitWidth: timePreviewCompact.implicitWidth + datePreviewCompact.implicitWidth + Colors.spacingM * 3
-                        radius: Colors.radiusPill
-                        color: Colors.primaryTint
-                        border.color: Colors.withAlpha(Colors.primary, 0.45)
-                        border.width: 1
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: Colors.spacingM
-                            anchors.rightMargin: Colors.spacingM
-                            spacing: Colors.spacingS
-
-                            Text {
-                                id: timePreviewCompact
-                                text: Qt.formatDateTime(previewClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeLarge
-                                font.weight: Font.Bold
-                            }
-
-                            Text {
-                                id: datePreviewCompact
-                                text: root.barDatePreview(previewClock.date)
-                                visible: text !== ""
-                                color: Colors.textSecondary
-                                font.pixelSize: Colors.fontSizeMedium
-                            }
-                        }
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Colors.spacingXXS
-
-                        Text {
-                            text: (WeatherService.condition || "Weather") + "  " + (WeatherService.temp || "--")
-                            color: Colors.text
-                            font.pixelSize: Colors.fontSizeMedium
-                            font.weight: Font.DemiBold
-                            Layout.fillWidth: true
-                            wrapMode: Text.WordWrap
-                        }
-
-                        Text {
-                            text: root.activeLocationSummary()
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
-                            Layout.fillWidth: true
-                            wrapMode: Text.WordWrap
-                        }
-                    }
-                }
-            }
-        }
-
-        SettingsCard {
-            title: "Time Format"
-            iconName: "󰔛"
-            description: "Clock format and bar date display options."
-
-            SettingsFieldGrid {
-                maximumColumns: root.compactMode ? 1 : 2
-
-                SettingsToggleRow {
-                    label: "24-Hour Clock"
-                    icon: "󰅐"
-                    configKey: "timeUse24Hour"
-                }
-                SettingsToggleRow {
-                    label: "Show Seconds"
-                    icon: "󰔟"
-                    configKey: "timeShowSeconds"
-                }
-                SettingsToggleRow {
-                    label: "Show Date In Bar"
-                    icon: "󰃭"
-                    configKey: "timeShowBarDate"
-                }
-            }
-
-            SettingsModeRow {
-                label: "Bar Date Style"
-                icon: "󰃭"
-                currentValue: Config.timeBarDateStyle
-                options: [
-                    {
-                        value: "weekday_short",
-                        label: "Weekday"
-                    },
-                    {
-                        value: "month_day",
-                        label: "Month + Day"
-                    },
-                    {
-                        value: "weekday_month_day",
-                        label: "Weekday + Date"
-                    }
-                ]
-                onModeSelected: modeValue => Config.timeBarDateStyle = modeValue
-            }
-        }
-
-        SettingsCard {
-            title: "Weather & Location"
-            iconName: "󰖔"
-            description: "Weather units, source priority, and location inputs."
-
-            SettingsModeRow {
-                label: "Units"
-                icon: "󰔄"
-                currentValue: Config.weatherUnits
-                options: [
-                    {
-                        value: "metric",
-                        label: "Metric (C)"
-                    },
-                    {
-                        value: "imperial",
-                        label: "Imperial (F)"
-                    }
-                ]
-                onModeSelected: modeValue => Config.weatherUnits = modeValue
-            }
-
-            SettingsModeRow {
-                label: "Location Priority"
-                icon: "󰍎"
-                currentValue: Config.weatherLocationPriority
-                options: [
-                    {
-                        value: "latlon_city_auto",
-                        label: "LatLon > City > Auto"
-                    },
-                    {
-                        value: "city_auto_latlon",
-                        label: "City > Auto > LatLon"
-                    },
-                    {
-                        value: "auto_city_latlon",
-                        label: "Auto > City > LatLon"
-                    }
-                ]
-                onModeSelected: modeValue => Config.weatherLocationPriority = modeValue
-            }
-
-            SettingsToggleRow {
-                label: "Auto Location"
-                icon: "󰍹"
-                configKey: "weatherAutoLocation"
-            }
-
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: Colors.spacingM
-
-                SettingsTextInputRow {
-                    label: "City"
-                    placeholderText: "New York, NY"
-                    leadingIcon: "󰍎"
-                    text: Config.weatherCityQuery
-                    onSubmitted: value => Config.weatherCityQuery = value.trim()
-                    onTextEdited: value => {
-                        if (Config.weatherCityQuery !== value)
-                            Config.weatherCityQuery = value;
-                    }
-                }
-
-                Flow {
                     Layout.fillWidth: true
-                    width: parent.width
                     spacing: Colors.spacingM
 
                     SettingsTextInputRow {
-                        id: weatherLatInput
-                        width: root.compactMode
-                            ? parent.width
-                            : Math.min(parent.width, Math.max(180, (parent.width - Colors.spacingM) / 2))
-                        label: "Latitude"
-                        placeholderText: "40.7128"
-                        leadingIcon: "󰍐"
-                        text: Config.weatherLatitude
-                        errorText: weatherLatInput.text.length > 0 && !root.latValid ? "Expected value between -90 and 90" : ""
-                        onSubmitted: value => Config.weatherLatitude = value.trim()
+                        label: "City"
+                        placeholderText: "New York, NY"
+                        leadingIcon: "󰍎"
+                        text: Config.weatherCityQuery
+                        onSubmitted: value => Config.weatherCityQuery = value.trim()
                         onTextEdited: value => {
-                            if (Config.weatherLatitude !== value)
-                                Config.weatherLatitude = value;
+                            if (Config.weatherCityQuery !== value)
+                                Config.weatherCityQuery = value;
                         }
                     }
 
-                    SettingsTextInputRow {
-                        id: weatherLonInput
-                        width: root.compactMode
-                            ? parent.width
-                            : Math.min(parent.width, Math.max(180, (parent.width - Colors.spacingM) / 2))
-                        label: "Longitude"
-                        placeholderText: "-74.0060"
-                        leadingIcon: "󰍐"
-                        text: Config.weatherLongitude
-                        errorText: weatherLonInput.text.length > 0 && !root.lonValid ? "Expected value between -180 and 180" : ""
-                        onSubmitted: value => Config.weatherLongitude = value.trim()
-                        onTextEdited: value => {
-                            if (Config.weatherLongitude !== value)
-                                Config.weatherLongitude = value;
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: Colors.spacingM
+
+                        SettingsTextInputRow {
+                            id: weatherLatInput
+                            width: root.compactMode
+                                ? parent.width
+                                : Math.min(parent.width, Math.max(180, (parent.width - Colors.spacingM) / 2))
+                            label: "Latitude"
+                            placeholderText: "40.7128"
+                            leadingIcon: "󰍐"
+                            text: Config.weatherLatitude
+                            errorText: weatherLatInput.text.length > 0 && !root.latValid ? "Expected value between -90 and 90" : ""
+                            onSubmitted: value => Config.weatherLatitude = value.trim()
+                            onTextEdited: value => {
+                                if (Config.weatherLatitude !== value)
+                                    Config.weatherLatitude = value;
+                            }
+                        }
+
+                        SettingsTextInputRow {
+                            id: weatherLonInput
+                            width: root.compactMode
+                                ? parent.width
+                                : Math.min(parent.width, Math.max(180, (parent.width - Colors.spacingM) / 2))
+                            label: "Longitude"
+                            placeholderText: "-74.0060"
+                            leadingIcon: "󰍐"
+                            text: Config.weatherLongitude
+                            errorText: weatherLonInput.text.length > 0 && !root.lonValid ? "Expected value between -180 and 180" : ""
+                            onSubmitted: value => Config.weatherLongitude = value.trim()
+                            onTextEdited: value => {
+                                if (Config.weatherLongitude !== value)
+                                    Config.weatherLongitude = value;
+                            }
                         }
                     }
-                }
 
-                SettingsInfoCallout {
-                    iconName: "󰋗"
-                    title: "Active location"
-                    body: root.activeLocationSummary() + ". Source priority applies to both the standalone Weather menu and the Date & Time dropdown."
+                    SettingsInfoCallout {
+                        iconName: "󰋗"
+                        title: "Active location"
+                        body: root.activeLocationSummary() + ". Source priority applies to both the standalone Weather menu and the Date & Time dropdown."
+                    }
                 }
             }
         }
 
-        SettingsCard {
+        SettingsSectionGroup {
             title: "Markets"
-            iconName: "󱓗"
-            description: "Configure the tickers for your market widget."
+            description: "Ticker configuration for the market widget surfaced in the shell."
 
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: Colors.spacingM
+            SettingsCard {
+                title: "Markets"
+                iconName: "󱓗"
+                description: "Configure the tickers for your market widget."
 
-                SettingsTextInputRow {
-                    label: "Tickers"
-                    placeholderText: "^SPX ^DJI ^NDQ AAPL.US"
-                    leadingIcon: "󱓗"
-                    text: Config.marketTickers
-                    onSubmitted: value => Config.marketTickers = value.trim()
-                    onTextEdited: value => {
-                        if (Config.marketTickers !== value)
-                            Config.marketTickers = value;
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingM
+
+                    SettingsTextInputRow {
+                        label: "Tickers"
+                        placeholderText: "^SPX ^DJI ^NDQ AAPL.US"
+                        leadingIcon: "󱓗"
+                        text: Config.marketTickers
+                        onSubmitted: value => Config.marketTickers = value.trim()
+                        onTextEdited: value => {
+                            if (Config.marketTickers !== value)
+                                Config.marketTickers = value;
+                        }
                     }
-                }
 
-                SettingsInfoCallout {
-                    iconName: "󰋗"
-                    title: "Data Provider"
-                    body: "Market data is fetched from Stooq. Use space or comma to separate multiple tickers. Use .US suffix for US stocks (e.g. AAPL.US) and ^ for indices."
+                    SettingsInfoCallout {
+                        iconName: "󰋗"
+                        title: "Data Provider"
+                        body: "Market data is fetched from Stooq. Use space or comma to separate multiple tickers. Use .US suffix for US stocks (e.g. AAPL.US) and ^ for indices."
+                    }
                 }
             }
         }

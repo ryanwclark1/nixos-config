@@ -63,7 +63,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Auto Transparency"
-                icon: "󰂵"
+                icon: "color-palette.svg"
                 configKey: "autoTransparency"
             }
         }
@@ -75,7 +75,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Dynamic Wallpaper Theming"
-                icon: "󰸉"
+                icon: "image.svg"
                 configKey: "useDynamicTheming"
             }
         }
@@ -88,7 +88,7 @@ Item {
             SettingsToggleRow {
                 label: "Automatic Eco Mode"
                 description: "Optimizes animations and disables shaders on battery."
-                icon: "󰂃"
+                icon: "leaf-two.svg"
                 configKey: "autoEcoMode"
             }
         }

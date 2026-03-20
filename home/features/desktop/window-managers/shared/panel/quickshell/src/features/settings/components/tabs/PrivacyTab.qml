@@ -25,12 +25,12 @@ Item {
 
                 SettingsToggleRow {
                     label: "Privacy Indicators"
-                    icon: "󰒃"
+                    icon: "shield.svg"
                     configKey: "privacyIndicatorsEnabled"
                 }
                 SettingsToggleRow {
                     label: "Camera Monitoring"
-                    icon: "󰄀"
+                    icon: "eye.svg"
                     configKey: "privacyCameraMonitoring"
                 }
             }
