@@ -504,7 +504,7 @@ PanelWindow {
         // Close button
         SharedWidgets.IconButton {
           size: 28; radius: Colors.radiusMedium
-          icon: "󰅖"
+          icon: "dismiss.svg"
           tooltipText: "Close"
           onClicked: root.closeRequested()
         }

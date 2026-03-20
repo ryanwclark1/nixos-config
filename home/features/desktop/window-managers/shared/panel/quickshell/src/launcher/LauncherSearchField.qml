@@ -166,7 +166,7 @@ Rectangle {
                     }
 
                     SharedWidgets.IconButton {
-                        icon: "󰅖"
+                        icon: "dismiss.svg"
                         size: 14
                         iconSize: 10
                         iconColor: accentColor
@@ -226,7 +226,7 @@ Rectangle {
 
             SharedWidgets.IconButton {
                 visible: input.text !== ""
-                icon: "󰅖"
+                icon: "dismiss.svg"
                 size: 24
                 iconSize: 14
                 iconColor: Colors.textDisabled
