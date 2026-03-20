@@ -385,16 +385,16 @@ main() {
       args+=(--id "${instance_id}")
     fi
     run_step_timeout "Running live surface responsive smoke" "${surfaces_timeout_seconds}" "${script_dir}/check-surface-responsive.sh" "${args[@]}"
-    refresh_instance_args
-    args=()
-    if [[ -n "${instance_id}" ]]; then
-      args+=(--id "${instance_id}")
+    if (( run_launcher == 1 )); then
+      refresh_instance_args
+      args=()
+      if [[ -n "${instance_id}" ]]; then
+        args+=(--id "${instance_id}")
+      fi
+      run_step_timeout "Running targeted runtime warning regressions" "${warnings_timeout_seconds}" "${script_dir}/check-runtime-warning-regressions.sh" "${args[@]}"
+    else
+      printf '[INFO] Skipping targeted runtime warning regressions because launcher capture is disabled.\n'
     fi
-    warning_args=("${args[@]}")
-    if (( run_launcher == 0 )); then
-      warning_args+=(--skip-launcher)
-    fi
-    run_step_timeout "Running targeted runtime warning regressions" "${warnings_timeout_seconds}" "${script_dir}/check-runtime-warning-regressions.sh" "${warning_args[@]}"
   fi
 
   if (( run_multibar == 1 )); then

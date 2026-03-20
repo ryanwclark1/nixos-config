@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
 # Usage: qs-tts-speak [--rate=N] [--volume=N] [--engine=ENGINE] TEXT
 # Speaks the given text using the configured TTS engine.
-# Kills any previous qs-tts-speak instance to avoid overlapping speech.
+# Kills any previous instance via PID file to avoid overlapping speech.
 
-# Kill previous instance (same script name)
-pkill -f "qs-tts-speak" -o 2>/dev/null || true
+PIDFILE="${XDG_RUNTIME_DIR:-/tmp}/qs-tts-speak.pid"
+
+# Kill previous instance if still running
+if [[ -f "$PIDFILE" ]]; then
+  old_pid=$(<"$PIDFILE")
+  if [[ -n "$old_pid" ]] && kill -0 "$old_pid" 2>/dev/null; then
+    kill "$old_pid" 2>/dev/null
+    wait "$old_pid" 2>/dev/null
+  fi
+fi
+
+# Write our PID
+echo $$ > "$PIDFILE"
+trap 'rm -f "$PIDFILE"' EXIT
 
 RATE=175
 VOLUME=100

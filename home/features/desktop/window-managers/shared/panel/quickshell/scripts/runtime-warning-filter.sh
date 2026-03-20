@@ -11,6 +11,8 @@ Registration will be attempted again
 quickshell\.hyprland\.ipc: Got removal for workspace id .* which was not previously tracked\.
 QML QQuickImage at @features/clipboard/ClipboardMenu\.qml\[.*\]: Error decoding: file:///run/user/.*/quickshell-clipboard/.*
 libpng error: Read Error
+\[W\]\[WeatherService\] Error: empty weather response
+\[W\]\[MarketService\] Error: empty market response
 EOF
 
   case "${profile}" in
@@ -51,9 +53,9 @@ runtime_filter_log_delta() {
   done < <(runtime_warning_ignore_patterns "${profile}")
 
   if [[ -n "${pattern}" ]]; then
-    grep -Evi "${pattern}" "${input_file}" || true
+    sed -E $'s/\x1B\\[[0-9;]*[[:alpha:]]//g' "${input_file}" | grep -Evi "${pattern}" || true
   else
-    cat "${input_file}"
+    sed -E $'s/\x1B\\[[0-9;]*[[:alpha:]]//g' "${input_file}"
   fi
 }
 
