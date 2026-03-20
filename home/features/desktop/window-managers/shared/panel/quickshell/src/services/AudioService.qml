@@ -42,8 +42,20 @@ QtObject {
     property int subscriberCount: 0
 
     // ── PipeWire object tracking ─────────────────
+    // Track default sink/source AND their .audio sub-objects for reactive volume/muted bindings.
     property PwObjectTracker _defaultTracker: PwObjectTracker {
-        objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
+        objects: {
+            var out = [];
+            if (Pipewire.defaultAudioSink) {
+                out.push(Pipewire.defaultAudioSink);
+                if (Pipewire.defaultAudioSink.audio) out.push(Pipewire.defaultAudioSink.audio);
+            }
+            if (Pipewire.defaultAudioSource) {
+                out.push(Pipewire.defaultAudioSource);
+                if (Pipewire.defaultAudioSource.audio) out.push(Pipewire.defaultAudioSource.audio);
+            }
+            return out;
+        }
     }
 
     property PwObjectTracker _nodeTracker: PwObjectTracker {
