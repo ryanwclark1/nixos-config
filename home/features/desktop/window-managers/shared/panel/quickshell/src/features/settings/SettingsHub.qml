@@ -244,8 +244,8 @@ PanelWindow {
   Rectangle {
     id: mainBox
     enabled: !settingsRoot.interactionBlocked
-    width: Math.min(Math.max(320, settingsRoot.usableWidth - settingsRoot.gutterX * 2), 960)
-    height: Math.min(Math.max(360, settingsRoot.usableHeight - settingsRoot.gutterY * 2), 920)
+    width: Math.min(Math.max(320, settingsRoot.usableWidth - settingsRoot.gutterX * 2), 1100)
+    height: Math.min(Math.max(360, settingsRoot.usableHeight - settingsRoot.gutterY * 2), 1000)
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.topMargin: settingsRoot.edgeMargins.top + Math.max(settingsRoot.gutterY, (settingsRoot.usableHeight - height) / 2)
