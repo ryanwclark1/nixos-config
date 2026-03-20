@@ -68,9 +68,9 @@ BasePopupMenu {
     Layout.fillWidth: true
     spacing: Colors.spacingS
 
-    SharedWidgets.PrivacySourceRow { icon: ""; label: "Microphone"; active: PrivacyService.micActive }
-    SharedWidgets.PrivacySourceRow { icon: "󰄀"; label: "Camera"; active: PrivacyService.cameraActive }
-    SharedWidgets.PrivacySourceRow { icon: "󰍹"; label: "Screen Share"; active: PrivacyService.screenshareActive }
+    SharedWidgets.PrivacySourceRow { icon: "mic.svg"; label: "Microphone"; active: PrivacyService.micActive }
+    SharedWidgets.PrivacySourceRow { icon: "eye.svg"; label: "Camera"; active: PrivacyService.cameraActive }
+    SharedWidgets.PrivacySourceRow { icon: "desktop.svg"; label: "Screen Share"; active: PrivacyService.screenshareActive }
   }
 
   Item { Layout.fillHeight: true }

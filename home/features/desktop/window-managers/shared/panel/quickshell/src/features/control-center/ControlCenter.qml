@@ -459,8 +459,8 @@ PanelWindow {
                                         Layout.fillWidth: true
                                         value: AudioService.outputVolume
                                         muted: AudioService.outputMuted
-                                        icon: "󰕾"
-                                        mutedIcon: "󰝟"
+                                        icon: "speaker.svg"
+                                        mutedIcon: "speaker-mute.svg"
                                         onSliderMoved: v => AudioService.setVolume("@DEFAULT_AUDIO_SINK@", v)
                                     }
                                 }
@@ -501,8 +501,8 @@ PanelWindow {
                                         Layout.fillWidth: true
                                         value: AudioService.inputVolume
                                         muted: AudioService.inputMuted
-                                        icon: "󰍬"
-                                        mutedIcon: "󰍭"
+                                        icon: "mic.svg"
+                                        mutedIcon: "mic-off.svg"
                                         onSliderMoved: v => AudioService.setVolume("@DEFAULT_AUDIO_SOURCE@", v)
                                     }
                                 }

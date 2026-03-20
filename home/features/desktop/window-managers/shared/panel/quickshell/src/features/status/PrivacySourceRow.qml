@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
+import "../../shared" as Shared
 
 Rectangle {
   id: root
@@ -24,12 +25,11 @@ Rectangle {
     anchors.margins: Colors.spacingM
     spacing: Colors.paddingSmall
 
-    Text {
-      text: root.icon
-      color: root.active ? Colors.warning : Colors.textDisabled
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeXL
+    Loader {
+      sourceComponent: root.icon.endsWith(".svg") ? _pSvg : _pNerd
     }
+    Component { id: _pSvg; Shared.SvgIcon { source: root.icon; color: root.active ? Colors.warning : Colors.textDisabled; size: Colors.fontSizeXL } }
+    Component { id: _pNerd; Text { text: root.icon; color: root.active ? Colors.warning : Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL } }
 
     Text {
       text: root.label
