@@ -186,8 +186,8 @@ PanelWindow {
     property bool _filterChunking: false
     property int _parseChunkToken: 0
     property var _parseChunkState: null
-    property var fileQueryCache: ({})
-    property var fileQueryCacheTime: ({})
+    property alias fileQueryCache: controller.fileQueryCache
+    property alias fileQueryCacheTime: controller.fileQueryCacheTime
     property string fileSearchBackend: ""
     property int fileSearchBackendResolvedAt: 0
     property var fileIndexItems: []
@@ -209,25 +209,7 @@ PanelWindow {
     property var preloadFailureState: ({})
     property var launcherIconMap: ({})
     readonly property var availableToplevels: CompositorAdapter.toplevels || []
-    property var launcherMetrics: ({
-            opens: 0,
-            cacheHits: 0,
-            cacheMisses: 0,
-            commandFailures: 0,
-            filterRuns: 0,
-            lastFilterMs: 0,
-            avgFilterMs: 0,
-            filesFdLoads: 0,
-            filesFindLoads: 0,
-            filesFdLastMs: 0,
-            filesFindLastMs: 0,
-            filesFdAvgMs: 0,
-            filesFindAvgMs: 0,
-            filesResolveRuns: 0,
-            filesResolveLastMs: 0,
-            filesResolveAvgMs: 0,
-            perMode: ({})
-        })
+    property alias launcherMetrics: controller.launcherMetrics
     function refreshMediaPlayers() {
         mediaPlayers = MediaService.getAvailablePlayers();
     }
@@ -1168,40 +1150,11 @@ PanelWindow {
     onFileSearchRootResolvedChanged: clearCaches()
     onFileSearchShowHiddenChanged: clearCaches()
 
-    function getFileQueryCached(queryKey) {
-        var items = fileQueryCache[queryKey];
-        if (!items)
-            return null;
-        var ttlMs = Math.max(1, Config.launcherCacheTtlSec) * 1000;
-        var last = fileQueryCacheTime[queryKey] || 0;
-        if (Date.now() - last > ttlMs) {
-            var nextCache = Object.assign({}, fileQueryCache);
-            var nextTimes = Object.assign({}, fileQueryCacheTime);
-            delete nextCache[queryKey];
-            delete nextTimes[queryKey];
-            fileQueryCache = nextCache;
-            fileQueryCacheTime = nextTimes;
-            return null;
-        }
-        return items;
-    }
+    function getFileQueryCached(queryKey) { return controller.getFileQueryCached(queryKey); }
+    function setFileQueryCached(queryKey, items) { controller.setFileQueryCached(queryKey, items); }
 
-    function setFileQueryCached(queryKey, items) {
-        var nextCache = Object.assign({}, fileQueryCache);
-        var nextTimes = Object.assign({}, fileQueryCacheTime);
-        nextCache[queryKey] = items;
-        nextTimes[queryKey] = Date.now();
-        fileQueryCache = nextCache;
-        fileQueryCacheTime = nextTimes;
-    }
-
-    function modeMetric(modeKey) {
-        return Metrics.modeMetric(launcherMetrics, modeKey);
-    }
-
-    function clearLauncherMetrics() {
-        launcherMetrics = Metrics.freshMetrics();
-    }
+    function modeMetric(modeKey) { return controller.modeMetric(modeKey); }
+    function clearLauncherMetrics() { controller.clearLauncherMetrics(); }
 
     function fileIndexStale() {
         if (!fileIndexReady)

@@ -12,7 +12,7 @@ Item {
   property var iconCandidates: []
   property int iconSize: Appearance.iconSizeMedium
   property var iconMap: null
-  property string fallbackIcon: "󰀻"
+  property string fallbackIcon: "apps.svg"
 
   width: iconSize
   height: iconSize
@@ -116,12 +116,28 @@ Item {
     visible: source !== "" && status === Image.Ready
   }
 
-  Text {
+  Loader {
     anchors.centerIn: parent
-    text: root._fallbackText
-    color: Colors.text
-    font.family: Appearance.fontMono
-    font.pixelSize: root.iconSize * 0.6
     visible: !iconImage.visible
+    sourceComponent: root._fallbackText.endsWith(".svg") ? _svgFallback : _nerdFallback
+  }
+
+  Component {
+    id: _svgFallback
+    SvgIcon {
+      source: root._fallbackText
+      color: Colors.text
+      size: root.iconSize * 0.8
+    }
+  }
+
+  Component {
+    id: _nerdFallback
+    Text {
+      text: root._fallbackText
+      color: Colors.text
+      font.family: Appearance.fontMono
+      font.pixelSize: root.iconSize * 0.6
+    }
   }
 }

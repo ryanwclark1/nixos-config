@@ -58,7 +58,7 @@ Rectangle {
     appName: taskItem.appName || taskItem.appId || ""
     iconSize: taskItem.iconSize
     iconMap: taskItem.iconMap
-    fallbackIcon: "󰀻"
+    fallbackIcon: "apps.svg"
   }
 
   SharedWidgets.StateLayer {

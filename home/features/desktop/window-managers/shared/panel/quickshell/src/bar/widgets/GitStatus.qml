@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
+import "../../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -44,11 +45,10 @@ Rectangle {
     anchors.centerIn: parent
     spacing: Appearance.spacingXS
 
-    Text {
-      text: "󰊢"
+    SharedWidgets.SvgIcon {
+      source: "git-branch.svg"
       color: Colors.primary
-      font.family: Appearance.fontMono
-      font.pixelSize: Appearance.fontSizeSmall
+      size: Appearance.fontSizeSmall
     }
 
     Text {

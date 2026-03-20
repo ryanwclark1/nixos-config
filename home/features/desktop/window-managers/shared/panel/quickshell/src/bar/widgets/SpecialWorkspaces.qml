@@ -71,15 +71,15 @@ Item {
 
   function _iconForWorkspace(shortName) {
     var lower = shortName.toLowerCase();
-    if (lower === "scratchpad") return "󱂬";
-    if (lower === "communication" || lower === "chat") return "󰍡";
-    if (lower === "music" || lower === "media") return "󰎆";
-    if (lower === "terminal" || lower === "term") return "";
-    if (lower === "browser" || lower === "web") return "󰖟";
-    if (lower === "mail" || lower === "email") return "󰇰";
-    if (lower === "files" || lower === "file") return "󰉋";
-    if (lower === "monitor" || lower === "system") return "󰍛";
-    return "󰏗";
+    if (lower === "scratchpad") return "app-generic.svg";
+    if (lower === "communication" || lower === "chat") return "chat.svg";
+    if (lower === "music" || lower === "media") return "music-note-2.svg";
+    if (lower === "terminal" || lower === "term") return "terminal.svg";
+    if (lower === "browser" || lower === "web") return "globe-search.svg";
+    if (lower === "mail" || lower === "email") return "mail.svg";
+    if (lower === "files" || lower === "file") return "folder.svg";
+    if (lower === "monitor" || lower === "system") return "board.svg";
+    return "apps.svg";
   }
 
   Connections {
@@ -149,13 +149,12 @@ Item {
       scale: mainMouse.containsMouse ? 1.08 : 1.0
       Behavior on scale { SpringAnimation { spring: 4; damping: 0.3 } }
 
-      Text {
+      Loader {
         anchors.centerIn: parent
-        text: root.mainIcon
-        color: root.isOnSpecial ? Colors.primary : Colors.text
-        font.pixelSize: root.pillFont
-        font.family: Appearance.fontMono
+        sourceComponent: root.mainIcon.endsWith(".svg") ? _mainSvgV : _mainNerdV
       }
+      Component { id: _mainSvgV; SharedWidgets.SvgIcon { source: root.mainIcon; color: root.isOnSpecial ? Colors.primary : Colors.text; size: root.pillFont } }
+      Component { id: _mainNerdV; Text { text: root.mainIcon; color: root.isOnSpecial ? Colors.primary : Colors.text; font.pixelSize: root.pillFont; font.family: Appearance.fontMono } }
 
       MouseArea {
         id: mainMouse
@@ -201,12 +200,12 @@ Item {
           anchors.centerIn: parent
           spacing: Appearance.spacingXS
 
-          Text {
-            text: modelData.icon
-            color: wsPill.isFocused ? Colors.primary : Colors.text
-            font.pixelSize: root.pillFont
-            font.family: Appearance.fontMono
+          Loader {
+            anchors.verticalCenter: parent.verticalCenter
+            sourceComponent: String(modelData.icon || "").endsWith(".svg") ? _wsSvg : _wsNerd
           }
+          Component { id: _wsSvg; SharedWidgets.SvgIcon { source: modelData.icon; color: wsPill.isFocused ? Colors.primary : Colors.text; size: root.pillFont } }
+          Component { id: _wsNerd; Text { text: modelData.icon; color: wsPill.isFocused ? Colors.primary : Colors.text; font.pixelSize: root.pillFont; font.family: Appearance.fontMono } }
           Text {
             visible: root.showLabels
             text: modelData.shortName
@@ -277,13 +276,12 @@ Item {
       border.width: 1
       Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
-      Text {
+      Loader {
         anchors.centerIn: parent
-        text: root.mainIcon
-        color: root.isOnSpecial ? Colors.primary : Colors.text
-        font.pixelSize: root.pillFont
-        font.family: Appearance.fontMono
+        sourceComponent: root.mainIcon.endsWith(".svg") ? _mainSvg : _mainNerd
       }
+      Component { id: _mainSvg; SharedWidgets.SvgIcon { source: root.mainIcon; color: root.isOnSpecial ? Colors.primary : Colors.text; size: root.pillFont } }
+      Component { id: _mainNerd; Text { text: root.mainIcon; color: root.isOnSpecial ? Colors.primary : Colors.text; font.pixelSize: root.pillFont; font.family: Appearance.fontMono } }
 
       MouseArea {
         id: mainMouseV
@@ -318,13 +316,12 @@ Item {
         border.width: isFocused ? 2 : 1
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
-        Text {
+        Loader {
           anchors.centerIn: parent
-          text: modelData.icon
-          color: parent.isFocused ? Colors.primary : Colors.text
-          font.pixelSize: root.pillFont
-          font.family: Appearance.fontMono
+          sourceComponent: String(modelData.icon || "").endsWith(".svg") ? _wsSvgV : _wsNerdV
         }
+        Component { id: _wsSvgV; SharedWidgets.SvgIcon { source: modelData.icon; color: parent.isFocused ? Colors.primary : Colors.text; size: root.pillFont } }
+        Component { id: _wsNerdV; Text { text: modelData.icon; color: parent.isFocused ? Colors.primary : Colors.text; font.pixelSize: root.pillFont; font.family: Appearance.fontMono } }
 
         MouseArea {
           id: wsHoverV

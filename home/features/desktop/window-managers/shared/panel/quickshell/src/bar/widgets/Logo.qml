@@ -88,12 +88,11 @@ Item {
       visible: status === Image.Ready && SystemStatus.overallStatus !== "failure"
     }
 
-    Text {
+    SharedWidgets.SvgIcon {
       anchors.verticalCenter: parent.verticalCenter
-      text: "󱄅"
+      source: "brands/nixos-symbolic.svg"
       color: root.statusColor
-      font.family: Appearance.fontMono
-      font.pixelSize: Appearance.fontSizeXL
+      size: Appearance.fontSizeXL
       visible: !logoImage.visible
     }
 
@@ -126,8 +125,8 @@ Item {
       } else {
         var globalPos = root.mapToItem(null, 0, 0);
         root.contextMenuRequested([
-            { label: "Check Health", icon: "󰓅", action: () => SystemStatus.refreshHealth() },
-            { label: "Apply Safe Fixes", icon: "󰁨", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.activeIncidents.length > 0 },
+            { label: "Check Health", icon: "board.svg", action: () => SystemStatus.refreshHealth() },
+            { label: "Apply Safe Fixes", icon: "checkmark.svg", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.activeIncidents.length > 0 },
             { label: "Open Health Dashboard", icon: "settings.svg", action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "health"]) },
             { separator: true },
             { label: "Restart Shell", icon: "arrow-clockwise.svg", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }

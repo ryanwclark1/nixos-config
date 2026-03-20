@@ -81,11 +81,10 @@ Item {
                 anchors.centerIn: parent
                 spacing: Appearance.spacingSM
 
-                Text {
-                    text: MediaService.isPlaying ? "󰏤" : "󰐊"
+                SharedWidgets.SvgIcon {
+                    source: MediaService.isPlaying ? "pause.svg" : "play.svg"
                     color: MediaService.artAccentColor
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeSmall
+                    size: Appearance.fontSizeSmall
 
                     MouseArea {
                         anchors.fill: parent
@@ -103,11 +102,10 @@ Item {
                     Layout.maximumWidth: 120
                 }
 
-                Text {
-                    text: "󰒭"
+                SharedWidgets.SvgIcon {
+                    source: "arrow-right.svg"
                     color: Colors.textDisabled
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeSmall
+                    size: Appearance.fontSizeSmall
 
                     MouseArea {
                         anchors.fill: parent
