@@ -13,7 +13,7 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Model Usage"
-        iconName: "󰊤"
+        iconName: "board.svg"
 
         SettingsCard {
             title: "Providers"

@@ -186,7 +186,7 @@ Item {
         }
         SettingsCard {
             description: "Customize how you interact with workspaces."
-            iconName: "󰒔"
+            iconName: "arrow-counterclockwise.svg"
             title: "Advanced Interaction"
 
             SettingsModeRow {
