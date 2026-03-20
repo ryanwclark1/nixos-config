@@ -24,6 +24,7 @@ ColumnLayout {
 
     spacing: Appearance.spacingS
     Layout.fillWidth: true
+    Layout.minimumWidth: 0
 
     Text {
         visible: root.label !== ""
@@ -84,6 +85,7 @@ ColumnLayout {
                 TextInput {
                     id: input
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     color: Colors.text
                     font.pixelSize: Appearance.fontSizeMedium
                     clip: true

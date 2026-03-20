@@ -72,6 +72,7 @@ Rectangle {
 
             ColumnLayout {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 spacing: Appearance.spacingXXS
 
                 Text {
@@ -80,6 +81,7 @@ Rectangle {
                     font.pixelSize: Appearance.fontSizeMedium
                     font.weight: Font.DemiBold
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     wrapMode: Text.WordWrap
                 }
 
@@ -89,6 +91,7 @@ Rectangle {
                     color: Colors.textSecondary
                     font.pixelSize: Appearance.fontSizeSmall
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     wrapMode: Text.WordWrap
                 }
             }
