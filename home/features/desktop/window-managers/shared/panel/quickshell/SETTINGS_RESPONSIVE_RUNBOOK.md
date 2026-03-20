@@ -87,7 +87,7 @@ This is a runtime guardrail, not a replacement for visual QA.
 If the installed shell does not reflect the repo checkout yet, use `scripts/check-panel-runtime.sh --repo-shell --skip-surfaces --skip-multibar` instead.
 For SSH-specific settings/editor changes, pair it with `scripts/check-ssh-settings-smoke.sh` so the custom SSH widget editor path is exercised directly rather than only through tab-open coverage.
 
-Unlike the headless multibar smoke in the panel QA flow, this live-session check uses only `PASS`, `WARN`, and `FAIL` outcomes. It does not emit `[SKIP]` results.
+Unlike the headless multibar smoke in the panel QA flow, this live-session check uses `PASS`, `WARN`, and `FAIL` outcomes by default. The one documented exception is the Niri VM path when the compositor exposes no `wl_output` objects at all; in that case the Bar Widgets first-open screenshot capture is skipped because `grim` cannot capture a nonexistent output, while the remaining settings smoke and the Hyprland VM still cover the live path.
 
 Current verified repo-shell baseline:
 

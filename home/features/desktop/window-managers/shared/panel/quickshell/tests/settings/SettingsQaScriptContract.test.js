@@ -12,6 +12,6 @@ describe("settings QA script contract", () => {
   it("keeps launcher runtime capture out of the settings-focused QA stack", () => {
     const source = readFileSync(settingsQaScriptPath, "utf8");
 
-    expect(source).toContain('check-settings-guardrails.sh" --skip-responsive --skip-launcher');
+    expect(source).toContain('check-settings-guardrails.sh" --skip-responsive --skip-launcher --skip-settings-deep');
   });
 });
