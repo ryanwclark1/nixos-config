@@ -6,6 +6,7 @@ singleton BarWidgetRegistry 1.0 ../features/bar/registry/BarWidgetRegistry.qml
 singleton BrightnessService 1.0 BrightnessService.qml
 singleton CaffeineService 1.0 CaffeineService.qml
 singleton ClipboardHistoryService 1.0 ClipboardHistoryService.qml
+singleton ColorExportService 1.0 ColorExportService.qml
 singleton Colors 1.0 Colors.qml
 singleton CompositorAdapter 1.0 CompositorAdapter.qml
 singleton Config 1.0 Config.qml

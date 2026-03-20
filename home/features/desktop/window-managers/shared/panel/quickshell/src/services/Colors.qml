@@ -117,11 +117,15 @@ QtObject {
     Behavior on _effectiveOpacitySurface { enabled: !colors.skipTransition; NumberAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
     Behavior on _effectiveOpacityOverlay { enabled: !colors.skipTransition; NumberAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
 
+    // --- OLED MODE ---
+    // Forces background to pure black for power savings on OLED displays
+    readonly property color _effectiveBackground: Config.oledMode ? "#000000" : background
+
     // --- GLASSMORPHISM ---
     readonly property real bgOpacity: _effectiveOpacityBase
-    readonly property color bgGlass: withAlpha(background, bgOpacity)
+    readonly property color bgGlass: withAlpha(_effectiveBackground, bgOpacity)
     readonly property color bgWidget: _isLight ? Qt.rgba(0, 0, 0, 0.06) : Qt.rgba(1, 1, 1, 0.08)
-    readonly property color bg: background
+    readonly property color bg: _effectiveBackground
 
     // --- GRADIENTS & DEPTH ---
     readonly property color surfaceGradientStart: withAlpha(surface, _effectiveOpacitySurface)
@@ -138,10 +142,17 @@ QtObject {
     // --- OVERLAYS ---
     readonly property color overlayScrim: Qt.rgba(0, 0, 0, 0.45)
 
+    // --- SURFACE ELEVATION HIERARCHY (MD3-inspired) ---
+    readonly property color surfaceContainerLowest: withAlpha(_effectiveBackground, _effectiveOpacityBase)
+    readonly property color surfaceContainerLow: withAlpha(surface, _effectiveOpacityBase * 0.97)
+    readonly property color surfaceContainer: withAlpha(surface, _effectiveOpacityBase)
+    readonly property color surfaceContainerHigh: withAlpha(surface, _effectiveOpacitySurface)
+    readonly property color surfaceContainerHighest: withAlpha(surface, _effectiveOpacityOverlay)
+
     // --- POPUP SURFACES (shared across all menus) ---
-    readonly property color popupSurface: withAlpha(surface, _effectiveOpacityBase)
-    readonly property color cardSurface: withAlpha(surface, _effectiveOpacitySurface)
-    readonly property color chipSurface: withAlpha(surface, _effectiveOpacityOverlay)
+    readonly property color popupSurface: surfaceContainer
+    readonly property color cardSurface: surfaceContainerHigh
+    readonly property color chipSurface: surfaceContainerHighest
     readonly property color modalFieldSurface: chipSurface
 
     property Connections _configConn: Connections {
@@ -211,8 +222,11 @@ QtObject {
         else reloadColors();
     }
 
+    property bool colorsReady: false
+
     Component.onCompleted: {
         colors._applyColorBackend();
+        colorsReady = true;
         Qt.callLater(function() { colors.skipTransition = false; });
     }
 
