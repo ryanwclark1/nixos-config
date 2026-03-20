@@ -71,7 +71,12 @@ ColumnLayout {
 
         RowLayout {
           Layout.fillWidth: true
-          Text { text: root.icon; color: root.muted ? Colors.error : Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL }
+          Loader {
+            property string _ic: root.icon
+            sourceComponent: String(_ic).endsWith(".svg") ? _adsSvg : _adsNerd
+          }
+          Component { id: _adsSvg; SvgIcon { source: root.icon; color: root.muted ? Colors.error : Colors.primary; size: Appearance.fontSizeXL } }
+          Component { id: _adsNerd; Text { text: root.icon; color: root.muted ? Colors.error : Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }
           Text { text: root.sectionLabel.charAt(0) + root.sectionLabel.slice(1).toLowerCase(); color: Colors.text; font.pixelSize: Appearance.fontSizeMedium; font.weight: Font.Medium }
           Item { Layout.fillWidth: true }
           MuteButton {

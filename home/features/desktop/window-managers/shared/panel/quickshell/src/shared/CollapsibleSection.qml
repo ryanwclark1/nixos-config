@@ -48,22 +48,21 @@ ColumnLayout {
             anchors.bottomMargin: Appearance.spacingS
             spacing: Appearance.spacingS
 
-            Text {
-                text: "\u{f0140}"
+            SvgIcon {
+                source: "chevron-down.svg"
                 color: Colors.textDisabled
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeSmall
+                size: Appearance.fontSizeSmall
                 rotation: root.expanded ? 0 : -90
                 Behavior on rotation { Anim { duration: Appearance.durationFast } }
             }
 
-            Text {
+            Loader {
                 visible: !!root.icon
-                text: root.icon
-                color: Colors.textSecondary
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeMedium
+                property string _ic: root.icon
+                sourceComponent: String(_ic).endsWith(".svg") ? _csSvg : _csNerd
             }
+            Component { id: _csSvg; SvgIcon { source: root.icon; color: Colors.textSecondary; size: Appearance.fontSizeMedium } }
+            Component { id: _csNerd; Text { text: root.icon; color: Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium } }
 
             ColumnLayout {
                 Layout.fillWidth: true

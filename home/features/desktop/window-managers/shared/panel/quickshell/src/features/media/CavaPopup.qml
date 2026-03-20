@@ -75,13 +75,24 @@ PopupWindow {
       anchors.margins: Appearance.paddingMedium
       spacing: Appearance.paddingSmall
 
-      Text {
-        text: "󰎆  AUDIO VISUALIZER"
-        color: Colors.textSecondary
-        font.pixelSize: Appearance.fontSizeXS
-        font.weight: Font.Bold
-        font.letterSpacing: Appearance.letterSpacingWide
+      Row {
+        spacing: Appearance.spacingS
         Layout.alignment: Qt.AlignHCenter
+
+        SharedWidgets.SvgIcon {
+          source: "music-note-2.svg"
+          color: Colors.textSecondary
+          size: Appearance.fontSizeXS
+          anchors.verticalCenter: parent.verticalCenter
+        }
+        Text {
+          text: "AUDIO VISUALIZER"
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          font.weight: Font.Bold
+          font.letterSpacing: Appearance.letterSpacingWide
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
 
       Item {

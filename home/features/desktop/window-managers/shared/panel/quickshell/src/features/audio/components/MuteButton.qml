@@ -19,12 +19,28 @@ Rectangle {
   border.color: showBorder ? Colors.border : "transparent"
   border.width: showBorder ? 1 : 0
 
-  Text {
+  Loader {
     anchors.centerIn: parent
-    text: root.muted ? root.mutedIcon : root.icon
-    color: root.muted ? Colors.error : Colors.textSecondary
-    font.family: Appearance.fontMono
-    font.pixelSize: Math.round(root.size * 0.5)
+    property string _ic: root.muted ? root.mutedIcon : root.icon
+    property color _col: root.muted ? Colors.error : Colors.textSecondary
+    sourceComponent: String(_ic).endsWith(".svg") ? _mbSvg : _mbNerd
+  }
+  Component {
+    id: _mbSvg
+    SvgIcon {
+      source: root.muted ? root.mutedIcon : root.icon
+      color: parent ? parent._col : Colors.textSecondary
+      size: Math.round(root.size * 0.5)
+    }
+  }
+  Component {
+    id: _mbNerd
+    Text {
+      text: root.muted ? root.mutedIcon : root.icon
+      color: parent ? parent._col : Colors.textSecondary
+      font.family: Appearance.fontMono
+      font.pixelSize: Math.round(root.size * 0.5)
+    }
   }
 
   opacity: enabled ? 1.0 : 0.4

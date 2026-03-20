@@ -30,13 +30,13 @@ BasePopupMenu {
     SharedWidgets.AudioDeviceSection {
       Layout.fillWidth: true
       sectionLabel: "OUTPUT"
-      icon: "󰕾"; mutedIcon: "󰝟"
+      icon: "speaker.svg"; mutedIcon: "speaker-mute.svg"
       volume: AudioService.outputVolume
       muted: AudioService.outputMuted
       target: "@DEFAULT_AUDIO_SINK@"
       deviceModel: AudioService.filteredSinks
       defaultDeviceId: AudioService.defaultSinkId
-      emptyIcon: "󰕿"
+      emptyIcon: "speaker-off.svg"
       emptyMessage: "No output devices detected"
       compactMode: root.compactMode
       onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SINK@", v)
@@ -45,13 +45,13 @@ BasePopupMenu {
     SharedWidgets.AudioDeviceSection {
       Layout.fillWidth: true
       sectionLabel: "INPUT"
-      icon: "󰍬"; mutedIcon: "󰍭"
+      icon: "mic.svg"; mutedIcon: "mic-off.svg"
       volume: AudioService.inputVolume
       muted: AudioService.inputMuted
       target: "@DEFAULT_AUDIO_SOURCE@"
       deviceModel: AudioService.filteredSources
       defaultDeviceId: AudioService.defaultSourceId
-      emptyIcon: "󰍭"
+      emptyIcon: "mic-off.svg"
       emptyMessage: "No input devices detected"
       compactMode: root.compactMode
       onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SOURCE@", v)

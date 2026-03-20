@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 Item {
   id: root
@@ -79,12 +80,11 @@ Item {
     color: Colors.primary
     opacity: scaleArea.containsMouse ? 1.0 : 0.6
 
-    Text {
+    SharedWidgets.SvgIcon {
       anchors.centerIn: parent
-      text: "󰁌"
+      source: "re-order-dots-vertical.svg"
       color: Colors.background
-      font.family: Appearance.fontMono
-      font.pixelSize: Appearance.fontSizeXS
+      size: Appearance.fontSizeXS
     }
 
     MouseArea {

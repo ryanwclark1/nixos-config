@@ -318,12 +318,11 @@ BasePopupMenu {
               anchors.margins: Appearance.spacingM
               spacing: Appearance.spacingS
 
-              Text {
-                text: "󰖂"
+              SharedWidgets.SvgIcon {
+                source: "wifi-off.svg"
                 color: NetworkService.vpnPrimaryStatus === "connected" ? Colors.success
                   : (NetworkService.vpnPrimaryStatus === "stopped" ? Colors.warning : Colors.textSecondary)
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeXL
+                size: Appearance.fontSizeXL
               }
 
               ColumnLayout {

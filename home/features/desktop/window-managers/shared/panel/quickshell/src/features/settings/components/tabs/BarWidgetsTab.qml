@@ -501,11 +501,10 @@ Item {
                                         Layout.fillWidth: true
                                         spacing: Appearance.spacingS
 
-                                        Text {
-                                            text: "󰆾"
+                                        SharedWidgets.SvgIcon {
+                                            source: "re-order-dots-vertical.svg"
                                             color: Colors.textDisabled
-                                            font.family: Appearance.fontMono
-                                            font.pixelSize: Appearance.fontSizeLarge
+                                            size: Appearance.fontSizeLarge
                                         }
 
                                         Text {

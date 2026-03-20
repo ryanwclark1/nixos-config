@@ -248,11 +248,10 @@ Item {
                                     }
                                 }
 
-                                Text {
-                                    text: "󰆓"
+                                SharedWidgets.SvgIcon {
+                                    source: "save.svg"
                                     color: Colors.textSecondary
-                                    font.family: Appearance.fontMono
-                                    font.pixelSize: Appearance.fontSizeLarge
+                                    size: Appearance.fontSizeLarge
 
                                     MouseArea {
                                         id: createTemplateMouse

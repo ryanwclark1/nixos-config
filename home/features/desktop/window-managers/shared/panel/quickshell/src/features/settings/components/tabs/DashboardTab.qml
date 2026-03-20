@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../../services"
+import "../../../../widgets" as SharedWidgets
 import ".."
 
 Item {
@@ -97,11 +98,11 @@ Item {
                                     fillMode: Image.PreserveAspectCrop
                                 }
 
-                                Text {
+                                SharedWidgets.SvgIcon {
                                     visible: !MediaService.trackArtUrl
                                     anchors.centerIn: parent
-                                    text: "󰓃"
-                                    font.pixelSize: Appearance.iconSizeMedium
+                                    source: "brands/github-symbolic.svg"
+                                    size: Appearance.iconSizeMedium
                                     color: Colors.textDisabled
                                 }
                             }

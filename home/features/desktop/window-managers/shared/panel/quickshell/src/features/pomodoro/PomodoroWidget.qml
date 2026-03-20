@@ -145,7 +145,7 @@ ThemedContainer {
 
       // Reset
       SharedWidgets.IconButton {
-        icon: ""
+        icon: "arrow-counterclockwise.svg"
         size: 34
         iconSize: Appearance.fontSizeMedium
         iconColor: Colors.textSecondary
@@ -156,7 +156,7 @@ ThemedContainer {
 
       // Play / Pause
       SharedWidgets.IconButton {
-        icon: PomodoroService.running ? "" : ""
+        icon: PomodoroService.running ? "pause.svg" : "play.svg"
         size: 44
         iconSize: Appearance.fontSizeXL
         iconColor: root.lapColor

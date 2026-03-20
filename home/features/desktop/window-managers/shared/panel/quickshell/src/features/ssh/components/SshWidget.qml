@@ -72,11 +72,10 @@ Item {
         Row {
             spacing: Appearance.spacingSM
 
-            Text {
-                text: "󰣀"
+            SvgIcon {
+                source: "terminal.svg"
                 color: sshData.importErrors.length > 0 ? Colors.warning : Colors.primary
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeMedium
+                size: Appearance.fontSizeMedium
             }
 
             Text {

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../../services"
+import "../../../../widgets" as SharedWidgets
 import ".."
 
 Item {
@@ -512,11 +513,10 @@ Item {
                     Layout.bottomMargin: Appearance.spacingS
                     spacing: Appearance.spacingS
 
-                    Text {
-                        text: "󰂛"
+                    SharedWidgets.SvgIcon {
+                        source: "alert.svg"
                         color: Colors.textDisabled
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeHuge
+                        size: Appearance.fontSizeHuge
                         Layout.alignment: Qt.AlignHCenter
                     }
 

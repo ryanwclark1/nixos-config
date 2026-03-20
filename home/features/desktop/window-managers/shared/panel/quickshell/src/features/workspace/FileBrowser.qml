@@ -339,12 +339,11 @@ PanelWindow {
               : "transparent"
             Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
-            Text {
+            SharedWidgets.SvgIcon {
               anchors.centerIn: parent
-              text: "󰕴"
+              source: "sort.svg"
               color: root._viewGrid ? Colors.primary : Colors.textSecondary
-              font.family: Appearance.fontMono
-              font.pixelSize: Appearance.fontSizeLarge
+              size: Appearance.fontSizeLarge
             }
             SharedWidgets.StateLayer {
               id: gridToggleSL
@@ -369,12 +368,11 @@ PanelWindow {
               : "transparent"
             Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
-            Text {
+            SharedWidgets.SvgIcon {
               anchors.centerIn: parent
-              text: "󰕵"
+              source: "sort.svg"
               color: !root._viewGrid ? Colors.primary : Colors.textSecondary
-              font.family: Appearance.fontMono
-              font.pixelSize: Appearance.fontSizeLarge
+              size: Appearance.fontSizeLarge
             }
             SharedWidgets.StateLayer {
               id: listToggleSL
@@ -396,12 +394,11 @@ PanelWindow {
             width: 30; height: 30; radius: height / 2
             color: "transparent"
 
-            Text {
+            SharedWidgets.SvgIcon {
               anchors.centerIn: parent
-              text: "󰅖"
+              source: "dismiss.svg"
               color: Colors.textSecondary
-              font.family: Appearance.fontMono
-              font.pixelSize: Appearance.fontSizeLarge
+              size: Appearance.fontSizeLarge
             }
             SharedWidgets.StateLayer {
               id: closeSL
@@ -471,12 +468,11 @@ PanelWindow {
                 anchors.centerIn: parent
                 spacing: Appearance.spacingS
 
-                Text {
+                SharedWidgets.SvgIcon {
                   Layout.alignment: Qt.AlignHCenter
-                  text: "󰑐"
+                  source: "arrow-clockwise.svg"
                   color: Colors.textDisabled
-                  font.family: Appearance.fontMono
-                  font.pixelSize: Appearance.fontSizeDisplay
+                  size: Appearance.fontSizeDisplay
 
                   RotationAnimator on rotation {
                     running: root._loading

@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 import "../VpnHelpers.js" as VH
 
 Row {
@@ -34,11 +35,10 @@ Row {
         active: root.visible
     }
 
-    Text {
-        text: "󰖂"
+    SharedWidgets.SvgIcon {
+        source: "wifi-off.svg"
         color: root.statusColor()
-        font.pixelSize: Appearance.fontSizeLarge
-        font.family: Appearance.fontMono
+        size: Appearance.fontSizeLarge
         anchors.verticalCenter: parent.verticalCenter
     }
 

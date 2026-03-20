@@ -231,12 +231,11 @@ Rectangle {
                             elide: Text.ElideRight
                         }
 
-                        Text {
+                        SharedWidgets.SvgIcon {
                             visible: optionDelegate.selected
-                            text: "󰄬"
+                            source: "checkmark.svg"
                             color: Colors.primary
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeSmall
+                            size: Appearance.fontSizeSmall
                         }
                     }
 

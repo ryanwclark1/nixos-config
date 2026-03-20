@@ -296,10 +296,15 @@ PanelWindow {
                 spacing: root.narrowHeader ? Appearance.spacingXS : Appearance.spacingS
                 clip: true
 
+                SharedWidgets.SvgIcon {
+                    source: "sparkle.svg"
+                    color: Colors.text
+                    size: root.narrowHeader ? Appearance.fontSizeLarge : Appearance.fontSizeXL
+                }
                 Text {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 0
-                    text: "󰚩  AI Chat"
+                    text: "AI Chat"
                     color: Colors.text
                     font.pixelSize: root.narrowHeader ? Appearance.fontSizeLarge : Appearance.fontSizeXL
                     font.weight: Font.DemiBold

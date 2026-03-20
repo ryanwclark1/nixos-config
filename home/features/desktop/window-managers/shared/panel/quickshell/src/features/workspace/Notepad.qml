@@ -428,8 +428,13 @@ PanelWindow {
       RowLayout {
         Layout.fillWidth: true
 
+        SharedWidgets.SvgIcon {
+          source: "edit.svg"
+          color: Colors.text
+          size: Appearance.fontSizeXL
+        }
         Text {
-          text: "󰠮  Notepad"
+          text: "Notepad"
           color: Colors.text
           font.pixelSize: Appearance.fontSizeXL
           font.weight: Font.DemiBold

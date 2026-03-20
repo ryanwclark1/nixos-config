@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../shared"
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 ColumnLayout {
     id: root
@@ -100,12 +101,11 @@ ColumnLayout {
                     }
                 }
 
-                Text {
+                SharedWidgets.SvgIcon {
                     visible: root.showClearButton && input.text.length > 0
-                    text: "󰅖"
+                    source: "dismiss.svg"
                     color: Colors.textDisabled
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeLarge
+                    size: Appearance.fontSizeLarge
 
                     MouseArea {
                         anchors.fill: parent

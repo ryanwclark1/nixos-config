@@ -34,11 +34,10 @@ Rectangle {
     spacing: 5
 
     // Checkmark when selected
-    Text {
-      text: "󰄬"
+    SvgIcon {
+      source: "checkmark.svg"
       color: Colors.primary
-      font.family: Appearance.fontMono
-      font.pixelSize: Appearance.fontSizeSmall
+      size: Appearance.fontSizeSmall
       visible: root.selected && root.icon === ""
       anchors.verticalCenter: parent.verticalCenter
     }

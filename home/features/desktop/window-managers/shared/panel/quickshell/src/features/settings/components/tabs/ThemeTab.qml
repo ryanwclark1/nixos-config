@@ -414,11 +414,10 @@ Item {
                                                         Layout.fillWidth: true
                                                         spacing: Appearance.spacingS
 
-                                                        Text {
-                                                            text: "󰄬"
+                                                        SharedWidgets.SvgIcon {
+                                                            source: "checkmark.svg"
                                                             color: Colors.primary
-                                                            font.family: Appearance.fontMono
-                                                            font.pixelSize: Appearance.fontSizeLarge
+                                                            size: Appearance.fontSizeLarge
                                                             visible: themeCardWrapper._themeIsActive
                                                         }
 

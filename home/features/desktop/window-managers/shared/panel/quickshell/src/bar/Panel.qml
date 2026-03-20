@@ -1177,7 +1177,7 @@ Item {
         id: aiChatPillComponent
         BarSurfacePill {
             surfaceId: "aiChat"
-            iconText: "󰚩"
+            iconText: "sparkle.svg"
             iconSize: Appearance.fontSizeLarge
             defaultLabel: "AI"
             tooltipText: "AI Chat"
@@ -1189,7 +1189,7 @@ Item {
         id: notepadComponent
         BarSurfacePill {
             surfaceId: "notepad"
-            iconText: "󰠮"
+            iconText: "edit.svg"
             iconSize: Appearance.fontSizeLarge
             defaultLabel: "Notes"
             tooltipText: "Notepad"
@@ -1201,7 +1201,7 @@ Item {
         id: controlCenterComponent
         BarSurfacePill {
             surfaceId: "controlCenter"
-            iconText: "󰒓"
+            iconText: "settings.svg"
             defaultLabel: "Controls"
             tooltipText: "System controls"
             tooltipShortcutText: "Meta+C"
@@ -1225,7 +1225,7 @@ Item {
         id: clipboardComponent
         BarSurfacePill {
             surfaceId: "clipboardMenu"
-            iconText: "󰅍"
+            iconText: "paste.svg"
             defaultLabel: "Clipboard"
             tooltipText: "Clipboard history"
             panelRef: root
@@ -1244,7 +1244,7 @@ Item {
         id: screenshotComponent
         BarSurfacePill {
             surfaceId: "screenshotMenu"
-            iconText: "󰩭"
+            iconText: "image-copy.svg"
             defaultLabel: "Shot"
             tooltipText: "Screenshot"
             panelRef: root

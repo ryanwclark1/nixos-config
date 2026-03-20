@@ -32,11 +32,21 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            Text { 
-                text: "󰆍  " + root.title 
-                color: Colors.primary
-                font.pixelSize: Appearance.fontSizeLarge
-                font.weight: Font.Bold
+            Row {
+                spacing: Appearance.spacingS
+                SvgIcon {
+                    source: "terminal.svg"
+                    color: Colors.primary
+                    size: Appearance.fontSizeLarge
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    text: root.title
+                    color: Colors.primary
+                    font.pixelSize: Appearance.fontSizeLarge
+                    font.weight: Font.Bold
+                    anchors.verticalCenter: parent.verticalCenter
+                }
             }
             Item { Layout.fillWidth: true }
             IconButton {

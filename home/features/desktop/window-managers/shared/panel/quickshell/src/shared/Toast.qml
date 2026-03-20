@@ -188,11 +188,10 @@ Item {
           anchors.centerIn: parent
           spacing: Appearance.spacingXS
 
-          Text {
-            text: "󰕌"
+          SvgIcon {
+            source: "dismiss.svg"
             color: Colors.primary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeSmall
+            size: Appearance.fontSizeSmall
           }
 
           Text {

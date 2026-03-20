@@ -27,11 +27,10 @@ Item {
 
       Row {
         spacing: Appearance.spacingSM
-        Text {
-          text: ""
+        SharedWidgets.SvgIcon {
+          source: "chevron-left.svg"
           color: Colors.primary
-          font.pixelSize: Appearance.fontSizeLarge
-          font.family: Appearance.fontMono
+          size: Appearance.fontSizeLarge
           anchors.verticalCenter: parent.verticalCenter
         }
         Text {
@@ -54,11 +53,10 @@ Item {
 
       Row {
         spacing: Appearance.spacingSM
-        Text {
-          text: ""
+        SharedWidgets.SvgIcon {
+          source: "chevron-right.svg"
           color: Colors.accent
-          font.pixelSize: Appearance.fontSizeLarge
-          font.family: Appearance.fontMono
+          size: Appearance.fontSizeLarge
           anchors.verticalCenter: parent.verticalCenter
         }
         Text {

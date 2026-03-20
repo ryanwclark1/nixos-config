@@ -532,11 +532,10 @@ Item {
                     Layout.topMargin: Appearance.spacingXL
                     spacing: Appearance.spacingM
 
-                    Text {
-                        text: "󰏗"
+                    SharedWidgets.SvgIcon {
+                        source: "puzzle-piece.svg"
                         color: Colors.textDisabled
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeHuge
+                        size: Appearance.fontSizeHuge
                         Layout.alignment: Qt.AlignHCenter
                     }
                     Text {

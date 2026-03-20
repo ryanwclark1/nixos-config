@@ -100,7 +100,7 @@ Rectangle {
         RowLayout {
           anchors.centerIn: parent
           spacing: Appearance.spacingS
-          Text { text: "󰜺"; color: Colors.error; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium }
+          SharedWidgets.SvgIcon { source: "arrow-counterclockwise.svg"; color: Colors.error; size: Appearance.fontSizeMedium }
           Text { text: "Revert Now"; color: Colors.error; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Bold }
         }
 
@@ -130,7 +130,7 @@ Rectangle {
         RowLayout {
           anchors.centerIn: parent
           spacing: Appearance.spacingS
-          Text { text: "󰄬"; color: Colors.secondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium }
+          SharedWidgets.SvgIcon { source: "checkmark.svg"; color: Colors.secondary; size: Appearance.fontSizeMedium }
           Text { text: "Keep Changes"; color: Colors.secondary; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Bold }
         }
 

@@ -123,11 +123,10 @@ BasePopupMenu {
                 anchors.margins: Appearance.spacingM
                 spacing: Appearance.spacingM
 
-                Text {
-                    text: "󰗊"
+                SharedWidgets.SvgIcon {
+                    source: "crop.svg"
                     color: Colors.primary
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeXL
+                    size: Appearance.fontSizeXL
                 }
 
                 ColumnLayout {
@@ -262,11 +261,10 @@ BasePopupMenu {
                 anchors.margins: Appearance.spacingM
                 spacing: Appearance.spacingM
 
-                Text {
-                    text: "󰍉"
+                SharedWidgets.SvgIcon {
+                    source: "search-visual.svg"
                     color: Colors.primary
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeXL
+                    size: Appearance.fontSizeXL
                 }
 
                 ColumnLayout {

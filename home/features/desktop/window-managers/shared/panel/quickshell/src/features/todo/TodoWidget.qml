@@ -30,13 +30,12 @@ Item {
         anchors { fill: parent; leftMargin: Appearance.spacingM; rightMargin: Appearance.spacingXS }
         spacing: Appearance.spacingXS
 
-        Text {
-          text: ""
+        SharedWidgets.SvgIcon {
+          source: "add.svg"
           color: inputField.activeFocus
             ? Colors.withAlpha(Colors.primary, 0.7)
             : Colors.textDisabled
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeSmall
+          size: Appearance.fontSizeSmall
         }
 
         TextInput {
@@ -71,7 +70,7 @@ Item {
         }
 
         SharedWidgets.IconButton {
-          icon: ""
+          icon: "arrow-enter-left.svg"
           size: 28
           iconSize: Appearance.fontSizeSmall
           iconColor: inputField.text.trim() ? Colors.primary : Colors.textDisabled
@@ -163,12 +162,11 @@ Item {
             Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
             Behavior on border.color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationSnap } }
 
-            Text {
+            SharedWidgets.SvgIcon {
               anchors.centerIn: parent
-              text: ""
+              source: "checkmark.svg"
               color: Colors.primary
-              font.family: Appearance.fontMono
-              font.pixelSize: Appearance.fontSizeCaption
+              size: Appearance.fontSizeCaption
               opacity: row.taskDone ? 1 : 0
               Behavior on opacity { NumberAnimation { duration: Appearance.durationSnap } }
             }

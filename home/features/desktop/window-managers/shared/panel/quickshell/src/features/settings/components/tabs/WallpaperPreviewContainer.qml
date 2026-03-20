@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
+import "../../../../widgets" as SharedWidgets
 import "../../../background"
 import "WallpaperTabHelpers.js" as WTH
 
@@ -52,11 +53,10 @@ Rectangle {
         visible: !previewContainer.solidPreview
             && (previewContainer.previewPath === "" || wallpaperPreview.currentSource == "")
 
-        Text {
-            text: "󰸉"
+        SharedWidgets.SvgIcon {
+            source: "image.svg"
             color: Colors.textDisabled
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeHuge
+            size: Appearance.fontSizeHuge
             Layout.alignment: Qt.AlignHCenter
         }
         Text {

@@ -36,12 +36,11 @@ Rectangle {
             width: 26; height: 26; radius: Appearance.radiusSmall
             color: "transparent"
 
-            Text {
+            SharedWidgets.SvgIcon {
                 anchors.centerIn: parent
-                text: "󰁞"
+                source: "chevron-right.svg"
                 color: Colors.textSecondary
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeMedium
+                size: Appearance.fontSizeMedium
             }
             SharedWidgets.StateLayer {
                 id: upSL
@@ -131,12 +130,11 @@ Rectangle {
             width: 26; height: 26; radius: Appearance.radiusSmall
             color: "transparent"
 
-            Text {
+            SharedWidgets.SvgIcon {
                 anchors.centerIn: parent
-                text: "󰑐"
+                source: "arrow-clockwise.svg"
                 color: Colors.textSecondary
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeMedium
+                size: Appearance.fontSizeMedium
             }
             SharedWidgets.StateLayer {
                 id: refreshSL

@@ -353,12 +353,11 @@ Item {
                                 color: pluginRow.hidden ? Colors.textFaint : Colors.primarySubtle
                                 Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
-                                Text {
+                                SharedWidgets.SvgIcon {
                                     anchors.centerIn: parent
-                                    text: "󰏗"
+                                    source: "puzzle-piece.svg"
                                     color: pluginRow.hidden ? Colors.textDisabled : Colors.primary
-                                    font.family: Appearance.fontMono
-                                    font.pixelSize: Appearance.fontSizeMedium
+                                    size: Appearance.fontSizeMedium
                                 }
                             }
 

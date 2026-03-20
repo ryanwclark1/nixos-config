@@ -78,11 +78,10 @@ Item {
     Behavior on scale { NumberAnimation { duration: Appearance.durationSnap; easing.type: Easing.OutBack } }
 
     // ── Checkmark icon ────────────────────────────────────────────────────
-    Text {
+    SvgIcon {
       anchors.centerIn: parent
-      text: "󰄬"
-      font.family: Appearance.fontMono
-      font.pixelSize: Appearance.fontSizeXS
+      source: "checkmark.svg"
+      size: Appearance.fontSizeXS
       color: Colors.primary
       opacity: root.checked ? 1.0 : 0.0
       Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }

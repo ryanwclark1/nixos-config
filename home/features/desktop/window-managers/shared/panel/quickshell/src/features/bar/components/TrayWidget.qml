@@ -40,11 +40,11 @@ Flow {
         asynchronous: true
 
         // Fallback icon if none found
-        Text {
+        SvgIcon {
           anchors.centerIn: parent
-          text: "󰏘"
+          source: "apps.svg"
           color: Colors.textSecondary
-          font.pixelSize: Appearance.fontSizeMedium
+          size: Appearance.fontSizeMedium
           visible: parent.status !== Image.Ready
         }
       }

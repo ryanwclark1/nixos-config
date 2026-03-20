@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import "../../services"
 import "../../shared"
+import "../../widgets" as SharedWidgets
 
 // On-Screen Keyboard
 // Anchors to the bottom edge of the screen as a layer-shell Overlay surface.
@@ -181,11 +182,10 @@ PanelWindow {
                     border.color: Colors.border
                     border.width: 1
 
-                    Text {
+                    SharedWidgets.SvgIcon {
                         anchors.centerIn: parent
-                        text: "󰌌"
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeMedium
+                        source: "keyboard.svg"
+                        size: Appearance.fontSizeMedium
                         color: Colors.textSecondary
                     }
 

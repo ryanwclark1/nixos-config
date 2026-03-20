@@ -54,7 +54,7 @@ Item {
       Text { text: "TEMP"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Appearance.letterSpacingWide }
       RowLayout {
         spacing: Appearance.spacingSM
-        Text { text: "󰔏"; color: Colors.warning; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL }
+        SvgIcon { source: "temperature.svg"; color: Colors.warning; size: Appearance.fontSizeXL }
         Text { text: SystemStatus.cpuTemp || "--"; color: Colors.text; font.pixelSize: Appearance.fontSizeLarge; font.weight: Font.Bold }
       }
     }

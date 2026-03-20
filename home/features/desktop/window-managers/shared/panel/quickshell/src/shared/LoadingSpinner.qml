@@ -9,12 +9,11 @@ Item {
     width: size
     height: size
 
-    Text {
+    SvgIcon {
         anchors.centerIn: parent
-        text: "󰑓"
+        source: "arrow-clockwise.svg"
         color: root.color
-        font.family: Appearance.fontMono
-        font.pixelSize: root.size
+        size: root.size
 
         RotationAnimation on rotation {
             from: 0

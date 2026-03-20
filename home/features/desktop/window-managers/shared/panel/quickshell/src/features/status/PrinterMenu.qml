@@ -195,13 +195,12 @@ BasePopupMenu {
                 spacing: Appearance.spacingM
 
                 // Printer icon
-                Text {
-                  text: "󰐪"
+                SharedWidgets.SvgIcon {
+                  source: "dismiss.svg"
                   color: printerCard.isDisabled ? Colors.textDisabled
                        : printerCard.isPrinting ? Colors.warning
                        : Colors.primary
-                  font.family: Appearance.fontMono
-                  font.pixelSize: Appearance.fontSizeHuge
+                  size: Appearance.fontSizeHuge
                   Layout.alignment: Qt.AlignVCenter
                 }
 

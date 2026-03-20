@@ -13,11 +13,11 @@ Rectangle {
     property string placeholder: "Search..."
     property color accentColor: Colors.primary
     property string statusText: ""
-    property string statusIcon: "󱞩"
+    property string statusIcon: "info.svg"
     property bool embedded: false
     property string modeLabel: ""
     property string modeSubtitle: ""
-    property string modeIconText: "󰍉"
+    property string modeIconText: "search-visual.svg"
     property string modePrefix: ""
 
     signal accepted(var modifiers)
@@ -118,13 +118,13 @@ Rectangle {
                     anchors.centerIn: parent
                     spacing: Appearance.spacingXS
 
-                    Text {
+                    Loader {
                         visible: root.statusIcon !== ""
-                        text: root.statusIcon
-                        color: root.accentColor
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeXS
+                        property string _si: root.statusIcon
+                        sourceComponent: String(_si).endsWith(".svg") ? _siSvg : _siNerd
                     }
+                    Component { id: _siSvg; SharedWidgets.SvgIcon { source: root.statusIcon; color: root.accentColor; size: Appearance.fontSizeXS } }
+                    Component { id: _siNerd; Text { text: root.statusIcon; color: root.accentColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXS } }
 
                     Text {
                         text: root.statusText

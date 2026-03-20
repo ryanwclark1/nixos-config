@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 Rectangle {
     id: root
@@ -24,11 +25,10 @@ Rectangle {
         anchors.rightMargin: Appearance.spacingM
         spacing: Appearance.spacingS
 
-        Text {
-            text: "󰖂"
+        SharedWidgets.SvgIcon {
+            source: "wifi-off.svg"
             color: root.isActive ? Colors.accent : Colors.textSecondary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
         }
 
         ColumnLayout {

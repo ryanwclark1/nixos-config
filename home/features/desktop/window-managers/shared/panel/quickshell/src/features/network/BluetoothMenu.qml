@@ -219,13 +219,12 @@ BasePopupMenu {
       width: 30; height: 30; radius: height / 2
       color: "transparent"
 
-      Text {
+      SharedWidgets.SvgIcon {
         id: scanIcon
         anchors.centerIn: parent
-        text: "󰑐"
+        source: "arrow-clockwise.svg"
         color: root.isScanning ? Colors.primary : Colors.textSecondary
-        font.family: Appearance.fontMono
-        font.pixelSize: Appearance.fontSizeXL
+        size: Appearance.fontSizeXL
 
         RotationAnimator on rotation {
           from: 0; to: 360
@@ -276,12 +275,11 @@ BasePopupMenu {
         spacing: Appearance.spacingM
         Layout.topMargin: 40
 
-        Text {
+        SharedWidgets.SvgIcon {
           Layout.alignment: Qt.AlignHCenter
-          text: "󰂲"
+          source: "bluetooth-disabled.svg"
           color: Colors.textDisabled
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeHuge * 2
+          size: Appearance.fontSizeHuge * 2
         }
         Text {
           Layout.alignment: Qt.AlignHCenter

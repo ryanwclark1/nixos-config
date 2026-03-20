@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
     id: root
@@ -34,11 +35,10 @@ Rectangle {
             width: parent.width
             spacing: Appearance.spacingS
 
-            Text {
-                text: "󰖟"
+            SharedWidgets.SvgIcon {
+                source: "globe-search.svg"
                 color: root.accentColor
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeSmall
+                size: Appearance.fontSizeSmall
             }
 
             Text {

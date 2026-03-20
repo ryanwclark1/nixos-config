@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 Rectangle {
     required property bool editMode
@@ -37,11 +38,10 @@ Rectangle {
                 anchors.centerIn: parent
                 spacing: Appearance.spacingSM
 
-                Text {
-                    text: "󰐕"
+                SharedWidgets.SvgIcon {
+                    source: "add.svg"
                     color: Colors.primary
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeLarge
+                    size: Appearance.fontSizeLarge
                 }
                 Text {
                     text: "Add Widget"
@@ -78,11 +78,10 @@ Rectangle {
                 id: snapRow
                 anchors.centerIn: parent
                 spacing: Appearance.spacingXS
-                Text {
-                    text: "󰕰"
+                SharedWidgets.SvgIcon {
+                    source: "widgets.svg"
                     color: Colors.text
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeMedium
+                    size: Appearance.fontSizeMedium
                 }
                 Text {
                     text: "Grid"
@@ -118,11 +117,10 @@ Rectangle {
                 id: exitRow
                 anchors.centerIn: parent
                 spacing: Appearance.spacingXS
-                Text {
-                    text: "󰅖"
+                SharedWidgets.SvgIcon {
+                    source: "dismiss.svg"
                     color: Colors.error
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeMedium
+                    size: Appearance.fontSizeMedium
                 }
                 Text {
                     text: "Done"

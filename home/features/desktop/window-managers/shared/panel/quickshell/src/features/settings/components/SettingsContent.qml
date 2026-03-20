@@ -185,11 +185,10 @@ Item {
         anchors.rightMargin: Appearance.spacingM
         spacing: Appearance.spacingS
 
-        Text {
-          text: "󰍉"
+        SharedWidgets.SvgIcon {
+          source: "search-visual.svg"
           color: Colors.textDisabled
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeMedium
+          size: Appearance.fontSizeMedium
         }
 
         TextInput {
@@ -216,11 +215,10 @@ Item {
           }
         }
 
-        Text {
-          text: "󰅖"
+        SharedWidgets.SvgIcon {
+          source: "dismiss.svg"
           color: Colors.textDisabled
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeSmall
+          size: Appearance.fontSizeSmall
           visible: compactSearchInput.text.length > 0
 
           MouseArea {

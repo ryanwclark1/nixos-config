@@ -75,8 +75,8 @@ RowLayout {
     // Mute button
     MuteButton {
         muted: root.appMuted
-        icon: "󰕾"
-        mutedIcon: "󰝟"
+        icon: "speaker.svg"
+        mutedIcon: "speaker-mute.svg"
         size: 28
         action: function () {
             AudioService.toggleAppMute(root.appNode.nodeRef);

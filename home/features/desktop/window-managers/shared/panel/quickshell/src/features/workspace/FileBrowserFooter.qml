@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
+import "../../widgets" as SharedWidgets
 
 Rectangle {
     id: root
@@ -57,11 +58,10 @@ Rectangle {
                 anchors.rightMargin: Appearance.spacingS
                 spacing: Appearance.spacingS
 
-                Text {
-                    text: "󰈙"
+                SharedWidgets.SvgIcon {
+                    source: "document.svg"
                     color: Colors.textDisabled
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeMedium
+                    size: Appearance.fontSizeMedium
                 }
 
                 TextInput {
@@ -148,11 +148,10 @@ Rectangle {
                         color: Colors.textSecondary
                         font.pixelSize: Appearance.fontSizeSmall
                     }
-                    Text {
-                        text: "󰅀"
+                    SharedWidgets.SvgIcon {
+                        source: "chevron-down.svg"
                         color: Colors.textDisabled
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeSmall
+                        size: Appearance.fontSizeSmall
                     }
                 }
 

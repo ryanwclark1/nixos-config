@@ -1,6 +1,7 @@
 import QtQuick
 import "../../services"
 import "../../shared"
+import "../../widgets" as SharedWidgets
 
 Item {
   id: root
@@ -127,12 +128,11 @@ Item {
           }
 
           // Drag cursor indicator (bottom-right small glyph)
-          Text {
+          SharedWidgets.SvgIcon {
             anchors { bottom: parent.bottom; right: parent.right; margins: 5 }
-            text: "󰆾"
+            source: "re-order-dots-vertical.svg"
             color: Colors.withAlpha(Colors.textDisabled, 0.6)
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeXS
+            size: Appearance.fontSizeXS
             visible: monDelegate.height > 40
           }
         }

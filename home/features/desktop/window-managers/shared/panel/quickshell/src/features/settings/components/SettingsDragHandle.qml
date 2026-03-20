@@ -1,6 +1,7 @@
 import QtQuick
 import "../../../shared"
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 Rectangle {
     id: root
@@ -10,7 +11,7 @@ Rectangle {
     property int handleSize: 28
     property int hitSize: 40
     property int dragAxis: Drag.YAxis
-    property string iconText: "󰆾"
+    property string iconSource: "re-order-dots-vertical.svg"
     property bool topAligned: false
     readonly property bool dragActive: dragArea.drag.active
     readonly property bool pressed: dragArea.pressed
@@ -31,12 +32,11 @@ Rectangle {
         CAnim {}
     }
 
-    Text {
+    SharedWidgets.SvgIcon {
         anchors.centerIn: parent
-        text: root.iconText
+        source: root.iconSource
         color: root.dragActive ? Colors.text : (root.pressed ? Colors.primary : Colors.textSecondary)
-        font.family: Appearance.fontMono
-        font.pixelSize: Appearance.fontSizeMedium
+        size: Appearance.fontSizeMedium
     }
 
     MouseArea {

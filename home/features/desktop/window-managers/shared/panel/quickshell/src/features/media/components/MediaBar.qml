@@ -68,14 +68,13 @@ Rectangle {
   scale: mediaMouse.containsMouse ? 1.04 : 1.0
 
   // Rewind flash indicator
-  Text {
+  SvgIcon {
     anchors.verticalCenter: parent.verticalCenter
     anchors.left: parent.left
     anchors.leftMargin: Appearance.spacingXS
-    text: "󰒮"
+    source: "previous.svg"
     color: Colors.primary
-    font.family: Appearance.fontMono
-    font.pixelSize: Appearance.fontSizeXS
+    size: Appearance.fontSizeXS
     opacity: root._rewindFlashOpacity
     z: 2
   }

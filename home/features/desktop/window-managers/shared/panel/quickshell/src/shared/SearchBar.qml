@@ -21,11 +21,10 @@ Rectangle {
         anchors.margins: Appearance.spacingS
         spacing: Appearance.spacingS
 
-        Text {
-            text: "󰍉"
+        SvgIcon {
+            source: "search-visual.svg"
             color: Colors.textSecondary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeMedium
+            size: Appearance.fontSizeMedium
         }
 
         TextInput {

@@ -85,11 +85,10 @@ BasePopupMenu {
                     Layout.fillWidth: true
                     spacing: Appearance.spacingM
 
-                    Text {
-                        text: "󰖩"
+                    SharedWidgets.SvgIcon {
+                        source: "wifi-4.svg"
                         color: mainStatusCard._statusClr
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeHuge
+                        size: Appearance.fontSizeHuge
                     }
 
                     ColumnLayout {
@@ -253,11 +252,10 @@ BasePopupMenu {
                 anchors.centerIn: parent
                 spacing: Appearance.spacingXS
 
-                Text {
-                    text: "󰖂"
+                SharedWidgets.SvgIcon {
+                    source: "wifi-off.svg"
                     color: Colors.textDisabled
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeXL
+                    size: Appearance.fontSizeXL
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -284,11 +282,10 @@ BasePopupMenu {
                 anchors.rightMargin: Appearance.spacingM
                 spacing: Appearance.spacingS
 
-                Text {
-                    text: "󰖩"
+                SharedWidgets.SvgIcon {
+                    source: "wifi-4.svg"
                     color: Colors.primary
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeLarge
+                    size: Appearance.fontSizeLarge
                 }
 
                 ColumnLayout {

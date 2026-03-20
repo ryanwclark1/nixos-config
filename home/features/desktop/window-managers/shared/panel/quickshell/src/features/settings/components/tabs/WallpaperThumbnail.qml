@@ -73,12 +73,11 @@ Item {
             }
         }
 
-        Text {
+        SharedWidgets.SvgIcon {
             anchors.centerIn: parent
-            text: "󰸉"
+            source: "image.svg"
             color: Colors.textDisabled
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeHuge
+            size: Appearance.fontSizeHuge
             visible: thumbImage.status !== Image.Ready
         }
 
@@ -94,12 +93,11 @@ Item {
             radius: height / 2
             color: Colors.primary
 
-            Text {
+            SharedWidgets.SvgIcon {
                 anchors.centerIn: parent
-                text: "󰄬"
+                source: "checkmark.svg"
                 color: Colors.text
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeXS
+                size: Appearance.fontSizeXS
             }
         }
 

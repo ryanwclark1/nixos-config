@@ -89,11 +89,10 @@ Rectangle {
                 anchors.rightMargin: Appearance.spacingM
                 spacing: Appearance.spacingS
 
-                Text {
-                    text: "󰍉"
+                SharedWidgets.SvgIcon {
+                    source: "search-visual.svg"
                     color: Colors.textDisabled
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeMedium
+                    size: Appearance.fontSizeMedium
                 }
 
                 TextInput {

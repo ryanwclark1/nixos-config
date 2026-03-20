@@ -5,7 +5,7 @@ import "../services"
 
 ColumnLayout {
     id: root
-    property string icon: "󰟢"
+    property string icon: "empty.svg"
     property string message: "Nothing here"
     property int iconSize: Appearance.iconSizeMedium
 

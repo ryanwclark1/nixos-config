@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../widgets" as SharedWidgets
 import "../features/system/sections" as Modules
 
 ColumnLayout {
@@ -137,12 +138,12 @@ ColumnLayout {
                                         color: Colors.withAlpha(Colors.background, 0.4)
                                         clip: true
 
-                                        Text {
+                                        SharedWidgets.SvgIcon {
                                             anchors.centerIn: parent
-                                            text: "󱗼"
+                                            source: "sparkle.svg"
                                             color: Colors.textDisabled
                                             opacity: 0.2
-                                            font.pixelSize: Appearance.fontSizeIcon
+                                            size: Appearance.fontSizeIcon
                                         }
                                     }
                                 }

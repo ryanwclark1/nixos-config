@@ -278,23 +278,81 @@ Rectangle {
       spacing: Appearance.spacingS
       visible: !!(root.notification && root.notification.screenshotPath)
 
-      SharedWidgets.Button {
+      Rectangle {
         Layout.fillWidth: true
         Layout.preferredHeight: 32
-        text: "󰏫  Edit in " + (Config.screenshotEditor === "satty" ? "Satty" : "Swappy")
-        fontSize: Appearance.fontSizeSmall
-        onClicked: root._openScreenshotEditor()
+        radius: Appearance.radiusMedium
+        color: editBtnMouse.containsMouse ? Colors.primaryFaint : Colors.cardSurface
+        border.color: editBtnMouse.containsMouse ? Colors.primaryRing : Colors.border
+        border.width: 1
+
+        Row {
+          anchors.centerIn: parent
+          spacing: Appearance.spacingXS
+
+          SharedWidgets.SvgIcon {
+            source: "edit.svg"
+            color: Colors.text
+            size: Appearance.fontSizeSmall
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
+          Text {
+            text: "Edit in " + (Config.screenshotEditor === "satty" ? "Satty" : "Swappy")
+            color: Colors.text
+            font.pixelSize: Appearance.fontSizeSmall
+            font.weight: Font.DemiBold
+            anchors.verticalCenter: parent.verticalCenter
+          }
+        }
+
+        MouseArea {
+          id: editBtnMouse
+          anchors.fill: parent
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: root._openScreenshotEditor()
+        }
       }
 
-      SharedWidgets.Button {
+      Rectangle {
         Layout.fillWidth: true
         Layout.preferredHeight: 32
-        text: "󰉋  Open Folder"
-        fontSize: Appearance.fontSizeSmall
-        onClicked: {
-          var dir = root.notification.screenshotPath.substring(0, root.notification.screenshotPath.lastIndexOf("/"));
-          Quickshell.execDetached(["xdg-open", dir]);
-          root.dismissRequested();
+        radius: Appearance.radiusMedium
+        color: folderBtnMouse.containsMouse ? Colors.primaryFaint : Colors.cardSurface
+        border.color: folderBtnMouse.containsMouse ? Colors.primaryRing : Colors.border
+        border.width: 1
+
+        Row {
+          anchors.centerIn: parent
+          spacing: Appearance.spacingXS
+
+          SharedWidgets.SvgIcon {
+            source: "folder-open.svg"
+            color: Colors.text
+            size: Appearance.fontSizeSmall
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
+          Text {
+            text: "Open Folder"
+            color: Colors.text
+            font.pixelSize: Appearance.fontSizeSmall
+            font.weight: Font.DemiBold
+            anchors.verticalCenter: parent.verticalCenter
+          }
+        }
+
+        MouseArea {
+          id: folderBtnMouse
+          anchors.fill: parent
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: {
+            var dir = root.notification.screenshotPath.substring(0, root.notification.screenshotPath.lastIndexOf("/"));
+            Quickshell.execDetached(["xdg-open", dir]);
+            root.dismissRequested();
+          }
         }
       }
     }
