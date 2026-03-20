@@ -625,10 +625,8 @@ launcher_args=(--ssh-port "${ssh_port}")
 if (( reset_disk == 1 )); then
   launcher_args+=(--reset-disk)
 fi
-coproc VM_LAUNCHER {
-  exec bash "${launcher}" "${launcher_args[@]}" >"${launcher_log}" 2>&1
-}
-launcher_pid="${VM_LAUNCHER_PID}"
+bash "${launcher}" "${launcher_args[@]}" >"${launcher_log}" 2>&1 &
+launcher_pid=$!
 
 wait_for_ssh
 install_host_pubkey
