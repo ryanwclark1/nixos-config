@@ -198,25 +198,43 @@ Scope {
         }
 
         Loader {
-          active: screenDelegate.dockAllowed && screenDelegate.autoHide && screenDelegate.modelData
+          active: screenDelegate.dockAllowed && screenDelegate.modelData && (root.dockApps.length > 0 || screenDelegate.autoHide)
           sourceComponent: PanelWindow {
+            id: dockWindow
             screen: screenDelegate.modelData
+            property string tooltipEdge: screenDelegate.dockPosition
+            readonly property bool _hasDockApps: root.dockApps.length > 0
             anchors.bottom: screenDelegate.isBottom
             anchors.top: screenDelegate.isTop
             anchors.left: screenDelegate.isLeft
             anchors.right: screenDelegate.isRight
             focusable: false
             color: "transparent"
-            implicitWidth: screenDelegate.vertical ? 1 : 200
-            implicitHeight: screenDelegate.vertical ? 200 : 1
-            WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.namespace: "quickshell-dock-peek"
-            WlrLayershell.exclusionMode: ExclusionMode.Ignore
-            mask: Region {}
 
+            implicitWidth: screenDelegate.vertical
+                ? (_hasDockApps ? dockContent.implicitWidth + Colors.paddingLarge + 12 : 13)
+                : Math.max(_hasDockApps ? dockContent.implicitWidth + Colors.paddingLarge : 1, 200)
+            implicitHeight: screenDelegate.vertical
+                ? Math.max(_hasDockApps ? dockContent.implicitHeight + Colors.paddingLarge : 1, 200)
+                : (_hasDockApps ? dockContent.implicitHeight + Colors.paddingLarge + 12 : 13)
+
+            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.namespace: "quickshell-dock"
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+
+            mask: Region { item: dockAnimWrapper.visible ? dockContent.background : null }
+
+            // Peek strip at screen edge — hover trigger for auto-hide
             MouseArea {
-              anchors.fill: parent
+              visible: screenDelegate.autoHide
               hoverEnabled: true
+              z: 10
+              anchors.bottom: screenDelegate.isBottom ? parent.bottom : undefined
+              anchors.top: screenDelegate.isTop ? parent.top : undefined
+              anchors.left: screenDelegate.isLeft ? parent.left : (!screenDelegate.vertical ? parent.left : undefined)
+              anchors.right: screenDelegate.isRight ? parent.right : (!screenDelegate.vertical ? parent.right : undefined)
+              width: screenDelegate.vertical ? 1 : undefined
+              height: screenDelegate.vertical ? undefined : 1
               onEntered: {
                 screenDelegate.peekHovered = true;
                 if (screenDelegate.hidden) showTimer.start();
@@ -227,76 +245,41 @@ Scope {
                 if (!screenDelegate.dockHovered) hideTimer.restart();
               }
             }
-          }
-        }
 
-        Loader {
-          active: screenDelegate.dockAllowed && screenDelegate.autoHide && screenDelegate.modelData
-          sourceComponent: PanelWindow {
-            screen: screenDelegate.modelData
-            anchors.bottom: screenDelegate.isBottom
-            anchors.top: screenDelegate.isTop
-            anchors.left: screenDelegate.isLeft
-            anchors.right: screenDelegate.isRight
-            margins.bottom: screenDelegate.isBottom ? 4 : 0
-            margins.top: screenDelegate.isTop ? 4 : 0
-            margins.left: screenDelegate.isLeft ? 4 : 0
-            margins.right: screenDelegate.isRight ? 4 : 0
-            focusable: false
-            color: "transparent"
-            implicitWidth: screenDelegate.vertical ? 3 : 60
-            implicitHeight: screenDelegate.vertical ? 60 : 3
-            WlrLayershell.layer: WlrLayer.Top
-            WlrLayershell.namespace: "quickshell-dock-indicator"
-            WlrLayershell.exclusionMode: ExclusionMode.Ignore
-
-            mask: Region { item: indicatorRect }
-
+            // Indicator pip near screen edge
             Rectangle {
-              id: indicatorRect
-              anchors.centerIn: parent
-              width: screenDelegate.vertical ? 3 : parent.width
-              height: screenDelegate.vertical ? parent.height : 3
+              visible: screenDelegate.autoHide && indicatorOpacity > 0
+              z: 5
+              anchors.bottom: screenDelegate.isBottom ? parent.bottom : undefined
+              anchors.top: screenDelegate.isTop ? parent.top : undefined
+              anchors.left: screenDelegate.isLeft ? parent.left : undefined
+              anchors.right: screenDelegate.isRight ? parent.right : undefined
+              anchors.horizontalCenter: !screenDelegate.vertical ? parent.horizontalCenter : undefined
+              anchors.verticalCenter: screenDelegate.vertical ? parent.verticalCenter : undefined
+              anchors.bottomMargin: screenDelegate.isBottom ? 4 : 0
+              anchors.topMargin: screenDelegate.isTop ? 4 : 0
+              anchors.leftMargin: screenDelegate.isLeft ? 4 : 0
+              anchors.rightMargin: screenDelegate.isRight ? 4 : 0
+              width: screenDelegate.vertical ? 3 : 60
+              height: screenDelegate.vertical ? 60 : 3
               radius: Colors.radiusMicro
               color: Colors.primary
-              opacity: screenDelegate.hidden ? 0.6 : 0.0
-              visible: opacity > 0
-              Behavior on opacity { NumberAnimation { duration: Colors.durationFast } }
+              property real indicatorOpacity: screenDelegate.hidden ? 0.6 : 0.0
+              opacity: indicatorOpacity
+              Behavior on indicatorOpacity { NumberAnimation { duration: Colors.durationFast } }
             }
-          }
-        }
 
-        Loader {
-          active: screenDelegate.dockAllowed && screenDelegate.modelData && root.dockApps.length > 0
-          sourceComponent: PanelWindow {
-            id: dockWindow
-            screen: screenDelegate.modelData
-            property string tooltipEdge: screenDelegate.dockPosition
-            anchors.bottom: screenDelegate.isBottom
-            anchors.top: screenDelegate.isTop
-            anchors.left: screenDelegate.isLeft
-            anchors.right: screenDelegate.isRight
-            margins.bottom: screenDelegate.isBottom ? 12 : 0
-            margins.top: screenDelegate.isTop ? 12 : 0
-            margins.left: screenDelegate.isLeft ? 12 : 0
-            margins.right: screenDelegate.isRight ? 12 : 0
-            focusable: false
-            color: "transparent"
-            implicitWidth: Math.max(1, dockContent.implicitWidth + Colors.paddingLarge)
-            implicitHeight: Math.max(1, dockContent.implicitHeight + Colors.paddingLarge)
-
-            WlrLayershell.layer: WlrLayer.Top
-            WlrLayershell.namespace: "quickshell-dock"
-            WlrLayershell.exclusionMode: ExclusionMode.Ignore
-
-            mask: Region { item: dockContent.background }
-
+            // Dock content, offset 12px from anchored edge
             Item {
               id: dockAnimWrapper
               anchors.fill: parent
+              anchors.bottomMargin: screenDelegate.isBottom ? 12 : 0
+              anchors.topMargin: screenDelegate.isTop ? 12 : 0
+              anchors.leftMargin: screenDelegate.isLeft ? 12 : 0
+              anchors.rightMargin: screenDelegate.isRight ? 12 : 0
 
+              visible: dockWindow._hasDockApps && opacity > 0
               opacity: screenDelegate.hidden ? 0 : 1
-              visible: opacity > 0
               property real xOffset: screenDelegate.hidden ? (screenDelegate.isLeft ? -20 : (screenDelegate.isRight ? 20 : 0)) : 0
               property real yOffset: screenDelegate.hidden ? (screenDelegate.isBottom ? 20 : (screenDelegate.isTop ? -20 : 0)) : 0
               Behavior on opacity { Anim {} }
