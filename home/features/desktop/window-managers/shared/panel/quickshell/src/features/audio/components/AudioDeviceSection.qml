@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "."
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets"
 
@@ -129,13 +130,35 @@ ColumnLayout {
         anchors.fill: parent
         anchors.margins: Appearance.paddingSmall
         spacing: Appearance.paddingSmall
-        Text { text: deviceCard.isDefault ? "󰄬" : root.icon; color: deviceCard.isDefault ? Colors.primary : Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge }
+        Loader {
+          readonly property string rowIcon: deviceCard.isDefault ? "checkmark.svg" : root.icon
+          sourceComponent: rowIcon.endsWith(".svg") ? deviceRowSvgIcon : deviceRowGlyphIcon
+        }
         Text { text: modelData.name; color: Colors.text; font.pixelSize: Appearance.fontSizeMedium; font.weight: deviceCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
         NumericText { text: Math.min(Math.round(modelData.volume * 100), 100) + "%"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXS }
         Text { visible: !root.compactMode; text: deviceCard.isDefault ? "Default" : "Select"; color: deviceCard.isDefault ? Colors.primary : Colors.textSecondary; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Medium }
       }
 
       MouseArea { id: deviceHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: AudioService.setDefaultDevice(modelData.id) }
+    }
+  }
+
+  Component {
+    id: deviceRowSvgIcon
+    SvgIcon {
+      source: parent.rowIcon
+      color: parent.parent.parent.deviceCard.isDefault ? Colors.primary : Colors.textSecondary
+      size: Appearance.fontSizeLarge
+    }
+  }
+
+  Component {
+    id: deviceRowGlyphIcon
+    Text {
+      text: parent.rowIcon
+      color: parent.parent.parent.deviceCard.isDefault ? Colors.primary : Colors.textSecondary
+      font.family: Appearance.fontMono
+      font.pixelSize: Appearance.fontSizeLarge
     }
   }
 

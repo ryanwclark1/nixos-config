@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Bluetooth
 import "../../shared"
 import "../../services"
+import "../../services/IconHelpers.js" as IconHelpers
 import "../../widgets" as SharedWidgets
 import "../../services/ShellUtils.js" as ShellUtils
 
@@ -60,15 +61,7 @@ BasePopupMenu {
   }
 
   function deviceIcon(dev) {
-    var n = (dev.name || "").toLowerCase();
-    if (n.indexOf("headphone") !== -1 || n.indexOf("airpod") !== -1 || n.indexOf("buds") !== -1 || n.indexOf("earphone") !== -1) return "󰋋";
-    if (n.indexOf("keyboard") !== -1) return "󰌌";
-    if (n.indexOf("mouse") !== -1 || n.indexOf("trackpad") !== -1) return "󰍽";
-    if (n.indexOf("phone") !== -1 || n.indexOf("iphone") !== -1 || n.indexOf("pixel") !== -1 || n.indexOf("galaxy") !== -1) return "󰄜";
-    if (n.indexOf("speaker") !== -1 || n.indexOf("soundbar") !== -1) return "󰓃";
-    if (n.indexOf("watch") !== -1) return "󰂰";
-    if (n.indexOf("gamepad") !== -1 || n.indexOf("controller") !== -1 || n.indexOf("xbox") !== -1 || n.indexOf("dualsense") !== -1) return "󰖳";
-    return "󰂯";
+    return IconHelpers.bluetoothDeviceIcon(dev);
   }
 
   function pairDevice(address) {

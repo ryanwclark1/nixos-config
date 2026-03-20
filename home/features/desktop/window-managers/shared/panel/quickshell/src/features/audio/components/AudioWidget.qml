@@ -2,6 +2,7 @@ import QtQuick
 import "../../system/sections"
 import "../../../services"
 import "../../../shared"
+import "../../../services/IconHelpers.js" as IconHelpers
 
 Row {
   id: root
@@ -15,18 +16,13 @@ Row {
 
   Ref { service: AudioService }
 
-  CircularGauge {
-    value: AudioService.outputMuted ? 0 : AudioService.outputVolume
-    color: AudioService.outputMuted ? Colors.error : Colors.text
-    icon: {
-      if (AudioService.outputMuted) return "󰝟";
-      if (AudioService.outputDeviceType === "bluetooth") return "󰂯";
-      if (AudioService.outputDeviceType === "headphone") return "󰋋";
-      return AudioService.outputVolume > 0.6 ? "󰕾" : (AudioService.outputVolume > 0.3 ? "󰖀" : "󰕿");
+    CircularGauge {
+      value: AudioService.outputMuted ? 0 : AudioService.outputVolume
+      color: AudioService.outputMuted ? Colors.error : Colors.text
+      icon: IconHelpers.audioOutputIcon(AudioService.outputVolume, AudioService.outputMuted, AudioService.outputDeviceType)
+      thickness: 3
+      width: 22; height: 22
     }
-    thickness: 3
-    width: 22; height: 22
-  }
 
   Text {
     id: volumeText

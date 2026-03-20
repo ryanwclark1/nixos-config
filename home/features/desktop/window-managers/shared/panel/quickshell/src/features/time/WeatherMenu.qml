@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../shared"
 import "../../services"
+import "../../services/IconHelpers.js" as IconHelpers
 import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
@@ -147,8 +148,16 @@ BasePopupMenu {
           Text { text: "Sun"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Medium }
           RowLayout {
             spacing: Appearance.spacingXS
-            Text { text: "↑" + WeatherService.sunrise; color: Colors.accent; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Medium }
-            Text { text: "↓" + WeatherService.sunset; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Medium }
+            RowLayout {
+              spacing: Appearance.spacingXXS
+              SharedWidgets.SvgIcon { source: IconHelpers.weatherDetailIcon("sunrise"); color: Colors.accent; size: Appearance.fontSizeSmall }
+              Text { text: WeatherService.sunrise; color: Colors.accent; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Medium }
+            }
+            RowLayout {
+              spacing: Appearance.spacingXXS
+              SharedWidgets.SvgIcon { source: IconHelpers.weatherDetailIcon("sunset"); color: Colors.textSecondary; size: Appearance.fontSizeSmall }
+              Text { text: WeatherService.sunset; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Medium }
+            }
           }
         }
       }
@@ -336,13 +345,23 @@ BasePopupMenu {
           }
 
           // Precipitation chance badge
-          Text {
+          RowLayout {
             visible: modelData.chanceOfRain !== undefined && modelData.chanceOfRain !== "--" && modelData.chanceOfRain !== "0%"
-            text: "💧" + modelData.chanceOfRain
-            color: Colors.primary
-            font.pixelSize: Appearance.fontSizeXS
-            font.weight: Font.Medium
+            spacing: Appearance.spacingXXS
             Layout.columnSpan: root.compactMode ? 1 : 1
+
+            SharedWidgets.SvgIcon {
+              source: IconHelpers.weatherDetailIcon("precipitation")
+              color: Colors.primary
+              size: Appearance.fontSizeXS
+            }
+
+            Text {
+              text: modelData.chanceOfRain
+              color: Colors.primary
+              font.pixelSize: Appearance.fontSizeXS
+              font.weight: Font.Medium
+            }
           }
 
           RowLayout {

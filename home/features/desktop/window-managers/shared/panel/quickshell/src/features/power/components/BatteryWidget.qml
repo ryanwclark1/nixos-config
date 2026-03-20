@@ -23,7 +23,7 @@ Row {
   CircularGauge {
     value: device ? device.percentage : 0
     color: device && device.state === UPower.DeviceStateCharging ? Colors.primary : (device && device.percentage < 0.2 ? Colors.error : Colors.text)
-    icon: device ? (device.state === UPower.DeviceStateCharging ? "󰂄" : (device.percentage > 0.9 ? "󰁹" : (device.percentage > 0.5 ? "󰁿" : (device.percentage > 0.2 ? "󰁽" : "󰂃")))) : "󰂑"
+    icon: BatteryHelpers.iconName(device, UPower)
     thickness: 3
     width: 20; height: 20
   }
