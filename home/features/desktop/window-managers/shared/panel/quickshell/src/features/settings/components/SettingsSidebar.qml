@@ -731,11 +731,10 @@ Rectangle {
                         anchors.centerIn: parent
                         spacing: Colors.spacingS
 
-                        Text {
-                            text: "󰆓"
+                        Shared.SvgIcon {
+                            source: "save.svg"
                             color: saveMouse.containsMouse ? Colors.background : Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: 16
+                            size: 16
                         }
 
                         Text {
