@@ -56,7 +56,7 @@ Item {
                             value: root._qualitySummary
                         },
                         {
-                            icon: "󰕾",
+                            icon: "speaker.svg",
                             label: "Audio",
                             value: root._audioSummary
                         },
@@ -195,7 +195,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Desktop Audio"
-                    icon: "󰕾"
+                    icon: "speaker.svg"
                     configKey: "recordingIncludeDesktopAudio"
                     enabledText: "System output audio is captured."
                     disabledText: "System output audio is not captured."
@@ -203,7 +203,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Microphone"
-                    icon: "󰍬"
+                    icon: "mic-off.svg"
                     configKey: "recordingIncludeMicrophoneAudio"
                     enabledText: "Default microphone input is captured."
                     disabledText: "Microphone input is not captured."

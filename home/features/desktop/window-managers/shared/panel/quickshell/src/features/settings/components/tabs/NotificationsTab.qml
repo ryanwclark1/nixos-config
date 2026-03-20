@@ -88,7 +88,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Notifications"
-        iconName: "󰂚"
+        iconName: "alert.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -388,7 +388,7 @@ Item {
 
                 SettingsModeRow {
                     label: "Engine"
-                    icon: "󰓃"
+                    icon: "mic.svg"
                     currentValue: Config.notifTtsEngine
                     enabled: Config.notifTtsEnabled
                     options: [

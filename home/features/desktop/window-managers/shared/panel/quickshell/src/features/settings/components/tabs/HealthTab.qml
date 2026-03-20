@@ -42,7 +42,7 @@ Item {
         // Overall Status
         SettingsCard {
             title: "Overall Status"
-            iconName: "󰋑"
+            iconName: "heart.svg"
             description: "Current health state of the shell."
 
             RowLayout {
@@ -80,7 +80,7 @@ Item {
             }
 
             SettingsDataRow {
-                iconName: "󰒍"
+                iconName: "chat.svg"
                 label: "Active Incidents"
                 value: SystemStatus.activeIncidents.length.toString()
                 monoValue: true
@@ -193,7 +193,7 @@ Item {
             SettingsActionButton {
                 Layout.fillWidth: true
                 label: "Apply Safe Fixes"
-                iconName: "󰁨"
+                iconName: "checkmark.svg"
                 visible: SystemStatus.activeIncidents.length > 0
                 onClicked: SystemStatus.applySafeFixes()
             }
