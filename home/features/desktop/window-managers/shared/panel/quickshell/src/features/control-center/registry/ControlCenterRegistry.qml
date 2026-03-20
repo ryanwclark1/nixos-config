@@ -24,7 +24,7 @@ QtObject {
     readonly property var quickToggleItems: [
         {
             id: "bluetooth",
-            icon: "󰂯",
+            icon: "bluetooth.svg",
             label: "Bluetooth"
         },
         {
@@ -34,7 +34,7 @@ QtObject {
         },
         {
             id: "nightLight",
-            icon: "󰖔",
+            icon: "weather-moon.svg",
             label: "Night Light"
         },
         {
@@ -44,7 +44,7 @@ QtObject {
         },
         {
             id: "recording",
-            icon: "󰑊",
+            icon: "record.svg",
             label: "Recording"
         },
         {

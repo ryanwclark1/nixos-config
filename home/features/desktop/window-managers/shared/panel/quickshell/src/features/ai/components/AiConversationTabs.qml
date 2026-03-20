@@ -70,7 +70,7 @@ RowLayout {
         return [
             {
                 label: "Rename",
-                icon: "󰑕",
+                icon: "rename.svg",
                 action: function() {
                     AiService.setActiveConversation(conv.id);
                     editingConversationId = conv.id;
@@ -78,7 +78,7 @@ RowLayout {
             },
             {
                 label: "Clear",
-                icon: "󰃢",
+                icon: "delete.svg",
                 action: function() {
                     var wasStreaming = AiService.isStreaming && AiService.activeConversationId === conv.id;
                     AiService.clearConversation(conv.id);
@@ -87,7 +87,7 @@ RowLayout {
             },
             {
                 label: "Duplicate Prompt",
-                icon: "󰆏",
+                icon: "copy.svg",
                 action: function() {
                     AiService.duplicateConversationPrompt(conv.id);
                 }

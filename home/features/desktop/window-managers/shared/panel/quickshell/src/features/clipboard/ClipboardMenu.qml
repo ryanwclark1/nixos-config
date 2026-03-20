@@ -81,7 +81,7 @@ BasePopupMenu {
       onClicked: root.refresh()
     },
     SharedWidgets.IconButton {
-      icon: "󰃢"
+      icon: "delete.svg"
       tooltipText: "Clear history"
       enabled: root.clipboardItems.length > 0
       onClicked: {
@@ -238,7 +238,7 @@ BasePopupMenu {
               }
 
               SharedWidgets.IconButton {
-                icon: "󰆴"
+                icon: "delete.svg"
                 size: 22
                 iconSize: Colors.fontSizeSmall
                 iconColor: Colors.textDisabled

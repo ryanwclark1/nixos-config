@@ -51,7 +51,7 @@ BasePopupMenu {
             onClicked: NetworkService.refreshData()
         },
         SharedWidgets.IconButton {
-            icon: "󰖩"
+            icon: "wifi-4.svg"
             tooltipText: "VPN settings"
             onClicked: root.openNetworkMenu()
         }

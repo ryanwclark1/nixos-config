@@ -174,7 +174,7 @@ Rectangle {
 
       // Skip
       SharedWidgets.IconButton {
-        icon: "󰒭"
+        icon: "next.svg"
         size: 34
         iconSize: Colors.fontSizeMedium
         iconColor: Colors.textSecondary

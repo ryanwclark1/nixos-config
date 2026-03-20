@@ -377,7 +377,7 @@ PanelWindow {
                                         SharedWidgets.SliderTrack {
                                             Layout.fillWidth: true
                                             value: modelData.brightness
-                                            icon: "󰃠"
+                                            icon: "weather-sunny.svg"
                                             enabled: modelData.available
                                             opacity: enabled ? 1.0 : 0.4
                                             onSliderMoved: v => BrightnessService.setBrightness(
@@ -418,7 +418,7 @@ PanelWindow {
                                     SharedWidgets.SliderTrack {
                                         Layout.fillWidth: true
                                         value: BrightnessService.kbdDevice.brightness
-                                        icon: "󰌌"
+                                        icon: "keyboard.svg"
                                         onSliderMoved: v => BrightnessService.setKbdBrightness(v)
                                     }
                                 }
