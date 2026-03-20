@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "WeatherLocationHelpers.js" as WeatherLocationHelpers
 
 QtObject {
   id: root
@@ -39,6 +40,10 @@ QtObject {
   property string co: "--"
   property string _resolvedLat: ""
   property string _resolvedLon: ""
+  property var _locationPlan: []
+  property int _locationPlanIndex: -1
+  property var _cityVariants: []
+  property int _cityVariantIndex: -1
 
   readonly property string _unitMode: Config.weatherUnits === "imperial" ? "imperial" : "metric"
   readonly property string _tempSuffix: _unitMode === "imperial" ? "°F" : "°C"
@@ -123,6 +128,68 @@ QtObject {
     retryTimer.restart();
   }
 
+  function _hasManualCoordinates() {
+    var lat = parseFloat(Config.weatherLatitude);
+    var lon = parseFloat(Config.weatherLongitude);
+    return !isNaN(lat) && !isNaN(lon);
+  }
+
+  function _buildLocationPlan() {
+    return WeatherLocationHelpers.buildLocationPlan(
+      Config.weatherLocationPriority,
+      root._hasManualCoordinates(),
+      String(Config.weatherCityQuery || "").trim().length > 0,
+      Config.weatherAutoLocation
+    );
+  }
+
+  function _advanceLocationPlan() {
+    root._locationPlanIndex += 1;
+    if (root._locationPlanIndex >= root._locationPlan.length) {
+      root._setUnavailableState("Location not configured");
+      return;
+    }
+
+    var mode = root._locationPlan[root._locationPlanIndex];
+    if (mode === "city") {
+      root._cityVariants = WeatherLocationHelpers.cityQueryVariants(Config.weatherCityQuery);
+      root._cityVariantIndex = 0;
+      if (root._cityVariants.length > 0) {
+        _geocode(root._cityVariants[0]);
+        return;
+      }
+    } else if (mode === "latlon") {
+      var lat = parseFloat(Config.weatherLatitude);
+      var lon = parseFloat(Config.weatherLongitude);
+      root._resolvedLat = lat.toString();
+      root._resolvedLon = lon.toString();
+      root.location = "Coordinates (" + lat.toFixed(2) + ", " + lon.toFixed(2) + ")";
+      _fetchWeather();
+      return;
+    } else if (mode === "auto") {
+      _autoLocate();
+      return;
+    }
+
+    root._advanceLocationPlan();
+  }
+
+  function _tryNextLocationSource(failureKey, details) {
+    if (root._locationPlan[root._locationPlanIndex] === "city" && root._cityVariantIndex + 1 < root._cityVariants.length) {
+      root._cityVariantIndex += 1;
+      _geocode(root._cityVariants[root._cityVariantIndex]);
+      return true;
+    }
+
+    if (root._locationPlanIndex + 1 < root._locationPlan.length) {
+      Logger.w("WeatherService", failureKey, (details ? details + " — falling back" : "falling back"));
+      root._advanceLocationPlan();
+      return true;
+    }
+
+    return false;
+  }
+
   function refresh() {
     if (Config.weatherProvider === "wttr") {
       _refreshWttr();
@@ -148,24 +215,13 @@ QtObject {
   }
 
   function _refreshOpenMeteo() {
-    var city = String(Config.weatherCityQuery || "").trim();
-    if (city.length > 0) {
-      _geocode(city);
-      return;
-    }
+    root._locationPlan = root._buildLocationPlan();
+    root._locationPlanIndex = -1;
+    root._cityVariants = [];
+    root._cityVariantIndex = -1;
 
-    var lat = parseFloat(Config.weatherLatitude);
-    var lon = parseFloat(Config.weatherLongitude);
-    if (!isNaN(lat) && !isNaN(lon)) {
-      root._resolvedLat = lat.toString();
-      root._resolvedLon = lon.toString();
-      root.location = "Coordinates (" + lat.toFixed(2) + ", " + lon.toFixed(2) + ")";
-      _fetchWeather();
-      return;
-    }
-
-    if (Config.weatherAutoLocation) {
-      _autoLocate();
+    if (root._locationPlan.length > 0) {
+      root._advanceLocationPlan();
       return;
     }
 
@@ -232,6 +288,9 @@ QtObject {
             throw new Error("City not found");
           }
         } catch (e) {
+          if (root._tryNextLocationSource("Geocoding error", e.message))
+            return;
+          root._setUnavailableState("Weather unavailable");
           root._reportFailure("Geocoding error", e.message);
         }
       }
@@ -253,6 +312,9 @@ QtObject {
             throw new Error("IP location failed");
           }
         } catch (e) {
+          if (root._tryNextLocationSource("Auto-location error", e.message))
+            return;
+          root._setUnavailableState("Weather unavailable");
           root._reportFailure("Auto-location error", e.message);
         }
       }
@@ -274,6 +336,8 @@ QtObject {
           root._lastFailureKey = "";
           root._fetchAqi();
         } catch (e) {
+          if (Config.weatherProvider === "open-meteo" && root._tryNextLocationSource("Weather parse error", e.message))
+            return;
           root._reportFailure("Weather parse error", e.message);
         }
       }

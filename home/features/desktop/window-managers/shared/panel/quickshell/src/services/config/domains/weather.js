@@ -11,5 +11,6 @@ var maps = [
     ["cityQuery", "weatherCityQuery"],
     ["latitude", "weatherLatitude", _str],
     ["longitude", "weatherLongitude", _str],
-    ["locationPriority", "weatherLocationPriority"]
+    ["locationPriority", "weatherLocationPriority"],
+    ["uiAnimation", "weatherUiAnimationEnabled"]
 ]
