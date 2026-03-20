@@ -2,6 +2,7 @@
 set -euo pipefail
 
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
+runtime_pid_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid"
 tmp_root="${TMPDIR:-/tmp}"
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
@@ -9,6 +10,7 @@ width=900
 height=700
 tab_id="wallpaper"
 instance_id=""
+instance_pid=""
 compositor=""
 hyprland_instance=""
 hyprland_wayland_socket=""
@@ -30,7 +32,7 @@ source "${script_dir}/graphics-session-env.sh"
 
 usage() {
   cat <<'EOF'
-Usage: capture-settings-viewport.sh [--id INSTANCE_ID] [--width PX] [--height PX] [--tab TAB_ID] [--delay SECONDS] [--scroll-y PX] [--frame modal|viewport] [--workspace current|auto|NAME] [--output PATH]
+Usage: capture-settings-viewport.sh [--id INSTANCE_ID] [--pid INSTANCE_PID] [--width PX] [--height PX] [--tab TAB_ID] [--delay SECONDS] [--scroll-y PX] [--frame modal|viewport] [--workspace current|auto|NAME] [--output PATH]
 
 Open the live SettingsHub through QuickShell IPC, capture a centered viewport-sized
 screenshot from the focused monitor, and save it to a file.
@@ -45,6 +47,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --id)
       instance_id="${2:-}"
+      shift 2
+      ;;
+    --pid)
+      instance_pid="${2:-}"
       shift 2
       ;;
     --width)
@@ -240,8 +246,27 @@ discover_reachable_instance() {
   return 1
 }
 
-refresh_instance_id() {
+resolve_instance_id_from_pid() {
+  local resolved=""
+
+  [[ -n "${instance_pid}" ]] || return 1
+  resolved="$(readlink -f "${runtime_pid_root}/${instance_pid}" 2>/dev/null || true)"
+  [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]] || return 1
+  instance_id="$(basename "${resolved}")"
+  return 0
+}
+
+refresh_instance_handle() {
   local refreshed_id=""
+
+  if [[ -n "${instance_pid}" ]]; then
+    if timeout "${ipc_timeout_seconds}s" quickshell ipc --pid "${instance_pid}" show >/dev/null 2>&1; then
+      resolve_instance_id_from_pid >/dev/null 2>&1 || true
+      return 0
+    fi
+    printf 'QuickShell pid %s is not reachable.\n' "${instance_pid}" >&2
+    return 1
+  fi
 
   if [[ -n "${instance_id}" ]] && timeout "${ipc_timeout_seconds}s" quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
     return 0
@@ -376,14 +401,22 @@ switch_to_capture_workspace() {
 call_ipc() {
   local target="$1"
   shift
-  refresh_instance_id || return 1
-  run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  refresh_instance_handle || return 1
+  if [[ -n "${instance_pid}" ]]; then
+    run_ipc quickshell ipc --pid "${instance_pid}" call "${target}" "$@"
+  else
+    run_ipc quickshell ipc --id "${instance_id}" call "${target}" "$@"
+  fi
 }
 
 cleanup() {
   call_ipc SettingsHub close >/dev/null 2>&1 || true
-  refresh_instance_id >/dev/null 2>&1 || true
-  quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true
+  refresh_instance_handle >/dev/null 2>&1 || true
+  if [[ -n "${instance_pid}" ]]; then
+    run_ipc quickshell ipc --pid "${instance_pid}" call Shell closeAllSurfaces >/dev/null 2>&1 || true
+  elif [[ -n "${instance_id}" ]]; then
+    run_ipc quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true
+  fi
   if [[ -n "${restore_workspace}" ]]; then
     focus_workspace "${restore_workspace}" >/dev/null 2>&1 || true
   fi
@@ -434,7 +467,7 @@ main() {
       ;;
   esac
 
-  refresh_instance_id || exit 1
+  refresh_instance_handle || exit 1
 
   if [[ -z "${output_path}" ]]; then
     output_path="${tmp_root}/settings-${tab_id}-${width}x${height}.png"
@@ -447,7 +480,11 @@ main() {
 
   switch_to_capture_workspace "${workspace_target}"
 
-  quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true
+  if [[ -n "${instance_pid}" ]]; then
+    run_ipc quickshell ipc --pid "${instance_pid}" call Shell closeAllSurfaces >/dev/null 2>&1 || true
+  else
+    run_ipc quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true
+  fi
   call_ipc SettingsHub close >/dev/null 2>&1 || true
   if (( scroll_y > 0 )); then
     if ! call_ipc SettingsHub openTabScrolled "${tab_id}" "${scroll_y}" >/dev/null; then

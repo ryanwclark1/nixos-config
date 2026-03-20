@@ -100,6 +100,9 @@ start_repo_shell() {
     sleep 1
   fi
 
+  pkill -x quickshell >/dev/null 2>&1 || true
+  sleep 0.5
+
   populate_repo_shell_env
   env "${repo_shell_env[@]}" quickshell -p "${script_dir}/../src/shell.qml" >/tmp/quickshell-repo-bar-widgets-first-open.log 2>&1 &
   repo_shell_pid="$!"
@@ -227,14 +230,20 @@ capture_until_visible() {
   local output_path="$2"
   local attempt
   local mean
+  local capture_args=(
+    --id "${instance_id}"
+    --tab bar-widgets
+    --scroll-y "${capture_scroll_y}"
+    --workspace current
+    --output "${output_path}"
+  )
+
+  if [[ -n "${repo_shell_pid}" ]]; then
+    capture_args+=(--pid "${repo_shell_pid}")
+  fi
 
   for attempt in 1 2 3 4; do
-    bash "${script_dir}/capture-settings-viewport.sh" \
-      --id "${instance_id}" \
-      --tab bar-widgets \
-      --scroll-y "${capture_scroll_y}" \
-      --workspace current \
-      --output "${output_path}"
+    bash "${script_dir}/capture-settings-viewport.sh" "${capture_args[@]}"
     mean="$(image_mean "${output_path}")"
     if awk "BEGIN { exit !(${mean} > 0.02) }"; then
       return 0
