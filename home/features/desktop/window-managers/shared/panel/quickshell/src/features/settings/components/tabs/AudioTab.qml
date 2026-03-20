@@ -39,7 +39,7 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰕾",
+                            icon: "speaker.svg",
                             label: "Volume Protection",
                             value: root._protectionSummary
                         },
@@ -118,7 +118,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Volume Protection"
-                    icon: "󰕾"
+                    icon: "speaker.svg"
                     configKey: "volumeProtectionEnabled"
                     enabledText: "Sudden volume jumps are capped at the maximum jump threshold."
                     disabledText: "Volume changes are not restricted."
@@ -164,7 +164,7 @@ Item {
 
                 SettingsTextInputRow {
                     label: "Add Output Device"
-                    leadingIcon: "󰓃"
+                    leadingIcon: "mic.svg"
                     placeholderText: "Device name…"
                     onSubmitted: value => {
                         var trimmed = value.trim();
@@ -202,7 +202,7 @@ Item {
 
                 SettingsTextInputRow {
                     label: "Add Input Device"
-                    leadingIcon: "󰍬"
+                    leadingIcon: "mic-off.svg"
                     placeholderText: "Device name…"
                     onSubmitted: value => {
                         var trimmed = value.trim();
@@ -245,7 +245,7 @@ Item {
 
                 SettingsTextInputRow {
                     label: "Add Output Device"
-                    leadingIcon: "󰝞"
+                    leadingIcon: "headphones.svg"
                     placeholderText: "Device name…"
                     onSubmitted: value => {
                         var trimmed = value.trim();
@@ -283,7 +283,7 @@ Item {
 
                 SettingsTextInputRow {
                     label: "Add Input Device"
-                    leadingIcon: "󰍭"
+                    leadingIcon: "mic-off-filled.svg"
                     placeholderText: "Device name…"
                     onSubmitted: value => {
                         var trimmed = value.trim();

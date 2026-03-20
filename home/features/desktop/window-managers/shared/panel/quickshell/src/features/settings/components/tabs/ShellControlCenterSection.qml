@@ -64,19 +64,19 @@ Item {
 
             SettingsToggleRow {
                 label: "Quick Links"
-                icon: "󰖩"
+                icon: "wifi-4.svg"
                 configKey: "controlCenterShowQuickLinks"
             }
             SettingsToggleRow {
                 label: "Media Widget"
-                icon: "󰝚"
+                icon: "music-note-2.svg"
                 configKey: "controlCenterShowMediaWidget"
             }
         }
 
         SettingsSliderRow {
             label: "Control Center Width"
-            icon: "󰖲"
+            icon: "options.svg"
             min: Config.controlCenterWidthMin
             max: Config.controlCenterWidthMax
             value: Config.controlCenterWidth

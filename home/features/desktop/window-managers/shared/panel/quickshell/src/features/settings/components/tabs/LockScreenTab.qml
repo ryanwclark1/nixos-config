@@ -38,7 +38,7 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰘖",
+                            icon: "lock-closed.svg",
                             label: "Presentation",
                             value: root._presentationSummary
                         },
@@ -120,27 +120,27 @@ Item {
 
                     SettingsToggleRow {
                         label: "Compact Mode"
-                        icon: "󰘖"
+                        icon: "lock-closed.svg"
                         configKey: "lockScreenCompact"
                     }
                     SettingsToggleRow {
                         label: "Media Controls"
-                        icon: "󰝚"
+                        icon: "music-note-2.svg"
                         configKey: "lockScreenMediaControls"
                     }
                     SettingsToggleRow {
                         label: "Weather"
-                        icon: "󰖙"
+                        icon: "weather-sunny.svg"
                         configKey: "lockScreenWeather"
                     }
                     SettingsToggleRow {
                         label: "Session Buttons"
-                        icon: "󰐥"
+                        icon: "power.svg"
                         configKey: "lockScreenSessionButtons"
                     }
                     SettingsToggleRow {
                         label: "Fingerprint Unlock"
-                        icon: "󰈷"
+                        icon: "fingerprint.svg"
                         configKey: "lockScreenFingerprint"
                     }
                 }

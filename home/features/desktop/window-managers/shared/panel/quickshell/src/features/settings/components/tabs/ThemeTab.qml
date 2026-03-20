@@ -74,7 +74,7 @@ Item {
 
                     SharedWidgets.FilterChip {
                         label: "Dark"
-                        icon: "󰖔"
+                        icon: "weather-moon.svg"
                         selected: root._themeVariantFilter === "dark"
                         onClicked: {
                             root._themeVariantFilter = root._themeVariantFilter === "dark" ? "" : "dark";
@@ -84,7 +84,7 @@ Item {
 
                     SharedWidgets.FilterChip {
                         label: "Light"
-                        icon: "󰖙"
+                        icon: "weather-sunny.svg"
                         selected: root._themeVariantFilter === "light"
                         onClicked: {
                             root._themeVariantFilter = root._themeVariantFilter === "light" ? "" : "light";
@@ -479,7 +479,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Enable Auto Schedule"
-                icon: "󰔠"
+                icon: "clock.svg"
                 checked: Config.themeAutoScheduleEnabled
                 onToggled: Config.themeAutoScheduleEnabled = !Config.themeAutoScheduleEnabled
             }
@@ -569,7 +569,7 @@ Item {
 
             SettingsTextInputRow {
                 label: "Latitude"
-                leadingIcon: "󰍎"
+                leadingIcon: "compass.svg"
                 text: Config.themeAutoLatitude
                 placeholderText: "e.g. 40.7128"
                 onSubmitted: v => Config.themeAutoLatitude = v.trim()
@@ -577,7 +577,7 @@ Item {
 
             SettingsTextInputRow {
                 label: "Longitude"
-                leadingIcon: "󰍎"
+                leadingIcon: "compass.svg"
                 text: Config.themeAutoLongitude
                 placeholderText: "e.g. -74.0060"
                 onSubmitted: v => Config.themeAutoLongitude = v.trim()

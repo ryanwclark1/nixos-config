@@ -86,7 +86,7 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰖲",
+                            icon: "options.svg",
                             label: "Active Bar",
                             value: root.selectedBarName
                         },
@@ -292,7 +292,7 @@ Item {
 
                 SettingsSelectRow {
                     label: "Editing"
-                    icon: "󰖲"
+                    icon: "options.svg"
                     description: "Switch the active bar here while comparing layout settings."
                     currentValue: String(Config.selectedBarId || "")
                     options: Config.barConfigs.map(function (barConfig) {
@@ -490,7 +490,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "No Background"
-                    icon: "󰖲"
+                    icon: "options.svg"
                     checked: root.selectedBar ? !!root.selectedBar.noBackground : false
                     onToggled: root.applyPatch({
                         noBackground: !(root.selectedBar && root.selectedBar.noBackground)
@@ -499,7 +499,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Hide on Fullscreen"
-                    icon: "󰊓"
+                    icon: "fullscreen.svg"
                     checked: root.selectedBar ? !!root.selectedBar.maximizeDetect : false
                     onToggled: root.applyPatch({
                         maximizeDetect: !(root.selectedBar && root.selectedBar.maximizeDetect)
