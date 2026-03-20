@@ -126,8 +126,8 @@ Rectangle {
       }
 
       Text {
-        visible: !root.isPopup && !!notification && !!notification.time
-        text: notification && notification.time ? Qt.formatDateTime(notification.time, "HH:mm") : ""
+        visible: !root.isPopup && !!notification && !!notification._receivedAt
+        text: notification && notification._receivedAt ? Qt.formatDateTime(notification._receivedAt, "HH:mm") : ""
         color: Colors.textDisabled
         font.pixelSize: Colors.fontSizeXS
       }

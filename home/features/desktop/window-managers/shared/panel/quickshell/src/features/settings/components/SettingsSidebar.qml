@@ -156,11 +156,10 @@ Rectangle {
                 anchors.rightMargin: Colors.spacingS
                 spacing: Colors.spacingS
 
-                Text {
-                    text: "󰍉"
+                Shared.SvgIcon {
+                    source: "search-visual.svg"
                     color: searchInput.activeFocus ? Colors.primary : Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: 14
+                    size: 14
                     opacity: 0.7
                 }
 
@@ -198,10 +197,11 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        text: "󰅖"
+                    Shared.SvgIcon {
+                        anchors.centerIn: parent
+                        source: "dismiss.svg"
                         color: Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: 10
+                        size: 10
                     }
 
                     MouseArea {
