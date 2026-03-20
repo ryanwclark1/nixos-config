@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../shared"
 import "../../services"
+import "../../services/ClipboardDisplayHelpers.js" as ClipboardDisplay
 import "../../services/SearchUtils.js" as SU
 import "../../widgets" as SharedWidgets
 
@@ -143,20 +144,12 @@ BasePopupMenu {
           border.width: 1
           Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
-          readonly property bool isImage: !!(modelData && modelData.content && String(modelData.content).indexOf("[[ binary data") !== -1)
+          readonly property bool isImage: ClipboardDisplay.isImageContent(modelData ? modelData.content : "")
           readonly property string imageSrc: {
             void ClipboardHistoryService._imageGeneration;
             return isImage ? ClipboardHistoryService.imagePath(modelData.id) : "";
           }
-          readonly property string contentText: {
-            if (!modelData || !modelData.content) return "";
-            if (clipCard.isImage) {
-              var raw = String(modelData.content);
-              var m = raw.match(/\[\[ binary data (.+?) \]\]/);
-              return m ? m[1] : "Image";
-            }
-            return String(modelData.content);
-          }
+          readonly property string contentText: ClipboardDisplay.displayText(modelData ? modelData.content : "")
           readonly property int charCount: contentText.length
 
           SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
