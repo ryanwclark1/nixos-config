@@ -79,7 +79,7 @@ PanelWindow {
         }
     }
 
-    ElasticNumber {
+    SharedWidgets.ElasticNumber {
         id: _elasticScale
         target: root.showContent ? 1.0 : 0.95
         fastDuration: Colors.durationSnap
