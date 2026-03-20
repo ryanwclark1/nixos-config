@@ -180,12 +180,22 @@ discover_instance() {
 
   [[ -d "${runtime_root}" ]] || return 1
 
+  if [[ -n "${instance_id}" ]]; then
+    for attempt in $(seq 1 20); do
+      if quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
+        printf '%s\n' "${instance_id}"
+        return 0
+      fi
+      sleep 0.5
+    done
+  fi
+
   if (( repo_shell_mode == 1 )) && [[ -n "${repo_shell_pid}" ]]; then
     resolved="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
     if [[ -n "${resolved}" && -S "${resolved}/ipc.sock" ]]; then
       candidate="$(basename "${resolved}")"
       for attempt in $(seq 1 20); do
-        if quickshell ipc --id "${candidate}" call SettingsHub close >/dev/null 2>&1; then
+        if quickshell ipc --id "${candidate}" show >/dev/null 2>&1; then
           printf '%s\n' "${candidate}"
           return 0
         fi
@@ -211,7 +221,7 @@ discover_instance() {
   for attempt in $(seq 1 20); do
     while IFS= read -r candidate; do
       [[ -n "${candidate}" ]] || continue
-      if quickshell ipc --id "${candidate}" call SettingsHub close >/dev/null 2>&1; then
+      if quickshell ipc --id "${candidate}" show >/dev/null 2>&1; then
         printf '%s\n' "${candidate}"
         return 0
       fi
@@ -389,10 +399,12 @@ capture_until_visible "First-open" "${first_open_png}"
 printf '[INFO] Reproducing close/reenter path for control capture\n'
 quickshell ipc --id "${instance_id}" call SettingsHub close >/dev/null 2>&1 || true
 sleep 0.5
-instance_id="$(discover_instance)" || {
-  printf 'Could not rediscover a reachable quickshell instance before re-entry capture.\n' >&2
-  exit 1
-}
+if ! quickshell ipc --id "${instance_id}" show >/dev/null 2>&1; then
+  instance_id="$(discover_instance)" || {
+    printf 'Could not rediscover a reachable quickshell instance before re-entry capture.\n' >&2
+    exit 1
+  }
+fi
 capture_until_visible "Re-entry" "${reenter_png}"
 
 first_text="$(ocr_text "${first_open_png}")"
