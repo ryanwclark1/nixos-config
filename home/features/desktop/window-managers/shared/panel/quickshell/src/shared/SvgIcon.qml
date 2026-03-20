@@ -32,6 +32,7 @@ Item {
         anchors.fill: parent
         source: root._resolvedSource ? Qt.resolvedUrl("../assets/icons/" + root._resolvedFolder + "/" + root._resolvedSource) : ""
         implicitSize: root.size
+        visible: !root.colorize
     }
 
     Loader {

@@ -793,7 +793,7 @@ Item {
         StatPill {
             property var widgetInstance: null
             statKey: "ramStatus"
-            icon: "󰍛"
+            icon: "board.svg"
             iconColor: Colors.accent
             label: "RAM"
             anchorWindow: root.anchorWindow
@@ -812,7 +812,7 @@ Item {
         StatPill {
             property var widgetInstance: null
             statKey: "gpuStatus"
-            icon: "󰢮"
+            icon: "developer-board.svg"
             iconColor: Colors.secondary
             label: "GPU"
             anchorWindow: root.anchorWindow
@@ -831,7 +831,7 @@ Item {
         StatPill {
             property var widgetInstance: null
             statKey: "diskStatus"
-            icon: "󰋊"
+            icon: "hard-drive.svg"
             iconColor: Colors.secondary
             label: "Disk"
             anchorWindow: root.anchorWindow
@@ -850,7 +850,7 @@ Item {
         StatPill {
             property var widgetInstance: null
             statKey: "networkStatus"
-            icon: "󰛳"
+            icon: "ethernet.svg"
             iconColor: Colors.primary
             label: "Net"
             anchorWindow: root.anchorWindow

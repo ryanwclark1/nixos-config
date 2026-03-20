@@ -316,14 +316,14 @@ Rectangle {
                     }
 
                     SharedWidgets.Chip {
-                        icon: "󰈀"
+                        icon: "download.svg"
                         iconColor: Colors.primary
                         text: "READ " + MU.formatBytes(root.detailData.readBytes)
                         textColor: Colors.primary
                     }
 
                     SharedWidgets.Chip {
-                        icon: "󰆼"
+                        icon: "upload.svg"
                         iconColor: Colors.accent
                         text: "WRITE " + MU.formatBytes(root.detailData.writeBytes)
                         textColor: Colors.accent
