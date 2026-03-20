@@ -443,7 +443,7 @@ surface_candidates_json() {
         | map(select((.pid // 0) == $shell_pid))
         | map(select((.namespace // "") != "swww-daemon"))
         | map(select(((.namespace // "") | startswith("quickshell-bar-")) | not))
-        | map(select((.namespace // "") != "quickshell-toast" and (.namespace // "") != "quickshell-corners"))
+        | map(select((.namespace // "") != "quickshell-toast" and (.namespace // "") != "quickshell-screen-decor"))
         | map(select((.w // 0) > 8 and (.h // 0) > 8))
         | map(. + {
             sig: [

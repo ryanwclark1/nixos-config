@@ -467,7 +467,6 @@ Scope {
     }
 
     ShellDecorLayers {
-        showBorders: Config.showScreenBorders
         startupComplete: root.startupComplete
     }
 }

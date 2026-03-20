@@ -10,7 +10,6 @@ import "../shared"
 
 Item {
     id: root
-    property bool showBorders: false
     property bool startupComplete: false
     readonly property bool _backgroundAutoHidden: Config.backgroundAutoHide && CompositorAdapter.hasFullscreenWindow
 
@@ -293,21 +292,7 @@ Item {
         }
     }
 
-    Corners {
-        id: screenCorners
-    }
-
-    Variants {
-        model: Quickshell.screens
-
-        delegate: Component {
-            ScreenBorder {
-                required property ShellScreen modelData
-                screen: modelData
-                visible: root.showBorders
-            }
-        }
-    }
+    ScreenDecor {}
 
     // Debug log overlay — visible when Config.debug is true
     Loader {

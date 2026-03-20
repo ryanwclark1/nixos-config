@@ -1,5 +1,4 @@
-Corners 1.0 Corners.qml
-ScreenBorder 1.0 ScreenBorder.qml
+ScreenDecor 1.0 ScreenDecor.qml
 ShellBarLayer 1.0 ShellBarLayer.qml
 ShellDecorLayers 1.0 ShellDecorLayers.qml
 ShellFileFlow 1.0 ShellFileFlow.qml
