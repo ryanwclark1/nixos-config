@@ -53,17 +53,27 @@ PopupWindow {
 
   Component.onDestruction: _destroyed = true
 
+  // ── Surface ID for FocusGrabManager ─────────
+  // Derived from title by default; override if needed.
+  property string _grabId: root.title ? root.title.toLowerCase().replace(/\s+/g, "") + "Popup" : "popup"
+
   onShowContentChanged: {
-    if (showContent && focusOnOpen) {
-      Qt.callLater(function() {
-        if (_destroyed) return;
-        if (!root.showContent) return;
-        if (root.focusTarget && root.focusTarget.forceActiveFocus)
-          root.focusTarget.forceActiveFocus();
-        else if (surface.forceActiveFocus)
-          surface.forceActiveFocus();
+    if (showContent) {
+      FocusGrabManager.requestGrab(root._grabId, function() {
+        root.wantVisible = false;
       });
-    } else if (!showContent) {
+      if (focusOnOpen) {
+        Qt.callLater(function() {
+          if (_destroyed) return;
+          if (!root.showContent) return;
+          if (root.focusTarget && root.focusTarget.forceActiveFocus)
+            root.focusTarget.forceActiveFocus();
+          else if (surface.forceActiveFocus)
+            surface.forceActiveFocus();
+        });
+      }
+    } else {
+      FocusGrabManager.releaseGrab(root._grabId);
       if (root.focusTarget && root.focusTarget.activeFocus)
         root.focusTarget.focus = false;
       if (surface.activeFocus)

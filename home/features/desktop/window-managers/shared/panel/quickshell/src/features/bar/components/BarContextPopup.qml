@@ -67,10 +67,12 @@ PopupWindow {
         }
 
         root.visible = true;
+        FocusGrabManager.requestGrab("barContextMenu", function() { root.close(); });
         contentRect.forceActiveFocus();
     }
 
     function close() {
+        FocusGrabManager.releaseGrab("barContextMenu");
         root.visible = false;
         root.model = [];
         root.focusedIndex = -1;
