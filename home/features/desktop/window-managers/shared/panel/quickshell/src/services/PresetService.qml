@@ -163,6 +163,22 @@ QtObject {
         });
     }
 
+    // ── Built-in presets ─────────────────────────
+    readonly property var builtinPresets: PresetData.builtinPresets()
+
+    function loadBuiltinPreset(presetId) {
+        var preset = PresetData.findBuiltinPreset(presetId);
+        if (!preset) {
+            Logger.e("PresetService", "unknown built-in preset:", presetId);
+            return;
+        }
+
+        var currentData = ConfigPersistence.buildData(Config);
+        var mergedData = PresetData.mergePresetData(currentData, preset.data);
+        root._applyPresetData(mergedData);
+        ToastService.showNotice("Preset Applied", preset.name + " preset loaded");
+    }
+
     // ── Delete preset ────────────────────────────
     function deletePreset(name) {
         var safeName = root._safePresetName(name);

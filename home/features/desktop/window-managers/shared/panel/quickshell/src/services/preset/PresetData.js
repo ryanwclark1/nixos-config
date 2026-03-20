@@ -73,3 +73,97 @@ function mergePresetData(currentData, presetData) {
     var preset = sanitizePresetData(presetData || {});
     return _mergeObjects(base, preset);
 }
+
+// ── Built-in presets ─────────────────────────────────────────────
+// Each adjusts radiusScale, spacingScale, uiDensityScale, animationSpeedScale,
+// and glassOpacity to create distinct shell personalities.
+
+var BUILTIN_PRESETS = [
+    {
+        id: "compact",
+        name: "Compact",
+        description: "Tight spacing, small radii — maximizes screen real estate.",
+        icon: "minimize.svg",
+        data: {
+            appearance: {
+                radiusScale: 0.6,
+                spacingScale: 0.8,
+                uiDensityScale: 0.85,
+                animationSpeedScale: 0.85
+            },
+            glass: { opacityBase: 0.9, opacitySurface: 0.95 }
+        }
+    },
+    {
+        id: "rounded",
+        name: "Rounded",
+        description: "Large radii, relaxed spacing — soft and approachable.",
+        icon: "circle.svg",
+        data: {
+            appearance: {
+                radiusScale: 1.6,
+                spacingScale: 1.15,
+                uiDensityScale: 1.1,
+                animationSpeedScale: 1.0
+            },
+            glass: { opacityBase: 0.82, opacitySurface: 0.92 }
+        }
+    },
+    {
+        id: "minimal",
+        name: "Minimal",
+        description: "Flat, fast, no-nonsense — focus on content.",
+        icon: "subtract.svg",
+        data: {
+            appearance: {
+                radiusScale: 0.3,
+                spacingScale: 0.9,
+                uiDensityScale: 0.95,
+                animationSpeedScale: 0.5
+            },
+            glass: { opacityBase: 0.95, opacitySurface: 0.98 }
+        }
+    },
+    {
+        id: "vibrant",
+        name: "Vibrant",
+        description: "Saturated, bouncy animations — expressive and lively.",
+        icon: "color-palette.svg",
+        data: {
+            appearance: {
+                radiusScale: 1.2,
+                spacingScale: 1.05,
+                uiDensityScale: 1.0,
+                animationSpeedScale: 1.4
+            },
+            glass: { opacityBase: 0.75, opacitySurface: 0.88 }
+        }
+    },
+    {
+        id: "calm",
+        name: "Calm",
+        description: "Slow animations, gentle opacity — easy on the eyes.",
+        icon: "weather-moon.svg",
+        data: {
+            appearance: {
+                radiusScale: 1.1,
+                spacingScale: 1.1,
+                uiDensityScale: 1.05,
+                animationSpeedScale: 0.7
+            },
+            glass: { opacityBase: 0.88, opacitySurface: 0.95 }
+        }
+    }
+];
+
+function builtinPresets() {
+    return BUILTIN_PRESETS;
+}
+
+function findBuiltinPreset(id) {
+    for (var i = 0; i < BUILTIN_PRESETS.length; i++) {
+        if (BUILTIN_PRESETS[i].id === id)
+            return BUILTIN_PRESETS[i];
+    }
+    return null;
+}
