@@ -47,6 +47,7 @@ QtObject {
 
   // ── Named constants ──────────────────────────
   readonly property int _refreshIntervalMs: 1800000  // 30 min
+  readonly property int _retryIntervalMs: 15000      // 15s retry on failure
   readonly property int _configDebounceMs: 500
 
   // Deferred activation flag — ensures Timer starts via a false→true transition
@@ -141,7 +142,8 @@ QtObject {
       + "?latitude=" + root._resolvedLat
       + "&longitude=" + root._resolvedLon
       + "&current=european_aqi,us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone";
-    aqiProc.command = ["curl", "-s", "--max-time", "10", url];
+    aqiProc.command = ["curl", "-s", "--compressed", "--max-time", "10",
+      "-H", "User-Agent: quickshell-weather/1.0", url];
     if (!aqiProc.running) aqiProc.running = true;
   }
 
@@ -205,7 +207,8 @@ QtObject {
       return;
     }
 
-    weatherProc.command = ["curl", "-s", "--max-time", "15", url];
+    weatherProc.command = ["curl", "-s", "--compressed", "--max-time", "15",
+      "-H", "User-Agent: quickshell-weather/1.0", url];
     if (!weatherProc.running) weatherProc.running = true;
   }
 
@@ -218,15 +221,23 @@ QtObject {
     return base + "?format=j1" + unitFlag;
   }
 
+  property string _stderrText: ""
+
   property Process weatherProc: Process {
     command: ["sh", "-c", "echo"]
     running: false
+    stderr: StdioCollector {
+      onStreamFinished: root._stderrText = String(this.text || "").trim()
+    }
     stdout: StdioCollector {
       onStreamFinished: {
         try {
           var raw = String(this.text || "").trim();
-          if (!raw) throw new Error("empty weather response");
-          if (raw.indexOf("{") !== 0) throw new Error("response is not JSON");
+          if (!raw) {
+            var detail = root._stderrText || "no stderr";
+            throw new Error("empty weather response (" + detail + ")");
+          }
+          if (raw.indexOf("{") !== 0) throw new Error("response is not JSON: " + raw.substring(0, 80));
           var json = JSON.parse(raw);
           var data = json.data || json; // Handle wrapped or unwrapped data
 
@@ -326,6 +337,7 @@ QtObject {
           root._fetchAqi();
         } catch (e) {
           root._reportFailure(String(e || "parse error"));
+          retryTimer.restart();
         }
       }
     }
@@ -371,20 +383,25 @@ QtObject {
     onTriggered: root.refresh()
   }
 
-  // Debounce config changes — avoids multiple curl requests when several
-  // weather settings change in rapid succession (e.g. SettingsHub batch updates).
+  property Timer _retryTimer: Timer {
+    id: retryTimer
+    interval: root._retryIntervalMs
+    onTriggered: root.refresh()
+  }
+
   property Timer _configDebounce: Timer {
+    id: configDebounce
     interval: root._configDebounceMs
     onTriggered: root.refresh()
   }
 
   property Connections configConnections: Connections {
     target: Config
-    function onWeatherUnitsChanged() { root._configDebounce.restart(); }
-    function onWeatherAutoLocationChanged() { root._configDebounce.restart(); }
-    function onWeatherCityQueryChanged() { root._configDebounce.restart(); }
-    function onWeatherLatitudeChanged() { root._configDebounce.restart(); }
-    function onWeatherLongitudeChanged() { root._configDebounce.restart(); }
-    function onWeatherLocationPriorityChanged() { root._configDebounce.restart(); }
+    function onWeatherUnitsChanged() { configDebounce.restart(); }
+    function onWeatherAutoLocationChanged() { configDebounce.restart(); }
+    function onWeatherCityQueryChanged() { configDebounce.restart(); }
+    function onWeatherLatitudeChanged() { configDebounce.restart(); }
+    function onWeatherLongitudeChanged() { configDebounce.restart(); }
+    function onWeatherLocationPriorityChanged() { configDebounce.restart(); }
   }
 }

@@ -72,7 +72,7 @@ QtObject {
           root._lastFailureKey = "";
         } catch (e) {
           root._reportFailure(String(e || "parse error"));
-          root._retryTimer.restart();
+          retryTimer.restart();
         }
       }
     }
@@ -87,17 +87,19 @@ QtObject {
   }
 
   property Timer _retryTimer: Timer {
+    id: retryTimer
     interval: root._retryIntervalMs
     onTriggered: root.refresh()
   }
 
   property Timer _configDebounce: Timer {
+    id: configDebounce
     interval: root._configDebounceMs
     onTriggered: root.refresh()
   }
 
   property Connections configConnections: Connections {
     target: Config
-    function onMarketTickersChanged() { root._configDebounce.restart(); }
+    function onMarketTickersChanged() { configDebounce.restart(); }
   }
 }

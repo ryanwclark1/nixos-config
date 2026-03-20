@@ -25,6 +25,8 @@ QtObject {
     property int _nextConversationNum: 1
     property var _closedConversationStack: []
     property string _sessionDraftMigrationText: ""
+    property bool _sessionLoading: false
+    property bool _sessionLoaded: false
 
     readonly property var activeConversation: {
         for (var i = 0; i < conversations.length; i++) {
@@ -186,7 +188,7 @@ QtObject {
     readonly property string sessionPath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/ai-chat-session.json"
 
     function saveSession() {
-        if (_loading) return;
+        if (_loading || _sessionLoading || !_sessionLoaded) return;
         var data = {
             activeConversationId: root.activeConversationId
         };
@@ -195,22 +197,9 @@ QtObject {
 
     property FileView sessionFile: FileView {
         path: root.sessionPath
-        onLoaded: {
-            try {
-                var data = JSON.parse(this.text);
-                root.activeConversationId = data.activeConversationId || "";
-                root._sessionDraftMigrationText = data.currentInputText || "";
-                if (root.activeConversationId) {
-                    for (var i = 0; i < root.conversations.length; i++) {
-                        if (root.conversations[i].id === root.activeConversationId) {
-                            // Found active conversation
-                            break;
-                        }
-                    }
-                }
-                root._applySessionDraftMigration();
-            } catch(e) {}
-        }
+        blockLoading: true
+        printErrors: false
+        atomicWrites: true
     }
 
     onActiveConversationIdChanged: {
@@ -244,8 +233,27 @@ QtObject {
         onTriggered: root._saveData()
     }
 
+    Component.onCompleted: _loadSession()
+
     function _scheduleSave() {
         if (!_loading) _saveTimer.restart();
+    }
+
+    function _loadSession() {
+        _sessionLoading = true;
+        try {
+            var raw = (sessionFile.text() || "").trim();
+            if (raw) {
+                var data = JSON.parse(raw);
+                activeConversationId = data.activeConversationId || "";
+                _sessionDraftMigrationText = data.currentInputText || "";
+            }
+        } catch (e) {
+            Logger.e("AiService", "failed to load session:", e);
+        }
+        _sessionLoading = false;
+        _sessionLoaded = true;
+        _applySessionDraftMigration();
     }
 
     function _copyMessages(messages) {

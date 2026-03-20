@@ -463,7 +463,7 @@ PanelWindow {
         // Search toggle
         SharedWidgets.IconButton {
           size: 28; radius: Colors.radiusXS
-          icon: "󰍉"
+          icon: "search-visual.svg"
           iconColor: root.isSearching ? Colors.primary : Colors.textDisabled
           tooltipText: root.isSearching ? "Hide search" : "Search"
           onClicked: {
@@ -488,7 +488,7 @@ PanelWindow {
         // Open file button
         SharedWidgets.IconButton {
           size: 28; radius: Colors.radiusXS
-          icon: "󰏗"
+          icon: "folder-open.svg"
           tooltipText: "Open file"
           onClicked: root.openFileRequested()
         }
@@ -496,7 +496,7 @@ PanelWindow {
         // Save As button
         SharedWidgets.IconButton {
           size: 28; radius: Colors.radiusXS
-          icon: "󰆓"
+          icon: "save.svg"
           tooltipText: "Save as"
           onClicked: root.saveAsRequested(root.activeContent)
         }
