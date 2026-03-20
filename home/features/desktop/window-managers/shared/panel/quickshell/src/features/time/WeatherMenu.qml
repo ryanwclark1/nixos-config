@@ -357,7 +357,7 @@ BasePopupMenu {
             }
 
             Text {
-              text: modelData.chanceOfRain
+              text: String(modelData.chanceOfRain || "")
               color: Colors.primary
               font.pixelSize: Appearance.fontSizeXS
               font.weight: Font.Medium

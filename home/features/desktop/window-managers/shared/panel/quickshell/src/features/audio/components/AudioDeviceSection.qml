@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import "."
 import "../../../services"
-import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets"
 
@@ -132,6 +131,7 @@ ColumnLayout {
         spacing: Appearance.paddingSmall
         Loader {
           readonly property string rowIcon: deviceCard.isDefault ? "checkmark.svg" : root.icon
+          readonly property color rowColor: deviceCard.isDefault ? Colors.primary : Colors.textSecondary
           sourceComponent: rowIcon.endsWith(".svg") ? deviceRowSvgIcon : deviceRowGlyphIcon
         }
         Text { text: modelData.name; color: Colors.text; font.pixelSize: Appearance.fontSizeMedium; font.weight: deviceCard.isDefault ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
@@ -147,7 +147,7 @@ ColumnLayout {
     id: deviceRowSvgIcon
     SvgIcon {
       source: parent.rowIcon
-      color: parent.parent.parent.deviceCard.isDefault ? Colors.primary : Colors.textSecondary
+      color: parent.rowColor
       size: Appearance.fontSizeLarge
     }
   }
@@ -156,7 +156,7 @@ ColumnLayout {
     id: deviceRowGlyphIcon
     Text {
       text: parent.rowIcon
-      color: parent.parent.parent.deviceCard.isDefault ? Colors.primary : Colors.textSecondary
+      color: parent.rowColor
       font.family: Appearance.fontMono
       font.pixelSize: Appearance.fontSizeLarge
     }

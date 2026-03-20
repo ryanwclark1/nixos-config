@@ -118,7 +118,7 @@ SharedWidgets.CardBase {
             Item { Layout.fillWidth: true }
 
             SharedWidgets.Chip {
-                icon: root.activeInterface === "offline" ? "warning.svg" : "ethernet.svg"
+                icon: IconHelpers.degradedStatusIcon(root.activeInterface === "offline", "ethernet.svg")
                 iconColor: root.activeInterface === "offline" ? Colors.error : Colors.primary
                 text: root.activeInterface.toUpperCase()
                 textColor: root.activeInterface === "offline" ? Colors.error : Colors.textSecondary

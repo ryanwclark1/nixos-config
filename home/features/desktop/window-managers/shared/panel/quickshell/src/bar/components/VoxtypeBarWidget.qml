@@ -16,13 +16,13 @@ SharedWidgets.BarPill {
         if (statusPoll.value && typeof statusPoll.value === "object")
             return statusPoll.value;
         return {
-            text: "",
+            text: "Mic",
             alt: "idle",
             class: "idle",
             tooltip: "Voxtype ready - hold hotkey to record"
         };
     }
-    readonly property string statusText: String(statusData.text || "")
+    readonly property string statusText: String(statusData.text || "Mic")
     readonly property string statusAlt: String(statusData.alt || "idle")
     readonly property string statusClass: String(statusData.class || statusAlt || "idle")
     readonly property string statusTooltip: String(statusData.tooltip || "Voxtype")
