@@ -119,7 +119,7 @@ QtObject {
         { type: "text", key: "sshCommand", label: "SSH Command", icon: "terminal.svg", placeholder: "ssh", description: "Command for connections (e.g. ssh, kitten ssh, mosh)." },
         { type: "mode", key: "displayMode", label: "Bar Label", description: "Choose whether the widget shows the total host count or the most recent host label.", options: [ { value: "count", label: "Count" }, { value: "recent", label: "Recent" } ] },
         { type: "mode", key: "defaultAction", label: "Primary Click", description: "Choose the action used when the widget has exactly one host.", options: [ { value: "connect", label: "Connect" }, { value: "copy", label: "Copy Command" } ] },
-        { type: "toggle", key: "showWhenEmpty", label: "Show When Empty", icon: "󰖰", enabledText: "Keep the SSH pill visible even when no hosts or import results are available yet.", disabledText: "Hide the SSH pill until hosts, import activity, or import errors exist." },
+        { type: "toggle", key: "showWhenEmpty", label: "Show When Empty", icon: "empty.svg", enabledText: "Keep the SSH pill visible even when no hosts or import results are available yet.", disabledText: "Hide the SSH pill until hosts, import activity, or import errors exist." },
         { type: "mode", key: "emptyClickAction", label: "Empty Click", description: "Choose what clicking the SSH pill does when it is visible but still has no hosts.", options: [ { value: "menu", label: "Open Menu" }, { value: "refresh", label: "Refresh Import" } ] },
         { type: "text", key: "emptyLabel", label: "Empty Label", icon: "rename.svg", placeholder: "SSH" }
       ]
@@ -140,11 +140,11 @@ QtObject {
     ] },
     { widgetType: "music", label: "Music", icon: "music-note-2.svg", section: "right", description: "Compact active player shortcut.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 100 }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the music widget adapts to bar orientation automatically, always shows track text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
-      { type: "slider", key: "maxTextWidth", label: "Track Text Width", icon: "󰛇", min: 60, max: 220, step: 1 }
+      { type: "slider", key: "maxTextWidth", label: "Track Text Width", icon: "ruler.svg", min: 60, max: 220, step: 1 }
     ] },
     { widgetType: "privacy", label: "Privacy", icon: "shield.svg", section: "right", description: "Camera, mic, and share indicators.", hasSettings: true, defaultSettings: { displayMode: "auto", showPulseDot: true }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the privacy widget adapts to bar orientation automatically, always shows text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
-      { type: "toggle", key: "showPulseDot", label: "Pulse Dot", icon: "󰄯", enabledText: "Show the animated activity dot beside the privacy icon.", disabledText: "Hide the animated pulse dot and keep only the icon/text." }
+      { type: "toggle", key: "showPulseDot", label: "Pulse Dot", icon: "record.svg", enabledText: "Show the animated activity dot beside the privacy icon.", disabledText: "Hide the animated pulse dot and keep only the icon/text." }
     ] },
     { widgetType: "voxtype", label: "Voxtype", icon: "", section: "right", description: "Voice-to-text daemon status and recording controls.", hasSettings: true, defaultSettings: { displayMode: "auto", iconTheme: "nerd-font", refreshInterval: 1 }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the Voxtype widget adapts to bar orientation automatically, always shows status text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
