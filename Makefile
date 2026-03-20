@@ -313,3 +313,15 @@ hyprland-vm-panel-qa:
 
 hyprland-vm-settings-qa:
 	bash ./scripts/vm/run-hyprland-panel-qa.sh --mode settings-qa
+
+vm-disk-cleanup:
+	bash ./scripts/vm/cleanup-vm-disks.sh --vm both
+
+vm-disk-cleanup-niri:
+	bash ./scripts/vm/cleanup-vm-disks.sh --vm niri
+
+vm-disk-cleanup-hyprland:
+	bash ./scripts/vm/cleanup-vm-disks.sh --vm hyprland
+
+vm-disk-cleanup-dry-run:
+	bash ./scripts/vm/cleanup-vm-disks.sh --vm both --dry-run --verbose

@@ -129,6 +129,18 @@ if [[ "${reset_disk}" -eq 0 && -e "${disk_image}" ]]; then
   echo "[INFO] If login fails, rerun with --reset-disk to clear stale credentials."
 fi
 
+# Clean up old QCOW2 files if enabled (default: enabled)
+if [[ "${VM_DISK_CLEANUP_DISABLE:-0}" != "1" ]]; then
+  cleanup_script="${repo_root}/scripts/vm/cleanup-vm-disks.sh"
+  if [[ -x "${cleanup_script}" ]]; then
+    echo "[INFO] Cleaning up old VM disk images..."
+    VM_DISK_CLEANUP_MAX_AGE_DAYS="${VM_DISK_CLEANUP_MAX_AGE_DAYS:-7}" \
+    VM_DISK_CLEANUP_MAX_KEEP="${VM_DISK_CLEANUP_MAX_KEEP:-5}" \
+    VM_DISK_CLEANUP_VERBOSE="${VM_DISK_CLEANUP_VERBOSE:-0}" \
+    bash "${cleanup_script}" --vm hyprland >/dev/null 2>&1 || true
+  fi
+fi
+
 build_attr="${flake_ref}#nixosConfigurations.${config_name}.config.system.build.vm"
 
 echo "[INFO] Building VM runner: ${build_attr}"
