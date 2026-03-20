@@ -221,14 +221,14 @@ Item {
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰅃"
+                                    iconName: "chevron-up.svg"
                                     enabled: toggleRow.index > 0
                                     onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleRow.modelData.id, -1)
                                 }
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰅀"
+                                    iconName: "chevron-down.svg"
                                     enabled: toggleRow.index < root.orderedToggles().length - 1
                                     onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleRow.modelData.id, 1)
                                 }
@@ -392,14 +392,14 @@ Item {
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰅃"
+                                    iconName: "chevron-up.svg"
                                     enabled: pluginRow.index > 0
                                     onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", pluginRow.modelData.id, -1)
                                 }
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰅀"
+                                    iconName: "chevron-down.svg"
                                     enabled: pluginRow.index < root.orderedPlugins().length - 1
                                     onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", pluginRow.modelData.id, 1)
                                 }

@@ -559,7 +559,7 @@ Rectangle {
                                 Layout.fillWidth: true
                                 radius: Colors.radiusMedium
                                 color: categoryMouse.containsMouse ? Colors.withAlpha(Colors.surface, 0.1) : "transparent"
-                                implicitHeight: 38
+                                implicitHeight: Colors.controlRowHeight
 
                                 SharedWidgets.StateLayer {
                                     id: categoryState
@@ -711,7 +711,7 @@ Rectangle {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 38
+                    implicitHeight: Colors.controlRowHeight
                     radius: Colors.radiusMedium
                     color: saveMouse.containsMouse ? Colors.primary : Colors.primaryAccent
                     border.color: Colors.withAlpha(Colors.primary, 0.5)

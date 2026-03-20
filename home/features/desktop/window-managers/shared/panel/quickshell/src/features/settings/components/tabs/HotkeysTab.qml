@@ -139,7 +139,7 @@ Item {
 
         SettingsCard {
             title: "Search"
-            iconName: "󰍉"
+            iconName: "search-visual.svg"
             description: "Filter active compositor binds by key, modifier, dispatcher, or arguments."
 
             SettingsTextInputRow {
@@ -164,7 +164,7 @@ Item {
 
         SettingsCard {
             title: "Bindings"
-            iconName: "󰌌"
+            iconName: "keyboard.svg"
             description: CompositorAdapter.isNiri ? "Niri keybindings from config.kdl." : "Current compositor keymap snapshot."
 
             Text {

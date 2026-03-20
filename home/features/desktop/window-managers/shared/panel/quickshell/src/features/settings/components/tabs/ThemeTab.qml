@@ -326,7 +326,7 @@ Item {
 
                             SettingsActionButton {
                                 label: "Apply Theme"
-                                iconName: "󰄬"
+                                iconName: "checkmark.svg"
                                 enabled: root._effectivePreviewTheme !== null
                                 onClicked: ThemeService.applyTheme(root._effectivePreviewTheme.id)
                             }

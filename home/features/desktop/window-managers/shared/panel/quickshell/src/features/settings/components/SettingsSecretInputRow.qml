@@ -37,7 +37,7 @@ ColumnLayout {
 
         Rectangle {
             Layout.fillWidth: true
-            height: 38
+            height: Colors.controlRowHeight
             radius: Colors.radiusSmall
             color: Colors.modalFieldSurface
             border.color: input.activeFocus ? Colors.primary : Colors.border

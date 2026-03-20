@@ -178,14 +178,14 @@ Column {
 
                     SettingsActionButton {
                         compact: true
-                        iconName: "󰅃"
+                        iconName: "chevron-up.svg"
                         enabled: modeRow.index > 0
                         onClicked: if (root.moveModeFn) root.moveModeFn(modeRow.modelData, -1)
                     }
 
                     SettingsActionButton {
                         compact: true
-                        iconName: "󰅀"
+                        iconName: "chevron-down.svg"
                         enabled: modeRow.index < (root.modeModel.length - 1)
                         onClicked: if (root.moveModeFn) root.moveModeFn(modeRow.modelData, 1)
                     }

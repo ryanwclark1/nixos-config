@@ -9,8 +9,8 @@ Rectangle {
     property bool active: false
 
     visible: root.icon !== ""
-    width: 38
-    height: 38
+    width: Colors.controlRowHeight
+    height: Colors.controlRowHeight
     radius: Colors.radiusSmall
     color: root.active
         ? Colors.primaryAccent

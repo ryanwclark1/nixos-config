@@ -115,7 +115,7 @@ Item {
 
             SettingsCard {
                 title: "Capture"
-                iconName: "󰹑"
+                iconName: "fullscreen.svg"
                 description: "Default source and visual capture behavior for screen recording."
 
                 SettingsModeRow {

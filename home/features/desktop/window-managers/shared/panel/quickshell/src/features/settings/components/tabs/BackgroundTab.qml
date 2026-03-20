@@ -175,7 +175,7 @@ Item {
 
             SettingsCard {
                 title: "Personality GIF"
-                iconName: "󰄛"
+                iconName: "people.svg"
                 description: "An optional animated element that reacts to your environment."
 
                 SettingsToggleRow {

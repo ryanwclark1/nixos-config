@@ -539,7 +539,7 @@ Item {
 
                                         SettingsActionButton {
                                             compact: true
-                                            iconName: "󰅃"
+                                            iconName: "chevron-up.svg"
                                             label: "↑"
                                             enabled: widgetRow.index > 0
                                             onClicked: root.moveWidget(widgetRow.sectionKey, widgetRow.index, -1)
@@ -547,7 +547,7 @@ Item {
 
                                         SettingsActionButton {
                                             compact: true
-                                            iconName: "󰅀"
+                                            iconName: "chevron-down.svg"
                                             label: "↓"
                                             enabled: widgetRow.index < (root.sectionWidgets(widgetRow.sectionKey).length - 1)
                                             onClicked: root.moveWidget(widgetRow.sectionKey, widgetRow.index, 1)

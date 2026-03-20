@@ -446,7 +446,7 @@ Item {
                     SettingsActionButton {
                         id: copyDiagnosticsButton
                         label: "Copy Diagnostics"
-                        iconName: "󰨓"
+                        iconName: "copy.svg"
                         compact: true
                         onClicked: root.copyPluginDiagnostics()
                     }

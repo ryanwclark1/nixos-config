@@ -920,7 +920,7 @@ Item {
                                     SettingsActionButton {
                                         compact: true
                                         enabled: webProviderRow.index > 0
-                                        iconName: "󰅃"
+                                        iconName: "chevron-up.svg"
                                         label: "↑"
                                         onClicked: root.moveWebProvider(webProviderRow.modelData, -1)
                                     }
@@ -928,7 +928,7 @@ Item {
                                     SettingsActionButton {
                                         compact: true
                                         enabled: webProviderRow.index < (root.orderedWebProviders().length - 1)
-                                        iconName: "󰅀"
+                                        iconName: "chevron-down.svg"
                                         label: "↓"
                                         onClicked: root.moveWebProvider(webProviderRow.modelData, 1)
                                     }
