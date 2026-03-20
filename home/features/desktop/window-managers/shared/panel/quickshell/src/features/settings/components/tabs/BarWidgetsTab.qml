@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
+import "../../../../services/IconHelpers.js" as IconHelpers
 import "../../../../widgets" as SharedWidgets
 import ".."
 import "BarWidgetPickerPolicy.js" as BarWidgetPickerPolicy
@@ -366,7 +367,7 @@ Item {
                 required property string modelData
                 readonly property string sectionKey: modelData
                 title: root.sectionLabel(sectionKey) + " Section"
-                iconName: sectionKey === "left" ? "󰁍" : (sectionKey === "center" ? "󰇘" : "󰁔")
+                iconName: IconHelpers.barSectionIcon(sectionKey)
                 description: "Drag to reorder widgets, or use the arrow buttons as a fallback."
                 visible: !!root.selectedBar
 
@@ -574,7 +575,7 @@ Item {
                                 visible: false
                                 x: widgetRow.dragOffsetX
                                 y: widgetRow.dragOffsetY
-                                Drag.active: root.dragReorderEnabled && widgetRow.dragHandle.dragActive
+                                Drag.active: root.dragReorderEnabled && widgetRow.dragging
                                 Drag.source: dragProxy
                                 Drag.hotSpot.x: width / 2
                                 Drag.hotSpot.y: height / 2

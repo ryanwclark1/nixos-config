@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
+import "../../../../services/IconHelpers.js" as IconHelpers
 import "../../../../widgets" as SharedWidgets
 import ".."
 
@@ -257,7 +258,7 @@ Item {
 
                                 SettingsActionButton {
                                     label: root._pendingDeleteName === modelData.name ? "Confirm?" : "Delete"
-                                    iconName: root._pendingDeleteName === modelData.name ? "󰀦" : "󰆴"
+                                    iconName: IconHelpers.presetDeleteIcon(root._pendingDeleteName === modelData.name)
                                     compact: true
                                     onClicked: {
                                         if (root._pendingDeleteName === modelData.name) {

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "ShellCoreHelpers.js" as Helpers
 import "../../../../services"
+import "../../../../services/IconHelpers.js" as IconHelpers
 import "../../../../widgets" as SharedWidgets
 import ".."
 
@@ -140,7 +141,7 @@ Item {
                         dropIndexFn: root.currentToggleDropIndex
 
                         SettingsMetricIcon {
-                            icon: toggleRow.modelData.icon || "󰖲"
+                            icon: toggleRow.modelData.icon || "settings.svg"
                             iconColor: toggleRow.hidden ? Colors.textDisabled : Colors.primary
                             Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
                         }

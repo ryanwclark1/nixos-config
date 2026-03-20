@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../../services"
+import "../../../../services/IconHelpers.js" as IconHelpers
 import "../../../../widgets" as SharedWidgets
 import ".."
 
@@ -558,12 +559,11 @@ Item {
                             border.width: 1
                             Layout.alignment: Qt.AlignVCenter
 
-                            Text {
+                            SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
-                                text: modelData.action === "mute" ? "󰂛" : "󰔛"
+                                source: IconHelpers.notificationActionIcon(modelData.action)
                                 color: Colors.textSecondary
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeLarge
+                                size: Appearance.fontSizeLarge
                             }
                         }
 

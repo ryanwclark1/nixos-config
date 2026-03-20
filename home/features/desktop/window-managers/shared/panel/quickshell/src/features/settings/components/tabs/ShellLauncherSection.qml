@@ -123,7 +123,7 @@ Item {
             for (var i = 0; i < customs.length; ++i) {
                 var c = customs[i];
                 if (c && c.key && c.name)
-                    builtIn.push({ key: c.key, label: c.name, icon: c.icon || "󰖟", isCustom: true });
+                    builtIn.push({ key: c.key, label: c.name, icon: c.icon || "globe-search.svg", isCustom: true });
             }
         }
         return builtIn;
@@ -804,7 +804,7 @@ Item {
                         itemCount: root.orderedWebProviders().length
                         listItem: webProviderOrderList
                         compactMode: root.compactMode
-                        active: dragHandle.dragActive
+                        active: webProviderRow.dragging
                         minimumHeight: root.compactMode ? 76 : 44
                         beginDragFn: function(listId, itemId, index) {
                             root.beginWebProviderDrag(itemId, index);
@@ -833,7 +833,7 @@ Item {
                                         if (root.webProviders[i].key === webProviderRow.modelData)
                                             return root.webProviders[i].icon;
                                     }
-                                    return "󰖟";
+                                    return "globe-search.svg";
                                 }
                             }
                         }
@@ -978,7 +978,7 @@ Item {
                             anchors.centerIn: parent
                             iconColor: Colors.primary
                             iconSize: Appearance.fontSizeSmall
-                            icon: customEngineRow.modelData.icon || "󰖟"
+                            icon: customEngineRow.modelData.icon || "globe-search.svg"
                         }
                     }
 
@@ -1072,7 +1072,7 @@ Item {
                         name: root.newEngineName.trim(),
                         exec: root.newEngineUrl.trim(),
                         home: "",
-                        icon: root.newEngineIcon.trim() || "󰖟"
+                        icon: root.newEngineIcon.trim() || "globe-search.svg"
                     });
                     Config.launcherWebCustomEngines = engines;
                     root.newEngineKey = "";
