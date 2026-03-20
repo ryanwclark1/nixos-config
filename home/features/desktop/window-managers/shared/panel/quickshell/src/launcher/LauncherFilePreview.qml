@@ -420,12 +420,11 @@ Rectangle {
                     anchors.centerIn: parent
                     spacing: Appearance.spacingS
 
-                    Text {
+                    SharedWidgets.SvgIcon {
                         Layout.alignment: Qt.AlignHCenter
-                        text: "󰈔"
+                        source: "document.svg"
                         color: Colors.textDisabled
-                        font.pixelSize: Appearance.fontSizeDisplay
-                        font.family: Appearance.fontMono
+                        size: Appearance.fontSizeDisplay
                     }
 
                     Text {

@@ -135,7 +135,7 @@ BasePopupMenu {
       ColumnLayout {
         anchors.centerIn: parent
         spacing: Appearance.spacingXXS
-        Text { text: "󰍹"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
+        SharedWidgets.SvgIcon { source: "fullscreen.svg"; color: Colors.primary; size: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
         Text { text: "Fullscreen"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
       }
 
@@ -166,7 +166,7 @@ BasePopupMenu {
       ColumnLayout {
         anchors.centerIn: parent
         spacing: Appearance.spacingXXS
-        Text { text: "󰹑"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
+        SharedWidgets.SvgIcon { source: "desktop.svg"; color: Colors.primary; size: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
         Text { text: "Portal"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
       }
 
@@ -197,7 +197,7 @@ BasePopupMenu {
       ColumnLayout {
         anchors.centerIn: parent
         spacing: Appearance.spacingXXS
-        Text { text: "󰩬"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
+        SharedWidgets.SvgIcon { source: "crop.svg"; color: Colors.primary; size: Appearance.fontSizeXL; Layout.alignment: Qt.AlignHCenter }
         Text { text: "Region"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; Layout.alignment: Qt.AlignHCenter }
       }
 
@@ -232,19 +232,19 @@ BasePopupMenu {
         {
           key: "recordingRecordCursor",
           label: "Cursor",
-          icon: "󰆺",
+          icon: "cursor-click.svg",
           active: Config.recordingRecordCursor
         },
         {
           key: "recordingIncludeDesktopAudio",
           label: "Desktop Audio",
-          icon: "󰕾",
+          icon: "speaker.svg",
           active: Config.recordingIncludeDesktopAudio
         },
         {
           key: "recordingIncludeMicrophoneAudio",
           label: "Microphone",
-          icon: "󰍬",
+          icon: "mic.svg",
           active: Config.recordingIncludeMicrophoneAudio
         }
       ]
@@ -258,13 +258,22 @@ BasePopupMenu {
         border.color: modelData.active ? Colors.primary : Colors.border
         border.width: 1
 
-        Text {
+        Row {
           anchors.centerIn: parent
-          text: modelData.icon + "  " + modelData.label
-          color: modelData.active ? Colors.primary : Colors.textSecondary
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeXS
-          font.weight: Font.DemiBold
+          spacing: Appearance.spacingS
+          SharedWidgets.SvgIcon {
+            source: modelData.icon
+            color: modelData.active ? Colors.primary : Colors.textSecondary
+            size: Appearance.fontSizeSmall
+            anchors.verticalCenter: parent.verticalCenter
+          }
+          Text {
+            text: modelData.label
+            color: modelData.active ? Colors.primary : Colors.textSecondary
+            font.pixelSize: Appearance.fontSizeXS
+            font.weight: Font.DemiBold
+            anchors.verticalCenter: parent.verticalCenter
+          }
         }
 
         SharedWidgets.StateLayer {
@@ -296,13 +305,22 @@ BasePopupMenu {
     color: stopHover.containsMouse ? Qt.darker(Colors.error, 1.1) : Colors.error
     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
-    Text {
+    Row {
       anchors.centerIn: parent
-      text: "󰓛  Stop Recording"
-      color: Colors.background
-      font.pixelSize: Appearance.fontSizeMedium
-      font.weight: Font.DemiBold
-      font.family: Appearance.fontMono
+      spacing: Appearance.spacingS
+      SharedWidgets.SvgIcon {
+        source: "stop.svg"
+        color: Colors.background
+        size: Appearance.fontSizeMedium
+        anchors.verticalCenter: parent.verticalCenter
+      }
+      Text {
+        text: "Stop Recording"
+        color: Colors.background
+        font.pixelSize: Appearance.fontSizeMedium
+        font.weight: Font.DemiBold
+        anchors.verticalCenter: parent.verticalCenter
+      }
     }
 
     MouseArea {
