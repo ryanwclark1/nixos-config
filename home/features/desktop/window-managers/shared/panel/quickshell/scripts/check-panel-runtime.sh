@@ -186,17 +186,23 @@ refresh_instance_args() {
   local resolved=""
 
   if (( repo_shell_mode == 1 )); then
-    if [[ -n "${repo_shell_pid}" ]]; then
-      resolved="$(readlink -f "${runtime_pid_root}/${repo_shell_pid}" 2>/dev/null || true)"
-      if [[ -n "${resolved}" ]]; then
-        refreshed_id="$(basename "${resolved}")"
-        if run_ipc quickshell ipc --id "${refreshed_id}" show >/dev/null; then
-          if [[ -z "${instance_id}" || "${refreshed_id}" != "${instance_id}" ]]; then
-            printf '[INFO] Refreshing repo-shell instance id %s -> %s\n' "${instance_id:-<unset>}" "${refreshed_id}"
-            instance_id="${refreshed_id}"
-          fi
-        fi
-      fi
+    if [[ -z "${repo_shell_pid}" ]]; then
+      printf 'Repo-shell mode expected a tracked QuickShell pid, but none was recorded.\n' >&2
+      return 1
+    fi
+    if ! run_ipc quickshell ipc --pid "${repo_shell_pid}" show >/dev/null; then
+      printf 'Repo-shell pid %s is no longer reachable.\n' "${repo_shell_pid}" >&2
+      return 1
+    fi
+    resolved="$(readlink -f "${runtime_pid_root}/${repo_shell_pid}" 2>/dev/null || true)"
+    if [[ -z "${resolved}" || ! -S "${resolved}/ipc.sock" ]]; then
+      printf 'Repo-shell pid %s no longer has a live runtime directory.\n' "${repo_shell_pid}" >&2
+      return 1
+    fi
+    refreshed_id="$(basename "${resolved}")"
+    if [[ -z "${instance_id}" || "${refreshed_id}" != "${instance_id}" ]]; then
+      printf '[INFO] Refreshing repo-shell instance id %s -> %s\n' "${instance_id:-<unset>}" "${refreshed_id}"
+      instance_id="${refreshed_id}"
     fi
     return 0
   fi
@@ -366,22 +372,22 @@ main() {
   if (( run_settings == 1 )); then
     refresh_instance_args
     args=()
-    if [[ -n "${instance_id}" ]]; then
+    if (( repo_shell_mode == 1 )) && [[ -n "${repo_shell_pid}" ]]; then
+      args+=(--pid "${repo_shell_pid}")
+    elif [[ -n "${instance_id}" ]]; then
       args+=(--id "${instance_id}")
     fi
     run_step_timeout "Running settings responsive smoke" "${settings_timeout_seconds}" "${script_dir}/check-settings-responsive.sh" "${args[@]}"
     refresh_instance_args
-    args=()
-    if [[ -n "${instance_id}" ]]; then
-      args+=(--id "${instance_id}")
-    fi
     run_step_timeout "Running SSH widget settings smoke" "${settings_timeout_seconds}" "${script_dir}/check-ssh-settings-smoke.sh"
   fi
 
   if (( run_surfaces == 1 )); then
     refresh_instance_args
     args=()
-    if [[ -n "${instance_id}" ]]; then
+    if (( repo_shell_mode == 1 )) && [[ -n "${repo_shell_pid}" ]]; then
+      args+=(--pid "${repo_shell_pid}")
+    elif [[ -n "${instance_id}" ]]; then
       args+=(--id "${instance_id}")
     fi
     run_step_timeout "Running live surface responsive smoke" "${surfaces_timeout_seconds}" "${script_dir}/check-surface-responsive.sh" "${args[@]}"

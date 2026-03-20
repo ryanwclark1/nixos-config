@@ -44,7 +44,7 @@ surface_ids=(
 
 usage() {
   cat <<'EOF'
-Usage: check-surface-responsive.sh [--id INSTANCE_ID] [--repo-shell]
+Usage: check-surface-responsive.sh [--id INSTANCE_ID] [--pid INSTANCE_PID] [--repo-shell]
 
 Smoke-check the live QuickShell surface stack by:
   1. locating a running QuickShell instance,
@@ -186,6 +186,10 @@ while [[ $# -gt 0 ]]; do
       instance_id="${2:-}"
       shift 2
       ;;
+    --pid)
+      instance_pid="${2:-}"
+      shift 2
+      ;;
     --repo-shell)
       repo_shell_mode=1
       shift
@@ -249,8 +253,8 @@ run_ipc() {
 }
 
 discover_running_pids() {
-  ps -eo pid=,comm=,args= \
-    | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }' \
+  ps -eo pid=,stat=,comm= \
+    | awk '$2 !~ /^Z/ && $3 ~ /quickshell|\\.quickshell-wra/ { print $1 }' \
     | awk 'NF && !seen[$0]++'
 }
 
@@ -280,7 +284,7 @@ discover_instances_from_pid() {
       shell_id="$(shell_id_for_runtime_dir "${resolved}" || true)"
       [[ -n "${shell_id}" ]] && ids+=("${shell_id}")
     fi
-  done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
+  done < <(discover_running_pids)
 
   printf '%s\n' "${ids[@]}" | awk 'NF && !seen[$0]++'
 }

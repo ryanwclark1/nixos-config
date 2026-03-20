@@ -260,8 +260,8 @@ discover_running_pids() {
     fi
   fi
 
-  ps -eo pid=,comm=,args= \
-    | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }' \
+  ps -eo pid=,stat=,comm= \
+    | awk '$2 !~ /^Z/ && $3 ~ /quickshell|\\.quickshell-wra/ { print $1 }' \
     | awk 'NF && !seen[$0]++'
 }
 
@@ -298,7 +298,7 @@ discover_instances_from_pid() {
         fallback+=("$(basename "${resolved}")")
       fi
     fi
-  done < <(ps -eo pid=,comm=,args= | awk '$2 ~ /quickshell/ || $3 ~ /quickshell/ { print $1 }')
+  done < <(discover_running_pids)
 
   if (( ${#preferred[@]} > 0 )); then
     printf '%s\n' "${preferred[@]}" | awk 'NF && !seen[$0]++'

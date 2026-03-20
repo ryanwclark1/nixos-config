@@ -247,6 +247,10 @@ load_quickshell_env() {
   export DISPLAY="$(printf '%s\n' "${env_dump}" | sed -n 's/^DISPLAY=//p' | head -n1)"
   export HYPRLAND_INSTANCE_SIGNATURE="$(printf '%s\n' "${env_dump}" | sed -n 's/^HYPRLAND_INSTANCE_SIGNATURE=//p' | head -n1)"
   export WAYLAND_DISPLAY="$(printf '%s\n' "${env_dump}" | sed -n 's/^WAYLAND_DISPLAY=//p' | head -n1)"
+  export NIRI_SOCKET="$(printf '%s\n' "${env_dump}" | sed -n 's/^NIRI_SOCKET=//p' | head -n1)"
+  export XDG_CURRENT_DESKTOP="$(printf '%s\n' "${env_dump}" | sed -n 's/^XDG_CURRENT_DESKTOP=//p' | head -n1)"
+  export DESKTOP_SESSION="$(printf '%s\n' "${env_dump}" | sed -n 's/^DESKTOP_SESSION=//p' | head -n1)"
+  export XDG_SESSION_TYPE="$(printf '%s\n' "${env_dump}" | sed -n 's/^XDG_SESSION_TYPE=//p' | head -n1)"
 
   [[ -n "${XDG_RUNTIME_DIR:-}" ]] || {
     printf 'quickshell environment is missing XDG_RUNTIME_DIR.\n' >&2
@@ -315,11 +319,11 @@ population_score() {
     'Current widgets'
     'Rem(aove|ove)'
     'Sett(irgs|ings)'
-    'App[[:space:]]+Launcher'
-    '.{0,2}orkspac.{0,2}[[:space:]]+Switcher'
+    'App[[:space:]]+L[a-z;]{0,3}uncher'
+    'W.{0,4}ks?.{0,4}pace[[:space:]]+Switcher'
     'L.{0,2}ft[[:space:]]+Section'
     'Window[[:space:]]+Title'
-    'Active[[:space:]]+Ap(p|o)[[:space:]]+Context'
+    'Act.{0,4}ve[[:space:]]+App[[:space:]]+.{0,8}text'
     'Runn.{0,2}ing[[:space:]]+Apps'
   )
 
