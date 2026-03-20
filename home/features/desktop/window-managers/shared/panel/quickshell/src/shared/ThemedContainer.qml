@@ -6,7 +6,7 @@ Rectangle {
 
     property string variant: "card"
     property bool showHighlight: true
-    property bool showGradient: true
+    property bool showGradient: _variantGradient
     property real customHighlightOpacity: -1
     property bool hovered: false
     default property alias content: contentItem.data
@@ -62,7 +62,7 @@ Rectangle {
 
     readonly property bool _variantGradient: variant === "popup" || variant === "surface" || variant === "pill"
 
-    gradient: (showGradient && _variantGradient) ? _grad : null
+    gradient: showGradient ? _grad : null
 
     SurfaceGradient { id: _grad }
 

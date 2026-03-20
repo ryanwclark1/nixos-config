@@ -19,8 +19,9 @@ import "../widgets"
 //     acceptedButtons: Qt.RightButton
 //     onClicked: (mouse) => myMenu.popup(mouse.x, mouse.y)
 //   }
-Rectangle {
+ThemedContainer {
     id: root
+    variant: "popup"
 
     property var model: []
     property bool showMenu: false
@@ -36,17 +37,9 @@ Rectangle {
     y: popupY
     width: 180
     height: menuPadding * 2 + contentColumn.implicitHeight
-    radius: Colors.radiusMedium
-    color: Colors.popupSurface
-    border.color: Colors.border
-    border.width: 1
     visible: root.showMenu
     z: 9999
-
-    gradient: SurfaceGradient {}
-
-    // Inner highlight
-    InnerHighlight { highlightOpacity: 0.15 }
+    customHighlightOpacity: 0.15
 
     scale: showMenu ? 1.0 : 0.9
     opacity: showMenu ? 1.0 : 0.0
