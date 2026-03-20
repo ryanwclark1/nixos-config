@@ -145,11 +145,21 @@ describe("launcherStateObject", () => {
       selectedIndex: 0,
       width: 800,
       height: 600,
+      hudHeight: 700,
+      windowChromeHeight: 52,
+      searchDeckHeight: 120,
+      utilityBandHeight: 56,
+      metricsHeight: 34,
+      homeHeight: 96,
+      resultsHeight: 438,
     });
     expect(result.visible).toBe(true);
     expect(result.mode).toBe("drun");
     expect(result.hasResults).toBe(true);
     expect(result.filteredItemCount).toBe(5);
+    expect(result.windowChromeHeight).toBe(52);
+    expect(result.resultsHeight).toBe(438);
+    expect(result.resultsHeightRatio).toBeCloseTo(438 / 700);
   });
 
   it("reports invisible when opacity is 0", () => {

@@ -3,6 +3,8 @@ import {
   itemActionLabel,
   itemProviderLabel,
   buildRecentEntry,
+  normalizeKeybindItem,
+  normalizeKeybindItems,
   executeEmptyPrimary,
 } from "../../src/launcher/LauncherExecutor.js";
 
@@ -60,6 +62,53 @@ describe("itemProviderLabel", () => {
 
   it("returns empty for hint items", () => {
     expect(itemProviderLabel("web", { name: "G", isHint: true })).toBe("");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeKeybindItem(s)
+// ---------------------------------------------------------------------------
+
+describe("normalizeKeybindItem", () => {
+  it("promotes the action description to the primary label and keeps the chord as secondary metadata", () => {
+    const item = normalizeKeybindItem({
+      name: "SUPER + Return",
+      desc: "Terminal",
+      disp: "exec",
+      args: "ghostty",
+    });
+
+    expect(item).toMatchObject({
+      name: "Terminal",
+      title: "SUPER + Return",
+      description: "Terminal",
+      body: "exec ghostty",
+      icon: "keyboard.svg",
+    });
+  });
+
+  it("falls back to the chord when the description is missing", () => {
+    const item = normalizeKeybindItem({
+      name: "SUPER + Shift + C",
+      disp: "close-window",
+    });
+
+    expect(item.name).toBe("SUPER + Shift + C");
+    expect(item.title).toBe("");
+    expect(item.body).toBe("close-window");
+  });
+});
+
+describe("normalizeKeybindItems", () => {
+  it("maps every raw keybind record into launcher display fields", () => {
+    const items = normalizeKeybindItems([
+      { name: "SUPER + B", desc: "Web browser", disp: "exec", args: "google-chrome" },
+      { name: "SUPER + N", desc: "File manager", disp: "exec", args: "nautilus" },
+    ]);
+
+    expect(items).toHaveLength(2);
+    expect(items.map((item) => item.name)).toEqual(["Web browser", "File manager"]);
+    expect(items.map((item) => item.title)).toEqual(["SUPER + B", "SUPER + N"]);
   });
 });
 

@@ -3,6 +3,7 @@ import {
   fuzzyMatchLower,
   safeCalcEval,
   stripSearchPrefix,
+  browseFileItems,
   compareByScoreThenUsage,
   compareByScoreOnly,
   highlightMatch,
@@ -121,6 +122,37 @@ describe("stripSearchPrefix", () => {
 
   it("returns unmodified text when prefix doesn't match", () => {
     expect(stripSearchPrefix("run", "firefox")).toBe("firefox");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// browseFileItems
+// ---------------------------------------------------------------------------
+
+describe("browseFileItems", () => {
+  it("returns top-level entries only, with directories before files", () => {
+    const items = [
+      { name: "src", relativePath: "src", fileKind: "dir", pathDepth: 0, _fileUsageBoost: 0 },
+      { name: "notes.md", relativePath: "notes.md", fileKind: "file", pathDepth: 0, _fileUsageBoost: 20 },
+      { name: "nested.txt", relativePath: "src/nested.txt", fileKind: "file", pathDepth: 1, _fileUsageBoost: 999 },
+      { name: "Downloads", relativePath: "Downloads", fileKind: "dir", pathDepth: 0, _fileUsageBoost: 5 },
+    ];
+
+    expect(browseFileItems(items, 10).map((item) => item.relativePath)).toEqual([
+      "Downloads",
+      "src",
+      "notes.md",
+    ]);
+  });
+
+  it("respects the result limit", () => {
+    const items = [
+      { relativePath: "a", fileKind: "dir", pathDepth: 0 },
+      { relativePath: "b", fileKind: "dir", pathDepth: 0 },
+      { relativePath: "c", fileKind: "file", pathDepth: 0 },
+    ];
+
+    expect(browseFileItems(items, 2)).toHaveLength(2);
   });
 });
 

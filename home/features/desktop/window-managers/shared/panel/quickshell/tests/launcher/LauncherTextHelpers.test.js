@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  fileModeHint,
   emptyStateTitle,
   emptyStateSubtitle,
   emptyPrimaryCta,
@@ -12,6 +13,21 @@ import {
 // This file exercises the plugin's cross-import resolution:
 // LauncherTextHelpers.js uses `.import "LauncherFileParser.js" as FileParser`
 // If the plugin's resolveId fails, the import will break at load time.
+
+// ---------------------------------------------------------------------------
+// fileModeHint
+// ---------------------------------------------------------------------------
+
+describe("fileModeHint", () => {
+  it("uses home wording for the default root", () => {
+    expect(fileModeHint("~")).toBe("Search home with /");
+    expect(fileModeHint("")).toBe("Search home with /");
+  });
+
+  it("uses the configured directory label for custom roots", () => {
+    expect(fileModeHint("~/Projects")).toBe("Search ~/Projects with /");
+  });
+});
 
 // ---------------------------------------------------------------------------
 // emptyStateTitle

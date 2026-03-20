@@ -485,6 +485,8 @@ describe("resetLauncherDefaults", () => {
     resetLauncherDefaults(config, defaults, defaultOrder, defaultModes, fullAdapter, launcherModes);
     expect(config.launcherDefaultMode).toBe("drun");
     expect(config.launcherMaxResults).toBe(80);
+    expect(config.launcherFileMinQueryLength).toBe(1);
+    expect(config.launcherFileSearchRoot).toBe("~");
     expect(config.launcherEnabledModes).toContain("drun");
     expect(config.launcherPrimaryModes).toContain("drun");
     expect(config.launcherWebProviderOrder).toEqual(defaultOrder);

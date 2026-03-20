@@ -318,6 +318,8 @@ describe("applyLauncherConfig", () => {
     applyLauncherConfig(config, {});
     expect(config.launcherDefaultMode).toBe("drun");
     expect(config.launcherMaxResults).toBe(80);
+    expect(config.launcherFileMinQueryLength).toBe(1);
+    expect(config.launcherFileSearchRoot).toBe("~");
     expect(config.launcherShowModeHints).toBe(true);
     expect(config.launcherTabBehavior).toBe("contextual");
     expect(config.launcherScoreNameWeight).toBe(1.0);

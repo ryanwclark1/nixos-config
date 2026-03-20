@@ -164,6 +164,16 @@ populate_repo_shell_env() {
   done < <(env)
 }
 
+ensure_repo_shell_env_default() {
+  local entry="$1"
+  local key="${entry%%=*}"
+  local current=""
+  for current in "${repo_shell_env[@]}"; do
+    [[ "${current}" == "${key}="* ]] && return 0
+  done
+  repo_shell_env+=("${entry}")
+}
+
 start_repo_shell() {
   local deadline runtime_dir
   if ! command -v systemctl >/dev/null 2>&1; then
@@ -176,6 +186,9 @@ start_repo_shell() {
     sleep 1
   fi
   populate_repo_shell_env
+  ensure_repo_shell_env_default "QS_VERIFY_LAUNCHER_FORCE_HOME_SECTIONS=1"
+  ensure_repo_shell_env_default "QS_VERIFY_LAUNCHER_FORCE_MODE_HINTS=1"
+  ensure_repo_shell_env_default "QS_VERIFY_LAUNCHER_FORCE_RUNTIME_METRICS=1"
   env "${repo_shell_env[@]}" quickshell -p "${config_root}/shell.qml" >"${repo_shell_log}" 2>&1 &
   repo_shell_pid="$!"
   deadline=$((SECONDS + 20))
@@ -342,8 +355,8 @@ const expectedTight = process.argv[5] === "true";
 const compact = usableWidth < 900 || usableHeight < 640;
 const sidebarCompact = usableWidth < 720;
 const tight = usableWidth < 560 || usableHeight < 500;
-const expectedHudWidth = Math.min(1120, Math.max(sidebarCompact ? 380 : 460, usableWidth - (tight ? 24 : 40)));
-const expectedHudHeight = Math.min(980, Math.max(520, usableHeight - (tight ? 24 : 28)));
+const expectedHudWidth = Math.min(1180, Math.max(sidebarCompact ? 380 : 460, usableWidth - (tight ? 20 : 32)));
+const expectedHudHeight = Math.min(1040, Math.max(520, usableHeight - (tight ? 20 : 24)));
 function nearlyEqual(a, b) {
   return Math.abs(a - b) <= 1.5;
 }
@@ -358,6 +371,52 @@ if (!(actualViewportWidth > 0 && actualViewportHeight > 0)) process.exit(1);
 if (!(actualUsableWidth > 0 && actualUsableHeight > 0)) process.exit(1);
 if (!(hudWidth >= 380 && hudHeight >= 520)) process.exit(1);
 ' "${viewport_width}" "${viewport_height}" "${expected_compact}" "${expected_sidebar}" "${expected_tight}" >/dev/null 2>&1; then
+      pass "${label}"
+      return 0
+    fi
+    sleep 0.25
+  done
+
+  fail "${label}"
+  if [[ -n "${launcher_state}" ]]; then
+    printf '%s\n' "${launcher_state}" >&2
+  fi
+  return 1
+}
+
+wait_for_density_matrix() {
+  local label="$1"
+  local viewport_width="$2"
+  local viewport_height="$3"
+  local minimum_ratio="$4"
+  local deadline=$((SECONDS + 12))
+  local launcher_state=""
+
+  call_ipc Launcher openDrun >/dev/null 2>&1 || return 1
+  call_ipc Launcher diagnosticSetSearchText "" >/dev/null 2>&1 || return 1
+  call_ipc Launcher diagnosticSetViewport "${viewport_width}" "${viewport_height}" >/dev/null 2>&1 || return 1
+
+  while (( SECONDS < deadline )); do
+    launcher_state="$(call_ipc Launcher launcherState 2>/dev/null || true)"
+    if [[ -n "${launcher_state}" ]] && printf '%s' "${launcher_state}" | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const minimumRatio = Number(process.argv[1]);
+const ratio = Number(payload.resultsHeightRatio || 0);
+if (String(payload.mode || "") !== "drun") process.exit(1);
+if (String(payload.searchText || "") !== "") process.exit(1);
+if (payload.showLauncherHome !== true) process.exit(1);
+if (String(payload.loadState || "") !== "ready" && String(payload.loadState || "") !== "idle") process.exit(1);
+if (!(Number(payload.filteredItemCount || 0) > 0)) process.exit(1);
+if (!(Number(payload.windowChromeHeight || 0) > 0)) process.exit(1);
+if (!(Number(payload.searchDeckHeight || 0) > 0)) process.exit(1);
+if (!(Number(payload.utilityBandHeight || 0) > 0)) process.exit(1);
+if (!(Number(payload.metricsHeight || 0) > 0)) process.exit(1);
+if (!(Number(payload.resultsHeight || 0) > 0)) process.exit(1);
+if (!(ratio >= minimumRatio)) process.exit(1);
+' "${minimum_ratio}" >/dev/null 2>&1; then
       pass "${label}"
       return 0
     fi
@@ -393,14 +452,15 @@ static_checks() {
   require_literal "$launcher_qml" 'readonly property bool compactMode: usableWidth < 900 || usableHeight < 640' "compact mode threshold"
   require_literal "$launcher_qml" 'readonly property bool sidebarCompact: usableWidth < 720' "sidebar compact threshold"
   require_literal "$launcher_qml" 'readonly property bool tightMode: usableWidth < 560 || usableHeight < 500' "tight mode threshold"
-  require_literal "$launcher_qml" 'width: Math.min(1120, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 24 : 40)))' "responsive launcher width bounds"
-  require_literal "$launcher_qml" 'height: Math.min(980, Math.max(520, launcherRoot.usableHeight - (launcherRoot.tightMode ? 24 : 28)))' "responsive launcher height bounds"
-  require_literal "$launcher_search_field_qml" 'height: 48' "compact search bar height"
+  require_literal "$launcher_qml" 'width: Math.min(1180, Math.max(launcherRoot.sidebarCompact ? 380 : 460, launcherRoot.usableWidth - (launcherRoot.tightMode ? 20 : 32)))' "responsive launcher width bounds"
+  require_literal "$launcher_qml" 'height: Math.min(1040, Math.max(520, launcherRoot.usableHeight - (launcherRoot.tightMode ? 20 : 24)))' "responsive launcher height bounds"
+  require_literal "$launcher_search_field_qml" 'implicitHeight: embedded ? 58 : 52' "embedded search field density"
   require_literal "$launcher_content_panel_qml" 'visible: launcher.transientNoticeText !== "" && !launcher.tightMode' "transient notice tight-mode guard"
-  require_literal "$launcher_metrics_box_qml" 'visible: Config.launcherShowRuntimeMetrics && !root.tightMode' "runtime metrics tight-mode guard"
+  require_literal "$launcher_metrics_box_qml" 'visible: root.showMetrics && !root.tightMode' "runtime metrics tight-mode guard"
   require_literal "$launcher_diag_js" 'loadState: String(props.modeLoadState || "idle"),' "launcher state load-state payload"
   require_literal "$launcher_diag_js" 'allItemCount: props.allItemsLength,' "launcher state all-item payload"
   require_literal "$launcher_diag_js" 'filteredItemCount: props.filteredItemsLength,' "launcher state filtered-item payload"
+  require_literal "$launcher_diag_js" 'resultsHeightRatio: hudHeight > 0 ? (resultsHeight / hudHeight) : 0' "launcher state density ratio payload"
   require_pattern "$launcher_ipc_handler_qml" 'function drunCategoryState\(\)\s*(?::\s*string)?\s*\{\s*return JSON\.stringify\((?:root\.)?launcher\.drunCategoryStateObject\(\)\);\s*\}' "drun category IPC payload mapping"
   require_pattern "$launcher_ipc_handler_qml" 'function escapeActionState\(\)\s*(?::\s*string)?\s*\{\s*return JSON\.stringify\((?:root\.)?launcher\.escapeActionStateObject\(\)\);\s*\}' "escape action IPC payload mapping"
   require_pattern "$launcher_ipc_handler_qml" 'function diagnosticSetSearchText\(text(?::\s*string)?\)\s*(?::\s*string)?\s*\{\s*return (?:root\.)?launcher\.diagnosticSetSearchText\(text\);\s*\}' "escape action query setter IPC mapping"
@@ -535,6 +595,9 @@ if (usableWidth >= 1400 && !(hudWidth >= 1000)) process.exit(1);
     wait_for_viewport_matrix "Launcher laptop viewport layout invariants" 1280 720 true false false
     wait_for_viewport_matrix "Launcher narrow viewport layout invariants" 820 720 true false false
     wait_for_viewport_matrix "Launcher portrait viewport layout invariants" 540 900 true true true
+    wait_for_density_matrix "Launcher wide drun density" 1600 1000 0.60
+    wait_for_density_matrix "Launcher laptop drun density" 1280 720 0.50
+    wait_for_density_matrix "Launcher narrow drun density" 820 720 0.50
     call_ipc Launcher diagnosticSetViewport 0 0 >/dev/null 2>&1 || true
   else
     warn "Launcher.diagnosticSetViewport not exposed by live instance; skipped responsive viewport matrix"
