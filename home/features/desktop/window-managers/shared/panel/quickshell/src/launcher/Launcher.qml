@@ -92,29 +92,28 @@ PanelWindow {
         onActivated: launcherRoot.handleEscapeAction()
     }
 
-    property string searchText: ""
-    property var allItems: []
-    property var filteredItems: []
-    property int selectedIndex: 0
-    property string mode: "drun"
+    // ── Controller (state machine) ───────────────
+    LauncherController {
+        id: controller
+    }
 
-    property string confirmTitle: ""
-    property var confirmCallback: null
-    readonly property bool showingConfirm: confirmTitle !== ""
+    // Aliases for backward compat — state lives in controller
+    property alias searchText: controller.searchText
+    property alias allItems: controller.allItems
+    property alias filteredItems: controller.filteredItems
+    property alias selectedIndex: controller.selectedIndex
+    property alias mode: controller.mode
 
-    property var recentItems: []
-    property var suggestionItems: []
-    property string drunCategoryFilter: ""
-    property bool drunCategorySectionExpanded: false
-    property var drunCategoryOptions: [
-        {
-            key: "",
-            label: "All",
-            count: 0,
-            hotkey: "0"
-        }
-    ]
-    property string _sessionWebProviderKey: ""
+    property alias confirmTitle: controller.confirmTitle
+    property alias confirmCallback: controller.confirmCallback
+    readonly property bool showingConfirm: controller.showingConfirm
+
+    property alias recentItems: controller.recentItems
+    property alias suggestionItems: controller.suggestionItems
+    property alias drunCategoryFilter: controller.drunCategoryFilter
+    property alias drunCategorySectionExpanded: controller.drunCategorySectionExpanded
+    property alias drunCategoryOptions: controller.drunCategoryOptions
+    property alias _sessionWebProviderKey: controller._sessionWebProviderKey
     property string _bangQuery: ""
     property string _bangSearchTerm: ""
     property var _bangResults: []
@@ -161,7 +160,7 @@ PanelWindow {
         }
     }
 
-    property var appFrequency: ({})
+    property alias appFrequency: controller.appFrequency
     property var launchHistory: []
     property var onCommandOutput: null
     property var onCommandError: null
@@ -173,15 +172,15 @@ PanelWindow {
     property bool suppressNextCommandExit: false
     property string fileIndexStdoutBuffer: ""
     property string fileIndexStderrBuffer: ""
-    property string modeLoadState: "idle"
-    property string modeLoadMessage: ""
-    property string modeLoadTarget: ""
-    property var modeCache: ({})
-    property var modeCacheTime: ({})
-    property string _lastFilterMode: ""
-    property string _lastFilterQuery: ""
-    property string _lastFilterCategory: ""
-    property var _lastFilterCandidates: []
+    property alias modeLoadState: controller.modeLoadState
+    property alias modeLoadMessage: controller.modeLoadMessage
+    property alias modeLoadTarget: controller.modeLoadTarget
+    property alias modeCache: controller.modeCache
+    property alias modeCacheTime: controller.modeCacheTime
+    property alias _lastFilterMode: controller._lastFilterMode
+    property alias _lastFilterQuery: controller._lastFilterQuery
+    property alias _lastFilterCategory: controller._lastFilterCategory
+    property alias _lastFilterCandidates: controller._lastFilterCandidates
     property int _filterChunkToken: 0
     property var _filterChunkState: null
     property bool _filterChunking: false
@@ -204,8 +203,8 @@ PanelWindow {
     readonly property int fileSearchBackendRefreshMs: 180000
     readonly property int fileSearchBackendMissRefreshMs: 20000
     property int openCount: 0
-    property int _requestToken: 0
-    property var _activeRequests: ({})
+    property alias _requestToken: controller._requestToken
+    property alias _activeRequests: controller._activeRequests
     property var mediaPlayers: []
     property var preloadFailureState: ({})
     property var launcherIconMap: ({})
@@ -234,27 +233,19 @@ PanelWindow {
     }
 
     function setModeLoadState(nextState, targetMode, message) {
-        modeLoadState = String(nextState || "idle");
-        modeLoadTarget = String(targetMode || mode || "");
-        modeLoadMessage = String(message || "");
+        controller.setModeLoadState(nextState, targetMode, message);
     }
 
     function beginModeLoad(targetMode, message) {
-        setModeLoadState("loading", targetMode, message);
+        controller.beginModeLoad(targetMode, message);
     }
 
     function completeModeLoad(targetMode, success, message) {
-        var target = String(targetMode || "");
-        if (target !== "" && target !== mode)
-            return;
-        setModeLoadState(success ? "ready" : "error", targetMode, message);
+        controller.completeModeLoad(targetMode, success, message);
     }
 
     function resetFilterCache() {
-        _lastFilterMode = "";
-        _lastFilterQuery = "";
-        _lastFilterCategory = "";
-        _lastFilterCandidates = [];
+        controller.resetFilterCache();
     }
 
     function resolveFileSearchRoot(rawValue) {
@@ -1146,55 +1137,13 @@ PanelWindow {
             Config.launcherWebLastProviderKey = key;
     }
 
-    function telemetryStart() {
-        return Date.now();
-    }
+    function telemetryStart() { return controller.telemetryStart(); }
+    function telemetryEnd(label, startedAt) { controller.telemetryEnd(label, startedAt); }
+    function beginRequest(modeKey) { return controller.beginRequest(modeKey); }
+    function isRequestCurrent(modeKey, token) { return controller.isRequestCurrent(modeKey, token); }
 
-    function telemetryEnd(label, startedAt) {
-        if (!Config.launcherEnableDebugTimings)
-            return;
-        var took = Math.max(0, Date.now() - startedAt);
-        Logger.d("Launcher", "timing:", label, took + "ms");
-    }
-
-    function beginRequest(modeKey) {
-        _requestToken += 1;
-        var next = Object.assign({}, _activeRequests);
-        next[modeKey] = _requestToken;
-        _activeRequests = next;
-        return _requestToken;
-    }
-
-    function isRequestCurrent(modeKey, token) {
-        return _activeRequests[modeKey] === token;
-    }
-
-    function getCached(modeKey) {
-        var items = modeCache[modeKey];
-        if (!items)
-            return null;
-        var ttlMs = Math.max(1, Config.launcherCacheTtlSec) * 1000;
-        var last = modeCacheTime[modeKey] || 0;
-        if (Date.now() - last > ttlMs) {
-            var nextCache = Object.assign({}, modeCache);
-            var nextTimes = Object.assign({}, modeCacheTime);
-            delete nextCache[modeKey];
-            delete nextTimes[modeKey];
-            modeCache = nextCache;
-            modeCacheTime = nextTimes;
-            return null;
-        }
-        return items;
-    }
-
-    function setCached(modeKey, items) {
-        var nextCache = Object.assign({}, modeCache);
-        var nextTimes = Object.assign({}, modeCacheTime);
-        nextCache[modeKey] = items;
-        nextTimes[modeKey] = Date.now();
-        modeCache = nextCache;
-        modeCacheTime = nextTimes;
-    }
+    function getCached(modeKey) { return controller.getCached(modeKey); }
+    function setCached(modeKey, items) { controller.setCached(modeKey, items); }
 
     function clearCaches() {
         if (fileIndexProc.running)
