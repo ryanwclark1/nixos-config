@@ -109,7 +109,7 @@ Item {
 
             SettingsInfoCallout {
                 visible: root.validationMessage !== "" || root.conflictMessage !== ""
-                iconName: "󰀪"
+                iconName: "warning.svg"
                 title: root.validationMessage !== "" ? "Dock warning" : "Shared edge"
                 body: root.validationMessage !== "" ? root.validationMessage : root.conflictMessage
             }

@@ -274,7 +274,7 @@ Item {
 
             SettingsInfoCallout {
                 visible: root.validationMessage !== ""
-                iconName: "󰀪"
+                iconName: "warning.svg"
                 title: "Layout warning"
                 body: root.validationMessage
             }
@@ -301,7 +301,7 @@ Item {
 
                 SettingsInfoCallout {
                     visible: !!root.selectedBar && root.selectedBarDockMessage !== ""
-                    iconName: "󰀪"
+                    iconName: "warning.svg"
                     title: "Dock overlap"
                     body: root.selectedBarDockMessage
                 }

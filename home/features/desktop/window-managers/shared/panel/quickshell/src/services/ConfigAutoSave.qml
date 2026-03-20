@@ -344,6 +344,15 @@ QtObject {
         function onHookPathsChanged() {
             root.config.scheduleSave();
         }
+        function onColorExportEnabledChanged() {
+            root.config.scheduleSave();
+        }
+        function onColorExportKittyChanged() {
+            root.config.scheduleSave();
+        }
+        function onColorExportGtkSchemeChanged() {
+            root.config.scheduleSave();
+        }
         function onIdleInhibitEnabledChanged() {
             root.config.scheduleSave();
         }
