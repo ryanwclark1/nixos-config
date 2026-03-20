@@ -50,7 +50,7 @@ QtObject {
         objects: _allAudioNodes()
     }
 
-    Timer {
+    property Timer refreshTimer: Timer {
         id: refreshTimer
         interval: 2000
         running: root.subscriberCount > 0
@@ -74,7 +74,7 @@ QtObject {
         return out;
     }
 
-    Connections {
+    property Connections _defaultPipewireConn: Connections {
         target: Pipewire
         function onDefaultAudioSinkChanged() {
             root._defaultTracker.objects = root._defaultObjects();
