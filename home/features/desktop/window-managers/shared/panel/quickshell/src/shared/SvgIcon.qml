@@ -32,14 +32,10 @@ Item {
         anchors.fill: parent
         source: root._resolvedSource ? Qt.resolvedUrl("../assets/icons/" + root._resolvedFolder + "/" + root._resolvedSource) : ""
         implicitSize: root.size
-        visible: !root.colorize
-    }
+        visible: true
 
-    Loader {
-        active: root.colorize
-        anchors.fill: iconImage
-        sourceComponent: ColorOverlay {
-            source: iconImage
+        layer.enabled: root.colorize
+        layer.effect: ColorOverlay {
             color: root.color
         }
     }

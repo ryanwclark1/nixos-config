@@ -81,7 +81,7 @@ QtObject {
     property int launcherPreloadFailureThreshold: 3
     property int launcherPreloadFailureBackoffSec: 120
     property int launcherMaxResults: 80
-    property int launcherFileMinQueryLength: 2
+    property int launcherFileMinQueryLength: 1
     property int launcherFileMaxResults: 100
     property string launcherFileSearchRoot: "~"
     property bool launcherFileShowHidden: false

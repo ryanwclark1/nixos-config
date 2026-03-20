@@ -250,7 +250,7 @@ function applyLauncherConfig(config, data) {
     config.launcherPreloadFailureBackoffSec = clampInt(launcher.preloadFailureBackoffSec, 10, 900, 120);
 
     config.launcherMaxResults = clampInt(launcher.maxResults, 20, 400, 80);
-    config.launcherFileMinQueryLength = clampInt(launcher.fileMinQueryLength, 1, 8, 2);
+    config.launcherFileMinQueryLength = clampInt(launcher.fileMinQueryLength, 1, 8, 1);
     config.launcherFileMaxResults = clampInt(launcher.fileMaxResults, 20, 500, 100);
     config.launcherFileSearchRoot = normalizeLauncherPath(launcher.fileSearchRoot, "~");
     config.launcherFileShowHidden = asBool(launcher.fileShowHidden, false);
