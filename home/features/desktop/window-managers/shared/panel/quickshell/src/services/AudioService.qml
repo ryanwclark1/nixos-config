@@ -8,20 +8,14 @@ QtObject {
     id: root
 
     // ── Output (sink) state ──────────────────────
-    readonly property real outputVolume: {
-        var v = Pipewire.defaultAudioSink?.audio?.volume;
-        return (v !== undefined && !isNaN(v)) ? Math.min(v, 1.0) : 0;
-    }
-    readonly property bool outputMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+    readonly property real outputVolume: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio ? Math.min(Pipewire.defaultAudioSink.audio.volume, 1.0) : 0
+    readonly property bool outputMuted: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio ? Pipewire.defaultAudioSink.audio.muted : false
     readonly property string outputLabel: _sinkDescription()
     readonly property string outputDeviceType: _detectDeviceType()
 
     // ── Input (source) state ─────────────────────
-    readonly property real inputVolume: {
-        var v = Pipewire.defaultAudioSource?.audio?.volume;
-        return (v !== undefined && !isNaN(v)) ? Math.min(v, 1.0) : 0;
-    }
-    readonly property bool inputMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
+    readonly property real inputVolume: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Math.min(Pipewire.defaultAudioSource.audio.volume, 1.0) : 0
+    readonly property bool inputMuted: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Pipewire.defaultAudioSource.audio.muted : false
     readonly property string inputLabel: _sourceDescription()
 
     // ── Device lists (reactive from PipeWire) ────
