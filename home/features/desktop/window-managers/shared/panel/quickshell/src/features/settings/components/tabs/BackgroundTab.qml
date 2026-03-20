@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import "../../../../services"
 import ".."
 
@@ -9,97 +10,222 @@ Item {
     property bool compactMode: false
     property bool tightSpacing: false
 
+    readonly property int _enabledBackgroundFeatures: (Config.backgroundVisualizerEnabled ? 1 : 0)
+        + (Config.backgroundUseShaderVisualizer ? 1 : 0)
+        + (Config.backgroundClockEnabled ? 1 : 0)
+        + (Config.backgroundAutoHide ? 1 : 0)
+        + (Config.weatherOverlayEnabled ? 1 : 0)
+    readonly property string _clockPositionSummary: Config.backgroundClockEnabled ? String(Config.backgroundClockPosition || "center") : "Hidden"
+    readonly property string _gifSummary: Config.personalityGifEnabled
+        ? String(Config.personalityGifReactionMode || "idle")
+        : "Disabled"
+
     SettingsTabPage {
         anchors.fill: parent
+        settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Background"
         iconName: "󰸉"
+        compactMode: root.compactMode
+        tightSpacing: root.tightSpacing
 
-        SettingsCard {
-            title: "Desktop Background"
-            iconName: "󰸉"
-            description: "Wallpaper overlays visible on the desktop background layer."
+        SettingsSectionGroup {
+            title: "Background Overview"
+            description: "Desktop-layer overlays, clock placement, and animated personality surface state."
 
-            SettingsFieldGrid {
-                maximumColumns: root.compactMode ? 1 : 2
+            Flow {
+                Layout.fillWidth: true
+                width: parent.width
+                spacing: Colors.spacingM
 
-                SettingsToggleRow {
-                    label: "Spectrum Visualizer"
-                    icon: "󰓃"
-                    configKey: "backgroundVisualizerEnabled"
-                }
-                SettingsToggleRow {
-                    label: "Shader Visualizer"
-                    description: "High-performance GLSL mode."
-                    icon: "󰓃"
-                    configKey: "backgroundUseShaderVisualizer"
-                }
-                SettingsToggleRow {
-                    label: "Desktop Clock"
-                    icon: "󰥔"
-                    configKey: "backgroundClockEnabled"
-                }
-                SettingsToggleRow {
-                    label: "Auto-Hide on Fullscreen"
-                    icon: "󰘖"
-                    configKey: "backgroundAutoHide"
-                }
-                SettingsToggleRow {
-                    label: "Weather overlay"
-                    icon: "󰖐"
-                    configKey: "weatherOverlayEnabled"
-                }
-            }
+                Repeater {
+                    model: [
+                        {
+                            icon: "󰸉",
+                            label: "Background Features",
+                            value: root._enabledBackgroundFeatures + " active"
+                        },
+                        {
+                            icon: "󰥔",
+                            label: "Clock",
+                            value: root._clockPositionSummary
+                        },
+                        {
+                            icon: "󰄛",
+                            label: "Personality GIF",
+                            value: root._gifSummary
+                        }
+                    ]
 
-            SettingsModeRow {
-                label: "Clock Position"
-                currentValue: Config.backgroundClockPosition
-                options: [
-                    { value: "center", label: "Center" },
-                    { value: "top-left", label: "Top Left" },
-                    { value: "top-right", label: "Top Right" },
-                    { value: "bottom-left", label: "Bottom Left" },
-                    { value: "bottom-right", label: "Bottom Right" }
-                ]
-                onModeSelected: v => Config.backgroundClockPosition = v
+                    delegate: Rectangle {
+                        required property var modelData
+
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
+                        radius: Colors.radiusLarge
+                        color: Colors.withAlpha(Colors.surface, 0.38)
+                        border.color: Colors.withAlpha(Colors.primary, 0.14)
+                        border.width: 1
+
+                        ColumnLayout {
+                            id: metricColumn
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingM
+                            spacing: Colors.spacingXS
+
+                            Text {
+                                text: modelData.icon
+                                color: Colors.primary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeLarge
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.label
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Black
+                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.value
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.Bold
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        SettingsCard {
-            title: "Personality GIF"
-            iconName: "󰄛"
-            description: "An optional animated element that reacts to your environment."
+        SettingsSectionGroup {
+            title: "Desktop Layer"
+            description: "Control the overlays that live directly on the desktop background surface."
 
-            SettingsToggleRow {
-                label: "Enable GIF"
-                icon: "󰄛"
-                configKey: "personalityGifEnabled"
-            }
+            SettingsCard {
+                title: "Desktop Background"
+                iconName: "󰸉"
+                description: "Wallpaper overlays visible on the desktop background layer."
 
-            SettingsTextInputRow {
-                label: "GIF Path"
-                placeholderText: "~/Pictures/bongocat.gif"
-                leadingIcon: "󰉋"
-                text: Config.personalityGifPath
-                onTextEdited: value => Config.personalityGifPath = value
+                SettingsFieldGrid {
+                    maximumColumns: root.compactMode ? 1 : 2
 
-                SettingsActionButton {
-                    label: "Pick File"
-                    compact: true
-                    onClicked: if (root.settingsRoot) root.settingsRoot.pickPersonalityGif()
+                    SettingsToggleRow {
+                        label: "Spectrum Visualizer"
+                        icon: "󰓃"
+                        configKey: "backgroundVisualizerEnabled"
+                    }
+                    SettingsToggleRow {
+                        label: "Shader Visualizer"
+                        description: "High-performance GLSL mode."
+                        icon: "󰓃"
+                        configKey: "backgroundUseShaderVisualizer"
+                    }
+                    SettingsToggleRow {
+                        label: "Desktop Clock"
+                        icon: "󰥔"
+                        configKey: "backgroundClockEnabled"
+                    }
+                    SettingsToggleRow {
+                        label: "Auto-Hide on Fullscreen"
+                        icon: "󰘖"
+                        configKey: "backgroundAutoHide"
+                    }
+                    SettingsToggleRow {
+                        label: "Weather overlay"
+                        icon: "󰖐"
+                        configKey: "weatherOverlayEnabled"
+                    }
+                }
+
+                SettingsModeRow {
+                    label: "Clock Position"
+                    currentValue: Config.backgroundClockPosition
+                    options: [
+                        {
+                            value: "center",
+                            label: "Center"
+                        },
+                        {
+                            value: "top-left",
+                            label: "Top Left"
+                        },
+                        {
+                            value: "top-right",
+                            label: "Top Right"
+                        },
+                        {
+                            value: "bottom-left",
+                            label: "Bottom Left"
+                        },
+                        {
+                            value: "bottom-right",
+                            label: "Bottom Right"
+                        }
+                    ]
+                    onModeSelected: v => Config.backgroundClockPosition = v
                 }
             }
+        }
 
-            SettingsModeRow {
-                label: "Reaction Mode"
-                currentValue: Config.personalityGifReactionMode
-                options: [
-                    { value: "media", label: "Music Playback" },
-                    { value: "cpu", label: "CPU Usage" },
-                    { value: "beat", label: "Audio Beat" },
-                    { value: "idle", label: "Always" }
-                ]
-                onModeSelected: v => Config.personalityGifReactionMode = v
+        SettingsSectionGroup {
+            title: "Personality Overlay"
+            description: "Animated overlay behavior that reacts to media, CPU activity, or audio."
+
+            SettingsCard {
+                title: "Personality GIF"
+                iconName: "󰄛"
+                description: "An optional animated element that reacts to your environment."
+
+                SettingsToggleRow {
+                    label: "Enable GIF"
+                    icon: "󰄛"
+                    configKey: "personalityGifEnabled"
+                }
+
+                SettingsTextInputRow {
+                    label: "GIF Path"
+                    placeholderText: "~/Pictures/bongocat.gif"
+                    leadingIcon: "󰉋"
+                    text: Config.personalityGifPath
+                    onTextEdited: value => Config.personalityGifPath = value
+
+                    SettingsActionButton {
+                        label: "Pick File"
+                        compact: true
+                        onClicked: if (root.settingsRoot) root.settingsRoot.pickPersonalityGif()
+                    }
+                }
+
+                SettingsModeRow {
+                    label: "Reaction Mode"
+                    currentValue: Config.personalityGifReactionMode
+                    options: [
+                        {
+                            value: "media",
+                            label: "Music Playback"
+                        },
+                        {
+                            value: "cpu",
+                            label: "CPU Usage"
+                        },
+                        {
+                            value: "beat",
+                            label: "Audio Beat"
+                        },
+                        {
+                            value: "idle",
+                            label: "Always"
+                        }
+                    ]
+                    onModeSelected: v => Config.personalityGifReactionMode = v
+                }
             }
         }
     }
