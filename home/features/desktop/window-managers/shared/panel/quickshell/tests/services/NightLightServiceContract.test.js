@@ -9,12 +9,11 @@ const quickshellRoot = resolve(__dirname, "..", "..");
 const nightLightServicePath = resolve(quickshellRoot, "src/services/NightLightService.qml");
 
 describe("NightLightService contract", () => {
-  it("keeps wake recovery wired through the shared suspend manager connection pattern", () => {
+  it("keeps wake recovery wired through IdleService connection pattern", () => {
     const source = readFileSync(nightLightServicePath, "utf8");
 
     expect(source).toContain("property Connections _suspendConn: Connections {");
-    expect(source).toContain("target: SuspendManager");
-    expect(source).not.toContain("property Connections suspendConn: Connections {");
-    expect(source).not.toContain("id: suspendConn");
+    expect(source).toContain("target: IdleService");
+    expect(source).not.toContain("target: SuspendManager");
   });
 });
