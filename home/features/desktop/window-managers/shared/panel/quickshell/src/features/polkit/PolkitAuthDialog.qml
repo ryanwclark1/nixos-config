@@ -150,7 +150,7 @@ PanelWindow {
                     text: "\u{f0552}"
                     color: Colors.primary
                     font.family: Colors.fontMono
-                    font.pixelSize: 48
+                    font.pixelSize: Colors.fontSizeGigantic
                 }
 
                 // Title

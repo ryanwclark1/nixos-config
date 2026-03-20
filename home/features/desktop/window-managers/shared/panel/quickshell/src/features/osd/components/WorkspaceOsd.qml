@@ -199,7 +199,7 @@ Scope {
               Layout.alignment: Qt.AlignHCenter
               text: root.specialIcon
               color: Colors.primary
-              font.pixelSize: 48
+              font.pixelSize: Colors.fontSizeGigantic
               font.family: Colors.fontMono
               visible: root.isSpecial && root.specialIcon !== ""
             }

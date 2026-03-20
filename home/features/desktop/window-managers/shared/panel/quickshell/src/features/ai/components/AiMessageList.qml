@@ -71,7 +71,7 @@ Rectangle {
                     text: "󰚩"
                     color: Colors.primaryRing
                     font.family: Colors.fontMono
-                    font.pixelSize: 48
+                    font.pixelSize: Colors.fontSizeGigantic
                     horizontalAlignment: Text.AlignHCenter
                 }
 
