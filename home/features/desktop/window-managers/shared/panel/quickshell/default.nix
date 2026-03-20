@@ -286,6 +286,7 @@ let
       qt6.qt5compat
       python3 # Needed for various scripts (Niri binds parser, etc.)
       ydotool # On-screen keyboard input injection
+      matugen # Material You color generation (optional backend)
 
       # Quickshell utility scripts
       qsRofiScript
