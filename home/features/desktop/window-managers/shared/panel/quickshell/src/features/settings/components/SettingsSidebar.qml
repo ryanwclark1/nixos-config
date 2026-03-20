@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared" as Shared
 import "../../../widgets" as SharedWidgets
 import "."
 
@@ -108,64 +109,59 @@ Rectangle {
         anchors.margins: root.compactMode ? Colors.spacingS : Colors.spacingL
         spacing: Colors.spacingS
 
-        Rectangle {
+        // --- Header Section ---
+        Item {
             visible: !root.compactMode
             Layout.fillWidth: true
-            radius: Colors.radiusLarge
-            color: Colors.withAlpha(Colors.surface, 0.24)
-            border.color: Colors.withAlpha(Colors.text, 0.08)
-            border.width: 1
-            implicitHeight: navHeaderColumn.implicitHeight + Colors.spacingM * 2
-
-            SharedWidgets.InnerHighlight { highlightOpacity: 0.08 }
+            implicitHeight: navHeaderColumn.implicitHeight + Colors.spacingS
 
             ColumnLayout {
                 id: navHeaderColumn
                 anchors.fill: parent
-                anchors.margins: Colors.spacingM
-                spacing: Colors.spacingXXS
+                spacing: 0
+
+                Text {
+                    text: "QUICKSHELL HUB"
+                    color: Colors.primary
+                    font.pixelSize: 9
+                    font.weight: Font.Black
+                    font.letterSpacing: 1.5
+                    opacity: 0.6
+                }
 
                 Text {
                     Layout.fillWidth: true
                     text: root.currentTabMeta ? String(root.currentTabMeta.label || "Settings") : "Settings"
                     color: Colors.text
-                    font.pixelSize: Colors.fontSizeXL
+                    font.pixelSize: 22
                     font.weight: Font.Black
                     wrapMode: Text.WordWrap
-                }
-
-                Text {
-                    text: "QUICKSHELL HUB"
-                    color: Colors.primary
-                    font.pixelSize: 10
-                    font.weight: Font.Bold
-                    font.letterSpacing: 1.2
-                    opacity: 0.8
                 }
             }
         }
 
+        // --- Search Section ---
         Rectangle {
             visible: !root.compactMode
             Layout.fillWidth: true
-            implicitHeight: searchBarColumn.implicitHeight + Colors.spacingS * 2
-            radius: Colors.radiusMedium
-            color: Colors.withAlpha(Colors.surface, 0.16)
-            border.color: searchInput.activeFocus ? Colors.primary : Colors.withAlpha(Colors.text, 0.08)
+            implicitHeight: 36
+            radius: Colors.radiusSmall
+            color: Colors.withAlpha(Colors.surface, searchInput.activeFocus ? 0.25 : 0.12)
+            border.color: searchInput.activeFocus ? Colors.primary : Colors.withAlpha(Colors.text, 0.06)
             border.width: 1
 
             RowLayout {
-                id: searchBarColumn
                 anchors.fill: parent
                 anchors.leftMargin: Colors.spacingM
-                anchors.rightMargin: Colors.spacingM
+                anchors.rightMargin: Colors.spacingS
                 spacing: Colors.spacingS
 
                 Text {
                     text: "󰍉"
                     color: searchInput.activeFocus ? Colors.primary : Colors.textDisabled
                     font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeMedium
+                    font.pixelSize: 14
+                    opacity: 0.7
                 }
 
                 TextInput {
@@ -174,6 +170,7 @@ Rectangle {
                     color: Colors.text
                     font.pixelSize: Colors.fontSizeSmall
                     clip: true
+                    verticalAlignment: TextInput.AlignVCenter
                     onVisibleChanged: {
                         if (!visible && activeFocus)
                             focus = false;
@@ -184,10 +181,11 @@ Rectangle {
                     }
 
                     Text {
-                        text: "Search..."
+                        text: "Search settings..."
                         color: Colors.textDisabled
                         font.pixelSize: parent.font.pixelSize
                         visible: !parent.text && !parent.activeFocus
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                 }
 
@@ -195,8 +193,8 @@ Rectangle {
                     visible: searchInput.text.length > 0
                     implicitWidth: 18
                     implicitHeight: 18
-                    radius: Colors.radiusPill
-                    color: Colors.withAlpha(Colors.surface, clearSearchMouse.containsMouse ? 0.6 : 0.3)
+                    radius: 9
+                    color: Colors.withAlpha(Colors.text, clearSearchMouse.containsMouse ? 0.15 : 0.08)
 
                     Text {
                         anchors.centerIn: parent
@@ -215,6 +213,16 @@ Rectangle {
                     }
                 }
             }
+        }
+
+        // Subtle separator
+        Rectangle {
+            visible: !root.compactMode
+            Layout.fillWidth: true
+            height: 1
+            color: Colors.withAlpha(Colors.text, 0.04)
+            Layout.topMargin: Colors.spacingS
+            Layout.bottomMargin: Colors.spacingS
         }
 
         Item {
@@ -275,13 +283,14 @@ Rectangle {
                                     stateColor: Colors.primary
                                 }
 
-                                Text {
+                                Loader {
                                     anchors.centerIn: parent
-                                    text: modelData.icon
-                                    color: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeLarge
+                                    property string _ic: modelData.icon
+                                    property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
+                                    sourceComponent: _ic.endsWith(".svg") ? _cSvg1 : _cNerd1
                                 }
+                                Component { id: _cSvg1; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeLarge } }
+                                Component { id: _cNerd1; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
 
                                 MouseArea {
                                     id: compactTabMouse
@@ -301,13 +310,14 @@ Rectangle {
                                 spacing: Colors.spacingXXS
                                 visible: modelData.type === "separator"
 
-                                Text {
+                                Loader {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    text: modelData.icon
-                                    color: Colors.withAlpha(Colors.textDisabled, 0.85)
-                                    font.family: Colors.fontMono
-                                    font.pixelSize: Colors.fontSizeSmall
+                                    property string _ic: modelData.icon
+                                    property color _co: Colors.withAlpha(Colors.textDisabled, 0.85)
+                                    sourceComponent: _ic.endsWith(".svg") ? _cSvg2 : _cNerd2
                                 }
+                                Component { id: _cSvg2; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeSmall } }
+                                Component { id: _cNerd2; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall } }
 
                                 Rectangle {
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -384,12 +394,13 @@ Rectangle {
                                         Layout.fillWidth: true
                                         spacing: Colors.spacingM
 
-                                        Text {
-                                            text: modelData.icon
-                                            color: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
-                                            font.family: Colors.fontMono
-                                            font.pixelSize: Colors.fontSizeMedium
+                                        Loader {
+                                            property string _ic: modelData.icon
+                                            property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
+                                            sourceComponent: _ic.endsWith(".svg") ? _cSvg3 : _cNerd3
                                         }
+                                        Component { id: _cSvg3; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeMedium } }
+                                        Component { id: _cNerd3; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium } }
 
                                         Text {
                                             text: modelData.label
@@ -543,15 +554,13 @@ Rectangle {
                             readonly property bool expanded: !!root.expandedCategories[modelData.id]
 
                             Layout.fillWidth: true
-                            spacing: 2
+                            spacing: 0
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 radius: Colors.radiusMedium
-                                color: expanded ? Colors.withAlpha(Colors.surface, 0.12) : "transparent"
-                                border.color: expanded ? Colors.withAlpha(Colors.text, 0.06) : "transparent"
-                                border.width: 1
-                                implicitHeight: categoryColumn.implicitHeight + Colors.spacingS * 2
+                                color: categoryMouse.containsMouse ? Colors.withAlpha(Colors.surface, 0.1) : "transparent"
+                                implicitHeight: 38
 
                                 SharedWidgets.StateLayer {
                                     id: categoryState
@@ -559,31 +568,31 @@ Rectangle {
                                     hovered: categoryMouse.containsMouse
                                     pressed: categoryMouse.pressed
                                     stateColor: Colors.primary
-                                    opacity: 0.4
+                                    opacity: 0.1
                                 }
 
                                 RowLayout {
-                                    id: categoryColumn
                                     anchors.fill: parent
                                     anchors.leftMargin: Colors.spacingM
                                     anchors.rightMargin: Colors.spacingM
                                     spacing: Colors.spacingS
 
-                                    Text {
-                                        text: modelData.icon
-                                        color: expanded ? Colors.primary : Colors.textSecondary
-                                        font.family: Colors.fontMono
-                                        font.pixelSize: Colors.fontSizeMedium
+                                    Loader {
+                                        property string _ic: modelData.icon
+                                        property color _co: expanded ? Colors.primary : Colors.textSecondary
+                                        opacity: expanded ? 1.0 : 0.6
+                                        sourceComponent: _ic.endsWith(".svg") ? _cSvg4 : _cNerd4
                                     }
+                                    Component { id: _cSvg4; Shared.SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
+                                    Component { id: _cNerd4; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: 14 } }
 
                                     Text {
-                                        text: modelData.label
-                                        color: Colors.text
-                                        font.pixelSize: 11
+                                        text: modelData.label.toUpperCase()
+                                        color: expanded ? Colors.text : Colors.textSecondary
+                                        font.pixelSize: 9
                                         font.weight: Font.Black
-                                        font.letterSpacing: 0.5
+                                        font.letterSpacing: 1.1
                                         Layout.fillWidth: true
-                                        wrapMode: Text.WordWrap
                                     }
 
                                     Text {
@@ -591,7 +600,7 @@ Rectangle {
                                         color: Colors.textDisabled
                                         font.family: Colors.fontMono
                                         font.pixelSize: 10
-                                        opacity: 0.6
+                                        opacity: 0.4
                                     }
                                 }
 
@@ -610,8 +619,9 @@ Rectangle {
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 visible: expanded
-                                spacing: 2
-                                Layout.leftMargin: 4
+                                spacing: 1
+                                Layout.topMargin: 2
+                                Layout.bottomMargin: 6
 
                                 Repeater {
                                     model: expanded ? categoryTabs : []
@@ -620,18 +630,15 @@ Rectangle {
                                         required property var modelData
 
                                         Layout.fillWidth: true
-                                        implicitHeight: 32
-                                        radius: Colors.radiusSmall
-                                        color: root.currentTabId === modelData.id ? Colors.withAlpha(Colors.primary, 0.12) : (tabMouse.containsMouse ? Colors.withAlpha(Colors.surface, 0.12) : "transparent")
-                                        border.color: root.currentTabId === modelData.id ? Colors.withAlpha(Colors.primary, 0.24) : "transparent"
-                                        border.width: 1
+                                        implicitHeight: 34
+                                        radius: Colors.radiusMedium
+                                        color: root.currentTabId === modelData.id ? Colors.withAlpha(Colors.primary, 0.1) : (tabMouse.containsMouse ? Colors.withAlpha(Colors.surface, 0.08) : "transparent")
 
                                         Rectangle {
                                             visible: root.currentTabId === modelData.id
                                             anchors.left: parent.left
-                                            anchors.top: parent.top
-                                            anchors.bottom: parent.bottom
-                                            anchors.margins: 6
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            height: 16
                                             width: 3
                                             radius: 1.5
                                             color: Colors.primary
@@ -644,22 +651,23 @@ Rectangle {
                                             pressed: tabMouse.pressed
                                             visible: root.currentTabId !== modelData.id
                                             stateColor: Colors.primary
-                                            opacity: 0.3
+                                            opacity: 0.15
                                         }
 
                                         RowLayout {
                                             anchors.fill: parent
-                                            anchors.leftMargin: Colors.spacingL
+                                            anchors.leftMargin: Colors.spacingXL
                                             anchors.rightMargin: Colors.spacingM
                                             spacing: Colors.spacingM
 
-                                            Text {
-                                                text: modelData.icon
-                                                color: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
-                                                font.family: Colors.fontMono
-                                                font.pixelSize: Colors.fontSizeMedium
-                                                opacity: root.currentTabId === modelData.id ? 1.0 : 0.7
+                                            Loader {
+                                                property string _ic: modelData.icon
+                                                property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
+                                                opacity: root.currentTabId === modelData.id ? 1.0 : 0.5
+                                                sourceComponent: _ic.endsWith(".svg") ? _cSvg5 : _cNerd5
                                             }
+                                            Component { id: _cSvg5; Shared.SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
+                                            Component { id: _cNerd5; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: 14 } }
 
                                             Text {
                                                 text: modelData.label
@@ -692,34 +700,32 @@ Rectangle {
             SharedWidgets.OverscrollGlow { flickable: sidebarFlick }
         }
 
-        Rectangle {
+        // --- Footer Section ---
+        Item {
             Layout.fillWidth: true
-            radius: root.compactMode ? Colors.radiusLarge : Colors.radiusLarge
-            color: Colors.withAlpha(Colors.surface, 0.16)
-            border.color: Colors.withAlpha(Colors.text, 0.06)
-            border.width: 1
-            implicitHeight: footerColumn.implicitHeight + Colors.spacingS * 2
+            implicitHeight: footerColumn.implicitHeight
 
             ColumnLayout {
                 id: footerColumn
                 anchors.fill: parent
-                anchors.margins: Colors.spacingS
                 spacing: Colors.spacingS
 
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 36
-                    radius: root.compactMode ? Colors.radiusMedium : Colors.radiusMedium
-                    color: Colors.primaryAccent
-                    border.color: Colors.withAlpha(Colors.primary, 0.4)
+                    implicitHeight: 38
+                    radius: Colors.radiusMedium
+                    color: saveMouse.containsMouse ? Colors.primary : Colors.primaryAccent
+                    border.color: Colors.withAlpha(Colors.primary, 0.5)
                     border.width: 1
+
+                    Behavior on color { CAnim {} }
 
                     SharedWidgets.StateLayer {
                         id: saveState
                         hovered: saveMouse.containsMouse
                         pressed: saveMouse.pressed
-                        stateColor: Colors.primary
-                        opacity: 0.2
+                        stateColor: Colors.background
+                        opacity: 0.15
                     }
 
                     RowLayout {
@@ -729,16 +735,16 @@ Rectangle {
 
                         Text {
                             text: "󰆓"
-                            color: Colors.primary
+                            color: saveMouse.containsMouse ? Colors.background : Colors.primary
                             font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeMedium
+                            font.pixelSize: 16
                         }
 
                         Text {
                             visible: !root.compactMode
                             text: "Save & Close"
-                            color: Colors.text
-                            font.pixelSize: 11
+                            color: saveMouse.containsMouse ? Colors.background : Colors.text
+                            font.pixelSize: 12
                             font.weight: Font.Bold
                         }
                     }
