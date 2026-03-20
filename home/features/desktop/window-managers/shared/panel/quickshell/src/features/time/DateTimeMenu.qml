@@ -87,7 +87,7 @@ BasePopupMenu {
               RowLayout {
                 spacing: Appearance.spacingXS
                 Text {
-                  text: Colors.weatherIcon(WeatherService.condition)
+                  text: Appearance.weatherIcon(WeatherService.condition)
                   color: Colors.accent
                   font.family: Appearance.fontMono
                   font.pixelSize: Appearance.fontSizeLarge
@@ -159,7 +159,7 @@ BasePopupMenu {
               color: Colors.withAlpha(Colors.accent, 0.1)
               Text {
                 anchors.centerIn: parent
-                text: Colors.weatherIcon(WeatherService.condition)
+                text: Appearance.weatherIcon(WeatherService.condition)
                 color: Colors.accent
                 font.family: Appearance.fontMono
                 font.pixelSize: Appearance.fontSizeDisplay

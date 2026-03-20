@@ -29,7 +29,7 @@ Item {
     spacing: Appearance.spacingL
 
     Text {
-      text: Colors.weatherIcon(WeatherService.condition)
+      text: Appearance.weatherIcon(WeatherService.condition)
       color: Colors.primary
       font.family: Appearance.fontMono
       font.pixelSize: Appearance.fontSizeIcon

@@ -45,7 +45,7 @@ BasePopupMenu {
         rowSpacing: Appearance.spacingM
 
         Text {
-          text: Colors.weatherIcon(WeatherService.condition)
+          text: Appearance.weatherIcon(WeatherService.condition)
           color: Colors.accent
           font.family: Appearance.fontMono
           font.pixelSize: root.compactMode ? 38 : 46
@@ -175,7 +175,7 @@ BasePopupMenu {
 
           Rectangle {
             width: 10; height: 10; radius: 5
-            color: Colors.aqiColor(WeatherService.aqi, Config.weatherUnits === "imperial")
+            color: Appearance.aqiColor(WeatherService.aqi, Config.weatherUnits === "imperial")
           }
 
           Text {
@@ -187,7 +187,7 @@ BasePopupMenu {
 
           Text {
             text: WeatherService.aqiCategory
-            color: Colors.aqiColor(WeatherService.aqi, Config.weatherUnits === "imperial")
+            color: Appearance.aqiColor(WeatherService.aqi, Config.weatherUnits === "imperial")
             font.pixelSize: Appearance.fontSizeSmall
             font.weight: Font.Medium
           }
@@ -250,7 +250,7 @@ BasePopupMenu {
               }
 
               Text {
-                text: Colors.weatherIcon(modelData.condition)
+                text: Appearance.weatherIcon(modelData.condition)
                 color: Colors.accent
                 font.family: Appearance.fontMono
                 font.pixelSize: Appearance.fontSizeLarge
@@ -322,7 +322,7 @@ BasePopupMenu {
           }
 
           Text {
-            text: Colors.weatherIcon(modelData.condition)
+            text: Appearance.weatherIcon(modelData.condition)
             color: Colors.accent
             font.family: Appearance.fontMono
             font.pixelSize: Appearance.fontSizeXL

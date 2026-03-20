@@ -30,7 +30,7 @@ SharedWidgets.BarPill {
         spacing: Appearance.spacingS
 
         Text {
-            text: Colors.weatherIcon(WeatherService.condition)
+            text: Appearance.weatherIcon(WeatherService.condition)
             color: Colors.accent
             font.family: Appearance.fontMono
             font.pixelSize: Appearance.fontSizeLarge
