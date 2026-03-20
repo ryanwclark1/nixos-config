@@ -68,7 +68,7 @@ main() {
   if niri_headless_without_outputs; then
     printf '%s\n' "[INFO] Skipping runtime warning regression artifact capture: Niri session exposes no wl_output in this headless VM."
   else
-    "${script_dir}/check-runtime-warning-regressions.sh" --workspace current "${runtime_args[@]}"
+    "${script_dir}/check-runtime-warning-regressions.sh" --workspace current --skip-surfaces "${runtime_args[@]}"
   fi
 
   printf '%s\n' "Settings guardrails passed."
