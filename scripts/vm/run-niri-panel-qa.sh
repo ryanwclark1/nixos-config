@@ -20,6 +20,10 @@ launcher_log="${NIRI_VM_QA_LOG:-}"
 extra_capture_args=()
 host_pubkey_file=""
 use_key_auth=0
+remote_runtime_dir=""
+remote_repo=""
+remote_tmp_root=""
+remote_state_home=""
 
 if [[ -z "${poll_attempts}" ]]; then
   poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
@@ -92,7 +96,7 @@ if [[ -z "${launcher_log}" ]]; then
 fi
 
 if [[ -z "${vm_output_dir}" ]]; then
-  vm_output_dir="/tmp/panel-qa-${capture_mode}-$(date +%Y%m%d-%H%M%S)"
+  vm_output_dir="__AUTO__"
 fi
 
 mkdir -p "${output_dir}"
@@ -255,6 +259,31 @@ wait_for_niri_unit() {
   return 1
 }
 
+resolve_remote_paths() {
+  remote_runtime_dir="$(vm_ssh 'printf %s "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"' 2>/dev/null || true)"
+  if [[ -z "${remote_runtime_dir}" ]]; then
+    remote_runtime_dir="/run/user/1000"
+  fi
+
+  remote_tmp_root="${remote_runtime_dir}/panel-qa"
+  remote_state_home="${remote_tmp_root}/state"
+  remote_repo="${remote_tmp_root}/repo"
+  if [[ "${vm_output_dir}" == "__AUTO__" ]]; then
+    vm_output_dir="${remote_tmp_root}/artifacts/${capture_mode}-$(date +%Y%m%d-%H%M%S)"
+  fi
+
+  vm_ssh "mkdir -p '${remote_tmp_root}' '${remote_state_home}' '${vm_output_dir}'"
+}
+
+prepare_guest_runtime() {
+  vm_ssh "
+    mkdir -p '${remote_tmp_root}' '${remote_state_home}' '${vm_output_dir}' &&
+    { systemctl --user stop quickshell.service >/dev/null 2>&1 || true; } &&
+    { pkill -x quickshell >/dev/null 2>&1 || true; } &&
+    rm -rf '${remote_repo}'
+  "
+}
+
 cleanup() {
   if (( keep_vm_running == 0 )) && [[ -n "${launcher_pid:-}" ]] && kill -0 "${launcher_pid}" 2>/dev/null; then
     kill "${launcher_pid}" 2>/dev/null || true
@@ -359,16 +388,16 @@ run_remote_capture() {
 
   case "${capture_mode}" in
     panel)
-      remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-launcher --output-dir '${vm_output_dir}'"
+      remote_cmd="env TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-launcher --output-dir '${vm_output_dir}'"
       ;;
     settings)
-      remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-surfaces --skip-launcher --output-dir '${vm_output_dir}'"
+      remote_cmd="env TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-surfaces --skip-launcher --output-dir '${vm_output_dir}'"
       ;;
     surfaces)
-      remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-settings --skip-launcher --output-dir '${vm_output_dir}'"
+      remote_cmd="env TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-settings --skip-launcher --output-dir '${vm_output_dir}'"
       ;;
     settings-qa)
-      vm_ssh "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+      vm_ssh "TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
 set -euo pipefail
 
 mkdir -p "${VM_OUTPUT_DIR}"
@@ -381,7 +410,7 @@ EOF
       return $?
       ;;
     gate)
-      vm_ssh "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+      vm_ssh "TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
 set -uo pipefail
 
 mkdir -p "${VM_OUTPUT_DIR}"
@@ -567,7 +596,9 @@ install_host_pubkey
 wait_for_niri
 
 run_id="$(date +%Y%m%d-%H%M%S)-$$"
-remote_repo="/tmp/nixos-config-${run_id}"
+resolve_remote_paths
+remote_repo="${remote_repo}-${run_id}"
+prepare_guest_runtime
 sync_repo "${remote_repo}"
 remote_exit=0
 set +e

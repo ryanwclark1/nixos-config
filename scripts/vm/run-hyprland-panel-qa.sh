@@ -18,6 +18,10 @@ vm_output_dir=""
 launcher_log="${HYPRLAND_VM_QA_LOG:-}"
 extra_capture_args=()
 host_pubkey_file=""
+remote_runtime_dir=""
+remote_repo=""
+remote_tmp_root=""
+remote_state_home=""
 
 if [[ -z "${poll_attempts}" ]]; then
   poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
@@ -96,7 +100,7 @@ if [[ -z "${launcher_log}" ]]; then
 fi
 
 if [[ -z "${vm_output_dir}" ]]; then
-  vm_output_dir="/tmp/panel-qa-${capture_mode}-$(date +%Y%m%d-%H%M%S)"
+  vm_output_dir="__AUTO__"
 fi
 
 mkdir -p "${output_dir}"
@@ -255,6 +259,31 @@ wait_for_hyprland() {
   return 1
 }
 
+resolve_remote_paths() {
+  remote_runtime_dir="$("${ssh_base[@]}" 'printf %s "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"' 2>/dev/null || true)"
+  if [[ -z "${remote_runtime_dir}" ]]; then
+    remote_runtime_dir="/run/user/1000"
+  fi
+
+  remote_tmp_root="${remote_runtime_dir}/panel-qa"
+  remote_state_home="${remote_tmp_root}/state"
+  remote_repo="${remote_tmp_root}/repo"
+  if [[ "${vm_output_dir}" == "__AUTO__" ]]; then
+    vm_output_dir="${remote_tmp_root}/artifacts/${capture_mode}-$(date +%Y%m%d-%H%M%S)"
+  fi
+
+  "${ssh_base[@]}" "mkdir -p '${remote_tmp_root}' '${remote_state_home}' '${vm_output_dir}'"
+}
+
+prepare_guest_runtime() {
+  "${ssh_base[@]}" "
+    mkdir -p '${remote_tmp_root}' '${remote_state_home}' '${vm_output_dir}' &&
+    { systemctl --user stop quickshell.service >/dev/null 2>&1 || true; } &&
+    { pkill -x quickshell >/dev/null 2>&1 || true; } &&
+    rm -rf '${remote_repo}'
+  "
+}
+
 sync_repo() {
   local remote_repo="$1"
   local panel_rel="home/features/desktop/window-managers/shared/panel"
@@ -291,7 +320,7 @@ EOF
   "${scp_base[@]}" "${script_tmp}" "administrator@127.0.0.1:${remote_script_path}"
   rm -f "${script_tmp}"
 
-  "${ssh_base[@]}" "chmod +x '${remote_script_path}' && rm -f '${remote_log_path}' '${remote_exit_path}' && nohup env REMOTE_EXIT='${remote_exit_path}' REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash '${remote_script_path}' > '${remote_log_path}' 2>&1 < /dev/null &"
+  "${ssh_base[@]}" "chmod +x '${remote_script_path}' && rm -f '${remote_log_path}' '${remote_exit_path}' && nohup env REMOTE_EXIT='${remote_exit_path}' REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' bash '${remote_script_path}' > '${remote_log_path}' 2>&1 < /dev/null &"
 
   while (( SECONDS < deadline )); do
     if remote_status="$("${ssh_base[@]}" "if [[ -f '${remote_exit_path}' ]]; then cat '${remote_exit_path}'; else exit 42; fi" 2>/dev/null)"; then
@@ -322,13 +351,13 @@ run_remote_capture() {
 
   case "${capture_mode}" in
     panel)
-      remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --output-dir '${vm_output_dir}'"
+      remote_cmd="env TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --output-dir '${vm_output_dir}'"
       ;;
     settings)
-      remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-surfaces --output-dir '${vm_output_dir}'"
+      remote_cmd="env TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-surfaces --output-dir '${vm_output_dir}'"
       ;;
     surfaces)
-      remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-settings --output-dir '${vm_output_dir}'"
+      remote_cmd="env TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-settings --output-dir '${vm_output_dir}'"
       ;;
     settings-qa)
       run_remote_background_script "${remote_panel_root}" "settings-qa" <<'EOF'
@@ -388,7 +417,7 @@ EOF
       return $?
       ;;
     launcher)
-      "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+      "${ssh_base[@]}" "TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
 set -euo pipefail
 
 repo_shell_pid=""
@@ -592,7 +621,9 @@ install_host_pubkey
 wait_for_hyprland
 
 run_id="$(date +%Y%m%d-%H%M%S)-$$"
-remote_repo="/tmp/nixos-config-${run_id}"
+resolve_remote_paths
+remote_repo="${remote_repo}-${run_id}"
+prepare_guest_runtime
 sync_repo "${remote_repo}"
 remote_exit=0
 set +e
