@@ -35,6 +35,7 @@ SliderTrack 1.0 SliderTrack.qml
 StateLayer 1.0 StateLayer.qml
 StatusChip 1.0 StatusChip.qml
 SurfaceGradient 1.0 SurfaceGradient.qml
+ThemedContainer 1.0 ThemedContainer.qml
 Toast 1.0 Toast.qml
 ToastOverlay 1.0 ToastOverlay.qml
 Tooltip 1.0 Tooltip.qml

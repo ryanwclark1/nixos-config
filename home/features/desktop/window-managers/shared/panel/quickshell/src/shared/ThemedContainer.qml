@@ -11,23 +11,67 @@ Rectangle {
     property bool hovered: false
     default property alias content: contentItem.data
 
-    readonly property var _v: Colors.containerVariant(variant)
+    // Resolve variant properties via direct bindings so color changes propagate.
+    color: _resolveColor()
+    border.color: _resolveBorderColor()
+    border.width: _resolveBorderWidth()
+    radius: _resolveRadius()
 
-    color: _v.color
-    border.color: _v.borderColor
-    border.width: _v.borderWidth
-    radius: _v.radius
+    function _resolveColor() {
+        switch (variant) {
+        case "popup": return Colors.popupSurface;
+        case "card": return Colors.cardSurface;
+        case "elevated": return Colors.chipSurface;
+        case "surface": return Qt.alpha(Colors.surface, Colors.opacitySurface);
+        case "pill": return Qt.alpha(Colors.surface, Colors.opacityOverlay);
+        default: return Colors.cardSurface;
+        }
+    }
 
-    gradient: (showGradient && _v.gradient) ? _grad : null
+    function _resolveBorderColor() {
+        if (variant === "surface") return "transparent";
+        return Colors.border;
+    }
+
+    function _resolveBorderWidth() {
+        if (variant === "surface") return 0;
+        return 1;
+    }
+
+    function _resolveRadius() {
+        switch (variant) {
+        case "popup": return Colors.radiusLarge;
+        case "card": return Colors.radiusMedium;
+        case "elevated": return Colors.radiusCard;
+        case "surface": return Colors.radiusSmall;
+        case "pill": return Colors.radiusPill;
+        default: return Colors.radiusMedium;
+        }
+    }
+
+    readonly property real _highlightOp: {
+        switch (variant) {
+        case "popup": return 0.15;
+        case "card": return 0.1;
+        case "elevated": return 0.08;
+        case "surface": return 0;
+        case "pill": return 0.08;
+        default: return 0.1;
+        }
+    }
+
+    readonly property bool _variantGradient: variant === "popup" || variant === "surface" || variant === "pill"
+
+    gradient: (showGradient && _variantGradient) ? _grad : null
 
     SurfaceGradient { id: _grad }
 
     InnerHighlight {
-        visible: root.showHighlight && root._v.highlightOpacity > 0
+        visible: root.showHighlight && root._highlightOp > 0
         highlightOpacity: root.customHighlightOpacity >= 0
-            ? root.customHighlightOpacity : root._v.highlightOpacity
+            ? root.customHighlightOpacity : root._highlightOp
         hovered: root.hovered
-        hoveredOpacity: root.hovered ? root._v.highlightOpacity * 1.5 : 0
+        hoveredOpacity: root.hovered ? root._highlightOp * 1.5 : 0
     }
 
     Item {

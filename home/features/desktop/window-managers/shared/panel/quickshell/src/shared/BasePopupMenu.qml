@@ -85,18 +85,13 @@ PopupWindow {
   SharedWidgets.ElevationShadow {}
 
   // ── Surface ───────────────────────────────────
-  Rectangle {
+  ThemedContainer {
     id: surface
+    variant: "popup"
+    showGradient: false
     anchors.fill: parent
-    color: Colors.popupSurface
-    border.color: Colors.border
-    border.width: 1
-    radius: Colors.radiusLarge
     clip: true
     focus: true
-
-    // Inner subtle highlight border
-    SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
 
     Item {
       id: backgroundSlot
