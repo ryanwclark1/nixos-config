@@ -187,11 +187,10 @@ PanelWindow {
         Layout.fillWidth: true
         spacing: Appearance.paddingSmall
 
-        Text {
-          text: "󰈊"
+        SharedWidgets.SvgIcon {
+          source: "eyedropper.svg"
           color: Colors.primary
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeXL
+          size: Appearance.fontSizeXL
         }
 
         Text {
@@ -518,12 +517,11 @@ PanelWindow {
           border.color: copyHover.containsMouse ? Colors.primary : Colors.border
           border.width: 1
 
-          Text {
+          SharedWidgets.SvgIcon {
             anchors.centerIn: parent
-            text: clipCopied.running ? "󰄬" : "󰆏"
+            source: clipCopied.running ? "checkmark.svg" : "copy.svg"
             color: clipCopied.running ? Colors.primary : Colors.textSecondary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
           }
 
           readonly property int _copyFeedbackMs: 1500

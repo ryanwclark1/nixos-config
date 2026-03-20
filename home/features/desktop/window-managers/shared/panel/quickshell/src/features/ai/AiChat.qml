@@ -360,12 +360,11 @@ PanelWindow {
                     radius: Appearance.radiusXS
                     color: "transparent"
                     visible: !root.narrowHeader && AiService.activeMessages.length > 0
-                    Text {
+                    SharedWidgets.SvgIcon {
                         anchors.centerIn: parent
-                        text: "󰆏"
+                        source: "copy.svg"
                         color: Colors.textSecondary
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeLarge
+                        size: Appearance.fontSizeLarge
                     }
                     SharedWidgets.StateLayer {
                         id: copyAllStateLayer
@@ -402,12 +401,11 @@ PanelWindow {
                     radius: Appearance.radiusXS
                     color: "transparent"
                     visible: !root.narrowHeader && (AiService.activeMessages.length > 0 || AiService.activeDraftText.length > 0)
-                    Text {
+                    SharedWidgets.SvgIcon {
                         anchors.centerIn: parent
-                        text: "󰃢"
+                        source: "delete.svg"
                         color: Colors.textSecondary
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeLarge
+                        size: Appearance.fontSizeLarge
                     }
                     SharedWidgets.StateLayer {
                         id: clearChatStateLayer
@@ -440,12 +438,11 @@ PanelWindow {
                     border.color: newChatHover.containsMouse ? Colors.primaryRing : "transparent"
                     border.width: 1
 
-                    Text {
+                    SharedWidgets.SvgIcon {
                         anchors.centerIn: parent
-                        text: "󰐕"
+                        source: "add.svg"
                         color: newChatHover.containsMouse ? Colors.primary : Colors.textSecondary
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeLarge
+                        size: Appearance.fontSizeLarge
                     }
                     SharedWidgets.StateLayer {
                         id: newChatStateLayer
@@ -475,12 +472,11 @@ PanelWindow {
                     height: 28
                     radius: Appearance.radiusMedium
                     color: "transparent"
-                    Text {
+                    SharedWidgets.SvgIcon {
                         anchors.centerIn: parent
-                        text: "󰅖"
+                        source: "dismiss.svg"
                         color: Colors.textSecondary
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeLarge
+                        size: Appearance.fontSizeLarge
                     }
                     SharedWidgets.StateLayer {
                         id: closeStateLayer
@@ -540,11 +536,10 @@ PanelWindow {
 
                     RowLayout {
                         spacing: Appearance.spacingS
-                        Text {
-                            text: "󰒓"
+                        SharedWidgets.SvgIcon {
+                            source: "settings.svg"
                             color: Colors.accent
-                            font.pixelSize: Appearance.fontSizeXL
-                            font.family: Appearance.fontMono
+                            size: Appearance.fontSizeXL
                         }
                         Text {
                             text: "Suggested System Action"
@@ -623,11 +618,10 @@ PanelWindow {
 
                     RowLayout {
                         spacing: Appearance.spacingS
-                        Text {
-                            text: "󰆍"
+                        SharedWidgets.SvgIcon {
+                            source: "terminal.svg"
                             color: Colors.success
-                            font.pixelSize: Appearance.fontSizeXL
-                            font.family: Appearance.fontMono
+                            size: Appearance.fontSizeXL
                         }
                         Text {
                             text: "Install Shell Script"
@@ -716,11 +710,10 @@ PanelWindow {
                     anchors.margins: Appearance.spacingS
                     spacing: Appearance.spacingS
 
-                    Text {
-                        text: "󰀦"
+                    SharedWidgets.SvgIcon {
+                        source: "warning.svg"
                         color: Colors.warning
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeMedium
+                        size: Appearance.fontSizeMedium
                     }
                     Text {
                         Layout.fillWidth: true
@@ -729,11 +722,10 @@ PanelWindow {
                         font.pixelSize: Appearance.fontSizeXS
                         wrapMode: Text.WordWrap
                     }
-                    Text {
-                        text: "󰅖"
+                    SharedWidgets.SvgIcon {
+                        source: "dismiss.svg"
                         color: Colors.textDisabled
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeSmall
+                        size: Appearance.fontSizeSmall
                         MouseArea {
                             anchors.fill: parent
                             anchors.margins: -4
@@ -905,12 +897,11 @@ PanelWindow {
                             border.color: root.includeWindowContext ? Colors.primary : Colors.border
                             border.width: 1
 
-                            Text {
+                            SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
-                                text: "󰖲"
+                                source: "app-generic.svg"
                                 color: root.includeWindowContext ? Colors.primary : Colors.textDisabled
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeSmall
+                                size: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: winCtxHover
@@ -937,12 +928,11 @@ PanelWindow {
                             border.color: root.includeVisualContext ? Colors.primary : Colors.border
                             border.width: 1
 
-                            Text {
+                            SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
-                                text: "󰄀"
+                                source: "camera.svg"
                                 color: root.includeVisualContext ? Colors.primary : Colors.textDisabled
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeSmall
+                                size: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: visualCtxHover
@@ -987,12 +977,11 @@ PanelWindow {
                             border.color: root.includeSelectionContext ? Colors.primary : Colors.border
                             border.width: 1
 
-                            Text {
+                            SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
-                                text: "󰒅"
+                                source: "select-all.svg"
                                 color: root.includeSelectionContext ? Colors.primary : Colors.textDisabled
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeSmall
+                                size: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: selCtxHover
@@ -1019,12 +1008,11 @@ PanelWindow {
                             border.color: AiService.isOcrBusy ? Colors.warning : Colors.border
                             border.width: 1
 
-                            Text {
+                            SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
-                                text: "󰚦"
+                                source: "scan-text.svg"
                                 color: AiService.isOcrBusy ? Colors.warning : Colors.textDisabled
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeSmall
+                                size: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: ocrHover
@@ -1062,12 +1050,11 @@ PanelWindow {
                             border.color: Config.aiSystemContext ? Colors.primary : Colors.border
                             border.width: 1
 
-                            Text {
+                            SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
-                                text: "󰒍"
+                                source: "board.svg"
                                 color: Config.aiSystemContext ? Colors.primary : Colors.textDisabled
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeSmall
+                                size: Appearance.fontSizeSmall
                             }
                             MouseArea {
                                 id: sysCtxHover
@@ -1111,12 +1098,11 @@ PanelWindow {
                             border.color: AiService.isStreaming ? Colors.error : Colors.primary
                             border.width: AiService.isStreaming || inputField.text.trim().length > 0 ? 1 : 0
 
-                            Text {
+                            SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
-                                text: AiService.isStreaming ? "󰅖" : "󰒊"
+                                source: AiService.isStreaming ? "stop.svg" : "send.svg"
                                 color: AiService.isStreaming ? Colors.error : Colors.primary
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeLarge
+                                size: Appearance.fontSizeLarge
                             }
                             SharedWidgets.StateLayer {
                                 id: sendStateLayer

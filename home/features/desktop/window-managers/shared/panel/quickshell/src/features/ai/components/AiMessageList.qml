@@ -66,12 +66,10 @@ Rectangle {
                 spacing: Appearance.spacingL
                 topPadding: 40
 
-                Text {
-                    width: parent.width
-                    text: "󰚩"
+                SharedWidgets.SvgIcon {
+                    source: "sparkle.svg"
                     color: Colors.primaryRing
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeGigantic
+                    size: Appearance.fontSizeGigantic
                     horizontalAlignment: Text.AlignHCenter
                 }
 
@@ -121,13 +119,13 @@ Rectangle {
                                 id: qsChipRow
                                 anchors.centerIn: parent
                                 spacing: Appearance.spacingXS
-                                Text {
-                                    text: modelData.icon
-                                    color: qsChipMouse.containsMouse ? Colors.primary : Colors.textSecondary
-                                    font.family: Appearance.fontMono
-                                    font.pixelSize: Appearance.fontSizeSmall
+                                Loader {
+                                    property string _ic: modelData.icon || ""
+                                    sourceComponent: String(_ic).endsWith(".svg") ? _qsSvg : _qsNerd
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
+                                Component { id: _qsSvg; SharedWidgets.SvgIcon { source: parent._ic; color: qsChipMouse.containsMouse ? Colors.primary : Colors.textSecondary; size: Appearance.fontSizeSmall } }
+                                Component { id: _qsNerd; Text { text: parent._ic; color: qsChipMouse.containsMouse ? Colors.primary : Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }
                                 Text {
                                     text: modelData.label
                                     color: qsChipMouse.containsMouse ? Colors.text : Colors.textSecondary
@@ -237,12 +235,11 @@ Rectangle {
                                 Behavior on opacity {
                                     NumberAnimation { duration: Appearance.durationFast }
                                 }
-                                Text {
+                                SharedWidgets.SvgIcon {
                                     anchors.centerIn: parent
-                                    text: "󰆏"
+                                    source: "copy.svg"
                                     color: Colors.textSecondary
-                                    font.family: Appearance.fontMono
-                                    font.pixelSize: Appearance.fontSizeSmall
+                                    size: Appearance.fontSizeSmall
                                 }
                                 MouseArea {
                                     id: userCopyHover
@@ -305,12 +302,11 @@ Rectangle {
                                     width: 22; height: 22
                                     radius: Appearance.radiusXXS
                                     color: regenHover.containsMouse ? Colors.bgWidget : "transparent"
-                                    Text {
+                                    SharedWidgets.SvgIcon {
                                         anchors.centerIn: parent
-                                        text: "󰑐"
+                                        source: "arrow-repeat.svg"
                                         color: Colors.textSecondary
-                                        font.family: Appearance.fontMono
-                                        font.pixelSize: Appearance.fontSizeSmall
+                                        size: Appearance.fontSizeSmall
                                     }
                                     MouseArea {
                                         id: regenHover
@@ -330,12 +326,11 @@ Rectangle {
                                     width: 22; height: 22
                                     radius: Appearance.radiusXXS
                                     color: assistCopyHover.containsMouse ? Colors.bgWidget : "transparent"
-                                    Text {
+                                    SharedWidgets.SvgIcon {
                                         anchors.centerIn: parent
-                                        text: "󰆏"
+                                        source: "copy.svg"
                                         color: Colors.textSecondary
-                                        font.family: Appearance.fontMono
-                                        font.pixelSize: Appearance.fontSizeSmall
+                                        size: Appearance.fontSizeSmall
                                     }
                                     MouseArea {
                                         id: assistCopyHover
@@ -390,11 +385,10 @@ Rectangle {
                         anchors.fill: parent
                         anchors.margins: Appearance.spacingM
                         spacing: Appearance.spacingS
-                        Text {
-                            text: "󰚩"
+                        SharedWidgets.SvgIcon {
+                            source: "sparkle.svg"
                             color: Colors.primary
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeLarge
+                            size: Appearance.fontSizeLarge
                             OpacityAnimator on opacity {
                                 from: 0.3; to: 1.0; duration: Appearance.durationLong
                                 running: AiService.isStreaming && AiService.streamingContent.length === 0
@@ -466,12 +460,11 @@ Rectangle {
                         height: 28
                         radius: Appearance.radiusXS
                         color: "transparent"
-                        Text {
+                        SharedWidgets.SvgIcon {
                             anchors.centerIn: parent
-                            text: "󰑐"
+                            source: "arrow-repeat.svg"
                             color: Colors.textSecondary
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeLarge
+                            size: Appearance.fontSizeLarge
                         }
                         SharedWidgets.StateLayer {
                             id: retryStateLayer

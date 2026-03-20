@@ -453,11 +453,10 @@ PanelWindow {
           anchors { fill: parent; leftMargin: Appearance.paddingLarge; rightMargin: Appearance.spacingL }
           spacing: Appearance.spacingM
 
-          Text {
-            text: "󰍺"
+          SharedWidgets.SvgIcon {
+            source: "desktop.svg"
             color: Colors.primary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeHuge
+            size: Appearance.fontSizeHuge
           }
           Text {
             text: "Display Configuration"
@@ -472,12 +471,11 @@ PanelWindow {
             width: 32; height: 32; radius: height / 2
             color: "transparent"
 
-            Text {
+            SharedWidgets.SvgIcon {
               anchors.centerIn: parent
-              text: "󰅖"
+              source: "dismiss.svg"
               color: Colors.textSecondary
-              font.family: Appearance.fontMono
-              font.pixelSize: Appearance.fontSizeLarge
+              size: Appearance.fontSizeLarge
             }
             SharedWidgets.StateLayer {
               id: closeSL
@@ -563,12 +561,12 @@ PanelWindow {
               id: presetRow
               anchors.centerIn: parent
               spacing: Appearance.spacingXS
-              Text {
-                text: modelData.icon
-                color: Colors.primary
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeSmall
+              Loader {
+                property string _ic: modelData.icon || ""
+                sourceComponent: String(_ic).endsWith(".svg") ? _presetSvg : _presetNerd
               }
+              Component { id: _presetSvg; SharedWidgets.SvgIcon { source: parent._ic; color: Colors.primary; size: Appearance.fontSizeSmall } }
+              Component { id: _presetNerd; Text { text: parent._ic; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }
               Text {
                 text: modelData.label
                 color: Colors.text
@@ -892,7 +890,7 @@ PanelWindow {
             id: saveProfileRow
             anchors.centerIn: parent
             spacing: Appearance.spacingXS
-            Text { text: "󰆓"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall }
+            SharedWidgets.SvgIcon { source: "save.svg"; color: Colors.primary; size: Appearance.fontSizeSmall }
             Text { text: "Save"; color: Colors.text; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Medium }
           }
 
@@ -955,7 +953,7 @@ PanelWindow {
           RowLayout {
             anchors.centerIn: parent
             spacing: Appearance.spacingS
-            Text { text: "󰑐"; color: Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium }
+            SharedWidgets.SvgIcon { source: "arrow-clockwise.svg"; color: Colors.textSecondary; size: Appearance.fontSizeMedium }
             Text { text: "Reload"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Medium }
           }
 
@@ -987,7 +985,7 @@ PanelWindow {
           RowLayout {
             anchors.centerIn: parent
             spacing: Appearance.spacingS
-            Text { text: "󰅖"; color: Colors.textSecondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium }
+            SharedWidgets.SvgIcon { source: "dismiss.svg"; color: Colors.textSecondary; size: Appearance.fontSizeMedium }
             Text { text: "Close"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Medium }
           }
 
@@ -1018,11 +1016,10 @@ PanelWindow {
           RowLayout {
             anchors.centerIn: parent
             spacing: Appearance.spacingS
-            Text {
-              text: displayRoot.applyInProgress ? "󰔟" : "󰄬"
+            SharedWidgets.SvgIcon {
+              source: displayRoot.applyInProgress ? "timer.svg" : "checkmark.svg"
               color: Colors.text
-              font.family: Appearance.fontMono
-              font.pixelSize: Appearance.fontSizeMedium
+              size: Appearance.fontSizeMedium
 
               // Simple spinning rotation when busy
               NumberAnimation on rotation {
