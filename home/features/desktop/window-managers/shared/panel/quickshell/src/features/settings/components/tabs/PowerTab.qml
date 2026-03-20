@@ -46,12 +46,12 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "Hot Corners"
-                    icon: "󰘖"
+                    icon: "lock-closed-filled.svg"
                     configKey: "hotCornersEnabled"
                 }
                 SettingsToggleRow {
                     label: "Idle Inhibitor"
-                    icon: "󰈈"
+                    icon: "desktop-filled.svg"
                     configKey: "idleInhibitEnabled"
                 }
                 SettingsToggleRow {
@@ -107,7 +107,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Monitor Off"
-                icon: "󰍹"
+                icon: "desktop.svg"
                 min: 1
                 max: 180
                 step: 1
@@ -118,7 +118,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Lock Screen"
-                icon: "󰌾"
+                icon: "lock-closed.svg"
                 min: 1
                 max: 240
                 step: 1
@@ -129,7 +129,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Suspend"
-                icon: "󰤄"
+                icon: "power-sleep.svg"
                 min: 1
                 max: 360
                 step: 1
@@ -140,12 +140,12 @@ Item {
 
             SettingsModeRow {
                 label: "Suspend Action"
-                icon: "󰒲"
+                icon: "power-sleep-filled.svg"
                 currentValue: Config.powerAcSuspendAction
                 options: [
-                    { value: "suspend", label: "Suspend", icon: "󰤄" },
-                    { value: "hibernate", label: "Hibernate", icon: "󰒲" },
-                    { value: "poweroff", label: "Power Off", icon: "󰐥" }
+                    { value: "suspend", label: "Suspend", icon: "power-sleep.svg" },
+                    { value: "hibernate", label: "Hibernate", icon: "power-sleep-filled.svg" },
+                    { value: "poweroff", label: "Power Off", icon: "power.svg" }
                 ]
                 onModeSelected: value => Config.powerAcSuspendAction = value
             }
@@ -158,7 +158,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Monitor Off"
-                icon: "󰍹"
+                icon: "desktop.svg"
                 min: 1
                 max: 120
                 step: 1
@@ -169,7 +169,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Lock Screen"
-                icon: "󰌾"
+                icon: "lock-closed.svg"
                 min: 1
                 max: 180
                 step: 1
@@ -180,7 +180,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Suspend"
-                icon: "󰤄"
+                icon: "power-sleep.svg"
                 min: 1
                 max: 240
                 step: 1
@@ -191,12 +191,12 @@ Item {
 
             SettingsModeRow {
                 label: "Suspend Action"
-                icon: "󰒲"
+                icon: "power-sleep-filled.svg"
                 currentValue: Config.powerBatSuspendAction
                 options: [
-                    { value: "suspend", label: "Suspend", icon: "󰤄" },
-                    { value: "hibernate", label: "Hibernate", icon: "󰒲" },
-                    { value: "poweroff", label: "Power Off", icon: "󰐥" }
+                    { value: "suspend", label: "Suspend", icon: "power-sleep.svg" },
+                    { value: "hibernate", label: "Hibernate", icon: "power-sleep-filled.svg" },
+                    { value: "poweroff", label: "Power Off", icon: "power.svg" }
                 ]
                 onModeSelected: value => Config.powerBatSuspendAction = value
             }

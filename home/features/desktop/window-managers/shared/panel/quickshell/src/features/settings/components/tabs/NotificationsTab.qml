@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import "../../../../services"
 import ".."
 
@@ -422,6 +423,19 @@ Item {
                     value: Config.notifTtsVolume
                     enabled: Config.notifTtsEnabled
                     onMoved: v => Config.notifTtsVolume = v
+                }
+
+                SettingsActionButton {
+                    label: "Test Voice"
+                    iconName: "󰐊"
+                    enabled: Config.notifTtsEnabled
+                    onClicked: Quickshell.execDetached([
+                        "qs-tts-speak",
+                        "--rate=" + Config.notifTtsRate,
+                        "--volume=" + Config.notifTtsVolume,
+                        "--engine=" + Config.notifTtsEngine,
+                        "This is a test of the notification read-aloud voice."
+                    ])
                 }
 
                 ColumnLayout {
