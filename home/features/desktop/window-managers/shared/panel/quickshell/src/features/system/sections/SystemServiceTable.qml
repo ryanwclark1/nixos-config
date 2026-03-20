@@ -459,7 +459,7 @@ SharedWidgets.CardBase {
                     SharedWidgets.EmptyState {
                         Layout.fillWidth: true
                         visible: root.visibleUnits.length === 0
-                        icon: "󰜺"
+                        icon: "filter.svg"
                         message: root.trimmedSearch === "" ? "No matching services for the current filter." : "No services matched the current search."
                     }
 
@@ -604,7 +604,7 @@ SharedWidgets.CardBase {
                     SharedWidgets.EmptyState {
                         Layout.fillWidth: true
                         visible: !root.selectedUnit
-                        icon: "󰒓"
+                        icon: "settings.svg"
                         message: root.visibleUnits.length === 0 ? "No service selected. Adjust filters or wait for service discovery." : "Select a service to inspect live unit detail."
                     }
 

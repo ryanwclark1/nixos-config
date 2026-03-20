@@ -324,7 +324,7 @@ SharedWidgets.CardBase {
         SharedWidgets.EmptyState {
             Layout.fillWidth: true
             visible: ServiceUnitService.userStatus === "ready" && visibleUserUnits.length === 0
-            icon: "󰜺"
+            icon: "filter.svg"
             message: String(searchQuery || "").trim() === "" ? "No matching user services for this filter." : "No user services match the current search."
         }
 
@@ -340,7 +340,7 @@ SharedWidgets.CardBase {
             SharedWidgets.EmptyState {
                 id: userUnavailable
                 anchors.centerIn: parent
-                icon: "󰅚"
+                icon: "error.svg"
                 message: ServiceUnitService.userMessage || "User services unavailable."
             }
         }
@@ -474,7 +474,7 @@ SharedWidgets.CardBase {
         SharedWidgets.EmptyState {
             Layout.fillWidth: true
             visible: root.showSystemUnits && root.systemAvailable && visibleSystemUnits.length === 0
-            icon: "󰜺"
+            icon: "filter.svg"
             message: String(searchQuery || "").trim() === "" ? "No system units matched the current filter." : "No system units match the current search."
         }
 
@@ -490,7 +490,7 @@ SharedWidgets.CardBase {
             SharedWidgets.EmptyState {
                 id: systemUnavailable
                 anchors.centerIn: parent
-                icon: "󰅚"
+                icon: "error.svg"
                 message: ServiceUnitService.systemMessage || "System services unavailable."
             }
         }

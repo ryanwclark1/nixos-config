@@ -68,7 +68,7 @@ Rectangle {
         SharedWidgets.EmptyState {
             Layout.fillWidth: true
             visible: !root.selectedProcess
-            icon: "󰍉"
+            icon: "search-visual.svg"
             message: "Select a process to inspect live detail."
         }
 

@@ -625,7 +625,7 @@ SharedWidgets.CardBase {
                     SharedWidgets.EmptyState {
                         Layout.fillWidth: true
                         visible: !ProcessService.busy && root.visibleProcesses.length === 0
-                        icon: "󰍉"
+                        icon: "search-visual.svg"
                         message: root.trimmedSearch === "" ? "No processes matched the current filter." : "No processes matched the current search."
                     }
 
