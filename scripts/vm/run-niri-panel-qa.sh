@@ -477,6 +477,30 @@ copy_artifacts_home() {
   vm_scp -r "administrator@127.0.0.1:${vm_output_dir}/." "${output_dir}/"
 }
 
+assert_expected_artifacts() {
+  local missing=0
+  local required=""
+
+  case "${capture_mode}" in
+    gate)
+      for required in runtime.log settings-qa.log gate-status.env; do
+        if [[ ! -f "${output_dir}/${required}" ]]; then
+          echo "[ERROR] Missing expected gate artifact: ${output_dir}/${required}" >&2
+          missing=1
+        fi
+      done
+      ;;
+    settings-qa)
+      if [[ ! -f "${output_dir}/settings-qa.log" ]]; then
+        echo "[ERROR] Missing expected settings QA log: ${output_dir}/settings-qa.log" >&2
+        missing=1
+      fi
+      ;;
+  esac
+
+  return "${missing}"
+}
+
 assert_headless_skip_markers() {
   local settings_log="${output_dir}/settings-qa.log"
 
@@ -520,10 +544,8 @@ write_summary() {
   local summary_ssh_port=""
 
   if [[ -f "${output_dir}/gate-status.env" ]]; then
-    # shellcheck disable=SC1090
-    source "${output_dir}/gate-status.env"
-    runtime_exit_value="${runtime_exit:-}"
-    settings_exit_value="${settings_exit:-}"
+    runtime_exit_value="$(grep '^runtime_exit=' "${output_dir}/gate-status.env" | cut -d= -f2- || true)"
+    settings_exit_value="$(grep '^settings_exit=' "${output_dir}/gate-status.env" | cut -d= -f2- || true)"
     case "${runtime_exit_value}" in
       0) runtime_status="pass" ;;
       *) runtime_status="fail" ;;
@@ -605,8 +627,18 @@ set +e
 run_remote_capture "${remote_repo}"
 remote_exit=$?
 set -e
-copy_artifacts_home || true
+if ! copy_artifacts_home; then
+  echo "[ERROR] Failed to copy VM artifacts from ${vm_output_dir}" >&2
+  if (( remote_exit == 0 )); then
+    remote_exit=1
+  fi
+fi
 cp "${launcher_log}" "${output_dir}/launcher.log"
+if ! assert_expected_artifacts; then
+  if (( remote_exit == 0 )); then
+    remote_exit=1
+  fi
+fi
 if ! assert_headless_skip_markers; then
   if (( remote_exit == 0 )); then
     remote_exit=1

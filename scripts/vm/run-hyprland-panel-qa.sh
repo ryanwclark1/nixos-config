@@ -545,7 +545,31 @@ copy_artifacts_home() {
   echo "[INFO] Copying artifacts back to host: ${output_dir}"
   rm -rf "${output_dir}"
   mkdir -p "${output_dir}"
-  "${scp_base[@]}" -r "administrator@127.0.0.1:${vm_output_dir}/." "${output_dir}/"
+  "${ssh_base[@]}" "test -d '${vm_output_dir}' && tar -C '${vm_output_dir}' -cf - ." | tar -xf - -C "${output_dir}"
+}
+
+assert_expected_artifacts() {
+  local missing=0
+  local required=""
+
+  case "${capture_mode}" in
+    gate)
+      for required in runtime.log settings-qa.log gate-status.env; do
+        if [[ ! -f "${output_dir}/${required}" ]]; then
+          echo "[ERROR] Missing expected gate artifact: ${output_dir}/${required}" >&2
+          missing=1
+        fi
+      done
+      ;;
+    settings-qa)
+      if [[ ! -f "${output_dir}/settings-qa.log" ]]; then
+        echo "[ERROR] Missing expected settings QA log: ${output_dir}/settings-qa.log" >&2
+        missing=1
+      fi
+      ;;
+  esac
+
+  return "${missing}"
 }
 
 write_summary() {
@@ -630,8 +654,18 @@ set +e
 run_remote_capture "${remote_repo}"
 remote_exit=$?
 set -e
-copy_artifacts_home || true
+if ! copy_artifacts_home; then
+  echo "[ERROR] Failed to copy VM artifacts from ${vm_output_dir}" >&2
+  if (( remote_exit == 0 )); then
+    remote_exit=1
+  fi
+fi
 cp "${launcher_log}" "${output_dir}/launcher.log"
+if ! assert_expected_artifacts; then
+  if (( remote_exit == 0 )); then
+    remote_exit=1
+  fi
+fi
 write_summary "${remote_exit}"
 
 echo "[INFO] Host review artifacts saved to ${output_dir}"
