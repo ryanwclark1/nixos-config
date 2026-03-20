@@ -617,7 +617,7 @@ coproc VM_LAUNCHER {
 launcher_pid="${VM_LAUNCHER_PID}"
 
 wait_for_ssh
-install_host_pubkey
+install_host_pubkey || true
 wait_for_hyprland
 
 run_id="$(date +%Y%m%d-%H%M%S)-$$"
