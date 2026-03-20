@@ -110,12 +110,47 @@ QtObject {
     // ── Command & Script Execution ──────────────
     property var pendingCommand: null // { label: string, cmd: [] }
     property var pendingScript: null  // { name: string, content: string }
-    
+    property bool isCommandRunning: false
+    readonly property int _toolOutputMaxChars: 4096
+
     function executePendingCommand() {
-        if (!pendingCommand) return;
-        Quickshell.execDetached(pendingCommand.cmd);
-        _addSystemMessage("Executed: `" + pendingCommand.cmd.join(" ") + "`");
+        if (!pendingCommand || isCommandRunning) return;
+        var cmd = pendingCommand.cmd;
+        var label = pendingCommand.label;
         pendingCommand = null;
+        isCommandRunning = true;
+
+        // Run with output capture so we can feed results back to the AI
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process { property string _out: ""; property string _err: ""; ' +
+            'stdout: SplitParser { onRead: line => parent._out += line + "\\n" } ' +
+            'stderr: SplitParser { onRead: line => parent._err += line + "\\n" } }',
+            root
+        );
+        proc.command = cmd;
+        proc.onExited.connect(function(exitCode) {
+            root.isCommandRunning = false;
+            var stdout = (proc._out || "").trim();
+            var stderr = (proc._err || "").trim();
+            var output = stdout || stderr || "(no output)";
+            // Truncate very long output
+            if (output.length > root._toolOutputMaxChars)
+                output = output.substring(0, root._toolOutputMaxChars) + "\n...(truncated)";
+
+            var msg = "**Executed:** `" + cmd.join(" ") + "`\n**Exit code:** " + exitCode;
+            if (output !== "(no output)")
+                msg += "\n```\n" + output + "\n```";
+            root._addSystemMessage(msg);
+
+            // Auto-reply: feed the tool result back to the AI for follow-up reasoning
+            if (Config.aiToolCallAutoReply && !root.isStreaming) {
+                var followUp = "The command `" + label + "` exited with code " + exitCode + ".\n\nOutput:\n```\n" + output + "\n```\n\nPlease analyze the output and suggest next steps if needed.";
+                root.sendMessage(followUp);
+            }
+
+            proc.destroy();
+        });
+        proc.running = true;
     }
 
     function cancelPendingCommand() {
