@@ -24,6 +24,7 @@ DockContent 1.0 ../features/dock/components/DockContent.qml
 DockMenu 1.0 ../features/dock/components/DockMenu.qml
 DragManager 1.0 ../shared/DragManager.qml
 DraggableDesktopWidget 1.0 ../features/desktop/components/DraggableDesktopWidget.qml
+ElasticNumber 1.0 ../shared/ElasticNumber.qml
 ElevationShadow 1.0 ../shared/ElevationShadow.qml
 EmptyState 1.0 ../shared/EmptyState.qml
 FadeLoader 1.0 ../shared/FadeLoader.qml

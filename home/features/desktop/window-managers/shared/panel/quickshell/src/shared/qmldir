@@ -9,6 +9,7 @@ ClickRipple 1.0 ClickRipple.qml
 CollapsibleSection 1.0 CollapsibleSection.qml
 ContextMenu 1.0 ContextMenu.qml
 DragManager 1.0 DragManager.qml
+ElasticNumber 1.0 ElasticNumber.qml
 ElevationShadow 1.0 ElevationShadow.qml
 EmptyState 1.0 EmptyState.qml
 FadeLoader 1.0 FadeLoader.qml
