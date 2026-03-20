@@ -113,7 +113,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             text: FBH.fileIcon(modelData)
-            color: "white"; font.pixelSize: 24; font.family: Colors.fontMono
+            color: "white"; font.pixelSize: Colors.iconSizeSmall; font.family: Colors.fontMono
         }
     }
 }

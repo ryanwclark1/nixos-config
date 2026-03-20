@@ -127,7 +127,7 @@ PanelWindow {
     }
   }
 
-  ElasticNumber {
+  SharedWidgets.ElasticNumber {
     id: _cpElasticScale
     target: root.isOpen ? 1.0 : 0.94
     fastDuration: Colors.durationSnap

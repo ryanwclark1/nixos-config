@@ -218,7 +218,7 @@ PanelWindow {
     }
   }
 
-  ElasticNumber {
+  SharedWidgets.ElasticNumber {
     id: _fbElasticScale
     target: root.isOpen ? 1.0 : 0.95
     fastDuration: Colors.durationSnap

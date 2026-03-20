@@ -286,7 +286,7 @@ PanelWindow {
               spacing: Colors.spacingM
 
               MouseArea {
-                Layout.preferredWidth: 24; Layout.preferredHeight: 24
+                Layout.preferredWidth: Colors.iconSizeSmall; Layout.preferredHeight: Colors.iconSizeSmall
                 hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                 Text {
                   anchors.centerIn: parent; text: isCollapsed ? "󰅂" : "󰅀"; color: Colors.primary

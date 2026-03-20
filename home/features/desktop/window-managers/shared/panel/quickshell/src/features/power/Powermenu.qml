@@ -143,7 +143,7 @@ PanelWindow {
       }
     }
 
-    ElasticNumber {
+    SharedWidgets.ElasticNumber {
       id: _pmElasticScale
       target: root.isVisible ? 1.0 : 0.92
       fastDuration: Colors.durationFast
@@ -243,7 +243,7 @@ PanelWindow {
               anchors.centerIn: parent
               spacing: Colors.spacingM
               Item {
-                width: 48; height: 48
+                width: Colors.iconSizeLarge; height: Colors.iconSizeLarge
                 Layout.alignment: Qt.AlignHCenter
                 Text {
                   anchors.centerIn: parent

@@ -394,7 +394,7 @@ PanelWindow {
     }
   }
 
-  ElasticNumber {
+  SharedWidgets.ElasticNumber {
     id: _dcElasticScale
     target: displayRoot.isOpen ? 1.0 : 0.95
     fastDuration: Colors.durationSnap

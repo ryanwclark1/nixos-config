@@ -205,7 +205,7 @@ PanelWindow {
                                         text: "\u{F0552}"
                                         color: Colors.primary
                                         font.family: Colors.fontMono
-                                        font.pixelSize: 32
+                                        font.pixelSize: Colors.iconSizeMedium
                                         Layout.alignment: Qt.AlignHCenter
                                     }
 

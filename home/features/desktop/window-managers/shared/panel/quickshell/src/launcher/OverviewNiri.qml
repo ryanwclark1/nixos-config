@@ -335,12 +335,12 @@ ColumnLayout {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 iconName: modelData.app_id || ""
                                                 appName: modelData.title || modelData.app_id || ""
-                                                iconSize: 32
+                                                iconSize: Colors.iconSizeMedium
                                             }
 
                                             Column {
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                width: parent.width - 32 - Colors.spacingM * 2 - closeBtn.width
+                                                width: parent.width - Colors.iconSizeMedium - Colors.spacingM * 2 - closeBtn.width
                                                 spacing: Colors.spacingXXS
 
                                                 Text {

@@ -109,7 +109,7 @@ PanelWindow {
             }
         }
 
-        ElasticNumber {
+        SharedWidgets.ElasticNumber {
             id: _polkitElasticScale
             target: root.isVisible ? 1.0 : 0.92
             fastDuration: Colors.durationFast

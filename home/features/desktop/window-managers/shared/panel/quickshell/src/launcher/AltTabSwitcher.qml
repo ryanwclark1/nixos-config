@@ -84,7 +84,7 @@ Scope {
     }
 
     function show() {
-        console.log("[AltTab] show() called, windowList.length=" + windowList.length + ", mruIds=" + JSON.stringify(CompositorAdapter.mruWindowIds));
+        Logger.d("AltTab", "show() called, windowList.length=" + windowList.length + ", mruIds=" + JSON.stringify(CompositorAdapter.mruWindowIds));
         if (windowList.length < 2)
             return;
         _cachedWindowList = windowList.slice();
