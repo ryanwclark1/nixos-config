@@ -331,12 +331,22 @@ Item {
                         border.color: Colors.primaryRing
                         border.width: 1
 
-                        Text {
+                        Loader {
                             anchors.centerIn: parent
-                            text: root.launcherHeroMeta.icon
-                            color: Colors.primary
-                            font.family: Colors.fontMono
-                            font.pixelSize: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL
+                            sourceComponent: root.launcherHeroMeta.icon.endsWith(".svg") ? _launcherSvgIcon : _launcherNerdIcon
+                        }
+                        Component {
+                            id: _launcherSvgIcon
+                            SharedWidgets.SvgIcon { source: root.launcherHeroMeta.icon; color: Colors.primary; size: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL }
+                        }
+                        Component {
+                            id: _launcherNerdIcon
+                            Text {
+                                text: root.launcherHeroMeta.icon
+                                color: Colors.primary
+                                font.family: Colors.fontMono
+                                font.pixelSize: root.compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL
+                            }
                         }
                     }
 

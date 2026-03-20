@@ -51,7 +51,7 @@ Item {
                             value: root._clockPositionSummary
                         },
                         {
-                            icon: "󰄛",
+                            icon: "people.svg",
                             label: "Personality GIF",
                             value: root._gifSummary
                         }
@@ -185,7 +185,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Enable GIF"
-                    icon: "󰄛"
+                    icon: "people.svg"
                     configKey: "personalityGifEnabled"
                 }
 

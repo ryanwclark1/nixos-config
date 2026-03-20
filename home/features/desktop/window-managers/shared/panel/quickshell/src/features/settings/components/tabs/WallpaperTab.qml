@@ -350,7 +350,7 @@ Item {
 
             SettingsSelectRow {
                 label: "Monitor"
-                icon: "󰍹"
+                icon: "desktop.svg"
                 description: "Use a single target selector when you have multiple displays configured."
                 currentValue: root.wallpaperSelectedMonitor
                 options: [{ value: "__all__", label: "All Monitors" }].concat(root.wallpaperMonitorNames.map(function (monitorName) {
@@ -425,10 +425,10 @@ Item {
 
             Repeater {
                 model: [
-                    { icon: "󰒭", label: "Next", action: "next" },
-                    { icon: "󰒝", label: "Random", action: "random" },
-                    { icon: "󰝤", label: "Solid", action: "solid" },
-                    { icon: "󰉋", label: "Browse...", action: "browse" }
+                    { icon: "next.svg", label: "Next", action: "next" },
+                    { icon: "shuffle.svg", label: "Random", action: "random" },
+                    { icon: "color-palette.svg", label: "Solid", action: "solid" },
+                    { icon: "folder.svg", label: "Browse...", action: "browse" }
                 ]
 
                 delegate: SettingsActionButton {
@@ -605,7 +605,7 @@ Item {
         SettingsFieldGrid {
             SettingsToggleRow {
                 label: "Use solid color on startup"
-                icon: "󰝤"
+                icon: "color-palette.svg"
                 configKey: "wallpaperUseSolidOnStartup"
             }
 
@@ -618,7 +618,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Shell-rendered wallpaper"
-                icon: "󰸉"
+                icon: "image.svg"
                 configKey: "wallpaperUseShellRenderer"
             }
 
@@ -643,7 +643,7 @@ Item {
             SettingsSliderRow {
                 visible: Config.wallpaperUseShellRenderer && Config.wallpaperTransitionType !== "none"
                 label: "Transition duration"
-                icon: "󱎫"
+                icon: "timer.svg"
                 value: Config.wallpaperTransitionDuration
                 min: 300
                 max: 4000
@@ -654,7 +654,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Dynamic wallpaper"
-                icon: "󱎫"
+                icon: "timer.svg"
                 configKey: "wallpaperDynamicEnabled"
             }
         }
