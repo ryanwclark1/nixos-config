@@ -16,5 +16,6 @@ var maps = [
     ["maxConversations", "aiMaxConversations"],
     ["maxMessages", "aiMaxMessages"],
     ["providerProfiles", "aiProviderProfiles"],
-    ["timeout", "aiTimeout"]
+    ["timeout", "aiTimeout"],
+    ["toolCallAutoReply", "aiToolCallAutoReply"]
 ]

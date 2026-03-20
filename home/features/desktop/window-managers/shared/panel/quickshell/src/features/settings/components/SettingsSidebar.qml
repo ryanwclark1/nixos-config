@@ -193,7 +193,7 @@ Rectangle {
                     visible: searchInput.text.length > 0
                     implicitWidth: 18
                     implicitHeight: 18
-                    radius: 9
+                    radius: height / 2
                     color: Colors.withAlpha(Colors.text, clearSearchMouse.containsMouse ? 0.15 : 0.08)
 
                     SvgIcon {
