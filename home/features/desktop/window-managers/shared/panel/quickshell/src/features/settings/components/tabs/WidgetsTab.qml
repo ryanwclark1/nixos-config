@@ -116,7 +116,7 @@ Item {
                 SettingsActionButton {
                     Layout.fillWidth: true
                     emphasized: true
-                    iconName: "󰏫"
+                    iconName: "edit.svg"
                     label: "Edit Widgets"
                     onClicked: {
                         DesktopWidgetRegistry.editMode = true;

@@ -137,7 +137,7 @@ Item {
 
             SettingsCard {
                 title: "Pinned Output Devices"
-                iconName: "󰓃"
+                iconName: "mic.svg"
                 description: "Pinned devices appear at the top of the output device list."
 
                 Flow {
@@ -175,7 +175,7 @@ Item {
 
             SettingsCard {
                 title: "Pinned Input Devices"
-                iconName: "󰍬"
+                iconName: "mic-off.svg"
                 description: "Pinned devices appear at the top of the input device list."
 
                 Flow {
@@ -218,7 +218,7 @@ Item {
 
             SettingsCard {
                 title: "Hidden Output Devices"
-                iconName: "󰝞"
+                iconName: "headphones.svg"
                 description: "Hidden devices won't appear in the audio menu."
 
                 Flow {
@@ -256,7 +256,7 @@ Item {
 
             SettingsCard {
                 title: "Hidden Input Devices"
-                iconName: "󰍭"
+                iconName: "mic-off-filled.svg"
                 description: "Hidden devices won't appear in the audio menu."
 
                 Flow {

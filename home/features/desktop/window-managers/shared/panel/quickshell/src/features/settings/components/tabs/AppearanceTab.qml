@@ -14,7 +14,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Style & Motion"
-        iconName: "󰏘"
+        iconName: "color-palette.svg"
 
         SettingsCard {
             title: "Glass Surface"
@@ -51,16 +51,6 @@ Item {
                 onMoved: v => Config.glassOpacityOverlay = v
             }
 
-            SettingsModeRow {
-                label: "Blur"
-                currentValue: Config.blurEnabled ? "enabled" : "disabled"
-                options: [
-                    { value: "enabled", label: "Enabled" },
-                    { value: "disabled", label: "Disabled" }
-                ]
-                onModeSelected: value => Config.blurEnabled = value === "enabled"
-            }
-
             SettingsToggleRow {
                 label: "Auto Transparency"
                 icon: "color-palette.svg"
@@ -72,7 +62,7 @@ Item {
 
         SettingsCard {
             title: "Theme Mode"
-            iconName: "󰏘"
+            iconName: "color-palette.svg"
             description: "Choose how shell colors are derived from your wallpaper."
 
             SettingsModeRow {
@@ -91,19 +81,82 @@ Item {
                 icon: "image.svg"
                 configKey: "useDynamicTheming"
             }
+
+            SettingsToggleRow {
+                label: "OLED Mode"
+                description: "Forces pure black backgrounds for OLED power savings."
+                icon: "desktop-monitor.svg"
+                configKey: "oledMode"
+            }
         }
 
         SettingsCard {
-            title: "Power Management"
-            iconName: "󰂄"
-            description: "Control how the shell behaves when running on battery."
+            title: "Screen Decorations"
+            iconName: "󰹑"
+            description: "Rounded corners and border frame overlays for your displays."
+
+            SettingsToggleRow {
+                label: "Screen Corners"
+                description: "Draws rounded corner overlays at each screen edge."
+                icon: "border-all.svg"
+                configKey: "showScreenCorners"
+            }
+
+            SettingsSliderRow {
+                label: "Corner Radius"
+                description: "Size of the rounded screen corners."
+                min: 4
+                max: 36
+                value: Config.screenCornerRadius
+                step: 2
+                onMoved: v => Config.screenCornerRadius = Math.round(v)
+                visible: Config.showScreenCorners
+            }
+
+            SettingsToggleRow {
+                label: "Screen Borders"
+                description: "Draws a thin frame around each display."
+                icon: "border-outside.svg"
+                configKey: "showScreenBorders"
+            }
+        }
+
+        SettingsCard {
+            title: "Performance"
+            iconName: "󰓅"
+            description: "Disable GPU-intensive features for lower-end hardware or battery savings."
 
             SettingsToggleRow {
                 label: "Automatic Eco Mode"
-                description: "Optimizes animations and disables shaders on battery."
+                description: "Reduces animations and disables shaders on battery."
                 icon: "leaf-two.svg"
                 configKey: "autoEcoMode"
             }
+
+            SettingsModeRow {
+                label: "Blur"
+                currentValue: Config.blurEnabled ? "enabled" : "disabled"
+                options: [
+                    { value: "enabled", label: "Enabled" },
+                    { value: "disabled", label: "Disabled" }
+                ]
+                onModeSelected: value => Config.blurEnabled = value === "enabled"
+            }
+
+            SettingsToggleRow {
+                label: "Weather Overlay Shaders"
+                description: "Animated rain, snow, and fog effects over the wallpaper."
+                icon: "weather-rain.svg"
+                configKey: "weatherOverlayEnabled"
+            }
+
+            SettingsToggleRow {
+                label: "Background Visualizer"
+                description: "Audio-reactive wallpaper visualizer."
+                icon: "music-note-2.svg"
+                configKey: "backgroundVisualizerEnabled"
+            }
+
         }
 
         SettingsCard {

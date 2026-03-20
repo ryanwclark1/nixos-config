@@ -232,7 +232,7 @@ Item {
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰏫"
+                                    iconName: "edit.svg"
                                     label: "Select"
                                     emphasized: Config.selectedBarId === modelData.id
                                     onClicked: Config.setSelectedBar(modelData.id)
@@ -255,7 +255,7 @@ Item {
                     SettingsActionButton {
                         Layout.fillWidth: true
                         emphasized: true
-                        iconName: "󰐕"
+                        iconName: "add.svg"
                         label: "Add Bar"
                         enabled: Config.barConfigs.length < Config.maxBars
                         onClicked: {

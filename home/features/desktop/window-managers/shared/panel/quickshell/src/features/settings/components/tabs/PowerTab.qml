@@ -13,11 +13,11 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Power & Sleep"
-        iconName: "󰌪"
+        iconName: "power.svg"
 
         SettingsCard {
             title: "Power Menu"
-            iconName: "󰌪"
+            iconName: "power.svg"
             description: "Configure countdown timing for destructive power actions."
 
             SettingsSliderRow {

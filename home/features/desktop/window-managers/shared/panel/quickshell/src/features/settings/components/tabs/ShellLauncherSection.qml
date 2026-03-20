@@ -493,7 +493,7 @@ Item {
             visible: root.isLauncherGeneralSection
             Layout.fillWidth: true
             title: "Home Layout"
-            iconName: "󰆍"
+            iconName: "terminal.svg"
             description: "Control what the launcher home view shows before a search is entered."
 
             SettingsFieldGrid {
@@ -1048,7 +1048,7 @@ Item {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Colors.spacingXXS
 
                         Text {
                             text: customEngineRow.modelData.name + " (" + customEngineRow.modelData.key + ")"
@@ -1068,7 +1068,7 @@ Item {
 
                     SettingsActionButton {
                         compact: true
-                        iconName: "󰆴"
+                        iconName: "delete.svg"
                         onClicked: {
                             var engines = Config.launcherWebCustomEngines.slice();
                             engines.splice(customEngineRow.index, 1);
@@ -1124,7 +1124,7 @@ Item {
             SettingsActionButton {
                 Layout.fillWidth: true
                 label: "Add Custom Engine"
-                iconName: "󰐕"
+                iconName: "add.svg"
                 enabled: root.newEngineKey.trim() !== "" && root.newEngineName.trim() !== "" && root.newEngineUrl.trim() !== ""
                 onClicked: {
                     var engines = Array.isArray(Config.launcherWebCustomEngines) ? Config.launcherWebCustomEngines.slice() : [];
@@ -1174,7 +1174,7 @@ Item {
                 SettingsActionButton {
                     Layout.fillWidth: true
                     label: "Sync Bang Database"
-                    iconName: "󰑓"
+                    iconName: "arrow-counterclockwise.svg"
                     enabled: Config.launcherWebBangsEnabled
                     onClicked: {
                         Quickshell.execDetached(["qs-bang-sync"]);
@@ -1422,7 +1422,7 @@ Item {
                     width: root.compactMode ? implicitWidth : 0
                     Layout.fillWidth: !root.compactMode
                     label: "Re-detect Files Backend"
-                    iconName: "󰑓"
+                    iconName: "arrow-counterclockwise.svg"
                     compact: true
                     onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "redetectFilesBackend"])
                 }

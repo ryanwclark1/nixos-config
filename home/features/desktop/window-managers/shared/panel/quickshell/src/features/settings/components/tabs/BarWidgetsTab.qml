@@ -650,7 +650,7 @@ Item {
                 SettingsActionButton {
                     Layout.fillWidth: true
                     emphasized: true
-                    iconName: "󰐕"
+                    iconName: "add.svg"
                     label: "Add Widget"
                     onClicked: root.openWidgetPicker(sectionKey)
                 }

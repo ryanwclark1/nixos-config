@@ -178,7 +178,7 @@ Item {
         // Actions
         SettingsCard {
             title: "Actions"
-            iconName: "󰜉"
+            iconName: "settings-cog-multiple.svg"
             description: "Health management and recovery actions."
 
             SettingsActionButton {

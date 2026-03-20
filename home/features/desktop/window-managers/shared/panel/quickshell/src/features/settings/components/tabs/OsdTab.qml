@@ -166,7 +166,7 @@ Item {
 
             SettingsCard {
                 title: "Style"
-                iconName: "󰏘"
+                iconName: "color-palette.svg"
                 description: "Shape and behavior for OSD presentation."
 
                 SettingsModeRow {

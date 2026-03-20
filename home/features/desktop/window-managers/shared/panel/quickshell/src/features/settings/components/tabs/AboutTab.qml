@@ -164,13 +164,13 @@ Item {
 
             SettingsCard {
                 title: "Actions"
-                iconName: "󰜉"
+                iconName: "settings-cog-multiple.svg"
                 description: "Restart QuickShell when visual or runtime state drifts."
 
                 SettingsActionButton {
                     Layout.fillWidth: true
                     label: "Restart Shell"
-                    iconName: "󰜉"
+                    iconName: "settings-cog-multiple.svg"
                     emphasized: true
                     onClicked: {
                         if (root.settingsRoot)

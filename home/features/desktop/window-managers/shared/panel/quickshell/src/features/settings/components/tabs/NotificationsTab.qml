@@ -216,7 +216,7 @@ Item {
 
             SettingsCard {
                 title: "Popup Appearance"
-                iconName: "󰏘"
+                iconName: "color-palette.svg"
                 description: "Visual style and layout of notification popups."
 
                 SettingsSliderRow {
@@ -485,7 +485,7 @@ Item {
 
                         SettingsActionButton {
                             label: "Add"
-                            iconName: "󰐕"
+                            iconName: "add.svg"
                             compact: true
                             emphasized: root._newTtsExcludedApp.trim() !== ""
                             enabled: root._newTtsExcludedApp.trim() !== ""
@@ -502,7 +502,7 @@ Item {
 
             SettingsCard {
                 title: "Rules"
-                iconName: "󰑓"
+                iconName: "arrow-counterclockwise.svg"
                 description: "Per-application overrides for notification handling."
 
                 ColumnLayout {
@@ -661,7 +661,7 @@ Item {
 
                     SettingsActionButton {
                         label: "Add Rule"
-                        iconName: "󰐕"
+                        iconName: "add.svg"
                         emphasized: root._newRuleAppName.trim() !== ""
                         enabled: root._newRuleAppName.trim() !== ""
                         onClicked: root._addRule()

@@ -165,7 +165,7 @@ Rectangle {
                             SettingsActionButton {
                                 compact: true
                                 emphasized: true
-                                iconName: "󰐕"
+                                iconName: "add.svg"
                                 label: "Add"
                                 onClicked: root.widgetAdded(modelData.widgetType)
                             }

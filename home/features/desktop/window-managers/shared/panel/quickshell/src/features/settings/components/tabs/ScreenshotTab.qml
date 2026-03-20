@@ -106,7 +106,7 @@ Item {
 
             SettingsCard {
                 title: "Editor"
-                iconName: "󰏫"
+                iconName: "edit.svg"
                 description: "Open the screenshot in an annotation editor after capture."
 
                 SettingsToggleRow {

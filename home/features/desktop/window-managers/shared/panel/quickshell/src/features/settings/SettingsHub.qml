@@ -240,6 +240,14 @@ PanelWindow {
     }
   }
 
+  ElasticNumber {
+    id: _shElasticScale
+    target: settingsRoot.isOpen ? 1.0 : 0.95
+    fastDuration: Colors.durationSnap
+    slowDuration: Colors.durationSlow
+    fastWeight: 0.45
+  }
+
   // Main settings box
   Rectangle {
     id: mainBox
@@ -274,10 +282,9 @@ PanelWindow {
     Keys.onEscapePressed: settingsRoot.isOpen = false
 
     opacity: settingsRoot.isOpen ? 1.0 : 0.0
-    scale: settingsRoot.isOpen ? 1.0 : 0.95
+    scale: _shElasticScale.value
     Behavior on opacity { NumberAnimation { id: shFadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-    Behavior on scale { NumberAnimation { id: shScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutBack } }
-    layer.enabled: (shFadeAnim.running || shScaleAnim.running) && settingsRoot.allowLayer(width, height)
+    layer.enabled: (shFadeAnim.running || _shElasticScale.running) && settingsRoot.allowLayer(width, height)
 
     // Prevent clicks from closing through the box
     MouseArea { anchors.fill: parent }

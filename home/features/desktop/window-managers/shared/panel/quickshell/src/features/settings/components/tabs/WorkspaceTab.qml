@@ -166,7 +166,7 @@ Item {
         }
         SettingsCard {
             description: "Custom colors for workspace pills. Leave empty to use theme defaults."
-            iconName: "󰏘"
+            iconName: "color-palette.svg"
             title: "Colors"
 
             SettingsColorRow {

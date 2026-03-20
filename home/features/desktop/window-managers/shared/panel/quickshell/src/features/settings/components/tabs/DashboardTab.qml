@@ -109,7 +109,7 @@ Item {
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 2
+                            spacing: Colors.spacingXXS
 
                             Text {
                                 text: MediaService.trackTitle || "Not Playing"
