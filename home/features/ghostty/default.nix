@@ -51,6 +51,10 @@
       # Slow down mouse scrolling for finer control
       mouse-scroll-multiplier = 0.95;
 
+      # Dynamic color integration with quickshell ColorExportService
+      # Silently skipped if file doesn't exist yet (? prefix)
+      config-file = "?~/.local/state/quickshell/ghostty-colors";
+
       # Keybindings
       keybind = [
         "ctrl+shift+c=copy_to_clipboard"
