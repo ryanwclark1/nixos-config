@@ -378,7 +378,7 @@ fi
 
 mkdir -p "${VM_OUTPUT_DIR}"
 populate_repo_shell_env
-env "${repo_shell_env[@]}" quickshell -p "${REMOTE_PANEL_ROOT}/config/shell.qml" >/tmp/quickshell-repo-launcher-qa.log 2>&1 &
+  env "${repo_shell_env[@]}" quickshell -p "${REMOTE_PANEL_ROOT}/src/shell.qml" >/tmp/quickshell-repo-launcher-qa.log 2>&1 &
 repo_shell_pid="$!"
 
 ready=0
@@ -426,7 +426,7 @@ do
   bash "${REMOTE_PANEL_ROOT}/scripts/capture-launcher-viewport.sh" "${args[@]}"
 done
 EOF
-      return 0
+      return $?
       ;;
     *)
       printf 'Unknown mode: %s\n' "${capture_mode}" >&2

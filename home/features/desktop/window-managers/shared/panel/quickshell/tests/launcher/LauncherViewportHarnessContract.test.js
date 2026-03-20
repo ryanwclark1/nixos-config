@@ -19,7 +19,7 @@ describe("launcher viewport harness contract", () => {
   it("uses the numeric capture workspace flow shared by the passing QA harnesses", () => {
     const source = readFileSync(launcherViewportScriptPath, "utf8");
 
-    expect(source).toContain('for candidate in $(seq 9101 9199); do');
+    expect(source).toContain('for candidate in $(seq 9001 9099); do');
     expect(source).toContain('hypr dispatch workspace "${target}" >/dev/null');
     expect(source).not.toContain('hypr dispatch workspace "name:${target}" >/dev/null');
     expect(source).not.toContain('candidate="qs-launcher-capture-');
