@@ -23,11 +23,10 @@ SharedWidgets.BarPill {
             action: () => NightLightService.toggle()
         }
     ]
-    Text {
+    SharedWidgets.SvgIcon {
         anchors.centerIn: parent
         color: Colors.warning
-        font.pixelSize: Appearance.fontSizeLarge
-        font.family: Appearance.fontMono
-        text: "󰌵"
+        size: Appearance.fontSizeLarge
+        source: "weather-moon.svg"
     }
 }

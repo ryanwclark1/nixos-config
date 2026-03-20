@@ -38,11 +38,25 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingXS
 
-        Text {
-            color: Colors.text
-            font.pixelSize: root.iconSize
-            font.family: Appearance.fontMono
-            text: root.iconText
+        Loader {
+            sourceComponent: (root.iconText || "").endsWith(".svg") ? _bspSvg : _bspNerd
+        }
+        Component {
+            id: _bspSvg
+            SharedWidgets.SvgIcon {
+                source: root.iconText
+                color: Colors.text
+                size: root.iconSize
+            }
+        }
+        Component {
+            id: _bspNerd
+            Text {
+                text: root.iconText
+                color: Colors.text
+                font.pixelSize: root.iconSize
+                font.family: Appearance.fontMono
+            }
         }
 
         Text {

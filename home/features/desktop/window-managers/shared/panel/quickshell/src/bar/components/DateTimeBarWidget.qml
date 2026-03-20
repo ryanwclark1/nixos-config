@@ -45,12 +45,11 @@ Item {
         ]
         onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
-        Text {
+        SharedWidgets.SvgIcon {
             visible: root.iconOnly
-            text: "󰥔"
+            source: "clock.svg"
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeLarge
-            font.family: Appearance.fontMono
+            size: Appearance.fontSizeLarge
         }
 
         Row {

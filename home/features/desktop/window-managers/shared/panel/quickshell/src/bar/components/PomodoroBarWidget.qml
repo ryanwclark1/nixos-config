@@ -35,11 +35,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingXS
 
-        Text {
+        SharedWidgets.SvgIcon {
             color: PomodoroService.isBreak ? Colors.success : Colors.primary
-            font.pixelSize: Appearance.fontSizeLarge
-            font.family: Appearance.fontMono
-            text: PomodoroService.running ? "󱎫" : "󰔟"
+            size: Appearance.fontSizeLarge
+            source: PomodoroService.running ? "timer.svg" : "timer-off.svg"
             anchors.verticalCenter: parent.verticalCenter
         }
 

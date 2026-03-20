@@ -31,11 +31,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingS
 
-        Text {
-            text: "󱓗"
+        SharedWidgets.SvgIcon {
+            source: "data-trending.svg"
             color: Colors.accent
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 

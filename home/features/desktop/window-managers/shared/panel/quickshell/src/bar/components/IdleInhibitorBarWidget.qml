@@ -42,11 +42,10 @@ Item {
             Quickshell.execDetached(DependencyService.resolveCommand("qs-inhibitor"));
         }
 
-        Text {
-            text: "󰒲"
+        SharedWidgets.SvgIcon {
+            source: "power-sleep.svg"
             color: root.inhibitorActive ? Colors.primary : Colors.text
-            font.pixelSize: Appearance.fontSizeXL
-            font.family: Appearance.fontMono
+            size: Appearance.fontSizeXL
         }
 
     }

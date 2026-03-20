@@ -23,11 +23,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingXS
 
-        Text {
+        SharedWidgets.SvgIcon {
             color: TodoService.pendingCount > 0 ? Colors.primary : Colors.success
-            font.pixelSize: Appearance.fontSizeLarge
-            font.family: Appearance.fontMono
-            text: TodoService.pendingCount > 0 ? "󰄱" : "󰄵"
+            size: Appearance.fontSizeLarge
+            source: TodoService.pendingCount > 0 ? "checkbox-unchecked.svg" : "checkbox-checked.svg"
             anchors.verticalCenter: parent.verticalCenter
         }
 

@@ -50,11 +50,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingS
 
-        Text {
-            text: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? "󰂯" : "󰂲"
+        SharedWidgets.SvgIcon {
+            source: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? "bluetooth.svg" : "bluetooth-disabled.svg"
             color: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? Colors.primary : Colors.textDisabled
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 

@@ -31,11 +31,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingXS
 
-        Text {
-            text: "󰐪"
+        SharedWidgets.SvgIcon {
+            source: "print.svg"
             color: PrinterService.activeJobs > 0 ? Colors.warning : Colors.text
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
             Behavior on color {
                 enabled: !Colors.isTransitioning

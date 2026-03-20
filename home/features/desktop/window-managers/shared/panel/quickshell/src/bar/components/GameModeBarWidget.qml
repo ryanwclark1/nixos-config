@@ -23,11 +23,10 @@ SharedWidgets.BarPill {
         }
     ]
 
-    Text {
+    SharedWidgets.SvgIcon {
         anchors.centerIn: parent
         color: Colors.warning
-        font.pixelSize: Appearance.fontSizeLarge
-        font.family: Appearance.fontMono
-        text: "󰊴"
+        size: Appearance.fontSizeLarge
+        source: "games.svg"
     }
 }
