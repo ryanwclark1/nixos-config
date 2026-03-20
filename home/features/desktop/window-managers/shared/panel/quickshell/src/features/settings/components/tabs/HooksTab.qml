@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import "../../../../services"
+import "../../../../services/IconHelpers.js" as IconHelpers
 import "../../../../widgets" as SharedWidgets
 import ".."
 
@@ -297,21 +298,7 @@ Item {
     }
 
     function _categoryIcon(cat) {
-        if (cat === "Appearance")
-            return "󰏘";
-        if (cat === "Power")
-            return "󰌪";
-        if (cat === "Audio")
-            return "󰕾";
-        if (cat === "Display")
-            return "󰍹";
-        if (cat === "Notifications")
-            return "󰂚";
-        if (cat === "Media")
-            return "󰝚";
-        if (cat === "Compositor")
-            return "󱗼";
-        return "󱁨";
+        return IconHelpers.hookCategoryIcon(cat);
     }
 
     function _hookHasScript(hookName) {

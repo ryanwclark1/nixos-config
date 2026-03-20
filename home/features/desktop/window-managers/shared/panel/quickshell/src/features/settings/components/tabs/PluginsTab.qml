@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import "../../../../services"
+import "../../../../services/IconHelpers.js" as IconHelpers
 import "../../../../services/ShellUtils.js" as ShellUtils
 import "../../../../shared"
 import "../../../../widgets" as SharedWidgets
@@ -208,17 +209,7 @@ Item {
     }
 
     function pluginTypeIcon(typeName) {
-        if (typeName === "bar-widget")
-            return "󰖯";
-        if (typeName === "desktop-widget")
-            return "󰖲";
-        if (typeName === "launcher-provider")
-            return "󰀻";
-        if (typeName === "control-center-widget")
-            return "󰕮";
-        if (typeName === "daemon")
-            return "󰒓";
-        return "󰏗";
+        return IconHelpers.pluginTypeIcon(typeName);
     }
 
     function pluginTypeLabel(typeName) {

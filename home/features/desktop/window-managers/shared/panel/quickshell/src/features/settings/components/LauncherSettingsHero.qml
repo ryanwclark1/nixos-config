@@ -54,7 +54,7 @@ Rectangle {
 
                 SettingsMetricIcon {
                     anchors.centerIn: parent
-                    icon: tabMeta ? String(tabMeta.icon || "󰍉") : "󰍉"
+                    icon: tabMeta ? String(tabMeta.icon || "settings.svg") : "settings.svg"
                     iconSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
                 }
             }
@@ -107,7 +107,7 @@ Rectangle {
                         spacing: Appearance.spacingXS
 
                         SettingsMetricIcon {
-                            icon: modelData.icon || "󰍉"
+                            icon: modelData.icon || "settings.svg"
                             iconColor: selected ? Colors.primary : Colors.textSecondary
                             iconSize: Appearance.fontSizeXS
                         }
