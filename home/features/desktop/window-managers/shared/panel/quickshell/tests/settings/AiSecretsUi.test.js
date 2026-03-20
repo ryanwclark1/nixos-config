@@ -30,7 +30,7 @@ describe("AI secret settings UI", () => {
     const secretInputSource = readFileSync(secretInputPath, "utf8");
 
     expect(secretInputSource).toContain("echoMode: root.secretVisible ? TextInput.Normal : TextInput.Password");
-    expect(secretInputSource).toContain('text: root.secretVisible ? "󰈈" : "󰈉"');
+    expect(secretInputSource).toContain("source: IconHelpers.secretVisibilityIcon(root.secretVisible)");
     expect(secretInputSource).toContain("onClicked: root.secretVisible = !root.secretVisible");
   });
 });

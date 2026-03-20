@@ -122,7 +122,7 @@ describe("buildRecentEntry", () => {
     expect(entry).toMatchObject({
       name: "ls",
       title: "ls -la",
-      icon: "󰆍",
+      icon: "terminal.svg",
       exec: "ls -la",
     });
   });

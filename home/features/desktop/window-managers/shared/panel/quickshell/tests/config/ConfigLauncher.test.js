@@ -243,7 +243,7 @@ describe("normalizeCustomEngines", () => {
       key: "my-search",
       name: "My Search",
       exec: "https://search.me/?q=",
-      icon: "󰖟",
+      icon: "globe-search.svg",
     });
   });
 

@@ -159,23 +159,23 @@ describe("formatDate", () => {
 
 describe("fileIcon", () => {
   it("returns folder icon for directories", () => {
-    expect(fileIcon({ isDir: true, extension: "" })).toBe("󰉋");
+    expect(fileIcon({ isDir: true, extension: "" })).toBe("folder.svg");
   });
 
   it("returns image icon for image files", () => {
-    expect(fileIcon({ isDir: false, extension: "png" })).toBe("󰋩");
+    expect(fileIcon({ isDir: false, extension: "png" })).toBe("image.svg");
   });
 
   it("returns code icon for source files", () => {
-    expect(fileIcon({ isDir: false, extension: "js" })).toBe("󰴭");
-    expect(fileIcon({ isDir: false, extension: "rs" })).toBe("󰴭");
+    expect(fileIcon({ isDir: false, extension: "js" })).toBe("code.svg");
+    expect(fileIcon({ isDir: false, extension: "rs" })).toBe("code.svg");
   });
 
   it("returns nix icon for .nix files", () => {
-    expect(fileIcon({ isDir: false, extension: "nix" })).toBe("󱄅");
+    expect(fileIcon({ isDir: false, extension: "nix" })).toBe("brands/nixos-symbolic.svg");
   });
 
   it("returns default icon for unknown types", () => {
-    expect(fileIcon({ isDir: false, extension: "xyz" })).toBe("󰈔");
+    expect(fileIcon({ isDir: false, extension: "xyz" })).toBe("document.svg");
   });
 });

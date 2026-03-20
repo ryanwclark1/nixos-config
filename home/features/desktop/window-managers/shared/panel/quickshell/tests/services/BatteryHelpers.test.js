@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { stateText } from "../../src/features/power/BatteryHelpers.js";
+import { stateText, iconName } from "../../src/features/power/BatteryHelpers.js";
 
 // Mock UPower enum values matching Quickshell's UPower.DeviceState* constants
 const UPowerEnums = {
@@ -40,5 +40,19 @@ describe("stateText", () => {
 
   it("returns 'Discharging' for device with no state property", () => {
     expect(stateText({}, UPowerEnums)).toBe("Discharging");
+  });
+});
+
+describe("iconName", () => {
+  it("maps charging devices to the shared charging svg", () => {
+    expect(iconName({ state: 1, percentage: 0.4 }, UPowerEnums)).toBe("battery-charge.svg");
+  });
+
+  it("maps low battery devices to warning svg", () => {
+    expect(iconName({ state: 2, percentage: 0.05 }, UPowerEnums)).toBe("battery-warning.svg");
+  });
+
+  it("maps healthy battery levels to stepped battery svgs", () => {
+    expect(iconName({ state: 2, percentage: 0.72 }, UPowerEnums)).toBe("battery-7.svg");
   });
 });

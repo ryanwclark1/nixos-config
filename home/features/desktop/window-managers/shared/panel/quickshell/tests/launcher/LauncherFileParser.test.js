@@ -18,6 +18,8 @@ describe("buildFileItemsFromRaw", () => {
     expect(items[0].parentPath).toBe("Documents");
     expect(items[0].displayPath).toBe("~/Documents");
     expect(items[0].pathDepth).toBe(1);
+    expect(items[0].icon).toBe("scan-text.svg");
+    expect(items[1].icon).toBe("image.svg");
   });
 
   it("handles absolute paths", () => {
@@ -45,17 +47,26 @@ describe("buildFileItemsFromRaw", () => {
     const items = buildFileItemsFromRaw(raw, HOME);
     expect(items[0].pathDepth).toBe(3);
     expect(items[0].parentPath).toBe("a/b/c");
+    expect(items[0].icon).toBe("text-t.svg");
   });
 
   it("handles files without extension", () => {
     const items = buildFileItemsFromRaw("Makefile", HOME);
     expect(items[0].extension).toBe("");
+    expect(items[0].icon).toBe("code.svg");
   });
 
   it("handles dotfiles (no extension — extIndex is 0, fails > 0 check)", () => {
     const items = buildFileItemsFromRaw(".bashrc", HOME);
     expect(items[0].name).toBe(".bashrc");
     expect(items[0].extension).toBe(""); // leading dot at index 0 is not treated as extension separator
+    expect(items[0].icon).toBe("document.svg");
+  });
+
+  it("uses folder svg for directory entries", () => {
+    const items = buildFileItemsFromRaw("d\tProjects/\n", HOME);
+    expect(items[0].fileKind).toBe("dir");
+    expect(items[0].icon).toBe("folder.svg");
   });
 });
 

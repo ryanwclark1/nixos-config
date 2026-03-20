@@ -5,6 +5,8 @@ import {
   emptyStateSubtitle,
   emptyPrimaryCta,
   emptySecondaryCta,
+  emptyPrimaryHintIcon,
+  emptySecondaryHintIcon,
   categoryFilterLabel,
   categoryFilterSummary,
   webAliasHint,
@@ -160,5 +162,18 @@ describe("webAliasHint", () => {
     expect(webAliasHint({}, [{ key: "x" }], false)).toBe(
       "Alias: provider key"
     );
+  });
+});
+
+describe("empty state hint icons", () => {
+  it("returns svg-backed primary icons by mode", () => {
+    expect(emptyPrimaryHintIcon("window")).toBe("window-multiple.svg");
+    expect(emptyPrimaryHintIcon("files")).toBe("folder.svg");
+  });
+
+  it("returns svg-backed secondary icons by mode and query", () => {
+    expect(emptySecondaryHintIcon("files", "")).toBe("folder-open.svg");
+    expect(emptySecondaryHintIcon("settings", "query")).toBe("dismiss.svg");
+    expect(emptySecondaryHintIcon("ssh", "")).toBe("arrow-clockwise.svg");
   });
 });
