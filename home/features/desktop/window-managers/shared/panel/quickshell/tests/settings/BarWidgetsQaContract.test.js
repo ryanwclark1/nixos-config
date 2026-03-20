@@ -26,7 +26,7 @@ describe("Bar Widgets QA contract", () => {
   it("keeps the widget-row OCR tolerant of the current Workspace Switcher and Running Apps glyph output", () => {
     const source = readFileSync(barWidgetsQaPath, "utf8");
 
-    expect(source).toContain(".{0,2}orkspac.{0,2}[[:space:]]+Switcher");
+    expect(source).toContain("W.{0,4}ks?.{0,4}pace[[:space:]]+Switcher");
     expect(source).toContain("Runn.{0,2}ing[[:space:]]+Apps");
     expect(source).not.toContain("Workspace[[:space:]]+Switcher");
     expect(source).not.toContain("Running Apps");
