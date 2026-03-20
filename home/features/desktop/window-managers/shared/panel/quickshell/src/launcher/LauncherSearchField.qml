@@ -227,7 +227,7 @@ Rectangle {
             SharedWidgets.IconButton {
                 visible: input.text !== ""
                 icon: "dismiss.svg"
-                size: 24
+                size: Colors.iconSizeSmall
                 iconSize: 14
                 iconColor: Colors.textDisabled
                 tooltipText: "Clear search"

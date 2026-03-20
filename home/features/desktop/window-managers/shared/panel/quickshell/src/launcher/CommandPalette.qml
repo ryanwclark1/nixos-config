@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import "../shared"
 import "../services"
 import "../widgets" as SharedWidgets
 import "LauncherEntryRegistry.js" as EntryRegistry
