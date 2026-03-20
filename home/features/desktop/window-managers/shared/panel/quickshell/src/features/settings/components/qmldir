@@ -8,6 +8,7 @@ SettingsDataRow 1.0 SettingsDataRow.qml
 SettingsDropIndicator 1.0 SettingsDropIndicator.qml
 SettingsDragHandle 1.0 SettingsDragHandle.qml
 SettingsFieldGrid 1.0 SettingsFieldGrid.qml
+SettingsHeaderBand 1.0 SettingsHeaderBand.qml
 SettingsIconBox 1.0 SettingsIconBox.qml
 SettingsInfoCallout 1.0 SettingsInfoCallout.qml
 SettingsListRow 1.0 SettingsListRow.qml
@@ -15,6 +16,8 @@ SettingsMetricIcon 1.0 SettingsMetricIcon.qml
 SettingsPageHero 1.0 SettingsPageHero.qml
 SettingsModeRow 1.0 SettingsModeRow.qml
 SettingsQuickLinksRow 1.0 SettingsQuickLinksRow.qml
+SettingsReorderButtons 1.0 SettingsReorderButtons.qml
+SettingsReorderRow 1.0 SettingsReorderRow.qml
 SettingsReorderState 1.0 SettingsReorderState.qml
 singleton SettingsRegistry 1.0 SettingsRegistry.qml
 SettingsRemovableChip 1.0 SettingsRemovableChip.qml

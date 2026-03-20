@@ -113,6 +113,14 @@ function transportToggleIcon(playing) {
     return playing ? "pause.svg" : "play.svg";
 }
 
+function speechToggleIcon(enabled) {
+    return enabled ? "mic-on.svg" : "mic-off.svg";
+}
+
+function doNotDisturbIcon(enabled) {
+    return enabled ? "alert-off.svg" : "alert.svg";
+}
+
 function runningStateIcon(running) {
     return running ? "stop.svg" : "play.svg";
 }
@@ -131,6 +139,23 @@ function degradedStatusIcon(degraded, healthyIcon) {
 
 function healthStatusIcon(attentionNeeded) {
     return attentionNeeded ? "warning.svg" : "checkmark.svg";
+}
+
+function sshCollectionIcon(imported) {
+    return imported ? "cloud.svg" : "server-2.svg";
+}
+
+function sshSessionIcon(sessionType) {
+    var typeName = String(sessionType || "ssh").toLowerCase();
+    if (typeName === "scp")
+        return "upload.svg";
+    if (typeName === "sftp")
+        return "folder.svg";
+    if (typeName === "rsync")
+        return "arrow-sync.svg";
+    if (typeName === "sshfs")
+        return "hard-drive.svg";
+    return "server-2.svg";
 }
 
 function pluginTypeIcon(typeName) {
@@ -183,4 +208,12 @@ function presetDeleteIcon(confirming) {
 
 function commandExecuteIcon(running) {
     return running ? "arrow-clockwise.svg" : "play.svg";
+}
+
+function processFocusIcon(focused, idleIcon) {
+    return focused ? "keyboard-dock.svg" : (idleIcon || "window-multiple.svg");
+}
+
+function gpuProcessToggleIcon(showProcesses) {
+    return showProcesses ? "subtract.svg" : "grid.svg";
 }
