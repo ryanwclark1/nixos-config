@@ -79,23 +79,19 @@ PanelWindow {
         }
     }
 
-    Rectangle {
+    SharedWidgets.ThemedContainer {
         id: paletteBox
+        variant: "card"
+        radius: Colors.radiusLarge
         width: 680
         height: Math.min(500, contentCol.implicitHeight + Colors.paddingLarge * 2)
         anchors.centerIn: parent
-        color: Colors.cardSurface
-        radius: Colors.radiusLarge
-        border.color: Colors.border
-        border.width: 1
         clip: true
 
         opacity: root.showContent ? 1.0 : 0.0
         scale: root.showContent ? 1.0 : 0.95
         Behavior on opacity { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: Colors.durationSlow; easing.type: Easing.OutBack } }
-
-        SharedWidgets.InnerHighlight {}
 
         ColumnLayout {
             id: contentCol

@@ -153,18 +153,15 @@ ColumnLayout {
         columnSpacing: Colors.spacingL
 
         // Recent Apps Grid
-        Rectangle {
+        SharedWidgets.ThemedContainer {
+            variant: "card"
+            radius: Colors.radiusLarge
+            showGradient: true
+            customHighlightOpacity: 0.12
             Layout.fillWidth: true
             visible: root.showRecentItems
             clip: true
-            color: Colors.cardSurface
-            radius: Colors.radiusLarge
-            border.color: Colors.border
-            border.width: 1
             implicitHeight: recentLayout.implicitHeight + (Colors.paddingLarge * 2)
-
-            SharedWidgets.InnerHighlight { highlightOpacity: 0.12 }
-            SharedWidgets.SurfaceGradient {}
 
             ColumnLayout {
                 id: recentLayout
@@ -261,18 +258,15 @@ ColumnLayout {
         }
 
         // Suggested Apps List
-        Rectangle {
+        SharedWidgets.ThemedContainer {
+            variant: "card"
+            radius: Colors.radiusLarge
+            showGradient: true
+            customHighlightOpacity: 0.12
             Layout.fillWidth: true
             visible: root.showSuggestions
             clip: true
-            color: Colors.cardSurface
-            radius: Colors.radiusLarge
-            border.color: Colors.border
-            border.width: 1
             implicitHeight: suggestionColumn.implicitHeight + (Colors.paddingLarge * 2)
-
-            SharedWidgets.InnerHighlight { highlightOpacity: 0.12 }
-            SharedWidgets.SurfaceGradient {}
 
             ColumnLayout {
                 id: suggestionColumn
