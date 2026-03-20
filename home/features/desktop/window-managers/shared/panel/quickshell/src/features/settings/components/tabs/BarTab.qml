@@ -96,7 +96,7 @@ Item {
                             value: root.barCount + " / " + Config.maxBars
                         },
                         {
-                            icon: "󰌷",
+                            icon: "pin.svg",
                             label: "Edge",
                             value: root.selectedBarPositionLabel
                         },
@@ -308,7 +308,7 @@ Item {
 
                 SettingsTextInputRow {
                     label: "Bar Name"
-                    leadingIcon: "󰓩"
+                    leadingIcon: "code.svg"
                     text: root.selectedBar ? root.selectedBar.name : ""
                     onSubmitted: value => root.applyPatch({
                         name: value.trim() || "Bar"
@@ -463,7 +463,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Auto-Hide"
-                    icon: "󰘊"
+                    icon: "re-order-dots-vertical.svg"
                     checked: root.selectedBar ? !!root.selectedBar.autoHide : false
                     onToggled: root.applyPatch({
                         autoHide: !(root.selectedBar && root.selectedBar.autoHide)
@@ -525,7 +525,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Shadow"
-                    icon: "󰘷"
+                    icon: "color-palette.svg"
                     checked: root.selectedBar ? !!root.selectedBar.shadowEnabled : false
                     onToggled: root.applyPatch({
                         shadowEnabled: !(root.selectedBar && root.selectedBar.shadowEnabled)

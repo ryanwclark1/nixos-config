@@ -10,7 +10,7 @@ SharedWidgets.CollapsibleSection {
 
     Layout.fillWidth: true
     title: "Import Diagnostics"
-    icon: "󰅚"
+    icon: "dismiss.svg"
     expanded: root.sshData.importErrors.length > 0 || root.sshData.skippedPatternEntries.length > 0
 
     ColumnLayout {

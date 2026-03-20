@@ -68,7 +68,7 @@ RowLayout {
         Layout.fillWidth: true
         value: root.appVolume
         muted: root.appMuted
-        icon: "󰎈"
+        icon: "music-note-2.svg"
         onSliderMoved: v => AudioService.setAppVolume(root.appNode.nodeRef, v)
     }
 

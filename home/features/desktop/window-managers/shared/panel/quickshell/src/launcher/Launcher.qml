@@ -139,7 +139,7 @@ PanelWindow {
                         items.push({
                             name: "!" + bang.t + " — " + bang.s,
                             title: bang.u || "",
-                            icon: "󰖟",
+                            icon: "globe-search.svg",
                             bangTrigger: bang.t,
                             bangUrl: bang.u,
                             isBang: true,
@@ -1433,7 +1433,7 @@ PanelWindow {
                 {
                     name: "Focus open windows",
                     title: "Jump into current clients",
-                    icon: "󰖯",
+                    icon: "globe-search.svg",
                     openMode: "window"
                 }
             ];
@@ -1781,7 +1781,7 @@ PanelWindow {
                 id: it.id,
                 name: it.content,
                 title: it.content,
-                icon: "󰅍"
+                icon: "copy.svg"
             };
         });
     }
@@ -2298,7 +2298,7 @@ PanelWindow {
                         name: "AI Response",
                         title: "Click to copy response",
                         body: raw,
-                        icon: "󰚩"
+                        icon: "sparkle.svg"
                     }
                 ];
             else

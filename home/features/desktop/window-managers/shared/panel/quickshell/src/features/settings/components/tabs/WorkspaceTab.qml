@@ -23,21 +23,21 @@ Item {
 
             SettingsToggleRow {
                 checked: Config.workspaceShowEmpty
-                icon: "󱗝"
+                icon: "board.svg"
                 label: "Show Empty Workspaces"
 
                 onToggled: Config.workspaceShowEmpty = !Config.workspaceShowEmpty
             }
             SettingsToggleRow {
                 checked: Config.workspaceShowNames
-                icon: "󰑭"
+                icon: "number-symbol.svg"
                 label: "Show Workspace Names"
 
                 onToggled: Config.workspaceShowNames = !Config.workspaceShowNames
             }
             SettingsToggleRow {
                 checked: Config.workspaceShowWindowCount
-                icon: "󰇄"
+                icon: "desktop.svg"
                 label: "Show Window Count"
 
                 onToggled: Config.workspaceShowWindowCount = !Config.workspaceShowWindowCount
@@ -114,7 +114,7 @@ Item {
 
             SettingsToggleRow {
                 checked: Config.workspaceShowAppIcons
-                icon: "󰀻"
+                icon: "info.svg"
                 label: "Show App Icons"
 
                 onToggled: Config.workspaceShowAppIcons = !Config.workspaceShowAppIcons
@@ -137,14 +137,14 @@ Item {
 
             SettingsToggleRow {
                 checked: Config.workspaceScrollEnabled
-                icon: "󰍽"
+                icon: "cursor-click.svg"
                 label: "Scroll to Switch"
 
                 onToggled: Config.workspaceScrollEnabled = !Config.workspaceScrollEnabled
             }
             SettingsToggleRow {
                 checked: Config.workspaceReverseScroll
-                icon: "󰁝"
+                icon: "fullscreen.svg"
                 label: "Reverse Scroll Direction"
                 visible: Config.workspaceScrollEnabled
 
@@ -158,7 +158,7 @@ Item {
 
             SettingsToggleRow {
                 checked: Config.notepadProjectSync
-                icon: "󰓹"
+                icon: "flash-on.svg"
                 label: "Auto-Switch Tabs by Workspace"
 
                 onToggled: Config.notepadProjectSync = !Config.notepadProjectSync
@@ -171,14 +171,14 @@ Item {
 
             SettingsColorRow {
                 currentValue: Config.workspaceActiveColor
-                icon: "󰸌"
+                icon: "star.svg"
                 label: "Active Color"
 
                 onColorSelected: v => Config.workspaceActiveColor = v
             }
             SettingsColorRow {
                 currentValue: Config.workspaceUrgentColor
-                icon: "󰀦"
+                icon: "warning.svg"
                 label: "Urgent Color"
 
                 onColorSelected: v => Config.workspaceUrgentColor = v

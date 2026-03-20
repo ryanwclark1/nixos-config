@@ -117,7 +117,7 @@ QtObject {
             remoteCommand: "",
             tags: ["imported"],
             group: "ssh-config",
-            icon: "󰣀",
+            icon: "apps.svg",
             source: "imported",
             sourcePath: String(input.sourcePath || ""),
             sourceLine: Math.max(0, Number(input.sourceLine || 0)),
@@ -625,7 +625,7 @@ QtObject {
         if (mergedHosts.length === 0) {
             actions.push({
                 label: "No SSH hosts configured",
-                icon: "󰅚",
+                icon: "dismiss.svg",
                 enabled: false
             });
             if (!enableSshConfigImport) {
@@ -642,7 +642,7 @@ QtObject {
             var host = mergedHosts[i];
             actions.push({
                 label: "Connect " + String(host.label || host.alias || host.host || "SSH"),
-                icon: "󰆍",
+                icon: "terminal.svg",
                 action: (function(selectedHost) {
                     return function() {
                         root.connectHost(selectedHost);
@@ -651,7 +651,7 @@ QtObject {
             });
             actions.push({
                 label: "Copy " + String(host.label || host.alias || host.host || "SSH"),
-                icon: "󰅍",
+                icon: "copy.svg",
                 action: (function(selectedHost) {
                     return function() {
                         root.copyHostCommand(selectedHost);

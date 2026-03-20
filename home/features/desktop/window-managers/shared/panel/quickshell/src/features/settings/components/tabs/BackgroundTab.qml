@@ -41,7 +41,7 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰸉",
+                            icon: "image-copy.svg",
                             label: "Background Features",
                             value: root._enabledBackgroundFeatures + " active"
                         },

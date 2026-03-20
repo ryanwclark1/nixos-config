@@ -46,12 +46,12 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰹑",
+                            icon: "record.svg",
                             label: "Source",
                             value: root._captureSourceSummary
                         },
                         {
-                            icon: "󰔟",
+                            icon: "timer.svg",
                             label: "Profile",
                             value: root._qualitySummary
                         },
@@ -61,7 +61,7 @@ Item {
                             value: root._audioSummary
                         },
                         {
-                            icon: "󰉋",
+                            icon: "folder.svg",
                             label: "Storage",
                             value: root._outputSummary
                         }
@@ -176,7 +176,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Record Cursor"
-                    icon: "󰆺"
+                    icon: "video.svg"
                     configKey: "recordingRecordCursor"
                     enabledText: "Pointer movements are visible in recordings."
                     disabledText: "Recordings omit the cursor."

@@ -40,8 +40,8 @@ BasePopupMenu {
 
         Repeater {
             model: [
-                { mode: "region", icon: "󰩭", label: "Select Region", desc: "Draw a rectangle to capture" },
-                { mode: "window", icon: "󰖯", label: "Active Window", desc: "Capture the focused window" },
+                { mode: "region", icon: "crop.svg", label: "Select Region", desc: "Draw a rectangle to capture" },
+                { mode: "window", icon: "pip.svg", label: "Active Window", desc: "Capture the focused window" },
                 { mode: "screen", icon: "desktop.svg", label: "Current Screen", desc: "Capture the active monitor" },
                 { mode: "fullscreen", icon: "fullscreen.svg", label: "All Screens", desc: "Capture everything" }
             ]

@@ -330,7 +330,7 @@ BasePopupMenu {
           highlightAlways: true
           chipText: "Connected"
           chipColor: Colors.primary
-          actionIcon: "󰅖"
+          actionIcon: "dismiss.svg"
           actionTooltip: "Disconnect"
           onChipClicked: {}
           onActionClicked: modelData.disconnect()
@@ -347,7 +347,7 @@ BasePopupMenu {
           iconColor: Colors.textSecondary
           chipText: "Connect"
           chipInteractive: true
-          actionIcon: "󰆴"
+          actionIcon: "delete.svg"
           actionTooltip: "Remove"
           onChipClicked: root.connectDevice(modelData)
           onActionClicked: Quickshell.execDetached(["bluetoothctl", "remove", modelData.address])

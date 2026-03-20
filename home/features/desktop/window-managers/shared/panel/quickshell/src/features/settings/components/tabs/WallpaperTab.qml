@@ -612,7 +612,7 @@ Item {
             SettingsToggleRow {
                 visible: !Config.themeName
                 label: "Run pywal on change"
-                icon: "󰏘"
+                icon: "color-palette.svg"
                 configKey: "wallpaperRunPywal"
             }
 
@@ -625,7 +625,7 @@ Item {
             SettingsSelectRow {
                 visible: Config.wallpaperUseShellRenderer
                 label: "Transition effect"
-                icon: "󰾆"
+                icon: "image-edit.svg"
                 currentValue: Config.wallpaperTransitionType
                 onOptionSelected: value => { Config.wallpaperTransitionType = value; }
                 options: [

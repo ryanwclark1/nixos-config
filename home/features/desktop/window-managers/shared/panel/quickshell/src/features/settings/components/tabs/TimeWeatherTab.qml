@@ -110,7 +110,7 @@ Item {
                             value: root.activeLocationSummary()
                         },
                         {
-                            icon: "󱓗",
+                            icon: "compass.svg",
                             label: "Markets",
                             value: root._marketTickerCount + " ticker" + (root._marketTickerCount === 1 ? "" : "s")
                         }
@@ -455,7 +455,7 @@ Item {
                                 : Math.min(parent.width, Math.max(180, (parent.width - Appearance.spacingM) / 2))
                             label: "Latitude"
                             placeholderText: "40.7128"
-                            leadingIcon: "󰍐"
+                            leadingIcon: "globe-search.svg"
                             text: Config.weatherLatitude
                             errorText: weatherLatInput.text.length > 0 && !root.latValid ? "Expected value between -90 and 90" : ""
                             onSubmitted: value => Config.weatherLatitude = value.trim()
@@ -472,7 +472,7 @@ Item {
                                 : Math.min(parent.width, Math.max(180, (parent.width - Appearance.spacingM) / 2))
                             label: "Longitude"
                             placeholderText: "-74.0060"
-                            leadingIcon: "󰍐"
+                            leadingIcon: "globe-search.svg"
                             text: Config.weatherLongitude
                             errorText: weatherLonInput.text.length > 0 && !root.lonValid ? "Expected value between -180 and 180" : ""
                             onSubmitted: value => Config.weatherLongitude = value.trim()
@@ -508,7 +508,7 @@ Item {
                     SettingsTextInputRow {
                         label: "Tickers"
                         placeholderText: "^SPX ^DJI ^NDQ AAPL.US"
-                        leadingIcon: "󱓗"
+                        leadingIcon: "compass.svg"
                         text: Config.marketTickers
                         onSubmitted: value => Config.marketTickers = value.trim()
                         onTextEdited: value => {

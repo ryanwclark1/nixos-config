@@ -59,12 +59,12 @@ Item {
                             value: root.presetCount + " preset" + (root.presetCount === 1 ? "" : "s")
                         },
                         {
-                            icon: "󰋊",
+                            icon: "save.svg",
                             label: "Latest",
                             value: root.latestPresetLabel
                         },
                         {
-                            icon: "󰏪",
+                            icon: "rename.svg",
                             label: "Draft Name",
                             value: root._presetName.trim() !== "" ? root._presetName.trim() : "Not set"
                         }
@@ -146,7 +146,7 @@ Item {
                 SettingsTextInputRow {
                     label: "Preset Name"
                     placeholderText: "e.g. My Dark Setup"
-                    leadingIcon: "󰏪"
+                    leadingIcon: "rename.svg"
                     text: root._presetName
                     onTextEdited: value => root._presetName = value
                 }
@@ -154,7 +154,7 @@ Item {
                 SettingsTextInputRow {
                     label: "Description (optional)"
                     placeholderText: "A brief note about this preset"
-                    leadingIcon: "󰈔"
+                    leadingIcon: "document.svg"
                     text: root._presetDesc
                     onTextEdited: value => root._presetDesc = value
                 }

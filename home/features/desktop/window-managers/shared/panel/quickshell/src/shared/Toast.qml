@@ -12,7 +12,7 @@ Item {
 
   property string title: ""
   property string description: ""
-  property string icon: "󰋼"
+  property string icon: "info.svg"
   property string type: "notice"
   property int duration: Appearance.durationToast
   property real progress: 1.0

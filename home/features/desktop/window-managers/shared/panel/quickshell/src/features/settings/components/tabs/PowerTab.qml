@@ -41,7 +41,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Screen Borders"
-                    icon: "󰩪"
+                    icon: "power-sleep.svg"
                     configKey: "showScreenBorders"
                 }
                 SettingsToggleRow {
@@ -69,7 +69,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Battery Alerts"
-                icon: "󱃍"
+                icon: "dark-theme.svg"
                 configKey: "batteryAlertsEnabled"
             }
 

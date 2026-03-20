@@ -22,7 +22,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Claude Code"
-                icon: "󰊤"
+                icon: "brands/github-symbolic.svg"
                 configKey: "modelUsageClaudeEnabled"
                 enabledText: "Claude Code usage is tracked and shown in the bar."
                 disabledText: "Claude Code usage tracking is disabled."
@@ -30,7 +30,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Codex CLI"
-                icon: ""
+                icon: "terminal.svg"
                 configKey: "modelUsageCodexEnabled"
                 enabledText: "Codex CLI usage is tracked and shown in the bar."
                 disabledText: "Codex CLI usage tracking is disabled."
@@ -38,7 +38,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Gemini CLI"
-                icon: "󰫢"
+                icon: "data-trending.svg"
                 configKey: "modelUsageGeminiEnabled"
                 enabledText: "Gemini CLI usage is tracked and shown in the bar."
                 disabledText: "Gemini CLI usage tracking is disabled."

@@ -341,7 +341,7 @@ function buildAdHocSshItem(query, sshCommand) {
         category: "Ad-hoc",
         name: target,
         title: displayCmd,
-        icon: "󰣀",
+        icon: "apps.svg",
         _adHoc: parsed,
         _recentBoost: -1
     };

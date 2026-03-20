@@ -31,17 +31,17 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰖲",
+                            icon: "add.svg",
                             label: "Widgets",
                             value: Config.desktopWidgetsEnabled ? "Enabled" : "Disabled"
                         },
                         {
-                            icon: "󰕰",
+                            icon: "subtract.svg",
                             label: "Grid Snap",
                             value: Config.desktopWidgetsGridSnap ? "Enabled" : "Freeform"
                         },
                         {
-                            icon: "󰏫",
+                            icon: "apps.svg",
                             label: "Edit Mode",
                             value: "Launch from settings"
                         }
@@ -103,12 +103,12 @@ Item {
 
                     SettingsToggleRow {
                         label: "Desktop Widgets"
-                        icon: "󰖲"
+                        icon: "add.svg"
                         configKey: "desktopWidgetsEnabled"
                     }
                     SettingsToggleRow {
                         label: "Grid Snap"
-                        icon: "󰕰"
+                        icon: "subtract.svg"
                         configKey: "desktopWidgetsGridSnap"
                     }
                 }

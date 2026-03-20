@@ -167,7 +167,7 @@ Item {
             SettingsTextInputRow {
                 label: "Primary Font Family"
                 placeholderText: "Inter"
-                leadingIcon: "󰛖"
+                leadingIcon: "text-t.svg"
                 text: Config.fontFamily
                 onTextEdited: value => Config.fontFamily = value
             }

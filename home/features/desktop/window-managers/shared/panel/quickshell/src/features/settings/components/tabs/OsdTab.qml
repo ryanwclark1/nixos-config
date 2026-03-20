@@ -47,22 +47,22 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰍡",
+                            icon: "alert.svg",
                             label: "Position",
                             value: root._positionSummary
                         },
                         {
-                            icon: "󰏘",
+                            icon: "color-palette.svg",
                             label: "Style",
                             value: root._styleSummary
                         },
                         {
-                            icon: "󰔛",
+                            icon: "timer.svg",
                             label: "Duration",
                             value: Config.osdDuration + " ms"
                         },
                         {
-                            icon: "󰆼",
+                            icon: "desktop.svg",
                             label: "Size",
                             value: String(Config.osdSize)
                         }
@@ -190,7 +190,7 @@ Item {
 
                     SettingsToggleRow {
                         label: "Volume Overdrive"
-                        icon: "󰝝"
+                        icon: "device-eq.svg"
                         configKey: "osdOverdrive"
                     }
                 }

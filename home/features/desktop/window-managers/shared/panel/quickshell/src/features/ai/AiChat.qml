@@ -886,7 +886,7 @@ PanelWindow {
 
                                     SharedWidgets.IconButton {
                                         id: removeButton
-                                        icon: "window-close-symbolic"
+                                        icon: "dismiss.svg"
                                         size: 16
                                         iconSize: 10
                                         color: "transparent"

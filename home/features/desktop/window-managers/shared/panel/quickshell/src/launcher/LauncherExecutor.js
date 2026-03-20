@@ -40,7 +40,7 @@ function buildRecentEntry(mode, item) {
         return {
             name: item.name || item.exec,
             title: item.exec || "",
-            icon: "󰆍",
+            icon: "terminal.svg",
             exec: item.exec || ""
         };
     }

@@ -316,7 +316,7 @@ Item {
 
             SettingsSelectRow {
                 label: "Bar"
-                icon: "󰕮"
+                icon: "speaker.svg"
                 description: "Switch the bar you are editing without taking horizontal space away from the widget sections."
                 currentValue: String(Config.selectedBarId || "")
                 options: Config.barConfigs.map(function (barConfig) {

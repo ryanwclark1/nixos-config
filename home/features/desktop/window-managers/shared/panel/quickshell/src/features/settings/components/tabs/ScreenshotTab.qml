@@ -42,7 +42,7 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰏫",
+                            icon: "apps.svg",
                             label: "Editor",
                             value: root._editorSummary
                         },
@@ -111,7 +111,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Edit After Capture"
-                    icon: "󰏫"
+                    icon: "apps.svg"
                     checked: Config.screenshotEditAfterCapture
                     enabledText: "Screenshots open in editor automatically"
                     disabledText: "Screenshots saved directly"
@@ -120,7 +120,7 @@ Item {
 
                 SettingsModeRow {
                     label: "Editor Application"
-                    icon: "󰀻"
+                    icon: "info.svg"
                     currentValue: Config.screenshotEditor
                     options: [
                         { value: "none", label: "None" },

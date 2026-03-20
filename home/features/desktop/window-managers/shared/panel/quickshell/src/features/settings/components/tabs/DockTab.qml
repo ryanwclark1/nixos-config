@@ -45,7 +45,7 @@ Item {
                             value: root.dockVisibilitySummary
                         },
                         {
-                            icon: "󰌷",
+                            icon: "pin.svg",
                             label: "Edge",
                             value: root.dockPositionLabel
                         },
@@ -55,7 +55,7 @@ Item {
                             value: Config.dockGroupApps ? "Grouped windows" : "Per-window"
                         },
                         {
-                            icon: "󰆼",
+                            icon: "desktop.svg",
                             label: "Icon Size",
                             value: Config.dockIconSize + " px"
                         }
@@ -129,7 +129,7 @@ Item {
                     }
                     SettingsToggleRow {
                         label: "Auto Hide"
-                        icon: "󰘊"
+                        icon: "re-order-dots-vertical.svg"
                         configKey: "dockAutoHide"
                     }
                     SettingsToggleRow {

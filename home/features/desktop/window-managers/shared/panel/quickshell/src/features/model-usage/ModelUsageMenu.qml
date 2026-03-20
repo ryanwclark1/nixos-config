@@ -40,9 +40,9 @@ BasePopupMenu {
       Repeater {
         model: {
           var tabs = [];
-          if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude", icon: "󱜚" });
+          if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude", icon: "brands/anthropic-symbolic.svg" });
           if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex", icon: "" });
-          if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini", icon: "󰫢" });
+          if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini", icon: "brands/google-gemini-symbolic.svg" });
           return tabs;
         }
         delegate: SharedWidgets.FilterChip {

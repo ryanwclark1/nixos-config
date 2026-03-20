@@ -72,11 +72,11 @@ function fileContextMenuModel(item, ctx) {
     if (!item || !item.fullPath)
         return [];
     return [
-        { label: "Open",                  icon: "󰈔", action: function() { openFileItem(item, ctx); ctx.close(); } },
-        { label: "Open Parent Folder",    icon: "󰉋", action: function() { openFileParent(item, ctx); ctx.close(); } },
-        { label: "Reveal in File Manager",icon: "󰙅", action: function() { revealFileInManager(item, ctx); ctx.close(); } },
+        { label: "Open",                  icon: "document.svg", action: function() { openFileItem(item, ctx); ctx.close(); } },
+        { label: "Open Parent Folder",    icon: "folder-open.svg", action: function() { openFileParent(item, ctx); ctx.close(); } },
+        { label: "Reveal in File Manager",icon: "folder.svg", action: function() { revealFileInManager(item, ctx); ctx.close(); } },
         { separator: true },
-        { label: "Copy Full Path",        icon: "󰅍", action: function() { copyFilePath(item, ctx); } }
+        { label: "Copy Full Path",        icon: "copy.svg", action: function() { copyFilePath(item, ctx); } }
     ];
 }
 

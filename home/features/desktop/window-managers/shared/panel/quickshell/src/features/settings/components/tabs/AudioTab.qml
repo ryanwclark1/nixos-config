@@ -44,17 +44,17 @@ Item {
                             value: root._protectionSummary
                         },
                         {
-                            icon: "󰓃",
+                            icon: "speaker.svg",
                             label: "Pinned Outputs",
                             value: root._pinnedOutputCount + " device" + (root._pinnedOutputCount === 1 ? "" : "s")
                         },
                         {
-                            icon: "󰍬",
+                            icon: "mic.svg",
                             label: "Pinned Inputs",
                             value: root._pinnedInputCount + " device" + (root._pinnedInputCount === 1 ? "" : "s")
                         },
                         {
-                            icon: "󰝞",
+                            icon: "music-note-2.svg",
                             label: "Hidden Devices",
                             value: (root._hiddenOutputCount + root._hiddenInputCount) + " total"
                         }

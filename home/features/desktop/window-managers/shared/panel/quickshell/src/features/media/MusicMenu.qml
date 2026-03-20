@@ -265,18 +265,18 @@ BasePopupMenu {
       spacing: root.compactMode ? Appearance.spacingL : Appearance.spacingXL
 
       SharedWidgets.PulseButton {
-        icon: "󰒟"; size: root.compactMode ? 24 : 28; tint: Colors.textSecondary
+        icon: "shuffle.svg"; size: root.compactMode ? 24 : 28; tint: Colors.textSecondary
         onClicked: if (root.player) root.player.shuffle = !root.player.shuffle
       }
 
       SharedWidgets.PulseButton {
-        icon: "󰒮"; size: root.compactMode ? 32 : 36; tint: Colors.text
+        icon: "previous.svg"; size: root.compactMode ? 32 : 36; tint: Colors.text
         onClicked: MediaService.previous()
       }
 
       // Play/Pause (larger, filled style — tinted by album art accent)
       SharedWidgets.PulseButton {
-        icon: MediaService.isPlaying ? "󰏤" : "󰐊"
+        icon: MediaService.isPlaying ? "pause.svg" : "play.svg"
         size: root.compactMode ? 42 : 48; tint: Colors.background
         color: root.dominantColor
         Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationEmphasis } }
@@ -284,12 +284,12 @@ BasePopupMenu {
       }
 
       SharedWidgets.PulseButton {
-        icon: "󰒭"; size: root.compactMode ? 32 : 36; tint: Colors.text
+        icon: "next.svg"; size: root.compactMode ? 32 : 36; tint: Colors.text
         onClicked: MediaService.next()
       }
 
       SharedWidgets.PulseButton {
-        icon: "󰑖"; size: root.compactMode ? 24 : 28; tint: Colors.textSecondary
+        icon: "repeat.svg"; size: root.compactMode ? 24 : 28; tint: Colors.textSecondary
         onClicked: {
           if (!root.player) return;
           if (root.player.loopStatus === Mpris.None) root.player.loopStatus = Mpris.Track;

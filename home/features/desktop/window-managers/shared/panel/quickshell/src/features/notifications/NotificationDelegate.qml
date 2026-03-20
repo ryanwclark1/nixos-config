@@ -98,7 +98,7 @@ Rectangle {
         iconName: notification ? notification.appIcon : ""
         appName: notification ? notification.appName : ""
         iconSize: 38
-        fallbackIcon: "󰂚"
+        fallbackIcon: "alert.svg"
         visible: !!notification && notification.appIcon !== ""
       }
 

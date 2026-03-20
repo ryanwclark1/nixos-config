@@ -89,31 +89,31 @@ Item {
     readonly property var launcherDefaultModes: ModeData.allKnownModes.slice()
     readonly property var webProviders: {
         var builtIn = [
-            { key: "duckduckgo", label: "DuckDuckGo", icon: "󰇥" },
-            { key: "google", label: "Google", icon: "󰊯" },
-            { key: "youtube", label: "YouTube", icon: "󰗃" },
-            { key: "nixos", label: "NixOS Packages", icon: "" },
-            { key: "github", label: "GitHub", icon: "󰊤" },
-            { key: "brave", label: "Brave Search", icon: "󰊯" },
-            { key: "bing", label: "Bing", icon: "󰊯" },
-            { key: "kagi", label: "Kagi", icon: "󰊯" },
-            { key: "stackoverflow", label: "Stack Overflow", icon: "" },
-            { key: "npm", label: "npm", icon: "󰎙" },
-            { key: "pypi", label: "PyPI", icon: "󰌠" },
-            { key: "crates", label: "crates.io", icon: "🦀" },
+            { key: "duckduckgo", label: "DuckDuckGo", icon: "globe-search.svg" },
+            { key: "google", label: "Google", icon: "globe-search.svg" },
+            { key: "youtube", label: "YouTube", icon: "globe-search.svg" },
+            { key: "nixos", label: "NixOS Packages", icon: "brands/nixos-symbolic.svg" },
+            { key: "github", label: "GitHub", icon: "brands/github-symbolic.svg" },
+            { key: "brave", label: "Brave Search", icon: "globe-search.svg" },
+            { key: "bing", label: "Bing", icon: "globe-search.svg" },
+            { key: "kagi", label: "Kagi", icon: "globe-search.svg" },
+            { key: "stackoverflow", label: "Stack Overflow", icon: "globe-search.svg" },
+            { key: "npm", label: "npm", icon: "globe-search.svg" },
+            { key: "pypi", label: "PyPI", icon: "globe-search.svg" },
+            { key: "crates", label: "crates.io", icon: "globe-search.svg" },
             { key: "mdn", label: "MDN Web Docs", icon: "globe-search.svg" },
-            { key: "archwiki", label: "Arch Wiki", icon: "󰣇" },
-            { key: "aur", label: "AUR", icon: "󰣇" },
-            { key: "nixopts", label: "NixOS Options", icon: "" },
-            { key: "reddit", label: "Reddit", icon: "󰑍" },
-            { key: "twitter", label: "Twitter/X", icon: "󰕄" },
-            { key: "linkedin", label: "LinkedIn", icon: "󰌻" },
-            { key: "wikipedia", label: "Wikipedia", icon: "󰖬" },
-            { key: "translate", label: "Google Translate", icon: "󰗊" },
-            { key: "imdb", label: "IMDb", icon: "󰎁" },
-            { key: "amazon", label: "Amazon", icon: "󰅐" },
-            { key: "ebay", label: "eBay", icon: "󰮫" },
-            { key: "maps", label: "Google Maps", icon: "󰍎" },
+            { key: "archwiki", label: "Arch Wiki", icon: "brands/arch-symbolic.svg" },
+            { key: "aur", label: "AUR", icon: "brands/arch-symbolic.svg" },
+            { key: "nixopts", label: "NixOS Options", icon: "brands/nixos-symbolic.svg" },
+            { key: "reddit", label: "Reddit", icon: "globe-search.svg" },
+            { key: "twitter", label: "Twitter/X", icon: "globe-search.svg" },
+            { key: "linkedin", label: "LinkedIn", icon: "globe-search.svg" },
+            { key: "wikipedia", label: "Wikipedia", icon: "globe-search.svg" },
+            { key: "translate", label: "Google Translate", icon: "globe-search.svg" },
+            { key: "imdb", label: "IMDb", icon: "globe-search.svg" },
+            { key: "amazon", label: "Amazon", icon: "globe-search.svg" },
+            { key: "ebay", label: "eBay", icon: "globe-search.svg" },
+            { key: "maps", label: "Google Maps", icon: "compass.svg" },
             { key: "images", label: "Google Images", icon: "image.svg" }
         ];
         // Append custom engines
@@ -402,7 +402,7 @@ Item {
                         delegate: SharedWidgets.Chip {
                             required property string modelData
                             text: modelData
-                            icon: "󰋗"
+                            icon: "info.svg"
                             iconColor: Colors.primary
                             textColor: Colors.text
                             bgColor: Colors.withAlpha(Colors.primary, 0.1)
@@ -429,7 +429,7 @@ Item {
 
             SettingsModeRow {
                 label: "Default Mode"
-                icon: "󰀻"
+                icon: "info.svg"
                 currentValue: Config.launcherDefaultMode
                 options: root.defaultModeOptions()
                 onModeSelected: modeValue => Config.launcherDefaultMode = modeValue
@@ -451,7 +451,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "Paste Characters on Select"
-                    icon: "󰆏"
+                    icon: "paste.svg"
                     configKey: "launcherCharacterPasteOnSelect"
                 }
                 SettingsModeRow {
@@ -462,7 +462,7 @@ Item {
                         {
                             value: "contextual",
                             label: "Contextual",
-                            icon: "󰛢"
+                            icon: "eye.svg"
                         },
                         {
                             value: "results",
@@ -479,7 +479,7 @@ Item {
                 }
                 SettingsTextInputRow {
                     label: "Character Trigger"
-                    leadingIcon: "󰞅"
+                    leadingIcon: "add.svg"
                     placeholderText: ":"
                     text: Config.launcherCharacterTrigger
                     onSubmitted: value => Config.launcherCharacterTrigger = value.trim() === "" ? ":" : value.trim()
@@ -507,7 +507,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "App Category Filters"
-                    icon: "󰀻"
+                    icon: "info.svg"
                     configKey: "launcherDrunCategoryFiltersEnabled"
                 }
             }

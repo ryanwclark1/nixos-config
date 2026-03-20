@@ -1,5 +1,6 @@
 import QtQuick
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
   id: root
@@ -43,13 +44,18 @@ Rectangle {
     ScriptAction { script: { pulse.scale = 0.6 } }
   }
 
-  Text {
+  Loader {
     anchors.centerIn: parent
-    text: root.icon
-    font.family: Appearance.fontMono
-    font.pixelSize: root.size * 0.58
-    color: root.tint
+    sourceComponent: String(root.icon).endsWith(".svg") ? _pbSvg : _pbNerd
     opacity: mouse.pressed ? 0.75 : 0.95
+  }
+  Component {
+    id: _pbSvg
+    SharedWidgets.SvgIcon { source: root.icon; color: root.tint; size: root.size * 0.58 }
+  }
+  Component {
+    id: _pbNerd
+    Text { text: root.icon; font.family: Appearance.fontMono; font.pixelSize: root.size * 0.58; color: root.tint }
   }
 
   MouseArea {

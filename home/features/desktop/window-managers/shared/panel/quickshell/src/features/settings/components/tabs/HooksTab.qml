@@ -51,7 +51,7 @@ Item {
                             value: Config.hooksEnabled ? "Enabled" : "Disabled"
                         },
                         {
-                            icon: "󰎛",
+                            icon: "document.svg",
                             label: "Catalog",
                             value: root.hookCount + " available"
                         },
@@ -61,7 +61,7 @@ Item {
                             value: root.configuredHookCount + " script" + (root.configuredHookCount === 1 ? "" : "s")
                         },
                         {
-                            icon: "󰓩",
+                            icon: "code.svg",
                             label: "Categories",
                             value: root.categoryCount + " groups"
                         }
@@ -174,7 +174,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Ghostty Colors"
-                    icon: "󰊠"
+                    icon: "sparkle.svg"
                     configKey: "colorExportGhostty"
                     description: "Write ghostty config fragment (add config-file = ~/.local/state/quickshell/ghostty-colors to ghostty config)"
                 }
@@ -188,7 +188,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "GTK Dark/Light Scheme"
-                    icon: "󰔎"
+                    icon: "play.svg"
                     configKey: "colorExportGtkScheme"
                     description: "Toggle gsettings color-scheme based on light/dark theme"
                 }

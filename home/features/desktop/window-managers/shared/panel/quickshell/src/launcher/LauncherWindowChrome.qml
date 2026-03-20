@@ -17,7 +17,7 @@ Rectangle {
     property string statusText: ""
     property string statusIcon: ""
     property string modePrefix: ""
-    property string modeIcon: "󰍉"
+    property string modeIcon: "search-visual.svg"
 
     anchors.top: parent.top
     anchors.left: parent.left

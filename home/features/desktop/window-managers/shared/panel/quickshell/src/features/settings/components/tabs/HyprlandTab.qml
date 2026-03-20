@@ -42,7 +42,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Master Layout"
-                icon: "󱗼"
+                icon: "widgets.svg"
                 checked: root.settingsRoot ? root.settingsRoot.layoutIsMaster : false
                 enabledText: "Master"
                 disabledText: "Dwindle"
@@ -103,7 +103,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Auto-Apply Profiles"
-                icon: "󰔠"
+                icon: "options.svg"
                 checked: Config.displayAutoProfile
                 onToggled: Config.displayAutoProfile = !Config.displayAutoProfile
             }

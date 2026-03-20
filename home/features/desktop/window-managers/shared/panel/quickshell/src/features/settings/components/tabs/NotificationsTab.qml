@@ -105,12 +105,12 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰞕",
+                            icon: "pip.svg",
                             label: "Popups",
                             value: root._positionSummary
                         },
                         {
-                            icon: "󰔛",
+                            icon: "timer.svg",
                             label: "Normal Timeout",
                             value: root._timeoutLabel(Config.notifTimeoutNormal)
                         },
@@ -125,7 +125,7 @@ Item {
                             value: root._ttsSummary
                         },
                         {
-                            icon: "󰑓",
+                            icon: "clock.svg",
                             label: "Rules",
                             value: root._ruleCount + " override" + (root._ruleCount === 1 ? "" : "s")
                         }
@@ -235,7 +235,7 @@ Item {
 
                     SettingsToggleRow {
                         label: "Compact Style"
-                        icon: "󰉻"
+                        icon: "filter.svg"
                         checked: Config.notifCompact
                         enabledText: "Reduced padding and smaller artwork"
                         disabledText: "Full-size popup with artwork"
@@ -477,7 +477,7 @@ Item {
                             id: ttsExcludedAppInput
                             Layout.fillWidth: true
                             label: ""
-                            leadingIcon: "󰀻"
+                            leadingIcon: "info.svg"
                             placeholderText: "App name (e.g. Spotify)"
                             showClearButton: true
                             onTextEdited: value => root._newTtsExcludedApp = value
@@ -629,7 +629,7 @@ Item {
                         id: newAppNameInput
                         Layout.fillWidth: true
                         label: ""
-                        leadingIcon: "󰀻"
+                        leadingIcon: "info.svg"
                         placeholderText: "Application name (e.g. Spotify)"
                         showClearButton: true
                         onTextEdited: value => root._newRuleAppName = value

@@ -62,7 +62,7 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󱗼",
+                            icon: "widgets.svg",
                             label: "Shell",
                             value: "QML Desktop Shell"
                         },
@@ -147,7 +147,7 @@ Item {
                             value: root.aboutKernel || "…"
                         },
                         {
-                            icon: "󱑎",
+                            icon: "heart-pulse.svg",
                             label: "Uptime",
                             value: root.aboutUptime || "…"
                         }

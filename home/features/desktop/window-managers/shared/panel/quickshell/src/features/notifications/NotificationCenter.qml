@@ -424,7 +424,7 @@ PanelWindow {
                 iconName: modelData.appIcon || ""
                 appName: modelData.appName || ""
                 iconSize: Appearance.iconSizeSmall
-                fallbackIcon: "󰂚"
+                fallbackIcon: "alert.svg"
               }
               ColumnLayout {
                 Layout.fillWidth: true; spacing: 0

@@ -334,17 +334,17 @@ Item {
                             value: root.pluginCount + " plugin" + (root.pluginCount === 1 ? "" : "s")
                         },
                         {
-                            icon: "󰄬",
+                            icon: "checkmark.svg",
                             label: "Enabled",
                             value: root.enabledPluginCount + " active"
                         },
                         {
-                            icon: "󰀪",
+                            icon: "warning.svg",
                             label: "Manifest Errors",
                             value: root.invalidManifestCount + " issue" + (root.invalidManifestCount === 1 ? "" : "s")
                         },
                         {
-                            icon: "󰒓",
+                            icon: "settings.svg",
                             label: "Runtime",
                             value: root.pluginStatusSummary().degraded > 0 || root.pluginStatusSummary().failed > 0
                                 ? (root.pluginStatusSummary().degraded + root.pluginStatusSummary().failed) + " attention"

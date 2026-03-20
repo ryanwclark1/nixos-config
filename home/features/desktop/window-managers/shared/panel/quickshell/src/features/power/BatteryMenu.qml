@@ -182,9 +182,9 @@ BasePopupMenu {
 
       Repeater {
         model: [
-          { id: "power-saver", label: "Saver", icon: "󰌪" },
-          { id: "balanced", label: "Balanced", icon: "󰛲" },
-          { id: "performance", label: "Perform", icon: "󱐋" }
+          { id: "power-saver", label: "Saver", icon: "leaf-two.svg" },
+          { id: "balanced", label: "Balanced", icon: "scales.svg" },
+          { id: "performance", label: "Perform", icon: "flash-on.svg" }
         ]
         delegate: SharedWidgets.FilterChip {
           Layout.fillWidth: true

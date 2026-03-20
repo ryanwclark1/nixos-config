@@ -134,7 +134,7 @@ Item {
                 iconName: root.iconSource
                 appName: root.appName || ""
                 iconSize: Config.dockIconSize - 8
-                fallbackIcon: "󰀻"
+                fallbackIcon: "info.svg"
             }
         }
 

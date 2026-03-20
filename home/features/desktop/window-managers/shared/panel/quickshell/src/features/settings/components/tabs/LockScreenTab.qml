@@ -43,17 +43,17 @@ Item {
                             value: root._presentationSummary
                         },
                         {
-                            icon: "󰓣",
+                            icon: "people.svg",
                             label: "Modules",
                             value: root._moduleCount + " active"
                         },
                         {
-                            icon: "󰈷",
+                            icon: "image.svg",
                             label: "Unlock",
                             value: root._unlockSummary
                         },
                         {
-                            icon: "󰔛",
+                            icon: "timer.svg",
                             label: "Countdown",
                             value: Config.lockScreenCountdown + " ms"
                         }

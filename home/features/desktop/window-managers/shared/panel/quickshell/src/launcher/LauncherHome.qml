@@ -228,7 +228,7 @@ ColumnLayout {
                                         iconName: modelData ? String(modelData.icon || "") : ""
                                         desktopId: modelData ? String(modelData.desktopId || "") : ""
                                         iconSize: 30
-                                        fallbackIcon: "󰀻"
+                                        fallbackIcon: "info.svg"
                                     }
                                 }
 
@@ -327,7 +327,7 @@ ColumnLayout {
                                     execName: modelData ? String(modelData.exec || "") : ""
                                     appName: root.primaryText(modelData)
                                     iconSize: 20
-                                    fallbackIcon: "󰀻"
+                                    fallbackIcon: "info.svg"
                                 }
                             }
 

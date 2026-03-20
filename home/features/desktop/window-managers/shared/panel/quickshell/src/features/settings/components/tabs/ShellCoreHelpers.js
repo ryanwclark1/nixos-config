@@ -17,7 +17,7 @@ function webProviderMeta(webProviders, providerKey) {
     return {
         key: providerKey,
         label: providerKey,
-        icon: "󰖟"
+        icon: "globe-search.svg"
     };
 }
 

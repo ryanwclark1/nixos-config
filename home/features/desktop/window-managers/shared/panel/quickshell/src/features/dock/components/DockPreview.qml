@@ -59,7 +59,7 @@ PopupWindow {
                         iconName: root.appIcon
                         appName: root.appName
                         iconSize: 20
-                        fallbackIcon: "\u{F0BBB}"
+                        fallbackIcon: "app-generic.svg"
                     }
 
                     ColumnLayout {

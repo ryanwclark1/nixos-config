@@ -70,7 +70,7 @@ Item {
 
             SettingsSelectRow {
                 label: "Provider"
-                icon: "󱁍"
+                icon: "sparkle.svg"
                 description: "A dropdown scales better here because providers may expand over time."
                 currentValue: Config.aiProvider
                 options: [
@@ -86,7 +86,7 @@ Item {
             SettingsTextInputRow {
                 visible: Config.aiProvider !== "ollama"
                 label: "Model"
-                leadingIcon: "󰘦"
+                leadingIcon: "chat.svg"
                 placeholderText: Config.aiProvider === "ollama" ? "e.g. llama3.2" : "Leave empty for default"
                 text: Config.aiModel
                 onTextEdited: value => Config.aiModel = value
@@ -123,7 +123,7 @@ Item {
                 SettingsSelectRow {
                     visible: AiService.availableModels.length > 0
                     label: "Detected Models"
-                    icon: "󰘦"
+                    icon: "chat.svg"
                     description: "Choose from models reported by Ollama instead of scanning a large chip list."
                     currentValue: Config.aiModel !== "" ? Config.aiModel : AiService.activeModel
                     maxMenuHeight: 220
@@ -144,7 +144,7 @@ Item {
 
                 SettingsTextInputRow {
                     label: "Model Override"
-                    leadingIcon: "󰘦"
+                    leadingIcon: "chat.svg"
                     placeholderText: "e.g. llama3.2"
                     text: Config.aiModel
                     onTextEdited: value => Config.aiModel = value

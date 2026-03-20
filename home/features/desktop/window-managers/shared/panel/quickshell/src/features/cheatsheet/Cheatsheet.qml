@@ -110,7 +110,7 @@ PanelWindow {
 
                 IconButton {
                     size: Appearance.iconSizeMedium
-                    icon: "\u{f0156}"
+                    icon: "keyboard.svg"
                     tooltipText: "Close"
                     onClicked: root.close()
                 }

@@ -194,7 +194,7 @@ PopupWindow {
       MenuItem {
         visible: root.showWorkspaceList
         text: "‹ Back"
-        icon: "󰁍"
+        icon: "pin.svg"
         onClicked: root.showWorkspaceList = false
       }
 

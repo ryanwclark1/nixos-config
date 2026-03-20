@@ -8,8 +8,8 @@ Rectangle {
 
   property string target: "@DEFAULT_AUDIO_SINK@"
   property bool muted: false
-  property string icon: "󰕾"
-  property string mutedIcon: "󰝟"
+  property string icon: "speaker.svg"
+  property string mutedIcon: "speaker-mute.svg"
   property int size: 28
   property bool showBorder: false
   property var action: null

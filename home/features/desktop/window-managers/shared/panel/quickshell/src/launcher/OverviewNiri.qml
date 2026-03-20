@@ -54,7 +54,7 @@ ColumnLayout {
             (function (targetWs) {
                     items.push({
                         label: "Move to " + wsLabel,
-                        icon: "󰁔",
+                        icon: "dismiss.svg",
                         action: function () {
                             NiriService.moveWindowToWorkspace(win.id, targetWs.idx, false);
                         }
@@ -69,7 +69,7 @@ ColumnLayout {
 
         items.push({
             label: "Fullscreen",
-            icon: "󰊓",
+            icon: "fullscreen.svg",
             action: function () {
                 CompositorAdapter.focusWindow(win.id);
                 NiriService.fullscreenWindow();
@@ -78,7 +78,7 @@ ColumnLayout {
 
         items.push({
             label: "Float",
-            icon: "󰖲",
+            icon: "add.svg",
             action: function () {
                 CompositorAdapter.focusWindow(win.id);
                 NiriService.toggleWindowFloating();
@@ -91,7 +91,7 @@ ColumnLayout {
 
         items.push({
             label: "Close",
-            icon: "󰅙",
+            icon: "dismiss.svg",
             danger: true,
             action: function () {
                 CompositorAdapter.closeWindow(win.id);
