@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
-import "../../../shared" as Shared
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 import "."
 
@@ -156,7 +156,7 @@ Rectangle {
                 anchors.rightMargin: Colors.spacingS
                 spacing: Colors.spacingS
 
-                Shared.SvgIcon {
+                SvgIcon {
                     source: "search-visual.svg"
                     color: searchInput.activeFocus ? Colors.primary : Colors.textDisabled
                     size: 14
@@ -195,7 +195,7 @@ Rectangle {
                     radius: 9
                     color: Colors.withAlpha(Colors.text, clearSearchMouse.containsMouse ? 0.15 : 0.08)
 
-                    Shared.SvgIcon {
+                    SvgIcon {
                         anchors.centerIn: parent
                         source: "dismiss.svg"
                         color: Colors.textSecondary
@@ -287,7 +287,7 @@ Rectangle {
                                     property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
                                     sourceComponent: _ic.endsWith(".svg") ? _cSvg1 : _cNerd1
                                 }
-                                Component { id: _cSvg1; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeLarge } }
+                                Component { id: _cSvg1; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeLarge } }
                                 Component { id: _cNerd1; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
 
                                 MouseArea {
@@ -314,7 +314,7 @@ Rectangle {
                                     property color _co: Colors.withAlpha(Colors.textDisabled, 0.85)
                                     sourceComponent: _ic.endsWith(".svg") ? _cSvg2 : _cNerd2
                                 }
-                                Component { id: _cSvg2; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeSmall } }
+                                Component { id: _cSvg2; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeSmall } }
                                 Component { id: _cNerd2; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall } }
 
                                 Rectangle {
@@ -397,7 +397,7 @@ Rectangle {
                                             property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
                                             sourceComponent: _ic.endsWith(".svg") ? _cSvg3 : _cNerd3
                                         }
-                                        Component { id: _cSvg3; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeMedium } }
+                                        Component { id: _cSvg3; SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeMedium } }
                                         Component { id: _cNerd3; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium } }
 
                                         Text {
@@ -581,7 +581,7 @@ Rectangle {
                                         opacity: expanded ? 1.0 : 0.6
                                         sourceComponent: _ic.endsWith(".svg") ? _cSvg4 : _cNerd4
                                     }
-                                    Component { id: _cSvg4; Shared.SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
+                                    Component { id: _cSvg4; SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
                                     Component { id: _cNerd4; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: 14 } }
 
                                     Text {
@@ -664,7 +664,7 @@ Rectangle {
                                                 opacity: root.currentTabId === modelData.id ? 1.0 : 0.5
                                                 sourceComponent: _ic.endsWith(".svg") ? _cSvg5 : _cNerd5
                                             }
-                                            Component { id: _cSvg5; Shared.SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
+                                            Component { id: _cSvg5; SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
                                             Component { id: _cNerd5; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: 14 } }
 
                                             Text {
@@ -731,7 +731,7 @@ Rectangle {
                         anchors.centerIn: parent
                         spacing: Colors.spacingS
 
-                        Shared.SvgIcon {
+                        SvgIcon {
                             source: "save.svg"
                             color: saveMouse.containsMouse ? Colors.background : Colors.primary
                             size: 16

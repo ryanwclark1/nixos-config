@@ -47,19 +47,19 @@ Item {
             },
             "launcher-web": {
                 label: "Web",
-                icon: "󰖟",
+                icon: "globe-search.svg",
                 description: "Manage providers, aliases, custom engines, and web-specific shortcuts.",
                 chips: ["Providers", "Aliases", "Custom engines"]
             },
             "launcher-modes": {
                 label: "Modes",
-                icon: "󰌌",
+                icon: "keyboard.svg",
                 description: "Control pinned and advanced mode layout, presets, and drag ordering.",
                 chips: ["Primary", "Advanced", "Presets"]
             },
             "launcher-runtime": {
                 label: "Runtime",
-                icon: "󰔟",
+                icon: "timer.svg",
                 description: "Configure preload, diagnostics, metrics, and recovery behavior.",
                 chips: ["Preload", "Metrics", "Recovery"]
             }
@@ -72,9 +72,9 @@ Item {
     readonly property var launcherHeroTabs: [
         { id: "launcher", label: "General", icon: "search-visual.svg" },
         { id: "launcher-search", label: "Search", icon: "search-visual.svg" },
-        { id: "launcher-web", label: "Web", icon: "󰖟" },
-        { id: "launcher-modes", label: "Modes", icon: "󰌌" },
-        { id: "launcher-runtime", label: "Runtime", icon: "󰔟" }
+        { id: "launcher-web", label: "Web", icon: "globe-search.svg" },
+        { id: "launcher-modes", label: "Modes", icon: "keyboard.svg" },
+        { id: "launcher-runtime", label: "Runtime", icon: "timer.svg" }
     ]
 
     // Static data arrays
@@ -101,7 +101,7 @@ Item {
             { key: "npm", label: "npm", icon: "󰎙" },
             { key: "pypi", label: "PyPI", icon: "󰌠" },
             { key: "crates", label: "crates.io", icon: "🦀" },
-            { key: "mdn", label: "MDN Web Docs", icon: "󰖟" },
+            { key: "mdn", label: "MDN Web Docs", icon: "globe-search.svg" },
             { key: "archwiki", label: "Arch Wiki", icon: "󰣇" },
             { key: "aur", label: "AUR", icon: "󰣇" },
             { key: "nixopts", label: "NixOS Options", icon: "" },
@@ -114,7 +114,7 @@ Item {
             { key: "amazon", label: "Amazon", icon: "󰅐" },
             { key: "ebay", label: "eBay", icon: "󰮫" },
             { key: "maps", label: "Google Maps", icon: "󰍎" },
-            { key: "images", label: "Google Images", icon: "󰋩" }
+            { key: "images", label: "Google Images", icon: "image.svg" }
         ];
         // Append custom engines
         var customs = Config.launcherWebCustomEngines;
@@ -431,12 +431,12 @@ Item {
 
                 SettingsToggleRow {
                     label: "Show Mode Hints"
-                    icon: "󰌌"
+                    icon: "keyboard.svg"
                     configKey: "launcherShowModeHints"
                 }
                 SettingsToggleRow {
                     label: "Keep Query on Mode Switch"
-                    icon: "󰔟"
+                    icon: "timer.svg"
                     configKey: "launcherKeepSearchOnModeSwitch"
                 }
                 SettingsToggleRow {
@@ -446,7 +446,7 @@ Item {
                 }
                 SettingsModeRow {
                     label: "Tab Behavior"
-                    icon: "󰌌"
+                    icon: "keyboard.svg"
                     currentValue: Config.launcherTabBehavior
                     options: [
                         {
@@ -462,7 +462,7 @@ Item {
                         {
                             value: "mode",
                             label: "Mode Switch",
-                            icon: "󰌌"
+                            icon: "keyboard.svg"
                         }
                     ]
                     onModeSelected: modeValue => Config.launcherTabBehavior = modeValue
@@ -492,7 +492,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Show Home Sections"
-                    icon: "󰆍"
+                    icon: "terminal.svg"
                     configKey: "launcherShowHomeSections"
                 }
                 SettingsToggleRow {
@@ -504,7 +504,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Recents History Limit"
-                icon: "󰑓"
+                icon: "arrow-counterclockwise.svg"
                 min: 4
                 max: 40
                 step: 1
@@ -515,7 +515,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Recent Apps on Home"
-                icon: "󰑓"
+                icon: "arrow-counterclockwise.svg"
                 min: 1
                 max: 20
                 step: 1
@@ -526,7 +526,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Suggestions on Home"
-                icon: "󰆒"
+                icon: "copy.svg"
                 min: 0
                 max: 12
                 step: 1
@@ -546,7 +546,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Max Results"
-                icon: "󰔛"
+                icon: "clock.svg"
                 min: 20
                 max: 200
                 step: 5
@@ -556,7 +556,7 @@ Item {
 
             SettingsSliderRow {
                 label: "File Query Min Length"
-                icon: "󰈔"
+                icon: "document.svg"
                 min: 1
                 max: 6
                 value: Config.launcherFileMinQueryLength
@@ -565,7 +565,7 @@ Item {
 
             SettingsSliderRow {
                 label: "File Search Max Results"
-                icon: "󰈔"
+                icon: "document.svg"
                 min: 20
                 max: 300
                 step: 10
@@ -575,7 +575,7 @@ Item {
 
             SettingsTextInputRow {
                 label: "File Search Root"
-                leadingIcon: "󰉋"
+                leadingIcon: "folder.svg"
                 placeholderText: "~"
                 text: Config.launcherFileSearchRoot
                 onSubmitted: value => Config.launcherFileSearchRoot = value.trim() === "" ? "~" : value.trim()
@@ -584,7 +584,7 @@ Item {
 
             SettingsToggleRow {
                 label: "Show Hidden Files"
-                icon: "󰘓"
+                icon: "sort.svg"
                 configKey: "launcherFileShowHidden"
                 enabledText: "Include dotfiles and hidden directories in file mode."
                 disabledText: "Hide dotfiles and hidden directories in file mode."
@@ -600,7 +600,7 @@ Item {
             SettingsToggleRow {
                 visible: root.launcherFilePreviewToggleAvailable
                 label: "File Preview Pane"
-                icon: "󰋩"
+                icon: "image.svg"
                 configKey: "launcherFilePreviewEnabled"
                 enabledText: "Show a content preview beside file search results (Alt+P)."
                 disabledText: "Hide the file preview pane."
@@ -608,7 +608,7 @@ Item {
 
             SettingsTextInputRow {
                 label: "File Opener"
-                leadingIcon: "󰈔"
+                leadingIcon: "document.svg"
                 placeholderText: "xdg-open"
                 text: Config.launcherFileOpener
                 onSubmitted: value => Config.launcherFileOpener = value.trim() === "" ? "xdg-open" : value.trim()
@@ -617,7 +617,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Cache TTL"
-                icon: "󰔟"
+                icon: "timer.svg"
                 min: 30
                 max: 1800
                 step: 30
@@ -628,7 +628,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Search Debounce"
-                icon: "󰔛"
+                icon: "clock.svg"
                 min: 0
                 max: 250
                 step: 5
@@ -639,7 +639,7 @@ Item {
 
             SettingsSliderRow {
                 label: "File Search Debounce"
-                icon: "󰔛"
+                icon: "clock.svg"
                 min: 50
                 max: 1200
                 step: 10
@@ -663,7 +663,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Name Weight"
-                icon: "󰌌"
+                icon: "keyboard.svg"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -674,7 +674,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Title Weight"
-                icon: "󰌌"
+                icon: "keyboard.svg"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -685,7 +685,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Exec/Class Weight"
-                icon: "󰆍"
+                icon: "terminal.svg"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -696,7 +696,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Body Weight"
-                icon: "󰈔"
+                icon: "document.svg"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -731,17 +731,17 @@ Item {
 
                 SettingsToggleRow {
                     label: "Web Enter Uses Primary"
-                    icon: "󰖟"
+                    icon: "globe-search.svg"
                     configKey: "launcherWebEnterUsesPrimary"
                 }
                 SettingsToggleRow {
                     label: "Web Number Hotkeys"
-                    icon: "󰌌"
+                    icon: "keyboard.svg"
                     configKey: "launcherWebNumberHotkeysEnabled"
                 }
                 SettingsToggleRow {
                     label: "Remember Web Provider"
-                    icon: "󰖟"
+                    icon: "globe-search.svg"
                     configKey: "launcherRememberWebProvider"
                 }
             }
@@ -1349,12 +1349,12 @@ Item {
 
                 SettingsToggleRow {
                     label: "Background Preload"
-                    icon: "󰔟"
+                    icon: "timer.svg"
                     configKey: "launcherEnablePreload"
                 }
                 SettingsToggleRow {
                     label: "Debug Launcher Timings"
-                    icon: "󰔛"
+                    icon: "clock.svg"
                     configKey: "launcherEnableDebugTimings"
                 }
                 SettingsToggleRow {
@@ -1366,7 +1366,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Preload Failure Threshold"
-                icon: "󰔟"
+                icon: "timer.svg"
                 min: 1
                 max: 10
                 step: 1
@@ -1377,7 +1377,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Preload Backoff"
-                icon: "󰔛"
+                icon: "clock.svg"
                 min: 10
                 max: 900
                 step: 10

@@ -90,12 +90,12 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰅐",
+                            icon: "clock.svg",
                             label: "Clock",
                             value: root._timeFormatSummary + (Config.timeShowSeconds ? " / seconds" : "")
                         },
                         {
-                            icon: "󰃭",
+                            icon: "calendar-add.svg",
                             label: "Bar Date",
                             value: root._dateSummary
                         },
@@ -105,7 +105,7 @@ Item {
                             value: root._weatherUnitsSummary
                         },
                         {
-                            icon: "󰍎",
+                            icon: "compass.svg",
                             label: "Location",
                             value: root.activeLocationSummary()
                         },
@@ -324,24 +324,24 @@ Item {
 
                     SettingsToggleRow {
                         label: "24-Hour Clock"
-                        icon: "󰅐"
+                        icon: "clock.svg"
                         configKey: "timeUse24Hour"
                     }
                     SettingsToggleRow {
                         label: "Show Seconds"
-                        icon: "󰔟"
+                        icon: "timer.svg"
                         configKey: "timeShowSeconds"
                     }
                     SettingsToggleRow {
                         label: "Show Date In Bar"
-                        icon: "󰃭"
+                        icon: "calendar-add.svg"
                         configKey: "timeShowBarDate"
                     }
                 }
 
                 SettingsModeRow {
                     label: "Bar Date Style"
-                    icon: "󰃭"
+                    icon: "calendar-add.svg"
                     currentValue: Config.timeBarDateStyle
                     options: [
                         {
@@ -373,7 +373,7 @@ Item {
 
                 SettingsModeRow {
                     label: "Units"
-                    icon: "󰔄"
+                    icon: "temperature.svg"
                     currentValue: Config.weatherUnits
                     options: [
                         {
@@ -390,7 +390,7 @@ Item {
 
                 SettingsModeRow {
                     label: "Location Priority"
-                    icon: "󰍎"
+                    icon: "compass.svg"
                     currentValue: Config.weatherLocationPriority
                     options: [
                         {
@@ -411,7 +411,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Auto Location"
-                    icon: "󰍹"
+                    icon: "desktop.svg"
                     configKey: "weatherAutoLocation"
                 }
 
@@ -422,7 +422,7 @@ Item {
                     SettingsTextInputRow {
                         label: "City"
                         placeholderText: "New York, NY"
-                        leadingIcon: "󰍎"
+                        leadingIcon: "compass.svg"
                         text: Config.weatherCityQuery
                         onSubmitted: value => Config.weatherCityQuery = value.trim()
                         onTextEdited: value => {

@@ -46,7 +46,7 @@ Item {
                             value: root._enabledBackgroundFeatures + " active"
                         },
                         {
-                            icon: "󰥔",
+                            icon: "clock.svg",
                             label: "Clock",
                             value: root._clockPositionSummary
                         },
@@ -118,28 +118,28 @@ Item {
 
                     SettingsToggleRow {
                         label: "Spectrum Visualizer"
-                        icon: "󰓃"
+                        icon: "mic.svg"
                         configKey: "backgroundVisualizerEnabled"
                     }
                     SettingsToggleRow {
                         label: "Shader Visualizer"
                         description: "High-performance GLSL mode."
-                        icon: "󰓃"
+                        icon: "mic.svg"
                         configKey: "backgroundUseShaderVisualizer"
                     }
                     SettingsToggleRow {
                         label: "Desktop Clock"
-                        icon: "󰥔"
+                        icon: "clock.svg"
                         configKey: "backgroundClockEnabled"
                     }
                     SettingsToggleRow {
                         label: "Auto-Hide on Fullscreen"
-                        icon: "󰘖"
+                        icon: "lock-closed.svg"
                         configKey: "backgroundAutoHide"
                     }
                     SettingsToggleRow {
                         label: "Weather overlay"
-                        icon: "󰖐"
+                        icon: "weather-sunny.svg"
                         configKey: "weatherOverlayEnabled"
                     }
                 }
