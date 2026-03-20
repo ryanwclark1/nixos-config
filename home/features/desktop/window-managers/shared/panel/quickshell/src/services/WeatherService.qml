@@ -354,5 +354,6 @@ QtObject {
     function onWeatherCityQueryChanged() { configDebounce.restart(); }
     function onWeatherLatitudeChanged() { configDebounce.restart(); }
     function onWeatherLongitudeChanged() { configDebounce.restart(); }
+    function onWeatherLocationPriorityChanged() { configDebounce.restart(); }
   }
 }
