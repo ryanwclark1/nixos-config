@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import "../system/sections"
+import "../../shared" as Shared
 import "../../services"
 import "../../widgets" as SharedWidgets
 
@@ -106,77 +107,161 @@ PanelWindow {
       anchors.margins: Appearance.paddingLarge
       spacing: Appearance.spacingLG
 
+      // --- Header Area ---
       RowLayout {
         Layout.fillWidth: true
         spacing: Appearance.spacingM
-        Text {
-          text: "Notifications"
-          color: Colors.text
-          font.pixelSize: Appearance.fontSizeHuge
-          font.weight: Font.DemiBold
-          font.letterSpacing: Appearance.letterSpacingTight
+
+        ColumnLayout {
+          spacing: 0
+          Text {
+            text: "Notification Center"
+            color: Colors.text
+            font.pixelSize: Appearance.fontSizeHuge
+            font.weight: Font.DemiBold
+            font.letterSpacing: Appearance.letterSpacingTight
+          }
+          RowLayout {
+            spacing: Appearance.spacingS
+            visible: notifList.count > 0
+            Rectangle {
+              width: 8; height: 8; radius: 4; color: Colors.primary
+            }
+            Text {
+              text: notifList.count + " active notifications"
+              color: Colors.textDisabled
+              font.pixelSize: Appearance.fontSizeXXS
+              font.weight: Font.Medium
+            }
+          }
         }
 
         Item { Layout.fillWidth: true }
 
-        // DND Toggle
-        SharedWidgets.IconButton {
-          size: Appearance.iconSizeMedium
-          icon: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
-          iconColor: root.manager && root.manager.dndEnabled ? Colors.error : Colors.textSecondary
-          tooltipText: root.manager && root.manager.dndEnabled ? "Disable do not disturb" : "Do not disturb"
-          onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
-        }
+        RowLayout {
+          spacing: Appearance.spacingXS
+          
+          // TTS Toggle
+          SharedWidgets.IconButton {
+            size: Appearance.iconSizeMedium
+            icon: Config.notifTtsEnabled ? "󰗆" : "󰗈"
+            iconColor: Config.notifTtsEnabled ? Colors.primary : Colors.textSecondary
+            tooltipText: Config.notifTtsEnabled ? "Disable read-aloud" : "Read notifications aloud"
+            onClicked: Config.notifTtsEnabled = !Config.notifTtsEnabled
+          }
 
-        // TTS Toggle
-        SharedWidgets.IconButton {
-          size: Appearance.iconSizeMedium
-          icon: Config.notifTtsEnabled ? "󰗆" : "󰗈"
-          iconColor: Config.notifTtsEnabled ? Colors.primary : Colors.textSecondary
-          tooltipText: Config.notifTtsEnabled ? "Disable read-aloud" : "Read notifications aloud"
-          onClicked: Config.notifTtsEnabled = !Config.notifTtsEnabled
-        }
+          // Stop Speaking — only visible while TTS is active
+          SharedWidgets.IconButton {
+            size: Appearance.iconSizeMedium
+            icon: "stop.svg"
+            iconColor: Colors.error
+            tooltipText: "Stop speaking"
+            visible: !!(root.manager && root.manager.ttsSpeaking)
+            onClicked: if (root.manager) root.manager.stopSpeaking()
+          }
 
-        // Stop Speaking — only visible while TTS is active
-        SharedWidgets.IconButton {
-          size: Appearance.iconSizeMedium
-          icon: "stop.svg"
-          iconColor: Colors.error
-          tooltipText: "Stop speaking"
-          visible: !!(root.manager && root.manager.ttsSpeaking)
-          onClicked: if (root.manager) root.manager.stopSpeaking()
-        }
+          // DND Toggle
+          SharedWidgets.IconButton {
+            size: Appearance.iconSizeMedium
+            icon: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
+            iconColor: root.manager && root.manager.dndEnabled ? Colors.error : Colors.textSecondary
+            tooltipText: root.manager && root.manager.dndEnabled ? "Disable do not disturb" : "Do not disturb"
+            onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
+          }
 
-        // Clear all
-        SharedWidgets.IconButton {
-          size: Appearance.iconSizeMedium
-          icon: "archive.svg"
-          iconColor: Colors.textDisabled
-          tooltipText: "Clear all"
-          onClicked: if (root.manager) root.manager.dismissAll()
-        }
+          // Clear all
+          SharedWidgets.IconButton {
+            size: Appearance.iconSizeMedium
+            icon: "archive.svg"
+            iconColor: Colors.textDisabled
+            tooltipText: "Clear all"
+            onClicked: if (root.manager) root.manager.dismissAll()
+          }
 
-        // Close button
-        SharedWidgets.IconButton {
-          size: Appearance.iconSizeMedium
-          icon: "dismiss.svg"
-          tooltipText: "Close"
-          tooltipShortcut: "Meta+N"
-          onClicked: root.closeRequested()
+          // Close button
+          SharedWidgets.IconButton {
+            size: Appearance.iconSizeMedium
+            icon: "dismiss.svg"
+            tooltipText: "Close"
+            onClicked: root.closeRequested()
+          }
         }
       }
 
-      WeatherWidget {}
+      // --- Dashboard Section ---
+      Shared.ThemedContainer {
+        variant: "card"
+        Layout.fillWidth: true
+        implicitHeight: dashContent.implicitHeight + Appearance.paddingLarge * 2
+
+        SystemClock { id: dashClock; precision: SystemClock.Minutes }
+
+        RowLayout {
+          id: dashContent
+          anchors.fill: parent
+          anchors.margins: Appearance.paddingLarge
+          spacing: Appearance.spacingXL
+
+          ColumnLayout {
+            spacing: 0
+            Text {
+              text: Qt.formatDateTime(dashClock.date, "HH:mm")
+              color: Colors.text
+              font.pixelSize: 32
+              font.weight: Font.Black
+              font.letterSpacing: -1
+            }
+            Text {
+              text: Qt.formatDateTime(dashClock.date, "dddd, MMMM d")
+              color: Colors.primary
+              font.pixelSize: Appearance.fontSizeSmall
+              font.weight: Font.Bold
+              opacity: 0.8
+            }
+          }
+
+          Rectangle { Layout.fillHeight: true; width: 1; color: Colors.border; opacity: 0.3 }
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Appearance.spacingXXS
+            SharedWidgets.Ref { service: WeatherService }
+            
+            RowLayout {
+              spacing: Appearance.spacingS
+              SharedWidgets.SvgIcon {
+                source: Appearance.weatherIcon(WeatherService.condition)
+                color: Colors.accent
+                size: 24
+              }
+              Text {
+                text: WeatherService.temp
+                color: Colors.text
+                font.pixelSize: Appearance.fontSizeLarge
+                font.weight: Font.Bold
+              }
+            }
+            Text {
+              text: (WeatherService.condition || "Unknown")
+              color: Colors.textSecondary
+              font.pixelSize: Appearance.fontSizeXXS
+              font.weight: Font.Black
+              font.capitalization: Font.AllUppercase
+            }
+          }
+        }
+      }
 
       Calendar {
-         visible: root.searchQuery === ""
+         visible: root.searchQuery === "" && notifList.count < 3
+         Layout.preferredHeight: 280
       }
 
-      // Search Bar
+      // --- Search Bar ---
       Rectangle {
         Layout.fillWidth: true
-        height: 44
-        color: Colors.cardSurface
+        height: 48
+        color: Colors.withAlpha(Colors.surface, searchInput.activeFocus ? 0.15 : 0.08)
         radius: Appearance.radiusMedium
         border.color: searchInput.activeFocus ? Colors.primary : Colors.border
         border.width: 1
@@ -187,8 +272,9 @@ PanelWindow {
           spacing: Appearance.spacingS
           SharedWidgets.SvgIcon {
             source: "search-visual.svg"
-            color: Colors.textDisabled
+            color: searchInput.activeFocus ? Colors.primary : Colors.textDisabled
             size: Appearance.fontSizeLarge
+            opacity: 0.7
           }
           TextInput {
             id: searchInput
@@ -202,7 +288,7 @@ PanelWindow {
           }
           Text {
             Layout.alignment: Qt.AlignVCenter
-            text: "Search..."
+            text: "Filter notifications..."
             color: Colors.textDisabled
             font.pixelSize: Appearance.fontSizeMedium
             visible: !searchInput.text && !searchInput.activeFocus
@@ -210,9 +296,9 @@ PanelWindow {
         }
       }
 
+      // --- Notifications List ---
       Item {
         Layout.fillWidth: true
-        // Shrink when empty so the archive history section gets more space
         readonly property bool _hasTracked: notifList.count > 0
         Layout.fillHeight: _hasTracked
         Layout.preferredHeight: _hasTracked ? -1 : (_emptyState.visible ? _emptyState.implicitHeight + Appearance.spacingL * 2 : 0)
@@ -234,20 +320,28 @@ PanelWindow {
             id: _emptyState
             anchors.centerIn: parent
             visible: (notifList.count === 0 && root.searchQuery === "") || (root.searchQuery !== "" && notifList.visibleCount === 0)
-            spacing: Appearance.spacingS
-            opacity: 0.6
+            spacing: Appearance.spacingM
+            opacity: 0.8
             SharedWidgets.SvgIcon {
               Layout.alignment: Qt.AlignHCenter
               source: root.searchQuery === "" ? "alert.svg" : "search-visual.svg"
-              color: Colors.textDisabled
-              size: 36
+              color: Colors.primary
+              size: 48
+              opacity: 0.4
             }
             Text {
               Layout.alignment: Qt.AlignHCenter
-              text: root.searchQuery === "" ? "No new notifications" : "No matches found"
-              color: Colors.textDisabled
-              font.pixelSize: Appearance.fontSizeMedium
-              font.weight: Font.Medium
+              text: root.searchQuery === "" ? "All caught up" : "No matches found"
+              color: Colors.text
+              font.pixelSize: Appearance.fontSizeLarge
+              font.weight: Font.Bold
+            }
+            Text {
+              Layout.alignment: Qt.AlignHCenter
+              text: root.searchQuery === "" ? "No new notifications at this time." : "Try a different search term."
+              color: Colors.textSecondary
+              font.pixelSize: Appearance.fontSizeSmall
+              horizontalAlignment: Text.AlignHCenter
             }
           }
 
@@ -275,7 +369,7 @@ PanelWindow {
           section.criteria: ViewSection.FullString
           section.delegate: Item {
             width: notifList.width
-            height: 44
+            height: 48
             property bool isCollapsed: notifList.collapsedGroups[section] || false
 
             RowLayout {
@@ -284,25 +378,25 @@ PanelWindow {
               spacing: Appearance.spacingM
 
               MouseArea {
-                Layout.preferredWidth: Appearance.iconSizeSmall; Layout.preferredHeight: Appearance.iconSizeSmall
+                Layout.preferredWidth: 24; Layout.preferredHeight: 24
                 hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                 SharedWidgets.SvgIcon {
                   anchors.centerIn: parent; source: isCollapsed ? "chevron-right.svg" : "chevron-down.svg"; color: Colors.primary
-                  size: Appearance.fontSizeLarge
+                  size: 16
                 }
                 onClicked: notifList.toggleGroup(section)
               }
 
               Text {
                 text: section || "System"
-                color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.Black
+                color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Black
                 font.capitalization: Font.AllUppercase; font.letterSpacing: Appearance.letterSpacingWide
               }
 
-              Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.4 }
+              Rectangle { Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.2 }
 
               Rectangle {
-                width: 24; height: 18; radius: Appearance.radiusSmall; color: Colors.highlight
+                width: 20; height: 20; radius: 10; color: Colors.primarySubtle
                 readonly property int sectionCount: {
                   var count = 0;
                   var notifs = root.manager ? root.manager.notifications : null;
@@ -313,7 +407,7 @@ PanelWindow {
                   }
                   return count;
                 }
-                Text { anchors.centerIn: parent; text: parent.sectionCount; color: Colors.primary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold }
+                Text { anchors.centerIn: parent; text: parent.sectionCount; color: Colors.primary; font.pixelSize: 10; font.weight: Font.Bold }
               }
 
               SharedWidgets.IconButton {
