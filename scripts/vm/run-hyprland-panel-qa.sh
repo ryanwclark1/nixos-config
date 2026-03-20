@@ -336,7 +336,7 @@ set -euo pipefail
 
 mkdir -p "${VM_OUTPUT_DIR}"
 log_path="${VM_OUTPUT_DIR}/settings-qa.log"
-artifact_dir="${VM_OUTPUT_DIR}/bar-widgets-first-open"
+artifact_dir="${VM_OUTPUT_DIR}"
 
 set -o pipefail
 bash "${REMOTE_PANEL_ROOT}/scripts/check-settings-qa.sh" --repo-shell --output-dir "${artifact_dir}" 2>&1 | tee "${log_path}"
@@ -350,7 +350,7 @@ set -uo pipefail
 mkdir -p "${VM_OUTPUT_DIR}"
 runtime_log="${VM_OUTPUT_DIR}/runtime.log"
 settings_log="${VM_OUTPUT_DIR}/settings-qa.log"
-artifact_dir="${VM_OUTPUT_DIR}/bar-widgets-first-open"
+artifact_dir="${VM_OUTPUT_DIR}"
 runtime_status=0
 settings_status=0
 
