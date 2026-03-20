@@ -13,9 +13,14 @@ Item {
     readonly property color accentColor: launcher.modeAccentColor ? launcher.modeAccentColor : Colors.primary
     readonly property real panelGap: launcher.compactMode ? Appearance.spacingXS : Appearance.spacingS
     readonly property bool minimalShell: launcher && launcher.diagnosticMinimalShell === true
-    readonly property bool showAssistBand: !minimalShell && !launcher.tightMode && (launcher.prefixQuickModes.length > 0
-        || launcher.effectiveShowModeHints
-        || (launcher.mode === "web" && launcher.filteredItems.length > 0)
+    readonly property bool showPrefixStrip: !launcher.compactMode && launcher.prefixQuickModes.length > 0
+    readonly property bool showActionLegend: !launcher.compactMode && launcher.effectiveShowModeHints
+    readonly property bool showWebProviderBar: launcher.mode === "web" && launcher.filteredItems.length > 0
+    readonly property bool showWebHints: !launcher.compactMode && launcher.effectiveShowModeHints && launcher.mode === "web"
+    readonly property bool showAssistBand: !minimalShell && !launcher.tightMode && (showPrefixStrip
+        || showActionLegend
+        || showWebProviderBar
+        || showWebHints
         || launcher.transientNoticeText !== "")
     readonly property real searchDeckHeight: searchDeckShell.visible ? searchDeckShell.height : 0
     readonly property real utilityBandHeight: utilityBandBox.visible ? utilityBandBox.height : 0
@@ -134,11 +139,11 @@ Item {
                         LauncherPrefixStrip {
                             launcher: root.launcher
                             accentColor: root.accentColor
-                            visible: launcher.prefixQuickModes.length > 0
+                            visible: root.showPrefixStrip
                         }
 
                         LauncherActionLegend {
-                            visible: launcher.effectiveShowModeHints
+                            visible: root.showActionLegend
                             summaryText: launcher.modeSummaryText
                             primaryAction: launcher.legendPrimaryAction
                             secondaryAction: launcher.legendSecondaryAction
@@ -150,7 +155,7 @@ Item {
                         }
 
                         LauncherWebProviderBar {
-                            visible: launcher.mode === "web" && launcher.filteredItems.length > 0
+                            visible: root.showWebProviderBar
                             providers: launcher.configuredWebProviders()
                             selectedKey: launcher.selectedWebProviderKey
                             accentColor: root.accentColor
@@ -158,7 +163,7 @@ Item {
                         }
 
                         LauncherWebHints {
-                            visible: launcher.effectiveShowModeHints && launcher.mode === "web"
+                            visible: root.showWebHints
                             primaryEnterHint: launcher.webPrimaryEnterHint
                             secondaryEnterHint: launcher.webSecondaryEnterHint
                             aliasHint: launcher.webAliasHint
@@ -228,7 +233,7 @@ Item {
                     id: homePanel
                     Layout.fillWidth: true
                     launcher: root.launcher
-                    visible: !root.minimalShell && launcher.mode === "drun" && launcher.showLauncherHomePanel && !launcher.isModeLoading
+                    visible: !root.minimalShell && launcher.mode === "drun" && launcher.showLauncherHomePanel && !launcher.isModeLoading && homePanel.hasVisibleContent
                     showHomeSections: true
                 }
 

@@ -18,8 +18,16 @@ ColumnLayout {
     readonly property bool showRecentItems: root.showHomeSections && root.launcher.recentItems.length > 0
     readonly property bool showSuggestions: root.showHomeSections && root.launcher.mode === "drun" && root.launcher.suggestionItems.length > 0
     readonly property bool showBrowseShelf: root.showRecentItems || root.showSuggestions
+    readonly property bool hasVisibleContent: root.showCategoryFilters || root.showBrowseShelf
     readonly property real recentCardWidth: root.launcher.compactMode ? 118 : 136
     readonly property real suggestionCardWidth: root.launcher.compactMode ? 184 : 208
+    readonly property real recentStripHeight: 40
+    readonly property real suggestionStripHeight: 36
+    implicitHeight: !root.hasVisibleContent
+        ? 0
+        : ((categorySection.visible ? categorySection.implicitHeight : 0)
+            + (categorySection.visible && browseShelf.visible ? root.spacing : 0)
+            + (browseShelf.visible ? browseShelf.implicitHeight : 0))
 
     function primaryText(item) {
         if (!item)
@@ -58,6 +66,7 @@ ColumnLayout {
     }
 
     Rectangle {
+        id: categorySection
         Layout.fillWidth: true
         visible: root.showCategoryFilters
         color: "transparent"
@@ -148,6 +157,7 @@ ColumnLayout {
     }
 
     Rectangle {
+        id: browseShelf
         Layout.fillWidth: true
         visible: root.showBrowseShelf
         radius: Appearance.radiusLarge
@@ -171,71 +181,72 @@ ColumnLayout {
                 font.letterSpacing: Appearance.letterSpacingWide
             }
 
-            Flow {
-                id: recentFlow
+            ListView {
+                id: recentStrip
                 Layout.fillWidth: true
                 visible: root.showRecentItems
-                width: parent.width
+                implicitHeight: root.recentStripHeight
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                interactive: contentWidth > width
+                orientation: ListView.Horizontal
                 spacing: Appearance.spacingXS
+                model: root.launcher.recentItems
 
-                Repeater {
-                    model: root.launcher.recentItems
+                delegate: Rectangle {
+                    required property var modelData
+                    readonly property bool hovered: recentHover.containsMouse
+                    readonly property bool selected: root.isSelected(modelData)
 
-                    delegate: Rectangle {
-                        required property var modelData
-                        readonly property bool hovered: recentHover.containsMouse
-                        readonly property bool selected: root.isSelected(modelData)
+                    width: root.recentCardWidth
+                    height: root.recentStripHeight
+                    radius: Appearance.radiusMedium
+                    color: selected ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : Colors.withAlpha(Colors.surface, 0.48))
+                    border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : Colors.border)
+                    border.width: 1
 
-                        width: root.recentCardWidth
-                        height: 40
-                        radius: Appearance.radiusMedium
-                        color: selected ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : Colors.withAlpha(Colors.surface, 0.48))
-                        border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : Colors.border)
-                        border.width: 1
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: Appearance.spacingXS
+                        spacing: Appearance.spacingXS
 
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: Appearance.spacingXS
-                            spacing: Appearance.spacingXS
+                        Rectangle {
+                            width: 24
+                            height: 24
+                            radius: Appearance.radiusSmall
+                            color: Colors.surface
+                            border.color: Colors.withAlpha(Colors.primary, 0.15)
+                            border.width: 1
 
-                            Rectangle {
-                                width: 24
-                                height: 24
-                                radius: Appearance.radiusSmall
-                                color: Colors.surface
-                                border.color: Colors.withAlpha(Colors.primary, 0.15)
-                                border.width: 1
-
-                                SharedWidgets.AppIcon {
-                                    anchors.centerIn: parent
-                                    iconName: modelData ? String(modelData.icon || "") : ""
-                                    desktopId: modelData ? String(modelData.desktopId || "") : ""
-                                    appId: modelData ? String(modelData.appId || "") : ""
-                                    execName: modelData ? String(modelData.exec || "") : ""
-                                    appName: root.primaryText(modelData)
-                                    iconSize: 16
-                                    fallbackIcon: "info.svg"
-                                }
-                            }
-
-                            Text {
-                                Layout.fillWidth: true
-                                text: root.primaryText(modelData)
-                                color: selected ? Colors.primary : Colors.text
-                                font.pixelSize: Appearance.fontSizeXS
-                                font.weight: selected ? Font.Bold : Font.Medium
-                                elide: Text.ElideRight
-                                maximumLineCount: 1
+                            SharedWidgets.AppIcon {
+                                anchors.centerIn: parent
+                                iconName: modelData ? String(modelData.icon || "") : ""
+                                desktopId: modelData ? String(modelData.desktopId || "") : ""
+                                appId: modelData ? String(modelData.appId || "") : ""
+                                execName: modelData ? String(modelData.exec || "") : ""
+                                appName: root.primaryText(modelData)
+                                iconSize: 16
+                                fallbackIcon: "info.svg"
                             }
                         }
 
-                        MouseArea {
-                            id: recentHover
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.launcher.activateHomeItem(modelData)
+                        Text {
+                            Layout.fillWidth: true
+                            text: root.primaryText(modelData)
+                            color: selected ? Colors.primary : Colors.text
+                            font.pixelSize: Appearance.fontSizeXS
+                            font.weight: selected ? Font.Bold : Font.Medium
+                            elide: Text.ElideRight
+                            maximumLineCount: 1
                         }
+                    }
+
+                    MouseArea {
+                        id: recentHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.launcher.activateHomeItem(modelData)
                     }
                 }
             }
@@ -249,90 +260,91 @@ ColumnLayout {
                 font.letterSpacing: Appearance.letterSpacingWide
             }
 
-            Flow {
-                id: suggestionFlow
+            ListView {
+                id: suggestionStrip
                 Layout.fillWidth: true
                 visible: root.showSuggestions
-                width: parent.width
+                implicitHeight: root.suggestionStripHeight
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                interactive: contentWidth > width
+                orientation: ListView.Horizontal
                 spacing: Appearance.spacingXS
+                model: root.launcher.suggestionItems
 
-                Repeater {
-                    model: root.launcher.suggestionItems
+                delegate: Rectangle {
+                    required property var modelData
+                    readonly property bool hovered: suggestionHover.containsMouse
+                    readonly property bool selected: root.isSelected(modelData)
 
-                    delegate: Rectangle {
-                        required property var modelData
-                        readonly property bool hovered: suggestionHover.containsMouse
-                        readonly property bool selected: root.isSelected(modelData)
+                    width: root.suggestionCardWidth
+                    height: root.suggestionStripHeight
+                    radius: Appearance.radiusMedium
+                    color: selected ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : Colors.withAlpha(Colors.surface, 0.42))
+                    border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : Colors.border)
+                    border.width: 1
 
-                        width: Math.min(root.suggestionCardWidth, suggestionFlow.width)
-                        height: 36
-                        radius: Appearance.radiusMedium
-                        color: selected ? Colors.highlight : (hovered ? Colors.withAlpha("#ffffff", 0.04) : Colors.withAlpha(Colors.surface, 0.42))
-                        border.color: selected ? Colors.withAlpha(Colors.primary, 0.4) : (hovered ? Colors.withAlpha(Colors.border, 0.5) : Colors.border)
-                        border.width: 1
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: Appearance.spacingXS
+                        spacing: Appearance.spacingXS
 
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: Appearance.spacingXS
-                            spacing: Appearance.spacingXS
+                        Rectangle {
+                            width: 22
+                            height: 22
+                            radius: Appearance.radiusSmall
+                            color: Colors.surface
+                            border.color: Colors.primaryGhost
+                            border.width: 1
+                            Layout.alignment: Qt.AlignVCenter
 
-                            Rectangle {
-                                width: 22
-                                height: 22
-                                radius: Appearance.radiusSmall
-                                color: Colors.surface
-                                border.color: Colors.primaryGhost
-                                border.width: 1
-                                Layout.alignment: Qt.AlignVCenter
-
-                                SharedWidgets.AppIcon {
-                                    anchors.centerIn: parent
-                                    iconName: modelData ? String(modelData.icon || "") : ""
-                                    desktopId: modelData ? String(modelData.desktopId || "") : ""
-                                    appId: modelData ? String(modelData.appId || "") : ""
-                                    execName: modelData ? String(modelData.exec || "") : ""
-                                    appName: root.primaryText(modelData)
-                                    iconSize: 14
-                                    fallbackIcon: "info.svg"
-                                }
+                            SharedWidgets.AppIcon {
+                                anchors.centerIn: parent
+                                iconName: modelData ? String(modelData.icon || "") : ""
+                                desktopId: modelData ? String(modelData.desktopId || "") : ""
+                                appId: modelData ? String(modelData.appId || "") : ""
+                                execName: modelData ? String(modelData.exec || "") : ""
+                                appName: root.primaryText(modelData)
+                                iconSize: 14
+                                fallbackIcon: "info.svg"
                             }
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: root.primaryText(modelData)
+                            color: selected ? Colors.primary : Colors.text
+                            font.pixelSize: Appearance.fontSizeXS
+                            font.weight: selected ? Font.Bold : Font.DemiBold
+                            elide: Text.ElideRight
+                            maximumLineCount: 1
+                        }
+
+                        Rectangle {
+                            radius: Appearance.radiusPill
+                            color: selected ? Colors.primarySubtle : Colors.highlight
+                            border.color: selected ? Colors.primaryRing : Colors.border
+                            border.width: 1
+                            implicitWidth: suggestionBadge.implicitWidth + 12
+                            implicitHeight: 18
 
                             Text {
-                                Layout.fillWidth: true
-                                text: root.primaryText(modelData)
-                                color: selected ? Colors.primary : Colors.text
-                                font.pixelSize: Appearance.fontSizeXS
-                                font.weight: selected ? Font.Bold : Font.DemiBold
-                                elide: Text.ElideRight
-                                maximumLineCount: 1
-                            }
-
-                            Rectangle {
-                                radius: Appearance.radiusPill
-                                color: selected ? Colors.primarySubtle : Colors.highlight
-                                border.color: selected ? Colors.primaryRing : Colors.border
-                                border.width: 1
-                                implicitWidth: suggestionBadge.implicitWidth + 12
-                                implicitHeight: 18
-
-                                Text {
-                                    id: suggestionBadge
-                                    anchors.centerIn: parent
-                                    text: (modelData._usage || 0) + "x"
-                                    color: selected ? Colors.primary : Colors.textDisabled
-                                    font.pixelSize: Appearance.fontSizeXXS
-                                    font.weight: Font.Black
-                                }
+                                id: suggestionBadge
+                                anchors.centerIn: parent
+                                text: (modelData._usage || 0) + "x"
+                                color: selected ? Colors.primary : Colors.textDisabled
+                                font.pixelSize: Appearance.fontSizeXXS
+                                font.weight: Font.Black
                             }
                         }
+                    }
 
-                        MouseArea {
-                            id: suggestionHover
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.launcher.activateHomeItem(modelData)
-                        }
+                    MouseArea {
+                        id: suggestionHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.launcher.activateHomeItem(modelData)
                     }
                 }
             }
