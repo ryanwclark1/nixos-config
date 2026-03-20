@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p curl git nix
+#!nix-shell -i bash -p curl git nix coreutils
 set -euo pipefail
 
 # Script to update vscode-generic/generic.nix from nixpkgs
@@ -30,6 +30,12 @@ if [[ "$CURRENT_HASH" == "$NEW_HASH" ]]; then
 fi
 
 echo "📦 Updating generic.nix..."
+
+# Create backup
+if [[ -f "$GENERIC_NIX" ]]; then
+  cp "$GENERIC_NIX" "${GENERIC_NIX}.bak"
+fi
+
 echo "$LATEST_GENERIC" > "$GENERIC_NIX"
 
 # Ensure default.nix exists and is correct
@@ -56,4 +62,8 @@ echo "  Hash: $CURRENT_HASH -> $NEW_HASH"
 echo ""
 echo "Please review the changes:"
 echo "  git diff $GENERIC_NIX"
+echo ""
+if [[ -f "${GENERIC_NIX}.bak" ]]; then
+  echo "Backup saved to: ${GENERIC_NIX}.bak"
+fi
 

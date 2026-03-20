@@ -4,19 +4,29 @@ set -eu -o pipefail
 
 # Get the directory where this script is located
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-packageFile="$scriptDir/default.nix"
+sourcesFile="$scriptDir/sources.json"
 
-# Extract current release from package.nix (format: YYYY.MM.DD-{hash})
-currentRelease=$(grep -E 'url.*lab/' "$packageFile" | sed -n 's|.*lab/\([^/]*\)/.*|\1|p' | head -1)
-currentVersion=$(grep -E '^\s*version\s*=' "$packageFile" | sed -E 's/.*version\s*=\s*"([^"]+)".*/\1/' | head -1)
-
-if [[ -z "$currentRelease" ]] || [[ -z "$currentVersion" ]]; then
-  echo "Error: Could not find release or version in $packageFile" >&2
+# Extract current version and release from sources.json
+if [[ ! -f "$sourcesFile" ]]; then
+  echo "Error: sources.json not found at $sourcesFile" >&2
   exit 1
 fi
 
-echo "Current release: $currentRelease"
+currentVersion=$(jq -r '.version' "$sourcesFile")
+currentRelease=$(jq -r '.release' "$sourcesFile")
+
+if [[ -z "$currentVersion" ]] || [[ "$currentVersion" == "null" ]]; then
+  echo "Error: Could not find version in $sourcesFile" >&2
+  exit 1
+fi
+
+if [[ -z "$currentRelease" ]] || [[ "$currentRelease" == "null" ]]; then
+  echo "Error: Could not find release in $sourcesFile" >&2
+  exit 1
+fi
+
 echo "Current version: $currentVersion"
+echo "Current release: $currentRelease"
 
 # Fetch latest release from cursor.com/install page
 echo "Fetching latest release from cursor.com/install..."
@@ -69,30 +79,32 @@ for platform in "${!platforms[@]}"; do
   echo "  Prefetching $platform..."
   source=$(nix-prefetch-url "$url" --name "cursor-cli-$latestVersion-$platform" 2>&1 | tail -1)
   hash=$(nix-hash --to-sri --type sha256 "$source")
-
-  urls[$platform]="$url"
   hashes[$platform]="$hash"
+  urls[$platform]="$url"
 done
 
-echo "Updating $packageFile..."
+echo "Updating $sourcesFile..."
 
 # Create backup
-cp "$packageFile" "${packageFile}.bak"
+cp "$sourcesFile" "${sourcesFile}.bak"
 
-# Update version
-sed -i "s/version = \"$currentVersion\"/version = \"$latestVersion\"/" "$packageFile"
+# Build the updated JSON using jq
+# Start with the base structure
+updated_json=$(jq --arg version "$latestVersion" --arg release "$latestRelease" \
+  '.version = $version | .release = $release' "$sourcesFile")
 
-# Update URLs and hashes for each platform
+# Update each platform's URL and hash
 for platform in "${!platforms[@]}"; do
   url="${urls[$platform]}"
   hash="${hashes[$platform]}"
 
-  # Update URL (match the line in the sources block)
-  sed -i "/^\s*$platform\s*=\s*fetchurl\s*{/,/^\s*};/ {
-    s|url = \"[^\"]*\"|url = \"$url\"|
-    s|hash = \"[^\"]*\"|hash = \"$hash\"|
-  }" "$packageFile"
+  updated_json=$(echo "$updated_json" | jq --arg platform "$platform" \
+    --arg url "$url" --arg hash "$hash" \
+    '.sources[$platform].url = $url | .sources[$platform].hash = $hash')
 done
+
+# Write the updated JSON back to the file with proper formatting
+echo "$updated_json" | jq . > "$sourcesFile"
 
 echo "✅ Updated to release $latestRelease (version $latestVersion)"
 echo ""
@@ -101,8 +113,6 @@ echo "  Release: $currentRelease -> $latestRelease"
 echo "  Version: $currentVersion -> $latestVersion"
 echo ""
 echo "Please review the changes:"
-echo "  git diff $packageFile"
+echo "  git diff $sourcesFile"
 echo ""
-echo "Backup saved to: ${packageFile}.bak"
-
-
+echo "Backup saved to: ${sourcesFile}.bak"

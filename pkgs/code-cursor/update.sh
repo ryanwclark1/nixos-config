@@ -4,17 +4,24 @@ set -eu -o pipefail
 
 # Get the directory where this script is located
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-packageFile="$scriptDir/default.nix"
+sourcesFile="$scriptDir/sources.json"
 
-# Extract current version from package.nix
-currentVersion=$(grep -E '^\s*version\s*=' "$packageFile" | sed -E 's/.*version\s*=\s*"([^"]+)".*/\1/' | head -1)
+# Extract current version from sources.json
+if [[ ! -f "$sourcesFile" ]]; then
+  echo "Error: sources.json not found at $sourcesFile" >&2
+  exit 1
+fi
 
-if [[ -z "$currentVersion" ]]; then
-  echo "Error: Could not find version in $packageFile" >&2
+currentVersion=$(jq -r '.version' "$sourcesFile")
+currentVscodeVersion=$(jq -r '.vscodeVersion' "$sourcesFile")
+
+if [[ -z "$currentVersion" ]] || [[ "$currentVersion" == "null" ]]; then
+  echo "Error: Could not find version in $sourcesFile" >&2
   exit 1
 fi
 
 echo "Current version: $currentVersion"
+echo "Current vscodeVersion: $currentVscodeVersion"
 
 declare -A platforms=(
   [x86_64-linux]='linux-x64'
@@ -81,28 +88,28 @@ for platform in "${!platforms[@]}"; do
   hashes[$platform]="$hash"
 done
 
-echo "Updating $packageFile..."
+echo "Updating $sourcesFile..."
 
 # Create backup
-cp "$packageFile" "${packageFile}.bak"
+cp "$sourcesFile" "${sourcesFile}.bak"
 
-# Update version
-sed -i "s/version = \"$currentVersion\"/version = \"$new_version\"/" "$packageFile"
+# Build the updated JSON using jq
+# Start with the base structure
+updated_json=$(jq --arg version "$new_version" --arg vscodeVersion "$currentVscodeVersion" \
+  '.version = $version | .vscodeVersion = $vscodeVersion' "$sourcesFile")
 
-# Update URLs and hashes for each platform
+# Update each platform's URL and hash
 for platform in "${!platforms[@]}"; do
   url="${urls[$platform]}"
   hash="${hashes[$platform]}"
 
-  # Escape special characters in URL for sed
-  escaped_url=$(echo "$url" | sed 's/[[\.*^$()+?{|]/\\&/g')
-
-  # Update URL (match the line after the platform declaration)
-  sed -i "/^\s*$platform\s*=\s*fetchurl\s*{/,/^\s*};/ {
-    s|url = \"[^\"]*\"|url = \"$url\"|
-    s|hash = \"[^\"]*\"|hash = \"$hash\"|
-  }" "$packageFile"
+  updated_json=$(echo "$updated_json" | jq --arg platform "$platform" \
+    --arg url "$url" --arg hash "$hash" \
+    '.sources[$platform].url = $url | .sources[$platform].hash = $hash')
 done
+
+# Write the updated JSON back to the file with proper formatting
+echo "$updated_json" | jq . > "$sourcesFile"
 
 echo "✅ Updated to version $new_version"
 echo ""
@@ -110,6 +117,6 @@ echo "Changes:"
 echo "  Version: $currentVersion -> $new_version"
 echo ""
 echo "Please review the changes:"
-echo "  git diff $packageFile"
+echo "  git diff $sourcesFile"
 echo ""
-echo "Backup saved to: ${packageFile}.bak"
+echo "Backup saved to: ${sourcesFile}.bak"
