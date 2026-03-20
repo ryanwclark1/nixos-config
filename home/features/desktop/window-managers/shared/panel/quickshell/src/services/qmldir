@@ -6,7 +6,6 @@ singleton AppCatalogService 1.0 AppCatalogService.qml
 singleton AutoHideCoordinator 1.0 AutoHideCoordinator.qml
 singleton BarWidgetRegistry 1.0 ../features/bar/registry/BarWidgetRegistry.qml
 singleton BrightnessService 1.0 BrightnessService.qml
-singleton CaffeineService 1.0 CaffeineService.qml
 singleton ClipboardHistoryService 1.0 ClipboardHistoryService.qml
 singleton ColorExportService 1.0 ColorExportService.qml
 singleton Colors 1.0 Colors.qml
@@ -18,6 +17,7 @@ singleton ControlCenterRegistry 1.0 ../features/control-center/registry/ControlC
 singleton DependencyService 1.0 DependencyService.qml
 singleton FirstRunService 1.0 FirstRunService.qml
 singleton FocusGrabManager 1.0 FocusGrabManager.qml
+singleton IdleService 1.0 IdleService.qml
 singleton GameModeService 1.0 GameModeService.qml
 singleton DesktopWidgetRegistry 1.0 ../features/desktop/registry/DesktopWidgetRegistry.qml
 singleton HookService 1.0 HookService.qml
@@ -46,7 +46,6 @@ singleton ScreenshotService 1.0 ScreenshotService.qml
 singleton ServiceUnitService 1.0 ServiceUnitService.qml
 singleton SpectrumService 1.0 SpectrumService.qml
 SurfaceService 1.0 SurfaceService.qml
-singleton SuspendManager 1.0 SuspendManager.qml
 singleton SystemActionRegistry 1.0 SystemActionRegistry.qml
 singleton SystemIoTelemetryService 1.0 SystemIoTelemetryService.qml
 singleton SystemStatus 1.0 SystemStatus.qml

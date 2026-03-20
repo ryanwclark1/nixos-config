@@ -146,17 +146,12 @@ QtObject {
         }
     }
 
-    // Idle inhibitor
-    property Connections _caffeineConn: Connections {
-        target: CaffeineService
+    // Idle inhibitor + sleep/wake (unified IdleService)
+    property Connections _idleConn: Connections {
+        target: IdleService
         function onInhibitingChanged() {
-            root.fireHook("idle-inhibit-changed", CaffeineService.inhibiting ? "enabled" : "disabled");
+            root.fireHook("idle-inhibit-changed", IdleService.inhibiting ? "enabled" : "disabled");
         }
-    }
-
-    // Sleep/wake
-    property Connections _suspendConn: Connections {
-        target: SuspendManager
         function onPreparingForSleep() { root.fireHook("sleep", ""); }
         function onWakingUp() { root.fireHook("wake", ""); }
     }
