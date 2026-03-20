@@ -127,7 +127,7 @@ Rectangle {
                     font.pixelSize: 9
                     font.weight: Font.Black
                     font.letterSpacing: 1.5
-                    opacity: 0.6
+                    opacity: 0.8
                 }
 
                 Text {
@@ -159,9 +159,9 @@ Rectangle {
 
                 SvgIcon {
                     source: "search-visual.svg"
-                    color: searchInput.activeFocus ? Colors.primary : Colors.textDisabled
+                    color: searchInput.activeFocus ? Colors.primary : Colors.textSecondary
                     size: 14
-                    opacity: 0.7
+                    opacity: searchInput.activeFocus ? 0.9 : 0.6
                 }
 
                 TextInput {
@@ -343,10 +343,11 @@ Rectangle {
                         Text {
                             visible: root.searchResults.length > 0
                             text: "PAGES"
-                            color: Colors.textDisabled
+                            color: Colors.textSecondary
                             font.pixelSize: Appearance.fontSizeXXS
                             font.weight: Font.Black
                             font.letterSpacing: Appearance.letterSpacingExtraWide
+                            opacity: 0.6
                             Layout.leftMargin: Appearance.spacingXS
                         }
 
@@ -395,7 +396,7 @@ Rectangle {
 
                                         Loader {
                                             property string _ic: modelData.icon
-                                            property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
+                                            property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
                                             sourceComponent: _ic.endsWith(".svg") ? _cSvg3 : _cNerd3
                                         }
                                         Component { id: _cSvg3; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeMedium } }
@@ -414,9 +415,10 @@ Rectangle {
                                     Text {
                                         Layout.fillWidth: true
                                         text: root.tabSearchSubtitle(modelData)
-                                        color: Colors.textDisabled
+                                        color: Colors.textSecondary
                                         font.pixelSize: Appearance.fontSizeXS
                                         wrapMode: Text.WordWrap
+                                        opacity: 0.8
                                         visible: !!text
                                     }
                                 }
@@ -437,10 +439,11 @@ Rectangle {
                         Text {
                             visible: root.settingResults.length > 0
                             text: "SETTINGS"
-                            color: Colors.textDisabled
+                            color: Colors.textSecondary
                             font.pixelSize: Appearance.fontSizeXXS
                             font.weight: Font.Black
                             font.letterSpacing: Appearance.letterSpacingExtraWide
+                            opacity: 0.6
                             Layout.topMargin: Appearance.spacingS
                             Layout.leftMargin: Appearance.spacingXS
                         }
@@ -490,10 +493,11 @@ Rectangle {
                                             var tabLabel = tab ? tab.label : modelData.tabId;
                                             return tabLabel + " > " + modelData.cardTitle;
                                         }
-                                        color: Colors.textDisabled
+                                        color: Colors.textSecondary
                                         font.pixelSize: Appearance.fontSizeXS
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
+                                        opacity: 0.8
                                     }
                                 }
 
@@ -579,7 +583,7 @@ Rectangle {
                                     Loader {
                                         property string _ic: modelData.icon
                                         property color _co: expanded ? Colors.primary : Colors.textSecondary
-                                        opacity: expanded ? 1.0 : 0.6
+                                        opacity: 1.0
                                         sourceComponent: _ic.endsWith(".svg") ? _cSvg4 : _cNerd4
                                     }
                                     Component { id: _cSvg4; SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
@@ -596,10 +600,10 @@ Rectangle {
 
                                     Text {
                                         text: expanded ? "󰅀" : "󰅂"
-                                        color: Colors.textDisabled
+                                        color: Colors.textSecondary
                                         font.family: Appearance.fontMono
                                         font.pixelSize: Appearance.fontSizeCaption
-                                        opacity: 0.4
+                                        opacity: 0.5
                                     }
                                 }
 
@@ -661,8 +665,8 @@ Rectangle {
 
                                             Loader {
                                                 property string _ic: modelData.icon
-                                                property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textDisabled
-                                                opacity: root.currentTabId === modelData.id ? 1.0 : 0.5
+                                                property color _co: root.currentTabId === modelData.id ? Colors.primary : Colors.textSecondary
+                                                opacity: 1.0
                                                 sourceComponent: _ic.endsWith(".svg") ? _cSvg5 : _cNerd5
                                             }
                                             Component { id: _cSvg5; SvgIcon { source: parent._ic; color: parent._co; size: 14 } }
