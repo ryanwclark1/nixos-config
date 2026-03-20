@@ -1,4 +1,5 @@
 import QtQuick
+import QtMultimedia
 import "../../services"
 
 Item {
@@ -11,6 +12,8 @@ Item {
     property int transitionDuration: 1500
     property color solidColor: "transparent"
     property bool showSolid: false
+    property url videoSource: ""
+    property bool showVideo: false
 
     signal imageLoadError(url source)
 
@@ -24,6 +27,28 @@ Item {
         anchors.fill: parent
         color: root.showSolid ? root.solidColor : "transparent"
         visible: root.showSolid
+    }
+
+    // Video wallpaper layer
+    MediaPlayer {
+        id: videoPlayer
+        source: root.showVideo ? root.videoSource : ""
+        loops: MediaPlayer.Infinite
+        audioOutput: AudioOutput { muted: true }
+        videoOutput: videoOutput
+        onSourceChanged: {
+            if (source !== "") play();
+        }
+        onErrorOccurred: (error, errorString) => {
+            Logger.w("WallpaperLayer", "Video playback error:", errorString);
+        }
+    }
+
+    VideoOutput {
+        id: videoOutput
+        anchors.fill: parent
+        fillMode: VideoOutput.PreserveAspectCrop
+        visible: root.showVideo && videoPlayer.playbackState === MediaPlayer.PlayingState
     }
 
     Image {

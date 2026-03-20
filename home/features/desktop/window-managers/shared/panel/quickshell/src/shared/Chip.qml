@@ -1,4 +1,5 @@
 import QtQuick
+import "."
 import "../services"
 
 Rectangle {
@@ -23,14 +24,12 @@ Rectangle {
     anchors.centerIn: parent
     spacing: Colors.spacingXS
 
-    Text {
-      text: root.icon
-      color: root.iconColor
-      font.family: Colors.fontMono
-      font.pixelSize: Colors.fontSizeXS
-      font.weight: Font.Black
+    Loader {
       visible: root.icon !== ""
+      sourceComponent: root.icon.endsWith(".svg") ? _chSvg : _chNerd
     }
+    Component { id: _chSvg; SvgIcon { source: root.icon; color: root.iconColor; size: Colors.fontSizeXS } }
+    Component { id: _chNerd; Text { text: root.icon; color: root.iconColor; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXS; font.weight: Font.Black } }
 
     Text {
       text: root.text
