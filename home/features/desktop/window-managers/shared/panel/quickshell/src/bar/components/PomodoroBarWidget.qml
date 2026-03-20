@@ -27,7 +27,7 @@ SharedWidgets.BarPill {
         { separator: true },
         {
             label: "Reset",
-            icon: "󰑐",
+            icon: "arrow-clockwise.svg",
             action: () => PomodoroService.reset()
         }
     ]

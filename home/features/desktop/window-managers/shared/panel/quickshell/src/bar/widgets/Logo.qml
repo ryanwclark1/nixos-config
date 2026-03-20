@@ -130,7 +130,7 @@ Item {
             { label: "Apply Safe Fixes", icon: "󰁨", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.activeIncidents.length > 0 },
             { label: "Open Health Dashboard", icon: "󰒓", action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "health"]) },
             { separator: true },
-            { label: "Restart Shell", icon: "󰑐", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }
+            { label: "Restart Shell", icon: "arrow-clockwise.svg", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }
         ], { x: globalPos.x, y: globalPos.y, width: root.width, height: root.height });
       }
     }

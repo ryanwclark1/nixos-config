@@ -636,7 +636,7 @@ Item {
                         },
                         {
                             label: "Remove Widget",
-                            icon: "󰅖",
+                            icon: "dismiss.svg",
                             danger: true,
                             action: function() { removeWidget(); }
                         }

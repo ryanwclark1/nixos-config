@@ -94,7 +94,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Restart Voxtype Service",
-            icon: "󰑐",
+            icon: "arrow-clockwise.svg",
             action: () => {
                 Quickshell.execDetached(["systemctl", "--user", "restart", "voxtype.service"]);
                 refreshAfterAction.restart();

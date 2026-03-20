@@ -63,7 +63,7 @@ Rectangle {
                         }
                         
                         SharedWidgets.IconButton {
-                            icon: "󰅖"
+                            icon: "dismiss.svg"
                             size: 24; iconSize: 12
                             iconColor: Colors.error
                             tooltipText: "Kill process"
