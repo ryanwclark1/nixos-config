@@ -191,6 +191,7 @@ start_repo_shell() {
     if [[ -n "${runtime_id}" ]] && run_ipc quickshell ipc --id "${runtime_id}" show >/dev/null; then
       sleep 1
       instance_pid="${repo_shell_pid}"
+      strict_instance_pid=1
       instance_id="${runtime_id}"
       instance_dir="${runtime_dir}"
       printf '[INFO] Repo shell instance ready: pid %s id %s\n' "${repo_shell_pid}" "${runtime_id}"

@@ -13,6 +13,8 @@ QML QQuickImage at @features/clipboard/ClipboardMenu\.qml\[.*\]: Error decoding:
 libpng error: Read Error
 \[W\]\[WeatherService\] Error: empty weather response
 \[W\]\[WeatherService\] Error: missing current condition
+\[W\]\[WeatherService\] Auto-location error JSON\.parse: Parse error
+\[W\]\[WeatherService\] Auto-location error IP location failed
 \[W\]\[MarketService\] Error: empty market response
 EOF
 

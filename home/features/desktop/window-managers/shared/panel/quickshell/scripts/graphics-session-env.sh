@@ -53,6 +53,7 @@ build_repo_shell_env_array() {
 
 niri_json_query() {
   local raw=""
+  local parsed=""
   local query="$1"
   shift || true
 
@@ -63,10 +64,18 @@ niri_json_query() {
   raw="$(niri msg -j "${query}" "$@" 2>/dev/null || true)"
   [[ -n "${raw}" ]] || return 1
 
-  printf '%s' "${raw}" | jq -cer '
-    fromjson?
-    // (capture("(?s)(?<json>(\\{.*\\}|\\[.*\\]))")?.json | fromjson?)
-  ' 2>/dev/null
+  parsed="$(printf '%s' "${raw}" | jq -cer '.' 2>/dev/null || true)"
+  if [[ -n "${parsed}" ]]; then
+    printf '%s\n' "${parsed}"
+    return 0
+  fi
+
+  parsed="$(printf '%s' "${raw}" | jq -Rrs '
+    capture("(?s)(?<json>(\\{.*\\}|\\[.*\\]))")?.json // empty
+  ' 2>/dev/null || true)"
+  [[ -n "${parsed}" ]] || return 1
+
+  printf '%s' "${parsed}" | jq -cer '.' 2>/dev/null
 }
 
 niri_headless_without_outputs() {
