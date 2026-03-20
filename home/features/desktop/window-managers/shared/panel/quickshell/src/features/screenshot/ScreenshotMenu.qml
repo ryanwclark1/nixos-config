@@ -42,8 +42,8 @@ BasePopupMenu {
             model: [
                 { mode: "region", icon: "󰩭", label: "Select Region", desc: "Draw a rectangle to capture" },
                 { mode: "window", icon: "󰖯", label: "Active Window", desc: "Capture the focused window" },
-                { mode: "screen", icon: "󰍹", label: "Current Screen", desc: "Capture the active monitor" },
-                { mode: "fullscreen", icon: "󰹑", label: "All Screens", desc: "Capture everything" }
+                { mode: "screen", icon: "desktop.svg", label: "Current Screen", desc: "Capture the active monitor" },
+                { mode: "fullscreen", icon: "fullscreen.svg", label: "All Screens", desc: "Capture everything" }
             ]
             delegate: Rectangle {
                 Layout.fillWidth: true
@@ -60,12 +60,12 @@ BasePopupMenu {
                     anchors.margins: Colors.spacingM
                     spacing: Colors.spacingM
 
-                    Text {
-                        text: modelData.icon
-                        color: Colors.primary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeXL
+                    Loader {
+                        property string _ic: modelData.icon
+                        sourceComponent: _ic.endsWith(".svg") ? _smSvg : _smNerd
                     }
+                    Component { id: _smSvg; SharedWidgets.SvgIcon { source: parent._ic; color: Colors.primary; size: Colors.fontSizeXL } }
+                    Component { id: _smNerd; Text { text: parent._ic; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL } }
 
                     ColumnLayout {
                         Layout.fillWidth: true

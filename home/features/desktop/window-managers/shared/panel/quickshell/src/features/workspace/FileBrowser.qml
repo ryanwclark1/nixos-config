@@ -106,13 +106,13 @@ PanelWindow {
   readonly property bool _showListDetailColumns: mainBox.width >= 1020
 
   readonly property var _quickLocations: [
-    { label: "Home",      icon: "󰋜", path: Quickshell.env("HOME") || "/home" },
-    { label: "Desktop",   icon: "󰧨", path: (Quickshell.env("HOME") || "/home") + "/Desktop" },
-    { label: "Documents", icon: "󰈙", path: (Quickshell.env("HOME") || "/home") + "/Documents" },
-    { label: "Downloads", icon: "󰉍", path: (Quickshell.env("HOME") || "/home") + "/Downloads" },
-    { label: "Pictures",  icon: "󰉏", path: (Quickshell.env("HOME") || "/home") + "/Pictures" },
-    { label: "Videos",    icon: "󰈫", path: (Quickshell.env("HOME") || "/home") + "/Videos" },
-    { label: "Music",     icon: "󰝚", path: (Quickshell.env("HOME") || "/home") + "/Music" }
+    { label: "Home",      icon: "home.svg", path: Quickshell.env("HOME") || "/home" },
+    { label: "Desktop",   icon: "desktop.svg", path: (Quickshell.env("HOME") || "/home") + "/Desktop" },
+    { label: "Documents", icon: "document.svg", path: (Quickshell.env("HOME") || "/home") + "/Documents" },
+    { label: "Downloads", icon: "download.svg", path: (Quickshell.env("HOME") || "/home") + "/Downloads" },
+    { label: "Pictures",  icon: "image.svg", path: (Quickshell.env("HOME") || "/home") + "/Pictures" },
+    { label: "Videos",    icon: "video.svg", path: (Quickshell.env("HOME") || "/home") + "/Videos" },
+    { label: "Music",     icon: "music-note-2.svg", path: (Quickshell.env("HOME") || "/home") + "/Music" }
   ]
 
   // ── Navigation helpers ───────────────────────────────────────────────────────

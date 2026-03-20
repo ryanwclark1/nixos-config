@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../services"
+import "../../shared" as Shared
 import "../../widgets" as SharedWidgets
 
 Rectangle {
@@ -63,12 +64,13 @@ Rectangle {
                     anchors.rightMargin: Colors.spacingS
                     spacing: Colors.spacingS
 
-                    Text {
-                        text: modelData.icon
-                        color: root.currentPath === modelData.path ? Colors.primary : Colors.textSecondary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeLarge
+                    Loader {
+                        property string _ic: modelData.icon
+                        property color _co: root.currentPath === modelData.path ? Colors.primary : Colors.textSecondary
+                        sourceComponent: _ic.endsWith(".svg") ? _fbSvg : _fbNerd
                     }
+                    Component { id: _fbSvg; Shared.SvgIcon { source: parent._ic; color: parent._co; size: Colors.fontSizeLarge } }
+                    Component { id: _fbNerd; Text { text: parent._ic; color: parent._co; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
                     Text {
                         text: modelData.label
                         color: root.currentPath === modelData.path ? Colors.text : Colors.textSecondary

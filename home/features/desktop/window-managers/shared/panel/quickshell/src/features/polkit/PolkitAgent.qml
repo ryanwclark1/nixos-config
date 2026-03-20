@@ -14,12 +14,30 @@ Scope {
     property var _identities: []
     property var _details: ({})
     property bool _daemonReady: false
+    property bool _externalAgentDetected: false
+
+    // Check for existing polkit agents before starting ours
+    Process {
+        id: agentDetectProc
+        command: ["sh", "-c",
+            "pidof polkit-gnome-authentication-agent-1 polkit-kde-authentication-agent-1 lxpolkit lxsession 2>/dev/null"
+        ]
+        onExited: (exitCode, exitStatus) => {
+            root._externalAgentDetected = (exitCode === 0);
+            if (root._externalAgentDetected)
+                Logger.i("PolkitAgent", "External polkit agent detected, skipping ours");
+            else
+                agentProc.running = true;
+        }
+    }
+
+    Component.onCompleted: agentDetectProc.running = true
 
     // Long-running Python polkit agent daemon
     Process {
         id: agentProc
         command: ["qs-polkit-agent"]
-        running: true
+        running: false
         stdinEnabled: true
 
         stdout: SplitParser {
@@ -56,12 +74,12 @@ Scope {
         }
     }
 
-    // Auto-restart daemon on crash
+    // Auto-restart daemon on crash (skip if external agent is present)
     Timer {
         id: restartTimer
         interval: 2000
         onTriggered: {
-            if (!agentProc.running)
+            if (!agentProc.running && !root._externalAgentDetected)
                 agentProc.running = true;
         }
     }

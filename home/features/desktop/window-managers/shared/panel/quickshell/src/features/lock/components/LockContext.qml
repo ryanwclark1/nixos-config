@@ -113,6 +113,7 @@ QtObject {
 
     onCompleted: result => {
       if (result === PamResult.Success) {
+        root._unlockKeyring(root.currentText);
         root.unlocked();
       } else {
         root.currentText = "";
@@ -133,6 +134,24 @@ QtObject {
     } else {
       pam.start();
     }
+  }
+
+  // Unlock GNOME Keyring with the same password used for PAM auth
+  function _unlockKeyring(password) {
+    if (!password) return;
+    var proc = Qt.createQmlObject(
+      'import Quickshell.Io; Process { stdinEnabled: true }', root);
+    proc.command = ["gnome-keyring-daemon", "--unlock"];
+    proc.onStarted.connect(function() {
+      proc.write(password);
+      proc.stdinEnabled = false;
+    });
+    proc.onExited.connect(function(code) {
+      if (code !== 0)
+        Logger.d("LockContext", "gnome-keyring-daemon unlock exited:", code);
+      proc.destroy();
+    });
+    proc.running = true;
   }
 
   function reset() {
