@@ -347,6 +347,9 @@ QtObject {
         function onColorExportEnabledChanged() {
             root.config.scheduleSave();
         }
+        function onColorExportGhosttyChanged() {
+            root.config.scheduleSave();
+        }
         function onColorExportKittyChanged() {
             root.config.scheduleSave();
         }

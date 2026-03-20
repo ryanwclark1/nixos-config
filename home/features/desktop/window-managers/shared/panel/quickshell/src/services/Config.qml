@@ -385,6 +385,7 @@ QtObject {
 
     // --- COLOR EXPORT ---
     property bool colorExportEnabled: false
+    property bool colorExportGhostty: false
     property bool colorExportKitty: false
     property bool colorExportGtkScheme: false
 

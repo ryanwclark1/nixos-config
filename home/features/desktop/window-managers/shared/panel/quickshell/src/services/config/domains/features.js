@@ -58,6 +58,7 @@ var colorExport = {
     sectionKey: "colorExport",
     maps: [
         ["enabled", "colorExportEnabled"],
+        ["ghostty", "colorExportGhostty"],
         ["kitty", "colorExportKitty"],
         ["gtkScheme", "colorExportGtkScheme"]
     ]
