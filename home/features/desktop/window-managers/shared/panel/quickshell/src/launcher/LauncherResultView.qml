@@ -39,7 +39,9 @@ StackLayout {
                 clip: true
                 cacheBuffer: 400
                 spacing: root.compactMode ? Colors.spacingXS : Colors.spacingS
-                currentIndex: root.launcher.selectedIndex
+                currentIndex: root.filteredItems.length > 0
+                    ? Math.min(root.launcher.selectedIndex, root.filteredItems.length - 1)
+                    : -1
                 enabled: !root.launcher.showingConfirm
                 topMargin: root.compactMode ? Colors.spacingXXS : Colors.spacingXS
                 section.property: "sectionLabel"

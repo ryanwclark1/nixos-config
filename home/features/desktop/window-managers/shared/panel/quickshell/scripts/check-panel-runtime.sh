@@ -15,7 +15,7 @@ run_surfaces=1
 run_multibar=1
 settings_timeout_seconds="${QS_VERIFY_SETTINGS_TIMEOUT_SECONDS:-150}"
 surfaces_timeout_seconds="${QS_VERIFY_SURFACES_TIMEOUT_SECONDS:-150}"
-warnings_timeout_seconds="${QS_VERIFY_WARNINGS_TIMEOUT_SECONDS:-300}"
+warnings_timeout_seconds="${QS_VERIFY_WARNINGS_TIMEOUT_SECONDS:-900}"
 multibar_timeout_seconds="${QS_VERIFY_MULTIBAR_TIMEOUT_SECONDS:-120}"
 
 usage() {

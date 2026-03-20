@@ -4,7 +4,7 @@
 # Usage: ./scripts/fetch-panel-icons.sh [--dry-run]
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 ICONS_DIR="$SCRIPT_DIR/../src/assets/icons"
 FLUENT_DIR="$ICONS_DIR/fluent"
 BRANDS_DIR="$ICONS_DIR/brands"

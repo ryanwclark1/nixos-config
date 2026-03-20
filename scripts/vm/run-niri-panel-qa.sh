@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+repo_root="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." >/dev/null 2>&1 && pwd -P)"
 launcher="${repo_root}/scripts/vm/launch-niri-test-vm.sh"
 ssh_port="${NIRI_VM_QA_SSH_PORT:-2232}"
 vm_password="${NIRI_VM_PASSWORD:-niri}"

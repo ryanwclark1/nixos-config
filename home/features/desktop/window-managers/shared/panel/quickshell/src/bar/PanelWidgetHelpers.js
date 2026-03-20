@@ -103,11 +103,15 @@ function itemLayoutFootprint(item, vertical) {
 
     var implicitWidth = Number(item.implicitWidth);
     var implicitHeight = Number(item.implicitHeight);
+    var width = Number(item.width);
+    var height = Number(item.height);
 
     implicitWidth = isNaN(implicitWidth) ? 0 : implicitWidth;
     implicitHeight = isNaN(implicitHeight) ? 0 : implicitHeight;
+    width = isNaN(width) ? 0 : width;
+    height = isNaN(height) ? 0 : height;
 
-    return vertical ? implicitHeight : implicitWidth;
+    return vertical ? Math.max(implicitHeight, height) : Math.max(implicitWidth, width);
 }
 
 function itemOccupiesSpace(item, vertical) {

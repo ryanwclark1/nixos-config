@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+repo_root="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." >/dev/null 2>&1 && pwd -P)"
 flake_ref="${FLAKE_REF:-path:${repo_root}}"
 config_name="${NIRI_VM_CONFIG:-niriTestVm}"
 state_dir="${NIRI_VM_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/niri-test-vm}"

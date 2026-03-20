@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+repo_root="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." >/dev/null 2>&1 && pwd -P)"
 port="${NIRI_VM_SMOKE_SSH_PORT:-2232}"
 boot_timeout="${NIRI_VM_SMOKE_BOOT_TIMEOUT:-300}"
 poll_delay="${NIRI_VM_SMOKE_POLL_DELAY:-2}"

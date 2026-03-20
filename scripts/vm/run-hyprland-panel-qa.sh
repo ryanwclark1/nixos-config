@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+repo_root="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." >/dev/null 2>&1 && pwd -P)"
 launcher="${repo_root}/scripts/vm/launch-hyprland-test-vm.sh"
 ssh_port="${HYPRLAND_VM_QA_SSH_PORT:-2242}"
 vm_password="${HYPRLAND_VM_PASSWORD:-hyprland}"

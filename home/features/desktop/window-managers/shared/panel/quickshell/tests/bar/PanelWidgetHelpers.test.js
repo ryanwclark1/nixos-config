@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   widgetSettings,
   widgetDiagnosticId,
+  itemLayoutFootprint,
+  itemOccupiesSpace,
   compactPercentText,
   widgetValueStyle,
   statDisplayText,
@@ -43,6 +45,45 @@ describe("widgetDiagnosticId", () => {
   it("handles missing instanceId", () => {
     const result = widgetDiagnosticId({ widgetType: "logo" }, { id: "bar1" });
     expect(result).toBe("bar=bar1 widget=logo");
+  });
+});
+
+describe("itemLayoutFootprint / itemOccupiesSpace", () => {
+  it("falls back to actual width and height when implicit size is zero", () => {
+    const horizontalItem = {
+      visible: true,
+      implicitWidth: 0,
+      implicitHeight: 0,
+      width: 72,
+      height: 32,
+    };
+    const verticalItem = {
+      visible: true,
+      implicitWidth: 0,
+      implicitHeight: 0,
+      width: 32,
+      height: 72,
+    };
+
+    expect(itemLayoutFootprint(horizontalItem, false)).toBe(72);
+    expect(itemLayoutFootprint(verticalItem, true)).toBe(72);
+    expect(itemOccupiesSpace(horizontalItem, false)).toBe(true);
+    expect(itemOccupiesSpace(verticalItem, true)).toBe(true);
+  });
+
+  it("still treats hidden items as non-occupying", () => {
+    expect(
+      itemOccupiesSpace(
+        {
+          visible: false,
+          implicitWidth: 0,
+          implicitHeight: 0,
+          width: 72,
+          height: 32,
+        },
+        false
+      )
+    ).toBe(false);
   });
 });
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+repo_root="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." >/dev/null 2>&1 && pwd -P)"
 state_root="${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/panel-vm-qa"
 timestamp="$(date +%Y%m%d-%H%M%S)"
 output_dir="${PANEL_VM_QA_OUTPUT_DIR:-${state_root}/${timestamp}}"
