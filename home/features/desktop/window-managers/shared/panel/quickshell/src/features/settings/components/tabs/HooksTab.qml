@@ -12,122 +12,227 @@ Item {
     property string tabId: ""
     property bool compactMode: false
     property bool tightSpacing: false
+    readonly property var groupedCategories: _groupedCategories()
+    readonly property int hookCount: HookService.hookCatalog.length
+    readonly property int categoryCount: root.groupedCategories.length
+    readonly property int configuredHookCount: {
+        var count = 0;
+        var catalog = HookService.hookCatalog || [];
+        for (var i = 0; i < catalog.length; i++) {
+            if (_hookHasScript(catalog[i].name))
+                count += 1;
+        }
+        return count;
+    }
 
     SettingsTabPage {
         anchors.fill: parent
+        settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Hooks"
         iconName: "󱁨"
+        compactMode: root.compactMode
+        tightSpacing: root.tightSpacing
 
-        SettingsCard {
-            title: "Hook System"
-            iconName: "󱁨"
-            description: "Run scripts when system events occur. Place executable scripts in ~/.config/quickshell/hooks/ or set custom paths below."
+        SettingsSectionGroup {
+            title: "Hook Overview"
+            description: "Execution state, catalog size, and how many hook points currently have scripts wired up."
 
-            SettingsToggleRow {
-                label: "Enable Hooks"
-                icon: "󱁨"
-                configKey: "hooksEnabled"
-            }
+            Flow {
+                Layout.fillWidth: true
+                width: parent.width
+                spacing: Colors.spacingM
 
-            SettingsListRow {
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: Colors.spacingXXS
+                Repeater {
+                    model: [
+                        {
+                            icon: "󱁨",
+                            label: "Hooks",
+                            value: Config.hooksEnabled ? "Enabled" : "Disabled"
+                        },
+                        {
+                            icon: "󰎛",
+                            label: "Catalog",
+                            value: root.hookCount + " available"
+                        },
+                        {
+                            icon: "󰆓",
+                            label: "Configured",
+                            value: root.configuredHookCount + " script" + (root.configuredHookCount === 1 ? "" : "s")
+                        },
+                        {
+                            icon: "󰓩",
+                            label: "Categories",
+                            value: root.categoryCount + " groups"
+                        }
+                    ]
 
-                    Text {
-                        Layout.fillWidth: true
-                        text: "Open Hooks Directory"
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeSmall
-                        font.weight: Font.DemiBold
-                        wrapMode: Text.WordWrap
+                    delegate: Rectangle {
+                        required property var modelData
+
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
+                        radius: Colors.radiusLarge
+                        color: Colors.withAlpha(Colors.surface, 0.38)
+                        border.color: Colors.withAlpha(Colors.primary, 0.14)
+                        border.width: 1
+
+                        ColumnLayout {
+                            id: metricColumn
+                            anchors.fill: parent
+                            anchors.margins: Colors.spacingM
+                            spacing: Colors.spacingXS
+
+                            Text {
+                                text: modelData.icon
+                                color: Colors.primary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeLarge
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.label
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Black
+                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.value
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.Bold
+                                wrapMode: Text.WordWrap
+                            }
+                        }
                     }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: "Open ~/.config/quickshell/hooks in the default file manager."
-                        color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
-                        wrapMode: Text.WordWrap
-                    }
-                }
-
-                SettingsActionButton {
-                    label: "Open"
-                    iconName: "folder.svg"
-                    compact: true
-                    onClicked: Quickshell.execDetached(["xdg-open", HookService.hookDir])
                 }
             }
         }
 
-        Repeater {
-            model: _groupedCategories()
+        SettingsSectionGroup {
+            title: "Hook System"
+            description: "Enable the hook runner globally and jump to the filesystem location where shell hooks are stored."
 
-            delegate: SettingsCard {
-                required property var modelData
-                title: modelData.category
-                iconName: _categoryIcon(modelData.category)
-                description: modelData.hooks.length + " hook" + (modelData.hooks.length !== 1 ? "s" : "") + " available"
+            SettingsCard {
+                title: "Hook System"
+                iconName: "󱁨"
+                description: "Run scripts when system events occur. Place executable scripts in ~/.config/quickshell/hooks/ or set custom paths below."
 
-                Repeater {
-                    model: modelData.hooks
+                SettingsToggleRow {
+                    label: "Enable Hooks"
+                    icon: "󱁨"
+                    configKey: "hooksEnabled"
+                }
 
-                    delegate: ColumnLayout {
-                        required property var modelData
+                SettingsListRow {
+                    ColumnLayout {
                         Layout.fillWidth: true
                         spacing: Colors.spacingXXS
 
-                        RowLayout {
+                        Text {
                             Layout.fillWidth: true
-                            spacing: Colors.spacingS
+                            text: "Open Hooks Directory"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeSmall
+                            font.weight: Font.DemiBold
+                            wrapMode: Text.WordWrap
+                        }
 
-                            Rectangle {
-                                width: 8
-                                height: 8
-                                radius: Colors.radiusXS
-                                color: _hookHasScript(modelData.name) ? Colors.success : Colors.textDisabled
-                            }
+                        Text {
+                            Layout.fillWidth: true
+                            text: "Open ~/.config/quickshell/hooks in the default file manager."
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                            wrapMode: Text.WordWrap
+                        }
+                    }
 
-                            ColumnLayout {
+                    SettingsActionButton {
+                        label: "Open"
+                        iconName: "folder.svg"
+                        compact: true
+                        onClicked: Quickshell.execDetached(["xdg-open", HookService.hookDir])
+                    }
+                }
+            }
+        }
+
+        SettingsSectionGroup {
+            title: "Hook Catalog"
+            description: "Available hook entry points grouped by category, with per-hook template generation."
+
+            Repeater {
+                model: root.groupedCategories
+
+                delegate: SettingsCard {
+                    required property var modelData
+                    title: modelData.category
+                    iconName: _categoryIcon(modelData.category)
+                    description: modelData.hooks.length + " hook" + (modelData.hooks.length !== 1 ? "s" : "") + " available"
+
+                    Repeater {
+                        model: modelData.hooks
+
+                        delegate: ColumnLayout {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            spacing: Colors.spacingXXS
+
+                            RowLayout {
                                 Layout.fillWidth: true
-                                spacing: 0
+                                spacing: Colors.spacingS
 
-                                Text {
-                                    text: modelData.name
-                                    color: Colors.text
-                                    font.pixelSize: Colors.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    font.family: Colors.fontMono
+                                Rectangle {
+                                    width: 8
+                                    height: 8
+                                    radius: Colors.radiusXS
+                                    color: _hookHasScript(modelData.name) ? Colors.success : Colors.textDisabled
                                 }
 
-                                Text {
-                                    text: modelData.description + (modelData.valueDescription ? " (" + modelData.valueDescription + ")" : "")
-                                    color: Colors.textDisabled
-                                    font.pixelSize: Colors.fontSizeXS
+                                ColumnLayout {
                                     Layout.fillWidth: true
-                                    elide: Text.ElideRight
+                                    spacing: 0
+
+                                    Text {
+                                        text: modelData.name
+                                        color: Colors.text
+                                        font.pixelSize: Colors.fontSizeMedium
+                                        font.weight: Font.Medium
+                                        font.family: Colors.fontMono
+                                    }
+
+                                    Text {
+                                        text: modelData.description + (modelData.valueDescription ? " (" + modelData.valueDescription + ")" : "")
+                                        color: Colors.textDisabled
+                                        font.pixelSize: Colors.fontSizeXS
+                                        Layout.fillWidth: true
+                                        elide: Text.ElideRight
+                                    }
                                 }
-                            }
 
-                            Text {
-                                text: "󰆓"
-                                color: Colors.textSecondary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeLarge
+                                Text {
+                                    text: "󰆓"
+                                    color: Colors.textSecondary
+                                    font.family: Colors.fontMono
+                                    font.pixelSize: Colors.fontSizeLarge
 
-                                MouseArea {
-                                    id: createTemplateMouse
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    hoverEnabled: true
-                                    onClicked: _createTemplate(modelData.name, modelData.valueDescription)
+                                    MouseArea {
+                                        id: createTemplateMouse
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        hoverEnabled: true
+                                        onClicked: _createTemplate(modelData.name, modelData.valueDescription)
 
-                                    SharedWidgets.BarTooltip {
-                                        anchorItem: createTemplateMouse
-                                        hovered: createTemplateMouse.containsMouse
-                                        text: "Create template script"
+                                        SharedWidgets.BarTooltip {
+                                            anchorItem: createTemplateMouse
+                                            hovered: createTemplateMouse.containsMouse
+                                            text: "Create template script"
+                                        }
                                     }
                                 }
                             }
@@ -184,14 +289,12 @@ Item {
     }
 
     function _createTemplate(hookName, valueDesc) {
-        // Validate hookName: only alphanumeric, hyphen, underscore allowed
         if (!/^[a-zA-Z0-9_-]+$/.test(hookName)) {
             ToastService.showError("Invalid Hook", "Hook name contains invalid characters");
             return;
         }
         var safeDesc = (valueDesc || "value").replace(/['"\\]/g, "");
         var path = HookService.hookDir + "/" + hookName;
-        // Use stdin to avoid shell injection — content is piped, not interpolated
         _templateProc.command = ["sh", "-c", "cat > \"$1\" && chmod +x \"$1\"", "sh", path];
         root._pendingTemplateContent = "#!/bin/sh\n# Hook: " + hookName + "\n# $1 = hook name, $2 = " + safeDesc + "\n\necho \"Hook fired: $1 = $2\" >> /tmp/quickshell-hooks.log\n";
         root._pendingTemplatePath = path;

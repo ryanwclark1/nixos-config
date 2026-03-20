@@ -75,7 +75,7 @@ Item {
                 SettingsCard {
                     Layout.fillWidth: true
                     title: "Now Playing"
-                    iconName: "󰝚"
+                    iconName: "music-note-2.svg"
                     visible: MediaService.isPlaying || !!MediaService.currentPlayer
 
                     RowLayout {
@@ -143,13 +143,13 @@ Item {
 
                 SettingsActionButton {
                     label: "Restart Shell"
-                    iconName: "󰑐"
+                    iconName: "arrow-clockwise.svg"
                     onClicked: Quickshell.reload()
                 }
 
                 SettingsActionButton {
                     label: Config.debug ? "Disable Debug" : "Enable Debug"
-                    iconName: "󰃤"
+                    iconName: "bug.svg"
                     onClicked: Config.debug = !Config.debug
                 }
             }

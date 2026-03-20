@@ -26,6 +26,11 @@ Item {
     readonly property bool selectedPluginHasSettings: selectedPluginId !== "" && PluginService.pluginSupportsSettings(selectedPluginId)
     readonly property bool selectedPluginCanWriteSettings: selectedPluginId !== "" && PluginService.pluginCanWriteSettings(selectedPluginId)
     readonly property bool selectedPluginHasControlCenterDetail: selectedPluginId !== "" && PluginService.pluginSupportsControlCenterDetail(selectedPluginId)
+    readonly property int pluginCount: (PluginService.plugins || []).length
+    readonly property int enabledPluginCount: (PluginService.plugins || []).filter(function (p) {
+        return !!(p && p.enabled);
+    }).length
+    readonly property int invalidManifestCount: root.pluginErrorEntries().length
 
     Component.onDestruction: _destroyed = true
 
@@ -305,441 +310,536 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
+        settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Plugins"
-        iconName: "󰏗"
+        iconName: "apps.svg"
+        compactMode: root.compactMode
+        tightSpacing: root.tightSpacing
 
-        SettingsCard {
-            title: "Plugin Manager"
-            iconName: "󰏗"
-            description: "Discover and toggle installed bar and desktop widget plugins."
+        SettingsSectionGroup {
+            title: "Plugin Overview"
+            description: "Installed count, runtime health, and manifest integrity before you drill into the catalog."
 
             Flow {
                 Layout.fillWidth: true
                 width: parent.width
                 spacing: Colors.spacingM
-
-                ColumnLayout {
-                    spacing: Colors.spacingXXS
-                    width: root.compactMode ? parent.width : Math.max(0, parent.width - scanPluginsButton.implicitWidth - copyDiagnosticsButton.implicitWidth - saveDiagnosticsButton.implicitWidth - (Colors.spacingM * 3))
-
-                    Text {
-                        text: PluginService.plugins.length + " plugin" + (PluginService.plugins.length !== 1 ? "s" : "") + " found"
-                        color: Colors.text
-                        font.pixelSize: Colors.fontSizeMedium
-                        font.weight: Font.Medium
-                    }
-
-                    Text {
-                        text: PluginService.plugins.filter(function (p) {
-                            return p.enabled;
-                        }).length + " enabled"
-                        color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeSmall
-                    }
-
-                    Text {
-                        visible: Object.keys(PluginService.pluginErrors || ({})).length > 0
-                        text: Object.keys(PluginService.pluginErrors || ({})).length + " invalid plugin manifest" + (Object.keys(PluginService.pluginErrors || ({})).length !== 1 ? "s" : "")
-                        color: Colors.warning
-                        font.pixelSize: Colors.fontSizeSmall
-                    }
-                }
-
-                SettingsActionButton {
-                    id: scanPluginsButton
-                    label: "Scan"
-                    iconName: "arrow-clockwise.svg"
-                    compact: true
-                    onClicked: PluginService.scanPlugins()
-                }
-
-                SettingsActionButton {
-                    id: copyDiagnosticsButton
-                    label: "Copy Diagnostics"
-                    iconName: "󰨓"
-                    compact: true
-                    onClicked: root.copyPluginDiagnostics()
-                }
-
-                SettingsActionButton {
-                    id: saveDiagnosticsButton
-                    label: "Save Diagnostics"
-                    iconName: "save.svg"
-                    compact: true
-                    onClicked: root.savePluginDiagnostics()
-                }
-            }
-
-            Flow {
-                Layout.fillWidth: true
-                width: parent.width
-                spacing: Colors.spacingS
-
-                Rectangle {
-                    implicitWidth: activeCount.implicitWidth + 12
-                    height: 20
-                    radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.success, 0.16)
-                    Text {
-                        id: activeCount
-                        anchors.centerIn: parent
-                        text: "active " + root.pluginStatusSummary().active
-                        color: Colors.success
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.DemiBold
-                    }
-                }
-
-                Rectangle {
-                    implicitWidth: degradedCount.implicitWidth + 12
-                    height: 20
-                    radius: Colors.radiusSmall
-                    color: Colors.warningLight
-                    Text {
-                        id: degradedCount
-                        anchors.centerIn: parent
-                        text: "degraded " + root.pluginStatusSummary().degraded
-                        color: Colors.warning
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.DemiBold
-                    }
-                }
-
-                Rectangle {
-                    implicitWidth: failedCount.implicitWidth + 12
-                    height: 20
-                    radius: Colors.radiusSmall
-                    color: Colors.withAlpha(Colors.error, 0.16)
-                    Text {
-                        id: failedCount
-                        anchors.centerIn: parent
-                        text: "failed " + root.pluginStatusSummary().failed
-                        color: Colors.error
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.DemiBold
-                    }
-                }
-
-                Rectangle {
-                    implicitWidth: disabledCount.implicitWidth + 12
-                    height: 20
-                    radius: Colors.radiusSmall
-                    color: Colors.borderLight
-                    Text {
-                        id: disabledCount
-                        anchors.centerIn: parent
-                        text: "disabled " + root.pluginStatusSummary().disabled
-                        color: Colors.textSecondary
-                        font.pixelSize: Colors.fontSizeXS
-                        font.weight: Font.DemiBold
-                    }
-                }
-            }
-
-            ColumnLayout {
-                visible: PluginService.plugins.length === 0
-                Layout.fillWidth: true
-                Layout.topMargin: Colors.spacingXL
-                spacing: Colors.spacingM
-
-                Text {
-                    text: "󰏗"
-                    color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeHuge
-                    Layout.alignment: Qt.AlignHCenter
-                }
-                Text {
-                    text: "No plugins found"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeLarge
-                    font.weight: Font.DemiBold
-                    Layout.alignment: Qt.AlignHCenter
-                }
-                Text {
-                    text: "Add a folder with manifest.json to get started"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeSmall
-                    Layout.alignment: Qt.AlignHCenter
-                }
-            }
-
-            Repeater {
-                model: PluginService.plugins
-
-                delegate: SettingsListRow {
-                    active: modelData.enabled
-                    radius: Colors.radiusMedium
-                    contentInset: Colors.spacingM
-                    rowSpacing: root.compactMode ? Colors.spacingS : Colors.spacingM
-                    minimumHeight: root.compactMode ? 92 : 66
-
-                    Rectangle {
-                        width: root.compactMode ? 32 : 38
-                        height: root.compactMode ? 32 : 38
-                        radius: Colors.radiusSmall
-                        color: modelData.enabled ? Colors.primarySubtle : Colors.textFaint
-                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: root.pluginTypeIcon(modelData.type)
-                            color: modelData.enabled ? Colors.primary : Colors.textDisabled
-                            font.family: Colors.fontMono
-                            font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
-                            Behavior on color {
-                                enabled: !Colors.isTransitioning
-                                CAnim {}
-                            }
-                        }
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 3
-
-                        Flow {
-                            Layout.fillWidth: true
-                            width: parent.width
-                            spacing: Colors.spacingS
-
-                            Text {
-                                text: modelData.name
-                                color: Colors.text
-                                font.pixelSize: Colors.fontSizeMedium
-                                font.weight: Font.DemiBold
-                                width: parent.width
-                                elide: Text.ElideRight
-                                wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
-                            }
-                        }
-
-                        Flow {
-                            Layout.fillWidth: true
-                            width: parent.width
-                            spacing: Colors.spacingS
-
-                            Rectangle {
-                                implicitWidth: verLabel.implicitWidth + 10
-                                height: 18
-                                radius: height / 2
-                                color: Colors.textWash
-                                Text {
-                                    id: verLabel
-                                    anchors.centerIn: parent
-                                    text: "v" + modelData.version
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.family: Colors.fontMono
-                                }
-                            }
-
-                            Rectangle {
-                                implicitWidth: typeLabel.implicitWidth + 10
-                                height: 18
-                                radius: height / 2
-                                color: Qt.rgba(root.pluginTypeAccent(modelData.type).r, root.pluginTypeAccent(modelData.type).g, root.pluginTypeAccent(modelData.type).b, 0.14)
-                                Text {
-                                    id: typeLabel
-                                    anchors.centerIn: parent
-                                    text: root.pluginTypeLabel(modelData.type)
-                                    color: root.pluginTypeAccent(modelData.type)
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.weight: Font.DemiBold
-                                }
-                            }
-
-                            Rectangle {
-                                implicitWidth: statusLabel.implicitWidth + 10
-                                height: 18
-                                radius: height / 2
-                                color: {
-                                    var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
-                                    var severity = root.statusSeverity(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
-                                    return root.severityBgColor(severity);
-                                }
-                                Text {
-                                    id: statusLabel
-                                    anchors.centerIn: parent
-                                    text: {
-                                        var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
-                                        return PluginRuntimeCatalog.stateLabel(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
-                                    }
-                                    color: {
-                                        var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
-                                        var severity = root.statusSeverity(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
-                                        return root.severityColor(severity);
-                                    }
-                                    font.pixelSize: Colors.fontSizeXS
-                                    font.weight: Font.DemiBold
-                                }
-                            }
-                        }
-
-                        Text {
-                            visible: modelData.description.length > 0
-                            text: modelData.description
-                            color: Colors.textSecondary
-                            font.pixelSize: Colors.fontSizeSmall
-                            Layout.fillWidth: true
-                            wrapMode: Text.WordWrap
-                        }
-                        Text {
-                            text: "by " + modelData.author
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
-                        }
-
-                        Flow {
-                            Layout.fillWidth: true
-                            width: parent.width
-                            spacing: Colors.spacingS
-
-                            SettingsActionButton {
-                                visible: PluginService.pluginSupportsControlCenterDetail(modelData.id)
-                                compact: true
-                                iconName: "󰍐"
-                                label: "Detail"
-                                onClicked: root.openPluginPane(modelData.id, "detail")
-                            }
-
-                            SettingsActionButton {
-                                visible: PluginService.pluginSupportsSettings(modelData.id)
-                                compact: true
-                                iconName: "settings.svg"
-                                label: "Settings"
-                                onClicked: root.openPluginPane(modelData.id, "settings")
-                            }
-                        }
-
-                        Text {
-                            visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].message || "") !== ""
-                            text: (PluginService.pluginStatuses[modelData.id].code ? ("[" + PluginRuntimeCatalog.errorLabel(PluginService.pluginStatuses[modelData.id].code) + "] ") : "") + String(PluginService.pluginStatuses[modelData.id].message || "")
-                            color: Colors.warning
-                            font.pixelSize: Colors.fontSizeXS
-                            Layout.fillWidth: true
-                            wrapMode: Text.WordWrap
-                        }
-
-                        Text {
-                            visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].code || "") !== "" && String(PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code) || "") !== ""
-                            text: PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code)
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
-                            Layout.fillWidth: true
-                            wrapMode: Text.WordWrap
-                        }
-
-                        Text {
-                            visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].updatedAt || "") !== ""
-                            text: "updated " + String(PluginService.pluginStatuses[modelData.id].updatedAt || "")
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
-                            Layout.fillWidth: true
-                            wrapMode: Text.WordWrap
-                        }
-
-                        Text {
-                            visible: {
-                                var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : (modelData.enabled ? "enabled" : "disabled");
-                                return String(root.statusDescription(status) || "") !== "";
-                            }
-                            text: {
-                                var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : (modelData.enabled ? "enabled" : "disabled");
-                                return root.statusDescription(status);
-                            }
-                            color: Colors.textDisabled
-                            font.pixelSize: Colors.fontSizeXS
-                            Layout.fillWidth: true
-                            wrapMode: Text.WordWrap
-                        }
-                    }
-
-                    SharedWidgets.ToggleSwitch {
-                        checked: modelData.enabled
-                        Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                        onToggled: {
-                            if (modelData.enabled)
-                                PluginService.disablePlugin(modelData.id);
-                            else
-                                PluginService.enablePlugin(modelData.id);
-                        }
-                    }
-                }
-            }
-
-            ColumnLayout {
-                visible: root.pluginErrorEntries().length > 0
-                Layout.fillWidth: true
-                spacing: Colors.spacingS
-                Layout.topMargin: Colors.spacingM
-
-                Text {
-                    text: "Invalid plugin manifests"
-                    color: Colors.warning
-                    font.pixelSize: Colors.fontSizeSmall
-                    font.weight: Font.DemiBold
-                }
 
                 Repeater {
-                    model: root.pluginErrorEntries()
+                    model: [
+                        {
+                            icon: "apps.svg",
+                            label: "Installed",
+                            value: root.pluginCount + " plugin" + (root.pluginCount === 1 ? "" : "s")
+                        },
+                        {
+                            icon: "󰄬",
+                            label: "Enabled",
+                            value: root.enabledPluginCount + " active"
+                        },
+                        {
+                            icon: "󰀪",
+                            label: "Manifest Errors",
+                            value: root.invalidManifestCount + " issue" + (root.invalidManifestCount === 1 ? "" : "s")
+                        },
+                        {
+                            icon: "󰒓",
+                            label: "Runtime",
+                            value: root.pluginStatusSummary().degraded > 0 || root.pluginStatusSummary().failed > 0
+                                ? (root.pluginStatusSummary().degraded + root.pluginStatusSummary().failed) + " attention"
+                                : "Healthy"
+                        }
+                    ]
 
                     delegate: Rectangle {
                         required property var modelData
-                        Layout.fillWidth: true
-                        radius: Colors.radiusSmall
-                        color: Colors.withAlpha(Colors.warning, 0.10)
-                        border.color: Colors.withAlpha(Colors.warning, 0.35)
-                        border.width: 1
-                        implicitHeight: issueText.implicitHeight + 14
 
-                        Text {
-                            id: issueText
+                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Colors.spacingM * 2) / 3))
+                        implicitHeight: metricColumn.implicitHeight + Colors.spacingM * 2
+                        radius: Colors.radiusLarge
+                        color: Colors.withAlpha(Colors.surface, 0.38)
+                        border.color: Colors.withAlpha(Colors.primary, 0.14)
+                        border.width: 1
+
+                        ColumnLayout {
+                            id: metricColumn
                             anchors.fill: parent
-                            anchors.margins: 7
-                            text: modelData.id + ": " + (modelData.code !== "" ? ("[" + modelData.code + "] ") : "") + modelData.error
-                            color: Colors.warning
-                            font.pixelSize: Colors.fontSizeXS
-                            wrapMode: Text.WordWrap
+                            anchors.margins: Colors.spacingM
+                            spacing: Colors.spacingXS
+
+                            Text {
+                                text: modelData.icon
+                                color: Colors.primary
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeLarge
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.label
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeXS
+                                font.weight: Font.Black
+                                font.letterSpacing: Colors.letterSpacingExtraWide
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.value
+                                color: Colors.text
+                                font.pixelSize: Colors.fontSizeMedium
+                                font.weight: Font.Bold
+                                wrapMode: Text.WordWrap
+                            }
                         }
                     }
                 }
             }
         }
 
-        SettingsCard {
-            title: "Installation"
-            iconName: "info.svg"
-            description: "Plugin format and discovery location."
+        SettingsSectionGroup {
+            title: "Plugin Catalog"
+            description: "Discover installed plugins, inspect runtime state, and open plugin settings or detail panes."
 
-            SettingsInfoCallout {
-                iconName: "󰏗"
-                title: "Plugin directory"
-                body: "~/.config/quickshell/plugins/"
+            SettingsCard {
+                title: "Plugin Manager"
+                iconName: "apps.svg"
+                description: "Discover and toggle installed bar and desktop widget plugins."
 
-                Text {
-                    text: "Each plugin is a folder containing a manifest.json and one or more QML entry points."
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
-                    wrapMode: Text.WordWrap
+                Flow {
                     Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingM
+
+                    ColumnLayout {
+                        spacing: Colors.spacingXXS
+                        width: root.compactMode ? parent.width : Math.max(0, parent.width - scanPluginsButton.implicitWidth - copyDiagnosticsButton.implicitWidth - saveDiagnosticsButton.implicitWidth - (Colors.spacingM * 3))
+
+                        Text {
+                            text: PluginService.plugins.length + " plugin" + (PluginService.plugins.length !== 1 ? "s" : "") + " found"
+                            color: Colors.text
+                            font.pixelSize: Colors.fontSizeMedium
+                            font.weight: Font.Medium
+                        }
+
+                        Text {
+                            text: PluginService.plugins.filter(function (p) {
+                                return p.enabled;
+                            }).length + " enabled"
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeSmall
+                        }
+
+                        Text {
+                            visible: Object.keys(PluginService.pluginErrors || ({})).length > 0
+                            text: Object.keys(PluginService.pluginErrors || ({})).length + " invalid plugin manifest" + (Object.keys(PluginService.pluginErrors || ({})).length !== 1 ? "s" : "")
+                            color: Colors.warning
+                            font.pixelSize: Colors.fontSizeSmall
+                        }
+                    }
+
+                    SettingsActionButton {
+                        id: scanPluginsButton
+                        label: "Scan"
+                        iconName: "arrow-clockwise.svg"
+                        compact: true
+                        onClicked: PluginService.scanPlugins()
+                    }
+
+                    SettingsActionButton {
+                        id: copyDiagnosticsButton
+                        label: "Copy Diagnostics"
+                        iconName: "󰨓"
+                        compact: true
+                        onClicked: root.copyPluginDiagnostics()
+                    }
+
+                    SettingsActionButton {
+                        id: saveDiagnosticsButton
+                        label: "Save Diagnostics"
+                        iconName: "save.svg"
+                        compact: true
+                        onClicked: root.savePluginDiagnostics()
+                    }
                 }
 
-                Text {
-                    text: "Manifest fields: id, name, description, author, version, type, permissions, entryPoints { barWidget|desktopWidget|launcherProvider|daemon|settings }"
-                    color: Colors.textSecondary
-                    font.pixelSize: Colors.fontSizeSmall
-                    wrapMode: Text.WordWrap
+                Flow {
                     Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Colors.spacingS
+
+                    Rectangle {
+                        implicitWidth: activeCount.implicitWidth + 12
+                        height: 20
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.success, 0.16)
+                        Text {
+                            id: activeCount
+                            anchors.centerIn: parent
+                            text: "active " + root.pluginStatusSummary().active
+                            color: Colors.success
+                            font.pixelSize: Colors.fontSizeXS
+                            font.weight: Font.DemiBold
+                        }
+                    }
+
+                    Rectangle {
+                        implicitWidth: degradedCount.implicitWidth + 12
+                        height: 20
+                        radius: Colors.radiusSmall
+                        color: Colors.warningLight
+                        Text {
+                            id: degradedCount
+                            anchors.centerIn: parent
+                            text: "degraded " + root.pluginStatusSummary().degraded
+                            color: Colors.warning
+                            font.pixelSize: Colors.fontSizeXS
+                            font.weight: Font.DemiBold
+                        }
+                    }
+
+                    Rectangle {
+                        implicitWidth: failedCount.implicitWidth + 12
+                        height: 20
+                        radius: Colors.radiusSmall
+                        color: Colors.withAlpha(Colors.error, 0.16)
+                        Text {
+                            id: failedCount
+                            anchors.centerIn: parent
+                            text: "failed " + root.pluginStatusSummary().failed
+                            color: Colors.error
+                            font.pixelSize: Colors.fontSizeXS
+                            font.weight: Font.DemiBold
+                        }
+                    }
+
+                    Rectangle {
+                        implicitWidth: disabledCount.implicitWidth + 12
+                        height: 20
+                        radius: Colors.radiusSmall
+                        color: Colors.borderLight
+                        Text {
+                            id: disabledCount
+                            anchors.centerIn: parent
+                            text: "disabled " + root.pluginStatusSummary().disabled
+                            color: Colors.textSecondary
+                            font.pixelSize: Colors.fontSizeXS
+                            font.weight: Font.DemiBold
+                        }
+                    }
                 }
 
-                Text {
-                    text: "Reference schema: src/plugins/manifest.schema.json"
-                    color: Colors.textDisabled
-                    font.pixelSize: Colors.fontSizeXS
-                    wrapMode: Text.WordWrap
+                ColumnLayout {
+                    visible: PluginService.plugins.length === 0
                     Layout.fillWidth: true
+                    Layout.topMargin: Colors.spacingXL
+                    spacing: Colors.spacingM
+
+                    Text {
+                        text: "󰏗"
+                        color: Colors.textDisabled
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeHuge
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    Text {
+                        text: "No plugins found"
+                        color: Colors.textDisabled
+                        font.pixelSize: Colors.fontSizeLarge
+                        font.weight: Font.DemiBold
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    Text {
+                        text: "Add a folder with manifest.json to get started"
+                        color: Colors.textDisabled
+                        font.pixelSize: Colors.fontSizeSmall
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                }
+
+                Repeater {
+                    model: PluginService.plugins
+
+                    delegate: SettingsListRow {
+                        active: modelData.enabled
+                        radius: Colors.radiusMedium
+                        contentInset: Colors.spacingM
+                        rowSpacing: root.compactMode ? Colors.spacingS : Colors.spacingM
+                        minimumHeight: root.compactMode ? 92 : 66
+
+                        Rectangle {
+                            width: root.compactMode ? 32 : 38
+                            height: root.compactMode ? 32 : 38
+                            radius: Colors.radiusSmall
+                            color: modelData.enabled ? Colors.primarySubtle : Colors.textFaint
+                            Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: root.pluginTypeIcon(modelData.type)
+                                color: modelData.enabled ? Colors.primary : Colors.textDisabled
+                                font.family: Colors.fontMono
+                                font.pixelSize: root.compactMode ? Colors.fontSizeLarge : Colors.fontSizeXL
+                                Behavior on color {
+                                    enabled: !Colors.isTransitioning
+                                    CAnim {}
+                                }
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 3
+
+                            Flow {
+                                Layout.fillWidth: true
+                                width: parent.width
+                                spacing: Colors.spacingS
+
+                                Text {
+                                    text: modelData.name
+                                    color: Colors.text
+                                    font.pixelSize: Colors.fontSizeMedium
+                                    font.weight: Font.DemiBold
+                                    width: parent.width
+                                    elide: Text.ElideRight
+                                    wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+                                }
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+                                width: parent.width
+                                spacing: Colors.spacingS
+
+                                Rectangle {
+                                    implicitWidth: verLabel.implicitWidth + 10
+                                    height: 18
+                                    radius: height / 2
+                                    color: Colors.textWash
+                                    Text {
+                                        id: verLabel
+                                        anchors.centerIn: parent
+                                        text: "v" + modelData.version
+                                        color: Colors.textSecondary
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.family: Colors.fontMono
+                                    }
+                                }
+
+                                Rectangle {
+                                    implicitWidth: typeLabel.implicitWidth + 10
+                                    height: 18
+                                    radius: height / 2
+                                    color: Qt.rgba(root.pluginTypeAccent(modelData.type).r, root.pluginTypeAccent(modelData.type).g, root.pluginTypeAccent(modelData.type).b, 0.14)
+                                    Text {
+                                        id: typeLabel
+                                        anchors.centerIn: parent
+                                        text: root.pluginTypeLabel(modelData.type)
+                                        color: root.pluginTypeAccent(modelData.type)
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.DemiBold
+                                    }
+                                }
+
+                                Rectangle {
+                                    implicitWidth: statusLabel.implicitWidth + 10
+                                    height: 18
+                                    radius: height / 2
+                                    color: {
+                                        var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
+                                        var severity = root.statusSeverity(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
+                                        return root.severityBgColor(severity);
+                                    }
+                                    Text {
+                                        id: statusLabel
+                                        anchors.centerIn: parent
+                                        text: {
+                                            var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
+                                            return PluginRuntimeCatalog.stateLabel(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
+                                        }
+                                        color: {
+                                            var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : "";
+                                            var severity = root.statusSeverity(status !== "" ? status : (modelData.enabled ? "enabled" : "disabled"));
+                                            return root.severityColor(severity);
+                                        }
+                                        font.pixelSize: Colors.fontSizeXS
+                                        font.weight: Font.DemiBold
+                                    }
+                                }
+                            }
+
+                            Text {
+                                visible: modelData.description.length > 0
+                                text: modelData.description
+                                color: Colors.textSecondary
+                                font.pixelSize: Colors.fontSizeSmall
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+                            Text {
+                                text: "by " + modelData.author
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeXS
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+                                width: parent.width
+                                spacing: Colors.spacingS
+
+                                SettingsActionButton {
+                                    visible: PluginService.pluginSupportsControlCenterDetail(modelData.id)
+                                    compact: true
+                                    iconName: "󰍐"
+                                    label: "Detail"
+                                    onClicked: root.openPluginPane(modelData.id, "detail")
+                                }
+
+                                SettingsActionButton {
+                                    visible: PluginService.pluginSupportsSettings(modelData.id)
+                                    compact: true
+                                    iconName: "settings.svg"
+                                    label: "Settings"
+                                    onClicked: root.openPluginPane(modelData.id, "settings")
+                                }
+                            }
+
+                            Text {
+                                visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].message || "") !== ""
+                                text: (PluginService.pluginStatuses[modelData.id].code ? ("[" + PluginRuntimeCatalog.errorLabel(PluginService.pluginStatuses[modelData.id].code) + "] ") : "") + String(PluginService.pluginStatuses[modelData.id].message || "")
+                                color: Colors.warning
+                                font.pixelSize: Colors.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].code || "") !== "" && String(PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code) || "") !== ""
+                                text: PluginRuntimeCatalog.errorDescription(PluginService.pluginStatuses[modelData.id].code)
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                visible: PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] && String(PluginService.pluginStatuses[modelData.id].updatedAt || "") !== ""
+                                text: "updated " + String(PluginService.pluginStatuses[modelData.id].updatedAt || "")
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Text {
+                                visible: {
+                                    var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : (modelData.enabled ? "enabled" : "disabled");
+                                    return String(root.statusDescription(status) || "") !== "";
+                                }
+                                text: {
+                                    var status = PluginService.pluginStatuses && PluginService.pluginStatuses[modelData.id] ? PluginService.pluginStatuses[modelData.id].state : (modelData.enabled ? "enabled" : "disabled");
+                                    return root.statusDescription(status);
+                                }
+                                color: Colors.textDisabled
+                                font.pixelSize: Colors.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+
+                        SharedWidgets.ToggleSwitch {
+                            checked: modelData.enabled
+                            Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+                            onToggled: {
+                                if (modelData.enabled)
+                                    PluginService.disablePlugin(modelData.id);
+                                else
+                                    PluginService.enablePlugin(modelData.id);
+                            }
+                        }
+                    }
+                }
+
+                ColumnLayout {
+                    visible: root.pluginErrorEntries().length > 0
+                    Layout.fillWidth: true
+                    spacing: Colors.spacingS
+                    Layout.topMargin: Colors.spacingM
+
+                    Text {
+                        text: "Invalid plugin manifests"
+                        color: Colors.warning
+                        font.pixelSize: Colors.fontSizeSmall
+                        font.weight: Font.DemiBold
+                    }
+
+                    Repeater {
+                        model: root.pluginErrorEntries()
+
+                        delegate: Rectangle {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            radius: Colors.radiusSmall
+                            color: Colors.withAlpha(Colors.warning, 0.10)
+                            border.color: Colors.withAlpha(Colors.warning, 0.35)
+                            border.width: 1
+                            implicitHeight: issueText.implicitHeight + 14
+
+                            Text {
+                                id: issueText
+                                anchors.fill: parent
+                                anchors.margins: 7
+                                text: modelData.id + ": " + (modelData.code !== "" ? ("[" + modelData.code + "] ") : "") + modelData.error
+                                color: Colors.warning
+                                font.pixelSize: Colors.fontSizeXS
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        SettingsSectionGroup {
+            title: "Installation & Diagnostics"
+            description: "Reference information for plugin packaging and the diagnostics export that backs the shell tooling."
+
+            SettingsCard {
+                title: "Installation"
+                iconName: "info.svg"
+                description: "Plugin format and discovery location."
+
+                SettingsInfoCallout {
+                    iconName: "apps.svg"
+                    title: "Plugin directory"
+                    body: "~/.config/quickshell/plugins/"
+
+                    Text {
+                        text: "Each plugin is a folder containing a manifest.json and one or more QML entry points."
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeSmall
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: "Manifest fields: id, name, description, author, version, type, permissions, entryPoints { barWidget|desktopWidget|launcherProvider|daemon|settings }"
+                        color: Colors.textSecondary
+                        font.pixelSize: Colors.fontSizeSmall
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: "Reference schema: src/plugins/manifest.schema.json"
+                        color: Colors.textDisabled
+                        font.pixelSize: Colors.fontSizeXS
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
                 }
             }
         }

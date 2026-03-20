@@ -1402,7 +1402,7 @@ Item {
             visible: root.isLauncherRuntimeSection
             Layout.fillWidth: true
             title: "Diagnostics & Recovery"
-            iconName: "󰑐"
+            iconName: "arrow-clockwise.svg"
             description: "Runtime reset actions and launcher maintenance controls."
 
             Flow {
@@ -1413,7 +1413,7 @@ Item {
                     width: root.compactMode ? implicitWidth : 0
                     Layout.fillWidth: !root.compactMode
                     label: "Reset Runtime Metrics"
-                    iconName: "󰑐"
+                    iconName: "arrow-clockwise.svg"
                     compact: true
                     onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "clearMetrics"])
                 }
@@ -1439,7 +1439,7 @@ Item {
             SettingsActionButton {
                 Layout.fillWidth: true
                 label: "Reset Launcher Defaults"
-                iconName: "󰑐"
+                iconName: "arrow-clockwise.svg"
                 onClicked: root.resetLauncherDefaults()
             }
         }

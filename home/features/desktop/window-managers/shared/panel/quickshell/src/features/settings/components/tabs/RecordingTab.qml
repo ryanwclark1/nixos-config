@@ -227,7 +227,7 @@ Item {
 
                 SettingsTextInputRow {
                     label: "Output Directory"
-                    leadingIcon: "󰉋"
+                    leadingIcon: "folder.svg"
                     placeholderText: "~/Videos"
                     text: Config.recordingOutputDir
                     onSubmitted: value => Config.recordingOutputDir = value.trim()

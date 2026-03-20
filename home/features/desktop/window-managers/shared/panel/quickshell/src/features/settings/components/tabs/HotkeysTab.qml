@@ -153,7 +153,7 @@ Item {
             SettingsActionButton {
                 Layout.fillWidth: true
                 label: "Refresh"
-                iconName: "󰑐"
+                iconName: "arrow-clockwise.svg"
                 onClicked: {
                     root.keybindsList = [];
                     if (CompositorAdapter.isNiri) NiriBinds.reload();

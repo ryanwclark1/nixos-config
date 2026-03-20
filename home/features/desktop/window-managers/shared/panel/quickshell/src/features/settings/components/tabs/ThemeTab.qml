@@ -504,7 +504,7 @@ Item {
             SettingsTextInputRow {
                 visible: Config.themeAutoScheduleEnabled
                 label: "Dark Theme"
-                leadingIcon: "󰖔"
+                leadingIcon: "weather-moon.svg"
                 text: Config.themeDarkName
                 placeholderText: "Theme ID for dark mode"
                 onSubmitted: v => Config.themeDarkName = v.trim()
@@ -513,7 +513,7 @@ Item {
             SettingsTextInputRow {
                 visible: Config.themeAutoScheduleEnabled
                 label: "Light Theme"
-                leadingIcon: "󰖙"
+                leadingIcon: "weather-sunny.svg"
                 text: Config.themeLightName
                 placeholderText: "Theme ID for light mode"
                 onSubmitted: v => Config.themeLightName = v.trim()

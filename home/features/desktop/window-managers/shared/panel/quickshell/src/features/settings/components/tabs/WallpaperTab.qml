@@ -465,7 +465,7 @@ Item {
                 Layout.fillWidth: true
                 label: "Default wallpaper folder"
                 placeholderText: "~/.config/wallpapers"
-                leadingIcon: "󰉋"
+                leadingIcon: "folder.svg"
                 text: root.wallpaperFolderInput
                 errorText: root.wallpaperFolderError
                 onTextEdited: value => root.wallpaperFolderInput = value
@@ -489,7 +489,7 @@ Item {
                 Layout.fillWidth: true
                 label: "Solid color"
                 placeholderText: "#000000"
-                leadingIcon: "󰝤"
+                leadingIcon: "color-palette.svg"
                 text: root.solidColorInput
                 errorText: root.solidColorError
                 onTextEdited: value => root.solidColorInput = value
@@ -670,7 +670,7 @@ Item {
             Layout.fillWidth: true
             label: "Manifest path"
             placeholderText: "/path/to/manifest.json"
-            leadingIcon: "󰈔"
+            leadingIcon: "document.svg"
             text: Config.wallpaperDynamicManifest || ""
             onTextEdited: value => Config.wallpaperDynamicManifest = value.trim()
             onSubmitted: value => Config.wallpaperDynamicManifest = value.trim()
@@ -736,7 +736,7 @@ Item {
 
             SettingsActionButton {
                 label: "Rescan"
-                iconName: "󰑐"
+                iconName: "arrow-clockwise.svg"
                 compact: true
                 onClicked: WallpaperService.scanWallpapers()
             }

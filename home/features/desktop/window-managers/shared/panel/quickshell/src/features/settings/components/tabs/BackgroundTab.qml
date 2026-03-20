@@ -192,7 +192,7 @@ Item {
                 SettingsTextInputRow {
                     label: "GIF Path"
                     placeholderText: "~/Pictures/bongocat.gif"
-                    leadingIcon: "󰉋"
+                    leadingIcon: "folder.svg"
                     text: Config.personalityGifPath
                     onTextEdited: value => Config.personalityGifPath = value
 

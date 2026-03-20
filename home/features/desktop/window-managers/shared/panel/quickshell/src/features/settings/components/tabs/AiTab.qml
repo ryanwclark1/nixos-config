@@ -114,7 +114,7 @@ Item {
 
                     SettingsActionButton {
                         label: "Refresh"
-                        iconName: "󰑐"
+                        iconName: "arrow-clockwise.svg"
                         compact: true
                         onClicked: AiService.refreshModels()
                     }
@@ -179,7 +179,7 @@ Item {
                 property bool _remember: Config.aiAnthropicKey !== ""
                 SettingsSecretInputRow {
                     label: "Anthropic API Key"
-                    leadingIcon: "󰌋"
+                    leadingIcon: "key.svg"
                     placeholderText: "sk-ant-..."
                     text: root.effectiveKey("anthropic")
                     onTextEdited: value => root.setRememberedKey("anthropic", parent._remember, value)
@@ -201,7 +201,7 @@ Item {
                 property bool _remember: Config.aiOpenaiKey !== ""
                 SettingsSecretInputRow {
                     label: "OpenAI API Key"
-                    leadingIcon: "󰌋"
+                    leadingIcon: "key.svg"
                     placeholderText: "sk-..."
                     text: root.effectiveKey("openai")
                     onTextEdited: value => root.setRememberedKey("openai", parent._remember, value)
@@ -223,7 +223,7 @@ Item {
                 property bool _remember: Config.aiGeminiKey !== ""
                 SettingsSecretInputRow {
                     label: "Gemini API Key"
-                    leadingIcon: "󰌋"
+                    leadingIcon: "key.svg"
                     placeholderText: "AIza..."
                     text: root.effectiveKey("gemini")
                     onTextEdited: value => root.setRememberedKey("gemini", parent._remember, value)
@@ -318,7 +318,7 @@ Item {
 
             SettingsTextInputRow {
                 label: "Custom System Prompt"
-                leadingIcon: "󰏪"
+                leadingIcon: "edit.svg"
                 placeholderText: "You are a helpful assistant..."
                 text: Config.aiSystemPrompt
                 onTextEdited: value => Config.aiSystemPrompt = value
