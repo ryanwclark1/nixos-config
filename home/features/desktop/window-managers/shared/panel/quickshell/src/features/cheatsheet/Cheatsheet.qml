@@ -47,6 +47,16 @@ PanelWindow {
         }
     }
 
+    // Elastic scale: fast track snaps to target, slow track settles — combined
+    // weight produces a spring-like overshoot without spring physics.
+    ElasticNumber {
+        id: _elasticScale
+        target: root.isVisible ? 1.0 : 0.95
+        fastDuration: Colors.durationSnap
+        slowDuration: Colors.durationPanelOpen
+        fastWeight: 0.45
+    }
+
     // Content card
     Rectangle {
         id: card
@@ -59,12 +69,11 @@ PanelWindow {
         radius: Colors.radiusLarge
 
         opacity: root.isVisible ? 1.0 : 0.0
-        scale: root.isVisible ? 1.0 : 0.95
+        scale: _elasticScale.value
         focus: root.isVisible
         Keys.onEscapePressed: root.close()
         Behavior on opacity { NumberAnimation { id: _fadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: Colors.durationPanelOpen; easing.type: Easing.OutBack; easing.overshoot: 1.3 } }
-        layer.enabled: _fadeAnim.running
+        layer.enabled: _fadeAnim.running || _elasticScale.running
 
         InnerHighlight { highlightOpacity: 0.12 }
         SurfaceGradient {}

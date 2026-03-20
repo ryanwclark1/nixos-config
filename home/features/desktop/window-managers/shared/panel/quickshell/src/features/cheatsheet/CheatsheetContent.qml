@@ -165,7 +165,7 @@ Item {
 
                                 // Key chord display
                                 Row {
-                                    spacing: 2
+                                    spacing: Colors.spacingXXS
                                     Repeater {
                                         model: (modelData.keys || "").split("+")
                                         delegate: Rectangle {
