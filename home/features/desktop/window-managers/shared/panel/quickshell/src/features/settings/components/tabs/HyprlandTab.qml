@@ -19,12 +19,12 @@ Item {
 
         SettingsCard {
             title: "Display Configuration"
-            iconName: "󰍺"
+            iconName: "desktop.svg"
             description: "Open monitor arrangement, scaling, and output settings."
 
             SettingsActionButton {
                 Layout.fillWidth: true
-                iconName: "󰍺"
+                iconName: "desktop.svg"
                 label: "Configure Displays"
                 emphasized: true
                 onClicked: {
@@ -98,7 +98,7 @@ Item {
 
         SettingsCard {
             title: "Display Profiles"
-            iconName: "󰍺"
+            iconName: "desktop.svg"
             description: "Saved monitor configurations for quick switching."
 
             SettingsToggleRow {
