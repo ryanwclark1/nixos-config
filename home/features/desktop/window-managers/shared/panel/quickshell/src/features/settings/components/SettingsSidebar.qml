@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../shared"
+import "../../../shared" as Shared
 import "../../../widgets" as SharedWidgets
 import "."
 
