@@ -238,14 +238,22 @@ Item {
         }
     }
 
+    // Simple tooltip for non-running apps
     BarTooltip {
-        text: root.isGrouped
-            ? root.appName + " (" + root.toplevels.length + " windows)"
-            : (root.isRunning && root.toplevels.length > 0 && root.toplevels[0].title
-               ? root.toplevels[0].title
-               : root.appName)
+        text: root.appName
         anchorItem: root
         anchorWindow: root.anchorWindow
-        hovered: mouseArea.containsMouse && !iconContainer.dragging && !root.contextMenuVisible
+        hovered: mouseArea.containsMouse && !iconContainer.dragging && !root.contextMenuVisible && !root.isRunning
+    }
+
+    // Window preview popup for running apps
+    DockPreview {
+        anchorItem: root
+        anchorWindow: root.anchorWindow
+        toplevels: root.toplevels
+        appName: root.appName
+        appIcon: root.iconSource
+        vertical: root.vertical
+        hovered: mouseArea.containsMouse && !iconContainer.dragging && !root.contextMenuVisible && root.isRunning
     }
 }
