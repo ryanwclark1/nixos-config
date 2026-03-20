@@ -171,6 +171,7 @@ var entries = [
     { tabId: "ai", cardTitle: "Generation", label: "Max Tokens", keywords: "ai tokens limit output", type: "slider" },
     { tabId: "ai", cardTitle: "Generation", label: "Timeout (seconds)", keywords: "ai timeout request", type: "slider" },
     { tabId: "ai", cardTitle: "System Prompt", label: "Include System Context", keywords: "ai system prompt context", type: "toggle" },
+    { tabId: "ai", cardTitle: "System Prompt", label: "Tool Call Auto-Reply", keywords: "ai tool calling command execution auto reply", type: "toggle" },
     { tabId: "ai", cardTitle: "System Prompt", label: "Custom System Prompt", keywords: "ai system prompt custom", type: "text" },
     { tabId: "ai", cardTitle: "Limits", label: "Max Conversations", keywords: "ai conversations limit history", type: "slider" },
     { tabId: "ai", cardTitle: "Limits", label: "Max Messages per Conversation", keywords: "ai messages limit", type: "slider" },

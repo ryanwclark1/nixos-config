@@ -316,6 +316,15 @@ Item {
                 disabledText: "No system information is sent to the AI provider."
             }
 
+            SettingsToggleRow {
+                label: "Tool Call Auto-Reply"
+                description: "Automatically feed command output back to the AI for follow-up reasoning."
+                icon: "play-circle.svg"
+                configKey: "aiToolCallAutoReply"
+                enabledText: "Command results are sent back to the AI automatically."
+                disabledText: "Command results are shown but not sent to the AI."
+            }
+
             SettingsTextInputRow {
                 label: "Custom System Prompt"
                 leadingIcon: "edit.svg"

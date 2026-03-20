@@ -577,13 +577,15 @@ PanelWindow {
                             label: "Cancel"
                             iconName: "󰅖"
                             compact: true
+                            enabled: !AiService.isCommandRunning
                             onClicked: AiService.cancelPendingCommand()
                         }
 
                         SettingsActionButton {
-                            label: "Execute"
-                            iconName: "󰐊"
+                            label: AiService.isCommandRunning ? "Running..." : "Execute"
+                            iconName: AiService.isCommandRunning ? "󰦖" : "󰐊"
                             compact: true
+                            enabled: !AiService.isCommandRunning
                             onClicked: AiService.executePendingCommand()
                         }
                     }
