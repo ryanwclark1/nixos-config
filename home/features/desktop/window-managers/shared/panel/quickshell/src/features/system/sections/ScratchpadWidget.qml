@@ -83,7 +83,7 @@ SharedWidgets.CardBase {
             Text { text: "󰐃"; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeMedium; Layout.alignment: Qt.AlignTop }
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: 2
+              spacing: Colors.spacingXXS
               Text {
                 text: modelData.title
                 color: Colors.text

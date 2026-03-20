@@ -150,21 +150,21 @@ SharedWidgets.CardBase {
             
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 2
+                spacing: Colors.spacingXXS
                 Text { text: "Graphics Engine"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
                 SharedWidgets.MiniProgressBar { value: AMDGPUService.gfxUsage; barColor: Colors.secondary }
             }
             
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 2
+                spacing: Colors.spacingXXS
                 Text { text: "Memory Controller"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
                 SharedWidgets.MiniProgressBar { value: AMDGPUService.memUsage; barColor: Colors.accent }
             }
             
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 2
+                spacing: Colors.spacingXXS
                 Text { text: "Media Engine"; color: Colors.textDisabled; font.pixelSize: Colors.fontSizeXXS; font.weight: Font.Bold }
                 SharedWidgets.MiniProgressBar { value: AMDGPUService.mediaUsage; barColor: Colors.success }
             }

@@ -84,7 +84,7 @@ Rectangle {
               anchors.bottom: parent.bottom
               anchors.horizontalCenter: parent.horizontalCenter
               anchors.bottomMargin: 4
-              spacing: 2
+              spacing: Colors.spacingXXS
               height: 12
               visible: modelData.playbackState === Mpris.Playing && SpectrumService.subscriberCount > 0
 
