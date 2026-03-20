@@ -20,12 +20,12 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Open VPN Hub",
-            icon: "󰖂",
+            icon: "shield-lock.svg",
             action: () => root.triggerRequested(root)
         },
         {
             label: "Open Network Menu",
-            icon: "󰖩",
+            icon: "wifi-4.svg",
             action: () => root.networkClicked(root)
         }
     ]

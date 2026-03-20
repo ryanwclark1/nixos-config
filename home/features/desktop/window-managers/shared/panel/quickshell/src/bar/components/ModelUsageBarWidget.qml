@@ -17,12 +17,12 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Refresh Now",
-            icon: "󰑓",
+            icon: "arrow-counterclockwise.svg",
             action: () => ModelUsageService.refresh()
         },
         {
             label: "Switch Provider",
-            icon: "󰔡",
+            icon: "arrow-swap.svg",
             visible: (ModelUsageService.claudeEnabled ? 1 : 0)
                    + (ModelUsageService.codexEnabled ? 1 : 0)
                    + (ModelUsageService.geminiEnabled ? 1 : 0) > 1,

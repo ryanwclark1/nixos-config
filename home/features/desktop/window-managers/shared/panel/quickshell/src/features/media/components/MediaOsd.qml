@@ -154,15 +154,13 @@ Scope {
               }
             }
 
-            Text {
+            SvgIcon {
               Layout.preferredWidth: 24
               Layout.preferredHeight: 24
-              horizontalAlignment: Text.AlignHCenter
-              verticalAlignment: Text.AlignVCenter
-              text: MediaService.isPlaying ? "󰏤" : "󰐊"
+              Layout.alignment: Qt.AlignVCenter
+              source: MediaService.isPlaying ? "pause.svg" : "play.svg"
               color: Colors.text
-              font.family: Appearance.fontMono
-              font.pixelSize: 18
+              size: 18
             }
           }
         }

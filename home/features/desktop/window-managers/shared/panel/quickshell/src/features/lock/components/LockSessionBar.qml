@@ -18,7 +18,7 @@ RowLayout {
         label: String(actionMeta.label || actionMeta.name || "")
         action: "logout"
     }
-    SessionButton { icon: "󰤄"; label: "Suspend"; action: "suspend" }
+    SessionButton { icon: "power-sleep.svg"; label: "Suspend"; action: "suspend" }
     Repeater {
         model: root.lockPowerButtons
         delegate: SessionButton {
@@ -46,13 +46,29 @@ RowLayout {
             pressed: sessionMa.pressed
         }
 
-        Text {
+        Loader {
             anchors.centerIn: parent
-            text: parent.icon
-            color: (root.timerActive && root.pendingAction === parent.action) ? Colors.error : Colors.textSecondary
-            Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            property string _ic: parent.icon
+            sourceComponent: String(_ic).endsWith(".svg") ? _lsbSvg : _lsbNerd
+        }
+        Component {
+            id: _lsbSvg
+            SvgIcon {
+                source: icon
+                color: (root.timerActive && root.pendingAction === action) ? Colors.error : Colors.textSecondary
+                Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+                size: Appearance.fontSizeLarge
+            }
+        }
+        Component {
+            id: _lsbNerd
+            Text {
+                text: icon
+                color: (root.timerActive && root.pendingAction === action) ? Colors.error : Colors.textSecondary
+                Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
+                font.family: Appearance.fontMono
+                font.pixelSize: Appearance.fontSizeLarge
+            }
         }
 
         MouseArea {

@@ -21,7 +21,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Stop Recording",
-            icon: "󰙧",
+            icon: "stop.svg",
             danger: true,
             action: () => RecordingService.stopRecording()
         }

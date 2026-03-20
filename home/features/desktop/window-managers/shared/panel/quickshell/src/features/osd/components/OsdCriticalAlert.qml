@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 ColumnLayout {
   id: root
@@ -28,13 +29,12 @@ ColumnLayout {
       border.width: 2
     }
 
-    Text {
+    Loader {
       anchors.centerIn: parent
-      text: root.osdIcon
-      color: root.osdColor
-      font.pixelSize: Appearance.fontSizeDisplay
-      font.family: Appearance.fontMono
+      sourceComponent: String(root.osdIcon).endsWith(".svg") ? _alertSvg : _alertNerd
     }
+    Component { id: _alertSvg; SharedWidgets.SvgIcon { source: root.osdIcon; color: root.osdColor; size: Appearance.fontSizeDisplay } }
+    Component { id: _alertNerd; Text { text: root.osdIcon; color: root.osdColor; font.pixelSize: Appearance.fontSizeDisplay; font.family: Appearance.fontMono } }
   }
 
   Text {

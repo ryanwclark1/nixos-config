@@ -91,14 +91,14 @@ Scope {
   }
 
   readonly property string osdIcon: {
-    if (osdType === "critical") return "󰀪";
-    if (osdType === "capslock") return capslockState ? "󰬶" : "󰬵";
-    if (osdType === "numlock") return numlockState ? "󰎠" : "󰎡";
-    if (osdType === "scrolllock") return scrolllockState ? "󱅮" : "󱅯";
-    if (osdType === "brightness") return "󰃠";
-    if (osdType === "kbdbrightness") return "󰌌";
-    if (osdType === "mic") return displaySourceMuted ? "󰍭" : "󰍬";
-    if (osdType === "volume") return displaySinkMuted ? "󰝟" : "󰕾";
+    if (osdType === "critical") return "warning.svg";
+    if (osdType === "capslock") return capslockState ? "keyboard-shift-filled.svg" : "keyboard-shift.svg";
+    if (osdType === "numlock") return numlockState ? "number-symbol.svg" : "number-symbol.svg";
+    if (osdType === "scrolllock") return scrolllockState ? "scroll-vertical.svg" : "scroll-vertical.svg";
+    if (osdType === "brightness") return "brightness-high.svg";
+    if (osdType === "kbdbrightness") return "keyboard.svg";
+    if (osdType === "mic") return displaySourceMuted ? "mic-off.svg" : "mic.svg";
+    if (osdType === "volume") return displaySinkMuted ? "speaker-mute.svg" : "speaker.svg";
     return "";
   }
 

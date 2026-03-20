@@ -76,17 +76,17 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: root.statusAlt.toLowerCase() === "recording" ? "Stop Recording" : "Toggle Recording",
-            icon: root.statusAlt.toLowerCase() === "recording" ? "󰙧" : "󰐊",
+            icon: root.statusAlt.toLowerCase() === "recording" ? "stop.svg" : "play.svg",
             action: () => root.runVoxtypeCommand(["record", "toggle"])
         },
         {
             label: "Start Recording",
-            icon: "󰻃",
+            icon: "mic.svg",
             action: () => root.runVoxtypeCommand(["record", "start"])
         },
         {
             label: "Stop Recording",
-            icon: "󰙧",
+            icon: "stop.svg",
             action: () => root.runVoxtypeCommand(["record", "stop"])
         },
         {

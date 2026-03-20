@@ -392,12 +392,11 @@ BasePopupMenu {
             anchors.margins: Appearance.spacingM
             spacing: Appearance.spacingS
 
-            Text {
-              text: root.showAdvanced ? "󰅂" : "󰅀"
+            SharedWidgets.SvgIcon {
+              source: root.showAdvanced ? "chevron-right.svg" : "chevron-down.svg"
               color: detailsMouse.containsMouse ? Colors.primary : Colors.textSecondary
               Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-              font.family: Appearance.fontMono
-              font.pixelSize: Appearance.fontSizeLarge
+              size: Appearance.fontSizeLarge
             }
 
             Text {
@@ -630,11 +629,10 @@ BasePopupMenu {
             Column {
               anchors.centerIn: parent
               spacing: Appearance.spacingXS
-              Text {
-                text: NetworkService.wifiDeviceAvailable ? (NetworkService.wifiRadioEnabled ? "󰤮" : "󰖪") : "󰤭"
+              SharedWidgets.SvgIcon {
+                source: NetworkService.wifiDeviceAvailable ? (NetworkService.wifiRadioEnabled ? "wifi-off.svg" : "wifi-off.svg") : "wifi-off.svg"
                 color: Colors.textDisabled
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeXL
+                size: Appearance.fontSizeXL
                 anchors.horizontalCenter: parent.horizontalCenter
               }
               Text {

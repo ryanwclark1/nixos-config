@@ -541,9 +541,9 @@ PanelWindow {
 
         Repeater {
           model: [
-            { icon: "󰍹", label: "Primary Only", preset: "primary" },
-            { icon: "󰹑", label: "Mirror",       preset: "mirror"  },
-            { icon: "󰕭", label: "Extend",       preset: "extend"  }
+            { icon: "desktop.svg", label: "Primary Only", preset: "primary" },
+            { icon: "image-copy.svg", label: "Mirror",       preset: "mirror"  },
+            { icon: "fullscreen.svg", label: "Extend",       preset: "extend"  }
           ]
 
           delegate: Rectangle {

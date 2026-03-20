@@ -95,7 +95,7 @@ RowLayout {
             { separator: true },
             {
                 label: "Close Others",
-                icon: "󰘴",
+                icon: "dismiss.svg",
                 disabled: AiService.conversations.length <= 1,
                 action: function() {
                     _closeOthersWithNotice(conv.id);

@@ -40,7 +40,7 @@ Item {
                 iconName: root.activeAppId
                 appName: root.activeTitle
                 iconSize: 16
-                fallbackIcon: "󰣆"
+                fallbackIcon: "app-generic.svg"
             }
         }
 

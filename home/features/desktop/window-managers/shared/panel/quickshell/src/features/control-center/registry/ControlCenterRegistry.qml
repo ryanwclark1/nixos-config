@@ -14,7 +14,7 @@ QtObject {
     ]).concat([
         {
             id: "screenshotControls",
-            icon: "󰩭",
+            icon: "crop.svg",
             title: "Screenshot",
             subtitle: "Capture region, screen, or fullscreen",
             clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "screenshotMenu"]
@@ -29,7 +29,7 @@ QtObject {
         },
         {
             id: "dnd",
-            icon: "󰒲",
+            icon: "alert-off.svg",
             label: "DND"
         },
         {
@@ -39,7 +39,7 @@ QtObject {
         },
         {
             id: "caffeine",
-            icon: "󰾪",
+            icon: "drink-coffee.svg",
             label: "Caffeine"
         },
         {
@@ -49,7 +49,7 @@ QtObject {
         },
         {
             id: "gameMode",
-            icon: "󰊗",
+            icon: "games.svg",
             label: "Game Mode"
         }
     ]

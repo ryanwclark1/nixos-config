@@ -774,7 +774,7 @@ Item {
         StatPill {
             property var widgetInstance: null
             statKey: "cpuStatus"
-            icon: ""
+            icon: "developer-board.svg"
             iconColor: Colors.primary
             label: "CPU"
             anchorWindow: root.anchorWindow
@@ -1132,12 +1132,12 @@ Item {
                 },
                 {
                     label: "Balanced",
-                    icon: "󰛲",
+                    icon: "scales.svg",
                     action: () => PowerProfileService.setProfile("balanced")
                 },
                 {
                     label: "Performance",
-                    icon: "󱐋",
+                    icon: "flash-on.svg",
                     action: () => PowerProfileService.setProfile("performance")
                 },
                 {

@@ -16,12 +16,12 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: PomodoroService.running ? "Pause" : "Start",
-            icon: PomodoroService.running ? "󰏤" : "󰐊",
+            icon: PomodoroService.running ? "pause.svg" : "play.svg",
             action: () => PomodoroService.toggle()
         },
         {
             label: "Skip",
-            icon: "󰒭",
+            icon: "next.svg",
             action: () => PomodoroService.skip()
         },
         { separator: true },

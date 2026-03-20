@@ -286,9 +286,9 @@ PanelWindow {
               MouseArea {
                 Layout.preferredWidth: Appearance.iconSizeSmall; Layout.preferredHeight: Appearance.iconSizeSmall
                 hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                Text {
-                  anchors.centerIn: parent; text: isCollapsed ? "󰅂" : "󰅀"; color: Colors.primary
-                  font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge
+                SharedWidgets.SvgIcon {
+                  anchors.centerIn: parent; source: isCollapsed ? "chevron-right.svg" : "chevron-down.svg"; color: Colors.primary
+                  size: Appearance.fontSizeLarge
                 }
                 onClicked: notifList.toggleGroup(section)
               }

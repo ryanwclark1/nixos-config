@@ -105,7 +105,7 @@ SharedWidgets.CardBase {
             spacing: Appearance.spacingS
 
             SharedWidgets.Chip {
-                icon: ""
+                icon: "developer-board.svg"
                 iconColor: Colors.primary
                 text: "CPU " + SystemStatus.cpuUsage + "  " + SystemStatus.cpuTemp
                 textColor: Colors.primary

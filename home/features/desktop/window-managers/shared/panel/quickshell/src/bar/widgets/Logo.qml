@@ -80,20 +80,11 @@ Item {
     anchors.centerIn: parent
     spacing: Appearance.spacingXS
 
-    Image {
-      id: logoImage
-      anchors.verticalCenter: parent.verticalCenter
-      sourceSize: Qt.size(20, 20)
-      source: Quickshell.iconPath("nix-snowflake") || ""
-      visible: status === Image.Ready && SystemStatus.overallStatus !== "failure"
-    }
-
     SharedWidgets.SvgIcon {
       anchors.verticalCenter: parent.verticalCenter
       source: "brands/nixos-symbolic.svg"
       color: root.statusColor
       size: Appearance.fontSizeXL
-      visible: !logoImage.visible
     }
 
     Text {

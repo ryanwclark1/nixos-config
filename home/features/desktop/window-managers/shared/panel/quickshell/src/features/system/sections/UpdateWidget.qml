@@ -200,14 +200,14 @@ SharedWidgets.CardBase {
       spacing: Appearance.spacingS
 
       SharedWidgets.Chip {
-        icon: "󱄅"
+        icon: "brands/nixos-symbolic.svg"
         iconColor: Colors.primary
         text: "NixOS " + root.nixUpdates
         textColor: Colors.primary
       }
 
       SharedWidgets.Chip {
-        icon: "󰏘"
+        icon: "brands/flatpak-symbolic.svg"
         iconColor: Colors.accent
         text: "Flatpak " + root.flatpakUpdates
         textColor: Colors.accent

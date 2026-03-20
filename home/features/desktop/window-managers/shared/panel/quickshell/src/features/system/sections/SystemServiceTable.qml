@@ -622,7 +622,7 @@ SharedWidgets.CardBase {
                         }
 
                         SharedWidgets.Chip {
-                            icon: "󱄅"
+                            icon: "brands/nixos-symbolic.svg"
                             iconColor: Colors.secondary
                             text: root.selectedUnit ? String(root.selectedUnit.sub || "") : ""
                             textColor: Colors.secondary

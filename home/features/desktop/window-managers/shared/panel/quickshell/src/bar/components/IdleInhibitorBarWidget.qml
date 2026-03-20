@@ -31,7 +31,7 @@ Item {
         contextActions: [
             {
                 label: root.inhibitorActive ? "Disable Inhibitor" : "Enable Inhibitor",
-                icon: "󰒲",
+                icon: "drink-coffee.svg",
                 action: () => {
                     Quickshell.execDetached(DependencyService.resolveCommand("qs-inhibitor"));
                 }

@@ -34,12 +34,12 @@ Item {
         contextActions: [
             {
                 label: "Copy Time",
-                icon: "󰅍",
+                icon: "copy.svg",
                 action: () => Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" | wl-copy", "sh", Qt.formatDateTime(centerClock.date, "HH:mm:ss")])
             },
             {
                 label: "Copy Date",
-                icon: "󰃭",
+                icon: "calendar-add.svg",
                 action: () => Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" | wl-copy", "sh", Qt.formatDateTime(centerClock.date, "yyyy-MM-dd")])
             }
         ]

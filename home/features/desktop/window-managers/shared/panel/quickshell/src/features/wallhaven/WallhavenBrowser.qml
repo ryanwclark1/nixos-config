@@ -201,11 +201,10 @@ PanelWindow {
                                     anchors.centerIn: parent
                                     spacing: Appearance.spacingS
 
-                                    Text {
-                                        text: "\u{F0552}"
+                                    SharedWidgets.SvgIcon {
+                                        source: "download.svg"
                                         color: Colors.primary
-                                        font.family: Appearance.fontMono
-                                        font.pixelSize: Appearance.iconSizeMedium
+                                        size: Appearance.iconSizeMedium
                                         Layout.alignment: Qt.AlignHCenter
                                     }
 

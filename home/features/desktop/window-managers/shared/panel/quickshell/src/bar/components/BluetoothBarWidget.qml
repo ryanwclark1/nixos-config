@@ -31,7 +31,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: (Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled) ? "Disable Bluetooth" : "Enable Bluetooth",
-            icon: "󰂯",
+            icon: "bluetooth.svg",
             action: () => {
                 if (Bluetooth.defaultAdapter)
                     Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled;
@@ -42,7 +42,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Open Bluetooth Menu",
-            icon: "󰂯",
+            icon: "bluetooth.svg",
             action: () => root.triggerRequested(root)
         }
     ]

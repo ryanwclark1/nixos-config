@@ -309,7 +309,7 @@ Rectangle {
                     spacing: Appearance.spacingS
 
                     SharedWidgets.Chip {
-                        icon: "󰞷"
+                        icon: "document.svg"
                         iconColor: Colors.secondary
                         text: "FD " + (root.detailData.fdCount === undefined || root.detailData.fdCount === null ? "Unavailable" : String(root.detailData.fdCount))
                         textColor: Colors.secondary
@@ -330,14 +330,14 @@ Rectangle {
                     }
 
                     SharedWidgets.Chip {
-                        icon: "󰛐"
+                        icon: "dismiss.svg"
                         iconColor: Colors.warning
                         text: "CANCEL " + MU.formatBytes(root.detailData.cancelledWriteBytes)
                         textColor: Colors.warning
                     }
 
                     SharedWidgets.Chip {
-                        icon: ProcessService.detailPermissionLimited ? "󰌾" : "󰄬"
+                        icon: ProcessService.detailPermissionLimited ? "lock-closed.svg" : "checkmark.svg"
                         iconColor: ProcessService.detailPermissionLimited ? Colors.warning : Colors.success
                         text: ProcessService.detailPermissionLimited ? "Permission limited" : "Live detail healthy"
                         textColor: ProcessService.detailPermissionLimited ? Colors.warning : Colors.success
@@ -350,28 +350,28 @@ Rectangle {
                     spacing: Appearance.spacingS
 
                     SharedWidgets.Chip {
-                        icon: "󰓅"
+                        icon: "people-settings.svg"
                         iconColor: Colors.secondary
                         text: "THR " + (root.detailData.statusFields && root.detailData.statusFields.threads !== null && root.detailData.statusFields.threads !== undefined ? String(root.detailData.statusFields.threads) : "Unavailable")
                         textColor: Colors.secondary
                     }
 
                     SharedWidgets.Chip {
-                        icon: "󰾆"
+                        icon: "memory.svg"
                         iconColor: Colors.accent
                         text: "VMRSS " + (root.detailData.statusFields && root.detailData.statusFields.vmRssKb !== null && root.detailData.statusFields.vmRssKb !== undefined ? PTH.formatKiB(root.detailData.statusFields.vmRssKb) : "Unavailable")
                         textColor: Colors.accent
                     }
 
                     SharedWidgets.Chip {
-                        icon: "󰚰"
+                        icon: "arrow-sync.svg"
                         iconColor: Colors.primary
                         text: "VCTX " + (root.detailData.statusFields && root.detailData.statusFields.voluntaryCtxtSwitches !== null && root.detailData.statusFields.voluntaryCtxtSwitches !== undefined ? String(root.detailData.statusFields.voluntaryCtxtSwitches) : "Unavailable")
                         textColor: Colors.primary
                     }
 
                     SharedWidgets.Chip {
-                        icon: "󰚌"
+                        icon: "arrow-repeat.svg"
                         iconColor: Colors.warning
                         text: "NVCTX " + (root.detailData.statusFields && root.detailData.statusFields.nonvoluntaryCtxtSwitches !== null && root.detailData.statusFields.nonvoluntaryCtxtSwitches !== undefined ? String(root.detailData.statusFields.nonvoluntaryCtxtSwitches) : "Unavailable")
                         textColor: Colors.warning

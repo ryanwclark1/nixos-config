@@ -15,13 +15,13 @@ Item {
         { id: "notifCenter", label: "Notification Center", icon: "alert.svg" },
         { id: "controlCenter", label: "Control Center", icon: "options.svg" },
         { id: "notepad", label: "Notepad", icon: "document.svg" },
-        { id: "aiChat", label: "AI Chat", icon: "\u{F0EA9}" },
+        { id: "aiChat", label: "AI Chat", icon: "chat.svg" },
         { id: "commandPalette", label: "Command Palette", icon: "search-visual.svg" },
-        { id: "powerMenu", label: "Power Menu", icon: "\u{F032A}" },
-        { id: "colorPicker", label: "Color Picker", icon: "\u{F0618}" },
-        { id: "displayConfig", label: "Display Config", icon: "\u{F0379}" },
+        { id: "powerMenu", label: "Power Menu", icon: "power.svg" },
+        { id: "colorPicker", label: "Color Picker", icon: "color-palette.svg" },
+        { id: "displayConfig", label: "Display Config", icon: "desktop.svg" },
         { id: "fileBrowser", label: "File Browser", icon: "folder.svg" },
-        { id: "systemMonitor", label: "System Monitor", icon: "\u{F04C7}" }
+        { id: "systemMonitor", label: "System Monitor", icon: "heart-pulse.svg" }
     ]
 
     function _togglePanel(panelId) {

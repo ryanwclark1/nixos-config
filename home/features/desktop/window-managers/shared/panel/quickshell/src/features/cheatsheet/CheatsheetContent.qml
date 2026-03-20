@@ -232,12 +232,11 @@ Item {
             return false;
         }
 
-        Text {
+        SvgIcon {
             Layout.alignment: Qt.AlignHCenter
-            text: "\u{f030f}"
+            source: "arrow-clockwise.svg"
             color: Colors.textDisabled
-            font.pixelSize: Appearance.fontSizeColossal
-            font.family: Appearance.fontMono
+            size: Appearance.fontSizeColossal
         }
         Text {
             Layout.alignment: Qt.AlignHCenter

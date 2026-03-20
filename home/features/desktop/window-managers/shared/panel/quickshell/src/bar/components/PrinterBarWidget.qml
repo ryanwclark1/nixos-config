@@ -19,7 +19,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Open Printer Menu",
-            icon: "󰐪",
+            icon: "print.svg",
             action: () => root.triggerRequested(root)
         }
     ]

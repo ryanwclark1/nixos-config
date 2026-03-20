@@ -146,12 +146,17 @@ Item {
       }
 
       // Battery
-      Text {
+      Row {
         visible: UPower.displayDevice && UPower.displayDevice.isPresent
-        text: UPower.displayDevice ? "󰁹 " + Math.round(UPower.displayDevice.percentage * 100) + "%" : ""
-        color: Colors.textSecondary
-        font.family: Appearance.fontMono
-        font.pixelSize: Appearance.fontSizeMedium
+        spacing: Appearance.spacingXS
+        SvgIcon { source: "battery-full.svg"; color: Colors.textSecondary; size: Appearance.fontSizeMedium }
+        Text {
+          text: UPower.displayDevice ? Math.round(UPower.displayDevice.percentage * 100) + "%" : ""
+          color: Colors.textSecondary
+          font.family: Appearance.fontMono
+          font.pixelSize: Appearance.fontSizeMedium
+          anchors.verticalCenter: parent.verticalCenter
+        }
       }
 
       // Session buttons (optional)

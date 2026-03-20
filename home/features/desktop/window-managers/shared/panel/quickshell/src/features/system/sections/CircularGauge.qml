@@ -1,13 +1,14 @@
 import QtQuick
 import QtQuick.Shapes
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 Item {
   id: root
   property real value: 0.0 // 0 to 1
   property color color: Colors.primary
   property int thickness: 2
-  property alias icon: iconText.text
+  property string icon: ""
   readonly property real safeThickness: Math.max(1, Math.min(root.thickness, Math.min(root.width, root.height) / 2))
   readonly property real innerDiameter: Math.max(0, Math.min(root.width, root.height) - (safeThickness * 2))
 
@@ -20,15 +21,12 @@ Item {
     width: root.innerDiameter
     height: root.innerDiameter
 
-    Text {
-      id: iconText
+    Loader {
       anchors.centerIn: parent
-      horizontalAlignment: Text.AlignHCenter
-      verticalAlignment: Text.AlignVCenter
-      font.family: Appearance.fontMono
-      font.pixelSize: Math.max(Appearance.fontSizeSmall, innerContent.width * 0.42)
-      color: root.color
+      sourceComponent: String(root.icon).endsWith(".svg") ? _cgSvg : _cgNerd
     }
+    Component { id: _cgSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.color; size: Math.max(Appearance.fontSizeSmall, innerContent.width * 0.42) } }
+    Component { id: _cgNerd; Text { text: root.icon; font.family: Appearance.fontMono; font.pixelSize: Math.max(Appearance.fontSizeSmall, innerContent.width * 0.42); color: root.color; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
   }
 
   Shape {

@@ -18,12 +18,12 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Refresh Now",
-            icon: "󰑓",
+            icon: "arrow-counterclockwise.svg",
             action: () => MarketService.refresh()
         },
         {
             label: "Open Markets Menu",
-            icon: "󱓗",
+            icon: "data-trending.svg",
             action: () => root.triggerRequested(root)
         }
     ]

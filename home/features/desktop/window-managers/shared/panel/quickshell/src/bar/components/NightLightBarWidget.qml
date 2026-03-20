@@ -19,7 +19,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Disable Night Light",
-            icon: "󰌵",
+            icon: "lightbulb.svg",
             action: () => NightLightService.toggle()
         }
     ]

@@ -100,10 +100,10 @@ Rectangle {
 
                     Repeater {
                         model: [
-                            { icon: "󰆏", label: "Summarize clipboard", prompt: "Summarize the text in my clipboard concisely." },
-                            { icon: "󰯃", label: "Explain error", prompt: "Explain this error and suggest a fix:" },
-                            { icon: "󰈮", label: "Write a script", prompt: "Write a shell script that " },
-                            { icon: "󰒓", label: "System check", prompt: "Analyze my current system status and suggest improvements." }
+                            { icon: "copy.svg", label: "Summarize clipboard", prompt: "Summarize the text in my clipboard concisely." },
+                            { icon: "bug.svg", label: "Explain error", prompt: "Explain this error and suggest a fix:" },
+                            { icon: "terminal.svg", label: "Write a script", prompt: "Write a shell script that " },
+                            { icon: "settings.svg", label: "System check", prompt: "Analyze my current system status and suggest improvements." }
                         ]
 
                         delegate: Rectangle {

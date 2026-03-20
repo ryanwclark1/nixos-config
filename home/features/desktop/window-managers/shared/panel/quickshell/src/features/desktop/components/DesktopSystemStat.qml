@@ -34,7 +34,7 @@ Item {
       Text { text: "CPU"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Appearance.letterSpacingWide }
       RowLayout {
         spacing: Appearance.spacingSM
-        Text { text: ""; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL }
+        SvgIcon { source: "developer-board.svg"; color: Colors.primary; size: Appearance.fontSizeXL }
         Text { text: SystemStatus.cpuUsage; color: Colors.text; font.pixelSize: Appearance.fontSizeLarge; font.weight: Font.Bold }
       }
     }
@@ -44,7 +44,7 @@ Item {
       Text { text: "RAM"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Bold; font.letterSpacing: Appearance.letterSpacingWide }
       RowLayout {
         spacing: Appearance.spacingSM
-        Text { text: ""; color: Colors.secondary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL }
+        SvgIcon { source: "memory.svg"; color: Colors.secondary; size: Appearance.fontSizeXL }
         Text { text: SystemStatus.ramUsage; color: Colors.text; font.pixelSize: Appearance.fontSizeLarge; font.weight: Font.Bold }
       }
     }

@@ -132,7 +132,7 @@ SharedWidgets.CardBase {
             ResourceGauge {
                 value: root.throughputPercent
                 color: root.activeInterface === "offline" ? Colors.error : root.throughputColor
-                icon: "󰛳"
+                icon: "ethernet.svg"
                 label: root.activeInterface === "offline" ? "OFF" : "ON"
             }
 

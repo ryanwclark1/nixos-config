@@ -80,7 +80,7 @@ SharedWidgets.CardBase {
 
             SharedWidgets.Chip {
                 visible: AMDGPUService.available ? AMDGPUService.powerWatts > 0 : false
-                icon: "󱐋"
+                icon: "flash-on.svg"
                 text: AMDGPUService.powerWatts + "W"
                 textColor: Colors.textSecondary
             }

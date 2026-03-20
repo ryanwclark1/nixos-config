@@ -76,7 +76,7 @@ BasePopupMenu {
 
   headerExtras: [
     SharedWidgets.IconButton {
-      icon: ClipboardHistoryService.loading ? "󰇚" : "󰑐"
+      icon: ClipboardHistoryService.loading ? "download.svg" : "arrow-clockwise.svg"
       tooltipText: "Refresh"
       onClicked: root.refresh()
     },
@@ -202,12 +202,11 @@ BasePopupMenu {
               }
 
               // Fallback for broken images
-              Text {
+              SharedWidgets.SvgIcon {
                 anchors.centerIn: parent
                 visible: clipImage.status === Image.Error
-                text: "\uf03e"
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeXL
+                source: "image.svg"
+                size: Appearance.fontSizeXL
                 color: Colors.withAlpha(Colors.text, 0.3)
               }
             }
@@ -271,7 +270,7 @@ BasePopupMenu {
         Layout.topMargin: Appearance.spacingS
         Layout.bottomMargin: Appearance.spacingS
         visible: root.filteredItemsResult.length === 0
-        icon: root.isLoadingHistory ? "󰔟" : (root.clipboardError !== "" ? "󰅙" : (root.searchQuery ? "󰍉" : "󰅗"))
+        icon: root.isLoadingHistory ? "clock.svg" : (root.clipboardError !== "" ? "error.svg" : (root.searchQuery ? "search-visual.svg" : "copy.svg"))
         message: root.isLoadingHistory
           ? "Loading clipboard history…"
           : (root.clipboardError !== ""

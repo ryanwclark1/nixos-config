@@ -110,7 +110,7 @@ SharedWidgets.CardBase {
             }
 
             SharedWidgets.Chip {
-                icon: ""
+                icon: "developer-board.svg"
                 iconColor: Colors.primary
                 text: String(coreModel.count) + " cores"
                 textColor: Colors.primary

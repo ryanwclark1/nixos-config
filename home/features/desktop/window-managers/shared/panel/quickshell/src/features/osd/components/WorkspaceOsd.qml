@@ -26,12 +26,12 @@ Scope {
 
   function _specialWorkspaceIcon(shortName) {
     var lower = shortName.toLowerCase();
-    if (lower === "scratchpad") return "󱂬";
-    if (lower === "communication" || lower === "chat") return "󰍡";
-    if (lower === "music" || lower === "media") return "󰎆";
-    if (lower === "terminal" || lower === "term") return "";
-    if (lower === "browser" || lower === "web") return "󰖟";
-    if (lower === "mail" || lower === "email") return "󰇰";
+    if (lower === "scratchpad") return "pip.svg";
+    if (lower === "communication" || lower === "chat") return "chat.svg";
+    if (lower === "music" || lower === "media") return "music-note-2.svg";
+    if (lower === "terminal" || lower === "term") return "terminal.svg";
+    if (lower === "browser" || lower === "web") return "globe-search.svg";
+    if (lower === "mail" || lower === "email") return "mail.svg";
     return "";
   }
 
@@ -191,18 +191,17 @@ Scope {
               Layout.alignment: Qt.AlignHCenter
               iconSize: 64
               iconName: root.isSpecial ? "view-pin-symbolic" : "view-grid-symbolic"
-              fallbackIcon: root.isSpecial ? (root.specialIcon !== "" ? root.specialIcon : "󰐃") : "󰖲"
+              fallbackIcon: root.isSpecial ? (root.specialIcon !== "" ? root.specialIcon : "sparkle.svg") : "apps.svg"
               visible: !root.isSpecial || root.specialIcon === ""
             }
 
-            Text {
+            Loader {
               Layout.alignment: Qt.AlignHCenter
-              text: root.specialIcon
-              color: Colors.primary
-              font.pixelSize: Appearance.fontSizeGigantic
-              font.family: Appearance.fontMono
+              sourceComponent: String(root.specialIcon).endsWith(".svg") ? _wsSvg : _wsNerd
               visible: root.isSpecial && root.specialIcon !== ""
             }
+            Component { id: _wsSvg; SvgIcon { source: root.specialIcon; color: Colors.primary; size: Appearance.fontSizeGigantic } }
+            Component { id: _wsNerd; Text { text: root.specialIcon; color: Colors.primary; font.pixelSize: Appearance.fontSizeGigantic; font.family: Appearance.fontMono } }
 
             Text {
               Layout.alignment: Qt.AlignHCenter

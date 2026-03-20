@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 RowLayout {
   id: root
@@ -22,18 +23,24 @@ RowLayout {
     pillIconPulse.restart();
   }
 
-  Text {
-    id: pillIconText
-    text: root.osdIcon
-    color: root.osdColor
-    font.pixelSize: Appearance.fontSizeXL
-    font.family: Appearance.fontMono
+  Item {
+    id: pillIconContainer
+    implicitWidth: pillIconLoader.item ? pillIconLoader.item.implicitWidth : Appearance.fontSizeXL
+    implicitHeight: pillIconLoader.item ? pillIconLoader.item.implicitHeight : Appearance.fontSizeXL
     scale: 1.0
+
+    Loader {
+      id: pillIconLoader
+      anchors.centerIn: parent
+      sourceComponent: String(root.osdIcon).endsWith(".svg") ? _pillSvg : _pillNerd
+    }
+    Component { id: _pillSvg; SharedWidgets.SvgIcon { source: root.osdIcon; color: root.osdColor; size: Appearance.fontSizeXL } }
+    Component { id: _pillNerd; Text { text: root.osdIcon; color: root.osdColor; font.pixelSize: Appearance.fontSizeXL; font.family: Appearance.fontMono } }
 
     SequentialAnimation {
       id: pillIconPulse
-      NumberAnimation { target: pillIconText; property: "scale"; to: 1.22; duration: Appearance.durationFlash; easing.type: Easing.OutQuad }
-      NumberAnimation { target: pillIconText; property: "scale"; to: 1.0; duration: Appearance.durationFast; easing.type: Easing.OutElastic }
+      NumberAnimation { target: pillIconContainer; property: "scale"; to: 1.22; duration: Appearance.durationFlash; easing.type: Easing.OutQuad }
+      NumberAnimation { target: pillIconContainer; property: "scale"; to: 1.0; duration: Appearance.durationFast; easing.type: Easing.OutElastic }
     }
   }
 

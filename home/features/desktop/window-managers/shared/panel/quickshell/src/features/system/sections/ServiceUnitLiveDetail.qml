@@ -86,14 +86,14 @@ Rectangle {
             spacing: Appearance.spacingS
 
             SharedWidgets.Chip {
-                icon: "󰈐"
+                icon: "code.svg"
                 iconColor: Colors.primary
                 text: "PID " + (root.detailData.mainPid !== undefined && root.detailData.mainPid !== null ? String(root.detailData.mainPid) : "Unavailable")
                 textColor: Colors.primary
             }
 
             SharedWidgets.Chip {
-                icon: "󰜎"
+                icon: "arrow-enter-left.svg"
                 iconColor: Colors.secondary
                 text: "EXIT " + (root.detailData.execMainStatus !== undefined && root.detailData.execMainStatus !== null ? String(root.detailData.execMainStatus) : "Unavailable")
                 textColor: Colors.secondary
@@ -107,14 +107,14 @@ Rectangle {
             }
 
             SharedWidgets.Chip {
-                icon: "󰓅"
+                icon: "people-settings.svg"
                 iconColor: Colors.warning
                 text: "TASKS " + (root.detailData.tasksCurrent !== undefined && root.detailData.tasksCurrent !== null ? String(root.detailData.tasksCurrent) : "Unavailable")
                 textColor: Colors.warning
             }
 
             SharedWidgets.Chip {
-                icon: ServiceUnitService.detailPermissionLimited ? "󰌾" : "󰄬"
+                icon: ServiceUnitService.detailPermissionLimited ? "lock-closed.svg" : "checkmark.svg"
                 iconColor: ServiceUnitService.detailPermissionLimited ? Colors.warning : Colors.success
                 text: ServiceUnitService.detailPermissionLimited ? "Permission limited" : "Live unit healthy"
                 textColor: ServiceUnitService.detailPermissionLimited ? Colors.warning : Colors.success

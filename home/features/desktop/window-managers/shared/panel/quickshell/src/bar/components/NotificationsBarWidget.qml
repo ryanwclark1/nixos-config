@@ -22,7 +22,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: (manager && manager.dndEnabled) ? "Disable DND" : "Enable DND",
-            icon: "󰂛",
+            icon: "alert-off.svg",
             action: () => {
                 if (manager)
                     manager.dndEnabled = !manager.dndEnabled;
@@ -41,7 +41,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Open Notifications",
-            icon: "󰂚",
+            icon: "alert.svg",
             action: () => root.triggerRequested(root)
         }
     ]
@@ -49,11 +49,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingXS
 
-        Text {
+        SharedWidgets.SvgIcon {
+            source: root.hasDnd ? "alert-off.svg" : "alert.svg"
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeXL
-            font.family: Appearance.fontMono
-            text: root.hasDnd ? "󰂛" : "󰂚"
+            size: Appearance.fontSizeXL
         }
 
         Text {

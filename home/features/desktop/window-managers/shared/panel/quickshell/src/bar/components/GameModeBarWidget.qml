@@ -17,7 +17,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Deactivate Game Mode",
-            icon: "󰊴",
+            icon: "games.svg",
             danger: true,
             action: () => GameModeService.deactivate()
         }
