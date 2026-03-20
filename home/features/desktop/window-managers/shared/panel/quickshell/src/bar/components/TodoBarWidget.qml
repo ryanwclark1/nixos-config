@@ -15,7 +15,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Clear Done",
-            icon: "󰎟",
+            icon: "archive.svg",
             action: () => TodoService.clearDone()
         }
     ]

@@ -30,7 +30,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Clear All",
-            icon: "󰎟",
+            icon: "archive.svg",
             action: () => {
                 if (manager && manager.notifications)
                     manager.notifications.clear();

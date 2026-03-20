@@ -30,7 +30,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Settings",
-            icon: "󰒓",
+            icon: "settings.svg",
             action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "model-usage"])
         }
     ]

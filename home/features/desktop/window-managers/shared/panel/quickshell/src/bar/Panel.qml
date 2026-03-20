@@ -392,7 +392,7 @@ Item {
                     { label: "Window Title", type: "windowTitle", icon: "󰖲" },
                     { label: "Clock/Date", type: "dateTime", icon: "󰥔" },
                     { label: "Media Bar", type: "mediaBar", icon: "󰓃" },
-                    { label: "System Tray", type: "tray", icon: "󰒓" },
+                    { label: "System Tray", type: "tray", icon: "settings.svg" },
                     { label: "Notifications", type: "notifications", icon: "󰂚" },
                     { label: "Audio", type: "audio", icon: "󰕾" },
                     { label: "Network", type: "network", icon: "󰛳" },
@@ -434,7 +434,7 @@ Item {
                     { separator: true },
                     {
                         label: "Open Settings",
-                        icon: "󰒓",
+                        icon: "settings.svg",
                         action: function() { root.requestSurface("controlCenter", null); }
                     }
                 ];
@@ -1215,7 +1215,7 @@ Item {
             extraContextActions: [
                 {
                     label: "Clear History",
-                    icon: "󰎟",
+                    icon: "archive.svg",
                     danger: true,
                     action: () => Quickshell.execDetached(["cliphist", "wipe"])
                 }
