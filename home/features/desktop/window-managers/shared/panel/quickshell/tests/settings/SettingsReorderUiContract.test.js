@@ -59,4 +59,14 @@ describe("settings reorder UI contract", () => {
     expect(source).toContain("onDragReleased:");
     expect(source).not.toContain('source: "re-order-dots-vertical.svg"');
   });
+
+  it("does not reach into internal drag handle ids from consuming tabs", () => {
+    const launcher = readFileSync(launcherSectionPath, "utf8");
+    const barWidgets = readFileSync(barWidgetsPath, "utf8");
+
+    expect(launcher).toContain("active: webProviderRow.dragging");
+    expect(launcher).not.toMatch(/\bdragHandle\./);
+    expect(barWidgets).toContain("Drag.active: root.dragReorderEnabled && widgetRow.dragging");
+    expect(barWidgets).not.toMatch(/\bwidgetRow\.dragHandle\b/);
+  });
 });
