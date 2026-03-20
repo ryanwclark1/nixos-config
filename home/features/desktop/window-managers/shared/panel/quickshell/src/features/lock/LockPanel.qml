@@ -132,8 +132,8 @@ Item {
         active: Config.lockScreenWeather && !compact && WeatherService.temp !== ""
         sourceComponent: RowLayout {
           spacing: Appearance.spacingS
-          SvgIcon {
-            source: Appearance.weatherIcon(WeatherService.condition)
+          AnimatedWeatherIcon {
+            condition: WeatherService.condition
             color: Colors.textSecondary
             size: Appearance.fontSizeXL
           }

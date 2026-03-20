@@ -29,8 +29,8 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingS
 
-        SharedWidgets.SvgIcon {
-            source: Appearance.weatherIcon(WeatherService.condition)
+        SharedWidgets.AnimatedWeatherIcon {
+            condition: WeatherService.condition
             color: Colors.accent
             size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter

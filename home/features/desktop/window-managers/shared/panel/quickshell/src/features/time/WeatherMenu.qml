@@ -44,8 +44,8 @@ BasePopupMenu {
         columnSpacing: Appearance.spacingM
         rowSpacing: Appearance.spacingM
 
-        SharedWidgets.SvgIcon {
-          source: Appearance.weatherIcon(WeatherService.condition)
+        SharedWidgets.AnimatedWeatherIcon {
+          condition: WeatherService.condition
           color: Colors.accent
           size: root.compactMode ? 38 : 46
           Layout.alignment: Qt.AlignVCenter

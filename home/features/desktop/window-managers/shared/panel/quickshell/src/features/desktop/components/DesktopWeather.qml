@@ -28,8 +28,8 @@ Item {
     id: row
     spacing: Appearance.spacingL
 
-    SvgIcon {
-      source: Appearance.weatherIcon(WeatherService.condition)
+    AnimatedWeatherIcon {
+      condition: WeatherService.condition
       color: Colors.primary
       size: Appearance.fontSizeIcon
     }

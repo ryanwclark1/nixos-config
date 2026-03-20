@@ -86,8 +86,8 @@ BasePopupMenu {
 
               RowLayout {
                 spacing: Appearance.spacingXS
-                SharedWidgets.SvgIcon {
-                  source: Appearance.weatherIcon(WeatherService.condition)
+                SharedWidgets.AnimatedWeatherIcon {
+                  condition: WeatherService.condition
                   color: Colors.accent
                   size: Appearance.fontSizeLarge
                 }
@@ -156,9 +156,9 @@ BasePopupMenu {
               width: 44; height: 44
               radius: Appearance.radiusSmall
               color: Colors.withAlpha(Colors.accent, 0.1)
-              SharedWidgets.SvgIcon {
+              SharedWidgets.AnimatedWeatherIcon {
                 anchors.centerIn: parent
-                source: Appearance.weatherIcon(WeatherService.condition)
+                condition: WeatherService.condition
                 color: Colors.accent
                 size: Appearance.fontSizeDisplay
               }

@@ -17,12 +17,17 @@ const weatherSurfacePaths = [
 ].map(path => resolve(quickshellRoot, path));
 
 describe("weather icon rendering contracts", () => {
-  it("renders weather icon asset names through SvgIcon instead of Text", () => {
+  it("renders primary weather conditions through the animated weather icon component", () => {
     for (const filePath of weatherSurfacePaths) {
       const source = readFileSync(filePath, "utf8");
 
-      expect(source).toContain("source: Appearance.weatherIcon(");
-      expect(source).not.toContain("text: Appearance.weatherIcon(");
+      expect(source).toContain("AnimatedWeatherIcon");
     }
+  });
+
+  it("keeps forecast rows on static SvgIcon assets", () => {
+    const source = readFileSync(resolve(quickshellRoot, "src/features/time/WeatherMenu.qml"), "utf8");
+
+    expect(source).toContain("source: Appearance.weatherIcon(modelData.condition)");
   });
 });

@@ -20,8 +20,8 @@ Shared.ThemedContainer {
     anchors.margins: Appearance.paddingMedium
     spacing: Appearance.paddingMedium
 
-    SharedWidgets.SvgIcon {
-      source: Appearance.weatherIcon(WeatherService.condition)
+    SharedWidgets.AnimatedWeatherIcon {
+      condition: WeatherService.condition
       color: Colors.accent
       size: Appearance.fontSizeIcon
     }

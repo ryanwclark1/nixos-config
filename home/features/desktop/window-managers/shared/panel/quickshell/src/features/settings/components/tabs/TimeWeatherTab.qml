@@ -400,6 +400,12 @@ Item {
                     onModeSelected: modeValue => Config.weatherUnits = modeValue
                 }
 
+                SettingsToggleRow {
+                    label: "Animated weather in bar and menus"
+                    icon: "weather-thunderstorm.svg"
+                    configKey: "weatherUiAnimationEnabled"
+                }
+
                 SettingsModeRow {
                     label: "Location Priority"
                     icon: "compass.svg"
