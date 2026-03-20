@@ -1,23 +1,18 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared" as Shared
 import "../../../widgets" as SharedWidgets
 
-Rectangle {
+Shared.ThemedContainer {
   id: root
+  variant: "card"
+  showGradient: true
   Layout.fillWidth: true
   Layout.preferredHeight: weatherContent.implicitHeight + Appearance.paddingMedium * 2
-  color: Colors.cardSurface
-  radius: Appearance.radiusLarge
-  border.color: Colors.border
   clip: true
 
   SharedWidgets.Ref { service: WeatherService }
-
-  gradient: SharedWidgets.SurfaceGradient {}
-
-  // Inner highlight
-  SharedWidgets.InnerHighlight { }
 
   RowLayout {
     id: weatherContent
@@ -26,7 +21,7 @@ Rectangle {
     spacing: Appearance.paddingMedium
 
     Text {
-      text: Colors.weatherIcon(WeatherService.condition)
+      text: Appearance.weatherIcon(WeatherService.condition)
       color: Colors.accent
       font.family: Appearance.fontMono
       font.pixelSize: Appearance.fontSizeIcon

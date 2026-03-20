@@ -2,20 +2,15 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../services"
+import "../../../shared" as Shared
 import "../../../widgets" as SharedWidgets
 
-Rectangle {
+Shared.ThemedContainer {
   id: root
+  variant: "card"
   Layout.fillWidth: true
   Layout.preferredHeight: userContent.implicitHeight + Appearance.paddingMedium * 2
-  color: Colors.cardSurface
-  radius: Appearance.radiusMedium
-  border.color: Colors.border
   clip: true
-
-
-  // Inner highlight
-  SharedWidgets.InnerHighlight { }
 
   property string username: Quickshell.env("USER") || Quickshell.env("LOGNAME") || "User"
   property string uptime: "0h 0m"

@@ -5,18 +5,13 @@ import "../../../services"
 import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
-Rectangle {
+ThemedContainer {
   id: root
+  variant: "card"
+  showGradient: true
   Layout.fillWidth: true
   Layout.preferredHeight: 300
-  color: Colors.cardSurface
-  radius: Appearance.radiusLarge
-  border.color: Colors.border
   clip: true
-
-  // Inner highlight
-  SharedWidgets.InnerHighlight { highlightOpacity: 0.1 }
-  SharedWidgets.SurfaceGradient {}
 
   SystemClock {
     id: calendarClock
