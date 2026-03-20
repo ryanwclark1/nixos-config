@@ -467,6 +467,17 @@ populate_repo_shell_env() {
   done < <(systemctl --user show-environment 2>/dev/null || true)
 }
 
+ensure_repo_shell_env_default() {
+  local entry="$1"
+  local key="${entry%%=*}"
+  local current=""
+
+  for current in "${repo_shell_env[@]}"; do
+    [[ "${current}" == "${key}="* ]] && return 0
+  done
+  repo_shell_env+=("${entry}")
+}
+
 cleanup() {
   if [[ -n "${repo_shell_pid}" ]]; then
     kill "${repo_shell_pid}" >/dev/null 2>&1 || true
@@ -486,7 +497,10 @@ fi
 
 mkdir -p "${VM_OUTPUT_DIR}"
 populate_repo_shell_env
-  env "${repo_shell_env[@]}" quickshell -p "${REMOTE_PANEL_ROOT}/src/shell.qml" >/tmp/quickshell-repo-launcher-qa.log 2>&1 &
+ensure_repo_shell_env_default "QS_VERIFY_LAUNCHER_FORCE_HOME_SECTIONS=1"
+ensure_repo_shell_env_default "QS_VERIFY_LAUNCHER_FORCE_MODE_HINTS=1"
+ensure_repo_shell_env_default "QS_VERIFY_LAUNCHER_FORCE_RUNTIME_METRICS=1"
+env "${repo_shell_env[@]}" quickshell -p "${REMOTE_PANEL_ROOT}/src/shell.qml" >/tmp/quickshell-repo-launcher-qa.log 2>&1 &
 repo_shell_pid="$!"
 
 ready=0
@@ -503,19 +517,24 @@ if (( ready == 0 )); then
   exit 1
 fi
 
-for capture in \
-  "drun|home||${VM_OUTPUT_DIR}/drun-home.png" \
-  "drun|query|firefox|${VM_OUTPUT_DIR}/drun-query.png" \
-  "drun|category|Utility|${VM_OUTPUT_DIR}/drun-category.png" \
-  "files|empty|__launcher_empty_probe__|${VM_OUTPUT_DIR}/files-empty.png" \
-  "system|home||${VM_OUTPUT_DIR}/system-home.png"
-do
-  IFS='|' read -r mode state query output <<<"${capture}"
+instance_runtime="$(readlink -f "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid/${repo_shell_pid}" 2>/dev/null || true)"
+instance_id="$(basename "${instance_runtime}")"
+if [[ -z "${instance_id}" || "${instance_id}" == "." || "${instance_id}" == "/" ]]; then
+  echo "[ERROR] Could not resolve launcher repo-shell instance id." >&2
+  exit 1
+fi
+
+run_launcher_capture() {
+  local mode="$1"
+  local state="$2"
+  local query="$3"
+  local output="$4"
+
   [[ -n "${mode}" && -n "${state}" && -n "${output}" ]] || {
-    echo "[ERROR] Invalid launcher capture definition: ${capture}" >&2
+    echo "[ERROR] Invalid launcher capture definition: ${mode}|${state}|${query}|${output}" >&2
     exit 1
   }
-  args=(
+  local args=(
     --pid "${repo_shell_pid}"
     --mode "${mode}"
     --state "${state}"
@@ -532,7 +551,39 @@ do
     fi
   fi
   bash "${REMOTE_PANEL_ROOT}/scripts/capture-launcher-viewport.sh" "${args[@]}"
+}
+
+run_launcher_capture "drun" "home" "" "${VM_OUTPUT_DIR}/drun-home.png"
+
+resolved_drun_category="$(
+  quickshell ipc --pid "${repo_shell_pid}" call Launcher drunCategoryState 2>/dev/null | node -e '
+const fs = require("node:fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(0);
+let payload = JSON.parse(raw);
+if (typeof payload === "string") payload = JSON.parse(payload);
+const options = Array.isArray(payload.options) ? payload.options : [];
+const match = options.find((item) => item && String(item.key || "") !== "");
+if (match) process.stdout.write(String(match.key || ""));
+' 2>/dev/null || true
+)"
+if [[ -n "${resolved_drun_category}" ]]; then
+  run_launcher_capture "drun" "category" "${resolved_drun_category}" "${VM_OUTPUT_DIR}/drun-category.png"
+else
+  echo "[INFO] Skipping drun/category launcher capture because no non-All category is available."
+fi
+
+for capture in \
+  "drun|query|firefox|${VM_OUTPUT_DIR}/drun-query.png" \
+  "files|empty|__launcher_empty_probe__|${VM_OUTPUT_DIR}/files-empty.png" \
+  "system|home||${VM_OUTPUT_DIR}/system-home.png"
+do
+  IFS='|' read -r mode state query output <<<"${capture}"
+  run_launcher_capture "${mode}" "${state}" "${query}" "${output}"
 done
+
+set -o pipefail
+bash "${REMOTE_PANEL_ROOT}/scripts/check-launcher-responsive.sh" --id "${instance_id}" 2>&1 | tee "${VM_OUTPUT_DIR}/launcher-responsive.log"
 EOF
       return $?
       ;;
@@ -584,6 +635,12 @@ assert_expected_artifacts() {
     vitest)
       if [[ ! -f "${output_dir}/vitest.log" ]]; then
         echo "[ERROR] Missing expected Vitest log: ${output_dir}/vitest.log" >&2
+        missing=1
+      fi
+      ;;
+    launcher)
+      if [[ ! -f "${output_dir}/launcher-responsive.log" ]]; then
+        echo "[ERROR] Missing expected launcher responsive log: ${output_dir}/launcher-responsive.log" >&2
         missing=1
       fi
       ;;
