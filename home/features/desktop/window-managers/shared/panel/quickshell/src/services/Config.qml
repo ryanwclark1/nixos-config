@@ -62,6 +62,7 @@ QtObject {
     property string weatherLatitude: ""
     property string weatherLongitude: ""
     property string weatherLocationPriority: "latlon_city_auto"
+    property bool weatherUiAnimationEnabled: false
 
     // --- MARKET ---
     property string marketTickers: "^SPX ^DJI ^NDQ"

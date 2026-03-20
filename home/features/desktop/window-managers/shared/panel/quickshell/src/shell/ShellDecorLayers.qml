@@ -6,6 +6,7 @@ import "../features/background"
 import "../features/desktop"
 import "../features/dock"
 import "../services"
+import "../services/WeatherVisuals.js" as WeatherVisuals
 import "../shared"
 
 Item {
@@ -115,16 +116,10 @@ Item {
                         ShaderEffect {
                             id: weatherOverlay
                             anchors.fill: parent
-                            visible: _weatherType !== "none"
+                            visible: _weatherVisual.overlayScene !== "none"
                             layer.enabled: visible
 
-                            readonly property string _weatherType: {
-                                var c = (WeatherService.condition || "").toLowerCase();
-                                if (c.indexOf("rain") !== -1 || c.indexOf("drizzle") !== -1) return "rain";
-                                if (c.indexOf("snow") !== -1 || c.indexOf("sleet") !== -1) return "snow";
-                                if (c.indexOf("fog") !== -1 || c.indexOf("mist") !== -1) return "fog";
-                                return "none";
-                            }
+                            readonly property var _weatherVisual: WeatherVisuals.visualForCondition(WeatherService.condition)
 
                             property real time: 0
                             NumberAnimation on time {
@@ -134,17 +129,12 @@ Item {
                                 running: weatherOverlay.visible
                             }
 
-                            property real intensity: {
-                                var c = (WeatherService.condition || "").toLowerCase();
-                                if (c.indexOf("heavy") !== -1 || c.indexOf("thunder") !== -1) return 1.0;
-                                if (c.indexOf("light") !== -1 || c.indexOf("drizzle") !== -1) return 0.3;
-                                return 0.6;
-                            }
+                            property real intensity: _weatherVisual.intensity
 
                             fragmentShader: {
-                                if (_weatherType === "rain") return _rainShader;
-                                if (_weatherType === "snow") return _snowShader;
-                                if (_weatherType === "fog") return _fogShader;
+                                if (_weatherVisual.overlayScene === "rain") return _rainShader;
+                                if (_weatherVisual.overlayScene === "snow") return _snowShader;
+                                if (_weatherVisual.overlayScene === "fog") return _fogShader;
                                 return "";
                             }
 
@@ -244,6 +234,25 @@ Item {
                                     gl_FragColor = vec4(0.85, 0.87, 0.9, fog * intensity * 0.25) * qt_Opacity;
                                 }
                             "
+
+                            Rectangle {
+                                anchors.fill: parent
+                                visible: weatherOverlay._weatherVisual.flash
+                                radius: Math.max(width, height)
+                                color: Colors.withAlpha("#ffffff", 0.45)
+                                opacity: 0
+
+                                SequentialAnimation on opacity {
+                                    running: weatherOverlay.visible && parent.visible
+                                    loops: Animation.Infinite
+                                    PauseAnimation { duration: Math.round(Appearance.durationAmbient * 1.3) }
+                                    NumberAnimation { to: 0.14; duration: Appearance.durationFlash; easing.type: Easing.OutCubic }
+                                    NumberAnimation { to: 0.0; duration: Appearance.durationFast; easing.type: Easing.InCubic }
+                                    PauseAnimation { duration: Math.round(Appearance.durationAmbient * 0.8) }
+                                    NumberAnimation { to: 0.07; duration: Appearance.durationFlash; easing.type: Easing.OutCubic }
+                                    NumberAnimation { to: 0.0; duration: Appearance.durationSnap; easing.type: Easing.InCubic }
+                                }
+                            }
                         }
                     }
 

@@ -74,6 +74,9 @@ QtObject {
         function onWeatherLocationPriorityChanged() {
             root.config.scheduleSave();
         }
+        function onWeatherUiAnimationEnabledChanged() {
+            root.config.scheduleSave();
+        }
         function onLauncherDefaultModeChanged() {
             root.config.scheduleSave();
         }
