@@ -122,8 +122,12 @@ run_one_vm() {
   local wrapper=""
   local vm_dir="${output_dir}/${vm}"
   local host_log="${vm_dir}/host-run.log"
+  local status_file="${vm_dir}/exit-code.txt"
+  local run_script="${vm_dir}/run-${vm}-gate.sh"
   local exit_code=0
   local ssh_port=""
+  local child_pid=""
+  local last_report=0
   local -a cmd=()
 
   case "${vm}" in
@@ -157,10 +161,42 @@ run_one_vm() {
     printf '\n'
   fi
 
-  set +e
-  "${cmd[@]}" >"${host_log}" 2>&1
-  exit_code=$?
-  set -e
+  rm -f "${status_file}"
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf 'set -euo pipefail\n'
+    printf 'if'
+    printf ' %q' "${cmd[@]}"
+    printf ' >%q 2>&1; then\n' "${host_log}"
+    printf "  printf '0\\n' >%q\n" "${status_file}"
+    printf 'else\n'
+    printf "  printf '%%s\\n' \"\$?\" >%q\n" "${status_file}"
+    printf 'fi\n'
+  } > "${run_script}"
+  chmod +x "${run_script}"
+
+  nohup "${run_script}" >/dev/null 2>&1 &
+  child_pid=$!
+  last_report=${SECONDS}
+
+  while true; do
+    if [[ -f "${status_file}" ]]; then
+      exit_code="$(cat "${status_file}" 2>/dev/null || printf '1')"
+      break
+    fi
+
+    if ! kill -0 "${child_pid}" 2>/dev/null; then
+      printf '[WARN] %s VM gate wrapper exited without writing %s\n' "${vm}" "${status_file}" >&2
+      exit_code=1
+      break
+    fi
+
+    if (( SECONDS - last_report >= 30 )); then
+      printf '[INFO] %s VM gate still running...\n' "${vm}"
+      last_report=${SECONDS}
+    fi
+    sleep 5
+  done
 
   if [[ -f "${host_log}" ]]; then
     cat "${host_log}"
@@ -168,7 +204,7 @@ run_one_vm() {
     printf '[WARN] Host log missing for %s VM run: %s\n' "${vm}" "${host_log}" >&2
   fi
 
-  printf '%s' "${exit_code}" > "${vm_dir}/exit-code.txt"
+  printf '%s' "${exit_code}" > "${status_file}"
   return "${exit_code}"
 }
 
