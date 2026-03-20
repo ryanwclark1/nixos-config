@@ -166,12 +166,11 @@ BasePopupMenu {
             visible: status === Image.Ready
           }
 
-          Text {
+          SharedWidgets.SvgIcon {
             anchors.centerIn: parent
-            text: "󰝚"
+            source: "music-note-2.svg"
             color: Colors.textDisabled
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeHuge * 2
+            size: Appearance.fontSizeHuge * 2
             visible: albumArt.status !== Image.Ready
           }
         }
@@ -305,11 +304,10 @@ BasePopupMenu {
       Layout.fillWidth: true
       spacing: Appearance.paddingSmall
 
-      Text {
-        text: "󰕾"
+      SharedWidgets.SvgIcon {
+        source: "speaker.svg"
         color: Colors.textSecondary
-        font.family: Appearance.fontMono
-        font.pixelSize: Appearance.fontSizeLarge
+        size: Appearance.fontSizeLarge
       }
 
       Rectangle {

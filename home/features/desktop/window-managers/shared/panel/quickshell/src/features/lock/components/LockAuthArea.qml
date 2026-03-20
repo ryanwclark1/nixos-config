@@ -44,10 +44,10 @@ ColumnLayout {
         spacing: Appearance.spacingXS
         visible: root.lockContext && root.lockContext.fprintAvailable && Config.lockScreenFingerprint
 
-        Text {
+        SvgIcon {
             id: fprintIcon
             Layout.alignment: Qt.AlignHCenter
-            text: "󰈷"
+            source: "fingerprint.svg"
             color: {
                 if (!root.lockContext) return Colors.textDisabled;
                 switch (root.lockContext.fprintStatus) {
@@ -57,8 +57,7 @@ ColumnLayout {
                 default: return Colors.textDisabled;
                 }
             }
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeDisplay
+            size: Appearance.fontSizeDisplay
 
             SequentialAnimation on opacity {
                 id: fprintPulse
@@ -101,11 +100,10 @@ ColumnLayout {
             anchors.margins: Appearance.spacingM
             spacing: Appearance.paddingSmall
 
-            Text {
-                text: "󰌾"
+            SvgIcon {
+                source: "lock-closed.svg"
                 color: Colors.textDisabled
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeXL
+                size: Appearance.fontSizeXL
             }
 
             TextInput {
@@ -139,12 +137,11 @@ ColumnLayout {
                 color: Colors.withAlpha(Colors.primary, 0.6)
                 visible: pwInput.text.length > 0
 
-                Text {
+                SvgIcon {
                     anchors.centerIn: parent
-                    text: "󰁔"
+                    source: "arrow-enter-left.svg"
                     color: Colors.background
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeMedium
+                    size: Appearance.fontSizeMedium
                 }
 
                 StateLayer {
@@ -231,12 +228,11 @@ ColumnLayout {
                     stateColor: Colors.error
                 }
 
-                Text {
+                SvgIcon {
                     anchors.centerIn: parent
-                    text: "󰅖"
+                    source: "dismiss.svg"
                     color: Colors.error
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeXS
+                    size: Appearance.fontSizeXS
                 }
 
                 MouseArea {

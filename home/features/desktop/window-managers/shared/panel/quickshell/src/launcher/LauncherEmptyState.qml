@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../services"
 import "../shared"
+import "../widgets" as SharedWidgets
 
 Rectangle {
     id: root
@@ -41,13 +42,12 @@ Rectangle {
             border.color: Colors.withAlpha(root.accentColor, 0.28)
             border.width: 1
 
-            Text {
+            Loader {
                 anchors.centerIn: parent
-                text: root.icon
-                color: root.accentColor
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeHuge
+                sourceComponent: root.icon.endsWith(".svg") ? _heroSvg : _heroNerd
             }
+            Component { id: _heroSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.accentColor; size: Appearance.fontSizeHuge } }
+            Component { id: _heroNerd; Text { text: root.icon; color: root.accentColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeHuge } }
         }
 
         Text {
@@ -150,13 +150,12 @@ Rectangle {
                 visible: root.primaryHint !== ""
                 spacing: Appearance.spacingS
 
-                Text {
-                    text: root.primaryHintIcon
-                    color: root.accentColor
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeSmall
-                    visible: text !== ""
+                Loader {
+                    visible: root.primaryHintIcon !== ""
+                    sourceComponent: root.primaryHintIcon.endsWith(".svg") ? _phSvg : _phNerd
                 }
+                Component { id: _phSvg; SharedWidgets.SvgIcon { source: root.primaryHintIcon; color: root.accentColor; size: Appearance.fontSizeSmall } }
+                Component { id: _phNerd; Text { text: root.primaryHintIcon; color: root.accentColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }
 
                 Text {
                     text: root.primaryHint
@@ -172,13 +171,12 @@ Rectangle {
                 visible: root.secondaryHint !== ""
                 spacing: Appearance.spacingS
 
-                Text {
-                    text: root.secondaryHintIcon
-                    color: Colors.textDisabled
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeSmall
-                    visible: text !== ""
+                Loader {
+                    visible: root.secondaryHintIcon !== ""
+                    sourceComponent: root.secondaryHintIcon.endsWith(".svg") ? _shSvg : _shNerd
                 }
+                Component { id: _shSvg; SharedWidgets.SvgIcon { source: root.secondaryHintIcon; color: Colors.textDisabled; size: Appearance.fontSizeSmall } }
+                Component { id: _shNerd; Text { text: root.secondaryHintIcon; color: Colors.textDisabled; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeSmall } }
 
                 Text {
                     text: root.secondaryHint

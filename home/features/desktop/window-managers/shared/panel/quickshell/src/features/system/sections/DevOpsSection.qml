@@ -82,11 +82,10 @@ ColumnLayout {
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: Appearance.paddingSmall
-                Text {
-                    text: "󰡨"
+                SharedWidgets.SvgIcon {
+                    source: "server.svg"
                     color: ServiceUnitService.dockerContainers.length > 0 ? Colors.primary : Colors.textDisabled
-                    font.pixelSize: Appearance.fontSizeXL
-                    font.family: Appearance.fontMono
+                    size: Appearance.fontSizeXL
                 }
                 Column {
                     Layout.fillWidth: true
@@ -117,11 +116,10 @@ ColumnLayout {
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: Appearance.paddingSmall
-                Text {
-                    text: "󰣀"
+                SharedWidgets.SvgIcon {
+                    source: "terminal.svg"
                     color: ServiceUnitService.sshActiveCount > 0 ? Colors.accent : Colors.textDisabled
-                    font.pixelSize: Appearance.fontSizeXL
-                    font.family: Appearance.fontMono
+                    size: Appearance.fontSizeXL
                 }
                 Column {
                     Layout.fillWidth: true
@@ -176,11 +174,10 @@ ColumnLayout {
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: Appearance.spacingS
-                    Text {
-                        text: "󰡨"
+                    SharedWidgets.SvgIcon {
+                        source: "server.svg"
                         color: Colors.primary
-                        font.pixelSize: Appearance.fontSizeLarge
-                        font.family: Appearance.fontMono
+                        size: Appearance.fontSizeLarge
                     }
                     Text {
                         text: modelData.name
@@ -237,22 +234,21 @@ ColumnLayout {
                 readonly property int sessionCount: modelData.count || 1
                 readonly property string typeIcon: {
                     switch (sessionType) {
-                    case "scp":   return "󰆏";
-                    case "sftp":  return "󰉋";
-                    case "rsync": return "󰓦";
-                    case "sshfs": return "󰋊";
-                    default:      return "󰣀";
+                    case "scp":   return "copy.svg";
+                    case "sftp":  return "document.svg";
+                    case "rsync": return "arrow-sync.svg";
+                    case "sshfs": return "hard-drive.svg";
+                    default:      return "terminal.svg";
                     }
                 }
 
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: Appearance.spacingS
-                    Text {
-                        text: typeIcon
+                    SharedWidgets.SvgIcon {
+                        source: typeIcon
                         color: Colors.accent
-                        font.pixelSize: Appearance.fontSizeLarge
-                        font.family: Appearance.fontMono
+                        size: Appearance.fontSizeLarge
                     }
                     Text {
                         text: sessionLabel + (sessionCount > 1 ? " ×" + sessionCount : "")

@@ -642,12 +642,11 @@ PanelWindow {
                       stateColor: Colors.error
                     }
 
-                    Text {
+                    SharedWidgets.SvgIcon {
                       anchors.centerIn: parent
-                      text: "󰅖"
+                      source: "dismiss.svg"
                       color: deleteTabMouse.containsMouse ? "white" : Colors.textDisabled
-                      font.family: Appearance.fontMono
-                      font.pixelSize: Appearance.fontSizeXS
+                      size: Appearance.fontSizeXS
                     }
                     MouseArea {
                       id: deleteTabMouse

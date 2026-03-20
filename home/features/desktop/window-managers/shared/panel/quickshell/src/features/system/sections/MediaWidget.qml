@@ -106,12 +106,11 @@ Rectangle {
               }
             }
 
-            Text {
+            SharedWidgets.SvgIcon {
               anchors.centerIn: parent
-              text: "󰝚"
+              source: "music-note-2.svg"
               color: Colors.textDisabled
-              font.family: Appearance.fontMono
-              font.pixelSize: Appearance.fontSizeIcon
+              size: Appearance.fontSizeIcon
               visible: albumArt.status !== Image.Ready
             }
           }
@@ -185,11 +184,10 @@ Rectangle {
               width: 32; height: 32
               cursorShape: Qt.PointingHandCursor
               hoverEnabled: true
-              Text { 
-                text: "󰒮"
+              SharedWidgets.SvgIcon {
+                source: "previous.svg"
                 color: prevBtn.containsMouse ? Colors.primary : Colors.text
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeXL
+                size: Appearance.fontSizeXL
                 anchors.centerIn: parent
                 Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               }
@@ -209,11 +207,10 @@ Rectangle {
                 border.color: playBtn.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
                 Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
-                Text { 
-                  text: modelData.playbackState === Mpris.Playing ? "󰏤" : "󰐊"
+                SharedWidgets.SvgIcon {
+                  source: modelData.playbackState === Mpris.Playing ? "pause.svg" : "play.svg"
                   color: playBtn.containsMouse ? Colors.background : Colors.text
-                  font.family: Appearance.fontMono
-                  font.pixelSize: Appearance.fontSizeLarge
+                  size: Appearance.fontSizeLarge
                   anchors.centerIn: parent
                   Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                 }
@@ -227,11 +224,10 @@ Rectangle {
               width: 32; height: 32
               cursorShape: Qt.PointingHandCursor
               hoverEnabled: true
-              Text { 
-                text: "󰒭"
+              SharedWidgets.SvgIcon {
+                source: "next.svg"
                 color: nextBtn.containsMouse ? Colors.primary : Colors.text
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeXL
+                size: Appearance.fontSizeXL
                 anchors.centerIn: parent
                 Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
               }
