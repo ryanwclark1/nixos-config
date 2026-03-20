@@ -2,6 +2,7 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
+source "${script_dir}/graphics-session-env.sh"
 
 pass_count=0
 fail_count=0
@@ -114,7 +115,8 @@ check_niri() {
   fi
 
   local raw active_name active_idx
-  raw="$(niri msg -j workspaces 2>/dev/null || true)"
+  load_graphics_session_env
+  raw="$(niri_json_query workspaces || true)"
 
   if printf '%s' "${raw}" | jq -e '.' >/dev/null 2>&1; then
     pass "Niri workspaces JSON parses"

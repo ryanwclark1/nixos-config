@@ -353,7 +353,7 @@ if [[ -z "${instance_id}" ]]; then
 fi
 
 printf '[INFO] Running settings smoke against instance %s\n' "${instance_id}"
-bash "${script_dir}/check-settings-responsive.sh" --pid "${repo_shell_pid}" --skip-reload
+bash "${script_dir}/check-settings-responsive.sh" --id "${instance_id}" --skip-reload
 instance_id="$(discover_instance)" || {
   printf 'Could not rediscover a reachable quickshell instance after settings smoke.\n' >&2
   exit 1

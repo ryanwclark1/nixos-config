@@ -51,14 +51,31 @@ build_repo_shell_env_array() {
   done
 }
 
+niri_json_query() {
+  local raw=""
+  local query="$1"
+  shift || true
+
+  [[ -n "${NIRI_SOCKET:-}" ]] || return 1
+  command -v niri >/dev/null 2>&1 || return 1
+  command -v jq >/dev/null 2>&1 || return 1
+
+  raw="$(niri msg -j "${query}" "$@" 2>/dev/null || true)"
+  [[ -n "${raw}" ]] || return 1
+
+  printf '%s' "${raw}" | jq -cer '
+    fromjson?
+    // (capture("(?s)(?<json>(\\{.*\\}|\\[.*\\]))")?.json | fromjson?)
+  ' 2>/dev/null
+}
+
 niri_headless_without_outputs() {
   local outputs_json=""
 
   load_graphics_session_env
 
   [[ -n "${NIRI_SOCKET:-}" ]] || return 1
-  command -v niri >/dev/null 2>&1 || return 1
-  outputs_json="$(niri msg -j outputs 2>/dev/null || true)"
+  outputs_json="$(niri_json_query outputs || true)"
   [[ -n "${outputs_json}" ]] || return 1
 
   if printf '%s' "${outputs_json}" | jq -e '

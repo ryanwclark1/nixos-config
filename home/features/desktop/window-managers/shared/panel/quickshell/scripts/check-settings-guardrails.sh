@@ -63,6 +63,7 @@ main() {
   require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'currentWebProviderDropIndex' "shell-core tab reorder math helper usage"
   require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'label:\s*"↑"' "shell-core tab up-arrow fallback"
   require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'label:\s*"↓"' "shell-core tab down-arrow fallback"
+  require_pattern "${script_dir}/check-bar-widgets-first-open.sh" 'check-settings-responsive\.sh"\s+--id "\$\{instance_id\}"\s+--skip-reload' "bar widgets first-open settings smoke instance-id binding"
 
   if (( skip_responsive == 0 )); then
     "${script_dir}/check-settings-responsive.sh" "${runtime_args[@]}"

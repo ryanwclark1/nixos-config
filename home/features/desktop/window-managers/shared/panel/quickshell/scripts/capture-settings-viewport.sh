@@ -129,7 +129,7 @@ run_ipc() {
 }
 
 detect_compositor() {
-  if [[ -n "${NIRI_SOCKET:-}" ]] && command -v niri >/dev/null 2>&1 && niri msg -j workspaces >/dev/null 2>&1; then
+  if niri_json_query workspaces >/dev/null 2>&1; then
     compositor="niri"
     return 0
   fi
@@ -149,7 +149,7 @@ hypr() {
 }
 
 niri_msg() {
-  niri msg -j "$@"
+  niri_json_query "$@"
 }
 
 grim_capture() {
@@ -330,10 +330,12 @@ focus_workspace() {
 
 focused_output_json() {
   if [[ "${compositor}" == "niri" ]]; then
-    niri_msg outputs | jq '
+    if ! niri_msg outputs | jq '
       (if type == "array" then . else (.outputs // []) end)
       | (map(select(.is_focused == true or .focused == true or .active == true or .is_active == true))[0] // .[0])
-    '
+    '; then
+      printf 'null\n'
+    fi
     return 0
   fi
 
