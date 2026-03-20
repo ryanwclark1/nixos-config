@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
@@ -154,11 +155,10 @@ Rectangle {
                     }
                 }
 
-                Text {
-                    text: root.expanded ? "󰅀" : "󰅂"
+                SharedWidgets.SvgIcon {
+                    source: IconHelpers.disclosureIcon(root.expanded)
                     color: Colors.textSecondary
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeMedium
+                    size: Appearance.fontSizeMedium
                 }
             }
 

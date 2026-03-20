@@ -28,6 +28,7 @@ Item {
     property var dropIndexFn: null
 
     readonly property bool dropBeforeActive: reorderState && reorderState.active && reorderState.targetListId === listId && reorderState.targetIndex === rowIndex
+    readonly property bool dragging: dragHandle.dragActive
     readonly property real dragOffsetX: dragHandle.dragOffsetX
     readonly property real dragOffsetY: dragHandle.dragOffsetY
 

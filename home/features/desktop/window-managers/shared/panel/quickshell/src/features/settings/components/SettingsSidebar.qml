@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../shared" as Shared
 import "../../../widgets" as SharedWidgets
@@ -598,11 +599,10 @@ Rectangle {
                                         Layout.fillWidth: true
                                     }
 
-                                    Text {
-                                        text: expanded ? "󰅀" : "󰅂"
+                                    SharedWidgets.SvgIcon {
+                                        source: IconHelpers.disclosureIcon(expanded)
                                         color: Colors.textSecondary
-                                        font.family: Appearance.fontMono
-                                        font.pixelSize: Appearance.fontSizeCaption
+                                        size: Appearance.fontSizeCaption
                                         opacity: 0.5
                                     }
                                 }

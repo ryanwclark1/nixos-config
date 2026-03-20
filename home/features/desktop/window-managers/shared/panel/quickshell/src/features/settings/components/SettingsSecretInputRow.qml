@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../shared"
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 
 ColumnLayout {
@@ -88,11 +89,10 @@ ColumnLayout {
                     }
                 }
 
-                Text {
-                    text: root.secretVisible ? "󰈈" : "󰈉"
+                SharedWidgets.SvgIcon {
+                    source: IconHelpers.secretVisibilityIcon(root.secretVisible)
                     color: Colors.textDisabled
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeLarge
+                    size: Appearance.fontSizeLarge
 
                     MouseArea {
                         anchors.fill: parent

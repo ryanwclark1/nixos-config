@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
@@ -26,23 +27,26 @@ Rectangle {
 
     SharedWidgets.InnerHighlight {}
 
-    SharedWidgets.AdaptiveAccentStrip {
+    SettingsHeaderBand {
         accentColor: Colors.primary
         parentRadius: root.radius
-        opacityValue: 0.72
+        bandHeight: headerContainer.height + Appearance.spacingS
+        dividerY: headerContainer.height
+        showDivider: root.expanded
+        surfaceStrength: 0.85
+        accentStrength: 0.95
     }
 
     Behavior on implicitHeight {
         Anim {}
     }
 
-    Rectangle {
+    Item {
         id: headerContainer
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         implicitHeight: headerColumn.implicitHeight + Appearance.spacingM * 2
-        color: Colors.withAlpha(Colors.primary, 0.05)
 
         ColumnLayout {
             id: headerColumn
@@ -90,12 +94,11 @@ Rectangle {
                     border.color: Colors.border
                     border.width: 1
 
-                    Text {
+                    SharedWidgets.SvgIcon {
                         anchors.centerIn: parent
-                        text: root.expanded ? "󰅃" : "󰅀"
+                        source: IconHelpers.panelChevronIcon(root.expanded)
                         color: Colors.textSecondary
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeSmall
+                        size: Appearance.fontSizeSmall
                     }
                 }
             }
@@ -125,15 +128,6 @@ Rectangle {
             disabled: !root.collapsible
             stateColor: Colors.primary
         }
-    }
-
-    Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: headerContainer.bottom
-        height: 1
-        color: Colors.withAlpha(Colors.primary, 0.12)
-        visible: root.expanded
     }
 
     ColumnLayout {
