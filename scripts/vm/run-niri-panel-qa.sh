@@ -16,13 +16,17 @@ capture_mode="panel"
 reset_disk=0
 keep_vm_running=0
 vm_output_dir=""
-launcher_log="${NIRI_VM_QA_LOG:-/tmp/niri-test-vm-qa.log}"
+launcher_log="${NIRI_VM_QA_LOG:-}"
 extra_capture_args=()
 host_pubkey_file=""
 use_key_auth=0
 
 if [[ -z "${poll_attempts}" ]]; then
   poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
+fi
+
+if [[ -z "${launcher_log}" ]]; then
+  launcher_log="/tmp/niri-test-vm-qa-${ssh_port}.log"
 fi
 
 usage() {
@@ -470,7 +474,7 @@ write_summary() {
     settings_status=$([[ "${remote_exit}" -eq 0 ]] && printf 'pass' || printf 'fail')
   fi
 
-  if [[ "${remote_exit}" -ne 0 ]]; then
+  if [[ "${remote_exit}" -ne 0 ]] || [[ "${runtime_status}" == "fail" ]] || [[ "${settings_status}" == "fail" ]]; then
     overall_status="fail"
   fi
 
@@ -488,17 +492,17 @@ write_summary() {
 }
 EOF
 
-  cat > "${output_dir}/summary.md" <<EOF
-# Niri VM QA Summary
-
-- mode: \`${capture_mode}\`
-- status: \`${overall_status}\`
-- remote exit: \`${remote_exit}\`
-- runtime: \`${runtime_status}\`
-- settings: \`${settings_status}\`
-- artifacts: \`${output_dir}\`
-- launcher log: \`${output_dir}/launcher.log\`
-EOF
+  printf '%s\n' \
+    '# Niri VM QA Summary' \
+    '' \
+    "- mode: \`${capture_mode}\`" \
+    "- status: \`${overall_status}\`" \
+    "- remote exit: \`${remote_exit}\`" \
+    "- runtime: \`${runtime_status}\`" \
+    "- settings: \`${settings_status}\`" \
+    "- artifacts: \`${output_dir}\`" \
+    "- launcher log: \`${output_dir}/launcher.log\`" \
+    > "${output_dir}/summary.md"
 }
 
 echo "[INFO] Launching Niri test VM on SSH port ${ssh_port}"

@@ -5,21 +5,31 @@ repo_root="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." >/dev/null 
 launcher="${repo_root}/scripts/vm/launch-hyprland-test-vm.sh"
 ssh_port="${HYPRLAND_VM_QA_SSH_PORT:-2242}"
 vm_password="${HYPRLAND_VM_PASSWORD:-hyprland}"
-qa_qemu_opts="${HYPRLAND_VM_QA_QEMU_OPTS:--vga none -device virtio-vga -display vnc=127.0.0.1:42}"
+qa_qemu_opts="${HYPRLAND_VM_QA_QEMU_OPTS:-}"
 boot_timeout="${HYPRLAND_VM_QA_BOOT_TIMEOUT:-300}"
 poll_delay="${HYPRLAND_VM_QA_POLL_DELAY:-2}"
 poll_attempts="${HYPRLAND_VM_QA_POLL_ATTEMPTS:-}"
+remote_job_timeout="${HYPRLAND_VM_QA_JOB_TIMEOUT:-5400}"
 output_dir="${HYPRLAND_VM_QA_OUTPUT_DIR:-/tmp/panel-qa-matrix-host}"
 capture_mode="panel"
 reset_disk=0
 keep_vm_running=0
 vm_output_dir=""
-launcher_log="${HYPRLAND_VM_QA_LOG:-/tmp/hyprland-test-vm-qa.log}"
+launcher_log="${HYPRLAND_VM_QA_LOG:-}"
 extra_capture_args=()
 host_pubkey_file=""
 
 if [[ -z "${poll_attempts}" ]]; then
   poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
+fi
+
+if [[ -z "${qa_qemu_opts}" ]]; then
+  default_vnc_display=$(( ssh_port % 1000 ))
+  qa_qemu_opts="-vga none -device virtio-vga -display vnc=127.0.0.1:${default_vnc_display}"
+fi
+
+if [[ -z "${launcher_log}" ]]; then
+  launcher_log="/tmp/hyprland-test-vm-qa-${ssh_port}.log"
 fi
 
 usage() {
@@ -188,7 +198,13 @@ install_host_pubkey() {
   pubkey="$(<"${host_pubkey_file}")"
   [[ -n "${pubkey}" ]] || return 0
 
-  "${ssh_base[@]}" "umask 077 && mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && grep -qxF $(printf '%q' "${pubkey}") ~/.ssh/authorized_keys || printf '%s\n' $(printf '%q' "${pubkey}") >> ~/.ssh/authorized_keys"
+  "${ssh_base[@]}" "HOST_PUBKEY=$(printf '%q' "${pubkey}") bash -s" <<'EOF'
+set -euo pipefail
+umask 077
+mkdir -p ~/.ssh
+touch ~/.ssh/authorized_keys
+grep -qxF "${HOST_PUBKEY}" ~/.ssh/authorized_keys || printf '%s\n' "${HOST_PUBKEY}" >> ~/.ssh/authorized_keys
+EOF
 }
 
 wait_for_hyprland() {
@@ -250,6 +266,55 @@ sync_repo() {
   tar -C "${repo_root}" -cf - "${panel_rel}" | "${ssh_base[@]}" "tar -xf - -C '${remote_repo}'"
 }
 
+run_remote_background_script() {
+  local remote_panel_root="$1"
+  local job_name="$2"
+  local remote_script_path="${vm_output_dir}/.${job_name}.sh"
+  local remote_log_path="${vm_output_dir}/.${job_name}.log"
+  local remote_exit_path="${vm_output_dir}/.${job_name}.exit"
+  local script_tmp=""
+  local remote_status=""
+  local deadline=$((SECONDS + remote_job_timeout))
+
+  script_tmp="$(mktemp)"
+  {
+    cat <<'EOF'
+#!/usr/bin/env bash
+set -uo pipefail
+trap 'status=$?; printf "%s\n" "$status" > "${REMOTE_EXIT}"' EXIT
+set -e
+EOF
+    cat
+  } > "${script_tmp}"
+
+  "${ssh_base[@]}" "mkdir -p '${vm_output_dir}'"
+  "${scp_base[@]}" "${script_tmp}" "administrator@127.0.0.1:${remote_script_path}"
+  rm -f "${script_tmp}"
+
+  "${ssh_base[@]}" "chmod +x '${remote_script_path}' && rm -f '${remote_log_path}' '${remote_exit_path}' && nohup env REMOTE_EXIT='${remote_exit_path}' REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash '${remote_script_path}' > '${remote_log_path}' 2>&1 < /dev/null &"
+
+  while (( SECONDS < deadline )); do
+    if remote_status="$("${ssh_base[@]}" "if [[ -f '${remote_exit_path}' ]]; then cat '${remote_exit_path}'; else exit 42; fi" 2>/dev/null)"; then
+      remote_status="$(printf '%s' "${remote_status}" | tr -d '[:space:]')"
+      "${ssh_base[@]}" "cat '${remote_log_path}' 2>/dev/null || true"
+      if [[ ! "${remote_status}" =~ ^[0-9]+$ ]]; then
+        remote_status=1
+      fi
+      return "${remote_status}"
+    fi
+    if [[ -n "${launcher_pid:-}" ]] && ! kill -0 "${launcher_pid}" 2>/dev/null; then
+      echo "[ERROR] VM launcher exited while waiting for remote job '${job_name}'" >&2
+      tail -n 120 "${launcher_log}" >&2 || true
+      return 1
+    fi
+    sleep "${poll_delay}"
+  done
+
+  echo "[ERROR] Timed out waiting for remote job '${job_name}'" >&2
+  "${ssh_base[@]}" "tail -n 120 '${remote_log_path}' 2>/dev/null || true" >&2 || true
+  return 124
+}
+
 run_remote_capture() {
   local remote_repo="$1"
   local remote_panel_root="${remote_repo}/home/features/desktop/window-managers/shared/panel/quickshell"
@@ -266,7 +331,7 @@ run_remote_capture() {
       remote_cmd="bash '${remote_panel_root}/scripts/capture-panel-matrix.sh' --repo-shell --skip-settings --output-dir '${vm_output_dir}'"
       ;;
     settings-qa)
-      "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+      run_remote_background_script "${remote_panel_root}" "settings-qa" <<'EOF'
 set -euo pipefail
 
 mkdir -p "${VM_OUTPUT_DIR}"
@@ -279,7 +344,7 @@ EOF
       return $?
       ;;
     gate)
-      "${ssh_base[@]}" "REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+      run_remote_background_script "${remote_panel_root}" "gate" <<'EOF'
 set -uo pipefail
 
 mkdir -p "${VM_OUTPUT_DIR}"
@@ -455,7 +520,7 @@ copy_artifacts_home() {
 }
 
 write_summary() {
-  local remote_exit="$1"
+  local remote_exit="${1:-1}"
   local overall_status="pass"
   local runtime_status="n/a"
   local settings_status="n/a"
@@ -480,7 +545,7 @@ write_summary() {
     settings_status=$([[ "${remote_exit}" -eq 0 ]] && printf 'pass' || printf 'fail')
   fi
 
-  if [[ "${remote_exit}" -ne 0 ]]; then
+  if [[ "${remote_exit}" -ne 0 ]] || [[ "${runtime_status}" == "fail" ]] || [[ "${settings_status}" == "fail" ]]; then
     overall_status="fail"
   fi
 
@@ -498,17 +563,17 @@ write_summary() {
 }
 EOF
 
-  cat > "${output_dir}/summary.md" <<EOF
-# Hyprland VM QA Summary
-
-- mode: \`${capture_mode}\`
-- status: \`${overall_status}\`
-- remote exit: \`${remote_exit}\`
-- runtime: \`${runtime_status}\`
-- settings: \`${settings_status}\`
-- artifacts: \`${output_dir}\`
-- launcher log: \`${output_dir}/launcher.log\`
-EOF
+  printf '%s\n' \
+    '# Hyprland VM QA Summary' \
+    '' \
+    "- mode: \`${capture_mode}\`" \
+    "- status: \`${overall_status}\`" \
+    "- remote exit: \`${remote_exit}\`" \
+    "- runtime: \`${runtime_status}\`" \
+    "- settings: \`${settings_status}\`" \
+    "- artifacts: \`${output_dir}\`" \
+    "- launcher log: \`${output_dir}/launcher.log\`" \
+    > "${output_dir}/summary.md"
 }
 
 echo "[INFO] Launching Hyprland test VM on SSH port ${ssh_port}"
