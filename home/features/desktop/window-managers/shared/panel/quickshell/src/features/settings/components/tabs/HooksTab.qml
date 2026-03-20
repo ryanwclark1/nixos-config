@@ -173,6 +173,13 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    label: "Ghostty Colors"
+                    icon: "󰊠"
+                    configKey: "colorExportGhostty"
+                    description: "Write ghostty config fragment (add config-file = ~/.local/state/quickshell/ghostty-colors to ghostty config)"
+                }
+
+                SettingsToggleRow {
                     label: "Kitty Remote Colors"
                     icon: "󰄛"
                     configKey: "colorExportKitty"
