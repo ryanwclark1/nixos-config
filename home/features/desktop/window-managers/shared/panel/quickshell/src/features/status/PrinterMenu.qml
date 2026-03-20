@@ -39,7 +39,7 @@ BasePopupMenu {
     },
     // Refresh button
     SharedWidgets.IconButton {
-      icon: "󰑐"
+      icon: "arrow-clockwise.svg"
       tooltipText: "Refresh"
       onClicked: PrinterService.refresh()
     }

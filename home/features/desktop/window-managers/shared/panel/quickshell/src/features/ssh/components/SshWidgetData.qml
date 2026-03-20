@@ -631,7 +631,7 @@ QtObject {
             if (!enableSshConfigImport) {
                 actions.push({
                     label: "Enable SSH config import",
-                    icon: "󰑐",
+                    icon: "arrow-clockwise.svg",
                     action: function() {
                         root.setImportEnabled(true);
                     }
@@ -662,7 +662,7 @@ QtObject {
         if (enableSshConfigImport) {
             actions.push({
                 label: importBusy ? "Refreshing import..." : "Refresh SSH config import",
-                icon: "󰑐",
+                icon: "arrow-clockwise.svg",
                 enabled: !importBusy,
                 action: function() {
                     root.refreshImport();

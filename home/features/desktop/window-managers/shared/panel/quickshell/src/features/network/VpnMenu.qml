@@ -46,7 +46,7 @@ BasePopupMenu {
 
     headerExtras: [
         SharedWidgets.IconButton {
-            icon: "󰑐"
+            icon: "arrow-clockwise.svg"
             tooltipText: "Refresh"
             onClicked: NetworkService.refreshData()
         },

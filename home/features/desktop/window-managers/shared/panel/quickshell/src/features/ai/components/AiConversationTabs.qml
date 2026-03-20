@@ -103,7 +103,7 @@ RowLayout {
             },
             {
                 label: "Close",
-                icon: "󰅖",
+                icon: "dismiss.svg",
                 danger: true,
                 action: function() {
                     _closeConversationWithUndo(conv.id, AiService.isStreaming && AiService.activeConversationId === conv.id);

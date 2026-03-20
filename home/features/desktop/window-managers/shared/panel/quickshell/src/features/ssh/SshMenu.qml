@@ -138,7 +138,7 @@ BasePopupMenu {
     },
     SharedWidgets.IconButton {
       visible: sshData.enableSshConfigImport
-      icon: "󰑐"
+      icon: "arrow-clockwise.svg"
       tooltipText: "Refresh SSH config"
       onClicked: sshData.refreshImport()
     }
