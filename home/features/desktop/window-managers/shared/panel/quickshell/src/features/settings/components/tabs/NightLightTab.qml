@@ -47,7 +47,7 @@ Item {
 
         SettingsCard {
             title: "Auto Schedule"
-            iconName: "󰔠"
+            iconName: "clock.svg"
             description: "Automatically enable night light on a schedule."
 
             SettingsToggleRow {
@@ -80,7 +80,7 @@ Item {
         SettingsCard {
             visible: Config.nightLightAutoSchedule && Config.nightLightScheduleMode === "time"
             title: "Fixed Time Schedule"
-            iconName: "󰥔"
+            iconName: "clock-filled.svg"
             description: "Set specific times to enable and disable night light."
 
             SettingsSliderRow {
@@ -123,7 +123,7 @@ Item {
         SettingsCard {
             visible: Config.nightLightAutoSchedule && Config.nightLightScheduleMode === "sunrise_sunset"
             title: "Location"
-            iconName: "󰍎"
+            iconName: "compass.svg"
             description: "Coordinates for sunrise/sunset calculation."
 
             SettingsTextInputRow {

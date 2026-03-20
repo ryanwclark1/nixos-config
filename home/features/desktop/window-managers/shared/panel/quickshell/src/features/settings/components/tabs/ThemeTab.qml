@@ -474,7 +474,7 @@ Item {
 
         SettingsCard {
             title: "Auto Schedule"
-            iconName: "󰔠"
+            iconName: "clock.svg"
             description: "Automatically switch between dark and light themes on a schedule."
 
             SettingsToggleRow {
@@ -522,7 +522,7 @@ Item {
 
         SettingsCard {
             title: "Schedule Times"
-            iconName: "󰥔"
+            iconName: "clock-filled.svg"
             description: "Set when to switch to dark and light themes."
             visible: Config.themeAutoScheduleEnabled && Config.themeAutoScheduleMode === "time"
 
@@ -563,7 +563,7 @@ Item {
 
         SettingsCard {
             title: "Location"
-            iconName: "󰍎"
+            iconName: "compass.svg"
             description: "Coordinates for sunrise/sunset theme switching."
             visible: Config.themeAutoScheduleEnabled && Config.themeAutoScheduleMode === "sunrise_sunset"
 

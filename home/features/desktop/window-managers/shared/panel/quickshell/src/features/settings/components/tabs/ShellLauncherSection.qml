@@ -418,11 +418,11 @@ Item {
             visible: root.isLauncherGeneralSection
             Layout.fillWidth: true
             title: "Launcher Behavior"
-            iconName: "󰍉"
+            iconName: "search-visual.svg"
             description: "Choose the default launcher behavior and opening mode."
 
             SettingsInfoCallout {
-                iconName: "󰛢"
+                iconName: "globe-search.svg"
                 title: "Dedicated launcher settings"
                 body: "Launcher controls now live under their own settings section so search, modes, home layout, and diagnostics are easier to tune without digging through Shell settings."
             }
@@ -551,7 +551,7 @@ Item {
             visible: root.isLauncherSearchSection
             Layout.fillWidth: true
             title: "Search Limits"
-            iconName: "󰔛"
+            iconName: "clock.svg"
             description: "Tune search breadth, file query thresholds, and response timing."
 
             SettingsSliderRow {
@@ -732,7 +732,7 @@ Item {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
             title: "Web Search Behavior"
-            iconName: "󰖟"
+            iconName: "globe-search.svg"
             description: "Web-mode defaults and keyboard behavior."
 
             SettingsFieldGrid {
@@ -762,7 +762,7 @@ Item {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
             title: "Web Providers"
-            iconName: "󰛢"
+            iconName: "globe-search.svg"
             description: "Enable providers and control the order shown in web mode."
 
             SettingsSectionLabel {
@@ -959,7 +959,7 @@ Item {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
             title: "Web Aliases"
-            iconName: "󰖟"
+            iconName: "globe-search.svg"
             description: "Customize short prefixes for each provider."
 
             SettingsSectionLabel {
@@ -967,7 +967,7 @@ Item {
             }
 
             SettingsInfoCallout {
-                iconName: "󰛢"
+                iconName: "globe-search.svg"
                 title: "Alias format"
                 body: "Enter aliases separated by commas. Example: g, gg"
             }
@@ -1013,7 +1013,7 @@ Item {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
             title: "Custom Search Engines"
-            iconName: "󰖟"
+            iconName: "globe-search.svg"
             description: "Add your own search engines with URL templates. Use %s as the query placeholder."
 
             SettingsSectionLabel {
@@ -1080,7 +1080,7 @@ Item {
 
             SettingsInfoCallout {
                 visible: !Array.isArray(Config.launcherWebCustomEngines) || Config.launcherWebCustomEngines.length === 0
-                iconName: "󰛢"
+                iconName: "globe-search.svg"
                 title: "No custom engines"
                 body: "Add a custom search engine below. It will appear in the web provider list."
             }
@@ -1162,7 +1162,7 @@ Item {
             }
 
             SettingsInfoCallout {
-                iconName: "󰛢"
+                iconName: "globe-search.svg"
                 title: "How bangs work"
                 body: "Type ?!prefix query in web mode. The bang database must be synced first using the button below."
             }
@@ -1205,11 +1205,11 @@ Item {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
             title: "Launcher Presets"
-            iconName: "󰌌"
+            iconName: "keyboard.svg"
             description: "Choose a focused default set, an extended power-user set, or everything."
 
             SettingsInfoCallout {
-                iconName: "󰛢"
+                iconName: "globe-search.svg"
                 title: "Sidebar vs advanced"
                 body: "Primary sidebar modes stay visible in the launcher. Advanced modes stay enabled, but live behind More and their prefixes."
             }
@@ -1248,7 +1248,7 @@ Item {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
             title: "Primary Sidebar"
-            iconName: "󰍉"
+            iconName: "search-visual.svg"
             description: "These modes stay pinned in the launcher sidebar."
 
             LauncherModeList {
@@ -1280,7 +1280,7 @@ Item {
             description: "These modes stay enabled behind More. Prefix-first modes remain one keystroke away."
 
             SettingsInfoCallout {
-                iconName: "󰛢"
+                iconName: "globe-search.svg"
                 title: "Prefix-first modes"
                 body: "Settings, Run, SSH, and Web stay visible under the search field as prefix shortcuts even when they are not pinned in the sidebar."
             }
@@ -1307,7 +1307,7 @@ Item {
 
             SettingsInfoCallout {
                 visible: root.orderedAdvancedModes().length === 0
-                iconName: "󰛢"
+                iconName: "globe-search.svg"
                 title: "No advanced modes"
                 body: "Enable another launcher mode to keep it available behind More."
             }
@@ -1350,7 +1350,7 @@ Item {
             visible: root.isLauncherRuntimeSection
             Layout.fillWidth: true
             title: "Runtime Behavior"
-            iconName: "󰔟"
+            iconName: "timer.svg"
             description: "Preload policy and runtime metric visibility."
 
             SettingsFieldGrid {
@@ -1431,7 +1431,7 @@ Item {
             SettingsActionButton {
                 Layout.fillWidth: true
                 label: "Launcher Diagnostic Reset"
-                iconName: "󰔟"
+                iconName: "timer.svg"
                 compact: true
                 onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "diagnosticReset"])
             }

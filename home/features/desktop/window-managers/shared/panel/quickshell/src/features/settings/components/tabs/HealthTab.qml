@@ -151,7 +151,7 @@ Item {
         // System Vitals
         SettingsCard {
             title: "System Vitals"
-            iconName: "󰍛"
+            iconName: "board.svg"
             description: "Current resource usage and temperatures."
 
             Repeater {

@@ -254,7 +254,7 @@ Item {
 
             SettingsCard {
                 title: "Timeouts"
-                iconName: "󰔛"
+                iconName: "clock.svg"
                 description: "How long popups stay visible per urgency level. Set to 0 for persistent."
 
                 ColumnLayout {

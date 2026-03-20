@@ -33,7 +33,7 @@ Item {
 
         SettingsCard {
             title: "Display"
-            iconName: "󰍹"
+            iconName: "desktop.svg"
             description: "Visual helpers and idle inhibition behavior."
 
             SettingsFieldGrid {

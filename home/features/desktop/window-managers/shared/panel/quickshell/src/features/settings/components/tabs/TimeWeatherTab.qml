@@ -74,7 +74,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Time & Weather"
-        iconName: "󰔛"
+        iconName: "clock.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -311,7 +311,7 @@ Item {
 
             SettingsCard {
                 title: "Time Format"
-                iconName: "󰔛"
+                iconName: "clock.svg"
                 description: "Clock format and bar date display options."
 
                 SettingsFieldGrid {

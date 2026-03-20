@@ -179,7 +179,7 @@ Item {
 
             SettingsCard {
                 title: "Saved Presets"
-                iconName: "󰋊"
+                iconName: "hard-drive.svg"
                 description: "Load or delete previously saved configuration snapshots."
 
                 SharedWidgets.EmptyState {

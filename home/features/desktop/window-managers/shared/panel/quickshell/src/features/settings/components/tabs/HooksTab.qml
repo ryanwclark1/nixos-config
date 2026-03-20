@@ -30,7 +30,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Hooks"
-        iconName: "󱁨"
+        iconName: "code.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -115,7 +115,7 @@ Item {
 
             SettingsCard {
                 title: "Hook System"
-                iconName: "󱁨"
+                iconName: "code.svg"
                 description: "Run scripts when system events occur. Place executable scripts in ~/.config/quickshell/hooks/ or set custom paths below."
 
                 SettingsToggleRow {

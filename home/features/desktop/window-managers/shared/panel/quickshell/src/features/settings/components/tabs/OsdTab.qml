@@ -31,7 +31,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "On-Screen Display"
-        iconName: "󰍡"
+        iconName: "speaker-settings.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -116,7 +116,7 @@ Item {
 
             SettingsCard {
                 title: "Position"
-                iconName: "󰍡"
+                iconName: "speaker-settings.svg"
                 description: "Where on-screen indicators appear."
 
                 SettingsModeRow {
@@ -203,7 +203,7 @@ Item {
 
             SettingsCard {
                 title: "Timing & Size"
-                iconName: "󰔛"
+                iconName: "clock.svg"
                 description: "Display duration and physical OSD scale."
 
                 SettingsSliderRow {

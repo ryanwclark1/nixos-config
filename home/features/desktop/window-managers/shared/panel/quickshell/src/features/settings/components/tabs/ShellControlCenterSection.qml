@@ -84,7 +84,7 @@ Item {
         }
 
         SettingsInfoCallout {
-            iconName: "󰛢"
+            iconName: "globe-search.svg"
             title: "Drag layout"
             body: "Drag rows to control the order inside the Control Center. Hidden toggles and plugin widgets stay in this list so you can stage their position before turning them back on."
         }
