@@ -20,7 +20,7 @@ load_graphics_session_env() {
     [[ -n "${value}" ]] || continue
 
     case "${key}" in
-      XDG_RUNTIME_DIR|DBUS_SESSION_BUS_ADDRESS|DISPLAY|HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE)
+      XDG_RUNTIME_DIR|XDG_STATE_HOME|DBUS_SESSION_BUS_ADDRESS|DISPLAY|HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE|TMPDIR)
         if [[ -z "${!key:-}" ]]; then
           printf -v "${key}" '%s' "${value}"
           export "${key}"
@@ -32,6 +32,23 @@ load_graphics_session_env() {
   if [[ -z "${QT_QPA_PLATFORM:-}" && ( -n "${WAYLAND_DISPLAY:-}" || -n "${NIRI_SOCKET:-}" ) ]]; then
     export QT_QPA_PLATFORM=wayland
   fi
+}
+
+build_repo_shell_env_array() {
+  local array_name="${1:?missing output array name}"
+  shift
+  local -n out_ref="${array_name}"
+  local key=""
+  local value=""
+
+  load_graphics_session_env
+
+  out_ref=("$@")
+  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE DISPLAY XDG_STATE_HOME TMPDIR QT_QPA_PLATFORM; do
+    value="${!key:-}"
+    [[ -n "${value}" ]] || continue
+    out_ref+=("${key}=${value}")
+  done
 }
 
 niri_headless_without_outputs() {

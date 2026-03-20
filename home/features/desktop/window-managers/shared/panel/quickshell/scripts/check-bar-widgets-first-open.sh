@@ -86,60 +86,7 @@ handle_termination() {
 }
 
 populate_repo_shell_env() {
-  local line=""
-  local key=""
-  local value=""
-  local has_wayland_session=0
-  local found_graphics_env=0
-
-  repo_shell_env=()
-  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
-  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE DISPLAY; do
-    value="${!key:-}"
-    if [[ -n "${value}" ]]; then
-      repo_shell_env+=("${key}=${value}")
-      case "${key}" in
-        HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
-          found_graphics_env=1
-          ;;&
-        WAYLAND_DISPLAY|NIRI_SOCKET)
-          has_wayland_session=1
-          ;;
-      esac
-    fi
-  done
-
-  if (( found_graphics_env == 1 )); then
-    if (( has_wayland_session == 1 )); then
-      repo_shell_env+=("QT_QPA_PLATFORM=wayland")
-    fi
-    return 0
-  fi
-
-  while IFS= read -r line; do
-    [[ "${line}" == *=* ]] || continue
-    key="${line%%=*}"
-    value="${line#*=}"
-    case "${key}" in
-      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE|DISPLAY)
-        if [[ -n "${value}" ]]; then
-          repo_shell_env+=("${key}=${value}")
-          case "${key}" in
-            HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
-              found_graphics_env=1
-              ;;&
-            WAYLAND_DISPLAY|NIRI_SOCKET)
-              has_wayland_session=1
-              ;;
-          esac
-        fi
-        ;;
-    esac
-  done < <(systemctl --user show-environment 2>/dev/null || true)
-
-  if (( has_wayland_session == 1 )); then
-    repo_shell_env+=("QT_QPA_PLATFORM=wayland")
-  fi
+  build_repo_shell_env_array repo_shell_env "QS_DISABLE_NOTIFICATION_SERVER=1"
 }
 
 start_repo_shell() {
@@ -243,17 +190,7 @@ discover_instance() {
 }
 
 load_quickshell_env() {
-  local env_dump
-  env_dump="$(systemctl --user show-environment)"
-  export XDG_RUNTIME_DIR="$(printf '%s\n' "${env_dump}" | sed -n 's/^XDG_RUNTIME_DIR=//p' | head -n1)"
-  export DBUS_SESSION_BUS_ADDRESS="$(printf '%s\n' "${env_dump}" | sed -n 's/^DBUS_SESSION_BUS_ADDRESS=//p' | head -n1)"
-  export DISPLAY="$(printf '%s\n' "${env_dump}" | sed -n 's/^DISPLAY=//p' | head -n1)"
-  export HYPRLAND_INSTANCE_SIGNATURE="$(printf '%s\n' "${env_dump}" | sed -n 's/^HYPRLAND_INSTANCE_SIGNATURE=//p' | head -n1)"
-  export WAYLAND_DISPLAY="$(printf '%s\n' "${env_dump}" | sed -n 's/^WAYLAND_DISPLAY=//p' | head -n1)"
-  export NIRI_SOCKET="$(printf '%s\n' "${env_dump}" | sed -n 's/^NIRI_SOCKET=//p' | head -n1)"
-  export XDG_CURRENT_DESKTOP="$(printf '%s\n' "${env_dump}" | sed -n 's/^XDG_CURRENT_DESKTOP=//p' | head -n1)"
-  export DESKTOP_SESSION="$(printf '%s\n' "${env_dump}" | sed -n 's/^DESKTOP_SESSION=//p' | head -n1)"
-  export XDG_SESSION_TYPE="$(printf '%s\n' "${env_dump}" | sed -n 's/^XDG_SESSION_TYPE=//p' | head -n1)"
+  load_graphics_session_env
 
   [[ -n "${XDG_RUNTIME_DIR:-}" ]] || {
     printf 'quickshell environment is missing XDG_RUNTIME_DIR.\n' >&2

@@ -6,6 +6,7 @@ runtime_pid_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-pid"
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
 
+source "${script_dir}/graphics-session-env.sh"
 source "${script_dir}/runtime-warning-filter.sh"
 instance_id=""
 instance_pid=""
@@ -91,60 +92,7 @@ handle_termination() {
 }
 
 populate_repo_shell_env() {
-  local line=""
-  local key=""
-  local value=""
-  local has_wayland_session=0
-  local found_graphics_env=0
-
-  repo_shell_env=()
-  repo_shell_env+=("QS_DISABLE_NOTIFICATION_SERVER=1")
-  for key in HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY NIRI_SOCKET XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_SESSION_TYPE DISPLAY; do
-    value="${!key:-}"
-    if [[ -n "${value}" ]]; then
-      repo_shell_env+=("${key}=${value}")
-      case "${key}" in
-        HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
-          found_graphics_env=1
-          ;;&
-        WAYLAND_DISPLAY|NIRI_SOCKET)
-          has_wayland_session=1
-          ;;
-      esac
-    fi
-  done
-
-  if (( found_graphics_env == 1 )); then
-    if (( has_wayland_session == 1 )); then
-      repo_shell_env+=("QT_QPA_PLATFORM=wayland")
-    fi
-    return 0
-  fi
-
-  while IFS= read -r line; do
-    [[ "${line}" == *=* ]] || continue
-    key="${line%%=*}"
-    value="${line#*=}"
-    case "${key}" in
-      HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|XDG_CURRENT_DESKTOP|DESKTOP_SESSION|XDG_SESSION_TYPE|DISPLAY)
-        if [[ -n "${value}" ]]; then
-          repo_shell_env+=("${key}=${value}")
-          case "${key}" in
-            HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY)
-              found_graphics_env=1
-              ;;&
-            WAYLAND_DISPLAY|NIRI_SOCKET)
-              has_wayland_session=1
-              ;;
-          esac
-        fi
-        ;;
-    esac
-  done < <(systemctl --user show-environment 2>/dev/null || true)
-
-  if (( has_wayland_session == 1 )); then
-    repo_shell_env+=("QT_QPA_PLATFORM=wayland")
-  fi
+  build_repo_shell_env_array repo_shell_env "QS_DISABLE_NOTIFICATION_SERVER=1"
 }
 
 start_repo_shell() {
