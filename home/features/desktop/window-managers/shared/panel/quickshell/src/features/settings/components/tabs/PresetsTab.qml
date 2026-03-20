@@ -27,11 +27,11 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Presets"
-        iconName: "󰆓"
+        iconName: "save.svg"
 
         SettingsCard {
             title: "Save Current Configuration"
-            iconName: "󰆓"
+            iconName: "save.svg"
             description: "Save a snapshot of your current settings as a named preset."
 
             SettingsTextInputRow {
@@ -52,7 +52,7 @@ Item {
 
             SettingsActionButton {
                 label: "Save Preset"
-                iconName: "󰆓"
+                iconName: "save.svg"
                 emphasized: true
                 enabled: root._presetName.trim().length > 0
                 onClicked: {

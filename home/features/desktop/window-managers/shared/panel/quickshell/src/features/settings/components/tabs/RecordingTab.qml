@@ -195,7 +195,7 @@ Item {
 
             SettingsCard {
                 title: "Audio"
-                iconName: "󰕾"
+                iconName: "speaker.svg"
                 description: "Choose which audio sources are included by default."
 
                 SettingsToggleRow {
@@ -222,7 +222,7 @@ Item {
 
             SettingsCard {
                 title: "Storage"
-                iconName: "󰉋"
+                iconName: "folder.svg"
                 description: "Leave blank to use the default Videos directory."
 
                 SettingsTextInputRow {

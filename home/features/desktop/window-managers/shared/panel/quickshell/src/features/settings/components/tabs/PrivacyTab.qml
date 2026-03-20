@@ -13,11 +13,11 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Privacy"
-        iconName: "󰒃"
+        iconName: "shield.svg"
 
         SettingsCard {
             title: "Indicators"
-            iconName: "󰒃"
+            iconName: "shield.svg"
             description: "Show active privacy-sensitive device usage in the bar."
 
             SettingsFieldGrid {
@@ -36,7 +36,7 @@ Item {
             }
 
             SettingsInfoCallout {
-                iconName: "󰋗"
+                iconName: "info.svg"
                 title: "Privacy indicators"
                 body: "Indicators appear in the bar when microphone, camera, or screen sharing is active."
             }

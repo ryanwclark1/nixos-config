@@ -110,7 +110,7 @@ Item {
 
                     SettingsActionButton {
                         label: "Clear Theme"
-                        iconName: "󰅖"
+                        iconName: "dismiss.svg"
                         compact: true
                         onClicked: ThemeService.clearTheme()
                     }

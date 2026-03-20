@@ -602,7 +602,7 @@ Item {
 
             SettingsInfoCallout {
                 visible: !root.launcherFilePreviewToggleAvailable
-                iconName: "󰋗"
+                iconName: "info.svg"
                 title: "File Preview Temporarily Disabled"
                 body: "The file preview pane is gated off by default while a QuickShell restart issue in files mode is being root-caused. Set QS_ENABLE_UNSTABLE_LAUNCHER_FILE_PREVIEW=1 only for debugging."
             }

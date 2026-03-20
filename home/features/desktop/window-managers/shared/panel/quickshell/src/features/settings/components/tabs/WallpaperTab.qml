@@ -338,7 +338,7 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Wallpaper"
-        iconName: "󰸉"
+        iconName: "image.svg"
 
         // Monitor selector (shown only when >1 monitor)
         ColumnLayout {
@@ -779,7 +779,7 @@ Item {
 
         // Info callout
         SettingsInfoCallout {
-            iconName: "󰋗"
+            iconName: "info.svg"
             title: "Wallpaper search directories"
             body: "Requires swww, hyprpaper, or swaybg to apply wallpapers."
 

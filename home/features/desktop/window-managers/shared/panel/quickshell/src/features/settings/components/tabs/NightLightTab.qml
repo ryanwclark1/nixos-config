@@ -13,11 +13,11 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Night Light"
-        iconName: "󰖔"
+        iconName: "weather-moon.svg"
 
         SettingsCard {
             title: "Night Light"
-            iconName: "󰖔"
+            iconName: "weather-moon.svg"
             description: "Reduce blue light to ease eye strain at night."
 
             SettingsToggleRow {
@@ -39,7 +39,7 @@ Item {
             }
 
             SettingsInfoCallout {
-                iconName: "󰋗"
+                iconName: "info.svg"
                 title: "Color temperature"
                 body: "Lower values (2500 K) are warmer and more orange. Higher values (6500 K) are cooler and more blue."
             }

@@ -22,7 +22,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Lock Screen"
-        iconName: "󰌾"
+        iconName: "lock-closed.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -112,7 +112,7 @@ Item {
 
             SettingsCard {
                 title: "Features"
-                iconName: "󰌾"
+                iconName: "lock-closed.svg"
                 description: "Lock screen modules and pre-lock countdown timing."
 
                 SettingsFieldGrid {

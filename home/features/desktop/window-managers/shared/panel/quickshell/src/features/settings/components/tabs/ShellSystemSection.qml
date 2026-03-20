@@ -14,7 +14,7 @@ Item {
         id: card
         anchors.fill: parent
         title: "Shell"
-        iconName: "󰒓"
+        iconName: "settings.svg"
         description: "Core shell visuals and transient notification behavior."
 
         SettingsFieldGrid {

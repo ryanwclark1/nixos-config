@@ -55,7 +55,7 @@ Item {
 
                 SettingsActionButton {
                     label: "Open"
-                    iconName: "󰉋"
+                    iconName: "folder.svg"
                     compact: true
                     onClicked: Quickshell.execDetached(["xdg-open", HookService.hookDir])
                 }

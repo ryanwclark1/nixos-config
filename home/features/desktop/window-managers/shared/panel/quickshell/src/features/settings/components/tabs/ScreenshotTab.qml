@@ -137,7 +137,7 @@ Item {
 
                 SettingsInfoCallout {
                     visible: Config.screenshotEditAfterCapture && Config.screenshotEditor === "none"
-                    iconName: "󰋗"
+                    iconName: "info.svg"
                     title: "No editor selected"
                     body: "\"Edit After Capture\" is enabled but no editor is selected. Choose Swappy or Satty above."
                 }

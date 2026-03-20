@@ -25,7 +25,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Background"
-        iconName: "󰸉"
+        iconName: "image.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -110,7 +110,7 @@ Item {
 
             SettingsCard {
                 title: "Desktop Background"
-                iconName: "󰸉"
+                iconName: "image.svg"
                 description: "Wallpaper overlays visible on the desktop background layer."
 
                 SettingsFieldGrid {

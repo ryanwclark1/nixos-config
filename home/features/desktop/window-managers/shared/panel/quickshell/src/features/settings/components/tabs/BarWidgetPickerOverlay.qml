@@ -64,7 +64,7 @@ Rectangle {
                 SettingsActionButton {
                     id: closePickerButton
                     compact: true
-                    iconName: "󰅖"
+                    iconName: "dismiss.svg"
                     label: "Close"
                     onClicked: root.closeRequested()
                 }

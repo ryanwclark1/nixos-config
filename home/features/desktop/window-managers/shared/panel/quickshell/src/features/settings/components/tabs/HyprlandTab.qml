@@ -150,7 +150,7 @@ Item {
 
                         SettingsActionButton {
                             compact: true
-                            iconName: "󰅖"
+                            iconName: "dismiss.svg"
                             label: "Delete"
                             onClicked: {
                                 var profiles = Config.displayProfiles.slice();

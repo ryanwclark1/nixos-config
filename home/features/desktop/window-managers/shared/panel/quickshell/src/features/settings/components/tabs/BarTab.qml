@@ -245,7 +245,7 @@ Item {
 
                                 SettingsActionButton {
                                     compact: true
-                                    iconName: "󰅖"
+                                    iconName: "dismiss.svg"
                                     label: "Remove"
                                     enabled: Config.barConfigs.length > 1
                                     onClicked: {

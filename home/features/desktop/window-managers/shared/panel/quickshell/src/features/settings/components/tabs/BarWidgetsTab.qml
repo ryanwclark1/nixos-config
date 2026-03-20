@@ -563,7 +563,7 @@ Item {
 
                                         SettingsActionButton {
                                             compact: true
-                                            iconName: "󰅖"
+                                            iconName: "dismiss.svg"
                                             label: "Remove"
                                             onClicked: root.removeWidget(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)
                                         }

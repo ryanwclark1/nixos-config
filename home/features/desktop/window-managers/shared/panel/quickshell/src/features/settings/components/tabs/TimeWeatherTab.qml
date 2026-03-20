@@ -368,7 +368,7 @@ Item {
 
             SettingsCard {
                 title: "Weather & Location"
-                iconName: "󰖔"
+                iconName: "weather-moon.svg"
                 description: "Weather units, source priority, and location inputs."
 
                 SettingsModeRow {
@@ -472,7 +472,7 @@ Item {
                     }
 
                     SettingsInfoCallout {
-                        iconName: "󰋗"
+                        iconName: "info.svg"
                         title: "Active location"
                         body: root.activeLocationSummary() + ". Source priority applies to both the standalone Weather menu and the Date & Time dropdown."
                     }
@@ -506,7 +506,7 @@ Item {
                     }
 
                     SettingsInfoCallout {
-                        iconName: "󰋗"
+                        iconName: "info.svg"
                         title: "Data Provider"
                         body: "Market data is fetched from Stooq. Use space or comma to separate multiple tickers. Use .US suffix for US stocks (e.g. AAPL.US) and ^ for indices."
                     }

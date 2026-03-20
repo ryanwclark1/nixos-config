@@ -604,7 +604,7 @@ Item {
 
                         SettingsActionButton {
                             label: "Remove"
-                            iconName: "󰅖"
+                            iconName: "dismiss.svg"
                             compact: true
                             Layout.alignment: Qt.AlignVCenter
                             onClicked: root._removeRule(index)
@@ -659,7 +659,7 @@ Item {
 
                     SettingsInfoCallout {
                         visible: root._newRuleAction === "timeout_override"
-                        iconName: "󰋗"
+                        iconName: "info.svg"
                         title: "Timeout Override"
                         body: "Applies the Low Urgency timeout to all notifications from this application, regardless of their urgency level."
                     }

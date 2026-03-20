@@ -23,7 +23,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Audio"
-        iconName: "󰕾"
+        iconName: "speaker.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -113,7 +113,7 @@ Item {
 
             SettingsCard {
                 title: "Volume Protection"
-                iconName: "󰕾"
+                iconName: "speaker.svg"
                 description: "Limit sudden volume jumps to protect hearing."
 
                 SettingsToggleRow {

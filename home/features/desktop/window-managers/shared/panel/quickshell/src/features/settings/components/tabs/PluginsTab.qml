@@ -349,7 +349,7 @@ Item {
                 SettingsActionButton {
                     id: scanPluginsButton
                     label: "Scan"
-                    iconName: "󰑐"
+                    iconName: "arrow-clockwise.svg"
                     compact: true
                     onClicked: PluginService.scanPlugins()
                 }
@@ -365,7 +365,7 @@ Item {
                 SettingsActionButton {
                     id: saveDiagnosticsButton
                     label: "Save Diagnostics"
-                    iconName: "󰆓"
+                    iconName: "save.svg"
                     compact: true
                     onClicked: root.savePluginDiagnostics()
                 }
@@ -607,7 +607,7 @@ Item {
                             SettingsActionButton {
                                 visible: PluginService.pluginSupportsSettings(modelData.id)
                                 compact: true
-                                iconName: "󰒓"
+                                iconName: "settings.svg"
                                 label: "Settings"
                                 onClicked: root.openPluginPane(modelData.id, "settings")
                             }
@@ -710,7 +710,7 @@ Item {
 
         SettingsCard {
             title: "Installation"
-            iconName: "󰋗"
+            iconName: "info.svg"
             description: "Plugin format and discovery location."
 
             SettingsInfoCallout {

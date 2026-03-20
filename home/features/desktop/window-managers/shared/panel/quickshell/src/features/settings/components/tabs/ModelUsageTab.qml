@@ -17,7 +17,7 @@ Item {
 
         SettingsCard {
             title: "Providers"
-            iconName: "󰒓"
+            iconName: "settings.svg"
             description: "Enable or disable usage tracking for each AI coding assistant."
 
             SettingsToggleRow {
