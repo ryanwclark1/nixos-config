@@ -158,7 +158,7 @@ Item {
 
             SettingsCard {
                 title: "OCR Language"
-                iconName: "󰗊"
+                iconName: "scan-text.svg"
                 description: "Tesseract language code for text recognition from screenshots."
 
                 SettingsModeRow {

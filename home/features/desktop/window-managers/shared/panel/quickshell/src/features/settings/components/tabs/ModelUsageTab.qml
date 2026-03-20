@@ -89,7 +89,7 @@ Item {
 
         SettingsCard {
             title: "Polling"
-            iconName: "󰔟"
+            iconName: "timer.svg"
             description: "How often to refresh usage data from local files."
 
             SettingsModeRow {

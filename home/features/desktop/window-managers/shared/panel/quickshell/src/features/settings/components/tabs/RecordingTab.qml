@@ -30,7 +30,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Recording"
-        iconName: "󰻃"
+        iconName: "video.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 

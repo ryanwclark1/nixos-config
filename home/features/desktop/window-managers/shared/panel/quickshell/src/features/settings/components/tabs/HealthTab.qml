@@ -37,7 +37,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Diagnostics"
-        iconName: "󰓅"
+        iconName: "timer.svg"
 
         // Overall Status
         SettingsCard {
@@ -184,7 +184,7 @@ Item {
             SettingsActionButton {
                 Layout.fillWidth: true
                 label: SystemStatus.isHealthChecking ? "Checking…" : "Run Health Check"
-                iconName: "󰓅"
+                iconName: "timer.svg"
                 emphasized: true
                 enabled: !SystemStatus.isHealthChecking
                 onClicked: SystemStatus.refreshHealth()

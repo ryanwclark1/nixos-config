@@ -46,7 +46,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "About"
-        iconName: "󰭹"
+        iconName: "info.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -131,7 +131,7 @@ Item {
 
             SettingsCard {
                 title: "System Info"
-                iconName: "󰘚"
+                iconName: "server.svg"
                 description: "Live host information from the current session."
 
                 Repeater {
@@ -187,7 +187,7 @@ Item {
 
             SettingsCard {
                 title: "Credits"
-                iconName: "󰀾"
+                iconName: "info.svg"
                 description: "Rendering stack and active theming source."
 
                 Text {

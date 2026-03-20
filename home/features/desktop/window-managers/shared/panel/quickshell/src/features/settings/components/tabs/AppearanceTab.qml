@@ -123,7 +123,7 @@ Item {
 
         SettingsCard {
             title: "Performance"
-            iconName: "󰓅"
+            iconName: "timer.svg"
             description: "Disable GPU-intensive features for lower-end hardware or battery savings."
 
             SettingsToggleRow {
@@ -161,7 +161,7 @@ Item {
 
         SettingsCard {
             title: "Typography"
-            iconName: "󰛖"
+            iconName: "text-t.svg"
             description: "Font families and sizing are appearance settings, independent from the active color theme."
 
             SettingsTextInputRow {
@@ -192,7 +192,7 @@ Item {
 
         SettingsCard {
             title: "Shape & Density"
-            iconName: "󰉵"
+            iconName: "color-palette.svg"
             description: "Tune scaling and responsiveness globally."
 
             SettingsSliderRow {

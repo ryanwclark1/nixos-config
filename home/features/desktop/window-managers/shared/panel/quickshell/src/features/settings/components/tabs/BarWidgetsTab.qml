@@ -585,7 +585,7 @@ Item {
 
                                         SettingsActionButton {
                                             compact: true
-                                            iconName: "󰍜"
+                                            iconName: "apps.svg"
                                             label: "Settings"
                                             enabled: BarWidgetRegistry.supportsSettings(widgetRow.widgetInstance.widgetType)
                                             onClicked: root.openWidgetSettings(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)

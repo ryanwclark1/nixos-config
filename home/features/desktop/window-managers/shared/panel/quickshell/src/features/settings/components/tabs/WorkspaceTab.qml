@@ -109,7 +109,7 @@ Item {
         }
         SettingsCard {
             description: "Show application icons inside workspace pills."
-            iconName: "󰀻"
+            iconName: "app-generic.svg"
             title: "App Icons"
 
             SettingsToggleRow {
@@ -132,7 +132,7 @@ Item {
         }
         SettingsCard {
             description: "Mouse wheel workspace switching on the workspace strip."
-            iconName: "󰍽"
+            iconName: "cursor-click.svg"
             title: "Scroll Behavior"
 
             SettingsToggleRow {
@@ -153,7 +153,7 @@ Item {
         }
         SettingsCard {
             description: "Notepad integration with workspaces."
-            iconName: "󱓧"
+            iconName: "arrow-sync.svg"
             title: "Notepad"
 
             SettingsToggleRow {

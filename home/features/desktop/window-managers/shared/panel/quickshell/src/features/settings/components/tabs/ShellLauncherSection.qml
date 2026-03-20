@@ -664,7 +664,7 @@ Item {
             visible: root.isLauncherSearchSection
             Layout.fillWidth: true
             title: "Result Scoring"
-            iconName: "󰀻"
+            iconName: "app-generic.svg"
             description: "Adjust how launcher results are ranked across labels, commands, and metadata."
 
             SettingsSectionLabel {
@@ -1339,7 +1339,7 @@ Item {
 
             SettingsInfoCallout {
                 visible: root.disabledLauncherModes().length === 0
-                iconName: "󰄬"
+                iconName: "checkmark.svg"
                 title: "Everything is enabled"
                 body: "Use disable on a primary or advanced mode if you want to remove it from launcher cycling entirely."
             }

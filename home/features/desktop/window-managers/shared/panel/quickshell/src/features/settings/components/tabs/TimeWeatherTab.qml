@@ -164,7 +164,7 @@ Item {
 
             SettingsCard {
                 title: "Preview"
-                iconName: "󰇙"
+                iconName: "data-pie.svg"
                 description: "Live preview for your top bar clock and the Date & Time menu weather strip."
 
                 Rectangle {
@@ -498,7 +498,7 @@ Item {
 
             SettingsCard {
                 title: "Markets"
-                iconName: "󱓗"
+                iconName: "data-trending.svg"
                 description: "Configure the tickers for your market widget."
 
                 ColumnLayout {

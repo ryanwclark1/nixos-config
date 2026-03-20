@@ -142,7 +142,7 @@ Item {
 
             SettingsCard {
                 title: "Layout"
-                iconName: "󰕰"
+                iconName: "options.svg"
                 description: "Dock position and icon sizing. If a bar uses the same edge on a display, the dock hides only on that display."
 
                 SettingsModeRow {

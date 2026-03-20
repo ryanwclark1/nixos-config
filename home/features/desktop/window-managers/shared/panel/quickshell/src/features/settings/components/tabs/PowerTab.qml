@@ -64,7 +64,7 @@ Item {
 
         SettingsCard {
             title: "Battery Alerts"
-            iconName: "󱃍"
+            iconName: "battery-full.svg"
             description: "Get notified when battery is running low."
 
             SettingsToggleRow {
@@ -102,7 +102,7 @@ Item {
 
         SettingsCard {
             title: "AC Power Profile"
-            iconName: "󰚥"
+            iconName: "power.svg"
             description: "Preferred idle timings while external power is connected."
 
             SettingsSliderRow {
@@ -153,7 +153,7 @@ Item {
 
         SettingsCard {
             title: "Battery Power Profile"
-            iconName: "󱟤"
+            iconName: "battery-saver.svg"
             description: "Preferred idle timings while running on battery."
 
             SettingsSliderRow {

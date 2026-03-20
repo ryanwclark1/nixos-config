@@ -250,7 +250,7 @@ Item {
 
                                 SettingsActionButton {
                                     label: "Load"
-                                    iconName: "󰦛"
+                                    iconName: "arrow-enter-left.svg"
                                     compact: true
                                     onClicked: PresetService.loadPreset(modelData.name)
                                 }

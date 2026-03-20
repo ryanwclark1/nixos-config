@@ -687,7 +687,7 @@ Item {
                                 SettingsActionButton {
                                     visible: PluginService.pluginSupportsControlCenterDetail(modelData.id)
                                     compact: true
-                                    iconName: "󰍐"
+                                    iconName: "pin.svg"
                                     label: "Detail"
                                     onClicked: root.openPluginPane(modelData.id, "detail")
                                 }

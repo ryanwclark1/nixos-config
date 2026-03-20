@@ -179,7 +179,7 @@ Item {
 
             SettingsCard {
                 title: "Popup Position"
-                iconName: "󰞕"
+                iconName: "open.svg"
                 description: "Where notification popups appear on-screen."
 
                 SettingsModeRow {
