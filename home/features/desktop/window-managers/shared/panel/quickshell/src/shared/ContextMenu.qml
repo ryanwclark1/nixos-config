@@ -152,13 +152,25 @@ Rectangle {
                         anchors.rightMargin: Colors.spacingS
                         spacing: Colors.spacingS
 
-                        Text {
+                        Loader {
                             visible: !!modelData.icon
-                            text: modelData.icon || ""
-                            color: modelData.danger ? Colors.error
+                            property string _icon: modelData.icon || ""
+                            property color _color: modelData.danger ? Colors.error
                                 : (modelData.disabled ? Colors.textDisabled : Colors.textSecondary)
-                            font.family: Colors.fontMono
-                            font.pixelSize: Colors.fontSizeMedium
+                            sourceComponent: _icon.endsWith(".svg") ? _ctxSvg : _ctxNerd
+                        }
+                        Component {
+                            id: _ctxSvg
+                            SvgIcon { source: parent._icon; color: parent._color; size: Colors.fontSizeMedium }
+                        }
+                        Component {
+                            id: _ctxNerd
+                            Text {
+                                text: parent._icon
+                                color: parent._color
+                                font.family: Colors.fontMono
+                                font.pixelSize: Colors.fontSizeMedium
+                            }
                         }
 
                         Text {

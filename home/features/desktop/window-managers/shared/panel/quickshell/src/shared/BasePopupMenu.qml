@@ -153,7 +153,7 @@ PopupWindow {
         }
 
         SharedWidgets.IconButton {
-          icon: "󰅖"
+          icon: "dismiss.svg"
           size: 32
           iconSize: Colors.fontSizeXL
           iconColor: Colors.textDisabled

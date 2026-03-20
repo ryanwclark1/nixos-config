@@ -16,6 +16,7 @@ QtObject {
 
   // ── Named constants ──────────────────────────
   readonly property int _refreshIntervalMs: 60000  // 1 min
+  readonly property int _retryIntervalMs: 10000    // 10s retry on failure
   readonly property int _configDebounceMs: 500
 
   // Deferred activation flag
@@ -30,7 +31,8 @@ QtObject {
     }
 
     var url = "https://stooq.com/q/l/?s=" + tickers + "&f=sd2t2ohlcv&h&e=json";
-    marketProc.command = ["curl", "-s", "--max-time", "15", url];
+    marketProc.command = ["curl", "-s", "--compressed", "--max-time", "15",
+      "-H", "User-Agent: quickshell-market/1.0", url];
     if (!marketProc.running) marketProc.running = true;
   }
 
@@ -45,15 +47,23 @@ QtObject {
     }
   }
 
+  property string _stderrText: ""
+
   property Process marketProc: Process {
     command: ["sh", "-c", "echo"]
     running: false
+    stderr: StdioCollector {
+      onStreamFinished: root._stderrText = String(this.text || "").trim()
+    }
     stdout: StdioCollector {
       onStreamFinished: {
         try {
           var raw = String(this.text || "").trim();
-          if (!raw) throw new Error("empty market response");
-          if (raw.indexOf("{") !== 0) throw new Error("response is not JSON");
+          if (!raw) {
+            var detail = root._stderrText || "no stderr";
+            throw new Error("empty market response (" + detail + ")");
+          }
+          if (raw.indexOf("{") !== 0) throw new Error("response is not JSON: " + raw.substring(0, 80));
           var json = JSON.parse(raw);
           if (!json.symbols) throw new Error("missing symbols in response");
 
@@ -62,6 +72,7 @@ QtObject {
           root._lastFailureKey = "";
         } catch (e) {
           root._reportFailure(String(e || "parse error"));
+          root._retryTimer.restart();
         }
       }
     }
@@ -72,6 +83,11 @@ QtObject {
     running: root._ready && root.subscriberCount > 0
     repeat: true
     triggeredOnStart: true
+    onTriggered: root.refresh()
+  }
+
+  property Timer _retryTimer: Timer {
+    interval: root._retryIntervalMs
     onTriggered: root.refresh()
   }
 

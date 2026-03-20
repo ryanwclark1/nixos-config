@@ -3,6 +3,6 @@ import "."
 import "../services"
 
 IconButton {
-  icon: "󰅖"
+  icon: "dismiss.svg"
   tooltipText: "Close"
 }

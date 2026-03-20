@@ -40,7 +40,7 @@ Rectangle {
             }
             Item { Layout.fillWidth: true }
             IconButton {
-                icon: "󰅖"
+                icon: "dismiss.svg"
                 size: 28; iconSize: 16
                 tooltipText: "Close"
                 onClicked: root.closeRequested()
