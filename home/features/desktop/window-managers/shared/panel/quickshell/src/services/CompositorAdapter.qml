@@ -145,6 +145,25 @@ QtObject {
   Component.onCompleted: {
     if (hasHyprlandToplevels && typeof Hyprland.refreshToplevels === "function")
       Hyprland.refreshToplevels();
+    // Seed MRU list from existing toplevels so AltTab works immediately
+    if (isHyprland)
+      Qt.callLater(_seedHyprlandMru);
+  }
+
+  function _seedHyprlandMru() {
+    if (_hyprlandMruIds.length > 0) return;
+    var tls = toplevels || [];
+    var ids = [];
+    var activeAddr = activeToplevel ? String(activeToplevel.address || "") : "";
+    if (activeAddr !== "")
+      ids.push(activeAddr);
+    for (var i = 0; i < tls.length; i++) {
+      var addr = String(tls[i].address || "");
+      if (addr !== "" && addr !== activeAddr)
+        ids.push(addr);
+    }
+    if (ids.length > 0)
+      _hyprlandMruIds = ids;
   }
 
   function windowTitle(windowRef) {
