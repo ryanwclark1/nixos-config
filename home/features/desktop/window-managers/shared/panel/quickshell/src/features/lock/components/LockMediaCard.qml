@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 Rectangle {
     implicitWidth: 320
@@ -35,11 +36,10 @@ Rectangle {
             }
         }
 
-        Text {
-            text: MediaService.isPlaying ? "󰏤" : "󰐊"
+        SharedWidgets.SvgIcon {
+            source: MediaService.isPlaying ? "pause.svg" : "play.svg"
             color: Colors.text
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeHuge
+            size: Appearance.fontSizeHuge
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor

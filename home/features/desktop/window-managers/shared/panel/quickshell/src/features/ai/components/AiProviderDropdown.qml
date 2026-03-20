@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
+import "../../../widgets" as SharedWidgets
 import "../services/AiProviders.js" as Providers
 
 // Floating dropdown for selecting the AI provider and model.
@@ -61,11 +63,10 @@ Rectangle {
                         color: isCurrent ? Colors.primary : Colors.text
                         Layout.fillWidth: true
                     }
-                    Text {
+                    SharedWidgets.SvgIcon {
                         visible: Providers.needsApiKey(modelData) && !AiService.apiKeyAvailable(modelData)
-                        text: "󰌆"
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeXS
+                        source: "lock-closed.svg"
+                        size: Appearance.fontSizeXS
                         color: Colors.warning
                     }
                 }

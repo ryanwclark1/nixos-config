@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../shared"
+import "../../../widgets" as SharedWidgets
 
 // Collapsible thinking block for extended-thinking model responses.
 // Instantiated via Loader; the Loader delegate provides `modelData` (blockData).
@@ -33,12 +34,11 @@ Rectangle {
         spacing: Appearance.spacingXS
 
         // Animated chevron
-        Text {
-            text: "\u{f0156}"
+        SharedWidgets.SvgIcon {
+            source: "sparkle.svg"
             rotation: root.expanded ? 0 : -90
             color: Colors.textDisabled
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeSmall
+            size: Appearance.fontSizeSmall
 
             Behavior on rotation {
                 Anim { duration: Appearance.durationFast }

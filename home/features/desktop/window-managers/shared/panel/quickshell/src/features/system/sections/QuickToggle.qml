@@ -57,7 +57,7 @@ Rectangle {
 
       Loader {
         anchors.centerIn: parent
-        sourceComponent: root.icon.endsWith(".svg") ? _qtSvg : _qtNerd
+        sourceComponent: String(root.icon).endsWith(".svg") ? _qtSvg : _qtNerd
       }
       Component { id: _qtSvg; SvgIcon { source: root.icon; color: active ? Colors.text : Colors.primary; size: Appearance.fontSizeXL } }
       Component { id: _qtNerd; Text { text: root.icon; color: active ? Colors.text : Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }
@@ -81,11 +81,10 @@ Rectangle {
     }
 
     // Drag Handle
-    Text {
-      text: "󰐚"
+    SharedWidgets.SvgIcon {
+      source: "chevron-right.svg"
       color: active ? Colors.withAlpha(Colors.text, 0.4) : Colors.textDisabled
-      font.family: Appearance.fontMono
-      font.pixelSize: Appearance.fontSizeSmall
+      size: Appearance.fontSizeSmall
       opacity: toggleMouse.containsMouse ? 1.0 : 0.0
       Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
     }

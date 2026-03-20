@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../../services"
 import "../../../shared"
+import "../../../widgets" as SharedWidgets
 
 // Code block for assistant messages with language label and copy button.
 // Instantiated via Loader; the Loader delegate provides `modelData` (blockData).
@@ -39,12 +40,11 @@ Rectangle {
             height: 20
             radius: Appearance.radiusMicro
             color: codeCopyHover.containsMouse ? Colors.bgWidget : "transparent"
-            Text {
+            SharedWidgets.SvgIcon {
                 anchors.centerIn: parent
-                text: "󰆏"
+                source: "copy.svg"
                 color: Colors.textSecondary
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeXS
+                size: Appearance.fontSizeXS
             }
             MouseArea {
                 id: codeCopyHover

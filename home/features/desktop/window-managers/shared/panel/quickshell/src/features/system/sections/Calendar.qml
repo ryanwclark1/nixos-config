@@ -115,12 +115,11 @@ ThemedContainer {
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
           Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
-        Text {
+        SharedWidgets.SvgIcon {
           anchors.centerIn: parent
-          text: "󰍞"
+          source: "chevron-left.svg"
           color: Colors.text
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeLarge
+          size: Appearance.fontSizeLarge
         }
       }
 
@@ -184,12 +183,11 @@ ThemedContainer {
           color: parent.containsMouse ? Colors.highlightLight : "transparent"
           Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         }
-        Text {
+        SharedWidgets.SvgIcon {
           anchors.centerIn: parent
-          text: "󰍟"
+          source: "chevron-right.svg"
           color: Colors.text
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeLarge
+          size: Appearance.fontSizeLarge
         }
       }
     }

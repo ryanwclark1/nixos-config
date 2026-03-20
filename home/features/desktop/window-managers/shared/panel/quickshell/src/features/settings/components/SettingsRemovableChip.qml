@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../services"
+import "../../../widgets" as SharedWidgets
 
 Rectangle {
     id: root
@@ -25,11 +26,10 @@ Rectangle {
             font.pixelSize: Appearance.fontSizeSmall
         }
 
-        Text {
-            text: "󰅖"
+        SharedWidgets.SvgIcon {
+            source: "dismiss.svg"
             color: Colors.textSecondary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeSmall
+            size: Appearance.fontSizeSmall
 
             MouseArea {
                 anchors.fill: parent

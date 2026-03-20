@@ -33,7 +33,7 @@ Rectangle {
 
             Loader {
                 anchors.centerIn: parent
-                sourceComponent: root.icon.endsWith(".svg") ? _qlSvg : _qlNerd
+                sourceComponent: String(root.icon).endsWith(".svg") ? _qlSvg : _qlNerd
             }
             Component { id: _qlSvg; Shared.SvgIcon { source: root.icon; color: Colors.primary; size: Appearance.fontSizeXL } }
             Component { id: _qlNerd; Text { text: root.icon; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL } }
@@ -61,11 +61,10 @@ Rectangle {
             }
         }
 
-        Text {
-            text: "󰄮"
+        SharedWidgets.SvgIcon {
+            source: "arrow-up-left.svg"
             color: Colors.textSecondary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeMedium
+            size: Appearance.fontSizeMedium
         }
     }
 

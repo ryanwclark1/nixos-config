@@ -274,12 +274,11 @@ RowLayout {
                             stateColor: Colors.error
                         }
 
-                        Text {
+                        SharedWidgets.SvgIcon {
                             anchors.centerIn: parent
-                            text: "󰅖"
+                            source: "dismiss.svg"
                             color: closeTabMouse.containsMouse ? "white" : Colors.textDisabled
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeXS
+                            size: Appearance.fontSizeXS
                         }
 
                         MouseArea {

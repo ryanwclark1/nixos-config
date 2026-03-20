@@ -115,11 +115,10 @@ ColumnLayout {
             anchors.centerIn: parent
             spacing: Appearance.spacingS
 
-            Text {
-                text: ""
+            SharedWidgets.SvgIcon {
+                source: "search-visual.svg"
                 color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeLarge
-                font.family: Appearance.fontMono
+                size: Appearance.fontSizeLarge
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -362,15 +361,14 @@ ColumnLayout {
                                         }
 
                                         // Close button (above cardMouse in z-stack)
-                                        Text {
+                                        SharedWidgets.SvgIcon {
                                             id: closeBtn
                                             anchors.right: parent.right
                                             anchors.top: parent.top
                                             anchors.margins: Appearance.spacingS
-                                            text: "󰅙"
+                                            source: "dismiss.svg"
                                             color: closeMouse.containsMouse ? Colors.error : Colors.textSecondary
-                                            font.pixelSize: Appearance.fontSizeLarge
-                                            font.family: Appearance.fontMono
+                                            size: Appearance.fontSizeLarge
                                             visible: cardMouse.containsMouse
 
                                             MouseArea {

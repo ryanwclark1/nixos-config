@@ -160,12 +160,11 @@ ColumnLayout {
                                                 }
                                             }
 
-                                            Text {
+                                            SharedWidgets.SvgIcon {
                                                 anchors.centerIn: parent
-                                                text: "󰅖"
+                                                source: "dismiss.svg"
                                                 color: Colors.text
-                                                font.family: Appearance.fontMono
-                                                font.pixelSize: Appearance.fontSizeMedium
+                                                size: Appearance.fontSizeMedium
                                             }
 
                                             MouseArea {

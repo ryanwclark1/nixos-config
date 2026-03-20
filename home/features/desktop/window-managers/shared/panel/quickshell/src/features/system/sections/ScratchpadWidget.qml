@@ -80,7 +80,7 @@ SharedWidgets.CardBase {
           RowLayout {
             id: scratchRow
             anchors.fill: parent; anchors.margins: Appearance.paddingSmall; spacing: Appearance.paddingSmall
-            Text { text: "󰐃"; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium; Layout.alignment: Qt.AlignTop }
+            SharedWidgets.SvgIcon { source: "pin.svg"; color: Colors.primary; size: Appearance.fontSizeMedium; Layout.alignment: Qt.AlignTop }
             ColumnLayout {
               Layout.fillWidth: true
               spacing: Appearance.spacingXXS
@@ -99,7 +99,7 @@ SharedWidgets.CardBase {
                 font.capitalization: Font.Capitalize
               }
             }
-            Text { text: "󰁔"; color: Colors.textDisabled; font.family: Appearance.fontMono }
+            SharedWidgets.SvgIcon { source: "arrow-enter-left.svg"; color: Colors.textDisabled; size: Appearance.fontSizeMedium }
           }
 
           SharedWidgets.StateLayer {

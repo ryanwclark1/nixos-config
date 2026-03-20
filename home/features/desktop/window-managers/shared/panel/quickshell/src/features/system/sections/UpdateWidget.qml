@@ -133,7 +133,7 @@ SharedWidgets.CardBase {
       Rectangle {
         width: 42; height: 42; radius: Appearance.radiusPill; color: Colors.secondary
         Layout.alignment: Qt.AlignTop
-        Text { anchors.centerIn: parent; text: "󰚰"; color: Colors.text; font.pixelSize: Appearance.fontSizeXL; font.family: Appearance.fontMono }
+        SharedWidgets.SvgIcon { anchors.centerIn: parent; source: "arrow-sync.svg"; color: Colors.text; size: Appearance.fontSizeXL }
       }
 
       Text {
