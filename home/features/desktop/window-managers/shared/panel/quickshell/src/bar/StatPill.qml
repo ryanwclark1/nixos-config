@@ -116,11 +116,9 @@ Item {
 
   Component {
     id: iconContent
-    Text {
-      text: root.icon
-      color: root.iconColor
-      font.pixelSize: Appearance.fontSizeMedium
-      font.family: Appearance.fontMono
+    Loader {
+      anchors.centerIn: parent
+      sourceComponent: root.icon.endsWith(".svg") ? _iconSvg : _iconNerd
     }
   }
 
@@ -129,12 +127,9 @@ Item {
     Column {
       spacing: 1
 
-      Text {
-        text: root.icon
-        color: root.iconColor
-        font.pixelSize: Appearance.fontSizeMedium
-        font.family: Appearance.fontMono
+      Loader {
         anchors.horizontalCenter: parent.horizontalCenter
+        sourceComponent: root.icon.endsWith(".svg") ? _compactSvg : _compactNerd
       }
 
       SharedWidgets.NumericText {
@@ -150,12 +145,9 @@ Item {
     Row {
       spacing: Appearance.spacingS
 
-      Text {
-        text: root.icon
-        color: root.iconColor
-        font.pixelSize: Appearance.fontSizeLarge
-        font.family: Appearance.fontMono
+      Loader {
         anchors.verticalCenter: parent.verticalCenter
+        sourceComponent: root.icon.endsWith(".svg") ? _wideSvg : _wideNerd
       }
 
       SharedWidgets.NumericText {
@@ -165,4 +157,11 @@ Item {
       }
     }
   }
+
+  Component { id: _iconSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeMedium } }
+  Component { id: _iconNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
+  Component { id: _compactSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeMedium } }
+  Component { id: _compactNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
+  Component { id: _wideSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeLarge } }
+  Component { id: _wideNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeLarge; font.family: Appearance.fontMono } }
 }
