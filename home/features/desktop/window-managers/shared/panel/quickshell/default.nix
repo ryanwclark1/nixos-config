@@ -299,7 +299,6 @@ let
       matugen # Material You color generation (optional backend)
 
       # Unified CLI dispatcher
-      qsCliScript
       qsCompletionZsh
 
       # Quickshell utility scripts
@@ -415,6 +414,12 @@ EOF
     };
 
     home.file.".config/quickshell/themes.json".source = "${themeManifest}/themes.json";
+
+    home.file.".local/bin/qs" = {
+      force = true;
+      executable = true;
+      source = "${qsCliScript}/bin/qs";
+    };
 
     home.file.".local/bin/qs-screenshot" = {
       force = true;
