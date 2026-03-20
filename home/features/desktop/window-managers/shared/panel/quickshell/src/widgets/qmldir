@@ -66,6 +66,7 @@ StateLayer 1.0 ../shared/StateLayer.qml
 StatusChip 1.0 ../shared/StatusChip.qml
 SurfaceGradient 1.0 ../shared/SurfaceGradient.qml
 SvgIcon 1.0 ../shared/SvgIcon.qml
+ThemedContainer 1.0 ../shared/ThemedContainer.qml
 Toast 1.0 ../shared/Toast.qml
 ToastOverlay 1.0 ../shared/ToastOverlay.qml
 TodoWidget 1.0 ../features/todo/TodoWidget.qml

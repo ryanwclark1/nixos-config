@@ -11,6 +11,7 @@ SettingsFieldGrid 1.0 SettingsFieldGrid.qml
 SettingsIconBox 1.0 SettingsIconBox.qml
 SettingsInfoCallout 1.0 SettingsInfoCallout.qml
 SettingsListRow 1.0 SettingsListRow.qml
+SettingsMetricIcon 1.0 SettingsMetricIcon.qml
 SettingsPageHero 1.0 SettingsPageHero.qml
 SettingsModeRow 1.0 SettingsModeRow.qml
 SettingsQuickLinksRow 1.0 SettingsQuickLinksRow.qml

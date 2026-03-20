@@ -14,6 +14,7 @@ ConfigBarManager 1.0 ConfigBarManager.qml
 singleton ControlCenterRegistry 1.0 ../features/control-center/registry/ControlCenterRegistry.qml
 singleton DependencyService 1.0 DependencyService.qml
 singleton FirstRunService 1.0 FirstRunService.qml
+singleton FocusGrabManager 1.0 FocusGrabManager.qml
 singleton GameModeService 1.0 GameModeService.qml
 singleton DesktopWidgetRegistry 1.0 ../features/desktop/registry/DesktopWidgetRegistry.qml
 singleton HookService 1.0 HookService.qml
