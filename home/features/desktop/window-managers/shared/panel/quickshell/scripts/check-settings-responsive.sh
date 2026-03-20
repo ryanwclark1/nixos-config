@@ -34,6 +34,7 @@ repo_shell_service_was_active=0
 repo_shell_env=()
 repo_shell_ready_timeout_sec="${QS_REPO_SHELL_READY_TIMEOUT_SEC:-40}"
 skip_reload=0
+repo_shell_log_dumped=0
 
 pass() {
   printf '[PASS] %s\n' "$1"
@@ -48,6 +49,18 @@ warn() {
 fail() {
   printf '[FAIL] %s\n' "$1" >&2
   fail_count=$((fail_count + 1))
+}
+
+dump_repo_shell_log_once() {
+  if (( repo_shell_mode == 0 || repo_shell_log_dumped == 1 )); then
+    return 0
+  fi
+
+  repo_shell_log_dumped=1
+  if [[ -f /tmp/quickshell-repo-settings.log ]]; then
+    printf '%s\n' '--- quickshell repo settings log ---' >&2
+    tail -n 200 /tmp/quickshell-repo-settings.log >&2 || true
+  fi
 }
 
 usage() {
@@ -432,6 +445,7 @@ refresh_instance_binding() {
     sleep 0.4
   done
 
+  dump_repo_shell_log_once
   return 1
 }
 
