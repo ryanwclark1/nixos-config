@@ -9,6 +9,7 @@ instance_id=""
 repo_shell_mode=0
 repo_shell_pid=""
 repo_shell_service_was_active=0
+repo_shell_health_was_active=0
 repo_shell_env=()
 run_settings=1
 run_surfaces=1
@@ -245,6 +246,9 @@ cleanup_repo_shell() {
   if (( repo_shell_service_was_active == 1 )); then
     systemctl --user start quickshell.service >/dev/null 2>&1 || true
   fi
+  if (( repo_shell_health_was_active == 1 )); then
+    systemctl --user start quickshell-health.service >/dev/null 2>&1 || true
+  fi
 }
 
 handle_termination() {
@@ -261,6 +265,7 @@ start_repo_shell() {
   local deadline
   local resolved=""
   local runtime_id=""
+  local stop_repo_units=0
 
   if ! command -v systemctl >/dev/null 2>&1; then
     printf 'systemctl is required for --repo-shell mode.\n' >&2
@@ -269,9 +274,19 @@ start_repo_shell() {
 
   if systemctl --user is-active --quiet quickshell.service; then
     repo_shell_service_was_active=1
-    systemctl --user stop quickshell.service >/dev/null 2>&1 || true
+    stop_repo_units=1
+  fi
+  if systemctl --user is-active --quiet quickshell-health.service; then
+    repo_shell_health_was_active=1
+    stop_repo_units=1
+  fi
+  if (( stop_repo_units == 1 )); then
+    systemctl --user stop quickshell.service quickshell-health.service >/dev/null 2>&1 || true
     sleep 1
   fi
+
+  pkill -x quickshell >/dev/null 2>&1 || true
+  sleep 0.5
 
   populate_repo_shell_env
   env "${repo_shell_env[@]}" quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-qa.log 2>&1 &
