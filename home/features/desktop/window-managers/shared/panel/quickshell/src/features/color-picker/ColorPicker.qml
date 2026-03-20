@@ -127,6 +127,14 @@ PanelWindow {
     }
   }
 
+  ElasticNumber {
+    id: _cpElasticScale
+    target: root.isOpen ? 1.0 : 0.94
+    fastDuration: Colors.durationSnap
+    slowDuration: Colors.durationNormal
+    fastWeight: 0.45
+  }
+
   // ─── Modal card ───────────────────────────────────────────────────────────
   Rectangle {
     id: mainBox
@@ -152,10 +160,9 @@ PanelWindow {
     Keys.onEscapePressed: root.close()
 
     opacity: root.isOpen ? 1.0 : 0.0
-    scale:   root.isOpen ? 1.0 : 0.94
+    scale:   _cpElasticScale.value
     Behavior on opacity { NumberAnimation { id: cpFadeAnim;  duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
-    Behavior on scale   { NumberAnimation { id: cpScaleAnim; duration: Colors.durationNormal; easing.type: Easing.OutBack  } }
-    layer.enabled: cpFadeAnim.running || cpScaleAnim.running
+    layer.enabled: cpFadeAnim.running || _cpElasticScale.running
 
     // Block background click-through
     MouseArea { anchors.fill: parent }

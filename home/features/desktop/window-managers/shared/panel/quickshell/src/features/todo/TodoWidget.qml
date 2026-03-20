@@ -198,7 +198,7 @@ Item {
           // ── Delete button ─────────────────────────────────────────
           SharedWidgets.IconButton {
             icon: "dismiss.svg"
-            size: 24
+            size: Colors.iconSizeSmall
             iconSize: Colors.fontSizeXS
             iconColor: Colors.textDisabled
             stateColor: Colors.error

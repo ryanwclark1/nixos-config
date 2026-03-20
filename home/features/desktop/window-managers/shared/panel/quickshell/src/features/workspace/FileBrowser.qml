@@ -218,6 +218,14 @@ PanelWindow {
     }
   }
 
+  ElasticNumber {
+    id: _fbElasticScale
+    target: root.isOpen ? 1.0 : 0.95
+    fastDuration: Colors.durationSnap
+    slowDuration: Colors.durationPanelClose
+    fastWeight: 0.45
+  }
+
   // ── Modal card ─────────────────────────────────────────────────────────────
   Rectangle {
     id: mainBox
@@ -271,10 +279,9 @@ PanelWindow {
     Keys.onEscapePressed: root.close()
 
     opacity: root.isOpen ? 1.0 : 0.0
-    scale:   root.isOpen ? 1.0 : 0.95
+    scale:   _fbElasticScale.value
     Behavior on opacity { NumberAnimation { id: fbFadeAnim;  duration: Colors.durationMedium; easing.type: Easing.OutCubic } }
-    Behavior on scale   { NumberAnimation { id: fbScaleAnim; duration: Colors.durationPanelClose; easing.type: Easing.OutBack  } }
-    layer.enabled: fbFadeAnim.running || fbScaleAnim.running
+    layer.enabled: fbFadeAnim.running || _fbElasticScale.running
 
     // Block click-through
     MouseArea { anchors.fill: parent }

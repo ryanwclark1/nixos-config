@@ -146,7 +146,7 @@ PanelWindow {
                 }
                 SharedWidgets.IconButton {
                     icon: "settings.svg"
-                    size: 32
+                    size: Colors.iconSizeMedium
                     iconSize: Colors.fontSizeXL
                     tooltipText: "Settings"
                     tooltipShortcut: "Meta+S"
@@ -157,7 +157,7 @@ PanelWindow {
                 }
                 SharedWidgets.IconButton {
                     icon: "dismiss.svg"
-                    size: 32
+                    size: Colors.iconSizeMedium
                     iconSize: Colors.fontSizeXL
                     tooltipText: "Close"
                     onClicked: root.closeRequested()
@@ -452,7 +452,7 @@ PanelWindow {
                                         muted: AudioService.outputMuted
                                         icon: "󰕾"
                                         mutedIcon: "󰝟"
-                                        size: 32
+                                        size: Colors.iconSizeMedium
                                         showBorder: true
                                     }
                                     SharedWidgets.SliderTrack {
@@ -494,7 +494,7 @@ PanelWindow {
                                         muted: AudioService.inputMuted
                                         icon: "󰍬"
                                         mutedIcon: "󰍭"
-                                        size: 32
+                                        size: Colors.iconSizeMedium
                                         showBorder: true
                                     }
                                     SharedWidgets.SliderTrack {

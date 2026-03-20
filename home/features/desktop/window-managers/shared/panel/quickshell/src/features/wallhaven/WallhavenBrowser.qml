@@ -69,7 +69,7 @@ PanelWindow {
 
                 SharedWidgets.IconButton {
                     icon: "dismiss.svg"
-                    size: 32
+                    size: Colors.iconSizeMedium
                     onClicked: root.closeRequested()
                 }
             }
@@ -93,7 +93,7 @@ PanelWindow {
                 }
 
                 Rectangle {
-                    width: 80; height: 38
+                    width: 80; height: Colors.controlRowHeight
                     radius: Colors.radiusSmall
                     color: Colors.primaryStrong
 

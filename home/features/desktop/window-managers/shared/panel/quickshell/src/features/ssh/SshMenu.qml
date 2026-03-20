@@ -256,7 +256,7 @@ BasePopupMenu {
       Layout.topMargin: 32
       visible: !sshData.importBusy && !root.hasHosts
       icon: "server.svg"
-      iconSize: 48
+      iconSize: Colors.iconSizeLarge
       message: sshData.enableSshConfigImport ? "No SSH hosts found yet" : "No SSH hosts configured"
     }
 
@@ -275,7 +275,7 @@ BasePopupMenu {
       Layout.topMargin: 32
       visible: !sshData.importBusy && root.hasHosts && root.hasSearchQuery && !root.hasFilteredHosts
       icon: "search-visual.svg"
-      iconSize: 48
+      iconSize: Colors.iconSizeLarge
       message: "No SSH hosts match \"" + root.searchQuery + "\""
     }
 

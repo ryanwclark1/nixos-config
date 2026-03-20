@@ -252,7 +252,7 @@ BasePopupMenu {
       delegate: Rectangle {
         required property var modelData
         Layout.fillWidth: true
-        implicitHeight: 38
+        implicitHeight: Colors.controlRowHeight
         radius: Colors.radiusMedium
         color: modelData.active ? Colors.primaryMid : Colors.cardSurface
         border.color: modelData.active ? Colors.primary : Colors.border

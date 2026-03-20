@@ -14,7 +14,7 @@ Rectangle {
     signal refresh()
 
     Layout.fillWidth: true
-    height: 38
+    height: Colors.controlRowHeight
     color: Colors.cardSurface
 
     Rectangle {

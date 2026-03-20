@@ -96,7 +96,7 @@ SharedWidgets.CardBase {
             SharedWidgets.IconButton {
                 visible: AMDGPUService.available
                 icon: root.showProcesses ? "󱗼" : "󱗻"
-                size: 24
+                size: Colors.iconSizeSmall
                 iconSize: Colors.fontSizeSmall
                 tooltipText: root.showProcesses ? "Hide GPU processes" : "Show GPU processes"
                 onClicked: root.showProcesses = !root.showProcesses

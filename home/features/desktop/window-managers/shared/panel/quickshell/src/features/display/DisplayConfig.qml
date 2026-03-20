@@ -394,6 +394,14 @@ PanelWindow {
     }
   }
 
+  ElasticNumber {
+    id: _dcElasticScale
+    target: displayRoot.isOpen ? 1.0 : 0.95
+    fastDuration: Colors.durationSnap
+    slowDuration: Colors.durationSlow
+    fastWeight: 0.45
+  }
+
   // Main dialog card
   Rectangle {
     id: mainCard
@@ -422,10 +430,9 @@ PanelWindow {
     }
 
     opacity: displayRoot.isOpen ? 1.0 : 0.0
-    scale: displayRoot.isOpen ? 1.0 : 0.95
+    scale: _dcElasticScale.value
     Behavior on opacity { NumberAnimation { id: dcFadeAnim; duration: Colors.durationNormal; easing.type: Easing.OutCubic } }
-    Behavior on scale   { NumberAnimation { id: dcScaleAnim; duration: Colors.durationSlow; easing.type: Easing.OutBack  } }
-    layer.enabled: dcFadeAnim.running || dcScaleAnim.running
+    layer.enabled: dcFadeAnim.running || _dcElasticScale.running
 
     // Eat mouse events so backdrop click doesn't reach through
     MouseArea { anchors.fill: parent }
@@ -603,7 +610,7 @@ PanelWindow {
         ColumnLayout {
           id: settingsPane
           anchors { left: parent.left; right: parent.right; top: parent.top; margins: Colors.spacingLG }
-          spacing: 14
+          spacing: Colors.spacingML
 
           // Section label
           Text {

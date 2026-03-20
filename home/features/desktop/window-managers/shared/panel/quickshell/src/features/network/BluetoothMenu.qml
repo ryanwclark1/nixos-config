@@ -265,7 +265,7 @@ BasePopupMenu {
         Layout.topMargin: 40
         visible: !root.hasAdapter
         icon: "bluetooth-disabled.svg"
-        iconSize: 48
+        iconSize: Colors.iconSizeLarge
         message: "No Bluetooth adapter found"
       }
 

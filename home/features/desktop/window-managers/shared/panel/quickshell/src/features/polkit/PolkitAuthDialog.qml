@@ -29,7 +29,7 @@ PanelWindow {
     property var details: ({})
     property bool isVisible: false
 
-    visible: root.isVisible || fadeAnim.running || scaleAnim.running
+    visible: root.isVisible || fadeAnim.running || _polkitElasticScale.running
 
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -109,6 +109,14 @@ PanelWindow {
             }
         }
 
+        ElasticNumber {
+            id: _polkitElasticScale
+            target: root.isVisible ? 1.0 : 0.92
+            fastDuration: Colors.durationFast
+            slowDuration: Colors.durationEmphasis
+            fastWeight: 0.4
+        }
+
         // Dialog card
         Rectangle {
             id: card
@@ -119,11 +127,10 @@ PanelWindow {
             color: Colors.cardSurface
             border.color: Colors.border
             border.width: 1
-            scale: root.isVisible ? 1.0 : 0.92
-            Behavior on scale { NumberAnimation { id: scaleAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutBack; easing.overshoot: 1.05 } }
+            scale: _polkitElasticScale.value
             opacity: root.isVisible ? 1.0 : 0.0
             Behavior on opacity { NumberAnimation { id: fadeAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } }
-            layer.enabled: scaleAnim.running || fadeAnim.running
+            layer.enabled: _polkitElasticScale.running || fadeAnim.running
 
             SharedWidgets.InnerHighlight { highlightOpacity: 0.12 }
 

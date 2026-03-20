@@ -121,7 +121,7 @@ PanelWindow {
 
         // DND Toggle
         SharedWidgets.IconButton {
-          size: 32
+          size: Colors.iconSizeMedium
           icon: root.manager && root.manager.dndEnabled ? "󰂛" : "󰂚"
           iconColor: root.manager && root.manager.dndEnabled ? Colors.error : Colors.textSecondary
           tooltipText: root.manager && root.manager.dndEnabled ? "Disable do not disturb" : "Do not disturb"
@@ -130,7 +130,7 @@ PanelWindow {
 
         // TTS Toggle
         SharedWidgets.IconButton {
-          size: 32
+          size: Colors.iconSizeMedium
           icon: Config.notifTtsEnabled ? "󰗆" : "󰗈"
           iconColor: Config.notifTtsEnabled ? Colors.primary : Colors.textSecondary
           tooltipText: Config.notifTtsEnabled ? "Disable read-aloud" : "Read notifications aloud"
@@ -139,7 +139,7 @@ PanelWindow {
 
         // Stop Speaking — only visible while TTS is active
         SharedWidgets.IconButton {
-          size: 32
+          size: Colors.iconSizeMedium
           icon: "stop.svg"
           iconColor: Colors.error
           tooltipText: "Stop speaking"
@@ -149,7 +149,7 @@ PanelWindow {
 
         // Clear all
         SharedWidgets.IconButton {
-          size: 32
+          size: Colors.iconSizeMedium
           icon: "archive.svg"
           iconColor: Colors.textDisabled
           tooltipText: "Clear all"
@@ -158,7 +158,7 @@ PanelWindow {
 
         // Close button
         SharedWidgets.IconButton {
-          size: 32
+          size: Colors.iconSizeMedium
           icon: "dismiss.svg"
           tooltipText: "Close"
           tooltipShortcut: "Meta+N"
@@ -381,7 +381,7 @@ PanelWindow {
             Layout.fillWidth: true; height: 1; color: Colors.border; opacity: 0.4
           }
           SharedWidgets.IconButton {
-            size: 24
+            size: Colors.iconSizeSmall
             icon: "archive.svg"
             iconColor: Colors.textDisabled
             stateColor: Colors.error
@@ -425,7 +425,7 @@ PanelWindow {
               SharedWidgets.AppIcon {
                 iconName: modelData.appIcon || ""
                 appName: modelData.appName || ""
-                iconSize: 24
+                iconSize: Colors.iconSizeSmall
                 fallbackIcon: "󰂚"
               }
               ColumnLayout {

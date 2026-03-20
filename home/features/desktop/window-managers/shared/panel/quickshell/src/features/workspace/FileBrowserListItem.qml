@@ -16,7 +16,7 @@ Rectangle {
     signal itemDoubleClicked(var entry)
 
     width: parent ? parent.width : 0
-    height: 38
+    height: Colors.controlRowHeight
 
     color: {
         var isSel = (selectedFile === modelData.path);

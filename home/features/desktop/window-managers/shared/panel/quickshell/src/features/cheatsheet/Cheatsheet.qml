@@ -109,7 +109,7 @@ PanelWindow {
                 }
 
                 IconButton {
-                    size: 32
+                    size: Colors.iconSizeMedium
                     icon: "\u{f0156}"
                     tooltipText: "Close"
                     onClicked: root.close()

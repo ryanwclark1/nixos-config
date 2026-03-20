@@ -141,7 +141,7 @@ BasePopupMenu {
           Layout.topMargin: 40
           visible: !PrinterService.hasPrinters
           icon: "print.svg"
-          iconSize: 48
+          iconSize: Colors.iconSizeLarge
           message: "No printers configured"
         }
 
