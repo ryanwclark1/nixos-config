@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
@@ -26,17 +27,26 @@ Rectangle {
 
     SharedWidgets.InnerHighlight { highlightOpacity: 0.1 }
 
+    SettingsHeaderBand {
+        accentColor: Colors.primary
+        parentRadius: root.radius
+        bandHeight: headerContainer.height + Appearance.spacingS
+        dividerY: headerContainer.height
+        showDivider: root.expanded
+        surfaceStrength: 0.95
+        accentStrength: root.expanded ? 0.85 : 0.7
+    }
+
     Behavior on implicitHeight {
         Anim {}
     }
 
-    Rectangle {
+    Item {
         id: headerContainer
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         implicitHeight: headerColumn.implicitHeight + Appearance.spacingM * 2
-        color: Colors.withAlpha(Colors.surface, 0.28)
 
         Rectangle {
             anchors.left: parent.left
@@ -94,12 +104,11 @@ Rectangle {
                     border.color: Colors.border
                     border.width: 1
 
-                    Text {
+                    SharedWidgets.SvgIcon {
                         anchors.centerIn: parent
-                        text: root.expanded ? "󰅃" : "󰅀"
+                        source: IconHelpers.panelChevronIcon(root.expanded)
                         color: Colors.textSecondary
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeSmall
+                        size: Appearance.fontSizeSmall
                     }
                 }
             }
@@ -129,15 +138,6 @@ Rectangle {
             disabled: !root.collapsible
             stateColor: Colors.primary
         }
-    }
-
-    Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: headerContainer.bottom
-        height: 1
-        color: Colors.withAlpha(Colors.border, 0.7)
-        visible: root.expanded
     }
 
     ColumnLayout {
