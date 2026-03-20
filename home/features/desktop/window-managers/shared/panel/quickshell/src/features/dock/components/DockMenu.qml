@@ -44,7 +44,13 @@ PopupWindow {
   onAnchorEdgeChanged: _updateRect()
   onImplicitWidthChanged: _updateRect()
   onImplicitHeightChanged: _updateRect()
-  onVisibleChanged: if (visible) _updateRect()
+  onVisibleChanged: {
+    if (visible) {
+      _updateRect();
+    } else {
+      FocusGrabManager.releaseGrab("dockMenu");
+    }
+  }
 
   visible: false
   implicitWidth: 200
@@ -61,19 +67,16 @@ PopupWindow {
 
   function open() {
     visible = true;
+    FocusGrabManager.requestGrab("dockMenu", function() { root.close(); });
+    menuBg.forceActiveFocus();
   }
 
   function close() {
+    FocusGrabManager.releaseGrab("dockMenu");
     visible = false;
     showWorkspaceList = false;
     appData = null;
     anchorItem = null;
-  }
-
-  // Close on click outside
-  MouseArea {
-    anchors.fill: parent
-    onPressed: function(mouse) { mouse.accepted = false; }
   }
 
   Rectangle {
@@ -84,6 +87,13 @@ PopupWindow {
     color: Colors.bgGlass
     border.color: Colors.border
     border.width: 1
+    focus: root.visible
+
+    onActiveFocusChanged: {
+      if (!activeFocus && root.visible)
+        root.close();
+    }
+    Keys.onEscapePressed: root.close()
 
     ColumnLayout {
       id: menuColumn

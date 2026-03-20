@@ -102,6 +102,9 @@ PopupWindow {
 
     onVisibleChanged: {
         if (!visible) {
+            // Safety: if compositor hid us (popup_done) or external close,
+            // ensure grab is released.
+            FocusGrabManager.releaseGrab("barContextMenu");
             model = [];
             focusedIndex = -1;
         }
@@ -116,6 +119,10 @@ PopupWindow {
         border.width: 1
 
         focus: root.visible
+        onActiveFocusChanged: {
+            if (!activeFocus && root.visible)
+                root.close();
+        }
         Keys.onUpPressed: root.moveFocus(-1)
         Keys.onDownPressed: root.moveFocus(1)
         Keys.onReturnPressed: root.executeItem(root.focusedIndex)
