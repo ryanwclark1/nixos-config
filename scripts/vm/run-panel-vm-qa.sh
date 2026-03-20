@@ -162,7 +162,11 @@ run_one_vm() {
   exit_code=$?
   set -e
 
-  cat "${host_log}"
+  if [[ -f "${host_log}" ]]; then
+    cat "${host_log}"
+  else
+    printf '[WARN] Host log missing for %s VM run: %s\n' "${vm}" "${host_log}" >&2
+  fi
 
   printf '%s' "${exit_code}" > "${vm_dir}/exit-code.txt"
   return "${exit_code}"

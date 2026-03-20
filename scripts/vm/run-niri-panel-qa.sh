@@ -490,7 +490,7 @@ copy_artifacts_home() {
   echo "[INFO] Copying artifacts back to host: ${output_dir}"
   rm -rf "${output_dir}"
   mkdir -p "${output_dir}"
-  vm_scp -r "administrator@127.0.0.1:${vm_output_dir}/." "${output_dir}/"
+  vm_ssh "test -d '${vm_output_dir}' && tar -C '${vm_output_dir}' -cf - ." | tar -xf - -C "${output_dir}"
 }
 
 assert_expected_artifacts() {
