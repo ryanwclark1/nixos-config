@@ -479,7 +479,7 @@ SharedWidgets.CardBase {
                 }
 
                 SharedWidgets.IconButton {
-                    icon: "󰑐"
+                    icon: "arrow-clockwise.svg"
                     size: 28
                     iconSize: Colors.fontSizeSmall
                     iconColor: Colors.textSecondary

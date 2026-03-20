@@ -315,7 +315,7 @@ PanelWindow {
                 }
 
                 SharedWidgets.IconButton {
-                    icon: "󰑐"
+                    icon: "arrow-clockwise.svg"
                     size: 34
                     iconSize: Colors.fontSizeLarge
                     tooltipText: "Refresh"
@@ -323,7 +323,7 @@ PanelWindow {
                 }
 
                 SharedWidgets.IconButton {
-                    icon: "󰅖"
+                    icon: "dismiss.svg"
                     size: 34
                     iconSize: Colors.fontSizeLarge
                     tooltipText: "Close"

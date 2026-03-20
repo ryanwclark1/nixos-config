@@ -329,7 +329,7 @@ SharedWidgets.CardBase {
                 }
 
                 SharedWidgets.IconButton {
-                    icon: "󰑐"
+                    icon: "arrow-clockwise.svg"
                     size: 28
                     iconSize: Colors.fontSizeSmall
                     iconColor: Colors.textSecondary
@@ -652,7 +652,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: "Restart"
-                            icon: "󰑐"
+                            icon: "arrow-clockwise.svg"
                             enabled: !!root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnit.scope, root.selectedUnit.name)
                             selected: false
                             onClicked: {

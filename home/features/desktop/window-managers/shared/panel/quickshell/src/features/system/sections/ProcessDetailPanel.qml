@@ -160,7 +160,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "KILL"
-                icon: "󰅖"
+                icon: "dismiss.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.killProcess(root.selectedPid)

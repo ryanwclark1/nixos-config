@@ -167,7 +167,7 @@ SharedWidgets.CardBase {
             }
 
             SharedWidgets.IconButton {
-                icon: "󰑐"
+                icon: "arrow-clockwise.svg"
                 size: 28
                 iconSize: Colors.fontSizeSmall
                 iconColor: Colors.textSecondary
@@ -297,7 +297,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: "Restart"
-                            icon: "󰑐"
+                            icon: "arrow-clockwise.svg"
                             enabled: !ServiceUnitService.isUnitPending("user", modelData.name)
                             selected: false
                             onClicked: ServiceUnitService.restartUnit("user", modelData.name)
@@ -441,7 +441,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: "Restart"
-                            icon: "󰑐"
+                            icon: "arrow-clockwise.svg"
                             enabled: !ServiceUnitService.isUnitPending("system", modelData.name)
                             selected: false
                             onClicked: ServiceUnitService.restartUnit("system", modelData.name)
@@ -601,7 +601,7 @@ SharedWidgets.CardBase {
 
                     SharedWidgets.FilterChip {
                         label: "Restart"
-                        icon: "󰑐"
+                        icon: "arrow-clockwise.svg"
                         enabled: root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnitScope, root.selectedUnitName)
                         selected: false
                         onClicked: ServiceUnitService.restartUnit(root.selectedUnitScope, root.selectedUnitName)
