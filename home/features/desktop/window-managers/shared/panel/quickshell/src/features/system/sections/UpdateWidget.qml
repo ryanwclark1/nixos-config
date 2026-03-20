@@ -52,9 +52,14 @@ SharedWidgets.CardBase {
     onFileChanged: this.reload()
   }
 
+  function _safeFileText(fileView) {
+    try { var t = fileView.text(); return typeof t === "string" ? t.trim() : ""; }
+    catch (e) { return ""; }
+  }
+
   function _updateFromCache() {
-    var nixRaw = String(nixCacheFile.text() || "").trim();
-    var fpkRaw = String(flatpakCacheFile.text() || "").trim();
+    var nixRaw = _safeFileText(nixCacheFile);
+    var fpkRaw = _safeFileText(flatpakCacheFile);
     root.nixUpdates = sanitizeCount(nixRaw);
     root.flatpakUpdates = sanitizeCount(fpkRaw);
     if (root.isChecking || root.lastRunFailed) return;
