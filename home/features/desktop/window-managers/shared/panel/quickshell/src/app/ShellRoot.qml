@@ -185,15 +185,8 @@ Scope {
         onActivated: root.toggleSurface("commandPalette")
     }
 
-    // Marks true ~100ms after startup so lazy-loaded panels can gate on it
-    property bool startupComplete: false
-
-    Timer {
-        id: startupTimer
-        interval: 100
-        running: true
-        onTriggered: root.startupComplete = true
-    }
+    // Data-driven startup gate: true once config is loaded and colors are applied
+    property bool startupComplete: Config.configReady && Colors.colorsReady
 
     // Ensure ThemeService and HookService initialize early, then defer
     // non-critical service init until after the first frame.
@@ -201,6 +194,7 @@ Scope {
         var done = Logger.perf("ShellRoot", "startup");
         void ThemeService.activeThemeId;
         void HookService;
+        void ColorExportService;
         Qt.callLater(function() {
             // Force-init deferred services by reading a property
             var _ = WeatherService.subscriberCount;

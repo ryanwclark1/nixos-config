@@ -7,8 +7,7 @@ import "../services"
 Scope {
     id: root
     
-    // Configurable radius
-    property int cornerRadius: 18
+    property int cornerRadius: Config.screenCornerRadius
 
     Variants {
         model: Quickshell.screens
@@ -17,7 +16,8 @@ Scope {
         PanelWindow {
             required property ShellScreen modelData
             screen: modelData
-            
+            visible: Config.showScreenCorners
+
             anchors {
                 top: true
                 bottom: true
@@ -65,7 +65,7 @@ Scope {
                         layer.samples: 4
                         
                         ShapePath {
-                            fillColor: Colors.background
+                            fillColor: Colors.bg
                             strokeWidth: 0
                             
                             // Start at top-left

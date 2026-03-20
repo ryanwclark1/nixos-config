@@ -6,7 +6,7 @@ import "../services"
 PanelWindow {
   id: win
 
-  property color frameColor: Colors.background
+  property color frameColor: Colors.bg
   property int thickness: 7
   property int borderRadius: Colors.radiusSmall
 
