@@ -140,7 +140,7 @@ PanelWindow {
                 contentHeight: resultsGrid.implicitHeight
                 boundsBehavior: Flickable.StopAtBounds
 
-                SharedWidgets.DankScrollbar { flickable: parent }
+                SharedWidgets.Scrollbar { flickable: parent }
 
                 GridLayout {
                     id: resultsGrid
