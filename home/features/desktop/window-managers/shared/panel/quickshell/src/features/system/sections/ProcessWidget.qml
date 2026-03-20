@@ -22,6 +22,17 @@ SharedWidgets.CardBase {
     property int _clockTick: 0
 
     readonly property string trimmedSearch: String(searchQuery || "").trim().toLowerCase()
+    readonly property bool compactTableLayout: root.compactMode || (root.width > 0 && root.width < 520)
+    readonly property var processColumnMap: ({
+        pid: { label: "PID", width: compactTableLayout ? 64 : 72 },
+        user: { label: "USER", width: compactTableLayout ? 84 : 104 },
+        name: { label: "PROCESS", fill: true },
+        cpu: { label: "CPU%", width: compactTableLayout ? 60 : 74 },
+        mem: { label: "MEM%", width: compactTableLayout ? 60 : 74 },
+        elapsed: { label: "TIME", width: 92, visible: !compactTableLayout },
+        state: { label: "STATE", width: 70, visible: !compactTableLayout }
+    })
+    readonly property var processColumns: buildProcessColumns()
     readonly property var visibleProcesses: computeVisibleProcesses()
     readonly property var selectedProcess: findProcessByPid(selectedPid)
     readonly property var detailData: ProcessService.detailPid === selectedPid ? ProcessService.processDetail : ({})
@@ -331,6 +342,36 @@ SharedWidgets.CardBase {
         return label + (sortDescending ? " ▼" : " ▲");
     }
 
+    function buildProcessColumns() {
+        var order = ["pid", "user", "name", "cpu", "mem", "elapsed", "state"];
+        var columns = [];
+        for (var i = 0; i < order.length; ++i) {
+            var key = order[i];
+            var definition = processColumnMap[key];
+            if (!definition || definition.visible === false)
+                continue;
+            var column = {
+                key: key,
+                label: definition.label || "",
+                fill: !!definition.fill
+            };
+            if (definition.width)
+                column.width = definition.width;
+            columns.push(column);
+        }
+        return columns;
+    }
+
+    function columnWidth(key) {
+        var definition = processColumnMap[key];
+        return definition && definition.width ? definition.width : 0;
+    }
+
+    function columnVisible(key) {
+        var definition = processColumnMap[key];
+        return !!definition && definition.visible !== false;
+    }
+
 
     onVisibleProcessesChanged: syncSelection()
     onSelectedPidChanged: {
@@ -474,7 +515,9 @@ SharedWidgets.CardBase {
                 SharedWidgets.Chip {
                     icon: keyboardFocused ? "󰌌" : "󰍉"
                     iconColor: keyboardFocused ? Colors.primary : Colors.textSecondary
-                    text: keyboardFocused ? "Arrows/J/K active" : (String(visibleProcesses.length) + " rows")
+                    text: keyboardFocused
+                        ? (root.compactTableLayout ? "Keys active" : "Arrows/J/K active")
+                        : (String(visibleProcesses.length) + " rows")
                     textColor: keyboardFocused ? Colors.primary : Colors.textSecondary
                 }
 
@@ -489,12 +532,15 @@ SharedWidgets.CardBase {
             }
 
             SharedWidgets.SearchBar {
-                placeholder: "Search PID, user, name, or command..."
+                placeholder: root.compactTableLayout
+                    ? "Search PID, user, or command..."
+                    : "Search PID, user, name, or command..."
                 onTextChanged: root.searchQuery = text
             }
 
-            RowLayout {
+            Flow {
                 Layout.fillWidth: true
+                width: parent.width
                 spacing: Appearance.spacingS
 
                 SharedWidgets.FilterChip {
@@ -519,10 +565,6 @@ SharedWidgets.CardBase {
                     label: "High Load"
                     selected: root.stateFilter === "high"
                     onClicked: root.stateFilter = "high"
-                }
-
-                Item {
-                    Layout.fillWidth: true
                 }
 
                 SharedWidgets.FilterChip {
@@ -581,15 +623,7 @@ SharedWidgets.CardBase {
                             spacing: Appearance.spacingS
 
                             Repeater {
-                                model: [
-                                    { key: "pid", label: "PID", width: 72 },
-                                    { key: "user", label: "USER", width: 104 },
-                                    { key: "name", label: "PROCESS", fill: true },
-                                    { key: "cpu", label: "CPU%", width: 74 },
-                                    { key: "mem", label: "MEM%", width: 74 },
-                                    { key: "elapsed", label: "TIME", width: 92 },
-                                    { key: "state", label: "STATE", width: 70 }
-                                ]
+                                model: root.processColumns
 
                                 delegate: Rectangle {
                                     required property var modelData
@@ -654,7 +688,7 @@ SharedWidgets.CardBase {
                                     spacing: Appearance.spacingS
 
                                     Text {
-                                        Layout.preferredWidth: 72
+                                        Layout.preferredWidth: root.columnWidth("pid")
                                         text: String(modelData.pid || 0)
                                         color: Colors.textSecondary
                                         font.pixelSize: Appearance.fontSizeXS
@@ -663,7 +697,7 @@ SharedWidgets.CardBase {
                                     }
 
                                     Text {
-                                        Layout.preferredWidth: 104
+                                        Layout.preferredWidth: root.columnWidth("user")
                                         text: String(modelData.user || "")
                                         color: Colors.textSecondary
                                         font.pixelSize: Appearance.fontSizeXS
@@ -675,7 +709,7 @@ SharedWidgets.CardBase {
                                         spacing: Appearance.spacingXS
 
                                         Item {
-                                            Layout.preferredWidth: Math.min(84, Number(modelData._depth || 0) * 12)
+                                            Layout.preferredWidth: Math.min(root.compactTableLayout ? 48 : 84, Number(modelData._depth || 0) * (root.compactTableLayout ? 8 : 12))
                                             Layout.fillHeight: true
                                         }
 
@@ -716,7 +750,7 @@ SharedWidgets.CardBase {
                                     }
 
                                     Text {
-                                        Layout.preferredWidth: 74
+                                        Layout.preferredWidth: root.columnWidth("cpu")
                                         text: Number(modelData.cpu || 0).toFixed(1)
                                         color: Number(modelData.cpu || 0) >= 20 ? Colors.primary : Colors.textSecondary
                                         font.pixelSize: Appearance.fontSizeXS
@@ -725,7 +759,7 @@ SharedWidgets.CardBase {
                                     }
 
                                     Text {
-                                        Layout.preferredWidth: 74
+                                        Layout.preferredWidth: root.columnWidth("mem")
                                         text: Number(modelData.mem || 0).toFixed(1)
                                         color: Number(modelData.mem || 0) >= 10 ? Colors.accent : Colors.textSecondary
                                         font.pixelSize: Appearance.fontSizeXS
@@ -734,7 +768,8 @@ SharedWidgets.CardBase {
                                     }
 
                                     Text {
-                                        Layout.preferredWidth: 92
+                                        visible: root.columnVisible("elapsed")
+                                        Layout.preferredWidth: root.columnWidth("elapsed")
                                         text: String(modelData.elapsed || "--:--")
                                         color: Colors.textSecondary
                                         font.pixelSize: Appearance.fontSizeXS
@@ -743,7 +778,8 @@ SharedWidgets.CardBase {
                                     }
 
                                     Text {
-                                        Layout.preferredWidth: 70
+                                        visible: root.columnVisible("state")
+                                        Layout.preferredWidth: root.columnWidth("state")
                                         text: String(modelData.state || "")
                                         color: String(modelData.state || "").indexOf("T") !== -1 ? Colors.warning : Colors.secondary
                                         font.pixelSize: Appearance.fontSizeXS

@@ -8,9 +8,9 @@ import "../../../widgets" as SharedWidgets
 
 BasePopupMenu {
     id: root
-    popupMinWidth: 360
-    popupMaxWidth: 460
-    compactThreshold: 420
+    popupMinWidth: root.statKey === "cpuStatus" || root.statKey === "ramStatus" ? 400 : 360
+    popupMaxWidth: root.statKey === "cpuStatus" || root.statKey === "ramStatus" ? 540 : 460
+    compactThreshold: root.statKey === "cpuStatus" || root.statKey === "ramStatus" ? 500 : 420
     readonly property int _desiredHeight: {
         if (statKey === "gpuStatus") return compactMode ? 400 : 380;
         if (statKey === "diskStatus") return compactMode ? 420 : 400;
