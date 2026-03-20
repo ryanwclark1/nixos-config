@@ -78,6 +78,11 @@ QtObject {
             isLight:       Colors._isLight
         };
 
+        // Read ANSI palette once for all consumers
+        var ansi = _readAnsiPalette();
+        if (ansi)
+            palette.ansiColors = ansi;
+
         // Write JSON
         _jsonWriter.command = [
             "sh", "-c",
@@ -93,9 +98,17 @@ QtObject {
         for (var i = 0; i < keys.length; i++) {
             var k = keys[i];
             var v = palette[k];
+            if (k === "ansiColors") continue; // handled separately below
             // QUICKSHELL_COLOR_BACKGROUND="#0a0a0c" etc.
             var envName = "QUICKSHELL_COLOR_" + k.replace(/([A-Z])/g, "_$1").toUpperCase();
             sh += envName + '="' + v + '"\n';
+        }
+        // ANSI palette as indexed vars: QUICKSHELL_ANSI_0="#..." through QUICKSHELL_ANSI_15="#..."
+        if (ansi) {
+            for (var ai = 0; ai < 16; ai++) {
+                if (ansi[ai])
+                    sh += 'QUICKSHELL_ANSI_' + ai + '="' + ansi[ai] + '"\n';
+            }
         }
         _shWriter.command = [
             "sh", "-c",
@@ -107,9 +120,9 @@ QtObject {
         // Fire hook
         HookService.fireHook("colors-changed", jsonPath);
 
-        // Built-in propagation
-        _propagateGhostty(palette);
-        _propagateKitty(palette);
+        // Built-in propagation (pass ansi to avoid re-reading)
+        _propagateGhostty(palette, ansi);
+        _propagateKitty(palette, ansi);
         _propagateGtkScheme(palette);
 
         Logger.d("ColorExport", "exported palette to " + jsonPath);
@@ -119,7 +132,8 @@ QtObject {
     // Writes a ghostty-compatible config file. User includes it via:
     //   config-file = ~/.local/state/quickshell/ghostty-colors
     // Ghostty auto-reloads when the included file changes.
-    function _propagateGhostty(palette) {
+    // Includes the full 16-color ANSI palette from pywal if available.
+    function _propagateGhostty(palette, ansi) {
         if (!Config.colorExportGhostty) return;
         // Strip "#" prefix — ghostty expects bare hex
         function bare(hex) { return String(hex).replace(/^#/, ""); }
@@ -129,6 +143,14 @@ QtObject {
             + "cursor-color = " + bare(palette.primary) + "\n"
             + "selection-background = " + bare(palette.primary) + "\n"
             + "selection-foreground = " + bare(palette.background) + "\n";
+
+        if (ansi) {
+            for (var i = 0; i < 16; i++) {
+                if (ansi[i])
+                    cfg += "palette = " + i + "=" + bare(ansi[i]) + "\n";
+            }
+        }
+
         _ghosttyWriter.command = [
             "sh", "-c",
             'printf "%s" "$1" > "$2"', "sh",
@@ -137,10 +159,32 @@ QtObject {
         _ghosttyWriter.running = true;
     }
 
+    // Read the 16 ANSI colors from pywal's colors.json
+    function _readAnsiPalette() {
+        try {
+            var raw = _walFile.text();
+            if (!raw) return null;
+            var data = JSON.parse(raw);
+            if (!data.colors) return null;
+            var result = [];
+            for (var i = 0; i < 16; i++)
+                result.push(data.colors["color" + i] || null);
+            return result;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    property FileView _walFile: FileView {
+        path: Quickshell.env("HOME") + "/.cache/wal/colors.json"
+        blockLoading: true
+        printErrors: false
+    }
+
     // ── Built-in kitty remote control ────────────────
-    function _propagateKitty(palette) {
+    function _propagateKitty(palette, ansi) {
         if (!Config.colorExportKitty) return;
-        _kittyProc.command = [
+        var args = [
             "kitty", "@", "set-colors",
             "background=" + palette.background,
             "foreground=" + palette.text,
@@ -148,6 +192,13 @@ QtObject {
             "selection_background=" + palette.primary,
             "selection_foreground=" + palette.background
         ];
+        if (ansi) {
+            for (var i = 0; i < 16; i++) {
+                if (ansi[i])
+                    args.push("color" + i + "=" + ansi[i]);
+            }
+        }
+        _kittyProc.command = args;
         _kittyProc.running = true;
     }
 

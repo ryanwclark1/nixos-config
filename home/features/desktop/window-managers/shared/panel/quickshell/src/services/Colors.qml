@@ -237,9 +237,9 @@ QtObject {
     readonly property int spacingSM: scaledMetric(6, _spacingScale, 3)
     readonly property int spacingS: scaledMetric(8, _spacingScale, 4)
     readonly property int spacingM: scaledMetric(12, _spacingScale, 8)
+    readonly property int spacingML: scaledMetric(14, _spacingScale, 10)
     readonly property int spacingL: scaledMetric(16, _spacingScale, 10)
     readonly property int spacingLG: scaledMetric(20, _spacingScale, 12)
-    readonly property int spacingML: scaledMetric(14, _spacingScale, 10)
     readonly property int spacingXL: scaledMetric(24, _spacingScale, 16)
 
     readonly property int controlRowHeight: scaledMetric(38, _spacingScale, 28)

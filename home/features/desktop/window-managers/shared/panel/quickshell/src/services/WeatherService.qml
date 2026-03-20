@@ -265,54 +265,11 @@ QtObject {
       onStreamFinished: {
         try {
           var data = JSON.parse(this.text);
-          var cur = data.current;
-          if (!cur) throw new Error("Missing current weather data");
-
-          root.temp = Math.round(cur.temperature_2m) + root._tempSuffix;
-          root.feelsLike = Math.round(cur.apparent_temperature) + root._tempSuffix;
-          root.humidity = Math.round(cur.relative_humidity_2m) + "%";
-          root.windSpeed = Math.round(cur.wind_speed_10m) + root._windSuffix;
-          root.windDir = root._getWindDir(cur.wind_direction_10m);
-          root.condition = root._getConditionFromWmo(cur.weather_code);
-          root.pressure = Math.round(cur.pressure_msl) + (root._unitMode === "imperial" ? " hPa" : " hPa"); // Open-meteo always hPa for pressure_msl usually
-          root.precipitation = cur.precipitation + (root._unitMode === "imperial" ? " in" : " mm");
-
-          if (data.daily) {
-            var d = data.daily;
-            root.sunrise = (d.sunrise && d.sunrise[0]) ? d.sunrise[0].split("T")[1] : "--";
-            root.sunset = (d.sunset && d.sunset[0]) ? d.sunset[0].split("T")[1] : "--";
-            root.uvIndex = (d.uv_index_max && d.uv_index_max[0]) ? d.uv_index_max[0].toString() : "--";
-
-            var daily = [];
-            for (var i = 0; i < Math.min(3, d.time.length); i++) {
-              daily.push({
-                date: d.time[i],
-                maxTemp: Math.round(d.temperature_2m_max[i]) + "°",
-                minTemp: Math.round(d.temperature_2m_min[i]) + "°",
-                condition: root._getConditionFromWmo(d.weather_code[i])
-              });
-            }
-            root.forecast = daily;
+          if (Config.weatherProvider === "wttr") {
+            _parseWttr(data);
+          } else {
+            _parseOpenMeteo(data);
           }
-
-          if (data.hourly) {
-            var h = data.hourly;
-            var hourly = [];
-            var now = new Date().getTime();
-            for (var j = 0; j < h.time.length; j++) {
-              var t = new Date(h.time[j]).getTime();
-              if (t < now - 3600000) continue;
-              if (hourly.length >= 12) break;
-              hourly.push({
-                time: h.time[j].split("T")[1],
-                temp: Math.round(h.temperature_2m[j]) + "°",
-                condition: root._getConditionFromWmo(h.weather_code[j]),
-                chanceOfRain: h.precipitation_probability[j] + "%"
-              });
-            }
-            root.hourlyForecast = hourly;
-          }
-
           root._hasSuccessfulFetch = true;
           root._lastFailureKey = "";
           root._fetchAqi();
@@ -320,6 +277,142 @@ QtObject {
           root._reportFailure("Weather parse error", e.message);
         }
       }
+    }
+  }
+
+  function _parseWttr(json) {
+    var data = json.data || json;
+    var cur = (data.current_condition && data.current_condition.length > 0) ? data.current_condition[0] : null;
+    if (!cur) throw new Error("missing current condition in wttr response");
+
+    var loc = "Local";
+    if (data.nearest_area && data.nearest_area[0]) {
+      var area = data.nearest_area[0];
+      var areaName = (area.areaName && area.areaName[0] && area.areaName[0].value) ? area.areaName[0].value : "";
+      var region = (area.region && area.region[0] && area.region[0].value) ? area.region[0].value : "";
+      loc = areaName || region || "Local";
+    }
+
+    root.location = loc;
+    root.condition = (cur.weatherDesc && cur.weatherDesc[0]) ? cur.weatherDesc[0].value : "Unknown";
+    
+    // Units are already handled by wttr.in if we pass &u, but it returns strings with units
+    // We'll strip them to match our suffixes
+    var rawTemp = _unitMode === "imperial" ? cur.temp_F : cur.temp_C;
+    root.temp = (rawTemp || "--") + root._tempSuffix;
+    
+    var rawFeels = _unitMode === "imperial" ? cur.FeelsLikeF : cur.FeelsLikeC;
+    root.feelsLike = (rawFeels || "--") + root._tempSuffix;
+    
+    root.humidity = (cur.humidity || "--") + "%";
+    
+    var rawWind = _unitMode === "imperial" ? cur.windspeedMiles : cur.windspeedKmph;
+    root.windSpeed = (rawWind || "--") + root._windSuffix;
+    root.windDir = cur.winddir16Point || "";
+    
+    var rawVis = _unitMode === "imperial" ? cur.visibilityMiles : cur.visibility;
+    root.visibility = (rawVis || "--") + root._visibilitySuffix;
+
+    root.uvIndex = cur.uvIndex || "--";
+    root.pressure = (_unitMode === "imperial"
+      ? (cur.pressureInches || "--") + " inHg"
+      : (cur.pressureMB || "--") + " hPa");
+    root.precipitation = (cur.precipMM || "0") + " mm";
+
+    var weather = data.weather || [];
+    if (weather.length > 0 && weather[0].astronomy && weather[0].astronomy[0]) {
+      var astro = weather[0].astronomy[0];
+      root.sunrise = astro.sunrise || "--";
+      root.sunset = astro.sunset || "--";
+    }
+
+    var daily = [];
+    for (var i = 0; i < Math.min(3, weather.length); i++) {
+      var w = weather[i];
+      var desc = (w.hourly && w.hourly[4] && w.hourly[4].weatherDesc && w.hourly[4].weatherDesc[0])
+        ? w.hourly[4].weatherDesc[0].value : "Unknown";
+      daily.push({
+        date: w.date,
+        maxTemp: (_unitMode === "imperial" ? w.maxtempF : w.maxtempC) + "°",
+        minTemp: (_unitMode === "imperial" ? w.mintempF : w.mintempC) + "°",
+        condition: desc
+      });
+    }
+    root.forecast = daily;
+
+    var hourly = [];
+    var currentHour = new Date().getHours();
+    for (var d = 0; d < Math.min(2, weather.length); d++) {
+      var hours = weather[d].hourly || [];
+      for (var h = 0; h < hours.length; h++) {
+        var entry = hours[h];
+        var hourTime = parseInt(entry.time, 10) / 100;
+        if (d === 0 && hourTime < currentHour) continue;
+        var hdesc = (entry.weatherDesc && entry.weatherDesc[0])
+          ? entry.weatherDesc[0].value : "Unknown";
+        hourly.push({
+          time: String(Math.floor(hourTime)).padStart(2, '0') + ":00",
+          temp: (_unitMode === "imperial" ? entry.tempF : entry.tempC) + "°",
+          condition: hdesc,
+          chanceOfRain: (entry.chanceofrain || "0") + "%"
+        });
+      }
+    }
+    root.hourlyForecast = hourly;
+
+    if (data.nearest_area && data.nearest_area[0]) {
+      root._resolvedLat = data.nearest_area[0].latitude || "";
+      root._resolvedLon = data.nearest_area[0].longitude || "";
+    }
+  }
+
+  function _parseOpenMeteo(data) {
+    var cur = data.current;
+    if (!cur) throw new Error("Missing current weather data");
+
+    root.temp = Math.round(cur.temperature_2m) + root._tempSuffix;
+    root.feelsLike = Math.round(cur.apparent_temperature) + root._tempSuffix;
+    root.humidity = Math.round(cur.relative_humidity_2m) + "%";
+    root.windSpeed = Math.round(cur.wind_speed_10m) + root._windSuffix;
+    root.windDir = root._getWindDir(cur.wind_direction_10m);
+    root.condition = root._getConditionFromWmo(cur.weather_code);
+    root.pressure = Math.round(cur.pressure_msl) + " hPa";
+    root.precipitation = cur.precipitation + (root._unitMode === "imperial" ? " in" : " mm");
+
+    if (data.daily) {
+      var d = data.daily;
+      root.sunrise = (d.sunrise && d.sunrise[0]) ? d.sunrise[0].split("T")[1] : "--";
+      root.sunset = (d.sunset && d.sunset[0]) ? d.sunset[0].split("T")[1] : "--";
+      root.uvIndex = (d.uv_index_max && d.uv_index_max[0]) ? d.uv_index_max[0].toString() : "--";
+
+      var daily = [];
+      for (var i = 0; i < Math.min(3, d.time.length); i++) {
+        daily.push({
+          date: d.time[i],
+          maxTemp: Math.round(d.temperature_2m_max[i]) + "°",
+          minTemp: Math.round(d.temperature_2m_min[i]) + "°",
+          condition: root._getConditionFromWmo(d.weather_code[i])
+        });
+      }
+      root.forecast = daily;
+    }
+
+    if (data.hourly) {
+      var h = data.hourly;
+      var hourly = [];
+      var now = new Date().getTime();
+      for (var j = 0; j < h.time.length; j++) {
+        var t = new Date(h.time[j]).getTime();
+        if (t < now - 3600000) continue;
+        if (hourly.length >= 12) break;
+        hourly.push({
+          time: h.time[j].split("T")[1],
+          temp: Math.round(h.temperature_2m[j]) + "°",
+          condition: root._getConditionFromWmo(h.weather_code[j]),
+          chanceOfRain: h.precipitation_probability[j] + "%"
+        });
+      }
+      root.hourlyForecast = hourly;
     }
   }
 
@@ -373,6 +466,7 @@ QtObject {
 
   property Connections configConnections: Connections {
     target: Config
+    function onWeatherProviderChanged() { configDebounce.restart(); }
     function onWeatherUnitsChanged() { configDebounce.restart(); }
     function onWeatherAutoLocationChanged() { configDebounce.restart(); }
     function onWeatherCityQueryChanged() { configDebounce.restart(); }
