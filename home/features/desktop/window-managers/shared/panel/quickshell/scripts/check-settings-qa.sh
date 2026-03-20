@@ -14,7 +14,8 @@ Run the settings-focused QA stack:
   1. first-open Bar Widgets live validation
   2. settings guardrails
   3. widget picker search regression
-  4. bar widget reorder regression
+  4. shared settings reorder contracts
+  5. bar widget reorder regression
 
 By default this includes the Home Manager deploy path through
 check-bar-widgets-first-open.sh. Use --skip-switch if the current repo state is
@@ -75,6 +76,7 @@ bash "${script_dir}/check-bar-widgets-first-open.sh" "${first_open_args[@]}"
 # deep scroll capture that has been flaky in the VM.
 bash "${script_dir}/check-settings-guardrails.sh" --skip-responsive --skip-runtime-capture --skip-launcher --skip-settings-deep "${guardrail_args[@]}"
 bash "${script_dir}/check-widget-picker-search.sh"
+bash "${script_dir}/check-settings-reorder-contracts.sh"
 bash "${script_dir}/check-bar-widget-reorder.sh"
 
 printf '[PASS] Settings QA completed.\n'

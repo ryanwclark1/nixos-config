@@ -27,6 +27,16 @@ require_pattern() {
   fi
 }
 
+reject_pattern() {
+  local file="$1"
+  local pattern="$2"
+  local label="$3"
+  if rg -q --multiline "${pattern}" "${file}"; then
+    printf '[FAIL] %s unexpectedly present in %s\n' "${label}" "${file}" >&2
+    exit 1
+  fi
+}
+
 main() {
   local runtime_args=()
 
@@ -60,14 +70,18 @@ main() {
     "${config_root}/features/settings/components/"*.qml \
     "${config_root}/features/settings/components/tabs/"*.qml >/dev/null
 
+  require_pattern "${config_root}/features/settings/components/SettingsDragHandle.qml" 'dragOffsetY' "shared drag-offset handle"
+  reject_pattern "${config_root}/features/settings/components/SettingsDragHandle.qml" 'drag\.target:' "legacy drag.target handle wiring"
+  require_pattern "${config_root}/features/settings/components/tabs/ShellControlCenterSection.qml" 'SettingsReorderRow' "control center shared reorder row"
+  require_pattern "${config_root}/features/settings/components/tabs/ShellControlCenterSection.qml" 'SettingsReorderButtons' "control center reorder fallback buttons"
+  require_pattern "${config_root}/features/settings/components/tabs/LauncherModeList.qml" 'SettingsReorderRow' "launcher mode shared reorder row"
+  require_pattern "${config_root}/features/settings/components/tabs/LauncherModeList.qml" 'SettingsReorderButtons' "launcher mode reorder fallback buttons"
   require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'dragReorderEnabled:\s*true' "bar widget drag enablement"
-  require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'SettingsDragHandle' "bar widget shared drag handle"
-  require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'label:\s*"↑"' "bar widget up-arrow fallback"
-  require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'label:\s*"↓"' "bar widget down-arrow fallback"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'SettingsDragHandle' "shell-core tab shared drag handle"
+  require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'SettingsReorderRow' "bar widget shared reorder row"
+  require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'SettingsReorderButtons' "bar widget reorder fallback buttons"
+  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'SettingsReorderRow' "launcher web shared reorder row"
+  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'SettingsReorderButtons' "launcher web reorder fallback buttons"
   require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'currentWebProviderDropIndex' "shell-core tab reorder math helper usage"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'label:\s*"↑"' "shell-core tab up-arrow fallback"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'label:\s*"↓"' "shell-core tab down-arrow fallback"
   require_pattern "${script_dir}/check-bar-widgets-first-open.sh" 'check-settings-responsive\.sh"\s+--id "\$\{instance_id\}"\s+--skip-reload' "bar widgets first-open settings smoke instance-id binding"
 
   if (( skip_responsive == 0 )); then

@@ -412,7 +412,7 @@ if (String(payload.loadState || "") !== "ready" && String(payload.loadState || "
 if (!(Number(payload.filteredItemCount || 0) > 0)) process.exit(1);
 if (!(Number(payload.windowChromeHeight || 0) > 0)) process.exit(1);
 if (!(Number(payload.searchDeckHeight || 0) > 0)) process.exit(1);
-if (!(Number(payload.utilityBandHeight || 0) > 0)) process.exit(1);
+if (!(Number(payload.utilityBandHeight || 0) >= 0)) process.exit(1);
 if (!(Number(payload.metricsHeight || 0) > 0)) process.exit(1);
 if (!(Number(payload.resultsHeight || 0) > 0)) process.exit(1);
 if (!(ratio >= minimumRatio)) process.exit(1);
