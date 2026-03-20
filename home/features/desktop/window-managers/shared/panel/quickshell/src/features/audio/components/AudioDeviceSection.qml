@@ -31,18 +31,11 @@ ColumnLayout {
 
   SectionLabel { label: root.sectionLabel }
 
-  Rectangle {
+  ThemedContainer {
+    variant: "card"
+    showGradient: true
     Layout.fillWidth: true
-    radius: Colors.radiusMedium
-    color: Colors.cardSurface
-    border.color: Colors.border
-    border.width: 1
     implicitHeight: controlCol.implicitHeight + 2 * Colors.spacingM
-
-    gradient: SurfaceGradient {}
-
-    // Inner highlight
-    InnerHighlight { }
 
     ColumnLayout {
       id: controlCol

@@ -5,18 +5,13 @@ import "../../services"
 import "../../shared"
 import "../../widgets" as SharedWidgets
 
-Rectangle {
+ThemedContainer {
   id: root
+  variant: "card"
+  radius: Colors.radiusCard
 
   implicitWidth: 280
   implicitHeight: column.implicitHeight + Colors.spacingL * 2
-
-  color: Colors.cardSurface
-  radius: Colors.radiusCard
-  border.color: Colors.border
-  border.width: 1
-
-  SharedWidgets.InnerHighlight {}
 
   // ── Derived state ────────────────────────────
   readonly property color lapColor: PomodoroService.isBreak ? Colors.success : Colors.primary
