@@ -9,6 +9,7 @@ disk_image="${NIRI_VM_DISK_IMAGE:-}"
 build_only=0
 reset_disk=0
 ssh_port=""
+out_link=""
 runner_args=()
 
 usage() {
@@ -100,6 +101,16 @@ fi
 mkdir -p "$(dirname "${disk_image}")"
 disk_image="$(readlink -m "${disk_image}")"
 
+if [[ -z "${out_link}" ]]; then
+  if [[ -n "${ssh_port}" ]]; then
+    out_link="${state_dir}/build-links/${config_name}-${ssh_port}"
+  else
+    out_link="${state_dir}/build-links/${config_name}"
+  fi
+fi
+mkdir -p "$(dirname "${out_link}")"
+out_link="$(readlink -m "${out_link}")"
+
 if [[ "${reset_disk}" -eq 1 && -e "${disk_image}" ]]; then
   echo "[INFO] Removing VM disk image: ${disk_image}"
   rm -f "${disk_image}"
@@ -114,27 +125,28 @@ build_attr="${flake_ref}#nixosConfigurations.${config_name}.config.system.build.
 
 echo "[INFO] Building VM runner: ${build_attr}"
 cd "${repo_root}"
-nix build "${build_attr}"
+nix build --out-link "${out_link}" "${build_attr}"
 
 runner=""
-if [[ -d "${repo_root}/result/bin" ]]; then
-  for candidate in "${repo_root}"/result/bin/run-*-vm; do
+if [[ -d "${out_link}/bin" ]]; then
+  for candidate in "${out_link}"/bin/run-*-vm; do
     if [[ -e "${candidate}" ]]; then
       runner="${candidate}"
       break
     fi
   done
-  if [[ -z "${runner}" && -x "${repo_root}/result/bin/run-nixos-vm" ]]; then
-    runner="${repo_root}/result/bin/run-nixos-vm"
+  if [[ -z "${runner}" && -x "${out_link}/bin/run-nixos-vm" ]]; then
+    runner="${out_link}/bin/run-nixos-vm"
   fi
 fi
 
 if [[ -z "${runner}" ]]; then
-  echo "[ERROR] Could not find VM runner under ${repo_root}/result/bin" >&2
+  echo "[ERROR] Could not find VM runner under ${out_link}/bin" >&2
   exit 1
 fi
 
 echo "[INFO] VM runner ready: ${runner}"
+echo "[INFO] Using VM build link: ${out_link}"
 echo "[INFO] Using VM disk image: ${disk_image}"
 if [[ "${build_only}" -eq 1 ]]; then
   echo "[INFO] Build-only mode enabled. Exiting without launch."

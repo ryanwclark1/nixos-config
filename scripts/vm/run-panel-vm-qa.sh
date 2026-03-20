@@ -117,17 +117,19 @@ settings_status_for_vm() {
   printf 'n/a'
 }
 
+host_log_for_vm() {
+  local vm="$1"
+  printf '%s/.host/%s/host-run.log' "${output_dir}" "${vm}"
+}
+
 run_one_vm() {
   local vm="$1"
   local wrapper=""
   local vm_dir="${output_dir}/${vm}"
-  local host_log="${vm_dir}/host-run.log"
-  local status_file="${vm_dir}/exit-code.txt"
-  local run_script="${vm_dir}/run-${vm}-gate.sh"
+  local host_log=""
+  local host_meta_dir=""
   local exit_code=0
   local ssh_port=""
-  local child_pid=""
-  local last_report=0
   local -a cmd=()
 
   case "${vm}" in
@@ -146,6 +148,9 @@ run_one_vm() {
   esac
 
   mkdir -p "${vm_dir}"
+  host_log="$(host_log_for_vm "${vm}")"
+  host_meta_dir="$(dirname "${host_log}")"
+  mkdir -p "${host_meta_dir}"
   cmd=(bash "${wrapper}" --mode gate --output-dir "${vm_dir}" --ssh-port "${ssh_port}")
   if (( reset_disk == 1 )); then
     cmd+=(--reset-disk)
@@ -161,42 +166,11 @@ run_one_vm() {
     printf '\n'
   fi
 
-  rm -f "${status_file}"
-  {
-    printf '#!/usr/bin/env bash\n'
-    printf 'set -euo pipefail\n'
-    printf 'if'
-    printf ' %q' "${cmd[@]}"
-    printf ' >%q 2>&1; then\n' "${host_log}"
-    printf "  printf '0\\n' >%q\n" "${status_file}"
-    printf 'else\n'
-    printf "  printf '%%s\\n' \"\$?\" >%q\n" "${status_file}"
-    printf 'fi\n'
-  } > "${run_script}"
-  chmod +x "${run_script}"
-
-  nohup "${run_script}" >/dev/null 2>&1 &
-  child_pid=$!
-  last_report=${SECONDS}
-
-  while true; do
-    if [[ -f "${status_file}" ]]; then
-      exit_code="$(cat "${status_file}" 2>/dev/null || printf '1')"
-      break
-    fi
-
-    if ! kill -0 "${child_pid}" 2>/dev/null; then
-      printf '[WARN] %s VM gate wrapper exited without writing %s\n' "${vm}" "${status_file}" >&2
-      exit_code=1
-      break
-    fi
-
-    if (( SECONDS - last_report >= 30 )); then
-      printf '[INFO] %s VM gate still running...\n' "${vm}"
-      last_report=${SECONDS}
-    fi
-    sleep 5
-  done
+  if "${cmd[@]}" >"${host_log}" 2>&1; then
+    exit_code=0
+  else
+    exit_code=$?
+  fi
 
   if [[ -f "${host_log}" ]]; then
     cat "${host_log}"
@@ -204,7 +178,11 @@ run_one_vm() {
     printf '[WARN] Host log missing for %s VM run: %s\n' "${vm}" "${host_log}" >&2
   fi
 
-  printf '%s' "${exit_code}" > "${status_file}"
+  mkdir -p "${vm_dir}"
+  printf '%s' "${exit_code}" > "${vm_dir}/exit-code.txt"
+  if [[ -f "${host_log}" ]]; then
+    cp "${host_log}" "${vm_dir}/aggregate-host-run.log"
+  fi
   return "${exit_code}"
 }
 
@@ -246,7 +224,8 @@ summary_md="${output_dir}/summary.md"
     printf '      "exitCode": %s,\n' "${exit_code}"
     printf '      "runtimeStatus": "%s",\n' "$(runtime_status_for_vm "${vm_dir}")"
     printf '      "settingsStatus": "%s",\n' "$(settings_status_for_vm "${vm_dir}")"
-    printf '      "artifactDir": "%s"\n' "${vm_dir}"
+    printf '      "artifactDir": "%s",\n' "${vm_dir}"
+    printf '      "hostLog": "%s"\n' "$(host_log_for_vm "${vm}")"
     printf '    }%s\n' "${sep}"
   done
   printf '  ]\n'
@@ -271,6 +250,7 @@ summary_md="${output_dir}/summary.md"
     printf -- '- runtime: `%s`\n' "$(runtime_status_for_vm "${vm_dir}")"
     printf -- '- settings: `%s`\n' "$(settings_status_for_vm "${vm_dir}")"
     printf -- '- artifacts: `%s`\n' "${vm_dir}"
+    printf -- '- host log: `%s`\n' "$(host_log_for_vm "${vm}")"
     printf -- '- wrapper summary: `%s`\n\n' "${vm_dir}/summary.json"
   done
 } > "${summary_md}"
