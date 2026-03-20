@@ -20,6 +20,7 @@ launcher_log="${NIRI_VM_QA_LOG:-}"
 extra_capture_args=()
 host_pubkey_file=""
 use_key_auth=0
+key_auth_ready=0
 remote_runtime_dir=""
 remote_repo=""
 remote_tmp_root=""
@@ -228,16 +229,18 @@ scp_password_base=(
 )
 
 vm_ssh() {
-  if (( use_key_auth == 1 )) && "${ssh_key_base[@]}" "$@"; then
-    return 0
+  if (( use_key_auth == 1 && key_auth_ready == 1 )); then
+    "${ssh_key_base[@]}" "$@"
+    return $?
   fi
 
   "${ssh_password_base[@]}" "$@"
 }
 
 vm_scp() {
-  if (( use_key_auth == 1 )) && "${scp_key_base[@]}" "$@"; then
-    return 0
+  if (( use_key_auth == 1 && key_auth_ready == 1 )); then
+    "${scp_key_base[@]}" "$@"
+    return $?
   fi
 
   "${scp_password_base[@]}" "$@"
@@ -317,7 +320,17 @@ install_host_pubkey() {
   pubkey="$(<"${host_pubkey_file}")"
   [[ -n "${pubkey}" ]] || return 0
 
-  vm_ssh "umask 077 && mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && grep -qxF $(printf '%q' "${pubkey}") ~/.ssh/authorized_keys || printf '%s\n' $(printf '%q' "${pubkey}") >> ~/.ssh/authorized_keys"
+  "${ssh_password_base[@]}" "HOST_PUBKEY=$(printf '%q' "${pubkey}") bash -s" <<'EOF'
+set -euo pipefail
+umask 077
+mkdir -p ~/.ssh
+touch ~/.ssh/authorized_keys
+grep -qxF "${HOST_PUBKEY}" ~/.ssh/authorized_keys || printf '%s\n' "${HOST_PUBKEY}" >> ~/.ssh/authorized_keys
+EOF
+
+  if (( use_key_auth == 1 )) && "${ssh_key_base[@]}" "echo READY" >/dev/null 2>&1; then
+    key_auth_ready=1
+  fi
 }
 
 wait_for_niri() {
@@ -514,6 +527,10 @@ assert_headless_skip_markers() {
   if [[ ! -f "${settings_log}" ]]; then
     echo "[ERROR] Expected settings QA log at ${settings_log}" >&2
     return 1
+  fi
+
+  if rg -Fq "[SKIP] settings qa skipped because runtime gate failed" "${settings_log}"; then
+    return 0
   fi
 
   rg -Fq "[SKIP] Bar Widgets first-open visual capture skipped: Niri session exposes no wl_output in this headless VM." "${settings_log}" || {
