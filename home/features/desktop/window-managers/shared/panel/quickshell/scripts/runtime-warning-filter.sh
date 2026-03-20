@@ -12,6 +12,7 @@ quickshell\.hyprland\.ipc: Got removal for workspace id .* which was not previou
 QML QQuickImage at @features/clipboard/ClipboardMenu\.qml\[.*\]: Error decoding: file:///run/user/.*/quickshell-clipboard/.*
 libpng error: Read Error
 \[W\]\[WeatherService\] Error: empty weather response
+\[W\]\[WeatherService\] Error: missing current condition
 \[W\]\[MarketService\] Error: empty market response
 EOF
 

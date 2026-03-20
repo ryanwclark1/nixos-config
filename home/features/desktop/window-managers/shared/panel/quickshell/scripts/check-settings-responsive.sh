@@ -468,6 +468,7 @@ main() {
     elif refresh_instance_binding && [[ -n "${instance_pid}" ]] && run_ipc quickshell ipc --pid "${instance_pid}" show >/dev/null; then
       pass "IPC reachable for pid ${instance_pid}"
     else
+      dump_repo_shell_log_once
       fail "IPC unreachable for pid ${instance_pid}"
       printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
       exit 1
@@ -480,6 +481,7 @@ main() {
         if run_ipc quickshell ipc --pid "${instance_pid}" show >/dev/null; then
           pass "IPC reachable for pid ${instance_pid}"
         else
+          dump_repo_shell_log_once
           fail "IPC unreachable for instance ${instance_id}"
           printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
           exit 1
@@ -487,11 +489,13 @@ main() {
       elif run_ipc quickshell ipc --id "${instance_id}" show >/dev/null; then
         pass "IPC reachable for instance ${instance_id}"
       else
+        dump_repo_shell_log_once
         fail "IPC unreachable for instance ${instance_id}"
         printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
         exit 1
       fi
     else
+      dump_repo_shell_log_once
       fail "IPC unreachable for instance ${instance_id}"
       printf '[INFO] Summary: %d pass, %d warn, %d fail\n' "${pass_count}" "${warn_count}" "${fail_count}"
       exit 1
