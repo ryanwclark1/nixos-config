@@ -1,11 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../shared"
 
 Rectangle {
     id: root
 
-    property string iconName: "󰋗"
+    property string iconName: "info.svg"
     property string title: ""
     property string body: ""
     default property alias content: contentColumn.data
@@ -32,14 +33,13 @@ Rectangle {
             width: parent.width
             spacing: Colors.spacingS
 
-            Text {
+            Loader {
                 visible: root.iconName !== ""
-                text: root.iconName
-                color: Colors.primary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeLarge
+                sourceComponent: root.iconName.endsWith(".svg") ? _ciSvg : _ciNerd
                 Layout.alignment: Qt.AlignTop
             }
+            Component { id: _ciSvg; SvgIcon { source: root.iconName; color: Colors.primary; size: Colors.fontSizeLarge } }
+            Component { id: _ciNerd; Text { text: root.iconName; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
 
             Text {
                 width: root.iconName !== "" ? Math.max(0, parent.width - Colors.fontSizeLarge - Colors.spacingS) : parent.width

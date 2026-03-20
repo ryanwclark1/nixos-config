@@ -68,13 +68,12 @@ Rectangle {
                     border.color: Colors.primaryRing
                     border.width: 1
 
-                    Text {
+                    Loader {
                         anchors.centerIn: parent
-                        text: root.iconName
-                        color: Colors.primary
-                        font.family: Colors.fontMono
-                        font.pixelSize: Colors.fontSizeSmall
+                        sourceComponent: root.iconName.endsWith(".svg") ? _scSvg : _scNerd
                     }
+                    Component { id: _scSvg; SvgIcon { source: root.iconName; color: Colors.primary; size: Colors.fontSizeSmall } }
+                    Component { id: _scNerd; Text { text: root.iconName; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeSmall } }
                 }
 
                 Text {
