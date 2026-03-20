@@ -19,7 +19,7 @@ Item {
         RotationAnimation on rotation {
             from: 0
             to: 360
-            duration: 1000
+            duration: Colors.durationAmbientShort
             loops: Animation.Infinite
         }
     }

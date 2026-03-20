@@ -14,7 +14,7 @@ Item {
   property string description: ""
   property string icon: "󰋼"
   property string type: "notice"
-  property int duration: 3000
+  property int duration: Colors.durationToast
   property real progress: 1.0
   property string actionLabel: ""
   property string actionToken: ""
