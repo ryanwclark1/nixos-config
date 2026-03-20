@@ -336,7 +336,7 @@ function mergedProviderCatalog(customEngines) {
             name: engine.name,
             exec: engine.exec,
             home: engine.home || "",
-            icon: engine.icon || "󰖟",
+            icon: engine.icon || "globe-search.svg",
             isWeb: true,
             isCustom: true
         };

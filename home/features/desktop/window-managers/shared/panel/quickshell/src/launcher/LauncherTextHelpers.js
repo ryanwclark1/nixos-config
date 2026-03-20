@@ -1,5 +1,6 @@
 .pragma library
 .import "LauncherFileParser.js" as FileParser
+.import "LauncherModeData.js" as ModeData
 
 // ── Empty state text ─────────────────────────────
 
@@ -118,23 +119,9 @@ function emptyPrimaryHint(mode, clean, webPrimaryName, webPrimaryHintName, fileR
 }
 
 function emptyPrimaryHintIcon(mode) {
-    if (mode === "files")
-        return "󰉋";
-    if (mode === "web")
-        return "󰖟";
-    if (mode === "ai")
-        return "󰚩";
-    if (mode === "settings")
-        return "󰒓";
-    if (mode === "run")
-        return "󰆍";
-    if (mode === "bookmarks")
-        return "󰃀";
-    if (mode === "ssh")
-        return "󰣀";
     if (mode === "window")
-        return "󱇙";
-    return "󰀻";
+        return "window-multiple.svg";
+    return ModeData.modeIcons[mode] || "apps.svg";
 }
 
 function emptySecondaryHint(mode, clean, searchText, webSecondaryName) {
@@ -157,19 +144,19 @@ function emptySecondaryHint(mode, clean, searchText, webSecondaryName) {
 
 function emptySecondaryHintIcon(mode, searchText) {
     if (mode === "files")
-        return "󰉋";
+        return "folder-open.svg";
     if (mode === "web")
-        return "󰇥";
+        return "home.svg";
     if (mode === "settings")
-        return searchText !== "" ? "󰅖" : "";
+        return searchText !== "" ? "dismiss.svg" : "";
     if (mode === "system")
-        return "󰒓";
+        return "settings.svg";
     if (mode === "run")
-        return "󰆍";
+        return "terminal.svg";
     if (mode === "ssh")
-        return "󰑐";
+        return "arrow-clockwise.svg";
     if (searchText !== "")
-        return "󰅖";
+        return "dismiss.svg";
     return "";
 }
 

@@ -1,37 +1,12 @@
 .pragma library
 
+.import "../services/FileIconHelpers.js" as FileIconHelpers
+
 // Pure file-path parsing utilities extracted from Launcher.qml.
 // No QML property access — all state passed via arguments.
 
 function iconForFile(name, extension, kind) {
-    var loweredName = String(name || "").toLowerCase();
-    var ext = String(extension || "").toLowerCase();
-    var type = String(kind || "file").toLowerCase();
-    if (type === "dir")
-        return "󰉋";
-    if (["png", "jpg", "jpeg", "gif", "webp", "svg", "avif", "bmp", "ico"].indexOf(ext) !== -1)
-        return "󰈟";
-    if (["pdf", "epub"].indexOf(ext) !== -1)
-        return "󰈦";
-    if (["doc", "docx", "odt", "rtf", "txt", "md"].indexOf(ext) !== -1)
-        return ext === "md" ? "󰍔" : "󰈙";
-    if (["xls", "xlsx", "ods", "csv", "tsv"].indexOf(ext) !== -1)
-        return "󰈛";
-    if (["ppt", "pptx", "odp", "key"].indexOf(ext) !== -1)
-        return "󰈧";
-    if (["zip", "tar", "gz", "xz", "bz2", "7z", "rar", "zst"].indexOf(ext) !== -1)
-        return "󰗄";
-    if (["mp3", "ogg", "flac", "wav", "m4a", "opus", "aac"].indexOf(ext) !== -1)
-        return "󰎆";
-    if (["mp4", "mkv", "webm", "mov", "avi"].indexOf(ext) !== -1)
-        return "󰈫";
-    if (["nix", "js", "jsx", "ts", "tsx", "py", "rs", "go", "c", "cpp", "h", "hpp", "java", "lua", "qml", "sh", "bash", "zsh", "json", "yaml", "yml", "toml", "ini", "conf", "service", "desktop", "lock"].indexOf(ext) !== -1)
-        return "󰅩";
-    if (loweredName === "makefile" || loweredName === "dockerfile")
-        return "󰅩";
-    if (loweredName.startsWith(".env"))
-        return "󰒓";
-    return "󰈔";
+    return FileIconHelpers.iconForFile(name, extension, kind);
 }
 
 function joinDisplayPath(rootLabel, parentPath) {

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../services/IconHelpers.js" as IconHelpers
 import "../shared"
 import "../widgets" as SharedWidgets
 
@@ -95,11 +96,10 @@ ColumnLayout {
                         anchors.centerIn: parent
                         spacing: Appearance.spacingXS
 
-                        Text {
-                            text: root.launcher.drunCategoryFilter === "" ? "󰍉" : "󰌌"
+                        SharedWidgets.SvgIcon {
+                            source: root.launcher.drunCategoryFilter === "" ? "apps.svg" : "filter.svg"
                             color: root.launcher.drunCategoryFilter === "" ? Colors.textSecondary : Colors.primary
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeXS
+                            size: Appearance.fontSizeXS
                         }
 
                         Text {
@@ -109,11 +109,10 @@ ColumnLayout {
                             font.weight: root.launcher.drunCategoryFilter === "" ? Font.Medium : Font.DemiBold
                         }
 
-                        Text {
-                            text: root.categorySummaryExpanded ? "󰅀" : "󰅂"
+                        SharedWidgets.SvgIcon {
+                            source: IconHelpers.disclosureIcon(root.categorySummaryExpanded)
                             color: Colors.textDisabled
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeXXS
+                            size: Appearance.fontSizeXXS
                         }
                     }
 

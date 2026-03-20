@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../services"
+import "../widgets" as SharedWidgets
 
 Rectangle {
     id: root
@@ -44,17 +45,47 @@ Rectangle {
                     border.color: selected ? Colors.withAlpha(root.accentColor, 0.4) : Colors.border
                     border.width: 1
                     implicitHeight: 28
-                    implicitWidth: Math.min(providerChipText.implicitWidth + 24, providerFlowContainer.width)
+                    implicitWidth: Math.min(providerChipRow.implicitWidth + 24, providerFlowContainer.width)
 
-                    Text {
-                        id: providerChipText
+                    RowLayout {
+                        id: providerChipRow
                         anchors.centerIn: parent
                         width: Math.min(implicitWidth, parent.width - 18)
-                        text: (modelData.icon || "󰖟") + " " + (modelData.name || "")
-                        color: parent.selected ? root.accentColor : Colors.textSecondary
-                        font.pixelSize: Appearance.fontSizeXS
-                        font.weight: Font.DemiBold
-                        elide: Text.ElideRight
+                        spacing: Appearance.spacingXS
+
+                        Loader {
+                            readonly property string iconName: String(modelData.icon || "globe-search.svg")
+                            sourceComponent: iconName.endsWith(".svg") ? providerSvgIcon : providerGlyphIcon
+                        }
+
+                        Text {
+                            text: modelData.name || ""
+                            color: parent.parent.selected ? root.accentColor : Colors.textSecondary
+                            font.pixelSize: Appearance.fontSizeXS
+                            font.weight: Font.DemiBold
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                    }
+
+                    Component {
+                        id: providerSvgIcon
+                        SharedWidgets.SvgIcon {
+                            source: parent.iconName
+                            color: parent.parent.parent.selected ? root.accentColor : Colors.textSecondary
+                            size: Appearance.fontSizeXS
+                        }
+                    }
+
+                    Component {
+                        id: providerGlyphIcon
+                        Text {
+                            text: parent.iconName
+                            color: parent.parent.parent.selected ? root.accentColor : Colors.textSecondary
+                            font.pixelSize: Appearance.fontSizeXS
+                            font.family: Appearance.fontMono
+                            font.weight: Font.DemiBold
+                        }
                     }
 
                     MouseArea {

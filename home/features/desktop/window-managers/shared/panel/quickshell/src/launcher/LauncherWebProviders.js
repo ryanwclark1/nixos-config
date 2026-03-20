@@ -52,7 +52,7 @@ function buildWebRecent(provider, target) {
     return {
         name: provider.name || "Web",
         title: target,
-        icon: provider.icon || "󰖟",
+        icon: provider.icon || "globe-search.svg",
         exec: String(provider.exec || "")
     };
 }

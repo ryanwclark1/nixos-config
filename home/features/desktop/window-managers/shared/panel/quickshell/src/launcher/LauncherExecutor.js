@@ -83,7 +83,7 @@ function buildRecentEntry(mode, item) {
         return {
             name: item.name || item.title || "Window",
             title: item.title || item.appId || "",
-            icon: item.icon || item.appId || "󰖯",
+            icon: item.icon || item.appId || "window-multiple.svg",
             appId: item.appId || "",
             id: item.address || item.id || "",
             openMode: "window"
@@ -93,7 +93,7 @@ function buildRecentEntry(mode, item) {
         return {
             name: item.name || "Link",
             title: item.title || item.exec || "",
-            icon: item.icon || "󰖟",
+            icon: item.icon || "globe-search.svg",
             exec: item.exec || ""
         };
     }
@@ -102,7 +102,7 @@ function buildRecentEntry(mode, item) {
             return {
                 name: item.name || item.fullPath,
                 title: item.fullPath,
-                icon: item.icon || "󰈔",
+                icon: item.icon || "document.svg",
                 fullPath: item.fullPath
             };
         }
@@ -112,7 +112,7 @@ function buildRecentEntry(mode, item) {
         return {
             name: item.name || "Action",
             title: item.category || item.title || "",
-            icon: item.icon || "󰒓",
+            icon: item.icon || "settings.svg",
             exec: item.exec || ""
         };
     }
@@ -120,7 +120,7 @@ function buildRecentEntry(mode, item) {
         return {
             name: item.name || "Settings",
             title: item.breadcrumb || item.title || "",
-            icon: item.icon || "󰒓",
+            icon: item.icon || "settings.svg",
             openMode: "settings"
         };
     }
