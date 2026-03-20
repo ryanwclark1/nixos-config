@@ -100,7 +100,7 @@ Item {
                             value: root._dateSummary
                         },
                         {
-                            icon: "󰖐",
+                            icon: "weather-sunny.svg",
                             label: "Weather",
                             value: (Config.weatherProvider === "wttr" ? "wttr.in" : "Open-Meteo") + " / " + root._weatherUnitsSummary
                         },
@@ -368,7 +368,7 @@ Item {
 
                 SettingsModeRow {
                     label: "Weather Provider"
-                    icon: "󰖐"
+                    icon: "weather-sunny.svg"
                     currentValue: Config.weatherProvider
                     options: [
                         {

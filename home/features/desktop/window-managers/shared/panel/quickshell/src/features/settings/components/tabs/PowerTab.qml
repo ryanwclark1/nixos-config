@@ -56,7 +56,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "Prevent Idle When Playing"
-                    icon: "󰎈"
+                    icon: "battery-saver.svg"
                     configKey: "inhibitIdleWhenPlaying"
                 }
             }

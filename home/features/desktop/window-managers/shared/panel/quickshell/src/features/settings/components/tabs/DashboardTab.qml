@@ -101,7 +101,7 @@ Item {
                                     visible: !MediaService.trackArtUrl
                                     anchors.centerIn: parent
                                     text: "󰓃"
-                                    font.pixelSize: 32
+                                    font.pixelSize: Colors.iconSizeMedium
                                     color: Colors.textDisabled
                                 }
                             }

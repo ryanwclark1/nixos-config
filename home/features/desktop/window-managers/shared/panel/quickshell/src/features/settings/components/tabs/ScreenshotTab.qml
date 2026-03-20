@@ -26,7 +26,7 @@ Item {
         settingsRoot: root.settingsRoot
         tabId: root.tabId
         title: "Screenshot"
-        iconName: "󰹑"
+        iconName: "fullscreen.svg"
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
@@ -47,12 +47,12 @@ Item {
                             value: root._editorSummary
                         },
                         {
-                            icon: "󰔛",
+                            icon: "clock.svg",
                             label: "Delay",
                             value: root._delaySummary
                         },
                         {
-                            icon: "󰋚",
+                            icon: "arrow-counterclockwise.svg",
                             label: "History",
                             value: (Config.screenshotHistory || []).length + " / " + Config.screenshotHistoryMax
                         }

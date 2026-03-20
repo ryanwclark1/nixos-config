@@ -46,7 +46,7 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󱁨",
+                            icon: "code.svg",
                             label: "Hooks",
                             value: Config.hooksEnabled ? "Enabled" : "Disabled"
                         },
@@ -56,7 +56,7 @@ Item {
                             value: root.hookCount + " available"
                         },
                         {
-                            icon: "󰆓",
+                            icon: "save.svg",
                             label: "Configured",
                             value: root.configuredHookCount + " script" + (root.configuredHookCount === 1 ? "" : "s")
                         },
@@ -120,7 +120,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Enable Hooks"
-                    icon: "󱁨"
+                    icon: "code.svg"
                     configKey: "hooksEnabled"
                 }
 
