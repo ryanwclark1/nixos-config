@@ -326,6 +326,9 @@ QtObject {
         function onBatteryCriticalThresholdChanged() {
             root.config.scheduleSave();
         }
+        function onEnabledPanelsChanged() {
+            root.config.scheduleSave();
+        }
         function onHooksEnabledChanged() {
             root.config.scheduleSave();
         }
