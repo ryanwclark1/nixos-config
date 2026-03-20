@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../services"
+import "../../../shared" as Shared
 import "../../../widgets" as SharedWidgets
 
 Rectangle {
@@ -30,13 +31,12 @@ Rectangle {
             radius: height / 2
             color: Colors.primarySubtle
 
-            Text {
+            Loader {
                 anchors.centerIn: parent
-                text: icon
-                color: Colors.primary
-                font.family: Colors.fontMono
-                font.pixelSize: Colors.fontSizeXL
+                sourceComponent: root.icon.endsWith(".svg") ? _qlSvg : _qlNerd
             }
+            Component { id: _qlSvg; Shared.SvgIcon { source: root.icon; color: Colors.primary; size: Colors.fontSizeXL } }
+            Component { id: _qlNerd; Text { text: root.icon; color: Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL } }
         }
 
         ColumnLayout {

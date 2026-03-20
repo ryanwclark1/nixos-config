@@ -302,7 +302,7 @@ PanelWindow {
 
                 SharedWidgets.FilterChip {
                     label: "Processes"
-                    icon: "󰆍"
+                    icon: "terminal.svg"
                     selected: root.keyboardSectionIndex === 0
                     onClicked: root.focusKeyboardSection(0)
                 }

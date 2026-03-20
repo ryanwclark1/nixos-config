@@ -44,7 +44,7 @@ BasePopupMenu {
     }
 
     headerExtras: SharedWidgets.IconButton {
-        icon: "󰄨"
+        icon: "info.svg"
         size: 30
         iconSize: Colors.fontSizeLarge
         iconColor: Colors.primary

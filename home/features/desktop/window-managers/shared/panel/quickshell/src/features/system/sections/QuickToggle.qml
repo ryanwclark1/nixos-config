@@ -55,13 +55,12 @@ Rectangle {
       scale: toggleMouse.containsMouse ? 1.1 : 1.0
       Behavior on scale { NumberAnimation { duration: Colors.durationNormal; easing.type: Easing.OutBack } }
 
-      Text {
+      Loader {
         anchors.centerIn: parent
-        text: root.icon
-        color: active ? Colors.text : Colors.primary
-        font.family: Colors.fontMono
-        font.pixelSize: Colors.fontSizeXL
+        sourceComponent: root.icon.endsWith(".svg") ? _qtSvg : _qtNerd
       }
+      Component { id: _qtSvg; SvgIcon { source: root.icon; color: active ? Colors.text : Colors.primary; size: Colors.fontSizeXL } }
+      Component { id: _qtNerd; Text { text: root.icon; color: active ? Colors.text : Colors.primary; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeXL } }
     }
 
     Column {
