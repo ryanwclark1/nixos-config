@@ -49,8 +49,8 @@ QtObject {
     signal windowsUpdated()
 
     // ── Named constants ─────────────────────────────
-    readonly property int _outputsDebounceMs: 200
-    readonly property int _windowsBatchMs: 50
+    readonly property int _outputsDebounceMs: GameModeService.active ? 500 : 200
+    readonly property int _windowsBatchMs: GameModeService.active ? 200 : 50
 
     // ── Batching for window updates ─────────────────
     property bool _windowsDirty: false

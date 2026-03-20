@@ -204,7 +204,8 @@ Scope {
             var _ = WeatherService.subscriberCount;
             _ = TodoService.totalCount;
             _ = PomodoroService.progress;
-            _ = GameModeService.gameRunning;
+            _ = GameModeService.active;
+            _ = FirstRunService;
         });
         done();
     }
@@ -284,7 +285,7 @@ Scope {
     }
 
     LazyLoader {
-        active: root.notifCenterVisible
+        active: Config.isPanelEnabled("notifCenter") && root.notifCenterVisible
         NotificationCenter {
             id: center
             readonly property var layoutState: root.surfacePanelLayout(root.activeSurfaceContext, Config.controlCenterWidth)
@@ -323,7 +324,7 @@ Scope {
     }
 
     LazyLoader {
-        active: root.systemMonitorVisible
+        active: Config.isPanelEnabled("systemMonitor") && root.systemMonitorVisible
         SystemMonitorPanel {
             id: systemMonitor
             screen: root.currentSurfaceScreen()
@@ -333,7 +334,7 @@ Scope {
     }
 
     LazyLoader {
-        active: root.notepadVisible
+        active: Config.isPanelEnabled("notepad") && root.notepadVisible
         Notepad {
             id: notepad
             screen: root.currentSurfaceScreen()
@@ -348,7 +349,7 @@ Scope {
     }
 
     LazyLoader {
-        active: root.aiChatVisible
+        active: Config.isPanelEnabled("aiChat") && root.aiChatVisible
         AiChat {
             id: aiChat
             screen: root.currentSurfaceScreen()
@@ -358,7 +359,7 @@ Scope {
     }
 
     LazyLoader {
-        active: root.commandPaletteVisible
+        active: Config.isPanelEnabled("commandPalette") && root.commandPaletteVisible
         CommandPalette {
             id: commandPalette
             screen: root.currentSurfaceScreen()
@@ -368,7 +369,7 @@ Scope {
     }
 
     LazyLoader {
-        active: root.powerMenuVisible
+        active: Config.isPanelEnabled("powerMenu") && root.powerMenuVisible
         Powermenu {
             id: powermenu
             screen: root.currentSurfaceScreen()
@@ -389,7 +390,7 @@ Scope {
     }
 
     LazyLoader {
-        active: root.colorPickerVisible
+        active: Config.isPanelEnabled("colorPicker") && root.colorPickerVisible
         ColorPicker {
             id: colorPicker
             isOpen: root.colorPickerVisible
@@ -401,7 +402,7 @@ Scope {
     DisplayAutoProfile {}
 
     LazyLoader {
-        active: root.displayConfigVisible
+        active: Config.isPanelEnabled("displayConfig") && root.displayConfigVisible
         DisplayConfig {
             id: displayConfig
             isOpen: root.displayConfigVisible
