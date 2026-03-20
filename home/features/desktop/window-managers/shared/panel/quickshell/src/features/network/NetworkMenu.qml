@@ -68,17 +68,12 @@ BasePopupMenu {
 
   Component {
     id: networkDetailCardComponent
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       required property var modelData
       Layout.fillWidth: true
       Layout.preferredHeight: 60
-      radius: Colors.radiusMedium
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
       clip: true
-
-      SharedWidgets.InnerHighlight { }
 
       Rectangle {
         anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
@@ -102,7 +97,7 @@ BasePopupMenu {
         }
       }
 
-      SharedWidgets.StateLayer { anchors.fill: parent; radius: parent.radius; stateColor: Colors.primary; enableRipple: false; hovered: detailHover.containsMouse }
+      SharedWidgets.StateLayer { anchors.fill: parent; stateColor: Colors.primary; enableRipple: false; hovered: detailHover.containsMouse }
       MouseArea { id: detailHover; anchors.fill: parent; hoverEnabled: true }
     }
   }

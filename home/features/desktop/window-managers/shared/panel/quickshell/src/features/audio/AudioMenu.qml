@@ -65,17 +65,10 @@ BasePopupMenu {
 
       SharedWidgets.SectionLabel { label: "APP VOLUME" }
 
-      Rectangle {
+      SharedWidgets.ThemedContainer {
+        variant: "card"
         Layout.fillWidth: true
-        radius: Colors.radiusMedium
-        color: Colors.cardSurface
-        border.color: Colors.border
-        border.width: 1
         implicitHeight: appCol.implicitHeight + 2 * Colors.spacingM
-
-
-        // Inner highlight
-        SharedWidgets.InnerHighlight { }
 
         ColumnLayout {
           id: appCol

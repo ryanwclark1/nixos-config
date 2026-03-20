@@ -32,16 +32,10 @@ BasePopupMenu {
     columnSpacing: Colors.spacingM
 
     // ── Current conditions card ──────────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       implicitHeight: root.compactMode ? 182 : 132
-      radius: Colors.radiusMedium
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      // Inner highlight
-      SharedWidgets.InnerHighlight { }
 
       GridLayout {
         anchors.fill: parent
@@ -112,16 +106,10 @@ BasePopupMenu {
     }
 
     // ── Additional details row ──────────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       implicitHeight: detailsGrid.implicitHeight + Colors.spacingM * 2
-      radius: Colors.radiusMedium
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      // Inner highlight
-      SharedWidgets.InnerHighlight { }
 
       GridLayout {
         id: detailsGrid
@@ -168,16 +156,11 @@ BasePopupMenu {
     }
 
     // ── Air Quality card ──────────────────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       visible: WeatherService.aqi !== "--"
       implicitHeight: aqiContent.implicitHeight + Colors.spacingM * 2
-      radius: Colors.radiusMedium
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      SharedWidgets.InnerHighlight { }
 
       ColumnLayout {
         id: aqiContent
@@ -248,16 +231,10 @@ BasePopupMenu {
         Repeater {
           model: WeatherService.hourlyForecast
 
-          delegate: Rectangle {
+          delegate: SharedWidgets.ThemedContainer {
+            variant: "card"
             width: 62
             height: 72
-            radius: Colors.radiusMedium
-            color: Colors.cardSurface
-            border.color: Colors.border
-            border.width: 1
-
-            // Inner highlight
-            SharedWidgets.InnerHighlight { }
 
             ColumnLayout {
               anchors.fill: parent

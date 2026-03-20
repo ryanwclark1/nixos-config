@@ -20,15 +20,10 @@ BasePopupMenu {
 
     Repeater {
       model: MarketService.marketData || []
-      delegate: Rectangle {
+      delegate: SharedWidgets.ThemedContainer {
+        variant: "card"
         Layout.fillWidth: true
         implicitHeight: 70
-        radius: Colors.radiusMedium
-        color: Colors.cardSurface
-        border.color: Colors.border
-        border.width: 1
-
-        SharedWidgets.InnerHighlight { }
 
         RowLayout {
           anchors.fill: parent

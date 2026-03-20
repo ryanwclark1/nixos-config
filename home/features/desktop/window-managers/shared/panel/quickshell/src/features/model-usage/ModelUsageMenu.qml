@@ -182,16 +182,11 @@ BasePopupMenu {
     }
 
     // ── Rate Limit Section (Claude only) ─────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       visible: root.showClaude && ModelUsageService.claudeRateLimitAvailable
       implicitHeight: rateLimitCol.implicitHeight + Colors.spacingL * 2
-      radius: Colors.radiusCard
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      SharedWidgets.InnerHighlight { }
 
       ColumnLayout {
         id: rateLimitCol
@@ -255,16 +250,11 @@ BasePopupMenu {
     }
 
     // ── Today Details Section ────────────────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       visible: ModelUsageService.isReady
       implicitHeight: todayCol.implicitHeight + Colors.spacingL * 2
-      radius: Colors.radiusCard
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      SharedWidgets.InnerHighlight { }
 
       ColumnLayout {
         id: todayCol
@@ -341,18 +331,13 @@ BasePopupMenu {
     }
 
     // ── Last 7 Days Chart ────────────────────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       visible: (root.showClaude && ModelUsageService.claudeRecentDays.length > 0)
               || (root.showGemini && ModelUsageService.geminiRecentDays.length > 0)
               || (root.showCodex && ModelUsageService.codexRecentDays.length > 0)
       implicitHeight: chartCol.implicitHeight + Colors.spacingL * 2
-      radius: Colors.radiusCard
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      SharedWidgets.InnerHighlight { }
 
       ColumnLayout {
         id: chartCol
@@ -440,16 +425,11 @@ BasePopupMenu {
     }
 
     // ── All-Time Model Breakdown (Claude) ────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       visible: root.showClaude && Object.keys(ModelUsageService.claudeModelUsage).length > 0
       implicitHeight: allTimeCol.implicitHeight + Colors.spacingL * 2
-      radius: Colors.radiusCard
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      SharedWidgets.InnerHighlight { }
 
       ColumnLayout {
         id: allTimeCol
@@ -556,16 +536,11 @@ BasePopupMenu {
     }
 
     // ── Gemini All-Time Stats ────────────────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       visible: root.showGemini && ModelUsageService.geminiReady
       implicitHeight: geminiAllTimeCol.implicitHeight + Colors.spacingL * 2
-      radius: Colors.radiusCard
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      SharedWidgets.InnerHighlight { }
 
       ColumnLayout {
         id: geminiAllTimeCol
@@ -651,16 +626,11 @@ BasePopupMenu {
     }
 
     // ── Codex Info Section ───────────────────────────
-    Rectangle {
+    SharedWidgets.ThemedContainer {
+      variant: "card"
       Layout.fillWidth: true
       visible: root.showCodex && ModelUsageService.codexReady
       implicitHeight: codexCol.implicitHeight + Colors.spacingL * 2
-      radius: Colors.radiusCard
-      color: Colors.cardSurface
-      border.color: Colors.border
-      border.width: 1
-
-      SharedWidgets.InnerHighlight { }
 
       ColumnLayout {
         id: codexCol
