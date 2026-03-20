@@ -315,16 +315,19 @@ wait_for_ssh() {
 
 install_host_pubkey() {
   local pubkey=""
+  local pubkey_b64=""
 
   resolve_host_pubkey || return 0
   pubkey="$(<"${host_pubkey_file}")"
   [[ -n "${pubkey}" ]] || return 0
+  pubkey_b64="$(printf '%s' "${pubkey}" | base64 -w0)"
 
-  "${ssh_password_base[@]}" "HOST_PUBKEY=$(printf '%q' "${pubkey}") bash -s" <<'EOF'
+  "${ssh_password_base[@]}" "HOST_PUBKEY_B64='${pubkey_b64}' bash -s" <<'EOF'
 set -euo pipefail
 umask 077
 mkdir -p ~/.ssh
 touch ~/.ssh/authorized_keys
+HOST_PUBKEY="$(printf '%s' "${HOST_PUBKEY_B64}" | base64 -d)"
 grep -qxF "${HOST_PUBKEY}" ~/.ssh/authorized_keys || printf '%s\n' "${HOST_PUBKEY}" >> ~/.ssh/authorized_keys
 EOF
 
