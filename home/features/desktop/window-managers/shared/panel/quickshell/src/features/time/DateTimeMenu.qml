@@ -86,11 +86,10 @@ BasePopupMenu {
 
               RowLayout {
                 spacing: Appearance.spacingXS
-                Text {
-                  text: Appearance.weatherIcon(WeatherService.condition)
+                SharedWidgets.SvgIcon {
+                  source: Appearance.weatherIcon(WeatherService.condition)
                   color: Colors.accent
-                  font.family: Appearance.fontMono
-                  font.pixelSize: Appearance.fontSizeLarge
+                  size: Appearance.fontSizeLarge
                 }
                 Text {
                   text: WeatherService.temp || "--"
@@ -157,12 +156,11 @@ BasePopupMenu {
               width: 44; height: 44
               radius: Appearance.radiusSmall
               color: Colors.withAlpha(Colors.accent, 0.1)
-              Text {
+              SharedWidgets.SvgIcon {
                 anchors.centerIn: parent
-                text: Appearance.weatherIcon(WeatherService.condition)
+                source: Appearance.weatherIcon(WeatherService.condition)
                 color: Colors.accent
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeDisplay
+                size: Appearance.fontSizeDisplay
               }
             }
 

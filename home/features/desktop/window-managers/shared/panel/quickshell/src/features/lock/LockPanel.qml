@@ -132,11 +132,10 @@ Item {
         active: Config.lockScreenWeather && !compact && WeatherService.temp !== ""
         sourceComponent: RowLayout {
           spacing: Appearance.spacingS
-          Text {
-            text: Appearance.weatherIcon(WeatherService.condition)
+          SvgIcon {
+            source: Appearance.weatherIcon(WeatherService.condition)
             color: Colors.textSecondary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeXL
+            size: Appearance.fontSizeXL
           }
           Text {
             text: (WeatherService.temp || "") + " " + (WeatherService.condition || "")

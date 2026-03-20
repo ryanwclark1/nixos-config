@@ -236,12 +236,11 @@ PanelWindow {
             visible: (notifList.count === 0 && root.searchQuery === "") || (root.searchQuery !== "" && notifList.visibleCount === 0)
             spacing: Appearance.spacingS
             opacity: 0.6
-            Text {
+            SharedWidgets.SvgIcon {
               Layout.alignment: Qt.AlignHCenter
-              text: root.searchQuery === "" ? "󰂚" : "󰍉"
+              source: root.searchQuery === "" ? "alert.svg" : "search-visual.svg"
               color: Colors.textDisabled
-              font.pixelSize: 36
-              font.family: Appearance.fontMono
+              size: 36
             }
             Text {
               Layout.alignment: Qt.AlignHCenter

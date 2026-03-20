@@ -130,7 +130,7 @@ PopupWindow {
         model: !root.showWorkspaceList ? root.desktopActions : []
         delegate: MenuItem {
           text: modelData.name
-          icon: "󰐕"
+          icon: "add.svg"
           onClicked: {
             try { modelData.action.execute(); } catch (e) {
               Quickshell.execDetached(["gtk-launch", root.appId]);
@@ -153,7 +153,7 @@ PopupWindow {
       MenuItem {
         visible: root.isRunning && !root.isGrouped && !root.showWorkspaceList
         text: "Focus"
-        icon: "󰖲"
+        icon: "options.svg"
         onClicked: {
           if (root.toplevels.length > 0) root.toplevels[0].activate();
           root.close();
@@ -175,7 +175,7 @@ PopupWindow {
       MenuItem {
         visible: !root.showWorkspaceList
         text: "New Instance"
-        icon: "󰐕"
+        icon: "add.svg"
         onClicked: {
           Quickshell.execDetached(["gtk-launch", root.appId]);
           root.close();
@@ -186,7 +186,7 @@ PopupWindow {
       MenuItem {
         visible: root.isRunning && !root.showWorkspaceList && CompositorAdapter.supportsWorkspaceMove
         text: "Move to Workspace  ›"
-        icon: "󰍹"
+        icon: "desktop.svg"
         onClicked: root.showWorkspaceList = true
       }
 
@@ -228,7 +228,7 @@ PopupWindow {
       MenuItem {
         visible: root.isRunning && !root.showWorkspaceList
         text: root.isGrouped ? "Close All (" + root.toplevels.length + ")" : "Close"
-        icon: "󰅖"
+        icon: "dismiss.svg"
         isDestructive: true
         onClicked: {
           for (var i = 0; i < root.toplevels.length; i++) {
@@ -269,12 +269,11 @@ PopupWindow {
         anchors.rightMargin: Appearance.paddingSmall
         spacing: Appearance.spacingS
 
-        Text {
-          text: menuItem.icon
-          color: menuItem.isDestructive ? Colors.error : Colors.text
-          font.family: Appearance.fontMono
-          font.pixelSize: Appearance.fontSizeMedium
+        Loader {
+          sourceComponent: menuItem.icon.endsWith(".svg") ? _miSvg : _miNerd
         }
+        Component { id: _miSvg; SvgIcon { source: menuItem.icon; color: menuItem.isDestructive ? Colors.error : Colors.text; size: Appearance.fontSizeMedium } }
+        Component { id: _miNerd; Text { text: menuItem.icon; color: menuItem.isDestructive ? Colors.error : Colors.text; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium } }
 
         Text {
           Layout.fillWidth: true

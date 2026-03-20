@@ -65,9 +65,9 @@ QtObject {
   // ── Provider identity ────────────────────────────
   readonly property string providerIcon: {
     var p = root.activeProvider;
-    if (p === "claude") return "󱜚";
-    if (p === "gemini") return "󰫢";
-    return "";   // Codex
+    if (p === "claude") return "brands/anthropic-symbolic.svg";
+    if (p === "gemini") return "brands/google-gemini-symbolic.svg";
+    return "brands/openai-symbolic.svg";
   }
   readonly property color providerColor: {
     var p = root.activeProvider;

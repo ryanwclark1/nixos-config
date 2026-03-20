@@ -182,11 +182,10 @@ RowLayout {
                         anchors.rightMargin: (closeTabBtn.visible ? closeTabBtn.width + 12 : 8)
                         spacing: Appearance.spacingXS
 
-                        Text {
-                            text: Providers.providerIcon(modelData.provider)
+                        SharedWidgets.SvgIcon {
+                            source: Providers.providerIcon(modelData.provider)
                             color: isActive ? Colors.primary : Colors.textSecondary
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeSmall
+                            size: Appearance.fontSizeSmall
                             visible: !tabDelegate.isEditing && !root.narrowMode
                         }
 

@@ -44,11 +44,10 @@ BasePopupMenu {
         columnSpacing: Appearance.spacingM
         rowSpacing: Appearance.spacingM
 
-        Text {
-          text: Appearance.weatherIcon(WeatherService.condition)
+        SharedWidgets.SvgIcon {
+          source: Appearance.weatherIcon(WeatherService.condition)
           color: Colors.accent
-          font.family: Appearance.fontMono
-          font.pixelSize: root.compactMode ? 38 : 46
+          size: root.compactMode ? 38 : 46
           Layout.alignment: Qt.AlignVCenter
         }
 
@@ -249,11 +248,10 @@ BasePopupMenu {
                 Layout.alignment: Qt.AlignHCenter
               }
 
-              Text {
-                text: Appearance.weatherIcon(modelData.condition)
+              SharedWidgets.SvgIcon {
+                source: Appearance.weatherIcon(modelData.condition)
                 color: Colors.accent
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeLarge
+                size: Appearance.fontSizeLarge
                 Layout.alignment: Qt.AlignHCenter
               }
 
@@ -321,11 +319,10 @@ BasePopupMenu {
             Layout.fillWidth: root.compactMode
           }
 
-          Text {
-            text: Appearance.weatherIcon(modelData.condition)
+          SharedWidgets.SvgIcon {
+            source: Appearance.weatherIcon(modelData.condition)
             color: Colors.accent
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeXL
+            size: Appearance.fontSizeXL
             Layout.alignment: root.compactMode ? Qt.AlignRight : Qt.AlignLeft
           }
 

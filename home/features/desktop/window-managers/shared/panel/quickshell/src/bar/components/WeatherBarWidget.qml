@@ -16,12 +16,12 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Refresh Now",
-            icon: "󰑓",
+            icon: "arrow-counterclockwise.svg",
             action: () => WeatherService.refresh()
         },
         {
             label: "Open Weather Menu",
-            icon: "󰖐",
+            icon: "weather-sunny.svg",
             action: () => root.triggerRequested(root)
         }
     ]
@@ -29,11 +29,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingS
 
-        Text {
-            text: Appearance.weatherIcon(WeatherService.condition)
+        SharedWidgets.SvgIcon {
+            source: Appearance.weatherIcon(WeatherService.condition)
             color: Colors.accent
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 

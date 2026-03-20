@@ -324,7 +324,7 @@ PanelWindow {
                     Layout.alignment: Qt.AlignVCenter
                     Layout.rightMargin: Appearance.spacingXS
                     Layout.maximumWidth: 140
-                    width: providerPickerText.implicitWidth + Appearance.spacingL
+                    width: providerPickerContent.implicitWidth + Appearance.spacingL
                     height: 24
                     visible: !root.compactHeader
                     radius: Appearance.radiusXXS
@@ -332,15 +332,27 @@ PanelWindow {
                     border.color: providerPickerMouse.containsMouse ? Colors.primaryRing : "transparent"
                     border.width: 1
 
-                    Text {
-                        id: providerPickerText
+                    Row {
+                        id: providerPickerContent
                         anchors.centerIn: parent
-                        text: Providers.providerIcon(AiService.activeProvider) + " " + AiService.activeModel
-                        color: providerPickerMouse.containsMouse ? Colors.primary : Colors.textDisabled
-                        font.pixelSize: Appearance.fontSizeXS
-                        font.family: Appearance.fontMono
-                        elide: Text.ElideRight
+                        spacing: Appearance.spacingXS
                         width: Math.min(implicitWidth, 130)
+
+                        SharedWidgets.SvgIcon {
+                            source: Providers.providerIcon(AiService.activeProvider)
+                            color: providerPickerMouse.containsMouse ? Colors.primary : Colors.textDisabled
+                            size: Appearance.fontSizeXS
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        Text {
+                            id: providerPickerText
+                            text: AiService.activeModel
+                            color: providerPickerMouse.containsMouse ? Colors.primary : Colors.textDisabled
+                            font.pixelSize: Appearance.fontSizeXS
+                            elide: Text.ElideRight
+                            width: Math.min(implicitWidth, 130 - parent.spacing - Appearance.fontSizeXS)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
                     }
 
                     MouseArea {

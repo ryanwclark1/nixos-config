@@ -168,7 +168,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Enable Color Export"
-                    icon: "󰏘"
+                    icon: "color-palette.svg"
                     configKey: "colorExportEnabled"
                 }
 
@@ -181,7 +181,7 @@ Item {
 
                 SettingsToggleRow {
                     label: "Kitty Remote Colors"
-                    icon: "󰄛"
+                    icon: "terminal.svg"
                     configKey: "colorExportKitty"
                     description: "Send colors to running kitty instances via remote control"
                 }

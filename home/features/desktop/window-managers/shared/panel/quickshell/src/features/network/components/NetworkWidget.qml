@@ -58,11 +58,10 @@ Row {
         active: root.visible
     }
 
-    Text {
-        text: NetworkService.networkIcon()
+    SvgIcon {
+        source: NetworkService.networkIcon()
         color: Colors.primary
-        font.pixelSize: Appearance.fontSizeLarge
-        font.family: Appearance.fontMono
+        size: Appearance.fontSizeLarge
         anchors.verticalCenter: parent.verticalCenter
     }
 

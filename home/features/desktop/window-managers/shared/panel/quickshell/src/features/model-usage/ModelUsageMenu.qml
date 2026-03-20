@@ -117,12 +117,11 @@ BasePopupMenu {
           color: Colors.withAlpha(root.providerAccent, Colors.primarySubtle)
           Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
 
-          Text {
+          SharedWidgets.SvgIcon {
             anchors.centerIn: parent
-            text: ModelUsageService.providerIcon
+            source: ModelUsageService.providerIcon
             color: root.providerAccent
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeHuge
+            size: Appearance.fontSizeHuge
             Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
           }
         }

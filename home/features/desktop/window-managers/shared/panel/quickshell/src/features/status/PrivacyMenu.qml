@@ -31,11 +31,10 @@ BasePopupMenu {
       anchors.margins: Appearance.spacingM
       spacing: Appearance.spacingM
 
-      Text {
-        text: PrivacyService.anyActive ? PrivacyService.activeIcon : "󰒃"
+      SharedWidgets.SvgIcon {
+        source: PrivacyService.anyActive ? PrivacyService.activeIcon : "shield.svg"
         color: PrivacyService.anyActive ? Colors.warning : Colors.textDisabled
-        font.family: Appearance.fontMono
-        font.pixelSize: Appearance.fontSizeDisplay
+        size: Appearance.fontSizeDisplay
         Layout.alignment: Qt.AlignVCenter
       }
 

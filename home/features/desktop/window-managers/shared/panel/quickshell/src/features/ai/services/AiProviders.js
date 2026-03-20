@@ -54,12 +54,12 @@ function providerLabel(provider) {
 
 function providerIcon(provider) {
     switch (provider) {
-        case "ollama":    return "󱗻";
-        case "anthropic": return "󰚩";
-        case "openai":    return "󰧑";
-        case "gemini":    return "󰊤";
-        case "custom":    return "󰒍";
-        default:          return "󰚩";
+        case "ollama":    return "brands/ollama-symbolic.svg";
+        case "anthropic": return "brands/anthropic-symbolic.svg";
+        case "openai":    return "brands/openai-symbolic.svg";
+        case "gemini":    return "brands/google-gemini-symbolic.svg";
+        case "custom":    return "server.svg";
+        default:          return "brands/anthropic-symbolic.svg";
     }
 }
 

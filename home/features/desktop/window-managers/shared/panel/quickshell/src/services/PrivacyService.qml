@@ -16,9 +16,9 @@ QtObject {
 
   // Priority order: camera > mic > screenshare for the single icon
   readonly property string activeIcon: {
-    if (cameraActive) return "󰄀";
-    if (micActive) return "";
-    if (screenshareActive) return "󰍹";
+    if (cameraActive) return "camera.svg";
+    if (micActive) return "mic.svg";
+    if (screenshareActive) return "desktop.svg";
     return "";
   }
 

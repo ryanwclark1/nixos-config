@@ -507,11 +507,10 @@ Item {
                                             size: Appearance.fontSizeLarge
                                         }
 
-                                        Text {
-                                            text: BarWidgetRegistry.displayIcon(widgetRow.widgetInstance.widgetType)
+                                        SharedWidgets.SvgIcon {
+                                            source: BarWidgetRegistry.displayIcon(widgetRow.widgetInstance.widgetType)
                                             color: Colors.primary
-                                            font.family: Appearance.fontMono
-                                            font.pixelSize: Appearance.fontSizeLarge
+                                            size: Appearance.fontSizeLarge
                                         }
 
                                         ColumnLayout {

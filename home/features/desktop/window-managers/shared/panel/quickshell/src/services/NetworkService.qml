@@ -107,9 +107,9 @@ QtObject {
     // ═══════════════════════════════════════════════════
 
     function networkIcon() {
-        if (activePrimaryName === "Offline") return "󰤮";
-        if (activePrimaryType === "ethernet" || activePrimaryType === "802-3-ethernet") return "󰈀";
-        return "󰖩";
+        if (activePrimaryName === "Offline") return "wifi-off.svg";
+        if (activePrimaryType === "ethernet" || activePrimaryType === "802-3-ethernet") return "ethernet.svg";
+        return "wifi-4.svg";
     }
 
     function networkSubtitle() {
@@ -121,11 +121,11 @@ QtObject {
 
     function signalIcon(signal) {
         var value = parseInt(signal || "0", 10);
-        if (value >= 80) return "󰤨";
-        if (value >= 60) return "󰤥";
-        if (value >= 40) return "󰤢";
-        if (value > 0) return "󰤟";
-        return "󰤯";
+        if (value >= 80) return "wifi-4.svg";
+        if (value >= 60) return "wifi-3.svg";
+        if (value >= 40) return "wifi-2.svg";
+        if (value > 0) return "wifi-1.svg";
+        return "wifi-off.svg";
     }
 
     function bandFromChannel(channel) {

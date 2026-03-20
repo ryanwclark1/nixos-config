@@ -70,7 +70,7 @@ Rectangle {
                     source: "sparkle.svg"
                     color: Colors.primaryRing
                     size: Appearance.fontSizeGigantic
-                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Text {

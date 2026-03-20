@@ -22,7 +22,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Open Privacy Menu",
-            icon: "󰒃",
+            icon: "shield.svg",
             action: () => root.triggerRequested(root)
         }
     ]
@@ -59,11 +59,10 @@ SharedWidgets.BarPill {
             }
         }
 
-        Text {
-            text: PrivacyService.activeIcon
+        SharedWidgets.SvgIcon {
+            source: PrivacyService.activeIcon
             color: Colors.warning
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 

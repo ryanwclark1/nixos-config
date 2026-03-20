@@ -177,7 +177,7 @@ QtObject {
     { widgetType: "tray", label: "System Tray", icon: "app-generic.svg", section: "right", description: "Status notifier tray.", hasSettings: true, defaultSettings: { itemSize: 24, iconSize: 18, spacing: 6 }, settingsSchema: [
       { type: "slider", key: "itemSize", label: "Item Size", icon: "desktop.svg", min: 18, max: 40, step: 1 },
       { type: "slider", key: "iconSize", label: "Icon Size", icon: "app-generic.svg", min: 12, max: 32, step: 1 },
-      { type: "slider", key: "spacing", label: "Spacing", icon: "󰝗", min: 2, max: 16, step: 1 }
+      { type: "slider", key: "spacing", label: "Spacing", icon: "more-horizontal.svg", min: 2, max: 16, step: 1 }
     ] },
     { widgetType: "clipboard", label: "Clipboard", icon: "copy.svg", section: "right", description: "Clipboard history popup.", hasSettings: true, defaultSettings: { displayMode: "icon", labelText: "Clipboard" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
@@ -264,7 +264,7 @@ QtObject {
 
   function displayIcon(widgetType) {
     var meta = metadataFor(widgetType);
-    return meta ? meta.icon : "󰖲";
+    return meta ? meta.icon : "app-generic.svg";
   }
 
   function description(widgetType) {

@@ -20,11 +20,10 @@ Shared.ThemedContainer {
     anchors.margins: Appearance.paddingMedium
     spacing: Appearance.paddingMedium
 
-    Text {
-      text: Appearance.weatherIcon(WeatherService.condition)
+    SharedWidgets.SvgIcon {
+      source: Appearance.weatherIcon(WeatherService.condition)
       color: Colors.accent
-      font.family: Appearance.fontMono
-      font.pixelSize: Appearance.fontSizeIcon
+      size: Appearance.fontSizeIcon
     }
 
     ColumnLayout {

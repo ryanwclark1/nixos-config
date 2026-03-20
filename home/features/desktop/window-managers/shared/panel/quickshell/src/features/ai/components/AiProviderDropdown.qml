@@ -51,10 +51,9 @@ Rectangle {
                     anchors.rightMargin: Appearance.spacingS
                     spacing: Appearance.spacingXS
 
-                    Text {
-                        text: Providers.providerIcon(modelData)
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeSmall
+                    SharedWidgets.SvgIcon {
+                        source: Providers.providerIcon(modelData)
+                        size: Appearance.fontSizeSmall
                         color: isCurrent ? Colors.primary : Colors.text
                     }
                     Text {

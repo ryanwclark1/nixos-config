@@ -127,15 +127,15 @@ QtObject {
 
     // ── Utility functions ──────────────────────
     function weatherIcon(condition) {
-        if (!condition) return "󰖐";
+        if (!condition) return "cloud.svg";
         var c = condition.toLowerCase();
-        if (c.includes("clear") || c.includes("sunny")) return "󰖙";
-        if (c.includes("cloud")) return "󰖐";
-        if (c.includes("rain") || c.includes("drizzle")) return "󰖖";
-        if (c.includes("snow") || c.includes("sleet")) return "󰖘";
-        if (c.includes("thunder") || c.includes("storm")) return "󰖓";
-        if (c.includes("fog") || c.includes("mist")) return "󰖑";
-        return "󰖐";
+        if (c.includes("clear") || c.includes("sunny")) return "weather-sunny.svg";
+        if (c.includes("cloud")) return "cloud.svg";
+        if (c.includes("rain") || c.includes("drizzle")) return "weather-rain.svg";
+        if (c.includes("snow") || c.includes("sleet")) return "weather-snow.svg";
+        if (c.includes("thunder") || c.includes("storm")) return "weather-thunderstorm.svg";
+        if (c.includes("fog") || c.includes("mist")) return "weather-fog.svg";
+        return "cloud.svg";
     }
 
     function aqiColor(value, isUS) {

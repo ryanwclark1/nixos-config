@@ -38,11 +38,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingS
 
-        Text {
-            text: ModelUsageService.providerIcon
+        SharedWidgets.SvgIcon {
+            source: ModelUsageService.providerIcon
             color: ModelUsageService.providerColor
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
 
             Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationMedium } }

@@ -129,11 +129,10 @@ BasePopupMenu {
               Layout.fillWidth: true
               spacing: Appearance.spacingL
 
-              Text {
-                text: NetworkService.networkIcon()
+              SharedWidgets.SvgIcon {
+                source: NetworkService.networkIcon()
                 color: root.isOffline ? Colors.textDisabled : Colors.primary
-                font.family: Appearance.fontMono
-                font.pixelSize: Appearance.fontSizeHuge
+                size: Appearance.fontSizeHuge
                 Layout.alignment: Qt.AlignVCenter
               }
 
@@ -235,9 +234,15 @@ BasePopupMenu {
                 color: Colors.chipSurface
                 border.color: Colors.border
                 border.width: 1
-                implicitWidth: signalLabel.implicitWidth + 16
+                implicitWidth: signalRow.implicitWidth + 16
                 implicitHeight: 22
-                Text { id: signalLabel; anchors.centerIn: parent; text: NetworkService.signalIcon(NetworkService.primarySignal) + " " + NetworkService.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold; font.family: Appearance.fontMono }
+                Row {
+                  id: signalRow
+                  anchors.centerIn: parent
+                  spacing: Appearance.spacingXS
+                  SharedWidgets.SvgIcon { source: NetworkService.signalIcon(NetworkService.primarySignal); color: Colors.textSecondary; size: Appearance.fontSizeXXS; anchors.verticalCenter: parent.verticalCenter }
+                  Text { text: NetworkService.primarySignal + "%"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXXS; font.weight: Font.Bold; anchors.verticalCenter: parent.verticalCenter }
+                }
               }
             }
           }
@@ -470,11 +475,10 @@ BasePopupMenu {
                 anchors.fill: parent
                 anchors.margins: Appearance.spacingM
                 spacing: Appearance.paddingSmall
-                Text {
-                  text: modelData.type === "802-3-ethernet" || modelData.type === "ethernet" ? "󰈀" : (modelData.type === "wifi" || modelData.type === "802-11-wireless" ? "󰖩" : "󰖂")
+                SharedWidgets.SvgIcon {
+                  source: modelData.type === "802-3-ethernet" || modelData.type === "ethernet" ? "ethernet.svg" : (modelData.type === "wifi" || modelData.type === "802-11-wireless" ? "wifi-4.svg" : "wifi-off.svg")
                   color: Colors.primary
-                  font.family: Appearance.fontMono
-                  font.pixelSize: Appearance.fontSizeLarge
+                  size: Appearance.fontSizeLarge
                 }
                 ColumnLayout {
                   Layout.fillWidth: true
@@ -521,11 +525,10 @@ BasePopupMenu {
                   anchors.margins: Appearance.spacingM
                   spacing: Appearance.paddingSmall
 
-                  Text {
-                    text: modelData.active ? "󰄬" : NetworkService.signalIcon(modelData.signal)
+                  SharedWidgets.SvgIcon {
+                    source: modelData.active ? "checkmark.svg" : NetworkService.signalIcon(modelData.signal)
                     color: modelData.active ? Colors.primary : Colors.textSecondary
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeLarge
+                    size: Appearance.fontSizeLarge
                   }
 
                   ColumnLayout {

@@ -92,7 +92,7 @@ Item {
 
         SettingsCard {
             title: "Screen Decorations"
-            iconName: "󰹑"
+            iconName: "fullscreen.svg"
             description: "Rounded corners and border frame overlays for your displays."
 
             SettingsToggleRow {
@@ -175,7 +175,7 @@ Item {
             SettingsTextInputRow {
                 label: "Monospace Font Family"
                 placeholderText: "JetBrainsMono Nerd Font"
-                leadingIcon: "󰍛"
+                leadingIcon: "code.svg"
                 text: Config.monoFontFamily
                 onTextEdited: value => Config.monoFontFamily = value
             }

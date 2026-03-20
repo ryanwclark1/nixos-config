@@ -40,7 +40,7 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰍜",
+                            icon: "apps.svg",
                             label: "Dock",
                             value: root.dockVisibilitySummary
                         },
@@ -124,7 +124,7 @@ Item {
 
                     SettingsToggleRow {
                         label: "Dock Enabled"
-                        icon: "󰍜"
+                        icon: "apps.svg"
                         configKey: "dockEnabled"
                     }
                     SettingsToggleRow {

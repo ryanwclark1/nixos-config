@@ -11,7 +11,7 @@ Item {
     required property var anchorWindow
     property bool vertical: false
 
-    property string updatesIcon: "󰚰"
+    property string updatesIcon: "arrow-sync.svg"
     property string updatesCount: "0"
     readonly property bool iconOnly: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
 
@@ -44,7 +44,7 @@ Item {
         var flat = parseInt(String(_flatpakCacheFile.text || "").trim(), 10) || 0;
         var total = Math.max(0, nix) + Math.max(0, flat);
         root.updatesCount = total > 0 ? total.toString() : "0";
-        root.updatesIcon = total > 0 ? "󰮯" : "󰚰";
+        root.updatesIcon = total > 0 ? "arrow-sync.svg" : "arrow-sync.svg";
     }
 
     SharedWidgets.BarPill {
@@ -56,11 +56,10 @@ Item {
 
         Row {
             spacing: Appearance.spacingXS
-            Text {
-                text: root.updatesIcon
+            SharedWidgets.SvgIcon {
+                source: root.updatesIcon
                 color: Colors.accent
-                font.pixelSize: Appearance.fontSizeXL
-                font.family: Appearance.fontMono
+                size: Appearance.fontSizeXL
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
