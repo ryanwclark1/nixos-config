@@ -23,6 +23,7 @@ run_launcher=1
 validate_artifacts=1
 
 source "${script_dir}/gallery-lib.sh"
+source "${script_dir}/graphics-session-env.sh"
 
 write_gallery() {
   local output_dir="$1"
@@ -407,9 +408,16 @@ start_repo_shell() {
 }
 
 main() {
+  load_graphics_session_env
+
   if (( run_settings == 0 && run_surfaces == 0 && run_launcher == 0 )); then
     printf 'Nothing to capture. Remove at least one --skip-* flag.\n' >&2
     exit 2
+  fi
+
+  if niri_headless_without_outputs; then
+    printf '%s\n' "[INFO] Skipping targeted runtime warning regressions: Niri session exposes no wl_output in this headless environment."
+    exit 0
   fi
 
   if (( repo_shell_mode == 1 )); then

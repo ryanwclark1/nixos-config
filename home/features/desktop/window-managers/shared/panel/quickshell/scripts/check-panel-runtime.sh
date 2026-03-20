@@ -20,6 +20,8 @@ surfaces_timeout_seconds="${QS_VERIFY_SURFACES_TIMEOUT_SECONDS:-150}"
 warnings_timeout_seconds="${QS_VERIFY_WARNINGS_TIMEOUT_SECONDS:-900}"
 multibar_timeout_seconds="${QS_VERIFY_MULTIBAR_TIMEOUT_SECONDS:-120}"
 
+source "${script_dir}/graphics-session-env.sh"
+
 usage() {
   cat <<'EOF'
 Usage: check-panel-runtime.sh [--id INSTANCE_ID] [--repo-shell] [--skip-settings] [--skip-surfaces] [--skip-multibar] [--skip-launcher]
@@ -352,6 +354,8 @@ start_repo_shell() {
 main() {
   local args=()
 
+  load_graphics_session_env
+
   if (( repo_shell_mode == 1 )); then
     trap cleanup_repo_shell EXIT
     trap handle_termination TERM INT
@@ -394,12 +398,16 @@ main() {
     fi
     run_step_timeout "Running live surface responsive smoke" "${surfaces_timeout_seconds}" "${script_dir}/check-surface-responsive.sh" "${args[@]}"
     if (( run_launcher == 1 )); then
-      refresh_instance_args
-      args=()
-      if [[ -n "${instance_id}" ]]; then
-        args+=(--id "${instance_id}")
+      if niri_headless_without_outputs; then
+        printf '[INFO] Skipping targeted runtime warning regressions because the current Niri session exposes no wl_output in this headless environment.\n'
+      else
+        refresh_instance_args
+        args=()
+        if [[ -n "${instance_id}" ]]; then
+          args+=(--id "${instance_id}")
+        fi
+        run_step_timeout "Running targeted runtime warning regressions" "${warnings_timeout_seconds}" "${script_dir}/check-runtime-warning-regressions.sh" "${args[@]}"
       fi
-      run_step_timeout "Running targeted runtime warning regressions" "${warnings_timeout_seconds}" "${script_dir}/check-runtime-warning-regressions.sh" "${args[@]}"
     else
       printf '[INFO] Skipping targeted runtime warning regressions because launcher capture is disabled.\n'
     fi

@@ -25,29 +25,6 @@ require_pattern() {
   fi
 }
 
-niri_headless_without_outputs() {
-  local outputs_json=""
-
-  [[ -n "${NIRI_SOCKET:-}" ]] || return 1
-  command -v niri >/dev/null 2>&1 || return 1
-  outputs_json="$(niri msg -j outputs 2>/dev/null || true)"
-  [[ -n "${outputs_json}" ]] || return 1
-
-  if printf '%s' "${outputs_json}" | jq -e '
-    if type == "array" then
-      length == 0
-    elif type == "object" then
-      length == 0 or (((.outputs // []) | length) == 0)
-    else
-      true
-    end
-  ' >/dev/null 2>&1; then
-    return 0
-  fi
-
-  return 1
-}
-
 main() {
   local runtime_args=()
 
