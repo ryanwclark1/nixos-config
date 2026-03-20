@@ -220,8 +220,6 @@ QtObject {
         Qt.callLater(function() { colors.skipTransition = false; });
     }
 
-
-
     function withAlpha(c, a) {
         if (c === undefined || c === null || c === "")
             return "transparent";

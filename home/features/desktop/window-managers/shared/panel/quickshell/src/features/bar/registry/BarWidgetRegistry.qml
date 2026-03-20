@@ -12,24 +12,24 @@ QtObject {
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
       { type: "text", key: "labelText", label: "Label Text", icon: "rename.svg", placeholder: "Apps" }
     ] },
-    { widgetType: "workspaces", label: "Workspace Switcher", icon: "󰍺", section: "left", description: "Current workspaces and switching.", hasSettings: true, defaultSettings: { showAddButton: true, showMiniMap: true, showEmpty: true, showNames: false, showAppIcons: false, showWindowCount: false, pillSize: "normal", style: "pill", layout: "horizontal", clickBehavior: "focus" }, settingsSchema: [
+    { widgetType: "workspaces", label: "Workspace Switcher", icon: "desktop.svg", section: "left", description: "Current workspaces and switching.", hasSettings: true, defaultSettings: { showAddButton: true, showMiniMap: true, showEmpty: true, showNames: false, showAppIcons: false, showWindowCount: false, pillSize: "normal", style: "pill", layout: "horizontal", clickBehavior: "focus" }, settingsSchema: [
       { type: "toggle", key: "showAddButton", label: "Add Button", icon: "add.svg", enabledText: "Show the quick add-workspace button at the end of the strip.", disabledText: "Hide the add-workspace button from this widget instance." },
       { type: "toggle", key: "showMiniMap", label: "Mini-map", icon: "desktop.svg", enabledText: "Show live mini-map window previews inside workspace pills.", disabledText: "Hide mini-map previews and keep the pills text-only." },
-      { type: "toggle", key: "showEmpty", label: "Show Empty", icon: "󱗝", enabledText: "Show all workspaces including empty ones.", disabledText: "Hide empty workspaces from the strip." },
-      { type: "toggle", key: "showNames", label: "Show Names", icon: "󰑭", enabledText: "Show workspace names or custom labels.", disabledText: "Show only workspace numbers or icons." },
+      { type: "toggle", key: "showEmpty", label: "Show Empty", icon: "empty.svg", enabledText: "Show all workspaces including empty ones.", disabledText: "Hide empty workspaces from the strip." },
+      { type: "toggle", key: "showNames", label: "Show Names", icon: "rename.svg", enabledText: "Show workspace names or custom labels.", disabledText: "Show only workspace numbers or icons." },
       { type: "toggle", key: "showAppIcons", label: "App Icons", icon: "app-generic.svg", enabledText: "Show application icons inside workspace pills.", disabledText: "Hide application icons." },
-      { type: "toggle", key: "showWindowCount", label: "Window Count", icon: "󰇄", enabledText: "Show a badge with the number of windows in the workspace.", disabledText: "Hide the window count badge." },
+      { type: "toggle", key: "showWindowCount", label: "Window Count", icon: "board.svg", enabledText: "Show a badge with the number of windows in the workspace.", disabledText: "Hide the window count badge." },
       { type: "mode", key: "pillSize", label: "Pill Size", description: "Choose the size of the workspace pills.", options: [ { value: "compact", label: "Compact" }, { value: "normal", label: "Normal" }, { value: "large", label: "Large" } ] },
       { type: "mode", key: "style", label: "Visual Style", description: "Choose the visual style for workspaces.", options: [ { value: "pill", label: "Pill" }, { value: "strip", label: "Strip" }, { value: "dots", label: "Dots" }, { value: "icons", label: "Icons" } ] },
       { type: "mode", key: "layout", label: "Layout", description: "Choose the layout for the workspace selector.", options: [ { value: "horizontal", label: "Horizontal" }, { value: "vertical", label: "Vertical" }, { value: "grid", label: "Grid" } ] },
       { type: "mode", key: "clickBehavior", label: "Click Behavior", description: "Choose what happens when you click a workspace pill.", options: [ { value: "focus", label: "Focus Workspace" }, { value: "last_window", label: "Last Active Window" } ] }
     ] },
-    { widgetType: "specialWorkspaces", label: "Special Workspaces", icon: "󰐃", section: "left", description: "Hyprland special workspace indicator and toggle (scratchpads).", hasSettings: true, defaultSettings: { mainIcon: "󰖲", showLabels: false }, settingsSchema: [
-      { type: "text", key: "mainIcon", label: "Main Icon", icon: "app-generic.svg", placeholder: "󰖲" },
+    { widgetType: "specialWorkspaces", label: "Special Workspaces", icon: "star.svg", section: "left", description: "Hyprland special workspace indicator and toggle (scratchpads).", hasSettings: true, defaultSettings: { mainIcon: "app-generic.svg", showLabels: false }, settingsSchema: [
+      { type: "text", key: "mainIcon", label: "Main Icon", icon: "app-generic.svg", placeholder: "app-generic.svg" },
       { type: "toggle", key: "showLabels", label: "Show Labels", icon: "rename.svg", enabledText: "Show workspace names alongside icons in expanded pills.", disabledText: "Show only icons in the expanded workspace pills." }
     ] },
-    { widgetType: "windowTitle", label: "Active App Context", icon: "󰖯", section: "left", description: "Active window title and app-specific tools.", hasSettings: true, defaultSettings: { maxTitleWidth: 300, showAppIcon: true, showGitStatus: true, showMediaContext: true }, settingsSchema: [
-      { type: "slider", key: "maxTitleWidth", label: "Title Width", icon: "󰨈", min: 120, max: 520, step: 1 },
+    { widgetType: "windowTitle", label: "Active App Context", icon: "window-shield.svg", section: "left", description: "Active window title and app-specific tools.", hasSettings: true, defaultSettings: { maxTitleWidth: 300, showAppIcon: true, showGitStatus: true, showMediaContext: true }, settingsSchema: [
+      { type: "slider", key: "maxTitleWidth", label: "Title Width", icon: "ruler.svg", min: 120, max: 520, step: 1 },
       { type: "toggle", key: "showAppIcon", label: "App Icon", icon: "app-generic.svg", enabledText: "Show the active app icon before the title.", disabledText: "Hide the app icon and show only textual context." },
       { type: "toggle", key: "showGitStatus", label: "Git Status", icon: "git-branch.svg", enabledText: "Show inline repository status next to the active window title.", disabledText: "Hide inline repository status from the title widget." },
       { type: "toggle", key: "showMediaContext", label: "Media Context", icon: "music-note-2.svg", enabledText: "Show the mini media context badge when media is active.", disabledText: "Hide inline media context from the title widget." }
@@ -37,18 +37,18 @@ QtObject {
     { widgetType: "keyboardLayout", label: "Keyboard Layout", icon: "keyboard.svg", section: "right", description: "Current keyboard layout indicator.", hasSettings: true, defaultSettings: { labelMode: "short" }, settingsSchema: [
       { type: "mode", key: "labelMode", label: "Label Mode", description: "Choose between the compact three-letter abbreviation or the full layout name.", options: [ { value: "short", label: "Short" }, { value: "full", label: "Full" } ] }
     ] },
-    { widgetType: "taskbar", label: "Running Apps", icon: "󰣆", section: "left", description: "Focused and running applications.", hasSettings: true, defaultSettings: { buttonSize: 32, iconSize: 20, showRunningIndicator: true, showSeparator: true, maxUnpinned: 0 }, settingsSchema: [
-      { type: "slider", key: "buttonSize", label: "Button Size", icon: "󰝗", min: 24, max: 56, step: 1 },
+    { widgetType: "taskbar", label: "Running Apps", icon: "apps.svg", section: "left", description: "Focused and running applications.", hasSettings: true, defaultSettings: { buttonSize: 32, iconSize: 20, showRunningIndicator: true, showSeparator: true, maxUnpinned: 0 }, settingsSchema: [
+      { type: "slider", key: "buttonSize", label: "Button Size", icon: "crop.svg", min: 24, max: 56, step: 1 },
       { type: "slider", key: "iconSize", label: "Icon Size", icon: "app-generic.svg", min: 14, max: 36, step: 1 },
-      { type: "slider", key: "maxUnpinned", label: "Max Unpinned Apps", icon: "󰇚", min: 0, max: 20, step: 1 },
-      { type: "toggle", key: "showRunningIndicator", label: "Running Indicator", icon: "󰄯", enabledText: "Show the running-state dot on active task buttons.", disabledText: "Hide the running-state indicator dot." },
-      { type: "toggle", key: "showSeparator", label: "Separator", icon: "󰇘", enabledText: "Separate pinned apps from unpinned running apps.", disabledText: "Remove the divider between pinned and unpinned apps." }
+      { type: "slider", key: "maxUnpinned", label: "Max Unpinned Apps", icon: "arrow-counterclockwise.svg", min: 0, max: 20, step: 1 },
+      { type: "toggle", key: "showRunningIndicator", label: "Running Indicator", icon: "record.svg", enabledText: "Show the running-state dot on active task buttons.", disabledText: "Hide the running-state indicator dot." },
+      { type: "toggle", key: "showSeparator", label: "Separator", icon: "more-horizontal.svg", enabledText: "Separate pinned apps from unpinned running apps.", disabledText: "Remove the divider between pinned and unpinned apps." }
     ] },
-    { widgetType: "cpuStatus", label: "CPU", icon: "", section: "left", description: "CPU usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "percent" }, settingsSchema: [
+    { widgetType: "cpuStatus", label: "CPU", icon: "developer-board.svg", section: "left", description: "CPU usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "percent" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "compact", label: "Compact" }, { value: "icon", label: "Icon" } ] },
       { type: "mode", key: "valueStyle", label: "Value Style", description: "Choose whether this stat shows percent only, usage text, or usage with temperature. Compact mode can shorten long values automatically.", options: [ { value: "percent", label: "Percent" }, { value: "usage", label: "Usage" }, { value: "usageTemp", label: "Usage + Temp" } ] }
     ] },
-    { widgetType: "ramStatus", label: "Memory", icon: "", section: "left", description: "Memory usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "usage" }, settingsSchema: [
+    { widgetType: "ramStatus", label: "Memory", icon: "board.svg", section: "left", description: "Memory usage with system stats popup.", hasSettings: true, defaultSettings: { displayMode: "auto", valueStyle: "usage" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this stat adapts to bar orientation or always stays full, compact, or icon-only. Compact mode may shorten long values automatically to keep vertical bars narrow.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "compact", label: "Compact" }, { value: "icon", label: "Icon" } ] },
       { type: "mode", key: "valueStyle", label: "Value Style", description: "Choose whether memory shows percent used or the current used-memory value. Compact mode can still fall back to percent when the usage text is too long.", options: [ { value: "usage", label: "Usage" }, { value: "percent", label: "Percent" } ] }
     ] },
@@ -71,11 +71,11 @@ QtObject {
     ] },
     { widgetType: "mediaBar", label: "Media Controls", icon: "music-note-2.svg", section: "center", description: "Current media playback widget with optional inline visualizer.", hasSettings: true, defaultSettings: { displayMode: "auto", maxTextWidth: 150, showVisualizer: true, visualizerBars: 8 }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the media widget adapts to bar orientation automatically, always shows track text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
-      { type: "slider", key: "maxTextWidth", label: "Track Text Width", icon: "󰛇", min: 80, max: 240, step: 1 },
+      { type: "slider", key: "maxTextWidth", label: "Track Text Width", icon: "ruler.svg", min: 80, max: 240, step: 1 },
       { type: "toggle", key: "showVisualizer", label: "Visualizer", icon: "device-eq.svg", enabledText: "Show the inline visualizer inside media controls while media is actively playing.", disabledText: "Hide the inline visualizer and keep only the media controls." },
       { type: "slider", key: "visualizerBars", label: "Visualizer Bars", icon: "device-eq.svg", min: 4, max: 20, step: 1 }
     ] },
-    { widgetType: "updates", label: "Updates", icon: "󰚰", section: "center", description: "Pending system updates.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+    { widgetType: "updates", label: "Updates", icon: "arrow-sync.svg", section: "center", description: "Pending system updates.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the updates widget adapts to bar orientation automatically, always shows its count, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
     ] },
     { widgetType: "cava", label: "Visualizer", icon: "device-eq.svg", section: "center", description: "Compact audio spectrum with popup.", hasSettings: true, defaultSettings: { barCount: 8 }, settingsSchema: [
@@ -88,7 +88,7 @@ QtObject {
     { widgetType: "weather", label: "Weather", icon: "weather-sunny.svg", section: "right", description: "Current weather and forecast popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
     ] },
-    { widgetType: "market", label: "Markets", icon: "󱓗", section: "right", description: "Market quotes and indices.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+    { widgetType: "market", label: "Markets", icon: "news.svg", section: "right", description: "Market quotes and indices.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
     ] },
     {

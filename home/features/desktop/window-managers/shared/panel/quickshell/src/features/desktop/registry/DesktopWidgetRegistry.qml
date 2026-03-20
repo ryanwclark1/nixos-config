@@ -12,7 +12,7 @@ QtObject {
         {
             id: "Clock",
             name: "Clock",
-            icon: "󰥔",
+            icon: "clock.svg",
             source: "builtin",
             componentSource: Qt.resolvedUrl("../components/DesktopClock.qml"),
             settingsSource: ""
@@ -28,7 +28,7 @@ QtObject {
         {
             id: "Weather",
             name: "Weather",
-            icon: "󰖐",
+            icon: "weather-sunny.svg",
             source: "builtin",
             componentSource: Qt.resolvedUrl("../components/DesktopWeather.qml"),
             settingsSource: ""
@@ -36,7 +36,7 @@ QtObject {
         {
             id: "Todo",
             name: "Todo List",
-            icon: "󰄬",
+            icon: "checkmark.svg",
             source: "builtin",
             componentSource: Qt.resolvedUrl("../../todo/TodoWidget.qml"),
             settingsSource: ""
@@ -52,7 +52,7 @@ QtObject {
             result.push({
                 id: "plugin:" + p.id,
                 name: p.name || p.id,
-                icon: "󰖲",
+                icon: "options.svg",
                 source: "plugin",
                 pluginId: p.id
             });
@@ -102,7 +102,7 @@ QtObject {
         return {
             id: "plugin:" + plugin.id,
             name: plugin.name || plugin.id,
-            icon: "󰖲",
+            icon: "options.svg",
             source: "plugin",
             pluginId: plugin.id,
             componentSource: (plugin.path || "") + desktopEntry,

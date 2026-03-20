@@ -108,7 +108,7 @@ QtObject {
 
     // ── Wake recovery ────────────────────────────
     property Connections _suspendConn: Connections {
-        target: SuspendManager
+        target: IdleService
         function onWakingUp() {
             // Re-check process state after wake
             wakeCheckTimer.restart();

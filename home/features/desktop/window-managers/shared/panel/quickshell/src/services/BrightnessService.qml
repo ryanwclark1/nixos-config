@@ -47,7 +47,7 @@ QtObject {
     Component.onCompleted: _detectMonitors()
 
     property Connections _suspendConn: Connections {
-        target: SuspendManager
+        target: IdleService
         function onWakingUp() {
             root._detected = false;
             root._detectTimer.restart();

@@ -99,7 +99,7 @@ QtObject {
         case "nightLight":
             return Services.NightLightService.active;
         case "caffeine":
-            return Services.CaffeineService.inhibiting;
+            return Services.IdleService.inhibiting;
         case "recording":
             return Services.RecordingService.isRecording;
         case "gameMode":
@@ -123,7 +123,7 @@ QtObject {
             Services.NightLightService.toggle();
             return;
         case "caffeine":
-            Services.CaffeineService.toggle();
+            Services.IdleService.toggle();
             return;
         case "recording":
             if (Services.RecordingService.isRecording)
