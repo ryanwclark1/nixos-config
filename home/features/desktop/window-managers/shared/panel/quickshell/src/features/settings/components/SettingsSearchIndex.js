@@ -232,6 +232,8 @@ var entries = [
     { tabId: "wallpaper", cardTitle: "", label: "Use solid color on startup", keywords: "wallpaper solid startup", type: "toggle" },
     { tabId: "wallpaper", cardTitle: "", label: "Run pywal on change", keywords: "wallpaper pywal theme colors", type: "toggle" },
     { tabId: "wallpaper", cardTitle: "", label: "Shell-rendered wallpaper", keywords: "wallpaper shell renderer quickshell", type: "toggle" },
+    { tabId: "wallpaper", cardTitle: "", label: "Video wallpaper", keywords: "video wallpaper mp4 webm animated", type: "toggle" },
+    { tabId: "wallpaper", cardTitle: "", label: "Browse Wallhaven", keywords: "wallhaven browse download online", type: "toggle" },
     { tabId: "wallpaper", cardTitle: "", label: "Transition effect", keywords: "wallpaper transition fade pixelate wipe", type: "select" },
     { tabId: "wallpaper", cardTitle: "", label: "Transition duration", keywords: "wallpaper transition duration speed", type: "slider" },
 

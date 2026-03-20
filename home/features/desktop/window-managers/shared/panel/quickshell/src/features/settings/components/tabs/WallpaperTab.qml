@@ -716,6 +716,60 @@ Item {
             compactMode: root.compactMode
         }
 
+        // Video wallpaper
+        SettingsSectionLabel {
+            text: "VIDEO WALLPAPER"
+        }
+
+        SettingsToggleRow {
+            label: "Video wallpaper"
+            icon: "video.svg"
+            configKey: "wallpaperVideoEnabled"
+        }
+
+        SettingsTextInputRow {
+            visible: Config.wallpaperVideoEnabled
+            Layout.fillWidth: true
+            label: "Video file path"
+            placeholderText: "/path/to/video.mp4"
+            leadingIcon: "video.svg"
+            text: Config.wallpaperVideoPath || ""
+            onTextEdited: value => Config.wallpaperVideoPath = value.trim()
+            onSubmitted: value => Config.wallpaperVideoPath = value.trim()
+        }
+
+        SettingsInfoCallout {
+            visible: Config.wallpaperVideoEnabled
+            iconName: "info.svg"
+            title: "Video wallpapers"
+            body: "Requires shell renderer mode. Video loops silently behind all windows. Supported: mp4, webm, mkv."
+        }
+
+        // Wallhaven browser
+        SettingsSectionLabel {
+            text: "WALLHAVEN"
+        }
+
+        SettingsActionButton {
+            label: "Browse Wallhaven"
+            iconName: "globe-search.svg"
+            description: "Search and download wallpapers from wallhaven.cc"
+            emphasized: true
+            onClicked: {
+                if (root.settingsRoot && root.settingsRoot.parent)
+                    root.settingsRoot.parent.toggleSurface("wallhavenBrowser");
+            }
+        }
+
+        SettingsTextInputRow {
+            Layout.fillWidth: true
+            label: "Wallhaven API Key (optional)"
+            placeholderText: "For NSFW and favorites access"
+            leadingIcon: "key.svg"
+            text: Config.wallhavenApiKey || ""
+            onTextEdited: value => Config.wallhavenApiKey = value.trim()
+        }
+
         // Wallpaper grid
         SettingsSectionLabel {
             text: WallpaperService.scanning ? "SCANNING…" : ("WALLPAPERS  (" + WallpaperService.availableWallpapers.length + ")")
