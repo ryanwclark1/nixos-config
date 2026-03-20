@@ -269,12 +269,12 @@ PanelWindow {
             || normalized.indexOf("not a directory") !== -1
             || normalized.indexOf("cannot access") !== -1;
         if (unavailable) {
-            setModeHint("Search directory unavailable", "Check Default Search Directory: " + fileSearchRootLabel, "󰅚");
+            setModeHint("Search directory unavailable", "Check Default Search Directory: " + fileSearchRootLabel, "warning.svg");
             completeModeLoad("files", false, "Search directory unavailable");
             return;
         }
         var summary = detail !== "" ? detail.split("\n")[0] : "Check helper command output and logs.";
-        setModeHint("File search failed", summary, "󰅚");
+        setModeHint("File search failed", summary, "warning.svg");
         completeModeLoad("files", false, String(fallbackMessage || "File search failed"));
     }
 
@@ -407,7 +407,7 @@ PanelWindow {
     readonly property color modeAccentBorder: Colors.withAlpha(modeAccentColor, 0.48)
     readonly property string modeHeroLabel: String(currentModeMeta.heroLabel || currentModeMeta.label || "Launcher")
     readonly property string modeShortLabel: String(currentModeMeta.shortLabel || currentModeMeta.label || "Launcher")
-    readonly property string modeHeroIcon: String(currentModeMeta.heroIcon || modeIcons[mode] || "󰍉")
+    readonly property string modeHeroIcon: String(currentModeMeta.heroIcon || modeIcons[mode] || "settings.svg")
     readonly property string modePrefixText: String(currentModeMeta.prefix || "")
     readonly property string emptyStateTitle: TextHelpers.emptyStateTitle(mode, _cleanSearch, Config.launcherFileMinQueryLength, fileSearchRootLabel)
     readonly property string emptyStateSubtitle: TextHelpers.emptyStateSubtitle(mode, _cleanSearch, Config.launcherFileMinQueryLength, fileSearchRootLabel)
@@ -517,14 +517,14 @@ PanelWindow {
     }
     readonly property string escapeStatusIcon: {
         if (mode === "files" && _cleanSearch !== "" && fileIndexReady)
-            return "󰈔";
+            return "folder.svg";
         if (showingConfirm)
-            return "󰅖";
+            return "dismiss.svg";
         if (sidebarOverflowExpanded || shortcutHelpExpanded)
-            return "󰅀";
+            return "chevron-left.svg";
         if (searchText !== "" || drunCategoryFilter !== "")
-            return "󰅖";
-        return "󰅚";
+            return "dismiss.svg";
+        return "dismiss.svg";
     }
     readonly property string webPrimaryProviderLabel: _webPrimaryProvider ? _webPrimaryProvider.name : "Primary"
     readonly property string webHotkeyHint: {
@@ -1042,7 +1042,7 @@ PanelWindow {
             {
                 name: title,
                 title: subtitle || "",
-                icon: iconName || (modeIcons[mode] || "󰋼"),
+                icon: iconName || (modeIcons[mode] || "folder.svg"),
                 isHint: true
             }
         ];
@@ -1366,7 +1366,7 @@ PanelWindow {
                 key: key,
                 name: item.name || item.label || item.title || key,
                 title: item.title || item.description || item.exec || "",
-                icon: item.icon || modeIcons[mode] || "󰀻",
+                icon: item.icon || modeIcons[mode] || "apps.svg",
                 appId: item.appId || "",
                 exec: item.exec || "",
                 address: item.address || "",
@@ -1532,7 +1532,7 @@ PanelWindow {
 
         depChecker.ensureModeDependencies(mode, function (ok, missingCmd) {
             if (!ok) {
-                setModeHint("Dependency missing", ModeData.missingDependencyMessage(mode, missingCmd), "󰋼");
+                setModeHint("Dependency missing", ModeData.missingDependencyMessage(mode, missingCmd), "warning.svg");
                 completeModeLoad(mode, false, "Dependency missing");
                 return;
             }
@@ -1661,7 +1661,7 @@ PanelWindow {
     function _handleLoadFailure(modeKey, startedAt) {
         recordLoadMetric(modeKey, Date.now() - startedAt, false, false);
         if (mode === modeKey) {
-            setModeHint("Failed to load " + ModeData.modeInfo(modeKey).label, "Check helper command output and logs.", "󰅚");
+            setModeHint("Failed to load " + ModeData.modeInfo(modeKey).label, "Check helper command output and logs.", "warning.svg");
             completeModeLoad(modeKey, false, "Failed to load " + ModeData.modeInfo(modeKey).label);
         }
     }
@@ -2238,7 +2238,7 @@ PanelWindow {
             if (!isRequestCurrent("files", token))
                 return;
             if (backend === "none") {
-                setModeHint("Dependency missing", "Install 'fd' or 'find' to use Files mode.", "󰋼");
+                setModeHint("Dependency missing", "Install 'fd' or 'find' to use Files mode.", "warning.svg");
                 completeModeLoad("files", false, "Missing files backend");
                 recordLoadMetric("files", Date.now() - startedAt, false, false);
                 return;
@@ -2368,7 +2368,7 @@ PanelWindow {
             items.push({
                 category: _categoryLabel(tab.categoryId),
                 name: tab.label,
-                icon: tab.icon || "󰒓",
+                icon: tab.icon || "settings.svg",
                 title: "Open settings tab",
                 breadcrumb: _categoryLabel(tab.categoryId) + " > " + tab.label,
                 entryKind: "settings",
@@ -2392,7 +2392,7 @@ PanelWindow {
                 category: categoryLabel,
                 name: entry.label,
                 title: entry.cardTitle || entryTab.label,
-                icon: entryTab.icon || "󰒓",
+                icon: entryTab.icon || "settings.svg",
                 breadcrumb: categoryLabel + " > " + entryTab.label,
                 description: entry.cardTitle || "Setting",
                 entryKind: "settings",

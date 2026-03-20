@@ -116,7 +116,7 @@ function buildNixosItems(actions) {
         {
             category: "System",
             name:     "Rebuild Switch (flake)",
-            icon:     "󰒓",
+            icon:     "settings.svg",
             action:   (function(a) {
                 return function() {
                     a.launchInTerminal("sudo nixos-rebuild switch --flake .#");
@@ -126,7 +126,7 @@ function buildNixosItems(actions) {
         {
             category: "System",
             name:     "Update Flake Locks",
-            icon:     "󰚰",
+            icon:     "arrow-sync.svg",
             action:   (function(a) {
                 return function() {
                     a.launchInTerminal("nix flake update");
@@ -136,7 +136,7 @@ function buildNixosItems(actions) {
         {
             category: "System",
             name:     "Collect Garbage",
-            icon:     "󰃢",
+            icon:     "delete.svg",
             action:   (function(a) {
                 return function() {
                     a.launchInTerminal("sudo nix-env --delete-generations old");
@@ -153,7 +153,7 @@ function buildNixosItems(actions) {
                 category: "Generations",
                 name:     "Generation " + g.id + (g.current ? " (current)" : ""),
                 title:    g.date + " • " + g.version,
-                icon:     g.current ? "󰄬" : "󰋚",
+                icon:     g.current ? "checkmark.svg" : "clock.svg",
                 action:   (function(id, a) {
                     return function() {
                         a.rollbackTo(id);
@@ -194,7 +194,7 @@ function buildDevOpsItems(actions) {
             category:    "Docker",
             name:        c.name,
             description: c.status + " (" + c.image + ")",
-            icon:        "󰡨",
+            icon:        "developer-board.svg",
             action:      (function(id, state, a) {
                 return function() {
                     a.runDockerAction(id, state === "running" ? "stop" : "start");
@@ -206,7 +206,7 @@ function buildDevOpsItems(actions) {
 
     // --- SSH sessions ---
     var ssh = actions.sshSessions || [];
-    var sshTypeIcons = { scp: "󰆏", sftp: "󰉋", rsync: "󰓦", sshfs: "󰋊" };
+    var sshTypeIcons = { scp: "upload.svg", sftp: "folder.svg", rsync: "arrow-sync.svg", sshfs: "hard-drive.svg" };
     for (var j = 0; j < ssh.length; j++) {
         var session = ssh[j];
         var sType = session.type || "ssh";
@@ -215,7 +215,7 @@ function buildDevOpsItems(actions) {
         items.push({
             category: sType === "ssh" ? "SSH" : sType.toUpperCase(),
             name:     sLabel + (sCount > 1 ? " ×" + sCount : ""),
-            icon:     sshTypeIcons[sType] || "󰣀",
+            icon:     sshTypeIcons[sType] || "server-2.svg",
             action:   (function(a) {
                 return function() {
                     a.close();
@@ -232,7 +232,7 @@ function buildDevOpsItems(actions) {
             items.push({
                 category: "Service",
                 name:     u.name.replace(".service", ""),
-                icon:     u.active === "active" ? "󰄬" : "󰅚",
+                icon:     u.active === "active" ? "checkmark.svg" : "dismiss.svg",
                 action:   (function(name, a) {
                     return function() {
                         a.restartUnit("user", name);
@@ -314,7 +314,7 @@ function buildSshItems(actions) {
             category: host.source === "imported" ? "Imported" : (host.group || "Manual"),
             name: host.label || host.alias || host.host,
             title: actions.buildDisplayCommand(host),
-            icon: host.icon || "󰣀",
+            icon: host.icon || "server-2.svg",
             _hostRef: host,
             _recentBoost: recentMap[String(host.id || "")] || 0
         });

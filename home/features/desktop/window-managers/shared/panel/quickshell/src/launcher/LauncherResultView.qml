@@ -122,7 +122,7 @@ StackLayout {
         }
 
         LauncherEmptyState {
-            icon: root.launcher.modeIcons[root.mode] || "󰈔"
+            icon: root.launcher.modeIcons[root.mode] || "document.svg"
             title: root.launcher.emptyStateTitle
             subtitle: root.launcher.emptyStateSubtitle
             primaryCta: root.launcher.emptyPrimaryCta

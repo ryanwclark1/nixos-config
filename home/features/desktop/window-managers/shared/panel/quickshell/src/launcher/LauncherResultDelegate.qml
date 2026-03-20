@@ -138,12 +138,12 @@ Rectangle {
 
     function itemFallbackIcon(it) {
         if (root.mode === "window")
-            return "󰖯";
+            return "window-multiple.svg";
         if (root.mode === "files")
-            return "󰈔";
+            return "document.svg";
         if (root.mode === "web")
-            return "󰖟";
-        return root.modeIcons[root.mode] || "󰀻";
+            return "globe-search.svg";
+        return root.modeIcons[root.mode] || "apps.svg";
     }
 
     Rectangle {

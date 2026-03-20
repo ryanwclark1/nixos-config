@@ -4,6 +4,7 @@ import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import "../widgets" as SharedWidgets
 import "../services"
+import "../services/IconHelpers.js" as IconHelpers
 
 ColumnLayout {
     id: root
@@ -68,7 +69,7 @@ ColumnLayout {
                             onClicked: (modelData._playerRef || modelData).previous()
                         }
                         SharedWidgets.IconButton {
-                            icon: (modelData._playerRef || modelData).playbackState === Mpris.Playing ? "󰏤" : "󰐊"
+                            icon: IconHelpers.transportToggleIcon((modelData._playerRef || modelData).playbackState === Mpris.Playing)
                             size: root.compactMode ? 30 : 36
                             iconSize: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeHuge
                             iconColor: Colors.primary
