@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
@@ -337,9 +338,7 @@ SharedWidgets.CardBase {
     }
 
     function headerLabel(label, field) {
-        if (sortField !== field)
-            return label;
-        return label + (sortDescending ? " ▼" : " ▲");
+        return label;
     }
 
     function buildProcessColumns() {
@@ -513,7 +512,7 @@ SharedWidgets.CardBase {
                 }
 
                 SharedWidgets.Chip {
-                    icon: keyboardFocused ? "󰌌" : "󰍉"
+                    icon: IconHelpers.processFocusIcon(keyboardFocused)
                     iconColor: keyboardFocused ? Colors.primary : Colors.textSecondary
                     text: keyboardFocused
                         ? (root.compactTableLayout ? "Keys active" : "Arrows/J/K active")
@@ -631,19 +630,31 @@ SharedWidgets.CardBase {
                                     Layout.fillWidth: !!modelData.fill
                                     Layout.alignment: Qt.AlignVCenter
                                     color: "transparent"
-                                    implicitHeight: headerText.implicitHeight + 8
+                                    implicitHeight: headerContent.implicitHeight + 8
 
-                                    Text {
-                                        id: headerText
+                                    RowLayout {
+                                        id: headerContent
                                         anchors.left: parent.left
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
-                                        text: root.headerLabel(modelData.label, modelData.key)
-                                        color: root.sortField === modelData.key ? Colors.primary : Colors.textSecondary
-                                        font.pixelSize: Appearance.fontSizeXS
-                                        font.weight: Font.Bold
-                                        elide: Text.ElideRight
-                                        horizontalAlignment: modelData.key === "name" ? Text.AlignLeft : Text.AlignRight
+                                        spacing: Appearance.spacingXXS
+
+                                        Text {
+                                            Layout.fillWidth: true
+                                            text: root.headerLabel(modelData.label, modelData.key)
+                                            color: root.sortField === modelData.key ? Colors.primary : Colors.textSecondary
+                                            font.pixelSize: Appearance.fontSizeXS
+                                            font.weight: Font.Bold
+                                            elide: Text.ElideRight
+                                            horizontalAlignment: modelData.key === "name" ? Text.AlignLeft : Text.AlignRight
+                                        }
+
+                                        SharedWidgets.SvgIcon {
+                                            visible: root.sortField === modelData.key
+                                            source: IconHelpers.sortIndicatorIcon(!root.sortDescending)
+                                            color: Colors.primary
+                                            size: Appearance.fontSizeXS
+                                        }
                                     }
 
                                     MouseArea {
@@ -716,11 +727,11 @@ SharedWidgets.CardBase {
                                         SharedWidgets.IconButton {
                                             visible: root.displayMode === "tree"
                                             enabled: !!modelData._hasChildren
-                                            icon: modelData._hasChildren ? (modelData._collapsed ? "󰅀" : "󰅂") : "󰧼"
+                                            icon: IconHelpers.treeDisclosureIcon(modelData._collapsed, modelData._hasChildren)
                                             size: 18
                                             iconSize: Appearance.fontSizeXS
                                             iconColor: selected ? Colors.primary : Colors.textDisabled
-                                            tooltipText: modelData._collapsed ? "Expand" : "Collapse"
+                                            tooltipText: modelData._hasChildren ? (modelData._collapsed ? "Expand" : "Collapse") : "No children"
                                             onClicked: {
                                                 root.selectProcess(modelData.pid);
                                                 if (modelData._hasChildren)

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {
@@ -284,7 +285,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: root.running(modelData) ? "Stop" : "Start"
-                            icon: root.running(modelData) ? "󰓛" : "󰐊"
+                            icon: IconHelpers.runningStateIcon(root.running(modelData))
                             enabled: !ServiceUnitService.isUnitPending("user", modelData.name)
                             selected: false
                             onClicked: {
@@ -449,7 +450,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: root.running(modelData) ? "Stop" : "Start"
-                            icon: root.running(modelData) ? "󰓛" : "󰐊"
+                            icon: IconHelpers.runningStateIcon(root.running(modelData))
                             enabled: !ServiceUnitService.isUnitPending("system", modelData.name)
                             selected: false
                             onClicked: {
@@ -586,7 +587,7 @@ SharedWidgets.CardBase {
 
                     SharedWidgets.FilterChip {
                         label: root.selectedUnit && root.running(root.selectedUnit) ? "Stop" : "Start"
-                        icon: root.selectedUnit && root.running(root.selectedUnit) ? "󰓛" : "󰐊"
+                        icon: IconHelpers.runningStateIcon(root.selectedUnit && root.running(root.selectedUnit))
                         enabled: root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnitScope, root.selectedUnitName)
                         selected: false
                         onClicked: {
@@ -673,7 +674,7 @@ SharedWidgets.CardBase {
                     }
 
                     SharedWidgets.Chip {
-                        icon: root.selectedUnitScope === "system" ? "󰒋" : "󰌾"
+                        icon: root.selectedUnitScope === "system" ? "settings.svg" : "people.svg"
                         iconColor: Colors.secondary
                         text: root.selectedUnitScope === "system" ? "SCOPE SYSTEM" : "SCOPE USER"
                         textColor: Colors.secondary

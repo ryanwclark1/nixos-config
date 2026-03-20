@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
 
@@ -95,7 +96,7 @@ SharedWidgets.CardBase {
             
             SharedWidgets.IconButton {
                 visible: AMDGPUService.available
-                icon: root.showProcesses ? "󱗼" : "󱗻"
+                icon: IconHelpers.gpuProcessToggleIcon(root.showProcesses)
                 size: Appearance.iconSizeSmall
                 iconSize: Appearance.fontSizeSmall
                 tooltipText: root.showProcesses ? "Hide GPU processes" : "Show GPU processes"

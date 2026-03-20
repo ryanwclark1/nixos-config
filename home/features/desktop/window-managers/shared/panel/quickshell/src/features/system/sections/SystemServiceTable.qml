@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
@@ -322,7 +323,7 @@ SharedWidgets.CardBase {
                 }
 
                 SharedWidgets.Chip {
-                    icon: keyboardFocused ? "󰌌" : "󰒓"
+                    icon: IconHelpers.processFocusIcon(keyboardFocused, "settings.svg")
                     iconColor: keyboardFocused ? Colors.primary : Colors.textSecondary
                     text: keyboardFocused ? "Arrows/J/K active" : (String(visibleUnits.length) + " rows")
                     textColor: keyboardFocused ? Colors.primary : Colors.textSecondary
@@ -637,7 +638,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: root.selectedUnit && root.running(root.selectedUnit) ? "Stop" : "Start"
-                            icon: root.selectedUnit && root.running(root.selectedUnit) ? "󰓛" : "󰐊"
+                            icon: IconHelpers.runningStateIcon(root.selectedUnit && root.running(root.selectedUnit))
                             enabled: !!root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnit.scope, root.selectedUnit.name)
                             selected: false
                             onClicked: {

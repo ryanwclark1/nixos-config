@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
 
@@ -117,7 +118,7 @@ SharedWidgets.CardBase {
             Item { Layout.fillWidth: true }
 
             SharedWidgets.Chip {
-                icon: root.activeInterface === "offline" ? "󰤭" : "󰛳"
+                icon: root.activeInterface === "offline" ? "warning.svg" : "ethernet.svg"
                 iconColor: root.activeInterface === "offline" ? Colors.error : Colors.primary
                 text: root.activeInterface.toUpperCase()
                 textColor: root.activeInterface === "offline" ? Colors.error : Colors.textSecondary
