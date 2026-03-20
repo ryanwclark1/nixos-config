@@ -977,13 +977,20 @@ QtObject {
     }
 
     // ── Model Refresh ───────────────────────────
+    property int _modelExitCode: 0
+
     property Process _modelProc: Process {
         id: modelProc
         running: false
+        onExited: (exitCode, exitStatus) => root._modelExitCode = exitCode
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
-                    var data = JSON.parse(this.text || "{}");
+                    var raw = String(this.text || "").trim();
+                    if (!raw) {
+                        throw new Error("empty response (curl exit " + root._modelExitCode + ")");
+                    }
+                    var data = JSON.parse(raw);
                     var models = data.models || [];
                     var names = [];
                     for (var i = 0; i < models.length; i++) {
@@ -991,16 +998,22 @@ QtObject {
                     }
                     root.availableModels = names;
                 } catch (e) {
-                    Logger.e("AiService", "failed to parse models:", e);
+                    Logger.w("AiService", "failed to fetch models:", e);
+                    root._modelRetryTimer.restart();
                 }
             }
         }
     }
 
+    property Timer _modelRetryTimer: Timer {
+        interval: 5000
+        onTriggered: root.refreshModels()
+    }
+
     function refreshModels() {
         if (Config.aiProvider === "ollama") {
             var endpoint = Config.aiCustomEndpoint || Providers.defaultEndpoint("ollama");
-            modelProc.command = ["curl", "-s", endpoint + "/api/tags"];
+            modelProc.command = ["curl", "-s", "--compressed", "--max-time", "10", endpoint + "/api/tags"];
             modelProc.running = true;
         } else {
             availableModels = Providers.defaultModels(Config.aiProvider);
