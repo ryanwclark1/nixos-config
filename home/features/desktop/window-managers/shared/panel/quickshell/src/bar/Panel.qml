@@ -436,17 +436,17 @@ Item {
                 var actions = [
                     {
                         label: "Add Widget to Left",
-                        icon: "󰁍",
+                        icon: "arrow-left.svg",
                         children: makeSectionMenu("left")
                     },
                     {
                         label: "Add Widget to Center",
-                        icon: "󰁔",
+                        icon: "arrow-sync.svg",
                         children: makeSectionMenu("center")
                     },
                     {
                         label: "Add Widget to Right",
-                        icon: "󰁔",
+                        icon: "arrow-right.svg",
                         children: makeSectionMenu("right")
                     },
                     { separator: true },
@@ -641,12 +641,12 @@ Item {
                     var actions = [
                         {
                             label: "Move Left",
-                            icon: "󰁍",
+                            icon: "arrow-left.svg",
                             action: function() { moveWidget(-1); }
                         },
                         {
                             label: "Move Right",
-                            icon: "󰁔",
+                            icon: "arrow-right.svg",
                             action: function() { moveWidget(1); }
                         },
                         {
@@ -696,12 +696,11 @@ Item {
             activeBorderColor: Colors.error
             tooltipText: "CRITICAL: High load or temperature detected"
 
-            Text {
+            SharedWidgets.SvgIcon {
                 anchors.centerIn: parent
-                text: "󰀪"
+                source: "alert.svg"
                 color: Colors.error
-                font.pixelSize: Appearance.fontSizeLarge
-                font.family: Appearance.fontMono
+                size: Appearance.fontSizeLarge
                 SequentialAnimation on opacity {
                     loops: Animation.Infinite
                     NumberAnimation {
