@@ -102,7 +102,7 @@ Item {
                         {
                             icon: "󰖐",
                             label: "Weather",
-                            value: root._weatherUnitsSummary
+                            value: (Config.weatherProvider === "wttr" ? "wttr.in" : "Open-Meteo") + " / " + root._weatherUnitsSummary
                         },
                         {
                             icon: "compass.svg",
@@ -365,6 +365,23 @@ Item {
                 title: "Weather & Location"
                 iconName: "weather-moon.svg"
                 description: "Weather units, source priority, and location inputs."
+
+                SettingsModeRow {
+                    label: "Weather Provider"
+                    icon: "󰖐"
+                    currentValue: Config.weatherProvider
+                    options: [
+                        {
+                            value: "open-meteo",
+                            label: "Open-Meteo (Recommended)"
+                        },
+                        {
+                            value: "wttr",
+                            label: "wttr.in"
+                        }
+                    ]
+                    onModeSelected: modeValue => Config.weatherProvider = modeValue
+                }
 
                 SettingsModeRow {
                     label: "Units"
