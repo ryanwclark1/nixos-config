@@ -26,7 +26,7 @@ QtObject {
     // ── Color transition control ───────────────
     property bool skipTransition: true
     property bool isTransitioning: false
-    readonly property int _colorTransitionMs: Math.round(400 * _animScale)
+    readonly property int _colorTransitionMs: Math.round(400 * Appearance._animScale)
 
     // ── Color transition behaviors ─────────────
     Behavior on background { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
@@ -43,16 +43,6 @@ QtObject {
     Behavior on textDisabled { enabled: !colors.skipTransition; ColorAnimation { duration: colors._colorTransitionMs; easing.type: Easing.OutCubic } }
 
     // --- DERIVED PROPERTIES (Auto-updating) ---
-    readonly property string fontMono: Config.monoFontFamily || "JetBrainsMono Nerd Font"
-    readonly property real _fontScale: clampScale(Config.fontScale, 1.0)
-    readonly property real _radiusScale: clampScale(Config.radiusScale, 1.0)
-    readonly property real _spacingScale: clampScale(Config.spacingScale * Config.uiDensityScale, 1.0)
-    
-    // Eco Mode: Auto-downscale animations on battery
-    readonly property bool _isEcoMode: Config.autoEcoMode && SystemStatus.isBatteryPowered
-    readonly property bool _isGameMode: GameModeService.active
-    readonly property real _powerAnimScale: _isGameMode ? 0.3 : (_isEcoMode ? 0.6 : 1.0)
-    readonly property real _animScale: Config.animationSpeedScale * _powerAnimScale
 
     readonly property color border: withAlpha(text, 0.15)
     readonly property color highlight: withAlpha(primary, 0.25)

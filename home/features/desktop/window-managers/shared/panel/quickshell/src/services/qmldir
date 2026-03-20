@@ -1,4 +1,5 @@
 singleton AiService 1.0 AiService.qml
+singleton Appearance 1.0 Appearance.qml
 singleton AMDGPUService 1.0 AMDGPUService.qml
 singleton AudioService 1.0 AudioService.qml
 singleton AppCatalogService 1.0 AppCatalogService.qml
