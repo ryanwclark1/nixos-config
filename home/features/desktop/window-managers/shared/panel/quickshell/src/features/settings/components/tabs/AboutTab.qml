@@ -67,17 +67,17 @@ Item {
                             value: "QML Desktop Shell"
                         },
                         {
-                            icon: "󰍹",
+                            icon: "desktop.svg",
                             label: "Host",
                             value: root.aboutHostname || "…"
                         },
                         {
-                            icon: "󰌢",
+                            icon: "laptop.svg",
                             label: "Kernel",
                             value: root.aboutKernel || "…"
                         },
                         {
-                            icon: "󰏘",
+                            icon: "color-palette.svg",
                             label: "Theme",
                             value: root.aboutTheme
                         }
@@ -137,12 +137,12 @@ Item {
                 Repeater {
                     model: [
                         {
-                            icon: "󰍹",
+                            icon: "desktop.svg",
                             label: "Hostname",
                             value: root.aboutHostname || "…"
                         },
                         {
-                            icon: "󰌢",
+                            icon: "laptop.svg",
                             label: "Kernel",
                             value: root.aboutKernel || "…"
                         },
