@@ -24,7 +24,7 @@ SharedWidgets.BarPill {
     contextActions: [
         {
             label: "Play / Pause",
-            icon: "󰐊",
+            icon: "play.svg",
             action: () => {
                 var p = SystemStatus.activeMprisPlayers;
                 if (p && p.length > 0 && p[0].player)
@@ -33,7 +33,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Next Track",
-            icon: "󰒭",
+            icon: "arrow-right.svg",
             action: () => {
                 var p = SystemStatus.activeMprisPlayers;
                 if (p && p.length > 0 && p[0].player)
@@ -45,7 +45,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Open Music Menu",
-            icon: "󰝚",
+            icon: "music-note-2.svg",
             action: () => root.triggerRequested(root)
         }
     ]
@@ -60,11 +60,10 @@ SharedWidgets.BarPill {
     Row {
         spacing: Appearance.spacingS
 
-        Text {
-            text: "󰝚"
+        SharedWidgets.SvgIcon {
+            source: "music-note-2.svg"
             color: Colors.primary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
 

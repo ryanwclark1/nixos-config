@@ -214,27 +214,14 @@ QtObject {
     }
 
     // ── Metrics ────────────────────────────────
-    property var launcherMetrics: Metrics.createMetrics()
+    property var launcherMetrics: Metrics.freshMetrics()
 
     function modeMetric(modeKey) { return Metrics.modeMetric(launcherMetrics, modeKey); }
-
-    function clearLauncherMetrics() { launcherMetrics = Metrics.createMetrics(); }
-
-    function recordFilterMetric(durationMs) {
-        launcherMetrics = Metrics.recordFilter(launcherMetrics, durationMs);
-    }
-
-    function recordLoadMetric(modeKey, durationMs, cacheHit, success) {
-        launcherMetrics = Metrics.recordLoad(launcherMetrics, modeKey, durationMs, cacheHit, success);
-    }
-
-    function recordFilesBackendLoad(backend, durationMs) {
-        launcherMetrics = Metrics.recordFilesBackend(launcherMetrics, backend, durationMs);
-    }
-
-    function recordFilesBackendResolveMetric(durationMs) {
-        launcherMetrics = Metrics.recordFilesResolve(launcherMetrics, durationMs);
-    }
+    function clearLauncherMetrics() { launcherMetrics = Metrics.freshMetrics(); }
+    function recordFilterMetric(durationMs) { launcherMetrics = Metrics.recordFilterMetric(launcherMetrics, durationMs); }
+    function recordLoadMetric(modeKey, durationMs, cacheHit, success) { launcherMetrics = Metrics.recordLoadMetric(launcherMetrics, modeKey, durationMs, cacheHit, success); }
+    function recordFilesBackendLoad(backend, durationMs) { launcherMetrics = Metrics.recordFilesBackendLoad(launcherMetrics, backend, durationMs); }
+    function recordFilesBackendResolveMetric(durationMs) { launcherMetrics = Metrics.recordFilesBackendResolveMetric(launcherMetrics, durationMs); }
 
     // ── Filter cache ───────────────────────────
     property string _lastFilterMode: ""

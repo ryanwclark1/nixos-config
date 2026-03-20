@@ -307,32 +307,9 @@ PanelWindow {
         execDetached:               function(cmd) { Quickshell.execDetached(cmd); }
     })
 
-    function updateDrunUsageCache(item) {
-        if (!item)
-            return;
-        var execKey = String(item.exec || "");
-        var rawFreq = (appFrequency[execKey] || 0) * 0.3;
-        var usageScore = UsageTrackerService.getUsageScore(execKey);
-        item._rawFrequencyScore = rawFreq;
-        item._usageScore = usageScore;
-        item._drunUsageBoost = Math.max(rawFreq, usageScore * 1.5);
-    }
-
-    function refreshDrunUsageCaches(items) {
-        var source = Array.isArray(items) ? items : [];
-        for (var i = 0; i < source.length; ++i)
-            updateDrunUsageCache(source[i]);
-    }
-
-    function prepareDrunItems(items) {
-        var source = Array.isArray(items) ? items : [];
-        for (var i = 0; i < source.length; ++i) {
-            var item = source[i];
-            Search.ensureItemRankCache(item);
-            updateDrunUsageCache(item);
-        }
-        return source;
-    }
+    function updateDrunUsageCache(item) { controller.updateDrunUsageCache(item); }
+    function refreshDrunUsageCaches(items) { controller.refreshDrunUsageCaches(items); }
+    function prepareDrunItems(items) { return controller.prepareDrunItems(items); }
 
     function applyDrunItems(items, persistCache) {
         var appItems = prepareDrunItems(items);
@@ -1213,21 +1190,10 @@ PanelWindow {
         }
     }
 
-    function recordFilesBackendLoad(backend, durationMs) {
-        launcherMetrics = Metrics.recordFilesBackendLoad(launcherMetrics, backend, durationMs);
-    }
-
-    function recordFilesBackendResolveMetric(durationMs) {
-        launcherMetrics = Metrics.recordFilesBackendResolveMetric(launcherMetrics, durationMs);
-    }
-
-    function recordFilterMetric(durationMs) {
-        launcherMetrics = Metrics.recordFilterMetric(launcherMetrics, durationMs);
-    }
-
-    function recordLoadMetric(modeKey, durationMs, cacheHit, success) {
-        launcherMetrics = Metrics.recordLoadMetric(launcherMetrics, modeKey, durationMs, cacheHit, success);
-    }
+    function recordFilesBackendLoad(backend, durationMs) { controller.recordFilesBackendLoad(backend, durationMs); }
+    function recordFilesBackendResolveMetric(durationMs) { controller.recordFilesBackendResolveMetric(durationMs); }
+    function recordFilterMetric(durationMs) { controller.recordFilterMetric(durationMs); }
+    function recordLoadMetric(modeKey, durationMs, cacheHit, success) { controller.recordLoadMetric(modeKey, durationMs, cacheHit, success); }
 
     function shouldBackoffPreload(modeKey) {
         var state = preloadFailureState[modeKey];
