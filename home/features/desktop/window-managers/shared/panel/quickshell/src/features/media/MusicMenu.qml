@@ -32,13 +32,13 @@ BasePopupMenu {
         color: root.dominantColor
         opacity: 0.12
         scale: MediaService.isPlaying ? 1.0 : 0.8
-        Behavior on scale { NumberAnimation { duration: 2000; easing.type: Easing.InOutSine } }
+        Behavior on scale { NumberAnimation { duration: Colors.durationAmbient; easing.type: Easing.InOutSine } }
 
         SequentialAnimation on opacity {
           running: MediaService.isPlaying && root.wantVisible
           loops: Animation.Infinite
-          NumberAnimation { from: 0.08; to: 0.18; duration: 3000; easing.type: Easing.InOutSine }
-          NumberAnimation { from: 0.18; to: 0.08; duration: 3000; easing.type: Easing.InOutSine }
+          NumberAnimation { from: 0.08; to: 0.18; duration: Colors.durationToast; easing.type: Easing.InOutSine }
+          NumberAnimation { from: 0.18; to: 0.08; duration: Colors.durationToast; easing.type: Easing.InOutSine }
         }
       }
     }
@@ -144,7 +144,7 @@ BasePopupMenu {
         color: root.dominantColor
         opacity: MediaService.isPlaying ? 0.25 : 0.1
         visible: albumArt.status === Image.Ready
-        Behavior on opacity { NumberAnimation { duration: 1000 } }
+        Behavior on opacity { NumberAnimation { duration: Colors.durationAmbientShort } }
       }
 
       ClippingWrapperRectangle {

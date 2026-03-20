@@ -146,10 +146,10 @@ Rectangle {
         SequentialAnimation on x {
           running: marqueeText.contentWidth > root.maxTextWidth
           loops: Animation.Infinite
-          NumberAnimation { from: 0; to: -(marqueeText.contentWidth - marqueeContainer.width + 10); duration: 5000; easing.type: Easing.Linear }
-          PauseAnimation { duration: 1000 }
-          NumberAnimation { from: -(marqueeText.contentWidth - marqueeContainer.width + 10); to: 0; duration: 5000; easing.type: Easing.Linear }
-          PauseAnimation { duration: 1000 }
+          NumberAnimation { from: 0; to: -(marqueeText.contentWidth - marqueeContainer.width + 10); duration: Colors.durationMarquee; easing.type: Easing.Linear }
+          PauseAnimation { duration: Colors.durationAmbientShort }
+          NumberAnimation { from: -(marqueeText.contentWidth - marqueeContainer.width + 10); to: 0; duration: Colors.durationMarquee; easing.type: Easing.Linear }
+          PauseAnimation { duration: Colors.durationAmbientShort }
         }
       }
     }
