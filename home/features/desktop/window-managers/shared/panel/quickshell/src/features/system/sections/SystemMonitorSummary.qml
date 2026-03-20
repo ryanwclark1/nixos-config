@@ -78,7 +78,7 @@ SharedWidgets.CardBase {
             }
 
             SharedWidgets.Chip {
-                icon: "󰥔"
+                icon: "clock.svg"
                 iconColor: Colors.secondary
                 text: root.uptimeText
                 textColor: Colors.secondary
@@ -112,14 +112,14 @@ SharedWidgets.CardBase {
             }
 
             SharedWidgets.Chip {
-                icon: "󰍛"
+                icon: "board.svg"
                 iconColor: Colors.accent
                 text: "RAM " + SystemStatus.ramUsage
                 textColor: Colors.accent
             }
 
             SharedWidgets.Chip {
-                icon: "󰢮"
+                icon: "developer-board.svg"
                 iconColor: Colors.secondary
                 text: "GPU " + SystemStatus.gpuUsage + "  " + SystemStatus.gpuTemp
                 textColor: Colors.secondary

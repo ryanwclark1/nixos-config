@@ -71,7 +71,7 @@ SharedWidgets.CardBase {
             }
 
             SharedWidgets.Chip {
-                icon: "󰥔"
+                icon: "clock.svg"
                 iconColor: Colors.textSecondary
                 text: "Meta " + MU.formatAge(SystemIoTelemetryService.metadataLastRefreshMs, root._clockTick)
                 textColor: Colors.textSecondary

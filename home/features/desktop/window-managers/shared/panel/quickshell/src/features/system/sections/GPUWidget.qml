@@ -87,7 +87,7 @@ SharedWidgets.CardBase {
 
             SharedWidgets.Chip {
                 visible: SystemStatus.gpuTemp !== "--"
-                icon: "󰢮"
+                icon: "developer-board.svg"
                 iconColor: SystemStatus.gpuTempNum > 85 ? Colors.error : Colors.textSecondary
                 text: SystemStatus.gpuTemp
                 textColor: SystemStatus.gpuTempNum > 85 ? Colors.error : Colors.textSecondary
@@ -111,7 +111,7 @@ SharedWidgets.CardBase {
             ResourceGauge {
                 value: SystemStatus.gpuPercent
                 color: root.usageColor
-                icon: "󰢮"
+                icon: "developer-board.svg"
                 label: SystemStatus.gpuUsage
             }
 

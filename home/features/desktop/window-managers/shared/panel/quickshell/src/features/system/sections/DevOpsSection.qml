@@ -194,7 +194,7 @@ ColumnLayout {
                     Row {
                         spacing: Colors.spacingXXS
                         SharedWidgets.IconButton {
-                            icon: "󰆍"
+                            icon: "terminal.svg"
                             size: 28
                             iconSize: 14
                             iconColor: Colors.textDisabled
@@ -205,7 +205,7 @@ ColumnLayout {
                             }
                         }
                         SharedWidgets.IconButton {
-                            icon: "󰋚"
+                            icon: "arrow-counterclockwise.svg"
                             size: 28
                             iconSize: 14
                             iconColor: Colors.textDisabled
@@ -272,7 +272,7 @@ ColumnLayout {
 
                     SharedWidgets.IconButton {
                         visible: sessionType === "ssh"
-                        icon: "󰆍"
+                        icon: "terminal.svg"
                         size: 28
                         iconSize: 14
                         iconColor: Colors.textDisabled

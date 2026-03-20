@@ -69,7 +69,7 @@ SharedWidgets.CardBase {
 
             SharedWidgets.Chip {
                 visible: root._primaryDrive !== null
-                icon: "󰋊"
+                icon: "hard-drive.svg"
                 iconColor: root.usageColor
                 text: root._primaryDrive ? root._primaryDrive.percent : "--"
                 textColor: root.usageColor
@@ -84,7 +84,7 @@ SharedWidgets.CardBase {
             ResourceGauge {
                 value: root.primaryPercent
                 color: root.usageColor
-                icon: "󰋊"
+                icon: "hard-drive.svg"
                 label: root._primaryDrive ? root._primaryDrive.percent : "--"
             }
 

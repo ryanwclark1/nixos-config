@@ -533,7 +533,7 @@ SharedWidgets.CardBase {
                 }
 
                 SharedWidgets.IconButton {
-                    icon: "󰐕"
+                    icon: "add.svg"
                     size: 28
                     iconSize: Colors.fontSizeSmall
                     iconColor: Colors.primary

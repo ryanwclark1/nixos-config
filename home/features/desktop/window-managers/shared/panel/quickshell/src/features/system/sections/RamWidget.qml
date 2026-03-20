@@ -64,7 +64,7 @@ SharedWidgets.CardBase {
             Item { Layout.fillWidth: true }
 
             SharedWidgets.Chip {
-                icon: "󰍛"
+                icon: "board.svg"
                 iconColor: root.usageColor
                 text: SystemStatus.ramUsage
                 textColor: root.usageColor
@@ -79,7 +79,7 @@ SharedWidgets.CardBase {
             ResourceGauge {
                 value: SystemStatus.ramPercent
                 color: root.usageColor
-                icon: "󰍛"
+                icon: "board.svg"
                 label: Math.round(SystemStatus.ramPercent * 100) + "%"
             }
 

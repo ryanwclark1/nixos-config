@@ -663,7 +663,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: "Logs"
-                            icon: "󰌱"
+                            icon: "terminal.svg"
                             enabled: !!root.selectedUnit
                             selected: false
                             onClicked: {
@@ -674,7 +674,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: "Status"
-                            icon: "󰋼"
+                            icon: "info.svg"
                             enabled: !!root.selectedUnit
                             selected: false
                             onClicked: {
@@ -685,7 +685,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: "Copy Unit"
-                            icon: "󰅍"
+                            icon: "copy.svg"
                             enabled: !!root.selectedUnit
                             selected: false
                             onClicked: {
@@ -696,7 +696,7 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.FilterChip {
                             label: "Copy Path"
-                            icon: "󰅍"
+                            icon: "copy.svg"
                             enabled: !!root.selectedUnit && !!root.detailData.fragmentPath
                             selected: false
                             onClicked: {
