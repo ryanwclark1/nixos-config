@@ -36,7 +36,7 @@ Item {
     Text {
       text: Qt.formatDateTime(clock.date, "HH:mm")
       color: Colors.primary
-      font.pixelSize: 92
+      font.pixelSize: Colors.fontSizeMassive
       font.weight: Font.Black
       font.letterSpacing: -4
     }

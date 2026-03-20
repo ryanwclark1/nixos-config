@@ -44,7 +44,7 @@ Item {
                 return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
             }
             color: Colors.withAlpha(Colors.text, 0.85)
-            font.pixelSize: 96
+            font.pixelSize: Colors.fontSizeMassive
             font.weight: Font.Light
             font.family: Config.fontFamily
             font.letterSpacing: Colors.letterSpacingTight

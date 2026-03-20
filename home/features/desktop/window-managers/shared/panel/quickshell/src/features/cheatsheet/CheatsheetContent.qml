@@ -236,7 +236,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             text: "\u{f030f}"
             color: Colors.textDisabled
-            font.pixelSize: 64
+            font.pixelSize: Colors.fontSizeColossal
             font.family: Colors.fontMono
         }
         Text {
