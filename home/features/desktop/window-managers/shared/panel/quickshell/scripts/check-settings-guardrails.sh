@@ -5,6 +5,7 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pw
 quickshell_root="$(CDPATH= cd -- "${script_dir}/.." >/dev/null && pwd)"
 config_root="${quickshell_root}/src"
 skip_responsive=0
+runtime_output_dir=""
 
 source "${script_dir}/graphics-session-env.sh"
 
@@ -33,6 +34,10 @@ main() {
       --skip-responsive)
         skip_responsive=1
         shift
+        ;;
+      --runtime-output-dir)
+        runtime_output_dir="${2:-}"
+        shift 2
         ;;
       *)
         runtime_args+=("$1")
@@ -68,7 +73,11 @@ main() {
   if niri_headless_without_outputs; then
     printf '%s\n' "[INFO] Skipping runtime warning regression artifact capture: Niri session exposes no wl_output in this headless VM."
   else
-    "${script_dir}/check-runtime-warning-regressions.sh" --workspace current --skip-surfaces "${runtime_args[@]}"
+    runtime_warning_args=(--workspace current --skip-surfaces)
+    if [[ -n "${runtime_output_dir}" ]]; then
+      runtime_warning_args+=(--output-dir "${runtime_output_dir}")
+    fi
+    "${script_dir}/check-runtime-warning-regressions.sh" "${runtime_warning_args[@]}" "${runtime_args[@]}"
   fi
 
   printf '%s\n' "Settings guardrails passed."

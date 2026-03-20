@@ -20,6 +20,10 @@ By default this includes the Home Manager deploy path through
 check-bar-widgets-first-open.sh. Use --skip-switch if the current repo state is
 already deployed, or --repo-shell to run the stack against a repo-shell instance
 without deploying Home Manager.
+
+When --output-dir is set, it is treated as the bundle root. Bar Widgets review
+artifacts are written to PATH/bar-widgets-first-open and runtime/settings matrix
+artifacts are written to PATH/panel-qa-matrix.
 EOF
 }
 
@@ -53,7 +57,8 @@ first_open_args=()
 guardrail_args=()
 
 if [[ -n "${output_dir}" ]]; then
-  first_open_args+=(--output-dir "${output_dir}")
+  first_open_args+=(--output-dir "${output_dir}/bar-widgets-first-open")
+  guardrail_args+=(--runtime-output-dir "${output_dir}/panel-qa-matrix")
 fi
 
 if (( repo_shell_mode == 1 )); then

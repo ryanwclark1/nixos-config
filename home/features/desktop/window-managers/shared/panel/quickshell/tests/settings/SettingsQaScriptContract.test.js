@@ -14,4 +14,11 @@ describe("settings QA script contract", () => {
 
     expect(source).toContain('check-settings-guardrails.sh" --skip-responsive --skip-launcher --skip-settings-deep');
   });
+
+  it("treats output-dir as the preserved bundle root for both first-open and matrix artifacts", () => {
+    const source = readFileSync(settingsQaScriptPath, "utf8");
+
+    expect(source).toContain('first_open_args+=(--output-dir "${output_dir}/bar-widgets-first-open")');
+    expect(source).toContain('guardrail_args+=(--runtime-output-dir "${output_dir}/panel-qa-matrix")');
+  });
 });
