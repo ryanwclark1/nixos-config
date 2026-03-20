@@ -221,21 +221,18 @@ QtObject {
     return base + "?format=j1" + unitFlag;
   }
 
-  property string _stderrText: ""
+  property int _lastExitCode: 0
 
   property Process weatherProc: Process {
     command: ["sh", "-c", "echo"]
     running: false
-    stderr: StdioCollector {
-      onStreamFinished: root._stderrText = String(this.text || "").trim()
-    }
+    onExited: (exitCode, exitStatus) => root._lastExitCode = exitCode
     stdout: StdioCollector {
       onStreamFinished: {
         try {
           var raw = String(this.text || "").trim();
           if (!raw) {
-            var detail = root._stderrText || "no stderr";
-            throw new Error("empty weather response (" + detail + ")");
+            throw new Error("empty weather response (curl exit " + root._lastExitCode + ")");
           }
           if (raw.indexOf("{") !== 0) throw new Error("response is not JSON: " + raw.substring(0, 80));
           var json = JSON.parse(raw);

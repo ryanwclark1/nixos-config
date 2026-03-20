@@ -233,7 +233,11 @@ QtObject {
         onTriggered: root._saveData()
     }
 
-    Component.onCompleted: _loadSession()
+    Component.onCompleted: {
+        _loadSession()
+        // _previousProvider and refreshModels() are handled by onActiveProviderChanged
+        _ensureIpcHandler()
+    }
 
     function _scheduleSave() {
         if (!_loading) _saveTimer.restart();
@@ -1159,11 +1163,6 @@ QtObject {
             return _ipcHandler;
         _ipcHandler = ipcHandlerComponent.createObject(root);
         return _ipcHandler;
-    }
-
-    Component.onCompleted: {
-        // _previousProvider and refreshModels() are handled by onActiveProviderChanged
-        _ensureIpcHandler();
     }
 
     Component.onDestruction: {
