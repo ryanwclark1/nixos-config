@@ -615,7 +615,7 @@ SharedWidgets.CardBase {
 
                     SharedWidgets.FilterChip {
                         label: "Reload"
-                        icon: "󰑓"
+                        icon: "arrow-clockwise.svg"
                         enabled: root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnitScope, root.selectedUnitName)
                         selected: false
                         onClicked: ServiceUnitService.reloadUnit(root.selectedUnitScope, root.selectedUnitName)
@@ -623,7 +623,7 @@ SharedWidgets.CardBase {
 
                     SharedWidgets.FilterChip {
                         label: "Logs"
-                        icon: "󱂬"
+                        icon: "terminal.svg"
                         enabled: root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnitScope, root.selectedUnitName)
                         selected: false
                         onClicked: ServiceUnitService.openUnitLogsInTerminal(root.selectedUnitScope, root.selectedUnitName)
@@ -631,7 +631,7 @@ SharedWidgets.CardBase {
 
                     SharedWidgets.FilterChip {
                         label: "Status"
-                        icon: "󰋼"
+                        icon: "info.svg"
                         enabled: root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnitScope, root.selectedUnitName)
                         selected: false
                         onClicked: ServiceUnitService.openUnitStatusInTerminal(root.selectedUnitScope, root.selectedUnitName)
@@ -639,7 +639,7 @@ SharedWidgets.CardBase {
 
                     SharedWidgets.FilterChip {
                         label: "Copy Name"
-                        icon: "󰅍"
+                        icon: "copy.svg"
                         enabled: root.selectedUnit && !ServiceUnitService.isUnitPending(root.selectedUnitScope, root.selectedUnitName)
                         selected: false
                         onClicked: ServiceUnitService.copyUnitName(root.selectedUnitScope, root.selectedUnitName)
@@ -652,14 +652,14 @@ SharedWidgets.CardBase {
                     spacing: Colors.spacingS
 
                     SharedWidgets.Chip {
-                        icon: "󰈈"
+                        icon: "desktop.svg"
                         iconColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
                         text: root.selectedUnit ? ("ACTIVE " + String(root.selectedUnit.active || "unknown").toUpperCase()) : ""
                         textColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
                     }
 
                     SharedWidgets.Chip {
-                        icon: "󰑓"
+                        icon: "arrow-counterclockwise.svg"
                         iconColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
                         text: root.selectedUnit ? ("SUB " + String(root.selectedUnit.sub || "unknown")) : ""
                         textColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
