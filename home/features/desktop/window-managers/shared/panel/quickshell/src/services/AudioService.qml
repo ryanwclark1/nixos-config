@@ -43,11 +43,45 @@ QtObject {
 
     // ── PipeWire object tracking ─────────────────
     property PwObjectTracker _defaultTracker: PwObjectTracker {
-        objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
+        objects: root._defaultObjects()
     }
 
     property PwObjectTracker _nodeTracker: PwObjectTracker {
         objects: _allAudioNodes()
+    }
+
+    Timer {
+        id: refreshTimer
+        interval: 2000
+        running: root.subscriberCount > 0
+        repeat: true
+        onTriggered: {
+            root._nodeTracker.objects = root._allAudioNodes();
+            root._defaultTracker.objects = _defaultObjects();
+        }
+    }
+
+    function _defaultObjects() {
+        var out = [];
+        if (Pipewire.defaultAudioSink) {
+            out.push(Pipewire.defaultAudioSink);
+            if (Pipewire.defaultAudioSink.audio) out.push(Pipewire.defaultAudioSink.audio);
+        }
+        if (Pipewire.defaultAudioSource) {
+            out.push(Pipewire.defaultAudioSource);
+            if (Pipewire.defaultAudioSource.audio) out.push(Pipewire.defaultAudioSource.audio);
+        }
+        return out;
+    }
+
+    Connections {
+        target: Pipewire
+        function onDefaultAudioSinkChanged() {
+            root._defaultTracker.objects = root._defaultObjects();
+        }
+        function onDefaultAudioSourceChanged() {
+            root._defaultTracker.objects = root._defaultObjects();
+        }
     }
 
     // ── Helpers ──────────────────────────────────
@@ -79,12 +113,15 @@ QtObject {
     function _allAudioNodes() {
         if (!Pipewire.ready) return [];
         var nodes = Pipewire.nodes?.values ?? [];
-        var audio = [];
+        var objects = [];
         for (var i = 0; i < nodes.length; i++) {
-            if (nodes[i] && nodes[i].audio)
-                audio.push(nodes[i]);
+            var node = nodes[i];
+            if (node && node.audio) {
+                objects.push(node);
+                objects.push(node.audio);
+            }
         }
-        return audio;
+        return objects;
     }
 
     function _deviceDisplayName(node) {
