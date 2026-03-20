@@ -49,7 +49,8 @@ QtObject {
     
     // Eco Mode: Auto-downscale animations on battery
     readonly property bool _isEcoMode: Config.autoEcoMode && SystemStatus.isBatteryPowered
-    readonly property real _powerAnimScale: _isEcoMode ? 0.6 : 1.0
+    readonly property bool _isGameMode: GameModeService.active
+    readonly property real _powerAnimScale: _isGameMode ? 0.3 : (_isEcoMode ? 0.6 : 1.0)
     readonly property real _animScale: Config.animationSpeedScale * _powerAnimScale
 
     readonly property color border: withAlpha(text, 0.15)
