@@ -1,5 +1,6 @@
 import QtQuick
 import "../services"
+import "../widgets" as SharedWidgets
 
 Item {
     id: root
@@ -38,11 +39,11 @@ Item {
         Behavior on opacity { Anim {} }
 
         // Placeholder if no path set
-        Text {
+        SharedWidgets.SvgIcon {
             visible: !img.source
             anchors.centerIn: parent
-            text: "󰄛"
-            font.pixelSize: 20
+            source: "chat.svg"
+            size: 20
             color: root.shouldPlay ? Colors.primary : Colors.textDisabled
         }
     }

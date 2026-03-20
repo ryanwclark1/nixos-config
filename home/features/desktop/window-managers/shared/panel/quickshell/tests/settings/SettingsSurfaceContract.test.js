@@ -51,4 +51,12 @@ describe("settings surface contract", () => {
     expect(source).toContain("property bool showDivider: false");
     expect(source.match(/GradientStop \{/g)).toHaveLength(9);
   });
+
+  it("exports shared settings surface helpers in the qmldir manifest", () => {
+    const source = componentSource("src/features/settings/components/qmldir");
+
+    expect(source).toContain("SettingsHeaderBand 1.0 SettingsHeaderBand.qml");
+    expect(source).toContain("SettingsReorderButtons 1.0 SettingsReorderButtons.qml");
+    expect(source).toContain("SettingsReorderRow 1.0 SettingsReorderRow.qml");
+  });
 });

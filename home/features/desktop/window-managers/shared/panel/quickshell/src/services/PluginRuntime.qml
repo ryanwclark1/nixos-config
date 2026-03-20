@@ -445,7 +445,7 @@ QtObject {
       name: name,
       title: String(item.title || ""),
       description: String(item.description || ""),
-      icon: String(item.icon || "󰏗"),
+      icon: String(item.icon || "puzzle-piece.svg"),
       score: score,
       data: item.data !== undefined ? item.data : null,
       exec: item.exec !== undefined ? item.exec : "",
