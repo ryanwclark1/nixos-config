@@ -12,8 +12,8 @@ describe("Bar Widgets QA contract", () => {
   it("reuses the live repo-shell pid for the nested settings smoke", () => {
     const source = readFileSync(barWidgetsQaPath, "utf8");
 
-    expect(source).toContain('bash "${script_dir}/check-settings-responsive.sh" --pid "${repo_shell_pid}" --skip-reload');
-    expect(source).not.toContain('bash "${script_dir}/check-settings-responsive.sh" --id "${instance_id}" --skip-reload');
+    expect(source).toContain('bash "${script_dir}/check-settings-responsive.sh" --id "${instance_id}" --skip-reload');
+    expect(source).not.toContain('bash "${script_dir}/check-settings-responsive.sh" --pid "${repo_shell_pid}" --skip-reload');
   });
 
   it("keeps the OCR score tolerant of the current Left Section glyph output", () => {

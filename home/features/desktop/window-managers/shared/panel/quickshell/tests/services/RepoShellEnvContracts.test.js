@@ -11,15 +11,14 @@ const barWidgetsQaPath = resolve(quickshellRoot, "scripts/check-bar-widgets-firs
 const runtimeWarningsPath = resolve(quickshellRoot, "scripts/check-runtime-warning-regressions.sh");
 
 describe("repo-shell environment contracts", () => {
-  it("does not mistake the notification-disable flag for a discovered session environment", () => {
+  it("delegates graphics session env to the shared helper instead of inline detection", () => {
     for (const scriptPath of [settingsResponsivePath, barWidgetsQaPath, runtimeWarningsPath]) {
       const source = readFileSync(scriptPath, "utf8");
 
-      expect(source).toContain("local found_graphics_env=0");
-      expect(source).toContain("found_graphics_env=1");
-      expect(source).toContain("if (( found_graphics_env == 1 )); then");
-      expect(source).toContain('repo_shell_env+=("QT_QPA_PLATFORM=wayland")');
-      expect(source).toContain("HYPRLAND_INSTANCE_SIGNATURE|WAYLAND_DISPLAY|NIRI_SOCKET|DISPLAY");
+      expect(source).toContain('source "${script_dir}/graphics-session-env.sh"');
+      expect(source).toContain("build_repo_shell_env_array repo_shell_env");
+      expect(source).toContain("populate_repo_shell_env");
+      expect(source).not.toContain("local found_graphics_env=0");
     }
   });
 });
