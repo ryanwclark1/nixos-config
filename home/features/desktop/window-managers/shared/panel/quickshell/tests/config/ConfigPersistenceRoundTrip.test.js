@@ -114,6 +114,7 @@ describe("ConfigPersistence round trip", () => {
       ],
       launcherWebBangsEnabled: true,
       launcherWebBangsLastSync: "2026-03-19T00:00:00.000Z",
+      weatherUiAnimationEnabled: true,
       marketTickers: "AAPL MSFT",
       wallpaperTransitionType: "wipe",
       wallpaperTransitionDuration: 2500,
@@ -158,6 +159,7 @@ describe("ConfigPersistence round trip", () => {
       { key: "docs", name: "Docs", urlTemplate: "https://example.com?q=%s" },
     ]);
     expect(applied.launcherWebBangsLastSync).toBe("2026-03-19T00:00:00.000Z");
+    expect(applied.weatherUiAnimationEnabled).toBe(true);
     expect(applied.marketTickers).toBe("AAPL MSFT");
     expect(applied.wallpaperTransitionType).toBe("wipe");
     expect(applied.wallpaperTransitionDuration).toBe(2500);

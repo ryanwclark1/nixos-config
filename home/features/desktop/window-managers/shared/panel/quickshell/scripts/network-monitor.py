@@ -418,12 +418,12 @@ def collect_primary_details(active_conns):
     return result
 
 
-def collect_internet_details():
+def collect_internet_details(public_ipv4=""):
     """Get route device, public IP, and traffic stats."""
     result = {
         "routeDevice": "",
         "routeSource": "",
-        "publicIpv4": "",
+        "publicIpv4": str(public_ipv4 or ""),
         "totalReceived": "0 B",
         "totalSent": "0 B",
     }
@@ -488,7 +488,7 @@ def collect_public_ip():
 
 # ── Full snapshot ─────────────────────────────────────────
 
-def build_snapshot():
+def build_snapshot(public_ipv4=None):
     """Build a complete state snapshot."""
     wifi_radio = collect_wifi_radio()
     wifi_dev = collect_wifi_device_path()
@@ -498,6 +498,26 @@ def build_snapshot():
     primary = collect_primary_details(active_conns)
     internet = collect_internet_details()
     tailscale = collect_tailscale()
+
+    route_device = internet.get("routeDevice", "")
+    connectivity = primary.get("connectivityStatus", "unknown")
+    primary_ipv4 = primary.get("primaryIpv4", "")
+    cached_public_ipv4 = str(_state.get("publicIpv4", ""))
+    should_refresh_public_ipv4 = (
+        public_ipv4 is not None
+        or "publicIpv4" not in _state
+        or route_device != str(_state.get("routeDevice", ""))
+        or connectivity != str(_state.get("connectivityStatus", "unknown"))
+        or primary_ipv4 != str(_state.get("primaryIpv4", ""))
+    )
+
+    resolved_public_ipv4 = str(cached_public_ipv4 if public_ipv4 is None else public_ipv4 or "")
+    if not route_device or connectivity in ("none", "unknown"):
+        resolved_public_ipv4 = ""
+    elif should_refresh_public_ipv4 and connectivity == "full":
+        resolved_public_ipv4 = collect_public_ip()
+
+    internet["publicIpv4"] = resolved_public_ipv4
 
     snapshot = {
         "type": "snapshot",
@@ -677,6 +697,7 @@ def poll_public_ip():
     try:
         ip = collect_public_ip()
         if ip != _state.get("publicIpv4", ""):
+            _state["publicIpv4"] = ip
             schedule_snapshot()
     except Exception:
         pass
