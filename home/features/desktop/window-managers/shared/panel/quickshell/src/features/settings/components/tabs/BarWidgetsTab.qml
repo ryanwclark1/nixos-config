@@ -432,26 +432,35 @@ Item {
 
                     Repeater {
                         model: root.sectionWidgets(sectionKey).length
-                        delegate: Item {
+                        delegate: SettingsReorderRow {
                             id: widgetRow
                             Layout.fillWidth: true
-                            width: sectionColumn.width
-                            implicitHeight: cardLayout.implicitHeight + Appearance.spacingM * 2
-                            height: implicitHeight
                             required property int index
                             readonly property string sectionKey: widgetSectionCard.sectionKey
                             readonly property var widgetInstance: root.sectionWidgets(sectionKey)[index]
-                            readonly property bool dropBeforeActive: root.dragTargetSection === widgetRow.sectionKey && root.dragTargetIndex === widgetRow.index
-
-                            SettingsDropIndicator {
-                                anchors {
-                                    left: parent.left
-                                    right: parent.right
-                                    top: parent.top
+                            reorderState: widgetReorderState
+                            listId: widgetRow.sectionKey
+                            itemId: String(widgetRow.widgetInstance.instanceId || "")
+                            rowIndex: widgetRow.index
+                            itemCount: root.sectionWidgets(widgetRow.sectionKey).length
+                            listItem: sectionColumn
+                            compactMode: root.compactMode
+                            dragEnabled: root.dragReorderEnabled
+                            trackInternalDropTarget: false
+                            autoCommitOnRelease: false
+                            onDragReleased: function(wasDragging, targetIndex) {
+                                if (wasDragging && dragProxy.Drag.active) {
+                                    dragProxy.Drag.drop();
+                                    Qt.callLater(function() {
+                                        if (widgetReorderState.active)
+                                            root.clearDragState();
+                                    });
+                                } else {
+                                    root.clearDragState();
                                 }
-                                active: root.dragReorderEnabled && widgetRow.dropBeforeActive
-                                visible: root.dragReorderEnabled && widgetRow.dropBeforeActive
-                                z: 3
+                            }
+                            beginDragFn: function(listId, itemId, index) {
+                                root.beginWidgetDrag(listId, itemId, index);
                             }
 
                             DropArea {
@@ -469,134 +478,91 @@ Item {
                                 }
                             }
 
-                            Rectangle {
-                                id: card
-                                anchors.fill: parent
-                                implicitHeight: cardLayout.implicitHeight + Appearance.spacingM * 2
-                                radius: Appearance.radiusSmall
-                                color: Colors.modalFieldSurface
-                                border.color: Colors.border
-                                border.width: 1
-                                opacity: dragHandle.dragActive ? 0.7 : 1.0
+                            SharedWidgets.SvgIcon {
+                                source: BarWidgetRegistry.displayIcon(widgetRow.widgetInstance.widgetType)
+                                color: Colors.primary
+                                size: Appearance.fontSizeLarge
+                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+                            }
 
-                                Behavior on y {
-                                    enabled: !dragHandle.dragActive
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: Appearance.spacingS
 
-                                    NumberAnimation {
-                                        duration: Appearance.durationFast
+                                Text {
+                                    text: BarWidgetRegistry.displayName(widgetRow.widgetInstance.widgetType)
+                                    color: Colors.text
+                                    font.pixelSize: Appearance.fontSizeMedium
+                                    font.weight: Font.Medium
+                                    Layout.fillWidth: true
+                                    wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+                                    elide: root.compactMode ? Text.ElideNone : Text.ElideRight
+                                }
+
+                                Text {
+                                    text: BarWidgetRegistry.description(widgetRow.widgetInstance.widgetType)
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Appearance.fontSizeXS
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.WordWrap
+                                }
+
+                                Text {
+                                    text: root.dragReorderEnabled ? "Drag to reorder within or across sections, or use the arrow buttons." : "Use the arrow buttons to reorder within this section."
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Appearance.fontSizeXS
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.WordWrap
+                                }
+
+                                Flow {
+                                    Layout.fillWidth: true
+                                    width: parent.width
+                                    spacing: Appearance.spacingS
+
+                                    SharedWidgets.FilterChip {
+                                        label: widgetRow.widgetInstance.enabled === false ? "Hidden" : "Visible"
+                                        selected: widgetRow.widgetInstance.enabled !== false
+                                        onClicked: root.toggleWidgetEnabled(widgetRow.sectionKey, widgetRow.widgetInstance)
+                                    }
+
+                                    Repeater {
+                                        model: BarWidgetRegistry.summaryChips(widgetRow.widgetInstance, root.selectedBarPosition)
+
+                                        delegate: SharedWidgets.FilterChip {
+                                            required property var modelData
+                                            label: String(modelData || "")
+                                            selected: false
+                                            enabled: false
+                                        }
                                     }
                                 }
 
-                                ColumnLayout {
-                                    id: cardLayout
-                                    anchors {
-                                        left: parent.left
-                                        right: parent.right
-                                        top: parent.top
-                                        margins: Appearance.spacingM
-                                    }
+                                Flow {
+                                    Layout.fillWidth: true
+                                    width: parent.width
                                     spacing: Appearance.spacingS
 
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        spacing: Appearance.spacingS
-
-                                        SharedWidgets.SvgIcon {
-                                            source: "re-order-dots-vertical.svg"
-                                            color: Colors.textDisabled
-                                            size: Appearance.fontSizeLarge
-                                        }
-
-                                        SharedWidgets.SvgIcon {
-                                            source: BarWidgetRegistry.displayIcon(widgetRow.widgetInstance.widgetType)
-                                            color: Colors.primary
-                                            size: Appearance.fontSizeLarge
-                                        }
-
-                                        ColumnLayout {
-                                            Layout.fillWidth: true
-                                            spacing: Appearance.spacingXXS
-
-                                            Text {
-                                                text: BarWidgetRegistry.displayName(widgetRow.widgetInstance.widgetType)
-                                                color: Colors.text
-                                                font.pixelSize: Appearance.fontSizeMedium
-                                                font.weight: Font.Medium
-                                                Layout.fillWidth: true
-                                                wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
-                                                elide: root.compactMode ? Text.ElideNone : Text.ElideRight
-                                            }
-
-                                            Text {
-                                                text: BarWidgetRegistry.description(widgetRow.widgetInstance.widgetType)
-                                                color: Colors.textSecondary
-                                                font.pixelSize: Appearance.fontSizeXS
-                                                Layout.fillWidth: true
-                                                wrapMode: Text.WordWrap
-                                            }
-
-                                            Text {
-                                                text: root.dragReorderEnabled ? "Drag to reorder within or across sections, or use the arrow buttons." : "Use the arrow buttons to reorder within this section."
-                                                color: Colors.textSecondary
-                                                font.pixelSize: Appearance.fontSizeXS
-                                                Layout.fillWidth: true
-                                                wrapMode: Text.WordWrap
-                                            }
-                                        }
+                                    SettingsReorderButtons {
+                                        moveUpEnabled: widgetRow.index > 0
+                                        moveDownEnabled: widgetRow.index < (root.sectionWidgets(widgetRow.sectionKey).length - 1)
+                                        onMoveUp: root.moveWidget(widgetRow.sectionKey, widgetRow.index, -1)
+                                        onMoveDown: root.moveWidget(widgetRow.sectionKey, widgetRow.index, 1)
                                     }
 
-                                    Flow {
-                                        Layout.fillWidth: true
-                                        width: parent.width
-                                        spacing: Appearance.spacingS
+                                    SettingsActionButton {
+                                        compact: true
+                                        iconName: "apps.svg"
+                                        label: "Settings"
+                                        enabled: BarWidgetRegistry.supportsSettings(widgetRow.widgetInstance.widgetType)
+                                        onClicked: root.openWidgetSettings(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)
+                                    }
 
-                                        SharedWidgets.FilterChip {
-                                            label: widgetRow.widgetInstance.enabled === false ? "Hidden" : "Visible"
-                                            selected: widgetRow.widgetInstance.enabled !== false
-                                            onClicked: root.toggleWidgetEnabled(widgetRow.sectionKey, widgetRow.widgetInstance)
-                                        }
-
-                                        Repeater {
-                                            model: BarWidgetRegistry.summaryChips(widgetRow.widgetInstance, root.selectedBarPosition)
-
-                                            delegate: SharedWidgets.FilterChip {
-                                                required property var modelData
-                                                label: String(modelData || "")
-                                                selected: false
-                                                enabled: false
-                                            }
-                                        }
-
-                                        SettingsActionButton {
-                                            compact: true
-                                            iconName: "chevron-up.svg"
-                                            label: "↑"
-                                            enabled: widgetRow.index > 0
-                                            onClicked: root.moveWidget(widgetRow.sectionKey, widgetRow.index, -1)
-                                        }
-
-                                        SettingsActionButton {
-                                            compact: true
-                                            iconName: "chevron-down.svg"
-                                            label: "↓"
-                                            enabled: widgetRow.index < (root.sectionWidgets(widgetRow.sectionKey).length - 1)
-                                            onClicked: root.moveWidget(widgetRow.sectionKey, widgetRow.index, 1)
-                                        }
-
-                                        SettingsActionButton {
-                                            compact: true
-                                            iconName: "apps.svg"
-                                            label: "Settings"
-                                            enabled: BarWidgetRegistry.supportsSettings(widgetRow.widgetInstance.widgetType)
-                                            onClicked: root.openWidgetSettings(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)
-                                        }
-
-                                        SettingsActionButton {
-                                            compact: true
-                                            iconName: "dismiss.svg"
-                                            label: "Remove"
-                                            onClicked: root.removeWidget(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)
-                                        }
+                                    SettingsActionButton {
+                                        compact: true
+                                        iconName: "dismiss.svg"
+                                        label: "Remove"
+                                        onClicked: root.removeWidget(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId)
                                     }
                                 }
                             }
@@ -606,42 +572,13 @@ Item {
                                 width: widgetRow.width
                                 height: widgetRow.height
                                 visible: false
-                                Drag.active: root.dragReorderEnabled && dragHandle.dragActive
+                                x: widgetRow.dragOffsetX
+                                y: widgetRow.dragOffsetY
+                                Drag.active: root.dragReorderEnabled && widgetRow.dragHandle.dragActive
                                 Drag.source: dragProxy
                                 Drag.hotSpot.x: width / 2
                                 Drag.hotSpot.y: height / 2
                                 Drag.keys: ["bar-widget"]
-                            }
-
-                            SettingsDragHandle {
-                                id: dragHandle
-                                anchors {
-                                    top: parent.top
-                                    right: parent.right
-                                    topMargin: Appearance.spacingS
-                                    rightMargin: Appearance.spacingS
-                                }
-                                enabled: root.dragReorderEnabled
-                                visible: root.dragReorderEnabled
-                                dragTarget: root.dragReorderEnabled ? card : null
-                                onPressedChanged: {
-                                    if (pressed)
-                                        root.beginWidgetDrag(widgetRow.sectionKey, widgetRow.widgetInstance.instanceId, widgetRow.index);
-                                }
-                                onReleased: function (wasDragging) {
-                                    card.x = 0;
-                                    card.y = 0;
-                                    if (wasDragging && dragProxy.Drag.active)
-                                        dragProxy.Drag.drop();
-                                    else
-                                        root.clearDragState();
-                                }
-                                onDragActiveChanged: {
-                                    if (!dragActive) {
-                                        card.x = 0;
-                                        card.y = 0;
-                                    }
-                                }
                             }
                         }
                     }
@@ -650,6 +587,7 @@ Item {
                         Layout.fillWidth: true
                         active: root.sectionWidgets(sectionKey).length > 0 && root.dragReorderEnabled && root.dragSourceIndex >= 0 && root.dragTargetSection === sectionKey && root.dragTargetIndex === root.sectionWidgets(sectionKey).length
                         visible: active
+                        label: root.dragReorderEnabled && root.dragSourceIndex >= 0 ? "Drop at end of " + root.sectionLabel(sectionKey).toLowerCase() : ""
                     }
 
                     DropArea {
@@ -666,13 +604,6 @@ Item {
                         }
                         onDropped: function (drop) {
                             root.moveDraggedWidget(sectionKey, root.sectionWidgets(sectionKey).length);
-                        }
-
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: root.dragReorderEnabled && root.dragSourceIndex >= 0 ? "Drop at end of " + root.sectionLabel(sectionKey).toLowerCase() : ""
-                            color: Colors.textSecondary
-                            font.pixelSize: Appearance.fontSizeXS
                         }
                     }
                 }

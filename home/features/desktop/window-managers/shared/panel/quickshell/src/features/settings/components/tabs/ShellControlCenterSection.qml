@@ -116,125 +116,71 @@ Item {
                 Repeater {
                     model: root.orderedToggles()
 
-                    delegate: Item {
+                    delegate: SettingsReorderRow {
                         id: toggleRow
-                        width: parent ? parent.width : 0
-                        implicitHeight: toggleCard.implicitHeight + (toggleDropBeforeIndicator.visible ? toggleDropBeforeIndicator.height + Appearance.spacingXS : 0)
-                        height: implicitHeight
                         required property int index
                         required property var modelData
                         readonly property bool hidden: Array.isArray(Config.controlCenterHiddenToggles) && Config.controlCenterHiddenToggles.indexOf(modelData.id) !== -1
-                        readonly property bool dropBeforeActive: toggleReorderState.active && toggleReorderState.targetListId === "control-center-toggle" && toggleReorderState.targetIndex === index
+                        reorderState: toggleReorderState
+                        listId: "control-center-toggle"
+                        itemId: String(toggleRow.modelData.id || "")
+                        rowIndex: toggleRow.index
+                        itemCount: root.orderedToggles().length
+                        listItem: toggleOrderList
+                        compactMode: root.compactMode
+                        minimumHeight: root.compactMode ? 78 : 62
+                        active: !toggleRow.hidden
+                        beginDragFn: function(listId, itemId, index) {
+                            root.beginToggleDrag(itemId, index);
+                        }
+                        moveDraggedFn: function(listId, targetIndex) {
+                            return root.moveDraggedToggle(targetIndex);
+                        }
+                        clearDragStateFn: root.clearToggleDragState
+                        dropIndexFn: root.currentToggleDropIndex
 
-                        SettingsDropIndicator {
-                            id: toggleDropBeforeIndicator
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: parent.top
-                            }
-                            active: toggleRow.dropBeforeActive
-                            visible: toggleRow.dropBeforeActive
+                        SettingsMetricIcon {
+                            icon: toggleRow.modelData.icon || "󰖲"
+                            iconColor: toggleRow.hidden ? Colors.textDisabled : Colors.primary
+                            Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
                         }
 
-                        SettingsListRow {
-                            id: toggleCard
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: toggleDropBeforeIndicator.bottom
-                                topMargin: toggleDropBeforeIndicator.visible ? Appearance.spacingXS : 0
-                            }
-                            minimumHeight: root.compactMode ? 78 : 62
-                            active: !toggleRow.hidden
-                            dragging: toggleDragHandle.dragActive
-                            dropTargeted: toggleRow.dropBeforeActive
-                            onYChanged: {
-                                if (toggleDragHandle.dragActive)
-                                    toggleReorderState.updateTarget("control-center-toggle", root.currentToggleDropIndex(toggleCard, toggleRow.index, toggleOrderList));
-                            }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Appearance.spacingXXS
 
-                            Behavior on y {
-                                enabled: !toggleDragHandle.dragActive
-
-                                NumberAnimation {
-                                    duration: Appearance.durationFast
-                                }
-                            }
-
-                            SettingsDragHandle {
-                                id: toggleDragHandle
-                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                                dragTarget: toggleCard
-                                onPressedChanged: {
-                                    if (pressed)
-                                        root.beginToggleDrag(toggleRow.modelData.id, toggleRow.index);
-                                }
-                                onReleased: function(wasDragging) {
-                                    var targetIndex = toggleReorderState.targetIndex;
-                                    if (wasDragging)
-                                        targetIndex = root.currentToggleDropIndex(toggleCard, toggleRow.index, toggleOrderList);
-                                    toggleCard.x = 0;
-                                    toggleCard.y = 0;
-                                    if (wasDragging) {
-                                        if (!root.moveDraggedToggle(targetIndex))
-                                            root.clearToggleDragState();
-                                    } else {
-                                        root.clearToggleDragState();
-                                    }
-                                }
-                            }
-
-                            SettingsMetricIcon {
-                                icon: toggleRow.modelData.icon || "󰖲"
-                                iconColor: toggleRow.hidden ? Colors.textDisabled : Colors.primary
-                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                            }
-
-                            ColumnLayout {
+                            Text {
+                                text: toggleRow.modelData.label || toggleRow.modelData.id
+                                color: Colors.text
+                                font.pixelSize: Appearance.fontSizeMedium
+                                font.weight: Font.Medium
                                 Layout.fillWidth: true
-                                spacing: Appearance.spacingXXS
-
-                                Text {
-                                    text: toggleRow.modelData.label || toggleRow.modelData.id
-                                    color: Colors.text
-                                    font.pixelSize: Appearance.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    Layout.fillWidth: true
-                                    elide: Text.ElideRight
-                                }
-
-                                Text {
-                                    text: toggleRow.hidden ? "Hidden in Control Center. Drag to stage its position, or use the switch to show it again." : "Visible in Control Center. Drag to reorder, or use the arrow buttons."
-                                    color: toggleRow.hidden ? Colors.textDisabled : Colors.textSecondary
-                                    font.pixelSize: Appearance.fontSizeXS
-                                    Layout.fillWidth: true
-                                    wrapMode: Text.WordWrap
-                                }
+                                elide: Text.ElideRight
                             }
 
-                            RowLayout {
-                                spacing: Appearance.spacingS
-                                Layout.alignment: Qt.AlignTop
+                            Text {
+                                text: toggleRow.hidden ? "Hidden in Control Center. Drag to stage its position, or use the switch to show it again." : "Visible in Control Center. Drag to reorder, or use the arrow buttons."
+                                color: toggleRow.hidden ? Colors.textDisabled : Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+                        }
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "chevron-up.svg"
-                                    enabled: toggleRow.index > 0
-                                    onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleRow.modelData.id, -1)
-                                }
+                        RowLayout {
+                            spacing: Appearance.spacingS
+                            Layout.alignment: Qt.AlignTop
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "chevron-down.svg"
-                                    enabled: toggleRow.index < root.orderedToggles().length - 1
-                                    onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleRow.modelData.id, 1)
-                                }
+                            SettingsReorderButtons {
+                                moveUpEnabled: toggleRow.index > 0
+                                moveDownEnabled: toggleRow.index < root.orderedToggles().length - 1
+                                onMoveUp: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleRow.modelData.id, -1)
+                                onMoveDown: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleRow.modelData.id, 1)
+                            }
 
-                                SharedWidgets.ToggleSwitch {
-                                    checked: !toggleRow.hidden
-                                    onToggled: Helpers.toggleHiddenListValue(Config, "controlCenterHiddenToggles", toggleRow.modelData.id)
-                                }
+                            SharedWidgets.ToggleSwitch {
+                                checked: !toggleRow.hidden
+                                onToggled: Helpers.toggleHiddenListValue(Config, "controlCenterHiddenToggles", toggleRow.modelData.id)
                             }
                         }
                     }
@@ -277,134 +223,80 @@ Item {
                 Repeater {
                     model: root.orderedPlugins()
 
-                    delegate: Item {
+                    delegate: SettingsReorderRow {
                         id: pluginRow
-                        width: parent ? parent.width : 0
-                        implicitHeight: pluginCard.implicitHeight + (pluginDropBeforeIndicator.visible ? pluginDropBeforeIndicator.height + Appearance.spacingXS : 0)
-                        height: implicitHeight
                         required property int index
                         required property var modelData
                         readonly property bool hidden: Array.isArray(Config.controlCenterHiddenPlugins) && Config.controlCenterHiddenPlugins.indexOf(modelData.id) !== -1
-                        readonly property bool dropBeforeActive: pluginReorderState.active && pluginReorderState.targetListId === "control-center-plugin" && pluginReorderState.targetIndex === index
+                        reorderState: pluginReorderState
+                        listId: "control-center-plugin"
+                        itemId: String(pluginRow.modelData.id || "")
+                        rowIndex: pluginRow.index
+                        itemCount: root.orderedPlugins().length
+                        listItem: pluginOrderList
+                        compactMode: root.compactMode
+                        minimumHeight: root.compactMode ? 82 : 66
+                        active: !pluginRow.hidden
+                        beginDragFn: function(listId, itemId, index) {
+                            root.beginPluginDrag(itemId, index);
+                        }
+                        moveDraggedFn: function(listId, targetIndex) {
+                            return root.moveDraggedPlugin(targetIndex);
+                        }
+                        clearDragStateFn: root.clearPluginDragState
+                        dropIndexFn: root.currentPluginDropIndex
 
-                        SettingsDropIndicator {
-                            id: pluginDropBeforeIndicator
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: parent.top
+                        Rectangle {
+                            width: root.compactMode ? 30 : 34
+                            height: width
+                            radius: Appearance.radiusSmall
+                            color: pluginRow.hidden ? Colors.textFaint : Colors.primarySubtle
+                            Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+
+                            SharedWidgets.SvgIcon {
+                                anchors.centerIn: parent
+                                source: "puzzle-piece.svg"
+                                color: pluginRow.hidden ? Colors.textDisabled : Colors.primary
+                                size: Appearance.fontSizeMedium
                             }
-                            active: pluginRow.dropBeforeActive
-                            visible: pluginRow.dropBeforeActive
                         }
 
-                        SettingsListRow {
-                            id: pluginCard
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: pluginDropBeforeIndicator.bottom
-                                topMargin: pluginDropBeforeIndicator.visible ? Appearance.spacingXS : 0
-                            }
-                            minimumHeight: root.compactMode ? 82 : 66
-                            active: !pluginRow.hidden
-                            dragging: pluginDragHandle.dragActive
-                            dropTargeted: pluginRow.dropBeforeActive
-                            onYChanged: {
-                                if (pluginDragHandle.dragActive)
-                                    pluginReorderState.updateTarget("control-center-plugin", root.currentPluginDropIndex(pluginCard, pluginRow.index, pluginOrderList));
-                            }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Appearance.spacingXXS
 
-                            Behavior on y {
-                                enabled: !pluginDragHandle.dragActive
-
-                                NumberAnimation {
-                                    duration: Appearance.durationFast
-                                }
-                            }
-
-                            SettingsDragHandle {
-                                id: pluginDragHandle
-                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                                dragTarget: pluginCard
-                                onPressedChanged: {
-                                    if (pressed)
-                                        root.beginPluginDrag(pluginRow.modelData.id, pluginRow.index);
-                                }
-                                onReleased: function(wasDragging) {
-                                    var targetIndex = pluginReorderState.targetIndex;
-                                    if (wasDragging)
-                                        targetIndex = root.currentPluginDropIndex(pluginCard, pluginRow.index, pluginOrderList);
-                                    pluginCard.x = 0;
-                                    pluginCard.y = 0;
-                                    if (wasDragging) {
-                                        if (!root.moveDraggedPlugin(targetIndex))
-                                            root.clearPluginDragState();
-                                    } else {
-                                        root.clearPluginDragState();
-                                    }
-                                }
-                            }
-
-                            Rectangle {
-                                width: root.compactMode ? 30 : 34
-                                height: width
-                                radius: Appearance.radiusSmall
-                                color: pluginRow.hidden ? Colors.textFaint : Colors.primarySubtle
-                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-
-                                SharedWidgets.SvgIcon {
-                                    anchors.centerIn: parent
-                                    source: "puzzle-piece.svg"
-                                    color: pluginRow.hidden ? Colors.textDisabled : Colors.primary
-                                    size: Appearance.fontSizeMedium
-                                }
-                            }
-
-                            ColumnLayout {
+                            Text {
+                                text: pluginRow.modelData.name || pluginRow.modelData.id
+                                color: Colors.text
+                                font.pixelSize: Appearance.fontSizeMedium
+                                font.weight: Font.Medium
                                 Layout.fillWidth: true
-                                spacing: Appearance.spacingXXS
-
-                                Text {
-                                    text: pluginRow.modelData.name || pluginRow.modelData.id
-                                    color: Colors.text
-                                    font.pixelSize: Appearance.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    Layout.fillWidth: true
-                                    elide: Text.ElideRight
-                                }
-
-                                Text {
-                                    text: pluginRow.hidden ? "Hidden in Control Center. Drag to stage its slot before showing it again." : "Visible in Control Center. Drag to reorder, or use the arrow buttons."
-                                    color: pluginRow.hidden ? Colors.textDisabled : Colors.textSecondary
-                                    font.pixelSize: Appearance.fontSizeXS
-                                    Layout.fillWidth: true
-                                    wrapMode: Text.WordWrap
-                                }
+                                elide: Text.ElideRight
                             }
 
-                            RowLayout {
-                                spacing: Appearance.spacingS
-                                Layout.alignment: Qt.AlignTop
+                            Text {
+                                text: pluginRow.hidden ? "Hidden in Control Center. Drag to stage its slot before showing it again." : "Visible in Control Center. Drag to reorder, or use the arrow buttons."
+                                color: pluginRow.hidden ? Colors.textDisabled : Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
+                        }
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "chevron-up.svg"
-                                    enabled: pluginRow.index > 0
-                                    onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", pluginRow.modelData.id, -1)
-                                }
+                        RowLayout {
+                            spacing: Appearance.spacingS
+                            Layout.alignment: Qt.AlignTop
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "chevron-down.svg"
-                                    enabled: pluginRow.index < root.orderedPlugins().length - 1
-                                    onClicked: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", pluginRow.modelData.id, 1)
-                                }
+                            SettingsReorderButtons {
+                                moveUpEnabled: pluginRow.index > 0
+                                moveDownEnabled: pluginRow.index < root.orderedPlugins().length - 1
+                                onMoveUp: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", pluginRow.modelData.id, -1)
+                                onMoveDown: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", pluginRow.modelData.id, 1)
+                            }
 
-                                SharedWidgets.ToggleSwitch {
-                                    checked: !pluginRow.hidden
-                                    onToggled: Helpers.toggleHiddenListValue(Config, "controlCenterHiddenPlugins", pluginRow.modelData.id)
-                                }
+                            SharedWidgets.ToggleSwitch {
+                                checked: !pluginRow.hidden
+                                onToggled: Helpers.toggleHiddenListValue(Config, "controlCenterHiddenPlugins", pluginRow.modelData.id)
                             }
                         }
                     }

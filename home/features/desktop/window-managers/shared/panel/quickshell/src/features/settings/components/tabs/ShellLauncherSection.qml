@@ -28,6 +28,7 @@ Item {
     readonly property bool isLauncherModesSection: sectionMode === "launcher-modes"
     readonly property bool isLauncherRuntimeSection: sectionMode === "launcher-runtime"
     readonly property bool launcherFilePreviewToggleAvailable: Quickshell.env("QS_ENABLE_UNSTABLE_LAUNCHER_FILE_PREVIEW") === "1"
+    readonly property int launcherWideFieldMinimumWidth: 420
     readonly property string currentLauncherTabId: isLauncherSearchSection ? "launcher-search"
         : (isLauncherWebSection ? "launcher-web"
         : (isLauncherModesSection ? "launcher-modes"
@@ -437,7 +438,7 @@ Item {
 
             SettingsFieldGrid {
                 maximumColumns: root.compactMode ? 1 : 2
-                minimumColumnWidth: 280
+                minimumColumnWidth: root.launcherWideFieldMinimumWidth
 
                 SettingsToggleRow {
                     label: "Show Mode Hints"
@@ -498,7 +499,7 @@ Item {
 
             SettingsFieldGrid {
                 maximumColumns: root.compactMode ? 1 : 2
-                minimumColumnWidth: 280
+                minimumColumnWidth: root.launcherWideFieldMinimumWidth
 
                 SettingsToggleRow {
                     label: "Show Home Sections"
@@ -792,145 +793,89 @@ Item {
 
                 Repeater {
                     model: root.orderedWebProviders()
-                    delegate: Item {
+                    delegate: SettingsReorderRow {
                         id: webProviderRow
-                        width: parent ? parent.width : 0
-                        implicitHeight: webProviderCard.implicitHeight + (webDropBeforeIndicator.visible ? webDropBeforeIndicator.height + Appearance.spacingXS : 0)
-                        height: implicitHeight
                         required property int index
                         required property var modelData
-                        readonly property bool dropBeforeActive: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === index
+                        reorderState: webProviderReorderState
+                        listId: "launcher-web-provider"
+                        itemId: String(webProviderRow.modelData || "")
+                        rowIndex: webProviderRow.index
+                        itemCount: root.orderedWebProviders().length
+                        listItem: webProviderOrderList
+                        compactMode: root.compactMode
+                        active: dragHandle.dragActive
+                        minimumHeight: root.compactMode ? 76 : 44
+                        beginDragFn: function(listId, itemId, index) {
+                            root.beginWebProviderDrag(itemId, index);
+                        }
+                        moveDraggedFn: function(listId, targetIndex) {
+                            return root.moveDraggedWebProvider(targetIndex);
+                        }
+                        clearDragStateFn: root.clearWebProviderDragState
+                        dropIndexFn: root.currentWebProviderDropIndex
 
-                        SettingsDropIndicator {
-                            id: webDropBeforeIndicator
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: parent.top
+                        Rectangle {
+                            Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
+                            border.color: Colors.border
+                            border.width: 1
+                            color: Colors.surface
+                            implicitHeight: 24
+                            implicitWidth: 24
+                            radius: Appearance.radiusCard
+
+                            SettingsMetricIcon {
+                                anchors.centerIn: parent
+                                iconColor: Colors.primary
+                                iconSize: Appearance.fontSizeSmall
+                                icon: {
+                                    for (var i = 0; i < root.webProviders.length; ++i) {
+                                        if (root.webProviders[i].key === webProviderRow.modelData)
+                                            return root.webProviders[i].icon;
+                                    }
+                                    return "󰖟";
+                                }
                             }
-                            active: webProviderRow.dropBeforeActive
-                            visible: webProviderRow.dropBeforeActive
                         }
 
-                        SettingsListRow {
-                            id: webProviderCard
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                top: webDropBeforeIndicator.bottom
-                                topMargin: webDropBeforeIndicator.visible ? Appearance.spacingXS : 0
-                            }
-                            minimumHeight: root.compactMode ? 76 : 44
-                            active: webDragHandle.dragActive
-                            dragging: webDragHandle.dragActive
-                            dropTargeted: webProviderRow.dropBeforeActive
-                            onYChanged: {
-                                if (webDragHandle.dragActive)
-                                    webProviderReorderState.updateTarget("launcher-web-provider", root.currentWebProviderDropIndex(webProviderCard, webProviderRow.index, webProviderOrderList));
-                            }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Appearance.spacingXS
 
-                            Behavior on y {
-                                enabled: !webDragHandle.dragActive
-
-                                NumberAnimation {
-                                    duration: Appearance.durationFast
-                                }
-                            }
-
-                            SettingsDragHandle {
-                                id: webDragHandle
-                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                                dragTarget: webProviderCard
-                                onPressedChanged: {
-                                    if (pressed)
-                                        root.beginWebProviderDrag(webProviderRow.modelData, webProviderRow.index);
-                                }
-                                onReleased: function (wasDragging) {
-                                    var targetIndex = root.dragWebProviderTargetIndex;
-                                    if (wasDragging)
-                                        targetIndex = root.currentWebProviderDropIndex(webProviderCard, webProviderRow.index, webProviderOrderList);
-                                    webProviderCard.x = 0;
-                                    webProviderCard.y = 0;
-                                    if (wasDragging) {
-                                        if (!root.moveDraggedWebProvider(targetIndex))
-                                            root.clearWebProviderDragState();
-                                    } else {
-                                        root.clearWebProviderDragState();
-                                    }
-                                }
-                            }
-
-                            Rectangle {
-                                Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                                border.color: Colors.border
-                                border.width: 1
-                                color: Colors.surface
-                                implicitHeight: 24
-                                implicitWidth: 24
-                                radius: Appearance.radiusCard
-
-                                SettingsMetricIcon {
-                                    anchors.centerIn: parent
-                                    iconColor: Colors.primary
-                                    iconSize: Appearance.fontSizeSmall
-                                    icon: {
-                                        for (var i = 0; i < root.webProviders.length; ++i) {
-                                            if (root.webProviders[i].key === webProviderRow.modelData)
-                                                return root.webProviders[i].icon;
-                                        }
-                                        return "󰖟";
-                                    }
-                                }
-                            }
-
-                            ColumnLayout {
+                            Text {
                                 Layout.fillWidth: true
-                                spacing: Appearance.spacingXS
-
-                                Text {
-                                    Layout.fillWidth: true
-                                    color: Colors.text
-                                    font.pixelSize: Appearance.fontSizeSmall
-                                    font.weight: Font.DemiBold
-                                    wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
-                                    elide: root.compactMode ? Text.ElideNone : Text.ElideRight
-                                    text: {
-                                        for (var i = 0; i < root.webProviders.length; ++i) {
-                                            if (root.webProviders[i].key === webProviderRow.modelData)
-                                                return root.webProviders[i].label;
-                                        }
-                                        return webProviderRow.modelData;
+                                color: Colors.text
+                                font.pixelSize: Appearance.fontSizeSmall
+                                font.weight: Font.DemiBold
+                                wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
+                                elide: root.compactMode ? Text.ElideNone : Text.ElideRight
+                                text: {
+                                    for (var i = 0; i < root.webProviders.length; ++i) {
+                                        if (root.webProviders[i].key === webProviderRow.modelData)
+                                            return root.webProviders[i].label;
                                     }
+                                    return webProviderRow.modelData;
                                 }
+                            }
 
-                                Text {
-                                    text: "Drag to reorder, or use the arrow buttons."
-                                    color: Colors.textSecondary
-                                    font.pixelSize: Appearance.fontSizeXS
-                                    Layout.fillWidth: true
-                                    wrapMode: Text.WordWrap
-                                }
+                            Text {
+                                text: "Drag to reorder, or use the arrow buttons."
+                                color: Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeXS
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                            }
 
-                                Flow {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: parent.width
-                                    spacing: Appearance.spacingS
+                            Flow {
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: parent.width
+                                spacing: Appearance.spacingS
 
-                                    SettingsActionButton {
-                                        compact: true
-                                        enabled: webProviderRow.index > 0
-                                        iconName: "chevron-up.svg"
-                                        label: "↑"
-                                        onClicked: root.moveWebProvider(webProviderRow.modelData, -1)
-                                    }
-
-                                    SettingsActionButton {
-                                        compact: true
-                                        enabled: webProviderRow.index < (root.orderedWebProviders().length - 1)
-                                        iconName: "chevron-down.svg"
-                                        label: "↓"
-                                        onClicked: root.moveWebProvider(webProviderRow.modelData, 1)
-                                    }
+                                SettingsReorderButtons {
+                                    moveUpEnabled: webProviderRow.index > 0
+                                    moveDownEnabled: webProviderRow.index < (root.orderedWebProviders().length - 1)
+                                    onMoveUp: root.moveWebProvider(webProviderRow.modelData, -1)
+                                    onMoveDown: root.moveWebProvider(webProviderRow.modelData, 1)
                                 }
                             }
                         }
@@ -941,14 +886,7 @@ Item {
                     width: parent ? parent.width : 0
                     active: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
                     visible: active
-                }
-
-                Text {
-                    width: parent ? parent.width : 0
-                    visible: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
-                    text: "Drop at end of provider order"
-                    color: Colors.textSecondary
-                    font.pixelSize: Appearance.fontSizeXS
+                    label: "Drop at end of provider order"
                 }
             }
         }
@@ -1296,7 +1234,7 @@ Item {
                 moveModeFn: root.moveAdvancedMode
                 modeMetaFn: root.launcherModeMeta
                 dropIndexFn: root.currentModeDropIndex
-                promoteLabel: "Pin"
+                promoteLabel: "Primary"
                 promoteFn: root.promoteLauncherMode
                 disableFn: root.disableLauncherMode
                 dropEndText: "Drop at end of advanced modes"

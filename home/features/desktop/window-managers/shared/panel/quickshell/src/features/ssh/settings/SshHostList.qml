@@ -26,10 +26,8 @@ Rectangle {
     function clearHostDragState() {
         hostReorderState.clear();
     }
-    function currentHostDropIndex(cardItem, rowIndex, listItem) {
-        if (!cardItem || !listItem)
-            return rowIndex;
-        return ReorderHelpers.targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, root.filteredManualHosts.length);
+    function currentHostDropIndex(cardItem, rowIndex, listItem, count, dragOffsetY) {
+        return ReorderHelpers.currentListDropIndex(cardItem, rowIndex, listItem, root.filteredManualHosts.length, dragOffsetY);
     }
     function moveDraggedHost(targetIndex) {
         var hostId = String(hostReorderState.sourceItemId || "");
@@ -141,201 +139,145 @@ Rectangle {
             Repeater {
                 model: root.filteredManualHosts
 
-                delegate: Item {
+                delegate: SettingsReorderRow {
                     id: hostRow
-                    width: parent ? parent.width : 0
-                    implicitHeight: hostCard.implicitHeight + (hostDropBeforeIndicator.visible ? hostDropBeforeIndicator.height + Appearance.spacingXS : 0)
-                    height: implicitHeight
                     required property var modelData
                     readonly property var host: modelData.host
                     readonly property int hostIndex: modelData.index
                     readonly property bool editingThisHost: String(host.id || "") === root.editingHostId
-                    readonly property bool dropBeforeActive: hostReorderState.active && hostReorderState.targetListId === "ssh-manual-host" && hostReorderState.targetIndex === modelData.index
-
-                    SettingsDropIndicator {
-                        id: hostDropBeforeIndicator
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            top: parent.top
-                        }
-                        active: hostRow.dropBeforeActive
-                        visible: hostRow.dropBeforeActive
+                    reorderState: hostReorderState
+                    listId: "ssh-manual-host"
+                    itemId: String(hostRow.host.id || "")
+                    rowIndex: hostRow.hostIndex
+                    itemCount: root.filteredManualHosts.length
+                    listItem: hostOrderList
+                    compactMode: true
+                    active: hostRow.editingThisHost
+                    dragEnabled: !root.reorderDisabled
+                    minimumHeight: 0
+                    beginDragFn: function(listId, itemId, index) {
+                        root.beginHostDrag(itemId, index);
                     }
+                    moveDraggedFn: function(listId, targetIndex) {
+                        return root.moveDraggedHost(targetIndex);
+                    }
+                    clearDragStateFn: root.clearHostDragState
+                    dropIndexFn: root.currentHostDropIndex
 
-                    SettingsListRow {
-                        id: hostCard
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            top: hostDropBeforeIndicator.bottom
-                            topMargin: hostDropBeforeIndicator.visible ? Appearance.spacingXS : 0
-                        }
-                        minimumHeight: 0
-                        active: hostRow.editingThisHost
-                        dragging: hostDragHandle.dragActive
-                        dropTargeted: hostRow.dropBeforeActive
-                        onYChanged: {
-                            if (hostDragHandle.dragActive)
-                                hostReorderState.updateTarget("ssh-manual-host", root.currentHostDropIndex(hostCard, hostRow.hostIndex, hostOrderList));
-                        }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Appearance.spacingS
 
-                        Behavior on y {
-                            enabled: !hostDragHandle.dragActive
-
-                            NumberAnimation {
-                                duration: Appearance.durationFast
-                            }
-                        }
-
-                        SettingsDragHandle {
-                            id: hostDragHandle
-                            Layout.alignment: Qt.AlignTop
-                            dragTarget: hostCard
-                            enabled: !root.reorderDisabled
-                            onPressedChanged: {
-                                if (pressed)
-                                    root.beginHostDrag(hostRow.host.id, hostRow.hostIndex);
-                            }
-                            onReleased: function(wasDragging) {
-                                var targetIndex = hostReorderState.targetIndex;
-                                if (wasDragging)
-                                    targetIndex = root.currentHostDropIndex(hostCard, hostRow.hostIndex, hostOrderList);
-                                hostCard.x = 0;
-                                hostCard.y = 0;
-                                if (wasDragging) {
-                                    if (!root.moveDraggedHost(targetIndex))
-                                        root.clearHostDragState();
-                                } else {
-                                    root.clearHostDragState();
-                                }
-                            }
-                        }
-
-                        ColumnLayout {
+                        RowLayout {
                             Layout.fillWidth: true
                             spacing: Appearance.spacingS
 
-                            RowLayout {
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: Appearance.spacingS
+                                spacing: Appearance.spacingXXS
 
-                                ColumnLayout {
+                                RowLayout {
                                     Layout.fillWidth: true
-                                    spacing: Appearance.spacingXXS
-
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        spacing: Appearance.spacingS
-
-                                        Text {
-                                            text: hostRow.host.label
-                                            color: Colors.text
-                                            font.pixelSize: Appearance.fontSizeMedium
-                                            font.weight: Font.Medium
-                                            Layout.fillWidth: true
-                                            elide: Text.ElideRight
-                                        }
-
-                                        SharedWidgets.FilterChip {
-                                            visible: hostRow.editingThisHost
-                                            label: "Editing"
-                                            selected: true
-                                            enabled: false
-                                        }
-                                    }
+                                    spacing: Appearance.spacingS
 
                                     Text {
-                                        text: root.sshData.buildDisplayCommand(hostRow.host)
-                                        color: Colors.textSecondary
-                                        font.pixelSize: Appearance.fontSizeXS
+                                        text: hostRow.host.label
+                                        color: Colors.text
+                                        font.pixelSize: Appearance.fontSizeMedium
+                                        font.weight: Font.Medium
                                         Layout.fillWidth: true
-                                        wrapMode: Text.WrapAnywhere
+                                        elide: Text.ElideRight
                                     }
 
-                                    Text {
-                                        text: root.reorderDisabled ? "Clear search to reorder hosts." : "Drag to reorder hosts, or use the arrow buttons."
-                                        color: Colors.textSecondary
-                                        font.pixelSize: Appearance.fontSizeXS
-                                        Layout.fillWidth: true
-                                        wrapMode: Text.WordWrap
-                                    }
-                                }
-                            }
-
-                            Flow {
-                                Layout.fillWidth: true
-                                width: parent.width
-                                spacing: Appearance.spacingS
-
-                                SharedWidgets.FilterChip {
-                                    visible: String(hostRow.host.group || "") !== ""
-                                    label: String(hostRow.host.group || "")
-                                    selected: false
-                                    enabled: false
-                                }
-
-                                SharedWidgets.FilterChip {
-                                    visible: String(hostRow.host.user || "") !== ""
-                                    label: String(hostRow.host.user || "")
-                                    selected: false
-                                    enabled: false
-                                }
-
-                                Repeater {
-                                    model: Array.isArray(hostRow.host.tags) ? hostRow.host.tags : []
-
-                                    delegate: SharedWidgets.FilterChip {
-                                        required property var modelData
-                                        visible: String(modelData || "").trim() !== ""
-                                        label: "#" + String(modelData || "")
-                                        selected: false
+                                    SharedWidgets.FilterChip {
+                                        visible: hostRow.editingThisHost
+                                        label: "Editing"
+                                        selected: true
                                         enabled: false
                                     }
                                 }
+
+                                Text {
+                                    text: root.sshData.buildDisplayCommand(hostRow.host)
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Appearance.fontSizeXS
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.WrapAnywhere
+                                }
+
+                                Text {
+                                    text: root.reorderDisabled ? "Clear search to reorder hosts." : "Drag to reorder hosts, or use the arrow buttons."
+                                    color: Colors.textSecondary
+                                    font.pixelSize: Appearance.fontSizeXS
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.WordWrap
+                                }
+                            }
+                        }
+
+                        Flow {
+                            Layout.fillWidth: true
+                            width: parent.width
+                            spacing: Appearance.spacingS
+
+                            SharedWidgets.FilterChip {
+                                visible: String(hostRow.host.group || "") !== ""
+                                label: String(hostRow.host.group || "")
+                                selected: false
+                                enabled: false
                             }
 
-                            Flow {
-                                Layout.fillWidth: true
-                                width: parent.width
-                                spacing: Appearance.spacingS
+                            SharedWidgets.FilterChip {
+                                visible: String(hostRow.host.user || "") !== ""
+                                label: String(hostRow.host.user || "")
+                                selected: false
+                                enabled: false
+                            }
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "edit.svg"
-                                    label: "Up"
-                                    enabled: !root.reorderDisabled && hostRow.hostIndex > 0
-                                    onClicked: root.moveHost(hostRow.hostIndex, -1)
-                                }
+                            Repeater {
+                                model: Array.isArray(hostRow.host.tags) ? hostRow.host.tags : []
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "delete.svg"
-                                    label: "Down"
-                                    enabled: !root.reorderDisabled && hostRow.hostIndex < (root.sshData.manualHosts.length - 1)
-                                    onClicked: root.moveHost(hostRow.hostIndex, 1)
+                                delegate: SharedWidgets.FilterChip {
+                                    required property var modelData
+                                    visible: String(modelData || "").trim() !== ""
+                                    label: "#" + String(modelData || "")
+                                    selected: false
+                                    enabled: false
                                 }
+                            }
+                        }
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "edit.svg"
-                                    label: "Edit"
-                                    onClicked: root.editHost(hostRow.hostIndex)
-                                }
+                        Flow {
+                            Layout.fillWidth: true
+                            width: parent.width
+                            spacing: Appearance.spacingS
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "rename.svg"
-                                    label: "Duplicate"
-                                    onClicked: root.duplicateHost(hostRow.hostIndex)
-                                }
+                            SettingsReorderButtons {
+                                moveUpEnabled: !root.reorderDisabled && hostRow.hostIndex > 0
+                                moveDownEnabled: !root.reorderDisabled && hostRow.hostIndex < (root.sshData.manualHosts.length - 1)
+                                onMoveUp: root.moveHost(hostRow.hostIndex, -1)
+                                onMoveDown: root.moveHost(hostRow.hostIndex, 1)
+                            }
 
-                                SettingsActionButton {
-                                    compact: true
-                                    iconName: "dismiss.svg"
-                                    label: "Remove"
-                                    onClicked: root.removeHost(hostRow.hostIndex)
-                                }
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "edit.svg"
+                                label: "Edit"
+                                onClicked: root.editHost(hostRow.hostIndex)
+                            }
+
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "rename.svg"
+                                label: "Duplicate"
+                                onClicked: root.duplicateHost(hostRow.hostIndex)
+                            }
+
+                            SettingsActionButton {
+                                compact: true
+                                iconName: "dismiss.svg"
+                                label: "Remove"
+                                onClicked: root.removeHost(hostRow.hostIndex)
                             }
                         }
                     }
