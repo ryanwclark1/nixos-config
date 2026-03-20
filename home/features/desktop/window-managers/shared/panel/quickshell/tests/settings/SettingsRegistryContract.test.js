@@ -33,4 +33,13 @@ describe("SettingsRegistry contract", () => {
 
     expect(missingIcons).toEqual([]);
   });
+
+  it("validates search entries against declared tabs while filtering runtime results to supported tabs", () => {
+    const source = readFileSync(registryPath, "utf8");
+
+    expect(source).toContain("function findDeclaredTab(tabId)");
+    expect(source).toContain("SearchIndex.validateIndex(findDeclaredTab);");
+    expect(source).toContain("return SearchIndex.searchSettings(query).filter(function(result) {");
+    expect(source).toContain("return findTab(result.tabId) !== null;");
+  });
 });
