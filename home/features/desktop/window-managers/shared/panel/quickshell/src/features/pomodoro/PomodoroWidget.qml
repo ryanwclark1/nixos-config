@@ -112,7 +112,7 @@ ThemedContainer {
       // Time display
       ColumnLayout {
         anchors.centerIn: parent
-        spacing: 2
+        spacing: Colors.spacingXXS
 
         Text {
           Layout.alignment: Qt.AlignHCenter

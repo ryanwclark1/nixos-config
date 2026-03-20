@@ -82,7 +82,7 @@ BasePopupMenu {
             ColumnLayout {
               anchors.fill: parent
               anchors.margins: Colors.spacingM
-              spacing: 2
+              spacing: Colors.spacingXXS
 
               RowLayout {
                 spacing: Colors.spacingXS

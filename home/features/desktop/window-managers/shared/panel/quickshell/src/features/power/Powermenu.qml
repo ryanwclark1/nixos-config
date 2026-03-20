@@ -25,7 +25,7 @@ PanelWindow {
   color: "transparent"
 
   property bool isVisible: false
-  visible: root.isVisible || pmFadeAnim.running || pmScaleAnim.running
+  visible: root.isVisible || pmFadeAnim.running || _pmElasticScale.running
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: root.isVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -143,16 +143,23 @@ PanelWindow {
       }
     }
 
+    ElasticNumber {
+      id: _pmElasticScale
+      target: root.isVisible ? 1.0 : 0.92
+      fastDuration: Colors.durationFast
+      slowDuration: Colors.durationEmphasis
+      fastWeight: 0.4
+    }
+
     // Power Menu Content
     ColumnLayout {
       id: contentCol
       anchors.centerIn: parent
       spacing: 64
-      scale: root.isVisible ? 1.0 : 0.92
-      Behavior on scale { NumberAnimation { id: pmScaleAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutBack; easing.overshoot: 1.05 } }
+      scale: _pmElasticScale.value
       opacity: root.isVisible ? 1.0 : 0.0
       Behavior on opacity { NumberAnimation { id: pmFadeAnim; duration: Colors.durationEmphasis; easing.type: Easing.OutCubic } }
-      layer.enabled: pmScaleAnim.running || pmFadeAnim.running
+      layer.enabled: _pmElasticScale.running || pmFadeAnim.running
 
       ColumnLayout {
         Layout.alignment: Qt.AlignHCenter

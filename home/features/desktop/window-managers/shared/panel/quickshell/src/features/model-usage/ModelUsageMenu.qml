@@ -130,7 +130,7 @@ BasePopupMenu {
         // Big metric
         ColumnLayout {
           Layout.fillWidth: true
-          spacing: 2
+          spacing: Colors.spacingXXS
 
           Text {
             text: String(ModelUsageService.todayPrompts)
@@ -500,7 +500,7 @@ BasePopupMenu {
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: Colors.spacingXXS
             required property var modelData
 
             Text {
@@ -596,7 +596,7 @@ BasePopupMenu {
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: Colors.spacingXXS
             required property var modelData
 
             Text {

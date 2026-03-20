@@ -94,7 +94,7 @@ BasePopupMenu {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 2
+                        spacing: Colors.spacingXXS
 
                         Text {
                             text: NetworkService.vpnPrimaryLabel

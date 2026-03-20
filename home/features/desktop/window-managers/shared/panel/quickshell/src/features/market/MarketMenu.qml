@@ -32,7 +32,7 @@ BasePopupMenu {
 
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: Colors.spacingXXS
             Text {
               text: modelData.symbol
               color: Colors.text
@@ -48,7 +48,7 @@ BasePopupMenu {
 
           ColumnLayout {
             Layout.alignment: Qt.AlignRight
-            spacing: 2
+            spacing: Colors.spacingXXS
             Text {
               text: modelData.close
               color: Colors.text
