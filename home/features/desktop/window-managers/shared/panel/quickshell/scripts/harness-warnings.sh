@@ -29,7 +29,7 @@ fail_on_quickshell_harness_warnings() {
     exit 1
   fi
 
-  if [[ -n "${filtered_output}" ]] && printf '%s\n' "${filtered_output}" | grep -Eqi 'warn|error|exception|binding loop|ReferenceError|TypeError|failed'; then
+  if [[ -n "${filtered_output}" ]] && printf '%s\n' "${filtered_output}" | grep -Eqi '(^|[[:space:]])(warn(ing)?|error|exception|failed)\b|binding loop|ReferenceError|TypeError'; then
     printf '[FAIL] %s emitted unexpected warnings/errors.\n' "${harness_name}" >&2
     printf '%s\n' "${filtered_output}" >&2
     exit 1

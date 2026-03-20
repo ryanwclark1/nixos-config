@@ -282,6 +282,29 @@ image_mean() {
   magick "${image_path}" -colorspace Gray -format '%[fx:mean]' info:
 }
 
+niri_headless_without_outputs() {
+  local outputs_json=""
+
+  [[ -n "${NIRI_SOCKET:-}" ]] || return 1
+  command -v niri >/dev/null 2>&1 || return 1
+  outputs_json="$(niri msg -j outputs 2>/dev/null || true)"
+  [[ -n "${outputs_json}" ]] || return 1
+
+  if printf '%s' "${outputs_json}" | jq -e '
+    if type == "array" then
+      length == 0
+    elif type == "object" then
+      length == 0 or (((.outputs // []) | length) == 0)
+    else
+      true
+    end
+  ' >/dev/null 2>&1; then
+    return 0
+  fi
+
+  return 1
+}
+
 capture_until_visible() {
   local label="$1"
   local output_path="$2"
@@ -397,6 +420,13 @@ instance_id="$(discover_instance)" || {
   printf 'Could not rediscover a reachable quickshell instance after settings smoke.\n' >&2
   exit 1
 }
+
+if niri_headless_without_outputs; then
+  printf '[SKIP] Bar Widgets first-open visual capture skipped: Niri session exposes no wl_output in this headless VM.\n'
+  printf 'Niri session exposes no wl_output in this headless VM, so grim-based Bar Widgets capture is unavailable.\n' \
+    > "${output_dir}/bar-widgets-first-open.skip.txt"
+  exit 0
+fi
 
 printf '[INFO] Capturing first-open Bar Widgets state\n'
 capture_until_visible "First-open" "${first_open_png}"

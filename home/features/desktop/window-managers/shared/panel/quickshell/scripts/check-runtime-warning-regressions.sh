@@ -16,6 +16,7 @@ output_dir="/tmp/panel-qa-matrix"
 settings_delay="2.5"
 surface_delay="1.6"
 settings_deep_scroll_y=""
+skip_settings_deep=0
 run_settings=1
 run_surfaces=1
 run_launcher=1
@@ -180,6 +181,10 @@ while [[ $# -gt 0 ]]; do
     --settings-deep-scroll-y)
       settings_deep_scroll_y="${2:-}"
       shift 2
+      ;;
+    --skip-settings-deep)
+      skip_settings_deep=1
+      shift
       ;;
     --skip-settings)
       run_settings=0
@@ -437,7 +442,7 @@ main() {
 
   if (( run_settings == 1 )); then
     local deep_scroll_y="${settings_deep_scroll_y}"
-    if [[ -z "${deep_scroll_y}" && "${settings_preset}" == "portrait" ]]; then
+    if (( skip_settings_deep == 0 )) && [[ -z "${deep_scroll_y}" && "${settings_preset}" == "portrait" ]]; then
       deep_scroll_y="520"
     fi
 

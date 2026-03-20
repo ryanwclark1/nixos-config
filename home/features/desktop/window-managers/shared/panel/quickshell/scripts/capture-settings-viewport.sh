@@ -2,6 +2,7 @@
 set -euo pipefail
 
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 width=900
 height=700
@@ -23,6 +24,8 @@ temp_crop=""
 restore_workspace=""
 modal_capture_padding_x="32"
 modal_capture_padding_y="20"
+
+source "${script_dir}/graphics-session-env.sh"
 
 usage() {
   cat <<'EOF'
@@ -395,7 +398,12 @@ main() {
   require_cmd sed
   require_cmd find
   require_cmd ps
+  load_graphics_session_env
   detect_compositor
+
+  if [[ "${compositor}" == "niri" && "${workspace_target}" == "auto" ]]; then
+    workspace_target="current"
+  fi
 
   if ! [[ "${width}" =~ ^[0-9]+$ ]] || ! [[ "${height}" =~ ^[0-9]+$ ]]; then
     printf 'Width and height must be integers.\n' >&2
@@ -458,27 +466,39 @@ main() {
   fi
   sleep "${delay_seconds}"
 
-  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right usable_w usable_h crop_x crop_y crop_w crop_h gutter_x gutter_y modal_w modal_h
+  local monitor_json monitor_x monitor_y monitor_w monitor_h reserved_top reserved_left reserved_bottom reserved_right usable_w usable_h crop_x crop_y crop_w crop_h gutter_x gutter_y modal_w modal_h full_capture_dims pre_captured_full=0
   monitor_json="$(focused_output_json)"
   if [[ -z "${monitor_json}" || "${monitor_json}" == "null" ]]; then
-    printf 'Could not resolve focused output from %s.\n' "${compositor}" >&2
-    exit 1
-  fi
-
-  monitor_x="$(printf '%s' "${monitor_json}" | jq -r '.logical.x // .logical_rect.x // .position.x // .x // 0')"
-  monitor_y="$(printf '%s' "${monitor_json}" | jq -r '.logical.y // .logical_rect.y // .position.y // .y // 0')"
-  monitor_w="$(printf '%s' "${monitor_json}" | jq -r '.logical.width // .logical_rect.width // .current_mode.width // .width // .physical.width // 0')"
-  monitor_h="$(printf '%s' "${monitor_json}" | jq -r '.logical.height // .logical_rect.height // .current_mode.height // .height // .physical.height // 0')"
-  if [[ "${compositor}" == "niri" ]]; then
+    grim_capture "${temp_full}"
+    pre_captured_full=1
+    full_capture_dims="$(magick identify -format '%w\t%h' "${temp_full}" 2>/dev/null || true)"
+    if [[ -z "${full_capture_dims}" ]]; then
+      printf 'Could not resolve focused output from %s or derive fallback screenshot dimensions.\n' "${compositor}" >&2
+      exit 1
+    fi
+    IFS=$'\t' read -r monitor_w monitor_h <<< "${full_capture_dims}"
+    monitor_x=0
+    monitor_y=0
     reserved_top=0
     reserved_left=0
     reserved_bottom=0
     reserved_right=0
   else
-    reserved_top="$(printf '%s' "${monitor_json}" | jq -r '.reserved[0]')"
-    reserved_left="$(printf '%s' "${monitor_json}" | jq -r '.reserved[1]')"
-    reserved_bottom="$(printf '%s' "${monitor_json}" | jq -r '.reserved[2]')"
-    reserved_right="$(printf '%s' "${monitor_json}" | jq -r '.reserved[3]')"
+    monitor_x="$(printf '%s' "${monitor_json}" | jq -r '.logical.x // .logical_rect.x // .position.x // .x // 0')"
+    monitor_y="$(printf '%s' "${monitor_json}" | jq -r '.logical.y // .logical_rect.y // .position.y // .y // 0')"
+    monitor_w="$(printf '%s' "${monitor_json}" | jq -r '.logical.width // .logical_rect.width // .current_mode.width // .width // .physical.width // 0')"
+    monitor_h="$(printf '%s' "${monitor_json}" | jq -r '.logical.height // .logical_rect.height // .current_mode.height // .height // .physical.height // 0')"
+    if [[ "${compositor}" == "niri" ]]; then
+      reserved_top=0
+      reserved_left=0
+      reserved_bottom=0
+      reserved_right=0
+    else
+      reserved_top="$(printf '%s' "${monitor_json}" | jq -r '.reserved[0]')"
+      reserved_left="$(printf '%s' "${monitor_json}" | jq -r '.reserved[1]')"
+      reserved_bottom="$(printf '%s' "${monitor_json}" | jq -r '.reserved[2]')"
+      reserved_right="$(printf '%s' "${monitor_json}" | jq -r '.reserved[3]')"
+    fi
   fi
 
   usable_w=$((monitor_w - reserved_left - reserved_right))
@@ -519,7 +539,9 @@ main() {
   local start_time
   start_time="$(date +'%Y-%m-%d %H:%M:%S')"
 
-  grim_capture "${temp_full}"
+  if (( pre_captured_full == 0 )); then
+    grim_capture "${temp_full}"
+  fi
   magick "${temp_full}" -crop "${crop_w}x${crop_h}+${crop_x}+${crop_y}" +repage "${temp_crop}"
   cp "${temp_crop}" "${output_path}"
 

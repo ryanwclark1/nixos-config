@@ -6,6 +6,8 @@ quickshell_root="$(CDPATH= cd -- "${script_dir}/.." >/dev/null && pwd)"
 config_root="${quickshell_root}/src"
 skip_responsive=0
 
+source "${script_dir}/graphics-session-env.sh"
+
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
     printf 'Missing required command: %s\n' "$1" >&2
@@ -21,6 +23,29 @@ require_pattern() {
     printf '[FAIL] %s missing in %s\n' "${label}" "${file}" >&2
     exit 1
   fi
+}
+
+niri_headless_without_outputs() {
+  local outputs_json=""
+
+  [[ -n "${NIRI_SOCKET:-}" ]] || return 1
+  command -v niri >/dev/null 2>&1 || return 1
+  outputs_json="$(niri msg -j outputs 2>/dev/null || true)"
+  [[ -n "${outputs_json}" ]] || return 1
+
+  if printf '%s' "${outputs_json}" | jq -e '
+    if type == "array" then
+      length == 0
+    elif type == "object" then
+      length == 0 or (((.outputs // []) | length) == 0)
+    else
+      true
+    end
+  ' >/dev/null 2>&1; then
+    return 0
+  fi
+
+  return 1
 }
 
 main() {
@@ -41,6 +66,7 @@ main() {
 
   require_cmd qmlformat
   require_cmd rg
+  load_graphics_session_env
 
   qmlformat -n \
     "${config_root}/features/settings/SettingsHub.qml" \
@@ -62,7 +88,11 @@ main() {
   if (( ${#runtime_args[@]} == 0 )); then
     runtime_args=(--repo-shell)
   fi
-  "${script_dir}/check-runtime-warning-regressions.sh" "${runtime_args[@]}"
+  if niri_headless_without_outputs; then
+    printf '%s\n' "[INFO] Skipping runtime warning regression artifact capture: Niri session exposes no wl_output in this headless VM."
+  else
+    "${script_dir}/check-runtime-warning-regressions.sh" --workspace current "${runtime_args[@]}"
+  fi
 
   printf '%s\n' "Settings guardrails passed."
 }

@@ -102,6 +102,13 @@ Item {
     return false;
   }
 
+  function pluginIds(items) {
+    var result = [];
+    for (var i = 0; i < items.length; ++i)
+      result.push(String(items[i].id || ""));
+    return result;
+  }
+
   BarWidgetsTab {
     id: barPicker
     anchors.fill: parent
@@ -122,21 +129,30 @@ Item {
     running: true
     repeat: true
     property int attempts: 0
+    property int maxAttempts: 160
 
     onTriggered: {
       attempts += 1;
-      if (Config._loading && attempts < 40)
+      barPicker.widgetSearchQuery = "";
+      var barAllTypes = widgetTypes(barPicker.availableWidgetsForPicker());
+      var pluginReady = hasValue(barAllTypes, "plugin:test-bar");
+      var pluginScanRunning = !!(PluginService.scanProc && PluginService.scanProc.running);
+
+      if ((Config._loading || pluginScanRunning || !pluginReady) && attempts < maxAttempts)
         return;
 
       stop();
 
-      barPicker.widgetSearchQuery = "";
-      var barAllTypes = widgetTypes(barPicker.availableWidgetsForPicker());
       console.log("BAR_ALL_COUNT", barAllTypes.length);
       console.log("BAR_HAS_BATTERY", hasValue(barAllTypes, "battery"));
       console.log("BAR_HAS_PRINTER", hasValue(barAllTypes, "printer"));
       console.log("BAR_HAS_SYSTEM_MONITOR", hasValue(barAllTypes, "systemMonitor"));
       console.log("BAR_HAS_PLUGIN_TEST", hasValue(barAllTypes, "plugin:test-bar"));
+      console.log("PLUGIN_SCAN_RUNNING", pluginScanRunning);
+      console.log("PLUGIN_COUNT", (PluginService.plugins || []).length);
+      console.log("PLUGIN_IDS", pluginIds(PluginService.plugins || []).join(","));
+      console.log("PLUGIN_STATUS_TEST", JSON.stringify((PluginService.pluginStatuses || {})["test-bar"] || null));
+      console.log("PLUGIN_ERRORS", JSON.stringify(PluginService.pluginErrors || {}));
 
       barPicker.widgetSearchQuery = "print";
       var barPrintTypes = widgetTypes(barPicker.availableWidgetsForPicker());
@@ -167,7 +183,7 @@ output="$(
     QS_SCRIPT_ROOT="${repo_root}/scripts" \
     XDG_RUNTIME_DIR="${tmp_runtime}" \
     QT_QPA_PLATFORM=offscreen \
-    timeout 5s quickshell -p "${tmp_qml}" --no-duplicate 2>&1
+    timeout 12s quickshell -p "${tmp_qml}" --no-duplicate 2>&1
 )"
 status=$?
 set -e

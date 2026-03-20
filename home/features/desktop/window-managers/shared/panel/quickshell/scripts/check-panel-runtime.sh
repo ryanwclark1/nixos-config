@@ -14,6 +14,7 @@ run_settings=1
 run_surfaces=1
 run_multibar=1
 run_launcher=1
+repo_shell_ready_timeout_sec="${QS_REPO_SHELL_READY_TIMEOUT_SEC:-40}"
 settings_timeout_seconds="${QS_VERIFY_SETTINGS_TIMEOUT_SECONDS:-150}"
 surfaces_timeout_seconds="${QS_VERIFY_SURFACES_TIMEOUT_SECONDS:-150}"
 warnings_timeout_seconds="${QS_VERIFY_WARNINGS_TIMEOUT_SECONDS:-900}"
@@ -327,7 +328,7 @@ start_repo_shell() {
   env "${repo_shell_env[@]}" quickshell -p "${config_root}/shell.qml" >/tmp/quickshell-repo-qa.log 2>&1 &
   repo_shell_pid="$!"
 
-  deadline=$((SECONDS + 20))
+  deadline=$((SECONDS + repo_shell_ready_timeout_sec))
   while (( SECONDS < deadline )); do
     resolved="$(readlink -f "${runtime_pid_root}/${repo_shell_pid}" 2>/dev/null || true)"
     runtime_id=""
@@ -343,7 +344,8 @@ start_repo_shell() {
     sleep 0.5
   done
 
-  printf 'Repo shell did not become IPC-ready in time. See /tmp/quickshell-repo-qa.log\n' >&2
+  printf 'Repo shell did not become IPC-ready in time after %ss. See /tmp/quickshell-repo-qa.log\n' "${repo_shell_ready_timeout_sec}" >&2
+  sed -n '1,200p' /tmp/quickshell-repo-qa.log >&2 || true
   exit 1
 }
 

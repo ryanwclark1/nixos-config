@@ -66,8 +66,9 @@ fi
 bash "${script_dir}/check-bar-widgets-first-open.sh" "${first_open_args[@]}"
 
 # Settings QA already exercises launcher-adjacent settings tabs during the
-# smoke step above; keep the heavier launcher matrix in its dedicated QA path.
-bash "${script_dir}/check-settings-guardrails.sh" --skip-responsive --skip-launcher "${guardrail_args[@]}"
+# smoke step above, and the Bar Widgets first-open gate already performs the
+# deep scroll capture that has been flaky in the VM.
+bash "${script_dir}/check-settings-guardrails.sh" --skip-responsive --skip-launcher --skip-settings-deep "${guardrail_args[@]}"
 bash "${script_dir}/check-widget-picker-search.sh"
 bash "${script_dir}/check-bar-widget-reorder.sh"
 
