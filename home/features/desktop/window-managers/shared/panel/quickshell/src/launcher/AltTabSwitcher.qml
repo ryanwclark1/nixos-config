@@ -398,7 +398,7 @@ Scope {
                                                 anchors.top: parent.top
                                                 anchors.left: parent.left
                                                 anchors.margins: Colors.spacingXS
-                                                icon: "󰅖"
+                                                icon: "dismiss.svg"
                                                 size: 22
                                                 iconSize: Colors.fontSizeXS
                                                 iconColor: Colors.text

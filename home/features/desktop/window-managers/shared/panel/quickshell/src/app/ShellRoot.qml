@@ -269,7 +269,7 @@ Scope {
 
     Loader {
         id: altTabSwitcher
-        active: CompositorAdapter.isNiri && NiriService.available
+        active: true
         sourceComponent: altTabSwitcherComponent
     }
 
