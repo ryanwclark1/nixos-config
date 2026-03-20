@@ -142,6 +142,26 @@ QtObject {
   readonly property var niriKeyboardLayoutNames: isNiri ? NiriService.keyboardLayoutNames : []
   readonly property int niriKeyboardLayoutIndex: isNiri ? NiriService.currentKeyboardLayoutIndex : 0
 
+  // ── Focused screen name ──────────────────────
+  // Returns the output/monitor name where the user is currently focused.
+  // Used by IPC to target surfaces to the correct screen.
+  readonly property string focusedScreenName: {
+    if (isNiri) {
+      var aw = NiriService.activeWindow;
+      if (aw && aw.workspace_id !== undefined) {
+        var ws = NiriService.workspaces[aw.workspace_id];
+        if (ws && ws.output) return ws.output;
+      }
+      // Fallback: first output
+      var outputKeys = Object.keys(NiriService.outputs || {});
+      return outputKeys.length > 0 ? outputKeys[0] : "";
+    }
+    if (isHyprland && typeof Hyprland !== "undefined" && Hyprland.focusedMonitor) {
+      return Hyprland.focusedMonitor.name || "";
+    }
+    return "";
+  }
+
   Component.onCompleted: {
     if (hasHyprlandToplevels && typeof Hyprland.refreshToplevels === "function")
       Hyprland.refreshToplevels();

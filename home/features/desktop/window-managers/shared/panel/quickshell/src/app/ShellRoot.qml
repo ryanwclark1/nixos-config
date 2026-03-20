@@ -115,48 +115,14 @@ Scope {
         return surfaceService.surfacePanelLayout(context, preferredWidth);
     }
 
-    IpcHandler {
-        target: "Shell"
-
-        // Generic surface operations — preferred for new callers:
-        //   quickshell ipc call Shell toggleSurface audioMenu
-        function toggleSurface(surfaceId: string) {
-            root.toggleSurface(surfaceId);
-        }
-        function openSurface(surfaceId: string) {
-            root.openSurface(surfaceId);
-        }
-        function isSurfaceOpen(surfaceId: string): bool {
-            return root.isSurfaceOpen(surfaceId);
-        }
-        function closeAllSurfaces() {
-            root.closeAllSurfaces();
-        }
-        function closeAll() {
-            root.closeAllSurfaces();
-        }
-        // Emergency escape: closes all surfaces, forces launcher closed,
-        // and forces overview closed locally (bypasses Niri IPC).
-        // Bind this to a compositor hotkey as a last resort:
-        //   quickshell ipc call Shell panicClose
-        function panicClose() {
-            root.closeAllSurfaces();
-            launcher.close();
-            osk.close();
-            regionSelector.dismiss();
-            polkitAgent.cancel();
-            if (overview)
-                overview.forceClose();
-            if (altTabSwitcher.item && altTabSwitcher.item.hide)
-                altTabSwitcher.item.hide();
-        }
-        function reloadConfig() {
-            Config.load();
-        }
-        function showAltTab() {
-            if (altTabSwitcher.item && altTabSwitcher.item.show)
-                altTabSwitcher.item.show();
-        }
+    ShellIpcHandler {
+        shellRoot: root
+        launcher: launcher
+        osk: osk
+        regionSelector: regionSelector
+        polkitAgent: polkitAgent
+        overview: overviewLoader.item || null
+        altTabSwitcher: altTabSwitcher
     }
 
     // Global shortcuts (outside Variants to avoid duplicate registration)

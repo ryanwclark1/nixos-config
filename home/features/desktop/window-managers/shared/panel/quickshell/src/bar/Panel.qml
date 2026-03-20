@@ -1054,7 +1054,7 @@ Item {
                 },
                 {
                     label: "Open Audio Menu",
-                    icon: "󰕾",
+                    icon: "speaker.svg",
                     action: () => root.requestSurface("audioMenu", this)
                 }
             ]
@@ -1128,7 +1128,7 @@ Item {
             contextActions: [
                 {
                     label: "Power Saver",
-                    icon: "󰌪",
+                    icon: "power.svg",
                     action: () => PowerProfileService.setProfile("power-saver")
                 },
                 {
@@ -1146,7 +1146,7 @@ Item {
                 },
                 {
                     label: "Open Battery Menu",
-                    icon: "󰁹",
+                    icon: "battery-full.svg",
                     action: () => root.requestSurface("batteryMenu", this)
                 }
             ]

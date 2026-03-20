@@ -11,6 +11,7 @@ Registration will be attempted again
 quickshell\.hyprland\.ipc: Got removal for workspace id .* which was not previously tracked\.
 QML QQuickImage at @features/clipboard/ClipboardMenu\.qml\[.*\]: Error decoding: file:///run/user/.*/quickshell-clipboard/.*
 libpng error: Read Error
+qt\.multimedia\.pipewire\.devicemonitor: Ignoring dummy output: .*
 \[W\]\[WeatherService\] Error: empty weather response
 \[W\]\[WeatherService\] Error: missing current condition
 \[W\]\[WeatherService\] Auto-location error JSON\.parse: Parse error

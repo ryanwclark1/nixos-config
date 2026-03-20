@@ -4,7 +4,9 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 services_dir="${script_dir}/../src/services"
 services_url="file://${services_dir}"
-contract_timeout_seconds="${QS_PANEL_CONFIG_CONTRACT_TIMEOUT_SECONDS:-10}"
+# Offscreen Quickshell startup in the VM can be slow enough that the first
+# singleton-heavy contract harness needs more than the old 10s default.
+contract_timeout_seconds="${QS_PANEL_CONFIG_CONTRACT_TIMEOUT_SECONDS:-20}"
 
 pass_count=0
 fail_count=0
