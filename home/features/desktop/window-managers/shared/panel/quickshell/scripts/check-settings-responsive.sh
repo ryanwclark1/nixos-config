@@ -36,6 +36,7 @@ repo_shell_env=()
 repo_shell_ready_timeout_sec="${QS_REPO_SHELL_READY_TIMEOUT_SEC:-40}"
 skip_reload=0
 repo_shell_log_dumped=0
+strict_instance_pid=0
 
 pass() {
   printf '[PASS] %s\n' "$1"
@@ -95,6 +96,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --pid)
       instance_pid="${2:-}"
+      strict_instance_pid=1
       shift 2
       ;;
     --repo-shell)
@@ -351,6 +353,26 @@ refresh_instance_binding() {
   local refreshed_dir=""
   local refreshed_log=""
   local attempt
+
+  if (( strict_instance_pid == 1 )) && [[ -n "${instance_pid}" ]]; then
+    if run_ipc quickshell ipc --pid "${instance_pid}" show >/dev/null; then
+      refreshed_dir="$(readlink -f "${runtime_pid_root}/${instance_pid}" 2>/dev/null || true)"
+      if [[ -n "${refreshed_dir}" && -S "${refreshed_dir}/ipc.sock" ]]; then
+        instance_dir="${refreshed_dir}"
+        instance_id="$(basename "${refreshed_dir}")"
+        log_file="${instance_dir}/log.log"
+        if [[ -f "${log_file}" ]]; then
+          start_bytes="$(wc -c < "${log_file}")"
+        else
+          start_bytes=0
+        fi
+        return 0
+      fi
+    fi
+
+    dump_repo_shell_log_once
+    return 1
+  fi
 
   for attempt in 1 2 3 4 5 6 7 8; do
     refreshed_pid="$(discover_reachable_pid || true)"

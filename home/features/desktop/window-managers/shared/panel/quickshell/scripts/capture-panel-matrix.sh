@@ -305,6 +305,26 @@ cleanup_repo_shell() {
   fi
 }
 
+capture_repo_shell_debug_artifacts() {
+  local debug_prefix="${1:-repo-shell}"
+  local runtime_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
+  local instance_dir=""
+
+  [[ -n "${output_dir:-}" ]] || return 0
+  mkdir -p "${output_dir}"
+
+  if [[ -f /tmp/quickshell-repo-qa.log ]]; then
+    cp /tmp/quickshell-repo-qa.log "${output_dir}/${debug_prefix}.log" 2>/dev/null || true
+  fi
+
+  if [[ -n "${instance_id:-}" ]]; then
+    instance_dir="$(readlink -f "${runtime_dir}/${instance_id}" 2>/dev/null || true)"
+    if [[ -n "${instance_dir}" && -f "${instance_dir}/log.log" ]]; then
+      cp "${instance_dir}/log.log" "${output_dir}/${debug_prefix}-instance.log" 2>/dev/null || true
+    fi
+  fi
+}
+
 handle_termination() {
   trap - EXIT TERM INT
   cleanup_repo_shell
@@ -339,9 +359,15 @@ run_with_repo_shell_retry() {
     return 1
   fi
 
+  capture_repo_shell_debug_artifacts "repo-shell-failure"
   printf '[INFO] %s failed with the current repo-shell instance; restarting repo shell and retrying once.\n' "${label}"
   ensure_repo_shell_ready
-  "$@"
+  if "$@"; then
+    return 0
+  fi
+
+  capture_repo_shell_debug_artifacts "repo-shell-retry-failure"
+  return 1
 }
 
 populate_repo_shell_env() {
@@ -385,6 +411,7 @@ start_repo_shell() {
   systemctl --user show-environment 2>/dev/null | grep -E 'HYPRLAND|WAYLAND|NIRI|XDG_CURRENT_DESKTOP|DESKTOP_SESSION' >&2 || true
   echo "--- quickshell repo qa log ---" >&2
   sed -n '1,200p' /tmp/quickshell-repo-qa.log >&2 || true
+  capture_repo_shell_debug_artifacts "repo-shell-startup-failure"
   exit 1
 }
 
