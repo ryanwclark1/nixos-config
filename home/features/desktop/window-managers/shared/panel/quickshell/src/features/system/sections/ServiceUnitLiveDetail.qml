@@ -100,7 +100,7 @@ Rectangle {
             }
 
             SharedWidgets.Chip {
-                icon: "󰍛"
+                icon: "board.svg"
                 iconColor: Colors.accent
                 text: "MEM " + MU.formatBytes(root.detailData.memoryCurrent)
                 textColor: Colors.accent
