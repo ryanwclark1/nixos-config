@@ -43,12 +43,23 @@ Flow {
                 anchors.centerIn: parent
                 spacing: Colors.spacingXS
 
-                Text {
-                    text: modelData.icon || ""
-                    color: selected ? Colors.primary : Colors.textSecondary
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeXS
-                    visible: !!text
+                Loader {
+                    active: !!(modelData.icon || "")
+                    visible: active
+                    sourceComponent: (modelData.icon || "").endsWith(".svg") ? _qlSvgIcon : _qlNerdIcon
+                }
+                Component {
+                    id: _qlSvgIcon
+                    SharedWidgets.SvgIcon { source: modelData.icon || ""; color: selected ? Colors.primary : Colors.textSecondary; size: Colors.fontSizeXS }
+                }
+                Component {
+                    id: _qlNerdIcon
+                    Text {
+                        text: modelData.icon || ""
+                        color: selected ? Colors.primary : Colors.textSecondary
+                        font.family: Colors.fontMono
+                        font.pixelSize: Colors.fontSizeXS
+                    }
                 }
 
                 Text {

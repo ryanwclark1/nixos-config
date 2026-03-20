@@ -716,7 +716,7 @@ Rectangle {
                     border.color: Colors.withAlpha(Colors.primary, 0.5)
                     border.width: 1
 
-                    Behavior on color { CAnim {} }
+                    Behavior on color { Shared.CAnim {} }
 
                     SharedWidgets.StateLayer {
                         id: saveState

@@ -62,12 +62,22 @@ Rectangle {
                 border.color: Colors.primaryRing
                 border.width: 1
 
-                Text {
+                Loader {
                     anchors.centerIn: parent
-                    text: root.resolvedIcon
-                    color: Colors.primary
-                    font.family: Colors.fontMono
-                    font.pixelSize: compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL
+                    sourceComponent: root.resolvedIcon.endsWith(".svg") ? _heroSvgIcon : _heroNerdIcon
+                }
+                Component {
+                    id: _heroSvgIcon
+                    SharedWidgets.SvgIcon { source: root.resolvedIcon; color: Colors.primary; size: compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL }
+                }
+                Component {
+                    id: _heroNerdIcon
+                    Text {
+                        text: root.resolvedIcon
+                        color: Colors.primary
+                        font.family: Colors.fontMono
+                        font.pixelSize: compactMode ? Colors.fontSizeXL : Colors.fontSizeXXL
+                    }
                 }
             }
 

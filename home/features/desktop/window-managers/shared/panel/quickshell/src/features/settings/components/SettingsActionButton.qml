@@ -45,14 +45,13 @@ Rectangle {
         anchors.bottomMargin: compact ? 6 : 7
         spacing: Colors.spacingS
 
-        Text {
+        Loader {
             visible: root.iconName !== ""
-            text: root.iconName
-            color: root.emphasized ? Colors.text : Colors.textSecondary
-            font.family: Colors.fontMono
-            font.pixelSize: compact ? Colors.fontSizeMedium : Colors.fontSizeLarge
+            sourceComponent: root.iconName.endsWith(".svg") ? _abSvg : _abNerd
             Layout.alignment: root.label === "" ? Qt.AlignHCenter | Qt.AlignVCenter : Qt.AlignVCenter
         }
+        Component { id: _abSvg; SvgIcon { source: root.iconName; color: root.emphasized ? Colors.text : Colors.textSecondary; size: root.compact ? Colors.fontSizeMedium : Colors.fontSizeLarge } }
+        Component { id: _abNerd; Text { text: root.iconName; color: root.emphasized ? Colors.text : Colors.textSecondary; font.family: Colors.fontMono; font.pixelSize: root.compact ? Colors.fontSizeMedium : Colors.fontSizeLarge } }
 
         Text {
             id: labelText
