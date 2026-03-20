@@ -584,9 +584,9 @@ Item {
             }
 
             SettingsTextInputRow {
-                label: "File Search Root"
+                label: "Default Search Directory"
                 leadingIcon: "folder.svg"
-                placeholderText: "~"
+                placeholderText: "Home (~)"
                 text: Config.launcherFileSearchRoot
                 onSubmitted: value => Config.launcherFileSearchRoot = value.trim() === "" ? "~" : value.trim()
                 onTextEdited: value => Config.launcherFileSearchRoot = value.trim() === "" ? "~" : value.trim()

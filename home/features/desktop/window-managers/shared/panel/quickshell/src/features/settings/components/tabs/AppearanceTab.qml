@@ -85,7 +85,7 @@ Item {
             SettingsToggleRow {
                 label: "OLED Mode"
                 description: "Forces pure black backgrounds for OLED power savings."
-                icon: "desktop-monitor.svg"
+                icon: "desktop.svg"
                 configKey: "oledMode"
             }
         }
@@ -98,7 +98,7 @@ Item {
             SettingsToggleRow {
                 label: "Screen Corners"
                 description: "Draws rounded corner overlays at each screen edge."
-                icon: "border-all.svg"
+                icon: "grid.svg"
                 configKey: "showScreenCorners"
             }
 
@@ -116,7 +116,7 @@ Item {
             SettingsToggleRow {
                 label: "Screen Borders"
                 description: "Draws a thin frame around each display."
-                icon: "border-outside.svg"
+                icon: "layout-row.svg"
                 configKey: "showScreenBorders"
             }
         }

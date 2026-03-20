@@ -572,7 +572,7 @@ function resetLauncherDefaults(Config, webAliasDefaults, webProviderDefaultOrder
     Config.launcherPreloadFailureThreshold = 3;
     Config.launcherPreloadFailureBackoffSec = 120;
     Config.launcherMaxResults = 80;
-    Config.launcherFileMinQueryLength = 2;
+    Config.launcherFileMinQueryLength = 1;
     Config.launcherFileMaxResults = 100;
     Config.launcherFileSearchRoot = "~";
     Config.launcherFileShowHidden = false;

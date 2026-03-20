@@ -267,7 +267,7 @@ var entries = [
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "Max Results", keywords: "search results limit", type: "slider" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Query Min Length", keywords: "file search minimum length", type: "slider" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Search Max Results", keywords: "file search results limit", type: "slider" },
-    { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Search Root", keywords: "file search root directory", type: "text" },
+    { tabId: "launcher-search", cardTitle: "Search Limits", label: "Default Search Directory", keywords: "file search root directory default search directory", type: "text" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "Show Hidden Files", keywords: "file search hidden dotfiles", type: "toggle" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Opener", keywords: "file opener application", type: "text" },
     { tabId: "launcher-search", cardTitle: "Search Limits", label: "File Preview", keywords: "file preview pane toggle", type: "toggle" },
