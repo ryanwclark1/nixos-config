@@ -1,18 +1,102 @@
 .pragma library
 
+// ── Domain imports ───────────────────────────────────────────────
+// Each domain module exports a sectionKey + maps array, and optionally
+// sub-sections as named objects with their own sectionKey/maps/extraKeys.
+.import "domains/bar.js" as Bar
+.import "domains/glass.js" as Glass
+.import "domains/notifications.js" as Notifications
+.import "domains/time.js" as Time
+.import "domains/weather.js" as Weather
+.import "domains/audio.js" as Audio
+.import "domains/ai.js" as Ai
+.import "domains/wallpaper.js" as Wallpaper
+.import "domains/appearance.js" as Appearance
+.import "domains/theme.js" as Theme
+.import "domains/power.js" as Power
+.import "domains/panels.js" as Panels
+.import "domains/features.js" as Features
+.import "domains/misc.js" as Misc
+.import "domains/launcher.js" as Launcher
+
+// ── Assemble _MAPS from domain modules ──────────────────────────
+// Primary sections come from each module's top-level sectionKey/maps.
+// Sub-sections (e.g. Power.nightLight, Panels.controlCenter) are nested
+// objects with their own sectionKey/maps.
+
+var _allDomains = [
+    Bar,
+    Glass,
+    Notifications,
+    Time,
+    Weather,
+    Audio,
+    Ai,
+    Wallpaper,
+    Appearance,
+    Theme,
+    Power,
+    Panels,
+    Features,
+    Misc,
+    Launcher
+];
+
+// Collect sub-sections from domain modules.
+// Each domain may export additional named objects with sectionKey/maps.
+var _SUB_SECTIONS = [
+    Power.nightLight,
+    Panels.controlCenter,
+    Panels.osd,
+    Panels.dock,
+    Panels.powerMenu,
+    Panels.lockScreen,
+    Features.recording,
+    Features.privacy,
+    Features.colorPicker,
+    Features.notepad,
+    Features.hooks,
+    Features.osk,
+    Features.hotCorners,
+    Features.screenBorders,
+    Misc.modelUsage,
+    Misc.desktopWidgets,
+    Misc.background,
+    Misc.workspaces,
+    Misc.displayProfiles,
+    Misc.state
+];
+
+var _MAPS = (function() {
+    var m = {};
+    var i;
+    for (i = 0; i < _allDomains.length; i++)
+        m[_allDomains[i].sectionKey] = _allDomains[i].maps;
+    for (i = 0; i < _SUB_SECTIONS.length; i++)
+        m[_SUB_SECTIONS[i].sectionKey] = _SUB_SECTIONS[i].maps;
+    return m;
+})();
+
+// ── Extra section keys (for validation of non-mapped keys) ──────
+var _EXTRA_SECTION_KEYS = (function() {
+    var result = {};
+    var i;
+    for (i = 0; i < _allDomains.length; i++) {
+        if (_allDomains[i].extraKeys)
+            result[_allDomains[i].sectionKey] = _allDomains[i].extraKeys;
+    }
+    for (i = 0; i < _SUB_SECTIONS.length; i++) {
+        if (_SUB_SECTIONS[i].extraKeys)
+            result[_SUB_SECTIONS[i].sectionKey] = _SUB_SECTIONS[i].extraKeys;
+    }
+    return result;
+})();
+
+// ── Constants ────────────────────────────────────────────────────
+
 var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
 
 var CURRENT_VERSION = 4;
-
-var _EXTRA_SECTION_KEYS = {
-    controlCenter: {
-        width: true
-    },
-    glass: {
-        opacity: true,
-        settingsSurfaceOpacity: true
-    }
-};
 
 // Migration functions: each takes `data` and mutates it in place.
 // Index corresponds to the version being migrated FROM (0 → 1, 1 → 2, etc.).
@@ -151,332 +235,6 @@ function _applyPluginData(config, pluginsData, options) {
     if (pluginsData.hotReload !== undefined)
         config.pluginHotReload = pluginsData.hotReload;
 }
-
-// ── Transforms for fields that need coercion on apply ────────────
-function _str(v) { return String(v); }
-function _strDef(v) { return String(v || ""); }
-function _num1(v) { return Number(v) || 1.0; }
-
-// ── Data-driven property mapping tables ──────────────────────────
-// Each entry: [jsonKey, configProperty] or [jsonKey, configProperty, applyTransform]
-// Sections with custom logic (bars, launcher-apply, plugins) are handled separately.
-
-var _MAPS = {
-    bar: [
-        ["height", "barHeight"],
-        ["floating", "barFloating"],
-        ["margin", "barMargin"],
-        ["opacity", "barOpacity"],
-        ["leftEntries", "barLeftEntries"],
-        ["centerEntries", "barCenterEntries"],
-        ["rightEntries", "barRightEntries"],
-        ["useModularEntries", "barUseModularEntries"]
-    ],
-    glass: [
-        ["blur", "blurEnabled"],
-        ["opacityBase", "glassOpacityBase"],
-        ["opacitySurface", "glassOpacitySurface"],
-        ["opacityOverlay", "glassOpacityOverlay"],
-        ["settingsBackdropOpacity", "settingsBackdropOpacity"],
-        ["autoTransparency", "autoTransparency"]
-    ],
-    notifications: [
-        ["width", "notifWidth"],
-        ["popupTimer", "popupTimer"],
-        ["position", "notifPosition"],
-        ["timeoutLow", "notifTimeoutLow"],
-        ["timeoutNormal", "notifTimeoutNormal"],
-        ["timeoutCritical", "notifTimeoutCritical"],
-        ["compact", "notifCompact"],
-        ["privacyMode", "notifPrivacyMode"],
-        ["historyEnabled", "notifHistoryEnabled"],
-        ["historyMaxCount", "notifHistoryMaxCount"],
-        ["historyMaxAgeDays", "notifHistoryMaxAgeDays"],
-        ["rules", "notifRules"],
-        ["ttsEnabled", "notifTtsEnabled"],
-        ["ttsEngine", "notifTtsEngine"],
-        ["ttsRate", "notifTtsRate"],
-        ["ttsVolume", "notifTtsVolume"],
-        ["ttsExcludedApps", "notifTtsExcludedApps"]
-    ],
-    time: [
-        ["use24Hour", "timeUse24Hour"],
-        ["showSeconds", "timeShowSeconds"],
-        ["showBarDate", "timeShowBarDate"],
-        ["barDateStyle", "timeBarDateStyle"]
-    ],
-    weather: [
-        ["units", "weatherUnits"],
-        ["autoLocation", "weatherAutoLocation"],
-        ["cityQuery", "weatherCityQuery"],
-        ["latitude", "weatherLatitude", _str],
-        ["longitude", "weatherLongitude", _str],
-        ["locationPriority", "weatherLocationPriority"]
-    ],
-    market: [
-        ["tickers", "marketTickers"]
-    ],
-    modelUsage: [
-        ["claudeEnabled", "modelUsageClaudeEnabled"],
-        ["codexEnabled", "modelUsageCodexEnabled"],
-        ["geminiEnabled", "modelUsageGeminiEnabled"],
-        ["activeProvider", "modelUsageActiveProvider"],
-        ["barMetric", "modelUsageBarMetric"],
-        ["refreshSec", "modelUsageRefreshSec"]
-    ],
-    controlCenter: [
-        ["showQuickLinks", "controlCenterShowQuickLinks"],
-        ["showMediaWidget", "controlCenterShowMediaWidget"],
-        ["toggleOrder", "controlCenterToggleOrder"],
-        ["hiddenToggles", "controlCenterHiddenToggles"],
-        ["pluginOrder", "controlCenterPluginOrder"],
-        ["hiddenPlugins", "controlCenterHiddenPlugins"]
-    ],
-    osd: [
-        ["duration", "osdDuration"],
-        ["size", "osdSize"],
-        ["position", "osdPosition"],
-        ["style", "osdStyle"],
-        ["overdrive", "osdOverdrive"]
-    ],
-    dock: [
-        ["enabled", "dockEnabled"],
-        ["autoHide", "dockAutoHide"],
-        ["pinnedApps", "dockPinnedApps"],
-        ["position", "dockPosition"],
-        ["groupApps", "dockGroupApps"],
-        ["iconSize", "dockIconSize"]
-    ],
-    desktopWidgets: [
-        ["enabled", "desktopWidgetsEnabled"],
-        ["gridSnap", "desktopWidgetsGridSnap"],
-        ["monitorWidgets", "desktopWidgetsMonitorWidgets"]
-    ],
-    background: [
-        ["visualizerEnabled", "backgroundVisualizerEnabled"],
-        ["useShaderVisualizer", "backgroundUseShaderVisualizer"],
-        ["clockEnabled", "backgroundClockEnabled"],
-        ["autoHide", "backgroundAutoHide"],
-        ["clockPosition", "backgroundClockPosition"],
-        ["weatherOverlay", "weatherOverlayEnabled"]
-    ],
-    hotCorners: [
-        ["enabled", "hotCornersEnabled"]
-    ],
-    screenBorders: [
-        ["show", "showScreenBorders"]
-    ],
-    powerMenu: [
-        ["countdown", "powermenuCountdown"]
-    ],
-    lockScreen: [
-        ["compact", "lockScreenCompact"],
-        ["mediaControls", "lockScreenMediaControls"],
-        ["weather", "lockScreenWeather"],
-        ["sessionButtons", "lockScreenSessionButtons"],
-        ["countdown", "lockScreenCountdown"],
-        ["fingerprint", "lockScreenFingerprint"]
-    ],
-    privacy: [
-        ["indicatorsEnabled", "privacyIndicatorsEnabled"],
-        ["cameraMonitoring", "privacyCameraMonitoring"]
-    ],
-    audio: [
-        ["volumeProtectionEnabled", "volumeProtectionEnabled"],
-        ["volumeProtectionMaxJump", "volumeProtectionMaxJump"],
-        ["pinnedOutputs", "audioPinnedOutputs"],
-        ["pinnedInputs", "audioPinnedInputs"],
-        ["hiddenOutputs", "audioHiddenOutputs"],
-        ["hiddenInputs", "audioHiddenInputs"]
-    ],
-    screenshot: [
-        ["editor", "screenshotEditor"],
-        ["editAfterCapture", "screenshotEditAfterCapture"],
-        ["delay", "screenshotDelay"],
-        ["ocrLanguage", "ocrLanguage"],
-        ["history", "screenshotHistory"],
-        ["historyMax", "screenshotHistoryMax"]
-    ],
-    recording: [
-        ["captureSource", "recordingCaptureSource"],
-        ["fps", "recordingFps"],
-        ["quality", "recordingQuality"],
-        ["recordCursor", "recordingRecordCursor"],
-        ["outputDir", "recordingOutputDir"],
-        ["includeDesktopAudio", "recordingIncludeDesktopAudio"],
-        ["includeMicrophoneAudio", "recordingIncludeMicrophoneAudio"]
-    ],
-    nightLight: [
-        ["enabled", "nightLightEnabled"],
-        ["temperature", "nightLightTemperature"],
-        ["autoSchedule", "nightLightAutoSchedule"],
-        ["scheduleMode", "nightLightScheduleMode"],
-        ["startHour", "nightLightStartHour"],
-        ["startMinute", "nightLightStartMinute"],
-        ["endHour", "nightLightEndHour"],
-        ["endMinute", "nightLightEndMinute"],
-        ["latitude", "nightLightLatitude", _str],
-        ["longitude", "nightLightLongitude", _str]
-    ],
-    power: [
-        ["idleInhibit", "idleInhibitEnabled"],
-        ["inhibitIdleWhenPlaying", "inhibitIdleWhenPlaying"],
-        ["batteryAlertsEnabled", "batteryAlertsEnabled"],
-        ["batteryWarningThreshold", "batteryWarningThreshold"],
-        ["batteryCriticalThreshold", "batteryCriticalThreshold"],
-        ["acMonitorTimeout", "powerAcMonitorTimeout"],
-        ["acLockTimeout", "powerAcLockTimeout"],
-        ["acSuspendTimeout", "powerAcSuspendTimeout"],
-        ["acSuspendAction", "powerAcSuspendAction"],
-        ["batMonitorTimeout", "powerBatMonitorTimeout"],
-        ["batLockTimeout", "powerBatLockTimeout"],
-        ["batSuspendTimeout", "powerBatSuspendTimeout"],
-        ["batSuspendAction", "powerBatSuspendAction"]
-    ],
-    panels: [
-        ["enabledPanels", "enabledPanels"]
-    ],
-    hooks: [
-        ["enabled", "hooksEnabled"],
-        ["paths", "hookPaths"]
-    ],
-    colorPicker: [
-        ["recentColors", "recentPickerColors"]
-    ],
-    ai: [
-        ["provider", "aiProvider"],
-        ["model", "aiModel"],
-        ["customEndpoint", "aiCustomEndpoint"],
-        ["systemContext", "aiSystemContext"],
-        ["maxTokens", "aiMaxTokens"],
-        ["temperature", "aiTemperature"],
-        ["systemPrompt", "aiSystemPrompt"],
-        ["anthropicKey", "aiAnthropicKey"],
-        ["openaiKey", "aiOpenaiKey"],
-        ["geminiKey", "aiGeminiKey"],
-        ["maxConversations", "aiMaxConversations"],
-        ["maxMessages", "aiMaxMessages"],
-        ["providerProfiles", "aiProviderProfiles"],
-        ["timeout", "aiTimeout"]
-    ],
-    state: [
-        ["activeSurfaceId", "activeSurfaceId"],
-        ["debug", "debug"]
-    ],
-    theme: [
-        ["name", "themeName"],
-        ["autoScheduleEnabled", "themeAutoScheduleEnabled"],
-        ["autoScheduleMode", "themeAutoScheduleMode"],
-        ["useDynamicTheming", "useDynamicTheming"],
-        ["darkName", "themeDarkName"],
-        ["lightName", "themeLightName"],
-        ["darkHour", "themeDarkHour"],
-        ["darkMinute", "themeDarkMinute"],
-        ["lightHour", "themeLightHour"],
-        ["lightMinute", "themeLightMinute"],
-        ["autoLatitude", "themeAutoLatitude", _str],
-        ["autoLongitude", "themeAutoLongitude", _str]
-    ],
-    workspaces: [
-        ["showEmpty", "workspaceShowEmpty"],
-        ["showNames", "workspaceShowNames"],
-        ["showAppIcons", "workspaceShowAppIcons"],
-        ["showWindowCount", "workspaceShowWindowCount"],
-        ["maxIcons", "workspaceMaxIcons"],
-        ["pillSize", "workspacePillSize"],
-        ["style", "workspaceStyle"],
-        ["layout", "workspaceLayout"],
-        ["scrollEnabled", "workspaceScrollEnabled"],
-        ["reverseScroll", "workspaceReverseScroll"],
-        ["activeColor", "workspaceActiveColor"],
-        ["urgentColor", "workspaceUrgentColor"],
-        ["clickBehavior", "workspaceClickBehavior"]
-    ],
-    osk: [
-        ["layout", "oskLayout"],
-        ["pinnedOnStartup", "oskPinnedOnStartup"]
-    ],
-    notepad: [
-        ["projectSync", "notepadProjectSync"]
-    ],
-    displayProfiles: [
-        ["profiles", "displayProfiles"],
-        ["autoProfile", "displayAutoProfile"]
-    ],
-    appearance: [
-        ["fontFamily", "fontFamily", _strDef],
-        ["monoFontFamily", "monoFontFamily", _strDef],
-        ["fontScale", "fontScale", _num1],
-        ["radiusScale", "radiusScale", _num1],
-        ["spacingScale", "spacingScale", _num1],
-        ["uiDensityScale", "uiDensityScale", _num1],
-        ["animationSpeedScale", "animationSpeedScale", _num1],
-        ["autoEcoMode", "autoEcoMode"],
-        ["personalityGifEnabled", "personalityGifEnabled"],
-        ["personalityGifPath", "personalityGifPath", _strDef],
-        ["personalityGifReactionMode", "personalityGifReactionMode", _strDef]
-    ],
-    wallpaper: [
-        ["runPywal", "wallpaperRunPywal"],
-        ["paths", "wallpaperPaths"],
-        ["cycleInterval", "wallpaperCycleInterval"],
-        ["defaultFolder", "wallpaperDefaultFolder"],
-        ["solidColor", "wallpaperSolidColor"],
-        ["useSolidOnStartup", "wallpaperUseSolidOnStartup"],
-        ["solidColorsByMonitor", "wallpaperSolidColorsByMonitor"],
-        ["recentSolidColors", "wallpaperRecentSolidColors"],
-        ["transitionType", "wallpaperTransitionType"],
-        ["transitionDuration", "wallpaperTransitionDuration"],
-        ["useShellRenderer", "wallpaperUseShellRenderer"],
-        ["dynamicEnabled", "wallpaperDynamicEnabled"],
-        ["dynamicManifest", "wallpaperDynamicManifest"]
-    ],
-    launcher: [
-        ["defaultMode", "launcherDefaultMode"],
-        ["showModeHints", "launcherShowModeHints"],
-        ["showHomeSections", "launcherShowHomeSections"],
-        ["drunCategoryFiltersEnabled", "launcherDrunCategoryFiltersEnabled"],
-        ["enablePreload", "launcherEnablePreload"],
-        ["keepSearchOnModeSwitch", "launcherKeepSearchOnModeSwitch"],
-        ["enableDebugTimings", "launcherEnableDebugTimings"],
-        ["showRuntimeMetrics", "launcherShowRuntimeMetrics"],
-        ["characterTrigger", "launcherCharacterTrigger"],
-        ["characterPasteOnSelect", "launcherCharacterPasteOnSelect"],
-        ["preloadFailureThreshold", "launcherPreloadFailureThreshold"],
-        ["preloadFailureBackoffSec", "launcherPreloadFailureBackoffSec"],
-        ["maxResults", "launcherMaxResults"],
-        ["fileMinQueryLength", "launcherFileMinQueryLength"],
-        ["fileMaxResults", "launcherFileMaxResults"],
-        ["fileSearchRoot", "launcherFileSearchRoot"],
-        ["fileShowHidden", "launcherFileShowHidden"],
-        ["fileOpener", "launcherFileOpener"],
-        ["filePreviewEnabled", "launcherFilePreviewEnabled"],
-        ["recentsLimit", "launcherRecentsLimit"],
-        ["recentAppsLimit", "launcherRecentAppsLimit"],
-        ["suggestionsLimit", "launcherSuggestionsLimit"],
-        ["cacheTtlSec", "launcherCacheTtlSec"],
-        ["searchDebounceMs", "launcherSearchDebounceMs"],
-        ["fileSearchDebounceMs", "launcherFileSearchDebounceMs"],
-        ["tabBehavior", "launcherTabBehavior"],
-        ["webEnterUsesPrimary", "launcherWebEnterUsesPrimary"],
-        ["webNumberHotkeysEnabled", "launcherWebNumberHotkeysEnabled"],
-        ["webAliases", "launcherWebAliases"],
-        ["rememberWebProvider", "launcherRememberWebProvider"],
-        ["webLastProviderKey", "launcherWebLastProviderKey"],
-        ["webProviderOrder", "launcherWebProviderOrder"],
-        ["modeOrder", "launcherModeOrder"],
-        ["enabledModes", "launcherEnabledModes"],
-        ["primaryModes", "launcherPrimaryModes"],
-        ["scoreNameWeight", "launcherScoreNameWeight"],
-        ["scoreTitleWeight", "launcherScoreTitleWeight"],
-        ["scoreExecWeight", "launcherScoreExecWeight"],
-        ["scoreBodyWeight", "launcherScoreBodyWeight"],
-        ["scoreCategoryWeight", "launcherScoreCategoryWeight"],
-        ["webCustomEngines", "launcherWebCustomEngines"],
-        ["webBangsEnabled", "launcherWebBangsEnabled"],
-        ["webBangsLastSync", "launcherWebBangsLastSync"]
-    ]
-};
 
 // ── Helpers ──────────────────────────────────────────────────────
 

@@ -269,6 +269,68 @@ QtObject {
         return Math.max(min, Math.min(2.5, scale));
     }
 
+    // ── Container variant definitions ─────────────
+    // Returns a fresh object with current color values for the given variant.
+    // Used by ThemedContainer to auto-apply visual treatment.
+    function containerVariant(name) {
+        switch (name) {
+        case "popup":
+            return {
+                color: popupSurface,
+                borderColor: border,
+                borderWidth: 1,
+                radius: radiusLarge,
+                gradient: true,
+                highlightOpacity: 0.15
+            };
+        case "card":
+            return {
+                color: cardSurface,
+                borderColor: border,
+                borderWidth: 1,
+                radius: radiusMedium,
+                gradient: false,
+                highlightOpacity: 0.1
+            };
+        case "elevated":
+            return {
+                color: chipSurface,
+                borderColor: border,
+                borderWidth: 1,
+                radius: radiusCard,
+                gradient: false,
+                highlightOpacity: 0.08
+            };
+        case "surface":
+            return {
+                color: Qt.alpha(surface, opacitySurface),
+                borderColor: "transparent",
+                borderWidth: 0,
+                radius: radiusSmall,
+                gradient: true,
+                highlightOpacity: 0
+            };
+        case "pill":
+            return {
+                color: Qt.alpha(surface, opacityOverlay),
+                borderColor: border,
+                borderWidth: 1,
+                radius: radiusPill,
+                gradient: true,
+                highlightOpacity: 0.08
+            };
+        default:
+            return {
+                color: cardSurface,
+                borderColor: border,
+                borderWidth: 1,
+                radius: radiusMedium,
+                gradient: false,
+                highlightOpacity: 0.1
+            };
+        }
+    }
+
     function weatherIcon(condition) {
         if (!condition) return "󰖐";
         var c = condition.toLowerCase();
