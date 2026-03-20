@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import "../../../../services"
 import ".."
 
@@ -7,54 +8,112 @@ Item {
     required property bool compactMode
     required property var settingsRoot
 
-    implicitHeight: card.implicitHeight
-    implicitWidth: card.implicitWidth
+    implicitHeight: col.implicitHeight
+    implicitWidth: col.implicitWidth
 
-    SettingsCard {
-        id: card
+    readonly property var _panelDefs: [
+        { id: "notifCenter", label: "Notification Center", icon: "alert.svg" },
+        { id: "controlCenter", label: "Control Center", icon: "options.svg" },
+        { id: "notepad", label: "Notepad", icon: "document.svg" },
+        { id: "aiChat", label: "AI Chat", icon: "\u{F0EA9}" },
+        { id: "commandPalette", label: "Command Palette", icon: "search-visual.svg" },
+        { id: "powerMenu", label: "Power Menu", icon: "\u{F032A}" },
+        { id: "colorPicker", label: "Color Picker", icon: "\u{F0618}" },
+        { id: "displayConfig", label: "Display Config", icon: "\u{F0379}" },
+        { id: "fileBrowser", label: "File Browser", icon: "folder.svg" },
+        { id: "systemMonitor", label: "System Monitor", icon: "\u{F04C7}" }
+    ]
+
+    function _togglePanel(panelId) {
+        var list = Config.enabledPanels.slice();
+        var idx = list.indexOf(panelId);
+        if (idx !== -1)
+            list.splice(idx, 1);
+        else
+            list.push(panelId);
+        Config.enabledPanels = list;
+        Config.scheduleSave();
+    }
+
+    ColumnLayout {
+        id: col
         anchors.fill: parent
-        title: "Shell"
-        iconName: "settings.svg"
-        description: "Core shell visuals and transient notification behavior."
+        spacing: Colors.spacingL
 
-        SettingsFieldGrid {
-            maximumColumns: root.compactMode ? 1 : 2
+        SettingsCard {
+            id: card
+            Layout.fillWidth: true
+            title: "Shell"
+            iconName: "settings.svg"
+            description: "Core shell visuals and transient notification behavior."
 
-            SettingsToggleRow {
-                label: "Floating Bar"
-                icon: "settings.svg"
-                configKey: "barFloating"
+            SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
+                SettingsToggleRow {
+                    label: "Floating Bar"
+                    icon: "settings.svg"
+                    configKey: "barFloating"
+                }
+                SettingsToggleRow {
+                    label: "Blur Effects"
+                    icon: "weather-sunny.svg"
+                    configKey: "blurEnabled"
+                }
+                SettingsToggleRow {
+                    label: "Debug Logging"
+                    icon: "bug.svg"
+                    configKey: "debug"
+                }
             }
-            SettingsToggleRow {
-                label: "Blur Effects"
-                icon: "weather-sunny.svg"
-                configKey: "blurEnabled"
+
+            SettingsSliderRow {
+                label: "Notification Width"
+                icon: "alert.svg"
+                min: 280
+                max: 520
+                value: Config.notifWidth
+                onMoved: v => Config.notifWidth = v
             }
-            SettingsToggleRow {
-                label: "Debug Logging"
-                icon: "bug.svg"
-                configKey: "debug"
+
+            SettingsSliderRow {
+                label: "Popup Duration"
+                icon: "timer.svg"
+                min: 2000
+                max: 10000
+                step: 500
+                value: Config.popupTimer
+                unit: "ms"
+                onMoved: v => Config.popupTimer = v
             }
         }
 
-        SettingsSliderRow {
-            label: "Notification Width"
-            icon: "alert.svg"
-            min: 280
-            max: 520
-            value: Config.notifWidth
-            onMoved: v => Config.notifWidth = v
-        }
+        SettingsCard {
+            Layout.fillWidth: true
+            title: "Panel Enablement"
+            iconName: "options.svg"
+            description: "Disable unused panels to reduce memory. Changes take effect on next toggle."
 
-        SettingsSliderRow {
-            label: "Popup Duration"
-            icon: "timer.svg"
-            min: 2000
-            max: 10000
-            step: 500
-            value: Config.popupTimer
-            unit: "ms"
-            onMoved: v => Config.popupTimer = v
+            SettingsFieldGrid {
+                maximumColumns: root.compactMode ? 1 : 2
+
+                Repeater {
+                    model: root._panelDefs
+                    delegate: SettingsToggleRow {
+                        required property var modelData
+                        label: modelData.label
+                        icon: modelData.icon
+                        checked: Config.enabledPanels.indexOf(modelData.id) !== -1
+                        onToggled: root._togglePanel(modelData.id)
+                    }
+                }
+            }
+
+            SettingsInfoCallout {
+                iconName: "info.svg"
+                title: "Memory savings"
+                body: "Disabled panels are never created, saving memory and startup time. Re-enable any time."
+            }
         }
     }
 }

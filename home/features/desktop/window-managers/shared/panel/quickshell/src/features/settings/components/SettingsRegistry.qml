@@ -141,7 +141,7 @@ QtObject {
             categoryId: "shell-core",
             order: 10,
             component: "SystemTab.qml",
-            searchTerms: ["shell", "notification", "popup", "bar", "blur"],
+            searchTerms: ["shell", "notification", "popup", "bar", "blur", "panels", "enable", "disable"],
             owner: {
                 surface: "",
                 service: "Config",

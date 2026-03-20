@@ -33,6 +33,16 @@ var entries = [
     { tabId: "system", cardTitle: "Shell", label: "Debug Logging", keywords: "debug log verbose", type: "toggle" },
     { tabId: "system", cardTitle: "Shell", label: "Notification Width", keywords: "notification popup width", type: "slider" },
     { tabId: "system", cardTitle: "Shell", label: "Popup Duration", keywords: "notification popup timeout duration", type: "slider" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "Notification Center", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "Control Center", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "Notepad", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "AI Chat", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "Command Palette", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "Power Menu", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "Color Picker", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "Display Config", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "File Browser", keywords: "panel enable disable memory", type: "toggle" },
+    { tabId: "system", cardTitle: "Panel Enablement", label: "System Monitor", keywords: "panel enable disable memory", type: "toggle" },
 
     // ── Control Center ───────────────────────────────
     { tabId: "control-center", cardTitle: "Control Center", label: "Quick Links", keywords: "links shortcuts", type: "toggle" },
