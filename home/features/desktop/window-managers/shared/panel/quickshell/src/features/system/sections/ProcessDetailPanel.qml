@@ -94,7 +94,7 @@ Rectangle {
             }
 
             SharedWidgets.Chip {
-                icon: "󰾆"
+                icon: "board.svg"
                 iconColor: Colors.accent
                 text: root.selectedProcess ? ("RSS " + PTH.formatKiB(root.selectedProcess.rssKb || 0)) : "RSS 0 KiB"
                 textColor: Colors.accent
@@ -108,21 +108,21 @@ Rectangle {
             }
 
             SharedWidgets.Chip {
-                icon: "󰘚"
+                icon: "link.svg"
                 iconColor: Colors.textSecondary
                 text: "PPID " + String(root.selectedProcess ? root.selectedProcess.parentPid || 0 : 0)
                 textColor: Colors.textSecondary
             }
 
             SharedWidgets.Chip {
-                icon: "󰓅"
+                icon: "more-horizontal.svg"
                 iconColor: Colors.secondary
                 text: "THR " + String(root.selectedProcess ? root.selectedProcess.threadCount || 0 : 0)
                 textColor: Colors.secondary
             }
 
             SharedWidgets.Chip {
-                icon: Number(root.selectedProcess ? root.selectedProcess.nice : 0) < 0 ? "󰓅" : "󰾆"
+                icon: Number(root.selectedProcess ? root.selectedProcess.nice : 0) < 0 ? "chevron-up.svg" : "chevron-down.svg"
                 iconColor: Number(root.selectedProcess ? root.selectedProcess.nice : 0) < 0 ? Colors.primary : Colors.textSecondary
                 text: "NICE " + String(root.selectedProcess ? root.selectedProcess.nice || 0 : 0)
                 textColor: Number(root.selectedProcess ? root.selectedProcess.nice : 0) < 0 ? Colors.primary : Colors.textSecondary
@@ -152,7 +152,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "TERM"
-                icon: "󰐊"
+                icon: "dismiss.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.terminateProcess(root.selectedPid)
@@ -168,7 +168,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? "Resume" : "Suspend"
-                icon: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? "󰐎" : "󰏤"
+                icon: root.selectedProcess && String(root.selectedProcess.state || "").indexOf("T") !== -1 ? "play.svg" : "pause.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.togglePause(root.selectedPid)
@@ -192,7 +192,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Nice -1"
-                icon: "󰓅"
+                icon: "chevron-up.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.reniceProcess(root.selectedPid, Number(root.selectedProcess ? root.selectedProcess.nice : 0) - 1)
@@ -200,7 +200,7 @@ Rectangle {
 
             SharedWidgets.FilterChip {
                 label: "Nice +1"
-                icon: "󰾆"
+                icon: "chevron-down.svg"
                 enabled: !ProcessService.isPidPending(root.selectedPid)
                 selected: false
                 onClicked: ProcessService.reniceProcess(root.selectedPid, Number(root.selectedProcess ? root.selectedProcess.nice : 0) + 1)

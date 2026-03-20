@@ -717,7 +717,7 @@ Item {
 
             SettingsSliderRow {
                 label: "Category/Keywords Weight"
-                icon: "󰀻"
+                icon: "apps.svg"
                 min: 0.1
                 max: 2.0
                 step: 0.05
@@ -1152,12 +1152,12 @@ Item {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
             title: "DuckDuckGo Bangs"
-            iconName: "󰇥"
+            iconName: "globe-search.svg"
             description: "Use DDG !bangs for quick site searches (e.g. !gh quickshell, !w quantum)."
 
             SettingsToggleRow {
                 label: "Enable !Bangs"
-                icon: "󰇥"
+                icon: "globe-search.svg"
                 configKey: "launcherWebBangsEnabled"
             }
 
@@ -1276,7 +1276,7 @@ Item {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
             title: "Advanced / Prefix"
-            iconName: "󰑖"
+            iconName: "options.svg"
             description: "These modes stay enabled behind More. Prefix-first modes remain one keystroke away."
 
             SettingsInfoCallout {
@@ -1317,7 +1317,7 @@ Item {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
             title: "Disabled Modes"
-            iconName: "󰅚"
+            iconName: "dismiss.svg"
             description: "Disabled modes are hidden from the launcher until you re-enable them."
 
             Flow {
@@ -1369,7 +1369,7 @@ Item {
                 }
                 SettingsToggleRow {
                     label: "Show Runtime Metrics"
-                    icon: "󰓅"
+                    icon: "board.svg"
                     configKey: "launcherShowRuntimeMetrics"
                 }
             }

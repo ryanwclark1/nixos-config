@@ -7,35 +7,35 @@ var defaultPrimaryModes = ["drun", "window", "files", "ai", "system"];
 var modePrefixes = "!/@?>=,:;~";
 
 var modeMeta = {
-    "drun": { label: "Apps", shortLabel: "Apps", heroLabel: "Application Launch", heroIcon: "󰀻", hint: "Launch applications", prefix: "", tone: "primary" },
-    "window": { label: "Windows", shortLabel: "Windows", heroLabel: "Window Switch", heroIcon: "󰖯", hint: "Jump to an open window with ~", prefix: "~", tone: "info" },
-    "files": { label: "Files", shortLabel: "Files", heroLabel: "File Search", heroIcon: "󰈔", hint: "Search home with /", prefix: "/", tone: "warning" },
-    "ai": { label: "AI", shortLabel: "AI", heroLabel: "AI Prompt", heroIcon: "󰚩", hint: "Ask with !", prefix: "!", tone: "accent" },
-    "clip": { label: "Clipboard", shortLabel: "Clipboard", heroLabel: "Clipboard History", heroIcon: "󰅍", hint: "Recent clipboard history", prefix: "", tone: "secondary" },
-    "emoji": { label: "Characters", shortLabel: "Chars", heroLabel: "Character Search", heroIcon: "󰞅", hint: "Search characters with :", prefix: ":", tone: "warning" },
-    "calc": { label: "Calculator", shortLabel: "Calc", heroLabel: "Inline Calculation", heroIcon: "󰪚", hint: "Evaluate with =", prefix: "=", tone: "warning" },
-    "web": { label: "Web", shortLabel: "Web", heroLabel: "Web Search", heroIcon: "󰖟", hint: "Search with ?", prefix: "?", tone: "info" },
-    "plugins": { label: "Plugins", shortLabel: "Plugins", heroLabel: "Plugin Search", heroIcon: "󰏗", hint: "Search plugin providers", prefix: "", tone: "secondary" },
-    "run": { label: "Run", shortLabel: "Run", heroLabel: "Command Execution", heroIcon: "󰆍", hint: "Run commands with >", prefix: ">", tone: "accent" },
-    "system": { label: "System", shortLabel: "System", heroLabel: "Shell Destinations", heroIcon: "󰒓", hint: "Shell and session destinations", prefix: "", tone: "secondary" },
-    "keybinds": { label: "Keybinds", shortLabel: "Keys", heroLabel: "Keybind Browser", heroIcon: "󰌌", hint: "Inspect and trigger binds", prefix: "", tone: "secondary" },
-    "media": { label: "Media", shortLabel: "Media", heroLabel: "Media Control", heroIcon: "󰝚", hint: "Control active players", prefix: "", tone: "success" },
-    "nixos": { label: "NixOS", shortLabel: "NixOS", heroLabel: "NixOS Actions", heroIcon: "", hint: "Nix maintenance actions", prefix: "", tone: "success" },
-    "wallpapers": { label: "Wallpapers", shortLabel: "Walls", heroLabel: "Wallpaper Picker", heroIcon: "󰸉", hint: "Pick and apply wallpapers", prefix: "", tone: "accent" },
-    "bookmarks": { label: "Bookmarks", shortLabel: "Marks", heroLabel: "Bookmark Search", heroIcon: "󰃭", hint: "Open bookmarked destinations", prefix: "@", tone: "primary" },
-    "settings": { label: "Settings", shortLabel: "Settings", heroLabel: "Settings Jump", heroIcon: "󰒓", hint: "Jump to a settings tab with ,", prefix: ",", tone: "secondary" },
-    "devops": { label: "DevOps", shortLabel: "DevOps", heroLabel: "Ops Controls", heroIcon: "󰒍", hint: "Control containers & services", prefix: "", tone: "warning" },
-    "orchestrator": { label: "Orchestrator", shortLabel: "Ops", heroLabel: "System Orchestrator", heroIcon: "󰓅", hint: "Full system dashboard", prefix: "", tone: "success" },
-    "ssh": { label: "SSH", shortLabel: "SSH", heroLabel: "Remote Connect", heroIcon: "󰣀", hint: "Connect with ;", prefix: ";", tone: "info" }
+    "drun": { label: "Apps", shortLabel: "Apps", heroLabel: "Application Launch", heroIcon: "apps.svg", hint: "Launch applications", prefix: "", tone: "primary" },
+    "window": { label: "Windows", shortLabel: "Windows", heroLabel: "Window Switch", heroIcon: "window-shield.svg", hint: "Jump to an open window with ~", prefix: "~", tone: "info" },
+    "files": { label: "Files", shortLabel: "Files", heroLabel: "File Search", heroIcon: "folder.svg", hint: "Search home with /", prefix: "/", tone: "warning" },
+    "ai": { label: "AI", shortLabel: "AI", heroLabel: "AI Prompt", heroIcon: "chat.svg", hint: "Ask with !", prefix: "!", tone: "accent" },
+    "clip": { label: "Clipboard", shortLabel: "Clipboard", heroLabel: "Clipboard History", heroIcon: "copy.svg", hint: "Recent clipboard history", prefix: "", tone: "secondary" },
+    "emoji": { label: "Characters", shortLabel: "Chars", heroLabel: "Character Search", heroIcon: "star.svg", hint: "Search characters with :", prefix: ":", tone: "warning" },
+    "calc": { label: "Calculator", shortLabel: "Calc", heroLabel: "Inline Calculation", heroIcon: "calculator.svg", hint: "Evaluate with =", prefix: "=", tone: "warning" },
+    "web": { label: "Web", shortLabel: "Web", heroLabel: "Web Search", heroIcon: "globe-search.svg", hint: "Search with ?", prefix: "?", tone: "info" },
+    "plugins": { label: "Plugins", shortLabel: "Plugins", heroLabel: "Plugin Search", heroIcon: "apps.svg", hint: "Search plugin providers", prefix: "", tone: "secondary" },
+    "run": { label: "Run", shortLabel: "Run", heroLabel: "Command Execution", heroIcon: "terminal.svg", hint: "Run commands with >", prefix: ">", tone: "accent" },
+    "system": { label: "System", shortLabel: "System", heroLabel: "Shell Destinations", heroIcon: "settings.svg", hint: "Shell and session destinations", prefix: "", tone: "secondary" },
+    "keybinds": { label: "Keybinds", shortLabel: "Keys", heroLabel: "Keybind Browser", heroIcon: "keyboard.svg", hint: "Inspect and trigger binds", prefix: "", tone: "secondary" },
+    "media": { label: "Media", shortLabel: "Media", heroLabel: "Media Control", heroIcon: "music-note-2.svg", hint: "Control active players", prefix: "", tone: "success" },
+    "nixos": { label: "NixOS", shortLabel: "NixOS", heroLabel: "NixOS Actions", heroIcon: "brands/nixos-symbolic.svg", hint: "Nix maintenance actions", prefix: "", tone: "success" },
+    "wallpapers": { label: "Wallpapers", shortLabel: "Walls", heroLabel: "Wallpaper Picker", heroIcon: "image.svg", hint: "Pick and apply wallpapers", prefix: "", tone: "accent" },
+    "bookmarks": { label: "Bookmarks", shortLabel: "Marks", heroLabel: "Bookmark Search", heroIcon: "bookmark.svg", hint: "Open bookmarked destinations", prefix: "@", tone: "primary" },
+    "settings": { label: "Settings", shortLabel: "Settings", heroLabel: "Settings Jump", heroIcon: "settings.svg", hint: "Jump to a settings tab with ,", prefix: ",", tone: "secondary" },
+    "devops": { label: "DevOps", shortLabel: "DevOps", heroLabel: "Ops Controls", heroIcon: "developer-board.svg", hint: "Control containers & services", prefix: "", tone: "warning" },
+    "orchestrator": { label: "Orchestrator", shortLabel: "Ops", heroLabel: "System Orchestrator", heroIcon: "board.svg", hint: "Full system dashboard", prefix: "", tone: "success" },
+    "ssh": { label: "SSH", shortLabel: "SSH", heroLabel: "Remote Connect", heroIcon: "server.svg", hint: "Connect with ;", prefix: ";", tone: "info" }
 };
 
 var modeIcons = {
-    "drun": "󰀻", "window": "󰖯", "files": "󰈔", "ai": "󰚩",
-    "clip": "󰅍", "emoji": "󰞅", "calc": "󰪚", "web": "󰖟",
-    "plugins": "󰏗", "run": "󰆍", "system": "󰒓", "keybinds": "󰌌",
-    "media": "󰝚", "nixos": "", "wallpapers": "󰸉", "bookmarks": "󰃭",
-    "settings": "󰒓", "devops": "󰒍", "orchestrator": "󰓅",
-    "ssh": "󰣀"
+    "drun": "apps.svg", "window": "window-shield.svg", "files": "folder.svg", "ai": "chat.svg",
+    "clip": "copy.svg", "emoji": "star.svg", "calc": "calculator.svg", "web": "globe-search.svg",
+    "plugins": "apps.svg", "run": "terminal.svg", "system": "settings.svg", "keybinds": "keyboard.svg",
+    "media": "music-note-2.svg", "nixos": "brands/nixos-symbolic.svg", "wallpapers": "image.svg", "bookmarks": "bookmark.svg",
+    "settings": "settings.svg", "devops": "developer-board.svg", "orchestrator": "board.svg",
+    "ssh": "server.svg"
 };
 
 var modeDeps = {
@@ -159,157 +159,157 @@ var webProviderCatalog = {
         key: "google", name: "Google",
         exec: "https://www.google.com/search?q=",
         home: "https://www.google.com/",
-        icon: "󰊯", isWeb: true
+        icon: "globe-search.svg", isWeb: true
     },
     "duckduckgo": {
         key: "duckduckgo", name: "DuckDuckGo",
         exec: "https://duckduckgo.com/?q=",
         home: "https://duckduckgo.com/",
-        icon: "󰇥", isWeb: true
+        icon: "globe-search.svg", isWeb: true
     },
     "youtube": {
         key: "youtube", name: "YouTube",
         exec: "https://www.youtube.com/results?search_query=",
         home: "https://www.youtube.com/",
-        icon: "󰗃", isWeb: true
+        icon: "play.svg", isWeb: true
     },
     "nixos": {
         key: "nixos", name: "NixOS Packages",
         exec: "https://search.nixos.org/packages?query=",
         home: "https://search.nixos.org/packages",
-        icon: "", isWeb: true
+        icon: "brands/nixos-symbolic.svg", isWeb: true
     },
     "github": {
         key: "github", name: "GitHub",
         exec: "https://github.com/search?q=",
         home: "https://github.com/",
-        icon: "󰊤", isWeb: true
+        icon: "brands/github-symbolic.svg", isWeb: true
     },
     "brave": {
         key: "brave", name: "Brave Search",
         exec: "https://search.brave.com/search?q=",
         home: "https://search.brave.com/",
-        icon: "󰊯", isWeb: true
+        icon: "globe-search.svg", isWeb: true
     },
     "bing": {
         key: "bing", name: "Bing",
         exec: "https://www.bing.com/search?q=",
         home: "https://www.bing.com/",
-        icon: "󰊯", isWeb: true
+        icon: "globe-search.svg", isWeb: true
     },
     "kagi": {
         key: "kagi", name: "Kagi",
         exec: "https://kagi.com/search?q=",
         home: "https://kagi.com/",
-        icon: "󰊯", isWeb: true
+        icon: "globe-search.svg", isWeb: true
     },
     "stackoverflow": {
         key: "stackoverflow", name: "Stack Overflow",
         exec: "https://stackoverflow.com/search?q=",
         home: "https://stackoverflow.com/",
-        icon: "", isWeb: true
+        icon: "globe-search.svg", isWeb: true
     },
     "npm": {
         key: "npm", name: "npm",
         exec: "https://www.npmjs.com/search?q=",
         home: "https://www.npmjs.com/",
-        icon: "󰎙", isWeb: true
+        icon: "apps.svg", isWeb: true
     },
     "pypi": {
         key: "pypi", name: "PyPI",
         exec: "https://pypi.org/search/?q=",
         home: "https://pypi.org/",
-        icon: "󰌠", isWeb: true
+        icon: "apps.svg", isWeb: true
     },
     "crates": {
         key: "crates", name: "crates.io",
         exec: "https://crates.io/search?q=",
         home: "https://crates.io/",
-        icon: "🦀", isWeb: true
+        icon: "apps.svg", isWeb: true
     },
     "mdn": {
         key: "mdn", name: "MDN Web Docs",
         exec: "https://developer.mozilla.org/en-US/search?q=",
         home: "https://developer.mozilla.org/",
-        icon: "󰖟", isWeb: true
+        icon: "globe-search.svg", isWeb: true
     },
     "archwiki": {
         key: "archwiki", name: "Arch Wiki",
         exec: "https://wiki.archlinux.org/index.php?search=",
         home: "https://wiki.archlinux.org/",
-        icon: "󰣇", isWeb: true
+        icon: "brands/arch-symbolic.svg", isWeb: true
     },
     "aur": {
         key: "aur", name: "AUR",
         exec: "https://aur.archlinux.org/packages?K=",
         home: "https://aur.archlinux.org/",
-        icon: "󰣇", isWeb: true
+        icon: "brands/arch-symbolic.svg", isWeb: true
     },
     "nixopts": {
         key: "nixopts", name: "NixOS Options",
         exec: "https://search.nixos.org/options?channel=unstable&query=",
         home: "https://search.nixos.org/options",
-        icon: "", isWeb: true
+        icon: "brands/nixos-symbolic.svg", isWeb: true
     },
     "reddit": {
         key: "reddit", name: "Reddit",
         exec: "https://www.reddit.com/search?q=",
         home: "https://www.reddit.com/",
-        icon: "󰑍", isWeb: true
+        icon: "chat.svg", isWeb: true
     },
     "twitter": {
         key: "twitter", name: "Twitter/X",
         exec: "https://twitter.com/search?q=",
         home: "https://twitter.com/",
-        icon: "󰕄", isWeb: true
+        icon: "chat.svg", isWeb: true
     },
     "linkedin": {
         key: "linkedin", name: "LinkedIn",
         exec: "https://www.linkedin.com/search/results/all/?keywords=",
         home: "https://www.linkedin.com/",
-        icon: "󰌻", isWeb: true
+        icon: "people.svg", isWeb: true
     },
     "wikipedia": {
         key: "wikipedia", name: "Wikipedia",
         exec: "https://en.wikipedia.org/wiki/Special:Search?search=",
         home: "https://en.wikipedia.org/",
-        icon: "󰖬", isWeb: true
+        icon: "library.svg", isWeb: true
     },
     "translate": {
         key: "translate", name: "Google Translate",
         exec: "https://translate.google.com/?text=",
         home: "https://translate.google.com/",
-        icon: "󰗊", isWeb: true
+        icon: "rename.svg", isWeb: true
     },
     "imdb": {
         key: "imdb", name: "IMDb",
         exec: "https://www.imdb.com/find?q=",
         home: "https://www.imdb.com/",
-        icon: "󰎁", isWeb: true
+        icon: "play.svg", isWeb: true
     },
     "amazon": {
         key: "amazon", name: "Amazon",
         exec: "https://www.amazon.com/s?k=",
         home: "https://www.amazon.com/",
-        icon: "󰅐", isWeb: true
+        icon: "apps.svg", isWeb: true
     },
     "ebay": {
         key: "ebay", name: "eBay",
         exec: "https://www.ebay.com/sch/i.html?_nkw=",
         home: "https://www.ebay.com/",
-        icon: "󰮫", isWeb: true
+        icon: "apps.svg", isWeb: true
     },
     "maps": {
         key: "maps", name: "Google Maps",
         exec: "https://www.google.com/maps/search/",
         home: "https://www.google.com/maps",
-        icon: "󰍎", isWeb: true
+        icon: "compass.svg", isWeb: true
     },
     "images": {
         key: "images", name: "Google Images",
         exec: "https://www.google.com/search?tbm=isch&q=",
         home: "https://www.google.com/imghp",
-        icon: "󰋩", isWeb: true
+        icon: "image.svg", isWeb: true
     }
 };
 

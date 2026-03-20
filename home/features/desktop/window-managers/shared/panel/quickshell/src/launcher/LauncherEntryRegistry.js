@@ -15,7 +15,7 @@ function buildSystemDestinationItems(actions) {
             name: "Dashboard",
             title: "Open the shell overview",
             description: "Shell > Dashboard",
-            icon: "󰕮",
+            icon: "board.svg",
             keywords: "overview vitals media dashboard",
             entryKind: "destination"
         }, actions, "openDashboard"),
@@ -25,7 +25,7 @@ function buildSystemDestinationItems(actions) {
             name: "Settings",
             title: "Open launcher and shell settings",
             description: "System > Settings",
-            icon: "󰒓",
+            icon: "settings.svg",
             keywords: "preferences settings launcher shell",
             entryKind: "destination"
         }, actions, "openSettings"),
@@ -35,7 +35,7 @@ function buildSystemDestinationItems(actions) {
             name: "Notifications",
             title: "Open notification history",
             description: "System > Notifications",
-            icon: "󰂚",
+            icon: "alert.svg",
             keywords: "notifications inbox alerts dnd",
             entryKind: "destination"
         }, actions, "openNotifications"),
@@ -45,7 +45,7 @@ function buildSystemDestinationItems(actions) {
             name: "Control Center",
             title: "Open shell controls",
             description: "System > Control Center",
-            icon: "󰖲",
+            icon: "app-generic.svg",
             keywords: "control center quick toggles media system",
             entryKind: "destination"
         }, actions, "openControlCenter"),
@@ -55,7 +55,7 @@ function buildSystemDestinationItems(actions) {
             name: "Screenshot Menu",
             title: "Open screenshot tools",
             description: "System > Capture",
-            icon: "󰄀",
+            icon: "crop.svg",
             keywords: "screenshot capture snip record",
             entryKind: "destination"
         }, actions, "openScreenshotMenu"),
@@ -65,7 +65,7 @@ function buildSystemDestinationItems(actions) {
             name: "Power Menu",
             title: "Open session controls",
             description: "Session > Power",
-            icon: "󰐥",
+            icon: "power.svg",
             keywords: "power logout reboot shutdown suspend",
             entryKind: "destination"
         }, actions, "openPowerMenu")
@@ -79,7 +79,7 @@ function buildCommandPaletteActions(actions) {
             category: "System",
             label: "Open Dashboard",
             description: "Jump to the shell overview and system status view.",
-            icon: "󰕮",
+            icon: "board.svg",
             keywords: "dashboard overview shell"
         }, actions, "openDashboard"),
         _entry({
@@ -87,7 +87,7 @@ function buildCommandPaletteActions(actions) {
             category: "System",
             label: "Open Settings",
             description: "Open Quickshell settings.",
-            icon: "󰒓",
+            icon: "settings.svg",
             keywords: "settings preferences launcher"
         }, actions, "openSettings"),
         _entry({
@@ -95,7 +95,7 @@ function buildCommandPaletteActions(actions) {
             category: "System",
             label: "Open Notifications",
             description: "Show recent notifications and alerts.",
-            icon: "󰂚",
+            icon: "alert.svg",
             keywords: "notifications alerts inbox"
         }, actions, "openNotifications"),
         _entry({
@@ -103,7 +103,7 @@ function buildCommandPaletteActions(actions) {
             category: "Controls",
             label: "Open Control Center",
             description: "Open the main shell controls surface.",
-            icon: "󰖲",
+            icon: "app-generic.svg",
             keywords: "control center quick toggles media"
         }, actions, "openControlCenter"),
         _entry({
@@ -111,7 +111,7 @@ function buildCommandPaletteActions(actions) {
             category: "Controls",
             label: "Open Network Controls",
             description: "Jump directly to Wi-Fi and connectivity controls.",
-            icon: "󰖩",
+            icon: "wifi-4.svg",
             keywords: "network wifi connectivity internet"
         }, actions, "openNetworkControls"),
         _entry({
@@ -119,7 +119,7 @@ function buildCommandPaletteActions(actions) {
             category: "Controls",
             label: "Open Audio Controls",
             description: "Open output, input, and volume controls.",
-            icon: "󰕾",
+            icon: "speaker.svg",
             keywords: "audio volume microphone speaker"
         }, actions, "openAudioControls"),
         _entry({
@@ -127,7 +127,7 @@ function buildCommandPaletteActions(actions) {
             category: "Controls",
             label: "Open VPN Hub",
             description: "Show VPN and Tailscale controls.",
-            icon: "󰖂",
+            icon: "shield-lock.svg",
             keywords: "vpn tailscale network secure"
         }, actions, "openVpnControls"),
         _entry({
@@ -135,7 +135,7 @@ function buildCommandPaletteActions(actions) {
             category: "Session",
             label: "Open Power Menu",
             description: "Open lock, logout, reboot, and shutdown actions.",
-            icon: "󰐥",
+            icon: "power.svg",
             keywords: "power reboot shutdown logout suspend"
         }, actions, "openPowerMenu"),
         _entry({
@@ -143,7 +143,7 @@ function buildCommandPaletteActions(actions) {
             category: "System",
             label: "Open Screenshot Menu",
             description: "Start a screenshot or capture workflow.",
-            icon: "󰄀",
+            icon: "crop.svg",
             keywords: "screenshot capture snip"
         }, actions, "openScreenshotMenu"),
         _entry({
@@ -151,7 +151,7 @@ function buildCommandPaletteActions(actions) {
             category: "Intelligence",
             label: "Ask AI Assistant",
             description: "Open the AI chat surface.",
-            icon: "󰚩",
+            icon: "chat.svg",
             keywords: "ai assistant chat"
         }, actions, "openAiChat"),
         _entry({
@@ -159,7 +159,7 @@ function buildCommandPaletteActions(actions) {
             category: "Power",
             label: "Toggle Eco Mode",
             description: "Flip the shell into reduced-intensity mode.",
-            icon: "󰂃",
+            icon: "battery-saver.svg",
             keywords: "eco battery power save"
         }, actions, "toggleEcoMode"),
         _entry({
@@ -167,7 +167,7 @@ function buildCommandPaletteActions(actions) {
             category: "Desktop",
             label: "Toggle Desktop Edit Mode",
             description: "Enable desktop widget edit affordances.",
-            icon: "󰏘",
+            icon: "edit.svg",
             keywords: "desktop edit widgets layout"
         }, actions, "toggleDesktopEditMode"),
         _entry({
@@ -175,7 +175,7 @@ function buildCommandPaletteActions(actions) {
             category: "Visuals",
             label: "Toggle Dynamic Theme",
             description: "Switch dynamic wallpaper-driven theming on or off.",
-            icon: "󰏘",
+            icon: "color-palette.svg",
             keywords: "theme visuals dynamic wallpaper"
         }, actions, "toggleDynamicTheme"),
         _entry({
@@ -183,7 +183,7 @@ function buildCommandPaletteActions(actions) {
             category: "System",
             label: "Reload Shell",
             description: "Reload the active Quickshell config.",
-            icon: "󰑓",
+            icon: "arrow-counterclockwise.svg",
             keywords: "reload shell refresh"
         }, actions, "reloadShell")
     ];
