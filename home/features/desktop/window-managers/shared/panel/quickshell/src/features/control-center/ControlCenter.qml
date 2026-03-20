@@ -145,7 +145,7 @@ PanelWindow {
                     Layout.fillWidth: true
                 }
                 SharedWidgets.IconButton {
-                    icon: "󰒓"
+                    icon: "settings.svg"
                     size: 32
                     iconSize: Colors.fontSizeXL
                     tooltipText: "Settings"

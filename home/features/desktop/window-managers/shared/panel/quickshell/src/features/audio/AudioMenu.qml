@@ -15,7 +15,7 @@ BasePopupMenu {
 
   headerExtras: [
     SharedWidgets.IconButton {
-      icon: "󰒓"
+      icon: "settings.svg"
       iconSize: Colors.fontSizeXL
       tooltipText: "Open mixer"
       onClicked: Quickshell.execDetached(["pavucontrol"])

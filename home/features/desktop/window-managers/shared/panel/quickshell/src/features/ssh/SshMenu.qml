@@ -132,7 +132,7 @@ BasePopupMenu {
       }
     },
     SharedWidgets.IconButton {
-      icon: "󰒓"
+      icon: "settings.svg"
       tooltipText: "Settings"
       onClicked: root.openBarWidgetSettings()
     },

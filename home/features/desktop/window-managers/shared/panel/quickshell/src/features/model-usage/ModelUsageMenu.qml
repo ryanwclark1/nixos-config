@@ -55,7 +55,7 @@ BasePopupMenu {
       }
     },
     SharedWidgets.IconButton {
-      icon: "󰒓"
+      icon: "settings.svg"
       size: 28
       iconSize: Colors.fontSizeLarge
       tooltipText: "Settings"

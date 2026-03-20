@@ -185,6 +185,7 @@ BasePopupMenu {
               clip: true
 
               Image {
+                id: clipImage
                 anchors.fill: parent
                 anchors.margins: 2
                 source: clipCard.imageSrc !== "" ? ("file://" + clipCard.imageSrc) : ""
@@ -192,6 +193,22 @@ BasePopupMenu {
                 asynchronous: true
                 cache: false
                 sourceSize.height: 120
+                visible: status !== Image.Error
+
+                onStatusChanged: {
+                  if (status === Image.Error)
+                    Logger.d("ClipboardMenu", "skipping unreadable image:", clipCard.imageSrc);
+                }
+              }
+
+              // Fallback for broken images
+              Text {
+                anchors.centerIn: parent
+                visible: clipImage.status === Image.Error
+                text: "\uf03e"
+                font.family: Colors.fontMono
+                font.pixelSize: Colors.fontSizeXL
+                color: Colors.withAlpha(Colors.text, 0.3)
               }
             }
 
