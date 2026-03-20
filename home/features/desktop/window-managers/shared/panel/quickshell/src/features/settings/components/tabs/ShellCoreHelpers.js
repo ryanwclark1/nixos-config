@@ -291,6 +291,9 @@ function movePrimaryMode(Config, CompositorAdapter, launcherModes, modeKey, delt
     current.splice(from, 1);
     current.splice(to, 0, moved);
     setPrimaryModes(Config, CompositorAdapter, launcherModes, current);
+    Config.launcherModeOrder = orderedPrimaryModes(Config, CompositorAdapter, launcherModes).concat(
+        orderedAdvancedModes(Config, CompositorAdapter, launcherModes)
+    );
 }
 
 function moveDraggedPrimaryMode(Config, CompositorAdapter, launcherModes, state, targetIndex) {
@@ -300,6 +303,9 @@ function moveDraggedPrimaryMode(Config, CompositorAdapter, launcherModes, state,
     if (!result.changed)
         return false;
     setPrimaryModes(Config, CompositorAdapter, launcherModes, result.items);
+    Config.launcherModeOrder = orderedPrimaryModes(Config, CompositorAdapter, launcherModes).concat(
+        orderedAdvancedModes(Config, CompositorAdapter, launcherModes)
+    );
     return true;
 }
 
@@ -336,6 +342,9 @@ function promoteLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) 
     if (primary.indexOf(modeKey) === -1)
         primary.push(modeKey);
     setPrimaryModes(Config, CompositorAdapter, launcherModes, primary);
+    Config.launcherModeOrder = orderedPrimaryModes(Config, CompositorAdapter, launcherModes).concat(
+        orderedAdvancedModes(Config, CompositorAdapter, launcherModes)
+    );
 }
 
 function enableLauncherMode(Config, CompositorAdapter, launcherModes, modeKey, asPrimary) {
@@ -352,6 +361,9 @@ function demoteLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) {
         return key !== modeKey;
     });
     setPrimaryModes(Config, CompositorAdapter, launcherModes, primary);
+    Config.launcherModeOrder = orderedPrimaryModes(Config, CompositorAdapter, launcherModes).concat(
+        orderedAdvancedModes(Config, CompositorAdapter, launcherModes)
+    );
 }
 
 function disableLauncherMode(Config, CompositorAdapter, launcherModes, modeKey) {
@@ -369,10 +381,8 @@ function _targetIndexFromMappedY(mappedY, itemExtent, spacing, count) {
     return SettingsReorderHelpers.targetIndexFromMappedY(mappedY, itemExtent, spacing, count);
 }
 
-function currentModeDropIndex(cardItem, rowIndex, listItem, count) {
-    if (!cardItem || !listItem)
-        return rowIndex;
-    return _targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, count);
+function currentModeDropIndex(cardItem, rowIndex, listItem, count, dragOffsetY) {
+    return SettingsReorderHelpers.currentListDropIndex(cardItem, rowIndex, listItem, count, dragOffsetY);
 }
 
 function moveDraggedMode(Config, CompositorAdapter, launcherModes, state, targetIndex) {
@@ -467,11 +477,11 @@ function clearWebProviderDragState(state) {
     SettingsReorderHelpers.clearState(state);
 }
 
-function currentWebProviderDropIndex(cardItem, rowIndex, listItem, Config, webProviders, webProviderDefaultOrder) {
+function currentWebProviderDropIndex(cardItem, rowIndex, listItem, Config, webProviders, webProviderDefaultOrder, dragOffsetY) {
     if (!cardItem || !listItem)
         return rowIndex;
     var providers = orderedWebProviders(Config, webProviders, webProviderDefaultOrder);
-    return _targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, providers.length);
+    return SettingsReorderHelpers.currentListDropIndex(cardItem, rowIndex, listItem, providers.length, dragOffsetY);
 }
 
 function moveDraggedWebProvider(Config, webProviders, webProviderDefaultOrder, state, targetIndex) {
@@ -538,10 +548,8 @@ function moveDraggedOrderedValue(Config, ControlCenterRegistry, PluginService, c
     return true;
 }
 
-function currentOrderedDropIndex(cardItem, rowIndex, listItem, count) {
-    if (!cardItem || !listItem)
-        return rowIndex;
-    return _targetIndexFromMappedY(cardItem.mapToItem(listItem, 0, cardItem.y).y, cardItem.height, listItem.spacing, count);
+function currentOrderedDropIndex(cardItem, rowIndex, listItem, count, dragOffsetY) {
+    return SettingsReorderHelpers.currentListDropIndex(cardItem, rowIndex, listItem, count, dragOffsetY);
 }
 
 function toggleHiddenListValue(Config, configKey, value) {

@@ -33,4 +33,11 @@ describe("ShellLauncherSection contract", () => {
     expect(source).not.toContain("LauncherSettingsPanel {");
     expect(source).not.toContain("LauncherSettingsHero {");
   });
+
+  it("keeps general launcher field grids on a wider breakpoint", () => {
+    const source = readFileSync(launcherSectionPath, "utf8");
+
+    expect(source).toContain("readonly property int launcherWideFieldMinimumWidth: 420");
+    expect(source.match(/minimumColumnWidth: root\.launcherWideFieldMinimumWidth/g)).toHaveLength(2);
+  });
 });

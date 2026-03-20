@@ -9,6 +9,7 @@ import {
   supportedLauncherModeKeys,
   orderedPrimaryModes,
   orderedAdvancedModes,
+  movePrimaryMode,
   moveDraggedPrimaryMode,
   moveDraggedAdvancedMode,
   promoteLauncherMode,
@@ -91,7 +92,7 @@ describe("webProviderMeta", () => {
   it("returns fallback for unknown provider", () => {
     const meta = webProviderMeta(providers, "bing");
     expect(meta.key).toBe("bing");
-    expect(meta.icon).toBe("󰖟");
+    expect(meta.icon).toBe("globe-search.svg");
   });
 });
 
@@ -274,26 +275,28 @@ describe("orderedPrimaryModes / orderedAdvancedModes", () => {
 });
 
 describe("promoteLauncherMode / demoteLauncherMode", () => {
-  it("promotes an advanced mode into the primary sidebar list", () => {
+  it("promotes an advanced mode into the primary sidebar list and regroups launcher order", () => {
     const config = {
       launcherEnabledModes: ["drun", "files", "ssh"],
-      launcherModeOrder: ["drun", "files", "ssh"],
+      launcherModeOrder: ["drun", "ssh", "files"],
       launcherPrimaryModes: ["drun", "files"],
       launcherDefaultMode: "drun",
     };
     promoteLauncherMode(config, fullAdapter, launcherModes, "ssh");
-    expect(config.launcherPrimaryModes).toContain("ssh");
+    expect(config.launcherPrimaryModes).toEqual(["drun", "files", "ssh"]);
+    expect(config.launcherModeOrder).toEqual(["drun", "files", "ssh"]);
   });
 
-  it("demotes a primary mode out of the sidebar list", () => {
+  it("demotes a primary mode out of the sidebar list and keeps advanced modes grouped after primary ones", () => {
     const config = {
       launcherEnabledModes: ["drun", "files", "ssh"],
-      launcherModeOrder: ["drun", "files", "ssh"],
-      launcherPrimaryModes: ["drun", "files"],
+      launcherModeOrder: ["files", "drun", "ssh"],
+      launcherPrimaryModes: ["files", "drun"],
       launcherDefaultMode: "drun",
     };
     demoteLauncherMode(config, fullAdapter, launcherModes, "files");
     expect(config.launcherPrimaryModes).toEqual(["drun"]);
+    expect(config.launcherModeOrder).toEqual(["drun", "files", "ssh"]);
   });
 });
 
@@ -317,6 +320,22 @@ describe("moveMode", () => {
   });
 });
 
+describe("movePrimaryMode", () => {
+  it("reorders primary modes and keeps advanced modes after the primary group", () => {
+    const config = {
+      launcherEnabledModes: ["drun", "files", "ssh"],
+      launcherModeOrder: ["drun", "ssh", "files"],
+      launcherPrimaryModes: ["drun", "files"],
+      launcherDefaultMode: "drun",
+    };
+
+    movePrimaryMode(config, fullAdapter, launcherModes, "files", -1);
+
+    expect(config.launcherPrimaryModes).toEqual(["files", "drun"]);
+    expect(config.launcherModeOrder).toEqual(["files", "drun", "ssh"]);
+  });
+});
+
 describe("moveDraggedPrimaryMode / moveDraggedAdvancedMode", () => {
   it("reorders primary modes within the primary group", () => {
     const config = {
@@ -335,6 +354,7 @@ describe("moveDraggedPrimaryMode / moveDraggedAdvancedMode", () => {
 
     expect(moveDraggedPrimaryMode(config, fullAdapter, launcherModes, state, 2)).toBe(true);
     expect(config.launcherPrimaryModes).toEqual(["files", "drun"]);
+    expect(config.launcherModeOrder).toEqual(["files", "drun", "ssh"]);
     expect(state.sourceItemId).toBe("");
     expect(state.targetIndex).toBe(-1);
   });

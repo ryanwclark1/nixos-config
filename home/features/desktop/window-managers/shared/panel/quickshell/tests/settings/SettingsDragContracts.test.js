@@ -21,8 +21,10 @@ describe("settings drag-and-drop contracts", () => {
 
     expect(hostListSource).toContain('readonly property bool reorderDisabled: root.searchQuery.trim() !== ""');
     expect(hostListSource).toContain('title: "Reordering paused while filtering"');
-    expect(hostListSource).toContain('enabled: !root.reorderDisabled && hostRow.hostIndex > 0');
-    expect(hostListSource).toContain('enabled: !root.reorderDisabled && hostRow.hostIndex < (root.sshData.manualHosts.length - 1)');
+    expect(hostListSource).toContain("dragEnabled: !root.reorderDisabled");
+    expect(hostListSource).toContain("SettingsReorderButtons {");
+    expect(hostListSource).toContain("moveUpEnabled: !root.reorderDisabled && hostRow.hostIndex > 0");
+    expect(hostListSource).toContain("moveDownEnabled: !root.reorderDisabled && hostRow.hostIndex < (root.sshData.manualHosts.length - 1)");
     expect(sshDataSource).toContain("function moveManualHost(hostId, targetIndex)");
     expect(sshDataSource).toContain("SettingsReorderHelpers.moveArrayItem");
     expect(sshDataSource).toContain("return saveManualHosts(result.items);");
