@@ -257,6 +257,15 @@ QtObject {
         function onShowScreenBordersChanged() {
             root.config.scheduleSave();
         }
+        function onShowScreenCornersChanged() {
+            root.config.scheduleSave();
+        }
+        function onScreenCornerRadiusChanged() {
+            root.config.scheduleSave();
+        }
+        function onOledModeChanged() {
+            root.config.scheduleSave();
+        }
         function onPowermenuCountdownChanged() {
             root.config.scheduleSave();
         }

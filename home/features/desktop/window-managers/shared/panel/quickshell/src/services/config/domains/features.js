@@ -54,6 +54,15 @@ var hooks = {
     ]
 }
 
+var colorExport = {
+    sectionKey: "colorExport",
+    maps: [
+        ["enabled", "colorExportEnabled"],
+        ["kitty", "colorExportKitty"],
+        ["gtkScheme", "colorExportGtkScheme"]
+    ]
+}
+
 var osk = {
     sectionKey: "osk",
     maps: [
@@ -73,5 +82,13 @@ var screenBorders = {
     sectionKey: "screenBorders",
     maps: [
         ["show", "showScreenBorders"]
+    ]
+}
+
+var screenCorners = {
+    sectionKey: "screenCorners",
+    maps: [
+        ["show", "showScreenCorners"],
+        ["radius", "screenCornerRadius"]
     ]
 }

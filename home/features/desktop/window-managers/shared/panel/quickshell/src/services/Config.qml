@@ -190,8 +190,13 @@ QtObject {
     property string backgroundClockPosition: "center"
     property bool weatherOverlayEnabled: false
 
-    // --- SCREEN BORDERS ---
+    // --- SCREEN DECORATIONS ---
     property bool showScreenBorders: false
+    property bool showScreenCorners: true
+    property int screenCornerRadius: 18
+
+    // --- OLED ---
+    property bool oledMode: false
 
     // --- HOT CORNERS ---
     property bool hotCornersEnabled: false
@@ -356,7 +361,7 @@ QtObject {
     // --- STATE RECOVERY ---
     property string activeSurfaceId: ""
     onActiveSurfaceIdChanged: {
-        if (!_loading) scheduleSave();
+        if (!pauseAutoSave) scheduleSave();
     }
 
     // --- PLUGINS ---
@@ -377,9 +382,15 @@ QtObject {
     property bool hooksEnabled: true
     property var hookPaths: ({})
 
+    // --- COLOR EXPORT ---
+    property bool colorExportEnabled: false
+    property bool colorExportKitty: false
+    property bool colorExportGtkScheme: false
+
     // --- INTERNAL ---
     property bool debug: false
-    property bool _loading: false
+    property bool pauseAutoSave: false
+    property bool configReady: false
     property bool _syncingLegacyBarSettings: false
 
     readonly property int maxBars: 4
@@ -702,11 +713,11 @@ QtObject {
         var last = history.pop();
         
         // Block save during restore to avoid loops
-        _loading = true;
+        pauseAutoSave = true;
         barLeftEntries = last.left;
         barCenterEntries = last.center;
         barRightEntries = last.right;
-        _loading = false;
+        pauseAutoSave = false;
         
         _modularLayoutHistory = history;
         scheduleSave();
@@ -767,7 +778,7 @@ QtObject {
     }
 
     function scheduleSave() {
-        if (!_loading)
+        if (!pauseAutoSave)
             saveTimer.restart();
     }
 
@@ -776,11 +787,12 @@ QtObject {
         var raw = configFile.text();
         if (!raw) {
             ConfigPersistence.initializeDefaults(root);
+            configReady = true;
             done();
             return;
         }
 
-        _loading = true;
+        pauseAutoSave = true;
 
         try {
             var data = JSON.parse(raw);
@@ -792,7 +804,8 @@ QtObject {
 
         ensureSelectedBar();
         syncLegacyBarSettingsFromPrimary();
-        _loading = false;
+        pauseAutoSave = false;
+        configReady = true;
         applyRuntimeSettings();
         done();
     }
@@ -805,10 +818,12 @@ QtObject {
         onLoadFailed: error => {
             if (error === 2) {
                 ConfigPersistence.initializeDefaults(root);
+                root.configReady = true;
                 root.save();
                 return;
             }
             Logger.e("Config", "Failed to load config file:", error);
+            root.configReady = true;
         }
         onSaveFailed: error => Logger.e("Config", "Failed to save config file:", error)
     }

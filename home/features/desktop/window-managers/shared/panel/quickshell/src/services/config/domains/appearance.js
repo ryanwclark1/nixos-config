@@ -17,5 +17,6 @@ var maps = [
     ["autoEcoMode", "autoEcoMode"],
     ["personalityGifEnabled", "personalityGifEnabled"],
     ["personalityGifPath", "personalityGifPath", _strDef],
-    ["personalityGifReactionMode", "personalityGifReactionMode", _strDef]
+    ["personalityGifReactionMode", "personalityGifReactionMode", _strDef],
+    ["oledMode", "oledMode"]
 ]
