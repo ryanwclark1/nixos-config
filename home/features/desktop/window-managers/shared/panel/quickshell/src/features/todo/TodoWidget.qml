@@ -88,7 +88,7 @@ Item {
       Layout.topMargin: Colors.spacingL
       Layout.bottomMargin: Colors.spacingL
       Layout.alignment: Qt.AlignHCenter
-      icon: "󰝦"
+      icon: "checkmark.svg"
       message: "No tasks yet"
       visible: TodoService.totalCount === 0
     }

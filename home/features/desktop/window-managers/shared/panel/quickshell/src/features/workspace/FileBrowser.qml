@@ -493,7 +493,7 @@ PanelWindow {
 
               SharedWidgets.EmptyState {
                 anchors.centerIn: parent
-                icon: "󰉋"
+                icon: "folder.svg"
                 message: "This folder is empty"
                 iconSize: 36
               }
