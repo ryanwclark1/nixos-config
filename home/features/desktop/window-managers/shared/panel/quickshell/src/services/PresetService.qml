@@ -111,13 +111,13 @@ QtObject {
     }
 
     function _applyPresetData(data) {
-        Config._loading = true;
+        Config.pauseAutoSave = true;
         try {
             ConfigPersistence.applyData(Config, data);
             Config.ensureSelectedBar();
             Config.syncLegacyBarSettingsFromPrimary();
         } finally {
-            Config._loading = false;
+            Config.pauseAutoSave = false;
         }
         Config.applyRuntimeSettings();
         Config.save();

@@ -19,6 +19,7 @@ QtObject {
     readonly property var hookCatalog: [
         { name: "wallpaper-changed", category: "Appearance", description: "Wallpaper changed on any monitor", valueDescription: "wallpaper file path" },
         { name: "theme-changed", category: "Appearance", description: "Theme changed", valueDescription: "theme name" },
+        { name: "colors-changed", category: "Appearance", description: "Shell colors changed (after transition)", valueDescription: "path to colors-export.json" },
         { name: "nightlight-toggled", category: "Appearance", description: "Night light toggled", valueDescription: "enabled or disabled" },
         { name: "battery-level", category: "Power", description: "Battery level changed (5% increments)", valueDescription: "0-100" },
         { name: "power-source-changed", category: "Power", description: "AC/battery power source changed", valueDescription: "ac or battery" },

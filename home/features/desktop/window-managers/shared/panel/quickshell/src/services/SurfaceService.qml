@@ -475,7 +475,7 @@ QtObject {
     }
 
     onActiveSurfaceIdChanged: {
-        if (!Config._loading && Config.activeSurfaceId !== activeSurfaceId) {
+        if (!Config.pauseAutoSave && Config.activeSurfaceId !== activeSurfaceId) {
             Config.activeSurfaceId = activeSurfaceId;
         }
     }
