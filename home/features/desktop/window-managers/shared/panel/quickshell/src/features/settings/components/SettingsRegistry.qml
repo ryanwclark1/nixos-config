@@ -397,6 +397,23 @@ QtObject {
             }
         },
         {
+            id: "screenshot",
+            label: "Screenshot",
+            shortLabel: "Screenshot",
+            description: "Editor, capture delay, OCR language, and screenshot history.",
+            pageStyle: "control",
+            icon: "󰹑",
+            categoryId: "interaction",
+            order: 55,
+            component: "ScreenshotTab.qml",
+            searchTerms: ["screenshot", "capture", "swappy", "satty", "editor", "ocr", "delay"],
+            owner: {
+                surface: "",
+                service: "ScreenshotService",
+                configDomain: "screenshot"
+            }
+        },
+        {
             id: "recording",
             label: "Recording",
             shortLabel: "Recording",

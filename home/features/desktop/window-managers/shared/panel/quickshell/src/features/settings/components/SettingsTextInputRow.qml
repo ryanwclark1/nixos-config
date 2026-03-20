@@ -73,13 +73,12 @@ ColumnLayout {
                 anchors.rightMargin: Colors.spacingM
                 spacing: Colors.spacingS
 
-                Text {
+                Loader {
                     visible: root.leadingIcon !== ""
-                    text: root.leadingIcon
-                    color: Colors.textDisabled
-                    font.family: Colors.fontMono
-                    font.pixelSize: Colors.fontSizeLarge
+                    sourceComponent: root.leadingIcon.endsWith(".svg") ? _tiSvg : _tiNerd
                 }
+                Component { id: _tiSvg; SvgIcon { source: root.leadingIcon; color: Colors.textDisabled; size: Colors.fontSizeLarge } }
+                Component { id: _tiNerd; Text { text: root.leadingIcon; color: Colors.textDisabled; font.family: Colors.fontMono; font.pixelSize: Colors.fontSizeLarge } }
 
                 TextInput {
                     id: input
