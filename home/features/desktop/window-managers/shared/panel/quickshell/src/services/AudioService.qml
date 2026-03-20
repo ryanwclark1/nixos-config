@@ -8,19 +8,27 @@ import "AudioHelpers.js" as AudioHelpers
 QtObject {
     id: root
 
-    // ── Output (sink) state ──────────────────────
-    readonly property real outputVolume: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio
+    readonly property int _wpctlPollIntervalMs: 1500
+    readonly property real _pipewireOutputVolume: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio
         ? AudioHelpers.normalizeVolume(Pipewire.defaultAudioSink.audio.volume, 1.0)
         : 0
-    readonly property bool outputMuted: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio ? Pipewire.defaultAudioSink.audio.muted : false
+    readonly property bool _pipewireOutputMuted: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio ? Pipewire.defaultAudioSink.audio.muted : false
+    readonly property real _pipewireInputVolume: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio
+        ? AudioHelpers.normalizeVolume(Pipewire.defaultAudioSource.audio.volume, 1.0)
+        : 0
+    readonly property bool _pipewireInputMuted: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Pipewire.defaultAudioSource.audio.muted : false
+    readonly property var _outputWpctlState: _outputPoll.value
+    readonly property var _inputWpctlState: _inputPoll.value
+
+    // ── Output (sink) state ──────────────────────
+    readonly property real outputVolume: _outputWpctlState ? _outputWpctlState.volume : _pipewireOutputVolume
+    readonly property bool outputMuted: _outputWpctlState ? _outputWpctlState.muted : _pipewireOutputMuted
     readonly property string outputLabel: _sinkDescription()
     readonly property string outputDeviceType: _detectDeviceType()
 
     // ── Input (source) state ─────────────────────
-    readonly property real inputVolume: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio
-        ? AudioHelpers.normalizeVolume(Pipewire.defaultAudioSource.audio.volume, 1.0)
-        : 0
-    readonly property bool inputMuted: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Pipewire.defaultAudioSource.audio.muted : false
+    readonly property real inputVolume: _inputWpctlState ? _inputWpctlState.volume : _pipewireInputVolume
+    readonly property bool inputMuted: _inputWpctlState ? _inputWpctlState.muted : _pipewireInputMuted
     readonly property string inputLabel: _sourceDescription()
 
     // ── Device lists (reactive from PipeWire) ────
@@ -59,6 +67,20 @@ QtObject {
 
     property PwObjectTracker _nodeTracker: PwObjectTracker {
         objects: _allAudioNodes()
+    }
+
+    property CommandPoll _outputPoll: CommandPoll {
+        interval: root._wpctlPollIntervalMs
+        running: root.subscriberCount > 0
+        command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
+        parse: function(out) { return AudioHelpers.parseWpctlVolume(out, 1.0); }
+    }
+
+    property CommandPoll _inputPoll: CommandPoll {
+        interval: root._wpctlPollIntervalMs
+        running: root.subscriberCount > 0
+        command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SOURCE@"]
+        parse: function(out) { return AudioHelpers.parseWpctlVolume(out, 1.0); }
     }
 
     // ── Helpers ──────────────────────────────────
@@ -148,6 +170,21 @@ QtObject {
         return target === "@DEFAULT_AUDIO_SINK@" ? root.outputMuted : root.inputMuted;
     }
 
+    function _defaultDeviceVolume(isSinkList, nodeId, fallbackVolume) {
+        if (isSinkList && nodeId === root.defaultSinkId)
+            return root.outputVolume;
+        if (!isSinkList && nodeId === root.defaultSourceId)
+            return root.inputVolume;
+        return fallbackVolume;
+    }
+
+    function _triggerTargetPoll(target) {
+        if (target === "@DEFAULT_AUDIO_SINK@")
+            root._outputPoll.poll();
+        else if (target === "@DEFAULT_AUDIO_SOURCE@")
+            root._inputPoll.poll();
+    }
+
     function _buildDeviceList(isSinkList) {
         if (!Pipewire.ready) return [];
         var nodes = Pipewire.nodes?.values ?? [];
@@ -167,7 +204,7 @@ QtObject {
                 name: displayName,
                 key: String(node.name || (node.properties ? node.properties["node.name"] : "") || displayName),
                 matchKeys: _deviceMatchKeys(node, displayName),
-                volume: vol,
+                volume: root._defaultDeviceVolume(isSinkList, node.id, vol),
                 muted: node.audio.muted || false,
                 isDefault: node.id === defaultId
             });
@@ -252,6 +289,11 @@ QtObject {
             node.audio.volume = clamped;
         }
 
+        if (clamped > 0)
+            Quickshell.execDetached(["wpctl", "set-mute", target, "0"]);
+        Quickshell.execDetached(["wpctl", "set-volume", target, clamped.toFixed(3)]);
+        root._triggerTargetPoll(target);
+
         if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")
             root._sendOsdIpc(isSink, clamped * 100, false);
     }
@@ -276,6 +318,9 @@ QtObject {
 
         if (node && node.audio)
             node.audio.muted = !currentlyMuted;
+
+        Quickshell.execDetached(["wpctl", "set-mute", target, currentlyMuted ? "0" : "1"]);
+        root._triggerTargetPoll(target);
 
         var vol = isSink ? root.outputVolume : root.inputVolume;
         if (isSink || target === "@DEFAULT_AUDIO_SOURCE@")

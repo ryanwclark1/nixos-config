@@ -14,3 +14,15 @@ function normalizeVolume(value, maxValue) {
 
     return Math.min(numeric, limit);
 }
+
+function parseWpctlVolume(output, maxValue) {
+    var text = String(output || "");
+    var match = text.match(/Volume:\s+([0-9]+(?:\.[0-9]+)?)/);
+    if (!match)
+        return null;
+
+    return {
+        volume: normalizeVolume(match[1], maxValue),
+        muted: text.indexOf("[MUTED]") !== -1
+    };
+}
