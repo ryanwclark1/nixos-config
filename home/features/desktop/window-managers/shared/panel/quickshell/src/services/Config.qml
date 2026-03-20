@@ -55,6 +55,7 @@ QtObject {
     property string timeBarDateStyle: "weekday_short" // weekday_short | month_day | weekday_month_day
 
     // --- WEATHER ---
+    property string weatherProvider: "open-meteo" // open-meteo | wttr
     property string weatherUnits: "metric" // metric | imperial
     property bool weatherAutoLocation: true
     property string weatherCityQuery: ""

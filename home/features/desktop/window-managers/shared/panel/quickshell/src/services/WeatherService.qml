@@ -314,12 +314,12 @@ QtObject {
           
           root.aqi = String(v);
           root.aqiCategory = useUS ? root._aqiCategoryUS(v) : root._aqiCategoryEU(v);
-          root.pm25 = cur.pm2_5 ? String(Math.round(cur.pm2_5 * 10) / 10) : "--";
-          root.pm10 = cur.pm10 ? String(Math.round(cur.pm10 * 10) / 10) : "--";
-          root.no2 = cur.nitrogen_dioxide ? String(Math.round(cur.nitrogen_dioxide * 10) / 10) : "--";
-          root.o3 = cur.ozone ? String(Math.round(cur.ozone * 10) / 10) : "--";
-          root.so2 = cur.sulphur_dioxide ? String(Math.round(cur.sulphur_dioxide * 10) / 10) : "--";
-          root.co = cur.carbon_monoxide ? String(Math.round(cur.carbon_monoxide * 10) / 10) : "--";
+          root.pm25 = (cur.pm2_5 !== undefined) ? String(Math.round(cur.pm2_5 * 10) / 10) : "--";
+          root.pm10 = (cur.pm10 !== undefined) ? String(Math.round(cur.pm10 * 10) / 10) : "--";
+          root.no2 = (cur.nitrogen_dioxide !== undefined) ? String(Math.round(cur.nitrogen_dioxide * 10) / 10) : "--";
+          root.o3 = (cur.ozone !== undefined) ? String(Math.round(cur.ozone * 10) / 10) : "--";
+          root.so2 = (cur.sulphur_dioxide !== undefined) ? String(Math.round(cur.sulphur_dioxide * 10) / 10) : "--";
+          root.co = (cur.carbon_monoxide !== undefined) ? String(Math.round(cur.carbon_monoxide * 10) / 10) : "--";
         } catch (e) {
           // ignore AQI failures
         }

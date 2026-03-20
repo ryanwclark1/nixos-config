@@ -53,6 +53,9 @@ QtObject {
         function onTimeBarDateStyleChanged() {
             root.config.scheduleSave();
         }
+        function onWeatherProviderChanged() {
+            root.config.scheduleSave();
+        }
         function onWeatherUnitsChanged() {
             root.config.scheduleSave();
         }

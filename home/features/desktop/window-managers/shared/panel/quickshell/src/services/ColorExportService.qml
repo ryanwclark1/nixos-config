@@ -178,9 +178,17 @@ QtObject {
         }
     }
 
-    // Initial export on startup (after first color load settles)
+    // Initial export: wait for colors to actually be loaded before scheduling
+    property Connections _readyConn: Connections {
+        target: Colors
+        function onColorsReadyChanged() {
+            if (Colors.colorsReady && Config.colorExportEnabled)
+                root._pendingExport = true;
+        }
+    }
+
     Component.onCompleted: {
-        if (Config.colorExportEnabled)
+        if (Config.colorExportEnabled && Colors.colorsReady)
             _pendingExport = true;
     }
 }
