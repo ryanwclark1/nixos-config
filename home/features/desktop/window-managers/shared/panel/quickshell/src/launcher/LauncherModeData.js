@@ -9,7 +9,7 @@ var modePrefixes = "!/@?>=,:;~";
 var modeMeta = {
     "drun": { label: "Apps", shortLabel: "Apps", heroLabel: "Application Launch", heroIcon: "apps.svg", hint: "Launch applications", prefix: "", tone: "primary" },
     "window": { label: "Windows", shortLabel: "Windows", heroLabel: "Window Switch", heroIcon: "window-shield.svg", hint: "Jump to an open window with ~", prefix: "~", tone: "info" },
-    "files": { label: "Files", shortLabel: "Files", heroLabel: "File Search", heroIcon: "folder.svg", hint: "Search home with /", prefix: "/", tone: "warning" },
+    "files": { label: "Files", shortLabel: "Files", heroLabel: "File Search", heroIcon: "folder.svg", hint: "Search files with /", prefix: "/", tone: "warning" },
     "ai": { label: "AI", shortLabel: "AI", heroLabel: "AI Prompt", heroIcon: "chat.svg", hint: "Ask with !", prefix: "!", tone: "accent" },
     "clip": { label: "Clipboard", shortLabel: "Clipboard", heroLabel: "Clipboard History", heroIcon: "copy.svg", hint: "Recent clipboard history", prefix: "", tone: "secondary" },
     "emoji": { label: "Characters", shortLabel: "Chars", heroLabel: "Character Search", heroIcon: "star.svg", hint: "Search characters with :", prefix: ":", tone: "warning" },

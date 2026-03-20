@@ -446,6 +446,37 @@ function rankFileItem(item, cleanLower) {
     return score;
 }
 
+function compareFileBrowseItems(a, b) {
+    var aIsDir = String(a && a.fileKind || "") === "dir";
+    var bIsDir = String(b && b.fileKind || "") === "dir";
+    if (aIsDir !== bIsDir)
+        return aIsDir ? -1 : 1;
+    var usageDiff = Number(b && b._fileUsageBoost || 0) - Number(a && a._fileUsageBoost || 0);
+    if (Math.abs(usageDiff) > 0.01)
+        return usageDiff > 0 ? 1 : -1;
+    var aPath = String(a && (a.relativePath || a.fullPath || a.name) || "");
+    var bPath = String(b && (b.relativePath || b.fullPath || b.name) || "");
+    return aPath < bPath ? -1 : aPath > bPath ? 1 : 0;
+}
+
+function browseFileItems(items, limit) {
+    var source = Array.isArray(items) ? items : [];
+    var results = [];
+    var numericLimit = Number(limit);
+    var max = isNaN(numericLimit) ? source.length : Math.max(1, numericLimit);
+    for (var i = 0; i < source.length; ++i) {
+        var item = source[i];
+        if (!item || Number(item.pathDepth || 0) !== 0)
+            continue;
+        item._score = Number(item._fileUsageBoost || 0);
+        results.push(item);
+    }
+    results.sort(compareFileBrowseItems);
+    if (results.length > max)
+        results.length = max;
+    return results;
+}
+
 // Safe arithmetic evaluator — handles +, -, *, /, parentheses, decimals.
 // Replaces eval() for calculator mode to eliminate code injection surface.
 function safeCalcEval(expr) {

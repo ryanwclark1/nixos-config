@@ -10,6 +10,13 @@ function _humanFileRootLabel(fileRootLabel, fallback) {
     return label;
 }
 
+function fileModeHint(fileRootLabel) {
+    var label = String(fileRootLabel || "").trim();
+    if (label === "" || label === "~")
+        return "Search home with /";
+    return "Search " + label + " with /";
+}
+
 function emptyStateTitle(mode, clean, fileMinQueryLength, fileRootLabel) {
     if (mode === "files") {
         if (clean.length < fileMinQueryLength)
@@ -90,7 +97,7 @@ function emptySecondaryCta(mode, clean, searchText, webSecondaryName) {
 function emptyPrimaryHint(mode, clean, webPrimaryName, webPrimaryHintName, fileRootLabel) {
     var hintName = webPrimaryHintName || webPrimaryName;
     if (mode === "files")
-        return "Open " + _humanFileRootLabel(fileRootLabel, "the configured search root") + " in the configured file opener.";
+        return "Open " + _humanFileRootLabel(fileRootLabel, "the configured default search directory") + " in the configured file opener.";
     if (mode === "web")
         return clean !== "" ? "Search " + hintName + " using the current query." : "Open " + hintName + " homepage.";
     if (mode === "ai")

@@ -35,6 +35,41 @@ function itemProviderLabel(mode, item) {
     return "";
 }
 
+function keybindCommandSummary(item) {
+    if (!item)
+        return "";
+    var dispatcher = String(item.disp || "").trim();
+    var args = String(item.args || "").trim();
+    if (dispatcher !== "" && args !== "")
+        return dispatcher + " " + args;
+    return dispatcher || args;
+}
+
+function normalizeKeybindItem(item) {
+    var source = item || {};
+    var chord = String(source.name || "").trim();
+    var description = String(source.desc || "").trim();
+    var primary = description || chord || "Keybind";
+    var commandSummary = keybindCommandSummary(source);
+
+    return Object.assign({}, source, {
+        id: source.id || [chord, source.disp || "", source.args || ""].join("|"),
+        name: primary,
+        title: chord !== "" && chord !== primary ? chord : "",
+        description: description,
+        body: commandSummary,
+        icon: source.icon || "keyboard.svg"
+    });
+}
+
+function normalizeKeybindItems(items) {
+    if (!Array.isArray(items))
+        return [];
+    return items.map(function(item) {
+        return normalizeKeybindItem(item);
+    });
+}
+
 function buildRecentEntry(mode, item) {
     if (mode === "run") {
         return {

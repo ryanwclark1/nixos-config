@@ -132,6 +132,8 @@ function escapeActionStateObject(props) {
 }
 
 function launcherStateObject(props) {
+    var hudHeight = Number(props.hudHeight || 0);
+    var resultsHeight = Number(props.resultsHeight || 0);
     return ({
             visible: props.launcherOpacity > 0,
             mode: String(props.mode || ""),
@@ -175,6 +177,13 @@ function launcherStateObject(props) {
             hudY: props.hudY,
             hudWidth: props.hudWidth,
             hudHeight: props.hudHeight,
-            hudScale: props.hudScale
+            hudScale: props.hudScale,
+            windowChromeHeight: Number(props.windowChromeHeight || 0),
+            searchDeckHeight: Number(props.searchDeckHeight || 0),
+            utilityBandHeight: Number(props.utilityBandHeight || 0),
+            metricsHeight: Number(props.metricsHeight || 0),
+            homeHeight: Number(props.homeHeight || 0),
+            resultsHeight: resultsHeight,
+            resultsHeightRatio: hudHeight > 0 ? (resultsHeight / hudHeight) : 0
         });
 }
