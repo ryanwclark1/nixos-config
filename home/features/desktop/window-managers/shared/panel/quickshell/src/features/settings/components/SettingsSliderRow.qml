@@ -7,6 +7,7 @@ Rectangle {
 
     property string label
     property string icon: ""
+    property string description: ""
     property real min
     property real max
     property real value
@@ -69,13 +70,27 @@ Rectangle {
 
             SettingsIconBox { icon: root.icon }
 
-            Text {
-                text: root.label
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
-                font.weight: Font.DemiBold
+            ColumnLayout {
                 Layout.fillWidth: true
-                wrapMode: Text.WordWrap
+                spacing: Colors.spacingXXS
+
+                Text {
+                    text: root.label
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
+
+                Text {
+                    visible: root.description !== ""
+                    text: root.description
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
             }
 
             Rectangle {

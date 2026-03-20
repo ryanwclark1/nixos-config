@@ -9,6 +9,7 @@ Rectangle {
 
     property string label
     property string icon
+    property string description: ""
     property string configKey: ""
     property bool checked: configKey ? Config[configKey] : false
     property string enabledText: "Enabled"
@@ -62,13 +63,27 @@ Rectangle {
 
             SettingsIconBox { icon: root.icon; active: root._active }
 
-            Text {
-                text: root.label
-                color: Colors.text
-                font.pixelSize: Colors.fontSizeMedium
-                font.weight: Font.DemiBold
+            ColumnLayout {
                 Layout.fillWidth: true
-                wrapMode: Text.WordWrap
+                spacing: Colors.spacingXXS
+
+                Text {
+                    text: root.label
+                    color: Colors.text
+                    font.pixelSize: Colors.fontSizeMedium
+                    font.weight: Font.DemiBold
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
+
+                Text {
+                    visible: root.description !== ""
+                    text: root.description
+                    color: Colors.textSecondary
+                    font.pixelSize: Colors.fontSizeSmall
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
             }
 
             SharedWidgets.ToggleSwitch {

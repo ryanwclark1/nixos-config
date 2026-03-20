@@ -158,6 +158,37 @@ Item {
         }
 
         SettingsSectionGroup {
+            title: "Color Export"
+            description: "Export shell colors to files and propagate to downstream apps when the palette changes."
+
+            SettingsCard {
+                title: "Color Export"
+                iconName: "color.svg"
+                description: "Write the active color palette to ~/.local/state/quickshell/ as JSON and shell variables. Fires the colors-changed hook."
+
+                SettingsToggleRow {
+                    label: "Enable Color Export"
+                    icon: "󰏘"
+                    configKey: "colorExportEnabled"
+                }
+
+                SettingsToggleRow {
+                    label: "Kitty Remote Colors"
+                    icon: "󰄛"
+                    configKey: "colorExportKitty"
+                    description: "Send colors to running kitty instances via remote control"
+                }
+
+                SettingsToggleRow {
+                    label: "GTK Dark/Light Scheme"
+                    icon: "󰔎"
+                    configKey: "colorExportGtkScheme"
+                    description: "Toggle gsettings color-scheme based on light/dark theme"
+                }
+            }
+        }
+
+        SettingsSectionGroup {
             title: "Hook Catalog"
             description: "Available hook entry points grouped by category, with per-hook template generation."
 
