@@ -350,7 +350,7 @@ PanelWindow {
               if (root.manager) root.manager.dismissNotification(notification);
             }
             onReplySent: function(text) {
-              notification.invoke(text);
+              notification.sendInlineReply(text);
               if (root.manager) root.manager.dismissNotification(notification);
             }
           }

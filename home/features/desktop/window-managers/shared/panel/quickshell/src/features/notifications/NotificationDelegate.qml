@@ -257,10 +257,10 @@ Rectangle {
         delegate: SharedWidgets.Button {
           Layout.fillWidth: true
           Layout.preferredHeight: 32
-          text: modelData.label || ""
+          text: modelData.text || ""
           fontSize: Colors.fontSizeSmall
           onClicked: {
-            var label = (modelData.label || "").toLowerCase();
+            var label = (modelData.text || "").toLowerCase();
             if (label.includes("reply")) {
               root.isReplying = true;
               replyInput.forceActiveFocus();
