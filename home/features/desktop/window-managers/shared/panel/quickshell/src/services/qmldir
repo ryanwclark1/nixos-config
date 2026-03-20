@@ -2,6 +2,7 @@ singleton AiService 1.0 AiService.qml
 singleton AMDGPUService 1.0 AMDGPUService.qml
 singleton AudioService 1.0 AudioService.qml
 singleton AppCatalogService 1.0 AppCatalogService.qml
+singleton AutoHideCoordinator 1.0 AutoHideCoordinator.qml
 singleton BarWidgetRegistry 1.0 ../features/bar/registry/BarWidgetRegistry.qml
 singleton BrightnessService 1.0 BrightnessService.qml
 singleton CaffeineService 1.0 CaffeineService.qml
