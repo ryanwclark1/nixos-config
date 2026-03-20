@@ -23,15 +23,6 @@ if [[ -z "${poll_attempts}" ]]; then
   poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
 fi
 
-if [[ -z "${qa_qemu_opts}" ]]; then
-  default_vnc_display=$(( ssh_port % 1000 ))
-  qa_qemu_opts="-vga none -device virtio-vga -display vnc=127.0.0.1:${default_vnc_display}"
-fi
-
-if [[ -z "${launcher_log}" ]]; then
-  launcher_log="/tmp/hyprland-test-vm-qa-${ssh_port}.log"
-fi
-
 usage() {
   cat <<'EOF'
 Usage: run-hyprland-panel-qa.sh [--output-dir DIR] [--mode panel|settings|surfaces|launcher|settings-qa|gate]
@@ -94,6 +85,15 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "${qa_qemu_opts}" ]]; then
+  default_vnc_display=$(( ssh_port % 1000 ))
+  qa_qemu_opts="-vga none -device virtio-vga -display vnc=127.0.0.1:${default_vnc_display}"
+fi
+
+if [[ -z "${launcher_log}" ]]; then
+  launcher_log="/tmp/hyprland-test-vm-qa-${ssh_port}.log"
+fi
 
 if [[ -z "${vm_output_dir}" ]]; then
   vm_output_dir="/tmp/panel-qa-${capture_mode}-$(date +%Y%m%d-%H%M%S)"

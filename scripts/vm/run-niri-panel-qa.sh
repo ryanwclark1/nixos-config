@@ -25,10 +25,6 @@ if [[ -z "${poll_attempts}" ]]; then
   poll_attempts=$(( (boot_timeout + poll_delay - 1) / poll_delay ))
 fi
 
-if [[ -z "${launcher_log}" ]]; then
-  launcher_log="/tmp/niri-test-vm-qa-${ssh_port}.log"
-fi
-
 usage() {
   cat <<'EOF'
 Usage: run-niri-panel-qa.sh [--output-dir DIR] [--mode panel|settings|surfaces|settings-qa|gate]
@@ -90,6 +86,10 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "${launcher_log}" ]]; then
+  launcher_log="/tmp/niri-test-vm-qa-${ssh_port}.log"
+fi
 
 if [[ -z "${vm_output_dir}" ]]; then
   vm_output_dir="/tmp/panel-qa-${capture_mode}-$(date +%Y%m%d-%H%M%S)"
