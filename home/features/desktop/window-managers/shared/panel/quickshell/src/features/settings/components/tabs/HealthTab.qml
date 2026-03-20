@@ -72,7 +72,7 @@ Item {
             }
 
             SettingsDataRow {
-                iconName: "󱑎"
+                iconName: "clock.svg"
                 label: "Last Check"
                 value: SystemStatus.lastHealthCheckTime.getTime() > 0
                     ? Qt.formatDateTime(SystemStatus.lastHealthCheckTime, "hh:mm:ss") : "Never"
@@ -87,7 +87,7 @@ Item {
             }
 
             SettingsDataRow {
-                iconName: "󰑣"
+                iconName: "checkmark.svg"
                 label: "Health Scripts"
                 value: SystemStatus._helperScriptsAvailable ? "Available" : "Unavailable"
                 monoValue: true
@@ -97,7 +97,7 @@ Item {
         // Active Incidents
         SettingsCard {
             title: "Active Incidents"
-            iconName: "󰀦"
+            iconName: "error.svg"
             description: SystemStatus.activeIncidents.length > 0
                 ? SystemStatus.activeIncidents.length + " active incident(s) detected."
                 : "No active incidents."

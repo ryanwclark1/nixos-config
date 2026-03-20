@@ -196,7 +196,7 @@ BasePopupMenu {
 
                 // Printer icon
                 SharedWidgets.SvgIcon {
-                  source: "dismiss.svg"
+                  source: "print.svg"
                   color: printerCard.isDisabled ? Colors.textDisabled
                        : printerCard.isPrinting ? Colors.warning
                        : Colors.primary

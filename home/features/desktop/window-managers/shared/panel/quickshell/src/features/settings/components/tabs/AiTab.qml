@@ -270,7 +270,7 @@ Item {
 
         SettingsCard {
             title: "Generation"
-            iconName: "󰘦"
+            iconName: "sparkle.svg"
             description: "Control response length and creativity."
 
             SettingsSliderRow {

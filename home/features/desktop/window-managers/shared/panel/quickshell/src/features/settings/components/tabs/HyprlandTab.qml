@@ -15,7 +15,7 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Hyprland Layout"
-        iconName: "󱗼"
+        iconName: "window-multiple.svg"
 
         SettingsCard {
             title: "Display Configuration"
@@ -37,7 +37,7 @@ Item {
 
         SettingsCard {
             title: "Window Layout"
-            iconName: "󱗼"
+            iconName: "window-multiple.svg"
             description: "Select layout mode and tune gap and opacity values."
 
             SettingsToggleRow {

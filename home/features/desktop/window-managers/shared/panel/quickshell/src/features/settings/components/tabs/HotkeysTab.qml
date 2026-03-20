@@ -135,7 +135,7 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "Keybindings"
-        iconName: "󱕴"
+        iconName: "keyboard-settings.svg"
 
         SettingsCard {
             title: "Search"

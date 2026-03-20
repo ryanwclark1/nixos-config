@@ -31,7 +31,7 @@ Item {
                 SettingsCard {
                     Layout.fillWidth: true
                     title: "System Status"
-                    iconName: "󰄧"
+                    iconName: "heart-pulse.svg"
 
                     ColumnLayout {
                         Layout.fillWidth: true

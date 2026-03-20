@@ -869,12 +869,11 @@ Item {
                                 implicitWidth: 24
                                 radius: Appearance.radiusCard
 
-                                Text {
+                                SettingsMetricIcon {
                                     anchors.centerIn: parent
-                                    color: Colors.primary
-                                    font.family: Appearance.fontMono
-                                    font.pixelSize: Appearance.fontSizeSmall
-                                    text: {
+                                    iconColor: Colors.primary
+                                    iconSize: Appearance.fontSizeSmall
+                                    icon: {
                                         for (var i = 0; i < root.webProviders.length; ++i) {
                                             if (root.webProviders[i].key === webProviderRow.modelData)
                                                 return root.webProviders[i].icon;
@@ -1037,12 +1036,11 @@ Item {
                         border.color: Colors.border
                         border.width: 1
 
-                        Text {
+                        SettingsMetricIcon {
                             anchors.centerIn: parent
-                            color: Colors.primary
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeSmall
-                            text: customEngineRow.modelData.icon || "󰖟"
+                            iconColor: Colors.primary
+                            iconSize: Appearance.fontSizeSmall
+                            icon: customEngineRow.modelData.icon || "󰖟"
                         }
                     }
 

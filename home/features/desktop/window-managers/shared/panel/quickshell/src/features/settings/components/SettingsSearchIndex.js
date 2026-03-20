@@ -202,6 +202,7 @@ var entries = [
     { tabId: "time-weather", cardTitle: "Time Format", label: "Show Date In Bar", keywords: "bar date display", type: "toggle" },
     { tabId: "time-weather", cardTitle: "Time Format", label: "Bar Date Style", keywords: "bar date format weekday month", type: "mode" },
     { tabId: "time-weather", cardTitle: "Weather & Location", label: "Units", keywords: "weather units metric imperial celsius fahrenheit", type: "mode" },
+    { tabId: "time-weather", cardTitle: "Weather & Location", label: "Animated weather in bar and menus", keywords: "weather animation animated bar menu icon rain snow fog thunder", type: "toggle" },
     { tabId: "time-weather", cardTitle: "Weather & Location", label: "Location Priority", keywords: "weather location priority auto city", type: "mode" },
     { tabId: "time-weather", cardTitle: "Weather & Location", label: "Auto Location", keywords: "weather auto location gps", type: "toggle" },
     { tabId: "time-weather", cardTitle: "Weather & Location", label: "City", keywords: "weather city name", type: "text" },

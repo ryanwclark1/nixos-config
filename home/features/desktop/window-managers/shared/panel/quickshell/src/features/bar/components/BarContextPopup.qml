@@ -174,14 +174,15 @@ PopupWindow {
                             anchors.rightMargin: Appearance.spacingS
                             spacing: Appearance.spacingS
 
-                            Text {
+                            Loader {
                                 visible: !!modelData.icon
-                                text: modelData.icon || ""
-                                color: modelData.danger ? Colors.error
+                                property string _ic: modelData.icon || ""
+                                property color _co: modelData.danger ? Colors.error
                                     : (modelData.disabled ? Colors.textDisabled : Colors.textSecondary)
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeMedium
+                                sourceComponent: _ic.endsWith(".svg") ? _bcpSvg : _bcpNerd
                             }
+                            Component { id: _bcpSvg; SvgIcon { source: parent._ic; color: parent._co; size: Appearance.fontSizeMedium } }
+                            Component { id: _bcpNerd; Text { text: parent._ic; color: parent._co; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeMedium } }
 
                             Text {
                                 text: modelData.label || ""
