@@ -396,7 +396,7 @@ BasePopupMenu {
             Rectangle {
               Layout.fillWidth: true
               implicitHeight: 14
-              radius: 3
+              radius: Colors.radiusXS3
               color: Colors.withAlpha(Colors.text, Colors.primaryFaint)
 
               Rectangle {

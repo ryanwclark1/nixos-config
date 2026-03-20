@@ -143,7 +143,7 @@ Rectangle {
       Rectangle {
         visible: root.isCurrentMonth
         width: 6; height: 6
-        radius: 3
+        radius: Colors.radiusXS3
         color: Colors.primary
         Layout.leftMargin: Colors.spacingXS
       }

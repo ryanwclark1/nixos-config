@@ -158,9 +158,11 @@ run_one_vm() {
   fi
 
   set +e
-  "${cmd[@]}" 2>&1 | tee "${host_log}"
-  exit_code=${PIPESTATUS[0]}
+  "${cmd[@]}" >"${host_log}" 2>&1
+  exit_code=$?
   set -e
+
+  cat "${host_log}"
 
   printf '%s' "${exit_code}" > "${vm_dir}/exit-code.txt"
   return "${exit_code}"

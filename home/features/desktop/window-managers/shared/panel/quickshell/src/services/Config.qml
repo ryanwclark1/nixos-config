@@ -357,6 +357,7 @@ QtObject {
     property int aiMaxMessages: 100                // per conversation
     property string aiProviderProfiles: "{}"       // JSON — per-provider model/temp/tokens/endpoint
     property int aiTimeout: 120                    // seconds, passed to curl --max-time
+    property bool aiToolCallAutoReply: false        // auto-send tool output back to AI
 
     // --- STATE RECOVERY ---
     property string activeSurfaceId: ""

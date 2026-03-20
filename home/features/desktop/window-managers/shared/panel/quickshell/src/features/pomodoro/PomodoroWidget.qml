@@ -49,7 +49,7 @@ ThemedContainer {
           model: PomodoroService.cyclesBeforeLongBreak
           delegate: Rectangle {
             width: 6; height: 6
-            radius: 3
+            radius: Colors.radiusXS3
             color: index < PomodoroService.cycle
               ? Colors.primary
               : Colors.withAlpha(Colors.text, Colors.textFaint * 2)
