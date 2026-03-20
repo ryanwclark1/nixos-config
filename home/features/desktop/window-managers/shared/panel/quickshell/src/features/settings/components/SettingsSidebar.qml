@@ -598,7 +598,7 @@ Rectangle {
                                         text: expanded ? "󰅀" : "󰅂"
                                         color: Colors.textDisabled
                                         font.family: Colors.fontMono
-                                        font.pixelSize: 10
+                                        font.pixelSize: Colors.fontSizeCaption
                                         opacity: 0.4
                                     }
                                 }

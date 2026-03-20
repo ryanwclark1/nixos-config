@@ -313,7 +313,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: String(root.launcher.overflowHintText || "")
                     color: Colors.textDisabled
-                    font.pixelSize: 10
+                    font.pixelSize: Colors.fontSizeCaption
                     wrapMode: Text.WordWrap
                 }
             }

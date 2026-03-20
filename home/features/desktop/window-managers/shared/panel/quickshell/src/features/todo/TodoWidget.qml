@@ -168,7 +168,7 @@ Item {
               text: ""
               color: Colors.primary
               font.family: Colors.fontMono
-              font.pixelSize: 10
+              font.pixelSize: Colors.fontSizeCaption
               opacity: row.taskDone ? 1 : 0
               Behavior on opacity { NumberAnimation { duration: Colors.durationSnap } }
             }

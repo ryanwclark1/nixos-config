@@ -440,6 +440,9 @@ QtObject {
         function onAiTimeoutChanged() {
             root.config.scheduleSave();
         }
+        function onAiToolCallAutoReplyChanged() {
+            root.config.scheduleSave();
+        }
         function onWallpaperRunPywalChanged() {
             root.config.scheduleSave();
         }
