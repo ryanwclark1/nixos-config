@@ -378,6 +378,8 @@ call_ipc() {
 
 cleanup() {
   call_ipc SettingsHub close >/dev/null 2>&1 || true
+  refresh_instance_id >/dev/null 2>&1 || true
+  quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true
   if [[ -n "${restore_workspace}" ]]; then
     focus_workspace "${restore_workspace}" >/dev/null 2>&1 || true
   fi
@@ -436,6 +438,7 @@ main() {
 
   switch_to_capture_workspace "${workspace_target}"
 
+  quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces >/dev/null 2>&1 || true
   call_ipc SettingsHub close >/dev/null 2>&1 || true
   if (( scroll_y > 0 )); then
     if ! call_ipc SettingsHub openTabScrolled "${tab_id}" "${scroll_y}" >/dev/null; then
