@@ -191,19 +191,19 @@ QtObject {
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the notifications widget adapts to bar orientation automatically, always shows extra status text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
       { type: "mode", key: "badgeStyle", label: "Badge Style", description: "Choose whether unread notifications show as a dot, a count, or no badge at all.", options: [ { value: "dot", label: "Dot" }, { value: "count", label: "Count" }, { value: "off", label: "Off" } ] }
     ] },
-    { widgetType: "spacer", label: "Spacer", icon: "󰉺", section: "center", description: "Adjustable empty spacing.", hasSettings: true, defaultSettings: { size: 24 }, settingsSchema: [
-      { type: "slider", key: "size", label: "Spacer Size", icon: "󰉺", min: 4, max: 160, step: 1 }
+    { widgetType: "spacer", label: "Spacer", icon: "subtract.svg", section: "center", description: "Adjustable empty spacing.", hasSettings: true, defaultSettings: { size: 24 }, settingsSchema: [
+      { type: "slider", key: "size", label: "Spacer Size", icon: "subtract.svg", min: 4, max: 160, step: 1 }
     ] },
-    { widgetType: "separator", label: "Separator", icon: "󰇘", section: "center", description: "Thin divider between widgets.", hasSettings: true, defaultSettings: { thickness: 1, length: 20, opacity: 0.8 }, settingsSchema: [
-      { type: "slider", key: "thickness", label: "Thickness", icon: "󰇘", min: 1, max: 8, step: 1 },
-      { type: "slider", key: "length", label: "Length", icon: "󰝗", min: 8, max: 64, step: 1 },
+    { widgetType: "separator", label: "Separator", icon: "more-horizontal.svg", section: "center", description: "Thin divider between widgets.", hasSettings: true, defaultSettings: { thickness: 1, length: 20, opacity: 0.8 }, settingsSchema: [
+      { type: "slider", key: "thickness", label: "Thickness", icon: "more-horizontal.svg", min: 1, max: 8, step: 1 },
+      { type: "slider", key: "length", label: "Length", icon: "crop.svg", min: 8, max: 64, step: 1 },
       { type: "slider", key: "opacity", label: "Opacity", icon: "weather-moon.svg", min: 0.1, max: 1.0, step: 0.05, unit: "%" }
     ] },
     { widgetType: "personality", label: "Personality", icon: "people.svg", section: "center", description: "Animated personality GIF widget." },
     { widgetType: "pomodoro", label: "Pomodoro Timer", icon: "pomodoro.svg", section: "right", description: "Focus/break timer with start, pause, skip, and reset controls." },
-    { widgetType: "todo", label: "Todo", icon: "󰄱", section: "right", description: "Pending task counter with clear-done shortcut." },
-    { widgetType: "gameMode", label: "Game Mode", icon: "󰊴", section: "right", description: "Performance mode indicator — shows when game mode is active." },
-    { widgetType: "nightLight", label: "Night Light", icon: "󰌵", section: "right", description: "Night light indicator — shows when color temperature filter is active." }
+    { widgetType: "todo", label: "Todo", icon: "checkmark.svg", section: "right", description: "Pending task counter with clear-done shortcut." },
+    { widgetType: "gameMode", label: "Game Mode", icon: "games.svg", section: "right", description: "Performance mode indicator — shows when game mode is active." },
+    { widgetType: "nightLight", label: "Night Light", icon: "weather-moon.svg", section: "right", description: "Night light indicator — shows when color temperature filter is active." }
   ]
 
   readonly property var pluginWidgets: {
