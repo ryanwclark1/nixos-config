@@ -69,13 +69,12 @@ Rectangle {
                 border.color: Colors.withAlpha(root.accentColor, 0.4)
                 border.width: 1
 
-                Text {
+                Loader {
                     anchors.centerIn: parent
-                    text: root.modeIconText
-                    color: root.accentColor
-                    font.pixelSize: embedded ? Appearance.fontSizeLarge : Appearance.fontSizeMedium
-                    font.family: Appearance.fontMono
+                    sourceComponent: (root.modeIconText || "").endsWith(".svg") ? _sfSvg : _sfNerd
                 }
+                Component { id: _sfSvg; SharedWidgets.SvgIcon { source: root.modeIconText; color: root.accentColor; size: embedded ? Appearance.fontSizeLarge : Appearance.fontSizeMedium } }
+                Component { id: _sfNerd; Text { text: root.modeIconText; color: root.accentColor; font.pixelSize: embedded ? Appearance.fontSizeLarge : Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
             }
 
             ColumnLayout {

@@ -54,13 +54,12 @@ Rectangle {
                 highlightOpacity: 0.18
             }
 
-            Text {
+            Loader {
                 anchors.centerIn: parent
-                text: root.modeIcon
-                color: root.accentColor
-                font.family: Appearance.fontMono
-                font.pixelSize: root.tightMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL
+                sourceComponent: (root.modeIcon || "").endsWith(".svg") ? _chromeSvg : _chromeNerd
             }
+            Component { id: _chromeSvg; SharedWidgets.SvgIcon { source: root.modeIcon; color: root.accentColor; size: root.tightMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL } }
+            Component { id: _chromeNerd; Text { text: root.modeIcon; color: root.accentColor; font.family: Appearance.fontMono; font.pixelSize: root.tightMode ? Appearance.fontSizeLarge : Appearance.fontSizeXL } }
         }
 
         ColumnLayout {
@@ -154,13 +153,12 @@ Rectangle {
                     anchors.centerIn: parent
                     spacing: Appearance.spacingXS
 
-                    Text {
+                    Loader {
                         visible: root.statusIcon !== ""
-                        text: root.statusIcon
-                        color: root.accentColor
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeXS
+                        sourceComponent: (root.statusIcon || "").endsWith(".svg") ? _statusSvg : _statusNerd
                     }
+                    Component { id: _statusSvg; SharedWidgets.SvgIcon { source: root.statusIcon; color: root.accentColor; size: Appearance.fontSizeXS } }
+                    Component { id: _statusNerd; Text { text: root.statusIcon; color: root.accentColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXS } }
 
                     Text {
                         text: root.statusText

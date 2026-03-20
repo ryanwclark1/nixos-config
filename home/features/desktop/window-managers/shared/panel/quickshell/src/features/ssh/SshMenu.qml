@@ -358,12 +358,12 @@ BasePopupMenu {
                   Layout.fillWidth: true
                   spacing: Appearance.spacingS
 
-                  Text {
-                    text: modelData.icon || "󰣀"
-                    color: Colors.primary
-                    font.family: Appearance.fontMono
-                    font.pixelSize: Appearance.fontSizeLarge
+                  Loader {
+                    property string _ic: modelData.icon || "󰣀"
+                    sourceComponent: _ic.endsWith(".svg") ? _shSvg : _shNerd
                   }
+                  Component { id: _shSvg; SvgIcon { source: parent._ic; color: Colors.primary; size: Appearance.fontSizeLarge } }
+                  Component { id: _shNerd; Text { text: parent._ic; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
 
                   ColumnLayout {
                     Layout.fillWidth: true

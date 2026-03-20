@@ -111,12 +111,12 @@ Rectangle {
                                 anchors.margins: Appearance.spacingM
                                 spacing: Appearance.spacingM
 
-                                Text {
-                                    text: modelData.icon || "󰖲"
-                                    color: Colors.primary
-                                    font.family: Appearance.fontMono
-                                    font.pixelSize: Appearance.fontSizeLarge
+                                Loader {
+                                    property string _ic: modelData.icon || "󰖲"
+                                    sourceComponent: _ic.endsWith(".svg") ? _dwpSvg : _dwpNerd
                                 }
+                                Component { id: _dwpSvg; SvgIcon { source: parent._ic; color: Colors.primary; size: Appearance.fontSizeLarge } }
+                                Component { id: _dwpNerd; Text { text: parent._ic; color: Colors.primary; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeLarge } }
 
                                 ColumnLayout {
                                     Layout.fillWidth: true

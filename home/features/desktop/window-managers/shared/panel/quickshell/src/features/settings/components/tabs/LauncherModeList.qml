@@ -111,12 +111,10 @@ Column {
                     border.width: 1
                     Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
 
-                    Text {
+                    SettingsMetricIcon {
                         anchors.centerIn: parent
-                        text: root.modeMetaFn ? root.modeMetaFn(modeRow.modelData).icon : ""
-                        color: Colors.primary
-                        font.family: Appearance.fontMono
-                        font.pixelSize: Appearance.fontSizeSmall
+                        icon: root.modeMetaFn ? root.modeMetaFn(modeRow.modelData).icon : ""
+                        iconSize: Appearance.fontSizeSmall
                     }
                 }
 

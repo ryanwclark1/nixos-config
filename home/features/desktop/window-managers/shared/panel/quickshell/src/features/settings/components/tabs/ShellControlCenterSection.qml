@@ -185,11 +185,9 @@ Item {
                                 }
                             }
 
-                            Text {
-                                text: toggleRow.modelData.icon || "󰖲"
-                                color: toggleRow.hidden ? Colors.textDisabled : Colors.primary
-                                font.family: Appearance.fontMono
-                                font.pixelSize: Appearance.fontSizeLarge
+                            SettingsMetricIcon {
+                                icon: toggleRow.modelData.icon || "󰖲"
+                                iconColor: toggleRow.hidden ? Colors.textDisabled : Colors.primary
                                 Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
                             }
 

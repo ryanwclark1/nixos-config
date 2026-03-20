@@ -52,12 +52,10 @@ Rectangle {
                 border.color: Colors.primaryRing
                 border.width: 1
 
-                Text {
+                SettingsMetricIcon {
                     anchors.centerIn: parent
-                    text: tabMeta ? String(tabMeta.icon || "󰍉") : "󰍉"
-                    color: Colors.primary
-                    font.family: Appearance.fontMono
-                    font.pixelSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
+                    icon: tabMeta ? String(tabMeta.icon || "󰍉") : "󰍉"
+                    iconSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
                 }
             }
 
@@ -108,11 +106,10 @@ Rectangle {
                         anchors.centerIn: parent
                         spacing: Appearance.spacingXS
 
-                        Text {
-                            text: modelData.icon || "󰍉"
-                            color: selected ? Colors.primary : Colors.textSecondary
-                            font.family: Appearance.fontMono
-                            font.pixelSize: Appearance.fontSizeXS
+                        SettingsMetricIcon {
+                            icon: modelData.icon || "󰍉"
+                            iconColor: selected ? Colors.primary : Colors.textSecondary
+                            iconSize: Appearance.fontSizeXS
                         }
 
                         Text {
