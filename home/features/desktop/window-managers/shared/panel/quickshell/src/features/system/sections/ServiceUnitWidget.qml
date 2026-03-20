@@ -666,7 +666,7 @@ SharedWidgets.CardBase {
                     }
 
                     SharedWidgets.Chip {
-                        icon: "󰒓"
+                        icon: "settings.svg"
                         iconColor: Colors.textSecondary
                         text: root.selectedUnit ? ("LOAD " + String(root.selectedUnit.load || "unknown")) : ""
                         textColor: Colors.textSecondary

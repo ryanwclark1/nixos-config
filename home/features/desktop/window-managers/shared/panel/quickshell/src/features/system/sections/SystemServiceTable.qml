@@ -615,7 +615,7 @@ SharedWidgets.CardBase {
                         spacing: Colors.spacingS
 
                         SharedWidgets.Chip {
-                            icon: "󰒓"
+                            icon: "settings.svg"
                             iconColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary
                             text: root.selectedUnit ? String(root.selectedUnit.active || "").toUpperCase() : ""
                             textColor: root.selectedUnit ? root.stateColor(root.selectedUnit) : Colors.textSecondary

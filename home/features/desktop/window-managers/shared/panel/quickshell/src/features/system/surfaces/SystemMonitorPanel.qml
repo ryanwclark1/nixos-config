@@ -309,7 +309,7 @@ PanelWindow {
 
                 SharedWidgets.FilterChip {
                     label: "Services"
-                    icon: "󰒓"
+                    icon: "settings.svg"
                     selected: root.keyboardSectionIndex === 1
                     onClicked: root.focusKeyboardSection(1)
                 }
