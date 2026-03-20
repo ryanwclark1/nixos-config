@@ -725,5 +725,20 @@ QtObject {
         function onWallpaperUseShellRendererChanged() {
             root.config.scheduleSave();
         }
+        function onScreenshotEditAfterCaptureChanged() {
+            root.config.scheduleSave();
+        }
+        function onScreenshotEditorChanged() {
+            root.config.scheduleSave();
+        }
+        function onScreenshotDelayChanged() {
+            root.config.scheduleSave();
+        }
+        function onOcrLanguageChanged() {
+            root.config.scheduleSave();
+        }
+        function onScreenshotHistoryMaxChanged() {
+            root.config.scheduleSave();
+        }
     }
 }

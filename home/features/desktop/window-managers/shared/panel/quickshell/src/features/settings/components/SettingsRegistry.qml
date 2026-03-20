@@ -741,7 +741,7 @@ QtObject {
             shortLabel: "Presets",
             description: "Save, restore, and inspect reusable shell configuration snapshots.",
             pageStyle: "catalog",
-            icon: "󰆓",
+            icon: "save.svg",
             categoryId: "meta",
             order: 30,
             component: "PresetsTab.qml",
