@@ -108,8 +108,16 @@ if [[ -z "${out_link}" ]]; then
     out_link="${state_dir}/build-links/${config_name}"
   fi
 fi
-mkdir -p "$(dirname "${out_link}")"
-out_link="$(readlink -m "${out_link}")"
+out_link_dir="$(dirname "${out_link}")"
+out_link_name="$(basename "${out_link}")"
+mkdir -p "${out_link_dir}"
+out_link_dir="$(readlink -m "${out_link_dir}")"
+out_link="${out_link_dir}/${out_link_name}"
+if [[ -L "${out_link}" || -f "${out_link}" ]]; then
+  rm -f "${out_link}"
+elif [[ -e "${out_link}" ]]; then
+  rm -rf "${out_link}"
+fi
 
 if [[ "${reset_disk}" -eq 1 && -e "${disk_image}" ]]; then
   echo "[INFO] Removing VM disk image: ${disk_image}"

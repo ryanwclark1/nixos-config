@@ -74,6 +74,17 @@ VM, stores artifacts under
 `${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/panel-vm-qa/`, and writes
 aggregate `summary.json` / `summary.md` files.
 
+For the focused quickshell unit-test suite inside both compositor VMs:
+
+```bash
+make quickshell-test
+bash scripts/vm/run-quickshell-test-vm.sh --vm both --reset-disk
+```
+
+This runs `npx vitest run tests/config tests/settings tests/launcher --config tests/vitest.config.js`
+inside each selected guest and stores per-VM logs plus aggregate summaries under
+`${XDG_STATE_HOME:-$HOME/.local/state}/nixos-config/quickshell-vm-tests/`.
+
 For host-side Hyprland settings QA run inside the VM:
 
 ```bash

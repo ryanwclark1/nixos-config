@@ -29,7 +29,7 @@ fi
 
 usage() {
   cat <<'EOF'
-Usage: run-hyprland-panel-qa.sh [--output-dir DIR] [--mode panel|settings|surfaces|launcher|settings-qa|gate]
+Usage: run-hyprland-panel-qa.sh [--output-dir DIR] [--mode panel|settings|surfaces|launcher|settings-qa|gate|vitest]
                                 [--ssh-port PORT] [--reset-disk] [--keep-vm-running]
                                 [--vm-output-dir DIR] [-- <extra capture args>]
 
@@ -44,6 +44,7 @@ Modes:
   launcher   Run capture-launcher-matrix.sh after launching the repo shell in the VM
   settings-qa Run check-settings-qa.sh --repo-shell and copy its artifacts/logs
   gate       Run runtime gate + settings QA and copy logs/artifacts
+  vitest     Run the focused quickshell Vitest suite in the VM and copy its log
 EOF
 }
 
@@ -416,6 +417,19 @@ exit 0
 EOF
       return $?
       ;;
+    vitest)
+      run_remote_background_script "${remote_panel_root}" "vitest" <<'EOF'
+set -euo pipefail
+
+mkdir -p "${VM_OUTPUT_DIR}"
+log_path="${VM_OUTPUT_DIR}/vitest.log"
+
+set -o pipefail
+cd "${REMOTE_PANEL_ROOT}"
+npx vitest run tests/config tests/settings tests/launcher --config tests/vitest.config.js 2>&1 | tee "${log_path}"
+EOF
+      return $?
+      ;;
     launcher)
       "${ssh_base[@]}" "TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
 set -euo pipefail
@@ -567,6 +581,12 @@ assert_expected_artifacts() {
         missing=1
       fi
       ;;
+    vitest)
+      if [[ ! -f "${output_dir}/vitest.log" ]]; then
+        echo "[ERROR] Missing expected Vitest log: ${output_dir}/vitest.log" >&2
+        missing=1
+      fi
+      ;;
   esac
 
   return "${missing}"
@@ -577,6 +597,7 @@ write_summary() {
   local overall_status="pass"
   local runtime_status="n/a"
   local settings_status="n/a"
+  local tests_status="n/a"
   local runtime_exit_value=""
   local settings_exit_value=""
 
@@ -596,9 +617,11 @@ write_summary() {
     esac
   elif [[ "${capture_mode}" == "settings-qa" ]]; then
     settings_status=$([[ "${remote_exit}" -eq 0 ]] && printf 'pass' || printf 'fail')
+  elif [[ "${capture_mode}" == "vitest" ]]; then
+    tests_status=$([[ "${remote_exit}" -eq 0 ]] && printf 'pass' || printf 'fail')
   fi
 
-  if [[ "${remote_exit}" -ne 0 ]] || [[ "${runtime_status}" == "fail" ]] || [[ "${settings_status}" == "fail" ]]; then
+  if [[ "${remote_exit}" -ne 0 ]] || [[ "${runtime_status}" == "fail" ]] || [[ "${settings_status}" == "fail" ]] || [[ "${tests_status}" == "fail" ]]; then
     overall_status="fail"
   fi
 
@@ -610,6 +633,7 @@ write_summary() {
   "remoteExit": ${remote_exit},
   "runtimeStatus": "${runtime_status}",
   "settingsStatus": "${settings_status}",
+  "testsStatus": "${tests_status}",
   "sshPort": "${ssh_port}",
   "artifactDir": "${output_dir}",
   "launcherLog": "${output_dir}/launcher.log"
@@ -624,6 +648,7 @@ EOF
     "- remote exit: \`${remote_exit}\`" \
     "- runtime: \`${runtime_status}\`" \
     "- settings: \`${settings_status}\`" \
+    "- tests: \`${tests_status}\`" \
     "- artifacts: \`${output_dir}\`" \
     "- launcher log: \`${output_dir}/launcher.log\`" \
     > "${output_dir}/summary.md"

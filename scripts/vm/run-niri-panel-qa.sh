@@ -32,7 +32,7 @@ fi
 
 usage() {
   cat <<'EOF'
-Usage: run-niri-panel-qa.sh [--output-dir DIR] [--mode panel|settings|surfaces|settings-qa|gate]
+Usage: run-niri-panel-qa.sh [--output-dir DIR] [--mode panel|settings|surfaces|settings-qa|gate|vitest]
                            [--ssh-port PORT] [--reset-disk] [--keep-vm-running]
                            [--vm-output-dir DIR] [-- <extra capture args>]
 
@@ -46,6 +46,7 @@ Modes:
   surfaces   Run capture-panel-matrix.sh --repo-shell --skip-settings --skip-launcher
   settings-qa Run check-settings-qa.sh --repo-shell and copy its artifacts/logs
   gate       Run runtime gate + settings QA and copy logs/artifacts
+  vitest     Run the focused quickshell Vitest suite in the VM and copy its log
 EOF
 }
 
@@ -469,6 +470,19 @@ exit 0
 EOF
       return $?
       ;;
+    vitest)
+      vm_ssh "TMPDIR='${remote_tmp_root}' XDG_STATE_HOME='${remote_state_home}' REMOTE_PANEL_ROOT='${remote_panel_root}' VM_OUTPUT_DIR='${vm_output_dir}' bash -s" <<'EOF'
+set -euo pipefail
+
+mkdir -p "${VM_OUTPUT_DIR}"
+log_path="${VM_OUTPUT_DIR}/vitest.log"
+
+set -o pipefail
+cd "${REMOTE_PANEL_ROOT}"
+npx vitest run tests/config tests/settings tests/launcher --config tests/vitest.config.js 2>&1 | tee "${log_path}"
+EOF
+      return $?
+      ;;
     *)
       printf 'Unknown mode: %s\n' "${capture_mode}" >&2
       exit 2
@@ -512,6 +526,12 @@ assert_expected_artifacts() {
         missing=1
       fi
       ;;
+    vitest)
+      if [[ ! -f "${output_dir}/vitest.log" ]]; then
+        echo "[ERROR] Missing expected Vitest log: ${output_dir}/vitest.log" >&2
+        missing=1
+      fi
+      ;;
   esac
 
   return "${missing}"
@@ -541,10 +561,11 @@ assert_headless_skip_markers() {
     return 1
   }
 
-  rg -Fq "[INFO] Skipping runtime warning regression artifact capture: Niri session exposes no wl_output in this headless VM." "${settings_log}" || {
+  if ! rg -Fq "[INFO] Skipping runtime warning regression artifact capture." "${settings_log}" \
+    && ! rg -Fq "[INFO] Skipping runtime warning regression artifact capture: Niri session exposes no wl_output in this headless VM." "${settings_log}"; then
     echo "[ERROR] Missing headless Niri runtime-warning skip marker in ${settings_log}" >&2
     return 1
-  }
+  fi
 
   echo "[INFO] Verified headless Niri skip markers in ${settings_log}"
 }
@@ -554,12 +575,14 @@ write_summary() {
   local overall_status="pass"
   local runtime_status="n/a"
   local settings_status="n/a"
+  local tests_status="n/a"
   local runtime_exit_value=""
   local settings_exit_value=""
   local summary_mode=""
   local summary_overall=""
   local summary_runtime=""
   local summary_settings=""
+  local summary_tests=""
   local summary_output_dir=""
   local summary_ssh_port=""
 
@@ -577,9 +600,11 @@ write_summary() {
     esac
   elif [[ "${capture_mode}" == "settings-qa" ]]; then
     settings_status=$([[ "${remote_exit}" -eq 0 ]] && printf 'pass' || printf 'fail')
+  elif [[ "${capture_mode}" == "vitest" ]]; then
+    tests_status=$([[ "${remote_exit}" -eq 0 ]] && printf 'pass' || printf 'fail')
   fi
 
-  if [[ "${remote_exit}" -ne 0 ]] || [[ "${runtime_status}" == "fail" ]] || [[ "${settings_status}" == "fail" ]]; then
+  if [[ "${remote_exit}" -ne 0 ]] || [[ "${runtime_status}" == "fail" ]] || [[ "${settings_status}" == "fail" ]] || [[ "${tests_status}" == "fail" ]]; then
     overall_status="fail"
   fi
 
@@ -587,6 +612,7 @@ write_summary() {
   summary_overall="${overall_status:-fail}"
   summary_runtime="${runtime_status:-n/a}"
   summary_settings="${settings_status:-n/a}"
+  summary_tests="${tests_status:-n/a}"
   summary_output_dir="${output_dir:-}"
   summary_ssh_port="${ssh_port:-}"
 
@@ -598,6 +624,7 @@ write_summary() {
   "remoteExit": ${remote_exit},
   "runtimeStatus": "${summary_runtime}",
   "settingsStatus": "${summary_settings}",
+  "testsStatus": "${summary_tests}",
   "sshPort": "${summary_ssh_port}",
   "artifactDir": "${summary_output_dir}",
   "launcherLog": "${summary_output_dir}/launcher.log"
@@ -612,6 +639,7 @@ EOF
     "- remote exit: \`${remote_exit}\`" \
     "- runtime: \`${summary_runtime}\`" \
     "- settings: \`${summary_settings}\`" \
+    "- tests: \`${summary_tests}\`" \
     "- artifacts: \`${summary_output_dir}\`" \
     "- launcher log: \`${summary_output_dir}/launcher.log\`" \
     > "${output_dir}/summary.md"
