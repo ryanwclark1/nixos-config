@@ -3,6 +3,7 @@ set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 repo_root="$(cd -- "${script_dir}/../../../../../../../.." >/dev/null 2>&1 && pwd -P)"
+tmp_root="${TMPDIR:-/tmp}"
 
 flake_target=".#administrator@woody"
 output_dir="${TMPDIR:-/tmp}/bar-widgets-first-open"
@@ -267,7 +268,7 @@ load_quickshell_env() {
 ocr_text() {
   local image_path="$1"
   local processed_image
-  processed_image="$(mktemp /tmp/bar-widgets-ocr-XXXXXX.png)"
+  processed_image="$(mktemp "${tmp_root}/bar-widgets-ocr-XXXXXX.png")"
   magick "${image_path}" \
     -colorspace Gray \
     -negate \

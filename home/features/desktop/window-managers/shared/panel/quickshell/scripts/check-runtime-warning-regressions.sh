@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
 config_root="$(CDPATH= cd -- "${script_dir}/../src" >/dev/null && pwd)"
+tmp_root="${TMPDIR:-/tmp}"
 instance_id=""
 repo_shell_mode=0
 repo_shell_pid=""
@@ -12,7 +13,7 @@ repo_shell_env=()
 settings_preset="portrait"
 surface_crop="surface"
 workspace_target="auto"
-output_dir="/tmp/panel-qa-matrix"
+output_dir="${tmp_root}/panel-qa-matrix"
 settings_delay="2.5"
 surface_delay="1.6"
 settings_deep_scroll_y=""

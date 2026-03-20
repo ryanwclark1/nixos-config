@@ -2,6 +2,7 @@
 set -euo pipefail
 
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/quickshell/by-id"
+tmp_root="${TMPDIR:-/tmp}"
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 width=900
@@ -436,11 +437,11 @@ main() {
   refresh_instance_id || exit 1
 
   if [[ -z "${output_path}" ]]; then
-    output_path="/tmp/settings-${tab_id}-${width}x${height}.png"
+    output_path="${tmp_root}/settings-${tab_id}-${width}x${height}.png"
   fi
 
-  temp_full="$(mktemp /tmp/settings-viewport-full-XXXXXX.png)"
-  temp_crop="$(mktemp /tmp/settings-viewport-crop-XXXXXX.png)"
+  temp_full="$(mktemp "${tmp_root}/settings-viewport-full-XXXXXX.png")"
+  temp_crop="$(mktemp "${tmp_root}/settings-viewport-crop-XXXXXX.png")"
 
   trap cleanup EXIT
 

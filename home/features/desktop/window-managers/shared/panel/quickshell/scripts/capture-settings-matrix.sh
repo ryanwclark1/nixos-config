@@ -2,10 +2,11 @@
 set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+tmp_root="${TMPDIR:-/tmp}"
 
 instance_id=""
 viewport_preset="portrait"
-output_dir="/tmp/settings-matrix"
+output_dir="${tmp_root}/settings-matrix"
 delay_seconds="4"
 scroll_y="0"
 workspace_target="auto"
