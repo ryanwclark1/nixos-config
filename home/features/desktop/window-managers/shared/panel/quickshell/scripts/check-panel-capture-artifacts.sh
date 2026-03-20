@@ -36,6 +36,7 @@ settings_tabs=(
   "hotkeys"
   "time-weather"
 )
+selected_settings_tabs=()
 
 surface_ids=(
   "networkMenu"
@@ -50,7 +51,7 @@ surface_ids=(
 
 usage() {
   cat <<'EOF'
-Usage: check-panel-capture-artifacts.sh --dir DIR [--settings-preset portrait|laptop|wide] [--surface-crop surface|monitor|usable] [--skip-launcher] [--skip-settings] [--skip-surfaces] [--expect-settings-deep]
+Usage: check-panel-capture-artifacts.sh --dir DIR [--settings-preset portrait|laptop|wide] [--surface-crop surface|monitor|usable] [--settings-tab TAB_ID] [--skip-launcher] [--skip-settings] [--skip-surfaces] [--expect-settings-deep]
 
 Validate that a panel QA capture bundle contains the expected review artifacts.
 This checks file presence, non-empty PNG captures, basic image dimensions, and galleries.
@@ -204,6 +205,10 @@ while [[ $# -gt 0 ]]; do
       surface_crop="${2:-}"
       shift 2
       ;;
+    --settings-tab)
+      selected_settings_tabs+=("${2:-}")
+      shift 2
+      ;;
     --skip-launcher)
       run_launcher=0
       shift
@@ -231,6 +236,10 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if (( ${#selected_settings_tabs[@]} > 0 )); then
+  settings_tabs=("${selected_settings_tabs[@]}")
+fi
 
 if [[ -z "${output_dir}" ]]; then
   printf '--dir is required.\n' >&2

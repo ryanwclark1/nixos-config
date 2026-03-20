@@ -16,7 +16,8 @@ reference_diag_active_fixture="${reference_source_dir}/expected-diagnostics-acti
 reference_diag_degraded_fixture="${reference_source_dir}/expected-diagnostics-degraded.json"
 shell_config="${script_dir}/../src/shell.qml"
 structure_verify_script="${script_dir}/quickshell-structure-verify.sh"
-quickshell_vm_default="${PLUGIN_LOCAL_QUICKSHELL_VM_DEFAULT:-hyprland}"
+quickshell_vm_default="${PLUGIN_LOCAL_QUICKSHELL_VM_DEFAULT:-both}"
+quickshell_capture_vm_default="${PLUGIN_LOCAL_QUICKSHELL_CAPTURE_VM_DEFAULT:-hyprland}"
 quickshell_use_vm="${PLUGIN_LOCAL_QUICKSHELL_USE_VM:-1}"
 docker_plugin_dir_name="docker-manager"
 docker_plugin_id="docker.manager"
@@ -759,9 +760,10 @@ Quickshell Manual Flow
    - home-manager switch --flake /home/administrator/nixos-config#administrator@woody
 2. Run the focused Quickshell runtime checks:
    - scripts/quickshell-structure-verify.sh
-   - scripts/quickshell-structure-verify.sh --vm
+   - scripts/quickshell-structure-verify.sh --vm ${quickshell_vm_default}
 3. Capture review artifacts for high-risk UI changes:
-   - ${vm_script_dir}/run-${quickshell_vm_default}-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-${quickshell_vm_default}
+   - ${vm_script_dir}/run-hyprland-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-hyprland
+   - ${vm_script_dir}/run-niri-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-niri
    - artifact validation runs automatically; use scripts/check-panel-capture-artifacts.sh --dir DIR to re-check a saved bundle
 4. Run the assembled Quickshell workflow:
    - scripts/plugin-local.sh quickshell-all
@@ -829,7 +831,7 @@ Local commands:
   fast:    ${structure_verify_script}
   vm:      ${structure_verify_script} --vm
   all:     scripts/plugin-local.sh quickshell-all
-  capture: ${vm_script_dir}/run-${quickshell_vm_default}-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-${quickshell_vm_default}
+  capture: ${vm_script_dir}/run-${quickshell_capture_vm_default}-panel-qa.sh --mode panel --output-dir /tmp/panel-qa-${quickshell_capture_vm_default}
 
 Runtime files:
   fast:     ${structure_verify_script}

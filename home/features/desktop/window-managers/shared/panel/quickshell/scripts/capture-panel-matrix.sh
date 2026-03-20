@@ -16,6 +16,7 @@ output_dir="/tmp/panel-qa-matrix"
 settings_delay="2.5"
 surface_delay="1.6"
 settings_deep_scroll_y=""
+settings_tabs=()
 run_settings=1
 run_surfaces=1
 run_launcher=1
@@ -131,7 +132,7 @@ EOF
 
 usage() {
   cat <<'EOF'
-Usage: capture-panel-matrix.sh [--id INSTANCE_ID] [--repo-shell] [--output-dir DIR] [--settings-preset portrait|laptop|wide] [--surface-crop surface|monitor|usable] [--workspace current|auto|NAME] [--settings-delay SECONDS] [--surface-delay SECONDS] [--settings-deep-scroll-y PX] [--skip-settings] [--skip-surfaces] [--skip-launcher] [--skip-validate]
+Usage: capture-panel-matrix.sh [--id INSTANCE_ID] [--repo-shell] [--output-dir DIR] [--settings-preset portrait|laptop|wide] [--surface-crop surface|monitor|usable] [--workspace current|auto|NAME] [--settings-delay SECONDS] [--surface-delay SECONDS] [--settings-deep-scroll-y PX] [--settings-tab TAB_ID] [--skip-settings] [--skip-surfaces] [--skip-launcher] [--skip-validate]
 
 Capture the shared panel QA artifact set:
   - launcher screenshots for portrait, laptop, and wide presets
@@ -180,6 +181,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --settings-deep-scroll-y)
       settings_deep_scroll_y="${2:-}"
+      shift 2
+      ;;
+    --settings-tab)
+      settings_tabs+=("${2:-}")
       shift 2
       ;;
     --skip-settings)
@@ -453,8 +458,15 @@ main() {
 
   if (( run_settings == 1 )); then
     local deep_scroll_y="${settings_deep_scroll_y}"
+    local settings_args=()
     if [[ -z "${deep_scroll_y}" && "${settings_preset}" == "portrait" ]]; then
       deep_scroll_y="520"
+    fi
+    if (( ${#settings_tabs[@]} > 0 )); then
+      local tab_id=""
+      for tab_id in "${settings_tabs[@]}"; do
+        settings_args+=(--tab "${tab_id}")
+      done
     fi
 
     printf '[INFO] Capturing settings matrix (%s)...\n' "${settings_preset}"
@@ -464,7 +476,8 @@ main() {
         --preset "${settings_preset}" \
         --delay "${settings_delay}" \
         --workspace "${workspace_target}" \
-        --output-dir "${output_dir}/settings-${settings_preset}"
+        --output-dir "${output_dir}/settings-${settings_preset}" \
+        "${settings_args[@]}"
 
     if [[ -n "${deep_scroll_y}" ]]; then
       printf '[INFO] Capturing settings matrix (%s, scroll %s)...\n' "${settings_preset}" "${deep_scroll_y}"
@@ -475,7 +488,8 @@ main() {
           --delay "${settings_delay}" \
           --scroll-y "${deep_scroll_y}" \
           --workspace "${workspace_target}" \
-          --output-dir "${output_dir}/settings-${settings_preset}-deep"
+          --output-dir "${output_dir}/settings-${settings_preset}-deep" \
+          "${settings_args[@]}"
     fi
   fi
 
@@ -509,6 +523,12 @@ main() {
     fi
     if (( run_settings == 1 )) && [[ -n "${deep_scroll_y}" ]]; then
       validator_args+=(--expect-settings-deep)
+    fi
+    if (( ${#settings_tabs[@]} > 0 )); then
+      local validator_tab=""
+      for validator_tab in "${settings_tabs[@]}"; do
+        validator_args+=(--settings-tab "${validator_tab}")
+      done
     fi
     bash "${script_dir}/check-panel-capture-artifacts.sh" "${validator_args[@]}"
   fi

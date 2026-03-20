@@ -10,7 +10,7 @@ output_dir="${tmp_root}/settings-matrix"
 delay_seconds="4"
 scroll_y="0"
 workspace_target="auto"
-tabs=(
+default_tabs=(
   "launcher"
   "launcher-search"
   "launcher-web"
@@ -26,13 +26,15 @@ tabs=(
   "hotkeys"
   "time-weather"
 )
+tabs=()
 
 usage() {
   cat <<'EOF'
-Usage: capture-settings-matrix.sh [--preset portrait|laptop|wide] [--output-dir DIR] [--delay SECONDS] [--scroll-y PX] [--workspace current|auto|NAME]
+Usage: capture-settings-matrix.sh [--preset portrait|laptop|wide] [--output-dir DIR] [--delay SECONDS] [--scroll-y PX] [--workspace current|auto|NAME] [--tab TAB_ID]
 
 Capture the high-risk settings tabs for a standard viewport preset.
 This produces review artifacts for manual inspection, not PASS/WARN/FAIL results.
+Repeat `--tab` to capture only specific settings tabs.
 EOF
 }
 
@@ -62,6 +64,10 @@ while [[ $# -gt 0 ]]; do
       workspace_target="${2:-}"
       shift 2
       ;;
+    --tab)
+      tabs+=("${2:-}")
+      shift 2
+      ;;
     -h|--help)
       usage
       exit 0
@@ -69,6 +75,21 @@ while [[ $# -gt 0 ]]; do
     *)
       printf 'Unknown argument: %s\n' "$1" >&2
       usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+if (( ${#tabs[@]} == 0 )); then
+  tabs=("${default_tabs[@]}")
+fi
+
+for tab in "${tabs[@]}"; do
+  case "${tab}" in
+    launcher|launcher-search|launcher-web|launcher-modes|launcher-runtime|ai|wallpaper|bar-widgets|bars|system|plugins|theme|hotkeys|time-weather)
+      ;;
+    *)
+      printf 'Unknown settings tab: %s\n' "${tab}" >&2
       exit 2
       ;;
   esac

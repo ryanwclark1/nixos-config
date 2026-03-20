@@ -7,7 +7,7 @@ nixos_repo_root="$(CDPATH= cd -- "${script_dir}/../../../../../../../../" && pwd
 src_root="${quickshell_root}/src"
 quiet=0
 use_vm=0
-vm_selector="${QS_VERIFY_VM_SELECTOR:-hyprland}"
+vm_selector="${QS_VERIFY_VM_SELECTOR:-both}"
 startup_timeout_seconds="${QS_VERIFY_STARTUP_TIMEOUT_SECONDS:-60}"
 launcher_timeout_seconds="${QS_VERIFY_LAUNCHER_SMOKE_TIMEOUT_SECONDS:-180}"
 journal_timeout_seconds="${QS_VERIFY_JOURNAL_GATE_TIMEOUT_SECONDS:-180}"
