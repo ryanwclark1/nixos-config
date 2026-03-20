@@ -164,7 +164,7 @@ PopupWindow {
       MenuItem {
         visible: !root.showWorkspaceList
         text: root.isPinned ? "Unpin" : "Pin to Dock"
-        icon: root.isPinned ? "󰤱" : "󰤰"
+        icon: "pin.svg"
         onClicked: {
           if (root.dockRoot) root.dockRoot.togglePin(root.appId);
           root.close();

@@ -1,6 +1,7 @@
 import QtQuick
 import "../../system/sections"
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets"
 
@@ -93,7 +94,7 @@ Rectangle {
       thickness: 2
       color: MediaService.artAccentColor
       Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationEmphasis } }
-      icon: MediaService.isPlaying ? "󰏤" : "󰐊"
+      icon: IconHelpers.transportToggleIcon(MediaService.isPlaying)
     }
 
     Item {

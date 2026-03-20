@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../shared"
 import "../../services"
+import "../../services/IconHelpers.js" as IconHelpers
 import "../../services/SearchUtils.js" as SU
 import "../../widgets" as SharedWidgets
 import "."
@@ -84,14 +85,14 @@ BasePopupMenu {
         key: String(host.source || "manual") + "|" + groupName.toLowerCase(),
         title: groupName,
         subtitle: isImported ? "Imported group" : "Manual group",
-        icon: isImported ? "󰣀" : "󰌆"
+        icon: IconHelpers.sshCollectionIcon(isImported)
       };
     }
     return {
       key: isImported ? "imported" : "manual",
       title: isImported ? "Imported Aliases" : "Manual Hosts",
       subtitle: isImported ? "From SSH config import" : "Configured in widget settings",
-      icon: isImported ? "󰮔" : "󰌆"
+      icon: isImported ? "download.svg" : "server-2.svg"
     };
   }
 
@@ -316,7 +317,7 @@ BasePopupMenu {
         Layout.fillWidth: true
         expanded: true
         title: String(modelData.title || "Hosts") + " (" + ((modelData.hosts && modelData.hosts.length) || 0) + ")"
-        icon: String(modelData.icon || "󰣀")
+        icon: String(modelData.icon || "server-2.svg")
 
         ColumnLayout {
           Layout.fillWidth: true

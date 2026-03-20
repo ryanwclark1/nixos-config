@@ -341,12 +341,11 @@ RowLayout {
         border.width: 1
         Layout.alignment: Qt.AlignVCenter
 
-        Text {
+        SharedWidgets.SvgIcon {
             anchors.centerIn: parent
-            text: root.narrowMode ? "…" : "󰅁"
+            source: "more-horizontal.svg"
             color: overflowMouse.containsMouse ? Colors.primary : Colors.textSecondary
-            font.family: Appearance.fontMono
-            font.pixelSize: Appearance.fontSizeSmall
+            size: Appearance.fontSizeSmall
         }
 
         MouseArea {

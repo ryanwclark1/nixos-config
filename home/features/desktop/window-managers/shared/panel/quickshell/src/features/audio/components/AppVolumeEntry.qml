@@ -20,22 +20,13 @@ RowLayout {
     spacing: Appearance.spacingS
     height: 40
 
-    // App icon (Nerd Font fallback if no icon resolved)
-    Text {
-        text: {
-            if (root.appIconName) {
-                var resolved = Config.resolveIconSource(root.appIconName);
-                if (resolved)
-                    return "";  // will use Image instead
-            }
-            return "󰎈";  // default music/app icon
-        }
+    // App icon fallback if no icon resolves
+    SvgIcon {
         visible: !appIconImage.visible
         color: root.appMuted ? Colors.error : Colors.primary
-        font.family: Appearance.fontMono
-        font.pixelSize: Appearance.fontSizeLarge
+        source: "music-note-2.svg"
+        size: Appearance.fontSizeLarge
         Layout.preferredWidth: 24
-        horizontalAlignment: Text.AlignHCenter
     }
 
     Image {

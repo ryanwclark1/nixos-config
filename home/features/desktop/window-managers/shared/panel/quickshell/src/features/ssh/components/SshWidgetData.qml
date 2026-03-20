@@ -93,7 +93,7 @@ QtObject {
             remoteCommand: String(input.remoteCommand || input.command || "").trim(),
             tags: _tagsFromValue(input.tags),
             group: String(input.group || "").trim(),
-            icon: String(input.icon || "󰣀").trim(),
+            icon: String(input.icon || "server-2.svg").trim(),
             source: "manual",
             searchText: ""
         };
