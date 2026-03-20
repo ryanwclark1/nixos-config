@@ -1007,7 +1007,7 @@ Item {
             contextActions: [
                 {
                     label: "Open Network Menu",
-                    icon: "󰛳",
+                    icon: "ethernet.svg",
                     action: () => root.requestSurface("networkMenu", this)
                 }
             ]
