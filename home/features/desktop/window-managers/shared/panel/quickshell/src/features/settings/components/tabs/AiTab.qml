@@ -61,11 +61,11 @@ Item {
         anchors.fill: parent
         tabId: root.tabId
         title: "AI Assistant"
-        iconName: "󰚩"
+        iconName: "chat.svg"
 
         SettingsCard {
             title: "Provider"
-            iconName: "󰚩"
+            iconName: "chat.svg"
             description: "Choose AI backend and model for the chat assistant."
 
             SettingsSelectRow {
@@ -163,7 +163,7 @@ Item {
 
         SettingsCard {
             title: "API Keys"
-            iconName: "󰌋"
+            iconName: "key.svg"
             description: "Fallback keys used when environment variables are not set."
             collapsible: true
             expanded: Config.aiProvider !== "ollama"
@@ -303,7 +303,7 @@ Item {
 
         SettingsCard {
             title: "System Prompt"
-            iconName: "󰏪"
+            iconName: "edit.svg"
             description: "Custom instructions prepended to every conversation."
             collapsible: true
             expanded: Config.aiSystemPrompt.length > 0

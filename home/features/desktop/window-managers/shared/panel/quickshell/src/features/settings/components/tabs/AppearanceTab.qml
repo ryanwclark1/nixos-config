@@ -71,7 +71,18 @@ Item {
         SettingsCard {
             title: "Theme Mode"
             iconName: "󰏘"
-            description: "Automate color extraction from your current wallpaper."
+            description: "Choose how shell colors are derived from your wallpaper."
+
+            SettingsModeRow {
+                label: "Color Backend"
+                currentValue: Config.colorBackend || "pywal"
+                options: [
+                    { value: "pywal", label: "Pywal" },
+                    { value: "matugen", label: "Material You" },
+                    { value: "dynamic", label: "Dynamic" }
+                ]
+                onModeSelected: value => Config.colorBackend = value
+            }
 
             SettingsToggleRow {
                 label: "Dynamic Wallpaper Theming"

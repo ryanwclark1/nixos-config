@@ -96,12 +96,7 @@ Rectangle {
                             width: pickerColumn.width
                             minimumHeight: root.compactMode ? 88 : 64
 
-                            Text {
-                                text: modelData.icon
-                                color: Colors.primary
-                                font.family: Colors.fontMono
-                                font.pixelSize: Colors.fontSizeLarge
-                            }
+                            SettingsMetricIcon { icon: modelData.icon }
 
                             ColumnLayout {
                                 Layout.fillWidth: true

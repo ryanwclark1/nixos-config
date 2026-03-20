@@ -321,13 +321,7 @@ Item {
                     radius: Colors.radiusSmall
                     color: Colors.primarySubtle
 
-                    Text {
-                      anchors.centerIn: parent
-                      text: modelData.icon
-                      color: Colors.primary
-                      font.family: Colors.fontMono
-                      font.pixelSize: Colors.fontSizeLarge
-                    }
+                    SettingsMetricIcon { anchors.centerIn: parent; icon: modelData.icon }
                   }
 
                   Text {
