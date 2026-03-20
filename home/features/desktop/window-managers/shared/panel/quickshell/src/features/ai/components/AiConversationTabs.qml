@@ -114,7 +114,7 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        height: 38
+        height: Colors.controlRowHeight
         clip: true
 
         Row {

@@ -380,7 +380,7 @@ Rectangle {
                 Rectangle {
                     visible: AiService.isStreaming && AiService.streamingContent.length === 0
                     width: 140
-                    height: 38
+                    height: Colors.controlRowHeight
                     radius: Colors.radiusMedium
                     color: Colors.bgGlass
                     border.color: Colors.border
