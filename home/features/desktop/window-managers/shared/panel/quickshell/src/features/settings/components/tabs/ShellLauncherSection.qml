@@ -35,13 +35,13 @@ Item {
     readonly property var launcherHeroMeta: ({
             "launcher": {
                 label: "General",
-                icon: "󰍉",
+                icon: "search-visual.svg",
                 description: "Tune the launcher shell, default entry mode, and home-stage behavior.",
                 chips: ["Default mode", "Home stage", "Hints"]
             },
             "launcher-search": {
                 label: "Search",
-                icon: "󰍉",
+                icon: "search-visual.svg",
                 description: "Adjust result breadth, debounce timing, and ranking signals for faster search.",
                 chips: ["Result mix", "Debounce", "Ranking"]
             },
@@ -65,13 +65,13 @@ Item {
             }
         })[currentLauncherTabId] || ({
             label: "General",
-            icon: "󰍉",
+            icon: "search-visual.svg",
             description: "Tune the launcher runtime, search flow, and mode surfaces from one place.",
             chips: ["Launcher"]
         })
     readonly property var launcherHeroTabs: [
-        { id: "launcher", label: "General", icon: "󰍉" },
-        { id: "launcher-search", label: "Search", icon: "󰍉" },
+        { id: "launcher", label: "General", icon: "search-visual.svg" },
+        { id: "launcher-search", label: "Search", icon: "search-visual.svg" },
         { id: "launcher-web", label: "Web", icon: "󰖟" },
         { id: "launcher-modes", label: "Modes", icon: "󰌌" },
         { id: "launcher-runtime", label: "Runtime", icon: "󰔟" }
@@ -457,7 +457,7 @@ Item {
                         {
                             value: "results",
                             label: "Results Only",
-                            icon: "󰍉"
+                            icon: "search-visual.svg"
                         },
                         {
                             value: "mode",

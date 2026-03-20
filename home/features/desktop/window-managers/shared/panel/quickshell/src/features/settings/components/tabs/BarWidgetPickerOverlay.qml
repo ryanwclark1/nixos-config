@@ -72,7 +72,7 @@ Rectangle {
 
             SettingsTextInputRow {
                 label: "Search"
-                leadingIcon: "󰍉"
+                leadingIcon: "search-visual.svg"
                 placeholderText: "Filter widgets by name"
                 text: root.searchQuery
                 onTextEdited: value => root.searchQueryEdited(value)
