@@ -103,9 +103,9 @@ SharedWidgets.CardBase {
             SharedWidgets.Chip {
                 visible: SystemIoTelemetryService.selectedDiskDevice !== ""
                 icon: SystemIoTelemetryService.diskDegraded ? "󰀦" : "󰋊"
-                iconColor: SystemIoTelemetryService.diskDegraded ? Colors.warning : Colors.secondary
+                iconColor: SystemIoTelemetryService.diskDegraded ? Colors.warning : Colors.info
                 text: String(SystemIoTelemetryService.selectedDiskDevice || "").toUpperCase() + "  " + MU.formatAge(SystemIoTelemetryService.diskLastSampleMs, root._clockTick)
-                textColor: SystemIoTelemetryService.diskDegraded ? Colors.warning : Colors.secondary
+                textColor: SystemIoTelemetryService.diskDegraded ? Colors.warning : Colors.info
             }
 
             Repeater {
@@ -170,7 +170,7 @@ SharedWidgets.CardBase {
 
             IoMetricCard {
                 label: "DISK READ"
-                accentColor: Colors.secondary
+                accentColor: Colors.info
                 currentFormatted: MU.formatRate(SystemIoTelemetryService.currentDiskRead)
                 peakFormatted: MU.formatRate(SystemIoTelemetryService.peakDiskRead)
                 maxFormatted: MU.formatRate(MU.arrayMax(SystemIoTelemetryService.diskHistoryRead))

@@ -21,7 +21,7 @@ SharedWidgets.CardBase {
     }
     readonly property real primaryPercent: _primaryDrive ? (Math.min(100, parseInt(_primaryDrive.percent, 10) || 0) / 100.0) : 0
     readonly property color usageColor: primaryPercent >= 0.9 ? Colors.error
-        : (primaryPercent >= 0.75 ? Colors.warning : Colors.secondary)
+        : (primaryPercent >= 0.75 ? Colors.warning : Colors.info)
 
     CommandPoll {
         interval: root._diskPollMs
@@ -113,7 +113,7 @@ SharedWidgets.CardBase {
                             value: Math.min(100, parseInt(modelData.percent, 10) || 0) / 100.0
                             barColor: {
                                 var pct = (parseInt(modelData.percent, 10) || 0) / 100.0;
-                                return pct >= 0.9 ? Colors.error : (pct >= 0.75 ? Colors.warning : Colors.secondary);
+                                return pct >= 0.9 ? Colors.error : (pct >= 0.75 ? Colors.warning : Colors.info);
                             }
                         }
                     }

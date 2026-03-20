@@ -143,9 +143,9 @@ SharedWidgets.CardBase {
             SharedWidgets.Chip {
                 visible: SystemIoTelemetryService.selectedDiskDevice !== ""
                 icon: SystemIoTelemetryService.diskHotspot ? "󰀦" : "󰋊"
-                iconColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.secondary
+                iconColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.info
                 text: "DISK PEAK " + MU.formatRate(Math.max(SystemIoTelemetryService.peakDiskRead, SystemIoTelemetryService.peakDiskWrite))
-                textColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.secondary
+                textColor: SystemIoTelemetryService.diskHotspot ? Colors.warning : Colors.info
             }
         }
 
