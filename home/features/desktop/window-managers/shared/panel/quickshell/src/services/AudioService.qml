@@ -3,18 +3,23 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
+import "AudioHelpers.js" as AudioHelpers
 
 QtObject {
     id: root
 
     // ── Output (sink) state ──────────────────────
-    readonly property real outputVolume: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio ? Math.min(Pipewire.defaultAudioSink.audio.volume, 1.0) : 0
+    readonly property real outputVolume: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio
+        ? AudioHelpers.normalizeVolume(Pipewire.defaultAudioSink.audio.volume, 1.0)
+        : 0
     readonly property bool outputMuted: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio ? Pipewire.defaultAudioSink.audio.muted : false
     readonly property string outputLabel: _sinkDescription()
     readonly property string outputDeviceType: _detectDeviceType()
 
     // ── Input (source) state ─────────────────────
-    readonly property real inputVolume: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Math.min(Pipewire.defaultAudioSource.audio.volume, 1.0) : 0
+    readonly property real inputVolume: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio
+        ? AudioHelpers.normalizeVolume(Pipewire.defaultAudioSource.audio.volume, 1.0)
+        : 0
     readonly property bool inputMuted: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Pipewire.defaultAudioSource.audio.muted : false
     readonly property string inputLabel: _sourceDescription()
 
@@ -155,14 +160,14 @@ QtObject {
             if (!node || !node.audio || node.isStream) continue;
             if (isSinkList !== node.isSink) continue;
 
-            var vol = node.audio.volume;
+            var vol = AudioHelpers.normalizeVolume(node.audio.volume, 1.0);
             var displayName = _deviceDisplayName(node);
             devices.push({
                 id: node.id,
                 name: displayName,
                 key: String(node.name || (node.properties ? node.properties["node.name"] : "") || displayName),
                 matchKeys: _deviceMatchKeys(node, displayName),
-                volume: (vol !== undefined && !isNaN(vol)) ? vol : 0,
+                volume: vol,
                 muted: node.audio.muted || false,
                 isDefault: node.id === defaultId
             });
@@ -202,14 +207,14 @@ QtObject {
             // Input app streams are sinks (isSink=true) receiving from sources
             if (isOutput === node.isSink) continue;
 
-            var vol = node.audio.volume;
+            var vol = AudioHelpers.normalizeVolume(node.audio.volume, 1.0);
             var props = node.properties || {};
             apps.push({
                 nodeRef: node,
                 id: node.id,
                 name: props["application.name"] || node.description || node.nickname || node.name || "Unknown",
                 iconName: props["application.icon-name"] || "",
-                volume: (vol !== undefined && !isNaN(vol)) ? vol : 0,
+                volume: vol,
                 muted: node.audio.muted || false
             });
         }
@@ -224,18 +229,21 @@ QtObject {
     // ── Volume protection ────────────────────────
     function protectedVolume(targetVolume, currentVolume) {
         var maxJump = Config.volumeProtectionEnabled ? Config.volumeProtectionMaxJump : 1.0;
-        var delta = targetVolume - currentVolume;
+        var safeCurrent = AudioHelpers.normalizeVolume(currentVolume, 1.0);
+        var safeTarget = AudioHelpers.normalizeVolume(targetVolume, 1.0);
+        var delta = safeTarget - safeCurrent;
         if (Math.abs(delta) > maxJump)
-            targetVolume = currentVolume + (delta > 0 ? maxJump : -maxJump);
-        return Colors.clamp01(targetVolume);
+            safeTarget = safeCurrent + (delta > 0 ? maxJump : -maxJump);
+        return Colors.clamp01(safeTarget);
     }
 
     // ── Actions (preserves existing API) ─────────
     function setVolume(target, value) {
         var current = root._currentTargetVolume(target);
+        var requested = AudioHelpers.normalizeVolume(value, 1.0);
         var clamped = Config.volumeProtectionEnabled
-            ? root.protectedVolume(value, current)
-            : Colors.clamp01(value);
+            ? root.protectedVolume(requested, current)
+            : Colors.clamp01(requested);
         var isSink = target === "@DEFAULT_AUDIO_SINK@";
         var node = isSink ? Pipewire.defaultAudioSink : Pipewire.defaultAudioSource;
 
@@ -250,7 +258,7 @@ QtObject {
 
     function setAppVolume(nodeRef, value) {
         if (!nodeRef || !nodeRef.audio) return;
-        var clamped = Colors.clamp01(value);
+        var clamped = Colors.clamp01(AudioHelpers.normalizeVolume(value, 1.0));
         if (clamped > 0) nodeRef.audio.muted = false;
         nodeRef.audio.volume = clamped;
     }
