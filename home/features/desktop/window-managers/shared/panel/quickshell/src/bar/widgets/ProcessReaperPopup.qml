@@ -76,7 +76,7 @@ Rectangle {
 
         SettingsActionButton {
             label: "Open Full Monitor"
-            iconName: "󰓅"
+            iconName: "board.svg"
             compact: true
             Layout.fillWidth: true
             onClicked: {
