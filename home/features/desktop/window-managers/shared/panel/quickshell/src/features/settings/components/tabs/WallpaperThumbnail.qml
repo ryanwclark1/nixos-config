@@ -2,7 +2,6 @@ import QtQuick
 import "../../../../services"
 import "../../../../shared"
 import "../../../../widgets" as SharedWidgets
-import "WallpaperTabHelpers.js" as WTH
 
 Item {
     id: thumbDelegate
@@ -54,20 +53,14 @@ Item {
         Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
 
-        Image {
+        SharedWidgets.WallpaperThumbImage {
             id: thumbImage
             anchors.fill: parent
-            source: WTH.imageSource(modelData.path, unsupportedImagePaths)
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            smooth: true
-            cache: false
-            sourceSize: Qt.size(216, 160)
+            imagePath: modelData.path
+            fileMtime: modelData.mtime || 0
+            unsupportedMap: unsupportedImagePaths
             opacity: status === Image.Ready ? 1.0 : 0.0
-            onStatusChanged: {
-                if (status === Image.Error)
-                    thumbDelegate.imageUnsupported(modelData.path);
-            }
+            onImageUnsupported: path => thumbDelegate.imageUnsupported(path)
             Behavior on opacity {
                 NumberAnimation { duration: Appearance.durationNormal }
             }

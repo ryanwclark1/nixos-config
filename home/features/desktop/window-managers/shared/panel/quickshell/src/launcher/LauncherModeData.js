@@ -44,7 +44,6 @@ var modeDeps = {
     "emoji": ["wl-copy"],
     "keybinds": ["qs-keybinds"],
     "bookmarks": ["qs-bookmarks"],
-    "wallpapers": ["qs-wallpapers"],
     "ai": ["qs-ai", "wl-copy"]
 };
 

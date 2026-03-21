@@ -24,6 +24,11 @@ let
     ${builtins.readFile ./scripts/wallpapers.sh}
   '';
 
+  wallpaperThumbScript = pkgs.writeShellScriptBin "qs-wallpaper-thumb" ''
+    PATH="${pkgs.ffmpeg}/bin:${pkgs.coreutils}/bin:$PATH"
+    ${builtins.readFile ./scripts/wallpaper-thumb.sh}
+  '';
+
   keybindsScript = pkgs.writeShellScriptBin "qs-keybinds" ''
     PATH="${pkgs.jq}/bin:${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:${pkgs.python3}/bin:$PATH"
     export PARSER_SCRIPT="${./scripts/parse-niri-binds.py}"
@@ -287,6 +292,8 @@ let
   };
 
   config = lib.mkIf config.features.quickshell.enable {
+    home.sessionVariables.QS_NIXOS_CONFIG = repoRoot;
+
     home.packages = with pkgs; [
       # Quickshell core and Qt dependencies
       quickshell
@@ -306,6 +313,7 @@ let
       qsRofiScript
       runScript
       wallpaperScript
+      wallpaperThumbScript
       keybindsScript
       aiScript
       aiStreamScript
@@ -421,7 +429,7 @@ EOF
       executable = true;
       text = ''
         #!/usr/bin/env bash
-        PATH="${pkgs.quickshell}/bin:${qsRofiScript}/bin:${runScript}/bin:${wallpaperScript}/bin:${keybindsScript}/bin:${aiScript}/bin:${aiStreamScript}/bin:${modelUsageScript}/bin:${bangSyncScript}/bin:${bangSearchScript}/bin:${bookmarksScript}/bin:${screenshotScript}/bin:${ttsSpeakScript}/bin:${ocrScript}/bin:${networkScript}/bin:${healthCheckScript}/bin:${pluginDoctorScript}/bin:$PATH"
+        PATH="${pkgs.quickshell}/bin:${qsRofiScript}/bin:${runScript}/bin:${wallpaperScript}/bin:${wallpaperThumbScript}/bin:${keybindsScript}/bin:${aiScript}/bin:${aiStreamScript}/bin:${modelUsageScript}/bin:${bangSyncScript}/bin:${bangSearchScript}/bin:${bookmarksScript}/bin:${screenshotScript}/bin:${ttsSpeakScript}/bin:${ocrScript}/bin:${networkScript}/bin:${healthCheckScript}/bin:${pluginDoctorScript}/bin:$PATH"
         ${builtins.readFile ./scripts/qs-cli.sh}
       '';
     };
@@ -479,6 +487,7 @@ EOF
         ''}";
         ExecStart = "${quickshellLaunchScript}/bin/quickshell-launch";
         Environment = [
+          "QS_NIXOS_CONFIG=${repoRoot}"
           "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin:${pkgs.python3}/bin"
           # Prefer VA-API via libvdpau-va-gl (in hardware.graphics.extraPackages) over probing NVIDIA VDPAU.
           "VDPAU_DRIVER=va_gl"

@@ -1333,51 +1333,11 @@ Item {
             }
         }
 
-        // ----- Diagnostics & Recovery (runtime) ----------------------------
-        SettingsCard {
+        LauncherDiagnosticsSettingsCard {
             visible: root.isLauncherRuntimeSection
             Layout.fillWidth: true
-            title: "Diagnostics & Recovery"
-            iconName: "arrow-clockwise.svg"
-            description: "Runtime reset actions and launcher maintenance controls."
-
-            Flow {
-                Layout.fillWidth: true
-                spacing: Appearance.spacingS
-
-                SettingsActionButton {
-                    width: root.compactMode ? implicitWidth : 0
-                    Layout.fillWidth: !root.compactMode
-                    label: "Reset Runtime Metrics"
-                    iconName: "arrow-clockwise.svg"
-                    compact: true
-                    onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "clearMetrics"])
-                }
-
-                SettingsActionButton {
-                    width: root.compactMode ? implicitWidth : 0
-                    Layout.fillWidth: !root.compactMode
-                    label: "Re-detect Files Backend"
-                    iconName: "arrow-counterclockwise.svg"
-                    compact: true
-                    onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "redetectFilesBackend"])
-                }
-            }
-
-            SettingsActionButton {
-                Layout.fillWidth: true
-                label: "Launcher Diagnostic Reset"
-                iconName: "timer.svg"
-                compact: true
-                onClicked: Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "diagnosticReset"])
-            }
-
-            SettingsActionButton {
-                Layout.fillWidth: true
-                label: "Reset Launcher Defaults"
-                iconName: "arrow-clockwise.svg"
-                onClicked: root.resetLauncherDefaults()
-            }
+            compactMode: root.compactMode
+            resetLauncherDefaults: function() { root.resetLauncherDefaults(); }
         }
     }
 }

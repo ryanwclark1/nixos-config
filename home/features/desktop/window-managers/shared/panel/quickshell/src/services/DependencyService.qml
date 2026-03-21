@@ -65,6 +65,9 @@ QtObject {
       },
       "qs-wallpapers": {
         requires: []
+      },
+      "qs-wallpaper-thumb": {
+        requires: []
       }
     })
 

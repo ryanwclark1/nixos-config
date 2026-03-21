@@ -4,6 +4,7 @@ import Quickshell
 import "../../../shared"
 import "../sections"
 import "../../../services"
+import "../../../services/ShellUtils.js" as SU
 import "../../../widgets" as SharedWidgets
 
 BasePopupMenu {
@@ -51,7 +52,7 @@ BasePopupMenu {
         tooltipText: "Open system monitor"
         onClicked: {
             root.closeRequested();
-            Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "systemMonitor"]);
+            Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "systemMonitor"));
         }
     }
 
@@ -98,6 +99,7 @@ BasePopupMenu {
         ProcessWidget {
             visible: root.showAll || root.statKey === "cpuStatus" || root.statKey === "ramStatus"
             compactMode: root.compactMode
+            statContext: root.statKey
         }
         ServiceUnitWidget {
             visible: root.showAll

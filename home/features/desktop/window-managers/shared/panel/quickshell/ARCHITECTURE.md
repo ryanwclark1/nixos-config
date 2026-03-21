@@ -6,6 +6,9 @@ This document defines the canonical structure for the active panel at:
 Compositor-specific behavior notes and capability expectations are documented in
 `COMPOSITOR_COMPATIBILITY.md`.
 
+Environment variables (`QS_NIXOS_CONFIG`, `QS_SCRIPT_ROOT`, etc.) are summarized in
+[ENV.md](ENV.md).
+
 ## Mental Model
 
 - `Shell Orchestrator`: top-level surface state, IPC entrypoints, per-screen wiring.

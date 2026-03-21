@@ -47,6 +47,7 @@ describe("modeDependencies", () => {
   it("returns empty array for modes with no dependencies", () => {
     expect(modeDependencies("drun")).toEqual([]);
     expect(modeDependencies("window")).toEqual([]);
+    expect(modeDependencies("wallpapers")).toEqual([]);
   });
 });
 

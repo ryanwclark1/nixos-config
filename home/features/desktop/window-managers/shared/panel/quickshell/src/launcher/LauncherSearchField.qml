@@ -20,6 +20,9 @@ Rectangle {
     property string modeIconText: "search-visual.svg"
     property string modePrefix: ""
 
+    readonly property bool modeHeaderVisible: root.modeLabel !== "" || root.modeSubtitle !== "" || root.statusText !== ""
+    readonly property real modeHeaderLeadWidth: (embedded ? 24 : 28) + Appearance.spacingXS
+
     signal accepted(var modifiers)
     signal escapePressed
 
@@ -54,7 +57,7 @@ Rectangle {
         spacing: embedded ? Appearance.spacingXS : Appearance.spacingS
 
         RowLayout {
-            visible: root.modeLabel !== "" || root.modeSubtitle !== "" || root.statusText !== ""
+            visible: root.modeHeaderVisible
             Layout.fillWidth: true
             spacing: Appearance.spacingXS
 
@@ -135,6 +138,12 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
+
+            Item {
+                visible: root.modeHeaderVisible
+                Layout.preferredWidth: root.modeHeaderLeadWidth
+                Layout.fillHeight: true
+            }
 
             Rectangle {
                 id: categoryBadge

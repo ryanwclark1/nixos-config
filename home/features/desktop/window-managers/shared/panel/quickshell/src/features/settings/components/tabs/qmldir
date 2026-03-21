@@ -21,6 +21,7 @@ LauncherWebTab 1.0 LauncherWebTab.qml
 LauncherModeList 1.0 LauncherModeList.qml
 LauncherModesTab 1.0 LauncherModesTab.qml
 LauncherRuntimeTab 1.0 LauncherRuntimeTab.qml
+LauncherDiagnosticsSettingsCard 1.0 LauncherDiagnosticsSettingsCard.qml
 LockScreenTab 1.0 LockScreenTab.qml
 NightLightTab 1.0 NightLightTab.qml
 NotificationsTab 1.0 NotificationsTab.qml

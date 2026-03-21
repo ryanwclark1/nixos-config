@@ -33,7 +33,8 @@ Item {
   Item {
     id: services
     SharedWidgets.Ref { service: SystemStatus }
-    SharedWidgets.Ref { service: ProcessService }
+    // Process list polling only while reaper popup is open (refresh on open in onSecondaryClicked).
+    SharedWidgets.Ref { service: ProcessService; active: reaperPopup.isOpen }
   }
 
   SharedWidgets.BarPill {

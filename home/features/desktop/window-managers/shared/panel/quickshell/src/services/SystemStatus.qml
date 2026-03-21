@@ -20,7 +20,16 @@ QtObject {
   property date lastHealthCheckTime: new Date(0)
 
   readonly property string configuredScriptRoot: Quickshell.env("QS_SCRIPT_ROOT") || ""
-  readonly property string repoRoot: (Quickshell.env("HOME") || "/home/administrator") + "/nixos-config"
+  // QS_NIXOS_CONFIG: flake / config repo root (set by Nix module); else ~/nixos-config
+  readonly property string repoRoot: {
+    var cfg = Quickshell.env("QS_NIXOS_CONFIG") || "";
+    if (cfg.length > 0)
+      return cfg;
+    var home = Quickshell.env("HOME") || "";
+    if (home.length > 0)
+      return home + "/nixos-config";
+    return "/nixos-config";
+  }
   readonly property string quickshellRepoRoot: repoRoot + "/home/features/desktop/window-managers/shared/panel/quickshell"
   readonly property string defaultScriptRoot: quickshellRepoRoot + "/scripts"
   readonly property string scriptRoot: configuredScriptRoot !== "" ? configuredScriptRoot : defaultScriptRoot

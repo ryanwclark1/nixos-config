@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import "."
 import "ShellUtils.js" as ShellUtils
+import "../shared/WallpaperThumbnailCache.js" as WTC
 
 // WallpaperService — per-monitor wallpaper management with swww/hyprpaper support.
 // Scans multiple well-known wallpaper directories and exposes the list of available
@@ -24,8 +25,14 @@ QtObject {
   property var wallpapers: ({})
 
   // Flat list of discovered image files across all search directories.
-  // Each entry: { path: string, filename: string, dir: string }
+  // Each entry: { path: string, filename: string, dir: string, mtime: number }
   property var availableWallpapers: []
+
+  // Per-path revision counter; WallpaperThumbImage bumps reload when a disk thumb is generated.
+  property var thumbRevisions: ({})
+  property var _thumbQueue: []
+  property var _thumbInflight: ({})
+  property var _thumbJob: null
 
   // True while a directory scan is in progress.
   property bool scanning: false
@@ -83,7 +90,8 @@ QtObject {
         + "2>/dev/null | while IFS= read -r f; do "
         + "mt=$(file -Lb --mime-type \"$f\" 2>/dev/null || true); "
         + "case \"$mt\" in "
-        + "image/jpeg|image/png|image/webp|image/gif|image/bmp|image/tiff) printf '%s\\n' \"$f\" ;; "
+        + "image/jpeg|image/png|image/webp|image/gif|image/bmp|image/tiff) "
+        + "ts=$(stat -c %Y \"$f\" 2>/dev/null || echo 0); printf '%s\\t%s\\n' \"$f\" \"$ts\" ;; "
         + "esac; "
         + "done || true; }"
       );
@@ -91,6 +99,61 @@ QtObject {
     var script = "{ " + findCmds.join("; ") + "; } | sort -u";
     scanProc.command = ["sh", "-c", script];
     scanProc.running = true;
+  }
+
+  function thumbRevisionFor(path) {
+    return thumbRevisions[path] || 0;
+  }
+
+  // Queue generation of a WebP grid thumbnail (Freedesktop miss, qs cache miss).
+  function requestThumbnail(path, mtime) {
+    var key = String(path || "") + "\0" + String(mtime | 0);
+    if (!path || _thumbInflight[key])
+      return;
+    var dest = WTC.quickshellThumbAbsolutePath(
+      path,
+      mtime,
+      Quickshell.env("XDG_CACHE_HOME"),
+      Quickshell.env("HOME")
+    );
+    if (!dest.length)
+      return;
+    var inflight = Object.assign({}, _thumbInflight);
+    inflight[key] = true;
+    _thumbInflight = inflight;
+    _thumbQueue = _thumbQueue.concat([{ path: path, mtime: mtime, key: key, dest: dest }]);
+    _pumpThumbQueue();
+  }
+
+  function _bumpThumbRevision(path) {
+    var next = Object.assign({}, thumbRevisions);
+    next[path] = (next[path] || 0) + 1;
+    thumbRevisions = next;
+  }
+
+  function _pumpThumbQueue() {
+    if (thumbGenProc.running)
+      return;
+    var cmd = DependencyService.resolveCommand("qs-wallpaper-thumb");
+    if (!cmd.length) {
+      if (_thumbQueue.length > 0)
+        Logger.w("WallpaperService", "qs-wallpaper-thumb unavailable; wallpaper grid uses full images");
+      while (_thumbQueue.length > 0) {
+        var dropped = _thumbQueue[0];
+        _thumbQueue = _thumbQueue.slice(1);
+        var cleared = Object.assign({}, _thumbInflight);
+        delete cleared[dropped.key];
+        _thumbInflight = cleared;
+      }
+      return;
+    }
+    if (_thumbQueue.length === 0)
+      return;
+    var job = _thumbQueue[0];
+    _thumbQueue = _thumbQueue.slice(1);
+    _thumbJob = job;
+    thumbGenProc.command = cmd.concat([job.path, job.dest]);
+    thumbGenProc.running = true;
   }
 
   // Apply `imagePath` as wallpaper for `monitorName`.
@@ -382,12 +445,20 @@ QtObject {
         });
         var result = [];
         for (var i = 0; i < lines.length; i++) {
-          var p = lines[i].trim();
+          var line = lines[i].trim();
+          if (!line) continue;
+          var tab = line.indexOf("\t");
+          var p = tab >= 0 ? line.slice(0, tab).trim() : line;
+          var mtime = 0;
+          if (tab >= 0) {
+            var mt = parseInt(line.slice(tab + 1).trim(), 10);
+            mtime = isNaN(mt) ? 0 : mt;
+          }
           if (!p) continue;
-          var parts = p.split("/");
-          var filename = parts[parts.length - 1];
-          var dir = parts.slice(0, parts.length - 1).join("/");
-          result.push({ path: p, filename: filename, dir: dir });
+          var pathParts = p.split("/");
+          var filename = pathParts[pathParts.length - 1];
+          var dir = pathParts.slice(0, pathParts.length - 1).join("/");
+          result.push({ path: p, filename: filename, dir: dir, mtime: mtime });
         }
         root.availableWallpapers = result;
         root.scanning = false;
@@ -396,6 +467,25 @@ QtObject {
           root._scanStartTime = 0;
         }
       }
+    }
+  }
+
+  property Process thumbGenProc: Process {
+    id: thumbGenProc
+    running: false
+    onExited: (exitCode, exitStatus) => {
+      var job = root._thumbJob;
+      root._thumbJob = null;
+      if (job) {
+        var cleared = Object.assign({}, root._thumbInflight);
+        delete cleared[job.key];
+        root._thumbInflight = cleared;
+        if (exitCode === 0)
+          root._bumpThumbRevision(job.path);
+        else
+          Logger.w("WallpaperService", "thumbnail generation failed", job.path, exitCode);
+      }
+      root._pumpThumbQueue();
     }
   }
 

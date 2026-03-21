@@ -30,6 +30,7 @@ Rectangle {
     readonly property bool highlighted: ListView.isCurrentItem
     readonly property bool hovered: resultHover.containsMouse && !ignoreMouseHover
     readonly property bool showsClipboardImage: root.mode === "clip" && !!(itemData && itemData.clipIsImage)
+    readonly property bool showsWallpaperThumb: root.mode === "wallpapers" && !!(itemData && itemData.path)
     readonly property string clipboardImageSource: {
         if (!showsClipboardImage || !itemData || !itemData.id)
             return "";
@@ -172,7 +173,7 @@ Rectangle {
             color: highlighted ? Colors.withAlpha(root.accentColor, 0.16) : (hovered ? Colors.withAlpha(Colors.surface, 0.78) : Colors.withAlpha(Colors.surface, 0.66))
             border.color: highlighted ? Colors.withAlpha(root.accentColor, 0.34) : Colors.withAlpha(Colors.border, 0.24)
             border.width: 1
-            clip: root.showsClipboardImage
+            clip: root.showsClipboardImage || root.showsWallpaperThumb
 
             Image {
                 id: clipboardPreview
@@ -187,9 +188,21 @@ Rectangle {
                 sourceSize.height: root.compactMode ? 64 : 80
             }
 
+            SharedWidgets.WallpaperThumbImage {
+                id: wallpaperRowPreview
+                anchors.fill: parent
+                anchors.margins: 2
+                visible: root.showsWallpaperThumb
+                imagePath: itemData && itemData.path ? String(itemData.path) : ""
+                fileMtime: itemData && itemData.mtime !== undefined ? (itemData.mtime | 0) : 0
+                fillMode: Image.PreserveAspectFit
+                sourceSize: Qt.size(root.compactMode ? 128 : 144, root.compactMode ? 128 : 144)
+            }
+
             SharedWidgets.AppIcon {
                 anchors.centerIn: parent
-                visible: !root.showsClipboardImage || clipboardPreview.source === "" || clipboardPreview.status === Image.Error
+                visible: (!root.showsClipboardImage || clipboardPreview.source === "" || clipboardPreview.status === Image.Error)
+                    && (!root.showsWallpaperThumb || wallpaperRowPreview.status === Image.Error)
                 iconName: root.itemIconName(itemData)
                 desktopId: itemData ? String(itemData.desktopId || "") : ""
                 appId: itemData ? String(itemData.appId || itemData.class || "") : ""

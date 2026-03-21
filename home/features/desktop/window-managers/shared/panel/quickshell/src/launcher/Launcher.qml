@@ -16,6 +16,7 @@ import "LauncherDiagnostics.js" as Diag
 import "LauncherFileParser.js" as FileParser
 import "LauncherExecutor.js" as Executor
 import "LauncherMetrics.js" as Metrics
+import "LauncherShellIpcActions.js" as ShellIpc
 import "LauncherSystemItems.js" as SystemItems
 import "LauncherHomeBuilder.js" as HomeBuilder
 import "LauncherCategoryHelpers.js" as CategoryHelpers
@@ -211,6 +212,8 @@ PanelWindow {
     property alias _activeRequests: controller._activeRequests
     property var mediaPlayers: []
     property var preloadFailureState: ({})
+    property bool _wallpaperModeLoading: false
+    property int _wallpaperLoadStartedAt: 0
     property var launcherIconMap: ({})
     readonly property var availableToplevels: CompositorAdapter.toplevels || []
     property alias launcherMetrics: controller.launcherMetrics
@@ -956,6 +959,30 @@ PanelWindow {
         function onMergedHostsChanged() {
             if (launcherRoot.mode === "ssh" && launcherRoot.launcherOpacity > 0)
                 launcherRoot.loadSsh();
+        }
+    }
+
+    Connections {
+        target: WallpaperService
+        function onScanningChanged() {
+            if (WallpaperService.scanning)
+                return;
+            if (launcherRoot._wallpaperModeLoading && launcherRoot.mode === "wallpapers") {
+                launcherRoot._completeWallpaperLoadPending();
+                return;
+            }
+            if (launcherRoot.mode === "wallpapers" && launcherRoot.launcherOpacity > 0 && !launcherRoot._wallpaperModeLoading) {
+                launcherRoot.allItems = launcherRoot.wallpaperLauncherItemsFromService();
+                launcherRoot.filterItems();
+            }
+        }
+    }
+
+    Connections {
+        target: controller
+        function onModeChanged() {
+            if (controller.mode !== "wallpapers")
+                launcherRoot._wallpaperModeLoading = false;
         }
     }
 
@@ -1768,8 +1795,77 @@ PanelWindow {
     function loadRun() {
         loadCached("run", DependencyService.resolveCommand("qs-run"), JSON.parse);
     }
+
+    function wallpaperLauncherItemsFromService() {
+        var raw = WallpaperService.availableWallpapers;
+        var out = [];
+        for (var i = 0; i < raw.length; i++) {
+            var e = raw[i];
+            var p = String(e.path || "");
+            var fn = String(e.filename || "");
+            out.push({
+                name: fn,
+                path: p,
+                fullPath: p
+            });
+        }
+        return out;
+    }
+
+    function _purgeWallpaperModeCache() {
+        if (!getCached("wallpapers"))
+            return;
+        var nextCache = Object.assign({}, modeCache);
+        var nextTimes = Object.assign({}, modeCacheTime);
+        delete nextCache.wallpapers;
+        delete nextTimes.wallpapers;
+        modeCache = nextCache;
+        modeCacheTime = nextTimes;
+    }
+
+    function _completeWallpaperLoadPending() {
+        if (!_wallpaperModeLoading || mode !== "wallpapers")
+            return;
+        var startedAt = _wallpaperLoadStartedAt > 0 ? _wallpaperLoadStartedAt : Date.now();
+        _wallpaperModeLoading = false;
+        allItems = wallpaperLauncherItemsFromService();
+        filterItems();
+        buildLauncherHome();
+        completeModeLoad("wallpapers", true, "");
+        recordLoadMetric("wallpapers", Date.now() - startedAt, false, true);
+    }
+
     function loadWallpapers() {
-        loadCached("wallpapers", DependencyService.resolveCommand("qs-wallpapers"), JSON.parse);
+        var startedAt = Date.now();
+        _purgeWallpaperModeCache();
+
+        if (WallpaperService.scanning) {
+            _wallpaperLoadStartedAt = startedAt;
+            _wallpaperModeLoading = true;
+            allItems = [];
+            filteredItems = [];
+            beginModeLoad("wallpapers", "Loading " + ModeData.modeInfo("wallpapers").label);
+            filterItems();
+            return;
+        }
+
+        if (WallpaperService.availableWallpapers.length > 0) {
+            _wallpaperModeLoading = false;
+            allItems = wallpaperLauncherItemsFromService();
+            filterItems();
+            buildLauncherHome();
+            completeModeLoad("wallpapers", true, "");
+            recordLoadMetric("wallpapers", Date.now() - startedAt, true, true);
+            return;
+        }
+
+        WallpaperService.scanWallpapers();
+        _wallpaperLoadStartedAt = startedAt;
+        _wallpaperModeLoading = true;
+        allItems = [];
+        filteredItems = [];
+        beginModeLoad("wallpapers", "Loading " + ModeData.modeInfo("wallpapers").label);
+        filterItems();
     }
     function loadKeybinds() {
         loadCached("keybinds", DependencyService.resolveCommand("qs-keybinds"), function(raw) {
@@ -2373,7 +2469,7 @@ PanelWindow {
                 keywords: (tab.searchTerms || []).join(" "),
                 action: (function (tId) {
                         return function () {
-                            Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", tId]);
+                            Quickshell.execDetached(SU.ipcCall("SettingsHub", "openTab", tId));
                         };
                     })(tab.id),
             });
@@ -2398,7 +2494,7 @@ PanelWindow {
                 keywords: [entry.keywords || "", entryTab.label, categoryLabel, entry.cardTitle || ""].join(" "),
                 action: (function(tabId, cardTitle, labelText) {
                     return function() {
-                        Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openSetting", tabId, cardTitle || "", labelText || ""]);
+                        Quickshell.execDetached(SU.ipcCall("SettingsHub", "openSetting", tabId, cardTitle || "", labelText || ""));
                     };
                 })(entry.tabId, entry.cardTitle || "", entry.label || "")
             });
@@ -2444,22 +2540,16 @@ PanelWindow {
     }
 
     function loadSystem() {
-        allItems = SystemItems.buildSystemItems({
+        allItems = SystemItems.buildSystemItems(Object.assign({
             sessionActions: SystemActionRegistry.sessionActions,
             shellEntryActions: SystemActionRegistry.shellEntryActions,
             makeConfirmedSystemAction: makeConfirmedSystemAction,
             makeDetachedSystemAction: makeDetachedSystemAction,
-            openDashboard: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "dashboard"]); },
-            openSettings: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "open"]); },
-            openNotifications: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "notifCenter"]); },
-            openControlCenter: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "controlCenter"]); },
-            openScreenshotMenu: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "screenshotMenu"]); },
-            openPowerMenu: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "powerMenu"]); },
             execDetached: function(cmd) { Quickshell.execDetached(cmd); },
             resolveCommand: function(name, args) { return DependencyService.resolveCommand(name, args); },
             launchInTerminal: launchInTerminal,
             defaultAdapter: Bluetooth.defaultAdapter
-        });
+        }, ShellIpc.shellDestinationAndPaletteHandlers(function(cmd) { Quickshell.execDetached(cmd); })));
         filterItems();
         completeModeLoad("system", true, "");
     }
@@ -2689,6 +2779,8 @@ PanelWindow {
                 if (mode === "drun")
                     item.sectionLabel = drunBrowseSectionLabel();
                 baseItems.push(item);
+                if (mode === "wallpapers" && baseItems.length >= modeResultLimit)
+                    break;
             }
             filteredItems = decorateResultSections(baseItems);
         } else {
@@ -2864,7 +2956,7 @@ PanelWindow {
             primaryWebProvider: primaryWebProvider,
             fileSearchRootResolved: fileSearchRootResolved,
             openSettings: function() {
-                Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "open"]);
+                Quickshell.execDetached(SU.ipcCall("SettingsHub", "open"));
             },
             parseAdHocTarget: SystemItems.parseAdHocTarget,
             connectAdHocSsh: function(user, host, port) {
@@ -2875,7 +2967,7 @@ PanelWindow {
                 Quickshell.execDetached(SU.terminalCommand.apply(null, ["exec " + _launcherSshCommand + " \"$@\""].concat(args)));
             },
             openSshSettings: function() {
-                Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "settingsHub"]);
+                Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "settingsHub"));
             },
             toggleOverview: function() { CompositorAdapter.toggleOverview(); }
         });
@@ -2991,7 +3083,7 @@ PanelWindow {
             return;
         }
         if (item.ipcTarget && item.ipcAction) {
-            Quickshell.execDetached(["quickshell", "ipc", "call", item.ipcTarget, item.ipcAction]);
+            Quickshell.execDetached(SU.ipcCall(item.ipcTarget, item.ipcAction));
             close();
             return;
         }

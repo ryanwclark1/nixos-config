@@ -10,7 +10,9 @@ SharedWidgets.CardBase {
     property string searchQuery: ""
     property string stateFilter: "all"
     property int maxRows: 24
-    property string sortField: ProcessService.sortBy === "mem" ? "mem" : "cpu"
+    /// Mirrors SystemStatsMenu / bar surface statKey: "ramStatus" | "cpuStatus" | "" (combined or other hosts).
+    property string statContext: ""
+    property string sortField: "cpu"
     property bool sortDescending: true
     property bool compactMode: false
     property string displayMode: "flat"
@@ -42,6 +44,21 @@ SharedWidgets.CardBase {
 
     Layout.fillWidth: true
     Layout.preferredHeight: tableFocus.implicitHeight + root.pad * 2
+
+    Component.onCompleted: applyContextDefaultSort()
+    onStatContextChanged: applyContextDefaultSort()
+
+    function applyContextDefaultSort() {
+        var nextField;
+        if (statContext === "ramStatus")
+            nextField = "mem";
+        else if (statContext === "cpuStatus")
+            nextField = "cpu";
+        else
+            nextField = ProcessService.sortBy === "mem" ? "mem" : "cpu";
+        sortField = nextField;
+        sortDescending = nextField === "cpu" || nextField === "mem" || nextField === "pid";
+    }
 
     function focusTable() {
         tableFocus.forceActiveFocus();

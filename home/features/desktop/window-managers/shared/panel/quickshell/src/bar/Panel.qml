@@ -15,16 +15,10 @@ Item {
         id: barGradient
     }
 
+    // Widgets/menus hold Refs for Recording, Privacy, Printer, Media, Weather, Market.
+    // Keep SystemStatus here so minimal bars (no logo/stat pills) still get stats + isCritical.
     SharedWidgets.ServiceRefList {
-        services: [
-            RecordingService,
-            PrivacyService,
-            PrinterService,
-            SystemStatus,
-            MediaService,
-            WeatherService,
-            MarketService
-        ]
+        services: [SystemStatus]
     }
 
     property var manager: null
@@ -175,7 +169,11 @@ Item {
 
     onBarConfigChanged: resetDiagnosticWarmup()
     onSectionWidgetsChanged: resetDiagnosticWarmup()
-    Component.onCompleted: resetDiagnosticWarmup()
+    Component.onCompleted: {
+        resetDiagnosticWarmup();
+        var panelPerfDone = Logger.perf("Panel", "firstFrameAfterMount");
+        Qt.callLater(panelPerfDone);
+    }
 
     Timer {
         id: diagnosticWarmupTimer

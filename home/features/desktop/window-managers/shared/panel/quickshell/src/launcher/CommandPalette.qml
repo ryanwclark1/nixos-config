@@ -7,6 +7,7 @@ import "../shared"
 import "../services"
 import "../widgets" as SharedWidgets
 import "LauncherEntryRegistry.js" as EntryRegistry
+import "LauncherShellIpcActions.js" as ShellIpc
 
 PanelWindow {
     id: root
@@ -29,22 +30,11 @@ PanelWindow {
     color: "transparent"
     visible: showContent || fadeAnim.running
 
-    readonly property var allActions: EntryRegistry.buildCommandPaletteActions({
-        openDashboard: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "dashboard"]); },
-        openSettings: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "open"]); },
-        openNotifications: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "notifCenter"]); },
-        openControlCenter: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "controlCenter"]); },
-        openNetworkControls: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "networkMenu"]); },
-        openAudioControls: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "audioMenu"]); },
-        openVpnControls: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "vpnMenu"]); },
-        openPowerMenu: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "powerMenu"]); },
-        openScreenshotMenu: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "screenshotMenu"]); },
-        openAiChat: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "aiChat"]); },
+    readonly property var allActions: EntryRegistry.buildCommandPaletteActions(Object.assign({
         toggleEcoMode: () => { Config.autoEcoMode = !Config.autoEcoMode; },
         toggleDesktopEditMode: () => { Config.desktopEditMode = !Config.desktopEditMode; },
-        toggleDynamicTheme: () => { Config.useDynamicTheming = !Config.useDynamicTheming; },
-        reloadShell: () => { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "reloadConfig"]); }
-    })
+        toggleDynamicTheme: () => { Config.useDynamicTheming = !Config.useDynamicTheming; }
+    }, ShellIpc.shellDestinationAndPaletteHandlers(function(cmd) { Quickshell.execDetached(cmd); })))
 
     readonly property var filteredActions: {
         if (!searchQuery) return allActions;
