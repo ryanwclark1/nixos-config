@@ -99,7 +99,8 @@ Item {
       var raw = pinnedFile.text();
       try {
         root.pinnedApps = raw ? JSON.parse(raw) : [];
-      } catch(e) {
+      } catch (e) {
+        Logger.w("Taskbar", "pinned apps JSON parse failed, resetting", e);
         root.pinnedApps = [];
       }
 

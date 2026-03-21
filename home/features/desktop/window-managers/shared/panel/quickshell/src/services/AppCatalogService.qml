@@ -207,6 +207,7 @@ QtObject {
       root.loadedFromCache = true;
       return true;
     } catch (err2) {
+      Logger.w("AppCatalogService", "persisted cache JSON parse failed", err2);
       return false;
     }
   }

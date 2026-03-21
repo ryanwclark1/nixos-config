@@ -352,7 +352,7 @@ function validateIndex(findTabFn) {
         var tabId = entries[i].tabId;
         if (warned[tabId]) continue;
         if (!findTabFn(tabId)) {
-            console.warn("SettingsSearchIndex: entry references unknown tab '" + tabId + "' (label: '" + entries[i].label + "')");
+            console.warn("[W][SettingsSearchIndex] entry references unknown tab '" + tabId + "' (label: '" + entries[i].label + "')");
             warned[tabId] = true;
         }
     }

@@ -631,6 +631,7 @@ PanelWindow {
             try {
                 launcherRoot.launchHistory = JSON.parse(historyFile.text());
             } catch (e) {
+                Logger.w("Launcher", "history file parse failed, resetting", e);
                 launcherRoot.launchHistory = [];
             }
         }

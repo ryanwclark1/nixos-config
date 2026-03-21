@@ -132,7 +132,10 @@ PopupWindow {
           text: modelData.name
           icon: "add.svg"
           onClicked: {
-            try { modelData.action.execute(); } catch (e) {
+            try {
+              modelData.action.execute();
+            } catch (e) {
+              Logger.w("DockMenu", "desktop action execute failed, falling back to gtk-launch", root.appId, e);
               Quickshell.execDetached(["gtk-launch", root.appId]);
             }
             root.close();

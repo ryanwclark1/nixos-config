@@ -154,6 +154,10 @@ function _migrateData(data) {
     data._version = CURRENT_VERSION;
 }
 
+function _warnValidation(detail) {
+    console.warn("[W][ConfigPersistence] " + detail);
+}
+
 // Warn about unknown keys in config data — helps catch typos in manual edits.
 function _validateData(data) {
     if (!data) return [];
@@ -168,8 +172,8 @@ function _validateData(data) {
 
     for (var key in data) {
         if (!knownSections[key]) {
-            var msg = "ConfigPersistence: unknown top-level key '" + key + "'";
-            console.warn(msg);
+            var msg = "unknown top-level key '" + key + "'";
+            _warnValidation(msg);
             warnings.push(msg);
         }
     }
@@ -186,8 +190,8 @@ function _validateData(data) {
             knownKeys[extraKey] = true;
         for (var sKey in data[sect]) {
             if (!knownKeys[sKey]) {
-                var sMsg = "ConfigPersistence: unknown key '" + sKey + "' in section '" + sect + "'";
-                console.warn(sMsg);
+                var sMsg = "unknown key '" + sKey + "' in section '" + sect + "'";
+                _warnValidation(sMsg);
                 warnings.push(sMsg);
             }
         }

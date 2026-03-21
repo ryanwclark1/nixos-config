@@ -15,6 +15,18 @@ Item {
         id: barGradient
     }
 
+    SharedWidgets.ServiceRefList {
+        services: [
+            RecordingService,
+            PrivacyService,
+            PrinterService,
+            SystemStatus,
+            MediaService,
+            WeatherService,
+            MarketService
+        ]
+    }
+
     property var manager: null
     property var anchorWindow: null
     property var screenRef: null
@@ -272,52 +284,9 @@ Item {
         return _widgetComponents[type] || unknownComponent;
     }
 
-    // ── Auto-hide logic ─────────────────────────
-    readonly property string _autoHideSourceId: "bar-" + ((barConfig && barConfig.id) || "default")
-    readonly property string _autoHideScreenName: (screenRef && screenRef.name) || ""
-
-    Timer {
-        id: autoHideTimer
-        interval: root.autoHideDelay
-        onTriggered: {
-            if (root.autoHide && !root._hovered && !AutoHideCoordinator.anyHovered(root._autoHideScreenName))
-                root._autoHidden = true;
-        }
-    }
-
-    Connections {
-        target: AutoHideCoordinator
-        function onAnyHoveredChanged() {
-            if (!root.autoHide || !root._autoHidden) return;
-            if (AutoHideCoordinator.anyHovered(root._autoHideScreenName)) {
-                root._autoHidden = false;
-                autoHideTimer.stop();
-            }
-        }
-    }
-
-    onAutoHideChanged: {
-        if (!autoHide) {
-            root._autoHidden = false;
-            AutoHideCoordinator.removeSource(_autoHideScreenName, _autoHideSourceId);
-        }
-    }
-
-    on_HoveredChanged: {
-        if (autoHide)
-            AutoHideCoordinator.setHovered(_autoHideScreenName, _autoHideSourceId, _hovered);
-        if (_hovered) {
-            root._autoHidden = false;
-            autoHideTimer.stop();
-        } else if (root.autoHide) {
-            autoHideTimer.restart();
-        }
-    }
-
-    // Hover sensor for auto-hide (covers the full bar area)
-    HoverHandler {
-        id: barHoverHandler
-        onHoveredChanged: root._hovered = barHoverHandler.hovered
+    PanelBarInteractionLayer {
+        anchors.fill: parent
+        panel: root
     }
 
     // Auto-hide: slide bar off-screen and fade out
@@ -340,25 +309,6 @@ Item {
 
     transform: Translate {
         y: root._slideOffset
-    }
-
-    // ── Scroll behavior ───────────────────────────
-    WheelHandler {
-        enabled: root.scrollBehavior !== "none"
-        onWheel: event => {
-            var delta = event.angleDelta.y;
-            if (delta === 0)
-                return;
-            if (root.scrollBehavior === "workspace") {
-                if (delta > 0)
-                    CompositorAdapter.focusWorkspace("e-1");
-                else
-                    CompositorAdapter.focusWorkspace("e+1");
-            } else if (root.scrollBehavior === "volume") {
-                var step = delta > 0 ? 0.02 : -0.02;
-                AudioService.setVolume("@DEFAULT_AUDIO_SINK@", Math.max(0, Math.min(1, AudioService.outputVolume + step)));
-            }
-        }
     }
 
     PanelShadowLayer {
