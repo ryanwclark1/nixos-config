@@ -83,7 +83,10 @@ PopupWindow {
         if (!item || item.separator || item.disabled) return;
         var fn = item.action;
         close();
-        if (typeof fn === "function") fn();
+        // Defer so the Wayland popup finishes teardown before actions that open
+        // other layers (e.g. SettingsHub via IPC); immediate fn() after close() could no-op or race.
+        if (typeof fn === "function")
+            Qt.callLater(fn);
     }
 
     function moveFocus(delta) {

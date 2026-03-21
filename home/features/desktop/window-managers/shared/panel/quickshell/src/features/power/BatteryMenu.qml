@@ -18,6 +18,23 @@ BasePopupMenu {
   property var device: UPower.displayDevice
   property bool hasBattery: device != null && device.isPresent
 
+  // UPower.displayDevice is an aggregate: energy fields map to changeRate / energyCapacity in Quickshell.
+  // Health (Capacity) is often 0 on DisplayDevice; prefer the physical laptop battery from UPower.devices.
+  readonly property int _upowerDeviceCount: (UPower.devices && UPower.devices.values) ? UPower.devices.values.length : 0
+  readonly property var _healthSourceDevice: {
+    var m = UPower.devices;
+    if (m && m.values) {
+      // Touch _upowerDeviceCount so we rebind when the model count changes (no countChanged on ObjectModel).
+      for (var i = 0; i < m.values.length && root._upowerDeviceCount >= 0; i++) {
+        var d = m.values[i];
+        if (d && d.isLaptopBattery && d.healthSupported) return d;
+      }
+    }
+    return (root.device && root.device.healthSupported) ? root.device : null;
+  }
+
+  readonly property real _healthPercentRaw: _healthSourceDevice ? _healthSourceDevice.healthPercentage : -1
+
   readonly property string batteryStateText: BatteryHelpers.stateText(device, UPower)
 
   readonly property string batteryIcon: BatteryHelpers.iconName(device, UPower)
@@ -132,27 +149,31 @@ BasePopupMenu {
 
         Text { text: "Energy rate"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeMedium }
         Text {
-          text: root.device && root.device.energyRate ? root.device.energyRate.toFixed(1) + " W" : "—"
+          text: (root.device && root.device.ready)
+            ? Math.abs(root.device.changeRate).toFixed(1) + " W"
+            : "—"
           color: Colors.text; font.pixelSize: Appearance.fontSizeMedium; font.weight: Font.Medium
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
 
         Text { text: "Capacity"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeMedium }
         Text {
-          text: root.device && root.device.energyFull ? root.device.energyFull.toFixed(1) + " Wh" : "—"
+          text: (root.device && root.device.ready && root.device.energyCapacity > 0)
+            ? root.device.energyCapacity.toFixed(1) + " Wh"
+            : "—"
           color: Colors.text; font.pixelSize: Appearance.fontSizeMedium; font.weight: Font.Medium
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
         }
 
         Text { text: "Health"; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeMedium }
         Text {
-          text: root.device && root.device.energyFullDesign > 0
-            ? Math.round((root.device.energyFull / root.device.energyFullDesign) * 100) + "%"
+          text: root._healthPercentRaw >= 0
+            ? (root._healthPercentRaw > 1 ? Math.round(root._healthPercentRaw) : Math.round(root._healthPercentRaw * 100)) + "%"
             : "—"
           color: {
-            if (!root.device || root.device.energyFullDesign <= 0) return Colors.text;
-            var health = root.device.energyFull / root.device.energyFullDesign;
-            return health > 0.8 ? Colors.primary : (health > 0.5 ? Colors.accent : Colors.error);
+            if (root._healthPercentRaw < 0) return Colors.text;
+            var p = root._healthPercentRaw > 1 ? root._healthPercentRaw / 100 : root._healthPercentRaw;
+            return p > 0.8 ? Colors.primary : (p > 0.5 ? Colors.accent : Colors.error);
           }
           font.pixelSize: Appearance.fontSizeMedium; font.weight: Font.Medium
           Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignRight
