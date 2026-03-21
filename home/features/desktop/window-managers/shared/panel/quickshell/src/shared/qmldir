@@ -32,6 +32,7 @@ Revealer 1.0 Revealer.qml
 ScrollableContent 1.0 ScrollableContent.qml
 Scrollbar 1.0 Scrollbar.qml
 SearchBar 1.0 SearchBar.qml
+ServiceRefList 1.0 ServiceRefList.qml
 SectionLabel 1.0 SectionLabel.qml
 SliderTrack 1.0 SliderTrack.qml
 StateLayer 1.0 StateLayer.qml

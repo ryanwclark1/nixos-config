@@ -10,15 +10,9 @@ Item {
     implicitHeight: 0
 
     Repeater {
-        model: root.services
-        delegate: Item {
-            required property var modelData
-            width: 0
-            height: 0
-
-            Ref {
-                service: modelData
-            }
+        model: root.services.length
+        delegate: Ref {
+            service: root.services[index]
         }
     }
 }
