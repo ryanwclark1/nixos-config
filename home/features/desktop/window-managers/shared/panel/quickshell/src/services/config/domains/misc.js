@@ -70,6 +70,7 @@ var state = {
     sectionKey: "state",
     maps: [
         ["activeSurfaceId", "activeSurfaceId"],
-        ["debug", "debug"]
+        ["debug", "debug"],
+        ["barWidgetLoadLogging", "barWidgetLoadLogging"]
     ]
 }

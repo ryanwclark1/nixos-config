@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { stateText, iconName } from "../../src/features/power/BatteryHelpers.js";
+import { stateText, iconName, isAcPowered } from "../../src/features/power/BatteryHelpers.js";
 
 // Mock UPower enum values matching Quickshell's UPower.DeviceState* constants
 const UPowerEnums = {
@@ -44,6 +44,27 @@ describe("stateText", () => {
 
   it("infers Charging when time-to-full is set but state is discharging (UPower quirk)", () => {
     expect(stateText({ state: 2, timeToFull: 960, timeToEmpty: 0 }, UPowerEnums)).toBe("Charging");
+  });
+});
+
+describe("isAcPowered", () => {
+  it("returns false for null device", () => {
+    expect(isAcPowered(null, UPowerEnums)).toBe(false);
+  });
+
+  it("returns true when charging, fully charged, or pending charge", () => {
+    expect(isAcPowered({ state: 1 }, UPowerEnums)).toBe(true);
+    expect(isAcPowered({ state: 4 }, UPowerEnums)).toBe(true);
+    expect(isAcPowered({ state: 5 }, UPowerEnums)).toBe(true);
+  });
+
+  it("returns false for plain discharging and pending discharge", () => {
+    expect(isAcPowered({ state: 2, percentage: 0.5 }, UPowerEnums)).toBe(false);
+    expect(isAcPowered({ state: 6 }, UPowerEnums)).toBe(false);
+  });
+
+  it("returns true when time-to-full implies charging despite discharging state", () => {
+    expect(isAcPowered({ state: 2, timeToFull: 600, timeToEmpty: 0 }, UPowerEnums)).toBe(true);
   });
 });
 

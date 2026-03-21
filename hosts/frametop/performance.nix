@@ -40,6 +40,10 @@
   # Enable thermal management for laptop
   services.thermald.enable = true;
 
+  # Qt Multimedia / FFmpeg probe VDPAU before VA-API; without a VA-API-backed VDPAU driver
+  # they log failures for libvdpau_nvidia.so on Intel-only systems.
+  hardware.graphics.extraPackages = with pkgs; [ libvdpau-va-gl ];
+
   # Laptop-specific packages (if not already in global)
   environment.systemPackages = with pkgs; [
     # powertop  # Disabled: service crashes with segfault, use auto-cpufreq instead

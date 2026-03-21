@@ -75,6 +75,7 @@ Item {
     property bool _autoHidden: false
     property bool _hovered: false
     property var _widgetDiagnosticStates: ({})
+    property var _barInactiveLogged: ({})
     property bool diagnosticsReady: false
     // Expose to shell.qml for exclusiveZone control
     readonly property bool isAutoHidden: _autoHidden
@@ -86,6 +87,7 @@ Item {
 
     function resetDiagnosticWarmup() {
         diagnosticsReady = false;
+        _barInactiveLogged = ({});
         diagnosticWarmupTimer.restart();
     }
 
@@ -141,6 +143,31 @@ Item {
     function isWidgetHiddenInVertical(wi) { return PanelHelpers.isWidgetHiddenInVertical(wi); }
     function shouldCollapseVerticalOverflow(wi) { return PanelHelpers.shouldCollapseVerticalOverflow(wi); }
 
+    function inactiveBarWidgetReason(widgetInstance, hiddenInVertical) {
+        if (!widgetInstance)
+            return "missing widget instance";
+        if (hiddenInVertical)
+            return "hidden on vertical bar (widget policy)";
+        if (widgetInstance.enabled === false)
+            return "disabled in bar layout — enable in Settings → Bar or set enabled: true in config";
+        return "";
+    }
+
+    function maybeLogBarWidgetInactive(widgetId, widgetInstance, hiddenInVertical) {
+        if (!Config.barWidgetLoadLogging)
+            return;
+        var reason = inactiveBarWidgetReason(widgetInstance, hiddenInVertical);
+        if (!reason)
+            return;
+        var prev = _barInactiveLogged[widgetId];
+        if (prev === reason)
+            return;
+        _barInactiveLogged[widgetId] = reason;
+        var wtype = widgetInstance ? String(widgetInstance.widgetType || "") : "";
+        var barId = barConfig ? barConfig.id : "";
+        Logger.i("Panel", "bar widget inactive:", widgetId, "type=" + wtype, "bar=" + barId, reason);
+    }
+
     function reportWidgetDiagnostic(widgetId, state, details) {
         var previous = _widgetDiagnosticStates[widgetId] || "";
         if (previous === state)
@@ -152,7 +179,8 @@ Item {
         }
 
         _widgetDiagnosticStates[widgetId] = state;
-        Logger.w("Panel", "widget state warning:", widgetId, "state=" + state, details || "");
+        if (Config.barWidgetLoadLogging)
+            Logger.w("Panel", "widget state warning:", widgetId, "state=" + state, details || "");
     }
 
     onBarConfigChanged: resetDiagnosticWarmup()
@@ -516,6 +544,7 @@ Item {
             property var widgetInstance: modelData
             property string deferredDiagnosticState: ""
             property string deferredDiagnosticDetail: ""
+            property bool stuckPendingReported: false
             readonly property bool occupiesSpace: root.itemOccupiesSpace(widgetLoader.item)
             readonly property bool diagnosticsReady: root.diagnosticsReady
             readonly property bool hiddenInVertical: root.vertical && root.isWidgetHiddenInVertical(widgetInstance)
@@ -563,13 +592,35 @@ Item {
             height: contributesLayout ? (root.vertical ? rawWidgetHeight : root.thickness) : 0
 
             function refreshDiagnosticState() {
+                if (diagnosticState === "inactive")
+                    root.maybeLogBarWidgetInactive(widgetId, widgetInstance, hiddenInVertical);
+
+                if (diagnosticState === "pending")
+                    stuckPendingTimer.restart();
+                else {
+                    stuckPendingTimer.stop();
+                    stuckPendingReported = false;
+                }
+
                 var detail = "";
-                if (diagnosticState === "load-error")
+                if (diagnosticState === "load-error") {
                     detail = "component failed to load";
-                else if (diagnosticState === "vertical-overflow")
+                    if (Config.barWidgetLoadLogging) {
+                        var wtypeErr = widgetInstance ? String(widgetInstance.widgetType || "") : "";
+                        var barErr = root.barConfig ? root.barConfig.id : "";
+                        detail += " | type=" + wtypeErr + " bar=" + barErr + " loaderStatus=" + widgetLoader.status;
+                    }
+                } else if (diagnosticState === "vertical-overflow") {
                     detail = "widget exceeded the vertical width cap and was collapsed";
-                else if (diagnosticState === "zero-footprint")
+                } else if (diagnosticState === "zero-footprint") {
                     detail = "widget is enabled but reports zero layout footprint";
+                    if (Config.barWidgetLoadLogging) {
+                        var wtypeZ = widgetInstance ? String(widgetInstance.widgetType || "") : "";
+                        var barZ = root.barConfig ? root.barConfig.id : "";
+                        var itemVis = widgetLoader.item ? widgetLoader.item.visible : null;
+                        detail += " | type=" + wtypeZ + " bar=" + barZ + " itemVisible=" + itemVis;
+                    }
+                }
                 if (diagnosticState === "zero-footprint") {
                     if (!root.diagnosticsReady) {
                         diagnosticGraceTimer.stop();
@@ -601,6 +652,22 @@ Item {
                     if (parent.diagnosticState !== parent.deferredDiagnosticState)
                         return;
                     root.reportWidgetDiagnostic(parent.widgetId, parent.deferredDiagnosticState, parent.deferredDiagnosticDetail);
+                }
+            }
+
+            Timer {
+                id: stuckPendingTimer
+                interval: 5000
+                repeat: false
+                onTriggered: {
+                    if (parent.diagnosticState !== "pending")
+                        return;
+                    if (!Config.barWidgetLoadLogging || parent.stuckPendingReported)
+                        return;
+                    parent.stuckPendingReported = true;
+                    var wtypeP = parent.widgetInstance ? String(parent.widgetInstance.widgetType || "") : "";
+                    var barP = root.barConfig ? root.barConfig.id : "";
+                    Logger.w("Panel", "bar widget still pending after 5s:", parent.widgetId, "type=" + wtypeP, "bar=" + barP);
                 }
             }
 

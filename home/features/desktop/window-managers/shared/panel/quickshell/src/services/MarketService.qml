@@ -13,10 +13,12 @@ QtObject {
   property var marketData: []
   property bool _hasSuccessfulFetch: false
   property string _lastFailureKey: ""
+  property double _rateLimitQuietUntil: 0 // epoch ms; refresh() no-ops until then
 
   // ── Named constants ──────────────────────────
   readonly property int _refreshIntervalMs: 60000  // 1 min
   readonly property int _retryIntervalMs: 10000    // 10s retry on failure
+  readonly property int _rateLimitBackoffMs: 6 * 60 * 60 * 1000 // Stooq daily cap — avoid hammering
   readonly property int _configDebounceMs: 500
 
   // Deferred activation flag
@@ -24,6 +26,9 @@ QtObject {
   Component.onCompleted: _ready = true
 
   function refresh() {
+    if (Date.now() < root._rateLimitQuietUntil) {
+      return;
+    }
     var tickers = (Config.marketTickers || "^SPX ^DJI ^NDQ").trim().replace(/,/g, " ").replace(/\s+/g, "+");
     if (!tickers) {
       root.marketData = [];
@@ -60,10 +65,24 @@ QtObject {
           if (!raw) {
             throw new Error("empty market response (curl exit " + root._lastExitCode + ")");
           }
-          if (raw.indexOf("{") !== 0) throw new Error("response is not JSON: " + raw.substring(0, 80));
+          if (raw.indexOf("{") !== 0) {
+            var rl = raw.toLowerCase();
+            if (rl.indexOf("exceeded") !== -1 && rl.indexOf("limit") !== -1) {
+              root._reportFailure(
+                "stooq_rate_limited",
+                "Daily Stooq quota exceeded; pausing market refresh for several hours"
+              );
+              retryTimer.stop();
+              root._rateLimitQuietUntil = Date.now() + root._rateLimitBackoffMs;
+              return;
+            }
+            throw new Error("response is not JSON: " + raw.substring(0, 80));
+          }
           var json = JSON.parse(raw);
           if (!json.symbols) throw new Error("missing symbols in response");
 
+          retryTimer.interval = root._retryIntervalMs;
+          root._rateLimitQuietUntil = 0;
           root.marketData = json.symbols;
           root._hasSuccessfulFetch = true;
           root._lastFailureKey = "";

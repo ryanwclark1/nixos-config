@@ -6,6 +6,8 @@ import "../../services"
 Rectangle {
   id: root
   property bool _destroyed: false
+  property bool _loggedWorkspaceApiUnavailable: false
+  property bool _loggedEmptyWorkspaceList: false
   readonly property bool hasWorkspaceContent: workspaceApiAvailable && !!state && (state.workspaces || []).length > 0
   readonly property real contentWidth: vertical ? 28 : (strip.implicitWidth + 12)
   readonly property real contentHeight: vertical ? (strip.implicitHeight + 12) : 24
@@ -49,6 +51,26 @@ Rectangle {
     }
   }
 
+  function _maybeLogWorkspaceStrip(context) {
+    if (!Config.barWidgetLoadLogging)
+      return;
+    if (!workspaceApiAvailable) {
+      if (_loggedWorkspaceApiUnavailable)
+        return;
+      _loggedWorkspaceApiUnavailable = true;
+      Logger.w("Workspaces", "[" + context + "] listing disabled — compositor=" + CompositorAdapter.compositor);
+      return;
+    }
+    var len = (state && state.workspaces) ? state.workspaces.length : 0;
+    if (len === 0) {
+      if (!_loggedEmptyWorkspaceList)
+        Logger.w("Workspaces", "[" + context + "] no workspaces from compositor (strip hidden; check IPC / session env)");
+      _loggedEmptyWorkspaceList = true;
+    } else {
+      _loggedEmptyWorkspaceList = false;
+    }
+  }
+
   Component.onCompleted: {
     if (CompositorAdapter.isNiri && NiriService.available) {
       _applyFocusedWorkspaceFromNiriService()
@@ -58,6 +80,7 @@ Rectangle {
       _updateStateFromHyprland();
       Hyprland.rawEvent.connect(_onHyprlandEvent);
     }
+    Qt.callLater(function() { if (!root._destroyed) root._maybeLogWorkspaceStrip("startup"); });
   }
 
   Component.onDestruction: {
@@ -80,6 +103,7 @@ Rectangle {
     var wsList = Hyprland.workspaces;
     if (!wsList) {
       state = { workspaces: [], activeWorkspace: -1 };
+      _maybeLogWorkspaceStrip("hyprland");
       return;
     }
 
@@ -112,6 +136,7 @@ Rectangle {
       workspaces: workspaces,
       activeWorkspace: activeId
     };
+    _maybeLogWorkspaceStrip("hyprland");
   }
 
   function _focusedWorkspaceIdFromNiriService() {
@@ -187,6 +212,7 @@ Rectangle {
       workspaces: workspaces,
       activeWorkspace: activeId
     };
+    _maybeLogWorkspaceStrip("niri");
   }
 
   WorkspaceStrip {

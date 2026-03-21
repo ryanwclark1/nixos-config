@@ -392,6 +392,7 @@ QtObject {
     property bool colorExportGtkScheme: false
 
     // --- INTERNAL ---
+    property bool barWidgetLoadLogging: true
     property bool debug: false
     property bool pauseAutoSave: false
     property bool configReady: false

@@ -377,6 +377,9 @@ QtObject {
         function onDebugChanged() {
             root.config.scheduleSave();
         }
+        function onBarWidgetLoadLoggingChanged() {
+            root.config.scheduleSave();
+        }
         function onFontFamilyChanged() {
             root.config.scheduleSave();
         }

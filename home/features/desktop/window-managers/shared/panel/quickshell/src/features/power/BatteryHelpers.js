@@ -8,6 +8,15 @@ function _timesImplyCharging(device) {
     return device && device.timeToFull > 0 && !(device.timeToEmpty > 0);
 }
 
+/** True when the machine is on AC or actively charging (matches stateText "plugged" cases). */
+function isAcPowered(device, UPowerEnums) {
+    if (!device) return false;
+    if (device.state === UPowerEnums.DeviceStateCharging) return true;
+    if (device.state === UPowerEnums.DeviceStateFullyCharged) return true;
+    if (device.state === UPowerEnums.DeviceStatePendingCharge) return true;
+    return _timesImplyCharging(device);
+}
+
 function stateText(device, UPowerEnums) {
     if (!device) return "Unknown";
     if (device.state === UPowerEnums.DeviceStateFullyCharged) return "Fully charged";

@@ -65,6 +65,12 @@ Item {
                     icon: "bug.svg"
                     configKey: "debug"
                 }
+                SettingsToggleRow {
+                    label: "Bar Widget Load Logging"
+                    icon: "alert.svg"
+                    description: "Log to journal when bar widgets are disabled, fail to load, stay pending, or report zero size."
+                    configKey: "barWidgetLoadLogging"
+                }
             }
 
             SettingsSliderRow {
