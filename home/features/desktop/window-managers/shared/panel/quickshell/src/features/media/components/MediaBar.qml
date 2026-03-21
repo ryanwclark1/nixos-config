@@ -41,9 +41,17 @@ Rectangle {
   property real _lastPosition: 0
   property real _rewindFlashOpacity: 0
 
-  Ref {
-    service: SpectrumService
-    active: root.visualizerVisible
+  Item {
+    width: 0
+    height: 0
+    visible: false
+    Ref {
+      service: MediaService
+    }
+    Ref {
+      service: SpectrumService
+      active: root.visualizerVisible
+    }
   }
 
   Connections {

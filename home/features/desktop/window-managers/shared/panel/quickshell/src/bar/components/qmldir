@@ -18,3 +18,4 @@ TodoBarWidget 1.0 TodoBarWidget.qml
 GameModeBarWidget 1.0 GameModeBarWidget.qml
 NightLightBarWidget 1.0 NightLightBarWidget.qml
 BarSurfacePill 1.0 BarSurfacePill.qml
+PanelShadowLayer 1.0 PanelShadowLayer.qml

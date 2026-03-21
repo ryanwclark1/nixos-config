@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Services.UPower
+import "."
 
 QtObject {
   id: root
@@ -58,6 +59,8 @@ QtObject {
           root.overallStatus = data.status || "failure";
           root._loadDetailedIncidents();
         } catch (e) {
+          var snippet = String(this.text || "").replace(/\s+/g, " ").substring(0, 120);
+          Logger.w("SystemStatus", "health-check JSON parse failed:", e, snippet ? "stdout:" + snippet : "");
           root.overallStatus = "failure";
         }
         root.isHealthChecking = false;
@@ -71,7 +74,13 @@ QtObject {
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
-        try { root.pluginDiagnostics = JSON.parse(this.text); } catch (e) {}
+        try {
+          root.pluginDiagnostics = JSON.parse(this.text);
+        } catch (e) {
+          var ps = String(this.text || "").replace(/\s+/g, " ").substring(0, 120);
+          Logger.w("SystemStatus", "plugin-doctor JSON parse failed:", e, ps ? "stdout:" + ps : "");
+          root.pluginDiagnostics = ({});
+        }
       }
     }
   }
@@ -137,8 +146,10 @@ QtObject {
             }
           }
           root.activeIncidents = nextIncidents;
-        } catch (e) { 
-          root.activeIncidents = []; 
+        } catch (e) {
+          var is = String(this.text || "").replace(/\s+/g, " ").substring(0, 120);
+          Logger.w("SystemStatus", "incidents JSON parse failed:", e, is ? "stdout:" + is : "");
+          root.activeIncidents = [];
         }
       }
     }
@@ -210,6 +221,47 @@ QtObject {
   // Use Ref { service: SystemStatus } for automatic lifecycle management.
   property int subscriberCount: 0
 
+  // Probed once at startup — avoids `command -v nvidia-smi` on every fast stats tick.
+  property bool _nvidiaSmiAvailable: false
+
+  property Process _nvidiaProbe: Process {
+    command: ["sh", "-c", "command -v nvidia-smi >/dev/null 2>&1"]
+    running: true
+    onExited: (exitCode) => {
+      root._nvidiaSmiAvailable = exitCode === 0;
+    }
+  }
+
+  // ── Fast path: CPU/RAM/disk/net without sensors or GPU queries ─────────
+  readonly property string _statsLiteScript:
+      "cpu_raw=$(grep '^cpu ' /proc/stat); "
+      + "ram_stats=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; printf \"%.1fGB\\n%.4f\", used/1024/1024, used/total}' /proc/meminfo); "
+      + "disk_pct=$(df / 2>/dev/null | awk 'NR==2 {print $5}'); "
+      + "iface=$(ip route show default 2>/dev/null | awk 'NR==1 {print $5}'); "
+      + "net_rx=0; net_tx=0; "
+      + "if [ -n \"$iface\" ] && [ -r \"/sys/class/net/$iface/statistics/rx_bytes\" ]; then "
+      + "net_rx=$(cat /sys/class/net/$iface/statistics/rx_bytes); "
+      + "net_tx=$(cat /sys/class/net/$iface/statistics/tx_bytes); fi; "
+      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' '' '' \"$cpu_raw\" '' \"$ram_stats\" \"$disk_pct\" \"$net_rx\" \"$net_tx\""
+
+  // ── Slow path: temperatures + GPU utilization (less frequent) ──────────
+  readonly property string _statsHwScriptBase:
+      "sensors_out=$(sensors 2>/dev/null); "
+      + "cpu_temp=$(echo \"$sensors_out\" | awk '/Tctl:|Package id 0:|Tdie:|Core 0:/ {gsub(/[+°C]/, \"\", $0); for(i=1;i<=NF;i++) if($i ~ /^[0-9.]+$/) {print $i; exit}}'); "
+      + "gpu_temp=$(echo \"$sensors_out\" | awk '/edge:|junction:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
+  readonly property string _statsHwScriptMid:
+      "gpu_usage=\"\"; for f in /sys/class/drm/card[0-9]/device/gpu_busy_percent; do "
+      + "[ ! -r \"$f\" ] && continue; u=$(cat \"$f\" 2>/dev/null); [ -n \"$u\" ] && gpu_usage=$u && break; done; "
+  readonly property string _statsHwNvidiaTemp:
+      "if [ -z \"$gpu_temp\" ]; then gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
+  readonly property string _statsHwNvidiaUtil:
+      "if [ -z \"$gpu_usage\" ]; then gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
+  readonly property string _statsHwScript: root._statsHwScriptBase
+      + (root._nvidiaSmiAvailable ? root._statsHwNvidiaTemp : "")
+      + root._statsHwScriptMid
+      + (root._nvidiaSmiAvailable ? root._statsHwNvidiaUtil : "")
+      + "printf '%s\\n%s\\n%s\\n' \"$cpu_temp\" \"$gpu_temp\" \"$gpu_usage\""
+
   function formatTemp(rawValue) {
     var parsed = parseFloat(rawValue);
     return isNaN(parsed) || parsed === 0 ? "--" : Math.round(parsed) + "°C";
@@ -233,27 +285,7 @@ QtObject {
     id: statsPoll
     interval: Math.max(1000, root.pollIntervalMs)
     running: root.subscriberCount > 0
-    command: [
-      "sh",
-      "-c",
-      // Optimized single-pass system stats collection
-      "sensors_out=$(sensors 2>/dev/null); "
-      + "cpu_temp=$(echo \"$sensors_out\" | awk '/Tctl:|Package id 0:|Tdie:|Core 0:/ {gsub(/[+°C]/, \"\", $0); for(i=1;i<=NF;i++) if($i ~ /^[0-9.]+$/) {print $i; exit}}'); "
-      + "gpu_temp=$(echo \"$sensors_out\" | awk '/edge:|junction:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
-      + "if [ -z \"$gpu_temp\" ] && command -v nvidia-smi >/dev/null 2>&1; then gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
-      + "cpu_raw=$(grep '^cpu ' /proc/stat); "
-      + "gpu_usage=\"\"; for f in /sys/class/drm/card[0-9]/device/gpu_busy_percent; do "
-      + "[ ! -r \"$f\" ] && continue; u=$(cat \"$f\" 2>/dev/null); [ -n \"$u\" ] && gpu_usage=$u && break; done; "
-      + "if [ -z \"$gpu_usage\" ] && command -v nvidia-smi >/dev/null 2>&1; then gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
-      + "ram_stats=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; printf \"%.1fGB\\n%.4f\", used/1024/1024, used/total}' /proc/meminfo); "
-      + "disk_pct=$(df / 2>/dev/null | awk 'NR==2 {print $5}'); "
-      + "iface=$(ip route show default 2>/dev/null | awk 'NR==1 {print $5}'); "
-      + "net_rx=0; net_tx=0; "
-      + "if [ -n \"$iface\" ] && [ -r \"/sys/class/net/$iface/statistics/rx_bytes\" ]; then "
-      + "net_rx=$(cat /sys/class/net/$iface/statistics/rx_bytes); "
-      + "net_tx=$(cat /sys/class/net/$iface/statistics/tx_bytes); fi; "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' \"$cpu_temp\" \"$gpu_temp\" \"$cpu_raw\" \"$gpu_usage\" \"$ram_stats\" \"$disk_pct\" \"$net_rx\" \"$net_tx\""
-    ]
+    command: ["sh", "-c", root._statsLiteScript]
 
     property var lastTotal: 0
     property var lastIdle: 0
@@ -261,8 +293,12 @@ QtObject {
     onUpdated: {
       var lines = root.parseStatsOutput(this.value);
       if (lines.length >= 6) {
-        root.cpuTemp = root.formatTemp(lines[0]);
-        root.gpuTemp = root.formatTemp(lines[1]);
+        var t0 = String(lines[0] || "").trim();
+        if (t0 !== "")
+          root.cpuTemp = root.formatTemp(lines[0]);
+        var t1 = String(lines[1] || "").trim();
+        if (t1 !== "")
+          root.gpuTemp = root.formatTemp(lines[1]);
 
         // CPU Usage calculation via /proc/stat delta
         var cpuParts = (lines[2] || "").split(/\s+/);
@@ -295,15 +331,18 @@ QtObject {
           this.lastIdle = currentIdle;
         }
 
-        var gpuRaw = lines[3] || "";
-        var gpuVal = parseInt(gpuRaw, 10);
-        if (!isNaN(gpuVal)) {
-          root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
-          root.gpuPercent = Colors.clamp01(gpuVal / 100);
-          root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
+        var gpuRaw = String(lines[3] || "").trim();
+        if (gpuRaw !== "") {
+          var gpuVal = parseInt(gpuRaw, 10);
+          if (!isNaN(gpuVal)) {
+            root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
+            root.gpuPercent = Colors.clamp01(gpuVal / 100);
+            root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
+          }
         }
 
-        if (lines[4]) root.ramUsage = lines[4];
+        if (lines[4])
+          root.ramUsage = lines[4];
 
         var ramRaw = lines[5] || "";
         var ramVal = parseFloat(ramRaw);
@@ -328,11 +367,44 @@ QtObject {
           if (root._netLastRx > 0) {
             var diffRx = Math.max(0, rx - root._netLastRx);
             var diffTx = Math.max(0, tx - root._netLastTx);
-            root.netDown = root._formatRate(diffRx / (root.pollIntervalMs / 1000));
-            root.netUp = root._formatRate(diffTx / (root.pollIntervalMs / 1000));
+            var dtSec = Math.max(0.001, root.pollIntervalMs / 1000);
+            root.netDown = root._formatRate(diffRx / dtSec);
+            root.netUp = root._formatRate(diffTx / dtSec);
           }
           root._netLastRx = rx;
           root._netLastTx = tx;
+        }
+      }
+    }
+  }
+
+  property var statsHwPoll: CommandPoll {
+    id: statsHwPoll
+    interval: Math.max(4000, root.pollIntervalMs * 2)
+    running: root.subscriberCount > 0
+    command: ["sh", "-c", root._statsHwScript]
+
+    onUpdated: {
+      var lines = root.parseStatsOutput(this.value);
+      if (lines.length >= 1) {
+        var c0 = String(lines[0] || "").trim();
+        if (c0 !== "")
+          root.cpuTemp = root.formatTemp(lines[0]);
+      }
+      if (lines.length >= 2) {
+        var c1 = String(lines[1] || "").trim();
+        if (c1 !== "")
+          root.gpuTemp = root.formatTemp(lines[1]);
+      }
+      if (lines.length >= 3) {
+        var gpuRaw = String(lines[2] || "").trim();
+        if (gpuRaw !== "") {
+          var gpuVal = parseInt(gpuRaw, 10);
+          if (!isNaN(gpuVal)) {
+            root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
+            root.gpuPercent = Colors.clamp01(gpuVal / 100);
+            root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
+          }
         }
       }
     }

@@ -16,6 +16,11 @@ Item {
     readonly property bool showGitStatus: widgetSettings.showGitStatus !== false
     readonly property bool showMediaContext: widgetSettings.showMediaContext !== false
 
+    SharedWidgets.Ref {
+        service: MediaService
+        active: root.showMediaContext
+    }
+
     readonly property string activeTitle: CompositorAdapter.activeWindowTitle || ""
     readonly property string activeAppId: CompositorAdapter.activeWindowAppId || ""
 

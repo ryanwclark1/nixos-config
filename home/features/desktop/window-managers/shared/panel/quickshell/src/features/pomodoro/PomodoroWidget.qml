@@ -67,8 +67,7 @@ ThemedContainer {
       // Background track
       Shape {
         anchors.fill: parent
-        layer.enabled: true
-        layer.samples: 4
+        layer.enabled: false
 
         ShapePath {
           fillColor: "transparent"
@@ -87,8 +86,7 @@ ThemedContainer {
       // Progress arc
       Shape {
         anchors.fill: parent
-        layer.enabled: true
-        layer.samples: 4
+        layer.enabled: false
 
         ShapePath {
           fillColor: "transparent"

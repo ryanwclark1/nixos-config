@@ -11,6 +11,10 @@ Item {
   implicitWidth: width
   implicitHeight: height
 
+  SharedWidgets.Ref {
+    service: SystemStatus
+  }
+
   property var anchorWindow: null
   property string tooltipText: "Applications • System Health: " + SystemStatus.overallStatus
   property bool iconOnly: true

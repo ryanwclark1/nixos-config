@@ -610,12 +610,15 @@ PanelWindow {
         onLoaded: {
             try {
                 launcherRoot.appFrequency = JSON.parse(freqFile.text());
-            } catch (e) {}
+            } catch (e) {
+                Logger.w("Launcher", "frequency file parse failed, resetting", e);
+                launcherRoot.appFrequency = ({});
+            }
         }
         onLoadFailed: error => {
             if (error === 2) {
                 launcherRoot.seedFrequencyFile = true;
-                seedFrequencyTimer.restart();
+                seedFileTimer.restart();
             }
         }
     }
@@ -634,32 +637,24 @@ PanelWindow {
         onLoadFailed: error => {
             if (error === 2) {
                 launcherRoot.seedHistoryFile = true;
-                seedHistoryTimer.restart();
+                seedFileTimer.restart();
             }
         }
     }
 
     Timer {
-        id: seedFrequencyTimer
+        id: seedFileTimer
         interval: 0
         repeat: false
         onTriggered: {
-            if (!launcherRoot.seedFrequencyFile)
-                return;
-            launcherRoot.seedFrequencyFile = false;
-            freqFile.setText("{}");
-        }
-    }
-
-    Timer {
-        id: seedHistoryTimer
-        interval: 0
-        repeat: false
-        onTriggered: {
-            if (!launcherRoot.seedHistoryFile)
-                return;
-            launcherRoot.seedHistoryFile = false;
-            historyFile.setText("[]");
+            if (launcherRoot.seedFrequencyFile) {
+                launcherRoot.seedFrequencyFile = false;
+                freqFile.setText("{}");
+            }
+            if (launcherRoot.seedHistoryFile) {
+                launcherRoot.seedHistoryFile = false;
+                historyFile.setText("[]");
+            }
         }
     }
 
@@ -1914,7 +1909,9 @@ PanelWindow {
             try {
                 setCached(key, preloadModes[key].parse(raw));
                 ok = true;
-            } catch (e) {}
+            } catch (e) {
+                Logger.w("Launcher", "preload parse failed", key, e);
+            }
         }
         if (ok) {
             markPreloadSuccess(key);

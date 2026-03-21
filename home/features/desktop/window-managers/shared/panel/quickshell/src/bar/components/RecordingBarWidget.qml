@@ -5,6 +5,7 @@ import "../PanelWidgetHelpers.js" as PanelHelpers
 
 SharedWidgets.BarPill {
     id: root
+
     property var widgetInstance: null
     property bool vertical: false
     signal triggerRequested(var triggerItem)
@@ -12,7 +13,7 @@ SharedWidgets.BarPill {
     readonly property bool iconOnly: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
     readonly property bool showPulseDot: PanelHelpers.widgetSettings(widgetInstance).showPulseDot !== false
 
-    visible: SystemStatus.isRecording
+    visible: RecordingService.isRecording
     activeColor: Colors.withAlpha(Colors.error, 0.22)
     normalColor: Colors.errorLight
     hoverColor: Colors.withAlpha(Colors.error, 0.25)
@@ -26,6 +27,15 @@ SharedWidgets.BarPill {
             action: () => RecordingService.stopRecording()
         }
     ]
+    Item {
+        width: 0
+        height: 0
+        visible: false
+        SharedWidgets.Ref {
+            service: RecordingService
+        }
+    }
+
     Row {
         spacing: Appearance.spacingS
 
@@ -37,7 +47,7 @@ SharedWidgets.BarPill {
             color: Colors.error
             anchors.verticalCenter: parent.verticalCenter
             SequentialAnimation on opacity {
-                running: SystemStatus.isRecording
+                running: RecordingService.isRecording
                 loops: Animation.Infinite
                 NumberAnimation {
                     from: 1.0

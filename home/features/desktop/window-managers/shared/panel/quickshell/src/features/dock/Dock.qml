@@ -21,7 +21,10 @@ Scope {
           ? DesktopEntries.heuristicLookup(appId)
           : (DesktopEntries.byId ? DesktopEntries.byId(appId) : null);
       }
-    } catch (e) {}
+    } catch (e) {
+      if (Config.debug)
+        Logger.d("Dock", "DesktopEntries lookup failed", appId, e);
+    }
     return null;
   }
 

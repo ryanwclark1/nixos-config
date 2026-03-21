@@ -106,7 +106,9 @@ Item {
         var initial = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.specialWorkspace : null;
         if (initial && initial.name && String(initial.name).startsWith("special:"))
           root.activeSpecial = String(initial.name);
-      } catch(e) {}
+      } catch (e) {
+        Logger.d("SpecialWorkspaces", "initial special workspace read failed", e);
+      }
     }
   }
 

@@ -29,28 +29,22 @@ SharedWidgets.ScrollableContent {
         return null;
     }
 
-    default property alias pageContent: contentColumn.data
+    readonly property int _pageMargin: tightSpacing ? 20 : (compactMode ? 24 : 32)
 
     anchors.fill: parent
     columnSpacing: Appearance.spacingXL
+    contentMarginH: _pageMargin
+    contentMarginV: _pageMargin
 
-    ColumnLayout {
-        id: contentColumn
+    // Hero + tab bodies (SettingsCard children) must live in ScrollableContent's flick column
+    // so long tabs scroll instead of clipping at the settings panel edge.
+    SettingsPageHero {
         Layout.fillWidth: true
-        Layout.leftMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
-        Layout.rightMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
-        Layout.topMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
-        Layout.bottomMargin: root.tightSpacing ? 20 : (root.compactMode ? 24 : 32)
-        spacing: Appearance.spacingXL
-
-        SettingsPageHero {
-            Layout.fillWidth: true
-            settingsRoot: root.resolvedSettingsRoot
-            tabId: root.tabId
-            title: root.resolvedTitle
-            subtitle: root.resolvedSubtitle
-            iconName: root.resolvedIconName
-            compactMode: root.compactMode
-        }
+        settingsRoot: root.resolvedSettingsRoot
+        tabId: root.tabId
+        title: root.resolvedTitle
+        subtitle: root.resolvedSubtitle
+        iconName: root.resolvedIconName
+        compactMode: root.compactMode
     }
 }

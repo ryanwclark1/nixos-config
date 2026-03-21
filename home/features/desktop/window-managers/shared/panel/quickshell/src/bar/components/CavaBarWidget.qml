@@ -11,6 +11,10 @@ Item {
     property bool isActive: false
     signal clicked(var triggerItem)
 
+    SharedWidgets.Ref {
+        service: MediaService
+    }
+
     readonly property int barCount: PanelHelpers.widgetIntegerSetting(widgetInstance, "barCount", 8, 4, 32)
     readonly property var cavaValues: {
         var raw = (SpectrumService && SpectrumService.values) ? SpectrumService.values : [];

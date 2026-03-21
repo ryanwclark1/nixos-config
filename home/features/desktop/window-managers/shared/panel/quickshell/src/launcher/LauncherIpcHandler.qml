@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../services"
 
 Item {
     id: root
@@ -62,7 +63,9 @@ Item {
             var items = [];
             try {
                 items = JSON.parse(itemsJson);
-            } catch (err) {}
+            } catch (err) {
+                Logger.w("LauncherIpc", "invalid dmenu itemsJson", err);
+            }
             root.launcher.mode = "dmenu";
             root.launcher.allItems = items.map(function (it) {
                 return {

@@ -15,28 +15,6 @@ Item {
         id: barGradient
     }
 
-    SharedWidgets.Ref {
-        service: RecordingService
-    }
-    SharedWidgets.Ref {
-        service: PrivacyService
-    }
-    SharedWidgets.Ref {
-        service: PrinterService
-    }
-    SharedWidgets.Ref {
-        service: SystemStatus
-    }
-    SharedWidgets.Ref {
-        service: MediaService
-    }
-    SharedWidgets.Ref {
-        service: WeatherService
-    }
-    SharedWidgets.Ref {
-        service: MarketService
-    }
-
     property var manager: null
     property var anchorWindow: null
     property var screenRef: null
@@ -149,7 +127,7 @@ Item {
         if (hiddenInVertical)
             return "hidden on vertical bar (widget policy)";
         if (widgetInstance.enabled === false)
-            return "disabled in bar layout — enable in Settings → Bar or set enabled: true in config";
+            return "disabled in bar layout — enable in Settings -> Bar or set enabled: true in config";
         return "";
     }
 
@@ -383,19 +361,12 @@ Item {
         }
     }
 
-    // ── Shadow (layered for soft-shadow effect) ──
-    Repeater {
-        model: root.shadowEnabled ? 3 : 0
-        Rectangle {
-            readonly property real spread: [2, 5, 8][index]
-            readonly property real baseAlpha: [0.5, 0.25, 0.1][index]
-            visible: !root._autoHidden
-            anchors.fill: parent
-            anchors.margins: -spread
-            z: -1 - index
-            radius: floatingBar ? Appearance.radiusMedium + spread : 0
-            color: Qt.rgba(0, 0, 0, root.shadowOpacity * baseAlpha)
-        }
+    PanelShadowLayer {
+        anchors.fill: parent
+        shadowEnabled: root.shadowEnabled
+        autoHidden: root._autoHidden
+        floatingBar: root.floatingBar
+        shadowOpacity: root.shadowOpacity
     }
 
     // ── Background ────────────────────────────────
@@ -509,6 +480,19 @@ Item {
         anchors.top: root.vertical ? parent.top : undefined
         anchors.topMargin: root.vertical ? outerPadding : 0
         anchors.horizontalCenter: root.vertical ? parent.horizontalCenter : undefined
+    }
+
+    Loader {
+        id: criticalStatusLoader
+        active: SystemStatus.isCritical
+        visible: SystemStatus.isCritical && !root.vertical
+        height: root.thickness
+        width: item ? item.implicitWidth : 0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: leftSection.right
+        anchors.leftMargin: root.runtimeSpacing
+        z: 20
+        sourceComponent: criticalAlertComponent
     }
 
     BarSectionRepeater {
@@ -752,6 +736,7 @@ Item {
     }
 
     Component {
+        id: criticalAlertComponent
         SharedWidgets.BarPill {
             property var widgetInstance: null
             visible: SystemStatus.isCritical

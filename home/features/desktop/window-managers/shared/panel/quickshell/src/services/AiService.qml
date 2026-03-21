@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import "../features/ai/services/AiProviders.js" as Providers
 import "../features/ai/services/AiProviderProfiles.js" as Profiles
+import "."
 
 QtObject {
     id: root
@@ -657,7 +658,9 @@ QtObject {
                         var usage = JSON.parse(line.substring(6));
                         if (usage.prompt !== undefined) root.lastPromptTokens = usage.prompt;
                         if (usage.completion !== undefined) root.lastCompletionTokens = usage.completion;
-                    } catch (e) { /* ignore parse errors */ }
+                    } catch (e) {
+                        Logger.d("AiService", "optional chunk parse skipped", e);
+                    }
                 }
                 // "DONE" is handled by onExited
             }

@@ -10,9 +10,20 @@ QtObject {
   readonly property alias items: adapter.items
   property string statePath: Quickshell.statePath("todo.json")
 
+  property int _doneCount: 0
   readonly property int totalCount: items.length
-  readonly property int doneCount: items.filter(function(i) { return i.done; }).length
+  readonly property int doneCount: _doneCount
   readonly property int pendingCount: totalCount - doneCount
+
+  function _syncDoneCount() {
+    var arr = adapter.items;
+    var n = 0;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] && arr[i].done)
+        n++;
+    }
+    root._doneCount = n;
+  }
 
   function addTask(description) {
     var text = (description || "").trim();
@@ -20,6 +31,7 @@ QtObject {
     var newItems = adapter.items.slice();
     newItems.push({ content: text, done: false, created: Date.now() });
     adapter.items = newItems;
+    root._syncDoneCount();
   }
 
   function toggleDone(index) {
@@ -27,6 +39,7 @@ QtObject {
     var newItems = adapter.items.slice();
     newItems[index] = Object.assign({}, newItems[index], { done: !newItems[index].done });
     adapter.items = newItems;
+    root._syncDoneCount();
   }
 
   function deleteItem(index) {
@@ -34,10 +47,12 @@ QtObject {
     var newItems = adapter.items.slice();
     newItems.splice(index, 1);
     adapter.items = newItems;
+    root._syncDoneCount();
   }
 
   function clearDone() {
     adapter.items = adapter.items.filter(function(i) { return !i.done; });
+    root._syncDoneCount();
   }
 
   readonly property FileView fileView: FileView {
@@ -48,7 +63,10 @@ QtObject {
     atomicWrites: true
     watchChanges: true
     onFileChanged: reload()
-    onAdapterUpdated: writeAdapter()
+    onAdapterUpdated: {
+      writeAdapter();
+      root._syncDoneCount();
+    }
 
     adapter: JsonAdapter {
       id: adapter
@@ -66,5 +84,6 @@ QtObject {
         Logger.e("TodoService", "migration failed:", e);
       }
     }
+    root._syncDoneCount();
   }
 }

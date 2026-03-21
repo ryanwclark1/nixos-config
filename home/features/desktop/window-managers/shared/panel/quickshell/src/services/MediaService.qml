@@ -34,7 +34,7 @@ Item {
 
   ColorQuantizer {
     id: _colorQuantizer
-    source: root.trackArtUrl
+    source: root.subscriberCount > 0 ? root.trackArtUrl : ""
     depth: 3        // 2^3 = 8 palette colors
     rescaleSize: 64 // fast, sufficient quality
   }

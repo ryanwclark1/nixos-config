@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell.Io
+import "."
 
 QtObject {
   id: root
@@ -21,6 +22,7 @@ QtObject {
         payload.errors = parsed.errors && typeof parsed.errors === "object" ? parsed.errors : ({ });
       }
     } catch (e) {
+      Logger.w("PluginRuntimeCatalog", "catalog parse failed", e);
       payload = ({ states: ({ }), errors: ({ }) });
     }
     states = payload.states;

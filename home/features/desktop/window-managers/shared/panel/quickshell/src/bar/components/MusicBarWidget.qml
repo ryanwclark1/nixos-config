@@ -5,6 +5,7 @@ import "../PanelWidgetHelpers.js" as PanelHelpers
 
 SharedWidgets.BarPill {
     id: root
+
     property var widgetInstance: null
     property bool vertical: false
     signal triggerRequested(var triggerItem)
@@ -12,33 +13,23 @@ SharedWidgets.BarPill {
     readonly property bool iconOnly: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
     readonly property int maxTextWidth: PanelHelpers.widgetIntegerSetting(widgetInstance, "maxTextWidth", 100, 60, 220)
 
-    visible: SystemStatus.hasActivePlayer
+    visible: MediaService.currentPlayer !== null
     tooltipText: {
-        var players = SystemStatus.activeMprisPlayers;
-        if (!players || players.length === 0)
+        if (!MediaService.trackTitle)
             return "Music controls";
-        var p = players[0];
-        return (p.trackTitle || "Music") + (p.trackArtist ? " - " + p.trackArtist : "");
+        return MediaService.trackTitle + (MediaService.trackArtist ? " - " + MediaService.trackArtist : "");
     }
     onClicked: root.triggerRequested(this)
     contextActions: [
         {
             label: "Play / Pause",
             icon: "play.svg",
-            action: () => {
-                var p = SystemStatus.activeMprisPlayers;
-                if (p && p.length > 0 && p[0].player)
-                    p[0].player.playPause();
-            }
+            action: () => MediaService.playPause()
         },
         {
             label: "Next Track",
             icon: "arrow-right.svg",
-            action: () => {
-                var p = SystemStatus.activeMprisPlayers;
-                if (p && p.length > 0 && p[0].player)
-                    p[0].player.next();
-            }
+            action: () => MediaService.next()
         },
         {
             separator: true
@@ -54,6 +45,15 @@ SharedWidgets.BarPill {
         NumberAnimation {
             duration: Appearance.durationSlow
             easing.type: Easing.OutCubic
+        }
+    }
+
+    Item {
+        width: 0
+        height: 0
+        visible: false
+        SharedWidgets.Ref {
+            service: MediaService
         }
     }
 
@@ -76,7 +76,7 @@ SharedWidgets.BarPill {
 
             Text {
                 id: musicTitleText
-                text: SystemStatus.activeMprisPlayers.length > 0 ? (SystemStatus.activeMprisPlayers[0].trackTitle || "") : ""
+                text: MediaService.trackTitle || ""
                 color: Colors.text
                 font.pixelSize: Appearance.fontSizeSmall
                 font.weight: Font.DemiBold

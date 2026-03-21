@@ -17,6 +17,18 @@ Item {
     function orderedPlugins() {
         return Helpers.orderedControlCenterPlugins(PluginService, Config);
     }
+
+    readonly property var orderedTogglesModel: (function() {
+        void Config.controlCenterToggleOrder;
+        void Config.controlCenterHiddenToggles;
+        return Helpers.orderedControlCenterToggles(ControlCenterRegistry, Config);
+    })()
+    readonly property var orderedPluginsModel: (function() {
+        void Config.controlCenterPluginOrder;
+        void Config.controlCenterHiddenPlugins;
+        void PluginService.controlCenterPlugins;
+        return Helpers.orderedControlCenterPlugins(PluginService, Config);
+    })()
     function beginToggleDrag(toggleId, index) {
         toggleReorderState.begin("control-center-toggle", toggleId, index);
     }
@@ -30,10 +42,10 @@ Item {
         pluginReorderState.clear();
     }
     function currentToggleDropIndex(cardItem, rowIndex, listItem) {
-        return Helpers.currentOrderedDropIndex(cardItem, rowIndex, listItem, root.orderedToggles().length);
+        return Helpers.currentOrderedDropIndex(cardItem, rowIndex, listItem, root.orderedTogglesModel.length);
     }
     function currentPluginDropIndex(cardItem, rowIndex, listItem) {
-        return Helpers.currentOrderedDropIndex(cardItem, rowIndex, listItem, root.orderedPlugins().length);
+        return Helpers.currentOrderedDropIndex(cardItem, rowIndex, listItem, root.orderedPluginsModel.length);
     }
     function moveDraggedToggle(targetIndex) {
         return Helpers.moveDraggedOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleReorderState, targetIndex);
@@ -115,7 +127,7 @@ Item {
                 spacing: Appearance.spacingXS
 
                 Repeater {
-                    model: root.orderedToggles()
+                    model: root.orderedTogglesModel
 
                     delegate: SettingsReorderRow {
                         id: toggleRow
@@ -126,7 +138,7 @@ Item {
                         listId: "control-center-toggle"
                         itemId: String(toggleRow.modelData.id || "")
                         rowIndex: toggleRow.index
-                        itemCount: root.orderedToggles().length
+                        itemCount: root.orderedTogglesModel.length
                         listItem: toggleOrderList
                         compactMode: root.compactMode
                         minimumHeight: root.compactMode ? 78 : 62
@@ -174,7 +186,7 @@ Item {
 
                             SettingsReorderButtons {
                                 moveUpEnabled: toggleRow.index > 0
-                                moveDownEnabled: toggleRow.index < root.orderedToggles().length - 1
+                                moveDownEnabled: toggleRow.index < root.orderedTogglesModel.length - 1
                                 onMoveUp: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleRow.modelData.id, -1)
                                 onMoveDown: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterToggleOrder", toggleRow.modelData.id, 1)
                             }
@@ -189,7 +201,7 @@ Item {
 
                 SettingsDropIndicator {
                     width: parent ? parent.width : 0
-                    active: toggleReorderState.active && toggleReorderState.targetListId === "control-center-toggle" && toggleReorderState.targetIndex === root.orderedToggles().length
+                    active: toggleReorderState.active && toggleReorderState.targetListId === "control-center-toggle" && toggleReorderState.targetIndex === root.orderedTogglesModel.length
                     visible: active
                     label: "Drop at end of quick toggles"
                 }
@@ -222,7 +234,7 @@ Item {
                 spacing: Appearance.spacingXS
 
                 Repeater {
-                    model: root.orderedPlugins()
+                    model: root.orderedPluginsModel
 
                     delegate: SettingsReorderRow {
                         id: pluginRow
@@ -233,7 +245,7 @@ Item {
                         listId: "control-center-plugin"
                         itemId: String(pluginRow.modelData.id || "")
                         rowIndex: pluginRow.index
-                        itemCount: root.orderedPlugins().length
+                        itemCount: root.orderedPluginsModel.length
                         listItem: pluginOrderList
                         compactMode: root.compactMode
                         minimumHeight: root.compactMode ? 82 : 66
@@ -290,7 +302,7 @@ Item {
 
                             SettingsReorderButtons {
                                 moveUpEnabled: pluginRow.index > 0
-                                moveDownEnabled: pluginRow.index < root.orderedPlugins().length - 1
+                                moveDownEnabled: pluginRow.index < root.orderedPluginsModel.length - 1
                                 onMoveUp: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", pluginRow.modelData.id, -1)
                                 onMoveDown: Helpers.moveOrderedValue(Config, ControlCenterRegistry, PluginService, "controlCenterPluginOrder", pluginRow.modelData.id, 1)
                             }
@@ -305,7 +317,7 @@ Item {
 
                 SettingsDropIndicator {
                     width: parent ? parent.width : 0
-                    active: pluginReorderState.active && pluginReorderState.targetListId === "control-center-plugin" && pluginReorderState.targetIndex === root.orderedPlugins().length
+                    active: pluginReorderState.active && pluginReorderState.targetListId === "control-center-plugin" && pluginReorderState.targetIndex === root.orderedPluginsModel.length
                     visible: active
                     label: "Drop at end of plugin widgets"
                 }

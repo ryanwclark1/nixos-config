@@ -59,6 +59,7 @@ ScrollableContent 1.0 ../shared/ScrollableContent.qml
 Scrollbar 1.0 ../shared/Scrollbar.qml
 SearchBar 1.0 ../shared/SearchBar.qml
 SectionLabel 1.0 ../shared/SectionLabel.qml
+ServiceRefList 1.0 ../shared/ServiceRefList.qml
 SliderTrack 1.0 ../shared/SliderTrack.qml
 SshWidget 1.0 ../features/ssh/components/SshWidget.qml
 SshWidgetData 1.0 ../features/ssh/components/SshWidgetData.qml

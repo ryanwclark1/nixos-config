@@ -74,7 +74,9 @@ Item {
         for (var i = 0; i < waiters.length; ++i) {
             try {
                 waiters[i](ok);
-            } catch (e) {}
+            } catch (e) {
+                Logger.w("LauncherDependencyChecker", "callback threw", e);
+            }
         }
         proc.destroy();
     }

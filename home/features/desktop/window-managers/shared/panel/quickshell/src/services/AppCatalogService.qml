@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "ShellUtils.js" as SU
+import "."
 
 QtObject {
   id: root
@@ -214,7 +215,9 @@ QtObject {
         savedAt: Date.now(),
         items: Array.isArray(itemsValue) ? itemsValue : []
       }));
-    } catch (err) {}
+    } catch (err) {
+      Logger.w("AppCatalogService", "cache write failed", err);
+    }
   }
 
   function ensureLoaded(callback) {

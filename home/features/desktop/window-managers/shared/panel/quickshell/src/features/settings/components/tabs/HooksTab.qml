@@ -164,7 +164,7 @@ Item {
 
             SettingsCard {
                 title: "Color Export"
-                iconName: "color.svg"
+                iconName: "color-palette.svg"
                 description: "Write the active color palette to ~/.local/state/quickshell/ as JSON and shell variables. Fires the colors-changed hook."
 
                 SettingsToggleRow {
