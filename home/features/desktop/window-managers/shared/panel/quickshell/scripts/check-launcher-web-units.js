@@ -92,7 +92,7 @@ const merged = ModeData.mergedProviderCatalog([
 assert(merged.google !== undefined, "merged keeps builtins");
 assert(merged.rustdoc !== undefined, "merged includes custom");
 assert(merged.rustdoc.isCustom === true, "custom engine flagged");
-assertEq(merged.rustdoc.icon, "󰖟", "custom engine default icon");
+assertEq(merged.rustdoc.icon, "globe-search.svg", "custom engine default icon");
 
 // Custom can override built-in
 const overridden = ModeData.mergedProviderCatalog([

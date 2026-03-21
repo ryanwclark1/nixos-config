@@ -9,6 +9,7 @@ launcher_content_panel_qml="${config_dir}/launcher/LauncherContentPanel.qml"
 launcher_home_qml="${config_dir}/launcher/LauncherHome.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
+launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 app_catalog_qml="${config_dir}/services/AppCatalogService.qml"
@@ -35,7 +36,7 @@ require_pattern() {
 
 # Config/state wiring
 require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: false' "drun category filters config property"
-require_literal "$config_persistence_js" '["drunCategoryFiltersEnabled", "launcherDrunCategoryFiltersEnabled"]' "drun category filters config persistence"
+require_literal "$launcher_domain_js" '["drunCategoryFiltersEnabled", "launcherDrunCategoryFiltersEnabled"]' "drun category filters config persistence"
 
 # Settings exposure
 require_literal "$launcher_settings_qml" 'label: "App Category Filters"' "settings category filter toggle label"
@@ -52,7 +53,7 @@ require_literal "$app_catalog_qml" 'desktopId: _desktopIdForPath(path)' "app cat
 
 # Launcher behavior and UI guards
 require_literal "$launcher_qml" 'readonly property bool drunCategoryFiltersEnabled: Config.launcherDrunCategoryFiltersEnabled' "launcher category filters enabled binding"
-require_literal "$launcher_qml" 'property var drunCategoryOptions:' "launcher category option state"
+require_literal "$launcher_qml" 'property alias drunCategoryOptions: controller.drunCategoryOptions' "launcher category option state"
 require_literal "$launcher_qml" 'function refreshDrunCategoryOptions(apps) {' "launcher category options refresh function"
 require_literal "$launcher_qml" 'if (!drunCategoryFiltersEnabled) {' "launcher category options disabled guard"
 require_literal "$launcher_qml" 'function setDrunCategoryFilter(categoryKey) {' "launcher category set function"

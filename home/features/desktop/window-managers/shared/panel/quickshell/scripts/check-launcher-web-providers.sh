@@ -10,6 +10,7 @@ mode_data_js="${config_dir}/launcher/LauncherModeData.js"
 web_providers_js="${config_dir}/launcher/LauncherWebProviders.js"
 config_launcher_js="${config_dir}/services/config/ConfigLauncher.js"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
+launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 config_qml="${config_dir}/services/Config.qml"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
@@ -65,7 +66,7 @@ require_literal "$launcher_settings_qml" '{ key: "wikipedia"' "wikipedia in sett
 require_literal "$config_qml" 'property var launcherWebCustomEngines: []' "custom engines config property"
 
 # Persistence
-require_literal "$config_persistence_js" '["webCustomEngines", "launcherWebCustomEngines"]' "custom engines persistence"
+require_literal "$launcher_domain_js" '["webCustomEngines", "launcherWebCustomEngines"]' "custom engines persistence"
 
 # Validation
 require_literal "$config_launcher_js" 'function normalizeCustomEngines(list) {' "custom engines normalizer"
@@ -99,8 +100,8 @@ require_literal "$config_qml" 'property bool launcherWebBangsEnabled: false' "ba
 require_literal "$config_qml" 'property string launcherWebBangsLastSync: ""' "bangs last sync config"
 
 # Persistence
-require_literal "$config_persistence_js" '["webBangsEnabled", "launcherWebBangsEnabled"]' "bangs enabled persistence"
-require_literal "$config_persistence_js" '["webBangsLastSync", "launcherWebBangsLastSync"]' "bangs last sync persistence"
+require_literal "$launcher_domain_js" '["webBangsEnabled", "launcherWebBangsEnabled"]' "bangs enabled persistence"
+require_literal "$launcher_domain_js" '["webBangsLastSync", "launcherWebBangsLastSync"]' "bangs last sync persistence"
 
 # Bang Process in Launcher
 require_literal "$launcher_qml" 'property Process bangSearchProc: Process {' "bang search process"

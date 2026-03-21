@@ -8,6 +8,7 @@ launcher_key_handler_qml="${config_dir}/launcher/LauncherKeyHandler.qml"
 launcher_content_panel_qml="${config_dir}/launcher/LauncherContentPanel.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
+launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 
@@ -99,7 +100,7 @@ forbid_literal "$launcher_qml" 'Text { text: launcherRoot.drunCategoryFiltersEna
 
 # Config must expose and persist tabBehavior.
 require_literal "$config_qml" 'property string launcherTabBehavior: "contextual"' "launcherTabBehavior config property"
-require_literal "$config_persistence_js" '["tabBehavior", "launcherTabBehavior"]' "launcher.tabBehavior persistence"
+require_literal "$launcher_domain_js" '["tabBehavior", "launcherTabBehavior"]' "launcher.tabBehavior persistence"
 
 # Settings must expose tab behavior and reset default.
 require_literal "$launcher_helpers_js" 'Config.launcherTabBehavior = "contextual";' "launcher default reset for tab behavior"

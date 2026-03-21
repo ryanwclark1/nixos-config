@@ -7,6 +7,7 @@ launcher_qml="${config_dir}/launcher/Launcher.qml"
 launcher_content_panel_qml="${config_dir}/launcher/LauncherContentPanel.qml"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
+launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 mode_data_js="${config_dir}/launcher/LauncherModeData.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
@@ -24,7 +25,7 @@ require_literal() {
 
 # Config: schema and persistence.
 require_literal "$config_qml" 'property var launcherWebAliases: ({' "launcherWebAliases property"
-require_literal "$config_persistence_js" '["webAliases", "launcherWebAliases"]' "web alias persistence"
+require_literal "$launcher_domain_js" '["webAliases", "launcherWebAliases"]' "web alias persistence"
 
 # Launcher mode data owns alias resolution/parsing.
 require_literal "$mode_data_js" 'function webAliasToProviderKey(token, providers, aliases, customEngines) {' "web alias normalization helper"

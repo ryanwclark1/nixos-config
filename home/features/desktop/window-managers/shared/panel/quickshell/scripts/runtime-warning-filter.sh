@@ -17,6 +17,12 @@ qt\.multimedia\.pipewire\.devicemonitor: Ignoring dummy output: .*
 \[W\]\[WeatherService\] Auto-location error JSON\.parse: Parse error
 \[W\]\[WeatherService\] Auto-location error IP location failed
 \[W\]\[MarketService\] Error: empty market response
+\[W\]\[MarketService\] stooq_rate_limited
+\[W\]\[AiService\] Ollama unreachable
+\[W\]\[Workspaces\] \[hyprland\] no workspaces from compositor
+Failed to open VDPAU backend libvdpau_nvidia\.so
+quickshell\.service\.pam\.subprocess:
+Read of .*niri/config\.kdl failed: File does not exist
 EOF
 
   case "${profile}" in

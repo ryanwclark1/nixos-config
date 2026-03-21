@@ -23,6 +23,7 @@ launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLaun
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
+launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 config_launcher_js="${config_dir}/services/config/ConfigLauncher.js"
 
 violations=()
@@ -48,8 +49,8 @@ forbid_literal() {
 # Config/state wiring
 require_literal "$config_qml" 'property var launcherPrimaryModes: ["drun", "window", "files", "ai", "system"]' "primary sidebar config property"
 require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled: false' "drun category filter enable config property"
-require_literal "$config_persistence_js" '["primaryModes", "launcherPrimaryModes"]' "primary sidebar config persistence"
-require_literal "$config_persistence_js" '["drunCategoryFiltersEnabled", "launcherDrunCategoryFiltersEnabled"]' "drun category filter enable config persistence"
+require_literal "$launcher_domain_js" '["primaryModes", "launcherPrimaryModes"]' "primary sidebar config persistence"
+require_literal "$launcher_domain_js" '["drunCategoryFiltersEnabled", "launcherDrunCategoryFiltersEnabled"]' "drun category filter enable config persistence"
 require_literal "$config_launcher_js" 'function normalizePrimaryModeList(list, enabledModes, fallbackList) {' "primary mode normalization helper"
 require_literal "$config_launcher_js" 'config.launcherPrimaryModes = normalizePrimaryModeList(launcher.primaryModes, config.launcherEnabledModes, fallbackPrimaryModes);' "primary mode config application"
 require_literal "$launcher_helpers_js" 'function orderedPrimaryModes(Config, CompositorAdapter, launcherModes) {' "settings helper ordered primary modes"
@@ -60,7 +61,7 @@ require_literal "$launcher_helpers_js" 'preset === "all" || preset === "full"' "
 require_literal "$launcher_helpers_js" 'presetModes = ["drun", "window", "files", "ai", "system", "settings", "run", "ssh", "web"];' "extended preset mode set"
 
 # Metrics core
-require_literal "$launcher_qml" 'property var launcherMetrics: ({' "launcher metrics state property"
+require_literal "$launcher_qml" 'property alias launcherMetrics: controller.launcherMetrics' "launcher metrics state property"
 require_literal "$launcher_qml" 'readonly property string filesCacheStatsLabel: {' "files cache stats label property"
 require_literal "$launcher_qml" 'function recordFilterMetric(durationMs) {' "filter metric recorder"
 require_literal "$launcher_qml" 'function recordFilesBackendLoad(backend, durationMs) {' "files backend metric recorder"
@@ -71,8 +72,8 @@ require_literal "$launcher_metrics_js" 'function freshMetrics() {' "metrics fres
 require_literal "$launcher_metrics_js" 'function recordFilesBackendLoad(metrics, backend, durationMs) {' "metrics files backend load helper"
 require_literal "$launcher_metrics_js" 'function recordFilesBackendResolveMetric(metrics, durationMs) {' "metrics backend resolve helper"
 require_literal "$launcher_diag_js" 'function filesBackendStatusObject(props) {' "files backend diagnostics helper"
-require_literal "$launcher_metrics_box_qml" '" • filter avg " + (root.metrics.avgFilterMs || 0) + "ms"' "runtime metrics filter average display"
-require_literal "$launcher_metrics_box_qml" '" • resolve " + (root.metrics.filesResolveAvgMs || 0) + "/" + (root.metrics.filesResolveLastMs || 0) + "ms"' "runtime metrics resolve latency display"
+require_literal "$launcher_metrics_box_qml" '"filter avg " + (root.metrics.avgFilterMs || 0) + "ms"' "runtime metrics filter average display"
+require_literal "$launcher_diag_js" 'filesResolveAvgMs: resolveAvgMs,' "runtime metrics resolve latency in diagnostics payload"
 
 # Search/ranking path
 require_literal "$launcher_search_js" 'function fuzzyMatchLower(s, p) {' "lowercased fuzzy matcher"
