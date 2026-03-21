@@ -264,14 +264,23 @@ QtObject {
         return _activeRequests[String(modeKey || "")] === token;
     }
 
-    // ── Web provider helpers ───────────────────
-    function configuredWebProviders() { return WebProviders.configuredWebProviders(); }
-    function primaryWebProvider() { return WebProviders.primaryWebProvider(); }
-    function configuredWebProviderByKey(providerKey) { return WebProviders.configuredWebProviderByKey(providerKey); }
-    function webAliasToProviderKey(token) { return WebProviders.webAliasToProviderKey(token); }
-    function parseWebQuery(text) { return WebProviders.parseWebQuery(text); }
-    function secondaryWebProvider() { return WebProviders.secondaryWebProvider(); }
-    function preferredWebProviderKey() { return WebProviders.preferredWebProviderKey(_sessionWebProviderKey); }
+    // ── Web provider helpers (mirror Launcher.qml; WebProviders.js only has slot helpers) ──
+    readonly property var _cachedWebProviders: ModeData.configuredWebProviders(Config.launcherWebProviderOrder, Config.launcherWebCustomEngines)
+    function configuredWebProviders() { return _cachedWebProviders; }
+    function primaryWebProvider() { return WebProviders.primaryProvider(configuredWebProviders()); }
+    function configuredWebProviderByKey(providerKey) { return WebProviders.providerByKey(configuredWebProviders(), providerKey); }
+    function webAliasToProviderKey(token) {
+        var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
+        return ModeData.webAliasToProviderKey(token, configuredWebProviders(), aliases, Config.launcherWebCustomEngines);
+    }
+    function parseWebQuery(text) {
+        var aliases = (Config.launcherWebAliases && typeof Config.launcherWebAliases === "object") ? Config.launcherWebAliases : ({});
+        return ModeData.parseWebQuery(text, configuredWebProviders(), aliases, Config.launcherWebCustomEngines);
+    }
+    function secondaryWebProvider() { return WebProviders.secondaryProvider(configuredWebProviders()); }
+    function preferredWebProviderKey() {
+        return WebProviders.preferredProviderKey(Config.launcherRememberWebProvider, Config.launcherWebLastProviderKey, _sessionWebProviderKey);
+    }
 
     // ── Selection helpers ──────────────────────
     readonly property bool hasResults: filteredItems.length > 0
