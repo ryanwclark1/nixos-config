@@ -42,6 +42,7 @@ in
         };
         # autoNumlock = true;
         # enableHidpi = true;
+        # Qt6 build from KDE’s package set; does not install Plasma Workspace.
         package = pkgs.kdePackages.sddm;
         # theme "= "${sddmTheme}";
         # theme = "catppuccin-frappe";

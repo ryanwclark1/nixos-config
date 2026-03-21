@@ -8,7 +8,7 @@
     xserver = {
       enable = true;
       displayManager = {
-        defaultSession = "plasma";
+        defaultSession = "hyprland-uwsm";
         autoLogin.user = "administrator";
         lightdm = {
           enable = true;
