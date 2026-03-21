@@ -138,7 +138,9 @@ QtObject {
     for (var i = 0; i < waiters.length; ++i) {
       try {
         waiters[i](root.loaded ? root.items : [], root.lastError);
-      } catch (e) {}
+      } catch (e) {
+        Logger.w("AppCatalogService", "callback threw", e);
+      }
     }
   }
 
