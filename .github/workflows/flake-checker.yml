@@ -20,6 +20,14 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v19
       - uses: DeterminateSystems/magic-nix-cache-action@v12
       - uses: DeterminateSystems/flake-checker-action@v10
+      - name: QuickShell structure verify (CI deterministic)
+        run: |
+          nix shell nixpkgs#bash nixpkgs#python3 nixpkgs#ripgrep nixpkgs#coreutils -c \
+            bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/quickshell-structure-verify.sh --ci --quiet
+      - name: QuickShell Vitest suite
+        run: |
+          cd home/features/desktop/window-managers/shared/panel/quickshell
+          nix shell nixpkgs#nodejs -c sh -c 'npm ci && npm test'
       - name: QuickShell compositor guard checks
         run: |
           nix shell nixpkgs#bash nixpkgs#ripgrep nixpkgs#coreutils -c \

@@ -7,6 +7,7 @@ nixos_repo_root="$(CDPATH= cd -- "${script_dir}/../../../../../../../../" && pwd
 src_root="${quickshell_root}/src"
 quiet=0
 use_vm=0
+ci_only=0
 vm_selector="${QS_VERIFY_VM_SELECTOR:-both}"
 startup_timeout_seconds="${QS_VERIFY_STARTUP_TIMEOUT_SECONDS:-60}"
 launcher_timeout_seconds="${QS_VERIFY_LAUNCHER_SMOKE_TIMEOUT_SECONDS:-180}"
@@ -18,7 +19,7 @@ stage_exits=()
 
 usage() {
   cat <<'EOF'
-Usage: quickshell-structure-verify.sh [--quiet] [--vm [niri|hyprland|both]]
+Usage: quickshell-structure-verify.sh [--quiet] [--ci] [--vm [niri|hyprland|both]]
 
 Default fast host path:
   1. structural import-boundary checks
@@ -27,6 +28,9 @@ Default fast host path:
   4. startup smoke
   5. transient repo-shell journal warning gate when a live session is available
   6. launcher smoke
+
+  --ci             Deterministic checks only (steps 1–3). For CI hosts without
+                   quickshell or a compositor; skips startup, journal gate, launcher.
 
 Optional exhaustive path:
   --vm [selector]  Run the fast host preflight first, then delegate exhaustive
@@ -38,6 +42,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --quiet)
       quiet=1
+      ;;
+    --ci)
+      ci_only=1
       ;;
     --vm)
       use_vm=1
@@ -163,6 +170,14 @@ trap print_stage_summary EXIT
 run_step "Checking import boundaries" bash "${quickshell_root}/tools/checks/check-import-boundaries.sh"
 run_step "Validating qmldir targets" run_qmldir_validation
 run_step "Running clipboard contract checks" bash "${script_dir}/check-clipboard-contracts.sh"
+
+if (( ci_only == 1 )); then
+  if (( quiet == 0 )); then
+    printf '[INFO] Quickshell structure verification completed (--ci: skipped runtime smoke).\n'
+  fi
+  exit 0
+fi
+
 run_step_timeout "Running startup smoke" "${startup_timeout_seconds}" bash "${script_dir}/check-quickshell-startup.sh"
 
 if has_live_session; then
