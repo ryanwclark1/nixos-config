@@ -233,16 +233,20 @@ QtObject {
   }
 
   // ── Fast path: CPU/RAM/disk/net without sensors or GPU queries ─────────
+  // RAM must be two separate printf fields: embedding "\n" inside one %s breaks the
+  // fixed line layout (QML splits on "\n"), so disk_pct could be parsed as ramPercent;
+  // parseFloat("71%") === 71 → clamp01 → 100% gauge while labels still look sane.
   readonly property string _statsLiteScript:
       "cpu_raw=$(grep '^cpu ' /proc/stat); "
-      + "ram_stats=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; printf \"%.1fGB\\n%.4f\", used/1024/1024, used/total}' /proc/meminfo); "
+      + "ram_usage_line=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "ram_frac=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.8f\", used/total; else print \"0\"}' /proc/meminfo); "
       + "disk_pct=$(df / 2>/dev/null | awk 'NR==2 {print $5}'); "
       + "iface=$(ip route show default 2>/dev/null | awk 'NR==1 {print $5}'); "
       + "net_rx=0; net_tx=0; "
       + "if [ -n \"$iface\" ] && [ -r \"/sys/class/net/$iface/statistics/rx_bytes\" ]; then "
       + "net_rx=$(cat /sys/class/net/$iface/statistics/rx_bytes); "
       + "net_tx=$(cat /sys/class/net/$iface/statistics/tx_bytes); fi; "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' '' '' \"$cpu_raw\" '' \"$ram_stats\" \"$disk_pct\" \"$net_rx\" \"$net_tx\""
+      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' '' '' \"$cpu_raw\" '' \"$ram_usage_line\" \"$ram_frac\" \"$disk_pct\" \"$net_rx\" \"$net_tx\""
 
   // ── Slow path: temperatures + GPU utilization (less frequent) ──────────
   readonly property string _statsHwScriptBase:
@@ -346,7 +350,8 @@ QtObject {
 
         var ramRaw = lines[5] || "";
         var ramVal = parseFloat(ramRaw);
-        if (!isNaN(ramVal)) {
+        // Reject misparsed fields (e.g. "71%" → 71, "65.0GB" → 65) from a shifted layout.
+        if (!isNaN(ramVal) && ramVal >= 0 && ramVal <= 1.001) {
           root.ramPercent = Colors.clamp01(ramVal);
           root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
         }
