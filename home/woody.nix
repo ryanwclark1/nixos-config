@@ -28,7 +28,6 @@
     ./features/discord
     ./features/docker
     ./features/docs
-    # ./features/dotfiles
     ./features/eza
     ./features/fastfetch
     ./features/fd
@@ -41,7 +40,6 @@
     ./features/gui-tools
     ./features/imv
     ./features/kitty
-    # ./features/kodi
     ./features/kubernetes
     ./features/lazygit
     ./features/media
@@ -68,7 +66,6 @@
     ./features/webapps
     ./features/wireless
     ./features/yazi
-    ./features/zellij
     ./features/zoxide
 
     # Desktop environment configuration

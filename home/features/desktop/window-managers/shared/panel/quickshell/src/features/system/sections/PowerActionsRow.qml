@@ -53,13 +53,27 @@ RowLayout {
       // Inner highlight border
       SharedWidgets.InnerHighlight { highlightOpacity: 0.15 }
 
-      Text {
+      Item {
         anchors.centerIn: parent
-        text: awaitingConfirm ? "Confirm?" : modelData.icon
-        color: awaitingConfirm ? Colors.background : Colors.text
-        font.family: awaitingConfirm ? "" : Appearance.fontMono
-        font.pixelSize: awaitingConfirm ? Appearance.fontSizeSmall : Appearance.fontSizeXL
-        font.weight: awaitingConfirm ? Font.Bold : Font.Normal
+        width: parent.width
+        height: parent.height
+
+        SharedWidgets.SvgIcon {
+          anchors.centerIn: parent
+          visible: !awaitingConfirm
+          source: modelData.icon
+          color: Colors.text
+          size: Math.min(Appearance.fontSizeXL, parent.height - 10)
+        }
+
+        Text {
+          anchors.centerIn: parent
+          visible: awaitingConfirm
+          text: "Confirm?"
+          color: Colors.background
+          font.pixelSize: Appearance.fontSizeSmall
+          font.weight: Font.Bold
+        }
       }
 
       SharedWidgets.StateLayer {

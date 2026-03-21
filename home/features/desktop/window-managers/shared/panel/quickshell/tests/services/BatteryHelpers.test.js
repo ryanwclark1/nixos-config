@@ -41,6 +41,10 @@ describe("stateText", () => {
   it("returns 'Discharging' for device with no state property", () => {
     expect(stateText({}, UPowerEnums)).toBe("Discharging");
   });
+
+  it("infers Charging when time-to-full is set but state is discharging (UPower quirk)", () => {
+    expect(stateText({ state: 2, timeToFull: 960, timeToEmpty: 0 }, UPowerEnums)).toBe("Charging");
+  });
 });
 
 describe("iconName", () => {
@@ -54,5 +58,11 @@ describe("iconName", () => {
 
   it("maps healthy battery levels to stepped battery svgs", () => {
     expect(iconName({ state: 2, percentage: 0.72 }, UPowerEnums)).toBe("battery-7.svg");
+  });
+
+  it("maps discharging state with time-to-full to charging icon", () => {
+    expect(iconName({ state: 2, percentage: 0.98, timeToFull: 600, timeToEmpty: 0 }, UPowerEnums)).toBe(
+      "battery-charge.svg",
+    );
   });
 });

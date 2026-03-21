@@ -180,6 +180,12 @@ let
 
     export WAYLAND_DISPLAY="''${wayland_display}"
     export QT_QPA_PLATFORM=wayland
+    # Qt Wayland text-input v3: harmless focus/surface race, noisy as journal WARN.
+    if [[ -n "''${QT_LOGGING_RULES:-}" ]]; then
+      export QT_LOGGING_RULES="''${QT_LOGGING_RULES};qt.qpa.wayland.textinput=false"
+    else
+      export QT_LOGGING_RULES="qt.qpa.wayland.textinput=false"
+    fi
 
     exec ${pkgs.quickshell}/bin/quickshell -p "${config.home.homeDirectory}/.config/quickshell/shell.qml"
   '';

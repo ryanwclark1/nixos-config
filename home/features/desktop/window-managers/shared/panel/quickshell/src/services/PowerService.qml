@@ -28,7 +28,8 @@ QtObject {
 
         var pct = Math.round(_batteryDevice.percentage * 100);
         var charging = _batteryDevice.state === UPower.DeviceStateCharging
-                    || _batteryDevice.state === UPower.DeviceStateFullyCharged;
+                    || _batteryDevice.state === UPower.DeviceStateFullyCharged
+                    || (_batteryDevice.timeToFull > 0 && !(_batteryDevice.timeToEmpty > 0));
 
         // Reset alerts when charging
         if (charging) {

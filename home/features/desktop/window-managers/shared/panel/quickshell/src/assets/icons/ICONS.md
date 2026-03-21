@@ -6,7 +6,8 @@ All icons are 24x24 SVGs. Regular and filled variants where available.
 
 | Source | License | Count |
 |--------|---------|-------|
-| [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons) | MIT (Microsoft) | ~340 |
+| [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons) | MIT (Microsoft) | ~338 |
+| [Material Design Icons](https://pictogrammers.com/library/mdi/) (Pictogrammers) | Apache-2.0 | 2 (`ethernet.svg`, `ethernet-filled.svg` — correct RJ45 glyph; prior `ethernet.svg` was a mislabeled cellular-bars asset) |
 | [Phosphor Icons](https://phosphoricons.com/) | MIT | 1 |
 | [Simple Icons](https://simpleicons.org/) | CC0 | 3 |
 | Custom/Community | Various | ~24 |
@@ -44,7 +45,8 @@ All icons are 24x24 SVGs. Regular and filled variants where available.
 `music-note-2.svg` `music-note-2-filled.svg` `record.svg` `record-filled.svg`
 
 ### Network
-`wifi-1.svg` .. `wifi-4.svg` (+ filled variants) `wifi-off.svg` `wifi-lock.svg`
+`wifi-1.svg` .. `wifi-4.svg` (+ filled variants) `wifi-off.svg` `wifi-lock.svg`  
+(`wifi-4.svg` / `wifi-4-filled.svg` were restored to full arc glyphs; they had been reduced to the center dot only, which made the bar look empty on Wi‑Fi.)
 `ethernet.svg` `ethernet-filled.svg` `bluetooth.svg` `bluetooth-filled.svg`
 `download.svg` `download-filled.svg` `upload.svg` `upload-filled.svg`
 `cloud.svg` `cloud-filled.svg` `globe-search.svg` `globe-shield.svg`

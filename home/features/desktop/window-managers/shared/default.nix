@@ -11,7 +11,7 @@
     ./notifications
     ./panel
     ./launcher/scripts/rofi/system-menu-rofi.nix # System menu launcher (rofi-based)
-    ./launcher/scripts/walker/system-menu.nix # System menu launcher (walker-based)
+    # ./launcher/scripts/walker/system-menu.nix # System menu launcher (walker-based)
     ./session
   ];
 

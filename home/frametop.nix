@@ -69,6 +69,8 @@
   ];
 
   # Frametop-specific configuration
+  features.quickshell.enable = true;
+
   features.battery-monitor = {
     enable = true;
     threshold = 15; # Framework laptops benefit from slightly higher threshold

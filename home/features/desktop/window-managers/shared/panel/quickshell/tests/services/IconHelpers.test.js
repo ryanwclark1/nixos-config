@@ -28,6 +28,9 @@ describe("IconHelpers", () => {
 
   it("maps battery and bluetooth state to svg icons", () => {
     expect(batteryIcon({ state: UPowerEnums.DeviceStateCharging, percentage: 0.4 }, UPowerEnums)).toBe("battery-charge.svg");
+    expect(batteryIcon({ state: 2, percentage: 0.98, timeToFull: 900, timeToEmpty: 0 }, UPowerEnums)).toBe(
+      "battery-charge.svg",
+    );
     expect(bluetoothDeviceIcon("MX Master Mouse")).toBe("cursor-click.svg");
   });
 

@@ -24,7 +24,8 @@ BasePopupMenu {
 
   readonly property color batteryColor: {
     if (!device) return Colors.textDisabled;
-    if (device.state === UPower.DeviceStateCharging) return Colors.primary;
+    if (device.state === UPower.DeviceStateCharging
+        || (device.timeToFull > 0 && !(device.timeToEmpty > 0))) return Colors.primary;
     if (device.percentage < 0.2) return Colors.error;
     if (device.percentage < 0.4) return Colors.accent;
     return Colors.primary;

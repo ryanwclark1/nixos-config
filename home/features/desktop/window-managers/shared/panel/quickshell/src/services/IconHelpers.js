@@ -63,6 +63,8 @@ function batteryIcon(device, UPowerEnums) {
         return "battery-charge.svg";
     if (device.state === UPowerEnums.DeviceStateFullyCharged)
         return "battery-full.svg";
+    if (device.timeToFull > 0 && !(device.timeToEmpty > 0))
+        return "battery-charge.svg";
     var p = Number(device.percentage || 0);
     if (!isFinite(p))
         p = 0;

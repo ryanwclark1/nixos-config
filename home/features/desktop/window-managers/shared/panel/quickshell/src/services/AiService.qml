@@ -1013,6 +1013,9 @@ QtObject {
 
     // ── Model Refresh ───────────────────────────
     property int _modelExitCode: 0
+    // When Ollama is not running, curl exits 7; stop the 5s retry loop and log once.
+    property bool _ollamaAutoModelRefreshSuspended: false
+    property bool _ollamaUnreachableLogged: false
 
     property Process _modelProc: Process {
         id: modelProc
@@ -1032,9 +1035,25 @@ QtObject {
                         if (models[i].name) names.push(models[i].name);
                     }
                     root.availableModels = names;
+                    root._ollamaAutoModelRefreshSuspended = false;
+                    root._ollamaUnreachableLogged = false;
                 } catch (e) {
-                    Logger.w("AiService", "failed to fetch models:", e);
-                    root._modelRetryTimer.restart();
+                    var errMsg = String(e && e.message ? e.message : e);
+                    var ollama = Config.aiProvider === "ollama";
+                    // curl 7 = connection refused; 28 = timeout. "empty response" covers exit-code ordering races.
+                    var ollamaUnreachable = ollama && (root._modelExitCode === 7 || root._modelExitCode === 28
+                        || errMsg.indexOf("empty response") !== -1);
+                    if (ollamaUnreachable) {
+                        root._ollamaAutoModelRefreshSuspended = true;
+                        if (!root._ollamaUnreachableLogged) {
+                            root._ollamaUnreachableLogged = true;
+                            Logger.w("AiService", "Ollama unreachable (connection failed); model auto-refresh paused. Start Ollama or change AI provider in Settings, then use Refresh models.");
+                        }
+                    } else {
+                        Logger.w("AiService", "failed to fetch models:", e);
+                    }
+                    if (!root._ollamaAutoModelRefreshSuspended)
+                        root._modelRetryTimer.restart();
                 }
             }
         }
@@ -1042,7 +1061,10 @@ QtObject {
 
     property Timer _modelRetryTimer: Timer {
         interval: 5000
-        onTriggered: root.refreshModels()
+        onTriggered: {
+            if (!root._ollamaAutoModelRefreshSuspended)
+                root.refreshModels();
+        }
     }
 
     function refreshModels() {
@@ -1185,6 +1207,10 @@ QtObject {
         if (_previousProvider === activeProvider) {
             refreshModels();
             return;
+        }
+        if (activeProvider === "ollama") {
+            root._ollamaAutoModelRefreshSuspended = false;
+            root._ollamaUnreachableLogged = false;
         }
         // Save outgoing provider's settings to its profile
         Config.aiProviderProfiles = Profiles.saveProfile(
