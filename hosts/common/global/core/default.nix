@@ -12,7 +12,7 @@
     ./environment.nix
   ];
 
-   # Common performance-related system packages
+  # Common performance-related system packages
   environment.systemPackages = with pkgs; [
     # System monitoring
     btop # Modern system monitor (better than htop)
@@ -36,6 +36,9 @@
     usbutils
     lshw
     lsof
+
+    # Sandboxing (Codex CLI checks /usr/bin/bwrap)
+    bubblewrap
 
     # Development tools
     git
