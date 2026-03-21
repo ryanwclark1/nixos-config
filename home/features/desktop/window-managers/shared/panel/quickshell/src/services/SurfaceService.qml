@@ -437,6 +437,14 @@ QtObject {
         var position = resolvedContext.position || "right";
         var reserved = Config.reservedEdgesForScreen(screen, "");
         var width = preferredWidth || Config.controlCenterWidth;
+        // PanelWindow uses implicitWidth panelWidth+20 and margins.right = reserved.right + spacingS;
+        // keep the layer surface within the output so the right edge (radius, content) is not clipped.
+        if (screen && screen.width > 0) {
+            var panelSlack = 28;
+            var maxPanel = screen.width - reserved.left - reserved.right - panelSlack;
+            if (maxPanel > 0)
+                width = Math.min(width, maxPanel);
+        }
         var height = screen ? Math.max(360, Math.min(screen.height - reserved.top - reserved.bottom, Math.round(screen.height * 0.78))) : 640;
         var x = Config.overlayInset;
 
