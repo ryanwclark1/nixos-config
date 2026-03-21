@@ -43,12 +43,24 @@ QtObject {
     }
   }
 
-  // Fingerprint reader detection
+  // PAM service for fingerprint unlock: fprintd-verify when present (e.g. after NixOS
+  // security.pam.services.fprintd-verify), else login (NixOS login stack includes pam_fprintd).
+  property string fprintPamConfig: "login"
+
+  // Fingerprint reader detection + PAM service pick
   property var _fprintDetectProc: Process {
-    command: ["sh", "-c", "fprintd-list \"$1\" 2>/dev/null", "sh", Quickshell.env("USER") || ""]
+    command: ["sh", "-c",
+      "user=\"$1\"; " +
+      "if ! fprintd-list \"$user\" >/dev/null 2>&1; then exit 1; fi; " +
+      "if [ -f /etc/pam.d/fprintd-verify ]; then echo fprintd-verify; else echo login; fi",
+      "sh",
+      Quickshell.env("USER") || ""
+    ]
     stdout: SplitParser {
       onRead: data => {
-        // Any output means fprintd-list found enrolled fingerprints
+        var name = (data || "").trim();
+        if (name.length > 0)
+          root.fprintPamConfig = name;
       }
     }
     onExited: (exitCode, exitStatus) => {
@@ -61,7 +73,7 @@ QtObject {
   // Fingerprint PAM context
   property PamContext fprintPam: PamContext {
     configDirectory: root.pamConfigDirectory
-    config: "fprintd-verify"
+    config: root.fprintPamConfig
 
     onPamMessage: {
       // fprintd prompts are informational — no response needed
