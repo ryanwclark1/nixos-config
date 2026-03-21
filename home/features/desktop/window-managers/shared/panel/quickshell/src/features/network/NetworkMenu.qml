@@ -4,6 +4,7 @@ import Quickshell
 import "../../shared"
 import "../system/sections"
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
@@ -22,7 +23,7 @@ BasePopupMenu {
 
   function openVpnHub() {
     root.closeRequested();
-    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleSurface", "vpnMenu"]);
+    Quickshell.execDetached(SU.ipcCall("Shell", "toggleSurface", "vpnMenu"));
   }
 
   // Subscriber-based polling: NetworkService polls only while we're visible.

@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
 import "AudioHelpers.js" as AudioHelpers
+import "ShellUtils.js" as SU
 
 QtObject {
     id: root
@@ -260,7 +261,7 @@ QtObject {
 
     function _sendOsdIpc(isSink, percent, muted) {
         var method = isSink ? "showVolume" : "showMic";
-        Quickshell.execDetached(["quickshell", "ipc", "call", "Osd", method, Math.round(percent).toString(), muted.toString()]);
+        Quickshell.execDetached(SU.ipcCall("Osd", method, Math.round(percent).toString(), muted.toString()));
     }
 
     // ── Volume protection ────────────────────────

@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../shared"
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../system/sections"
 import "../../widgets" as SharedWidgets
 
@@ -237,7 +238,7 @@ BasePopupMenu {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                   fullWeatherState.burst(mouse.x, mouse.y);
-                  Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleSurface", "weatherMenu"]);
+                  Quickshell.execDetached(SU.ipcCall("Shell", "toggleSurface", "weatherMenu"));
                 }
               }
             }

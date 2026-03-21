@@ -1,5 +1,7 @@
 .pragma library
 
+.import "../services/ShellUtils.js" as ShellUtils
+
 // Mode-dispatch execution and label lookups extracted from Launcher.qml.
 // QML-side capabilities are passed via an `actions` object to avoid direct QML coupling.
 
@@ -183,7 +185,7 @@ function executeSelection(mode, item, actions) {
         }
     } else if (mode === "system" || mode === "nixos") {
         if (item.ipcTarget && item.ipcAction)
-            actions.execDetached(["quickshell", "ipc", "call", item.ipcTarget, item.ipcAction]);
+            actions.execDetached(ShellUtils.ipcCall(item.ipcTarget, item.ipcAction));
         else if (item.action)
             item.action();
         if (!actions.showingConfirm)

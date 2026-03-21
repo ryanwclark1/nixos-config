@@ -5,6 +5,7 @@ import "../../shared"
 import "../../services"
 import "../../services/IconHelpers.js" as IconHelpers
 import "../../services/SearchUtils.js" as SU
+import "../../services/ShellUtils.js" as ShellUtils
 import "../../widgets" as SharedWidgets
 import "."
 import "../settings/components"
@@ -99,9 +100,9 @@ BasePopupMenu {
   function openBarWidgetSettings() {
     var instanceId = menuWidgetInstance && menuWidgetInstance.instanceId ? String(menuWidgetInstance.instanceId) : "";
     if (instanceId !== "")
-      Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openBarWidgetInstance", instanceId]);
+      Quickshell.execDetached(ShellUtils.ipcCall("SettingsHub", "openBarWidgetInstance", instanceId));
     else
-      Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "bar-widgets"]);
+      Quickshell.execDetached(ShellUtils.ipcCall("SettingsHub", "openTab", "bar-widgets"));
     root.closeRequested();
   }
 

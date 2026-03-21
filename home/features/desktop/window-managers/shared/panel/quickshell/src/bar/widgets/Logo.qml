@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../shared"
 import "../../widgets" as SharedWidgets
 
@@ -116,13 +117,13 @@ Item {
     onClicked: (mouse) => {
       stateLayer.burst(mouse.x, mouse.y);
       if (mouse.button === Qt.LeftButton) {
-        Quickshell.execDetached(["quickshell", "ipc", "call", "Launcher", "openDrun"]);
+        Quickshell.execDetached(SU.ipcCall("Launcher", "openDrun"));
       } else {
         var globalPos = root.mapToItem(null, 0, 0);
         root.contextMenuRequested([
             { label: "Check Health", icon: "board.svg", action: () => SystemStatus.refreshHealth() },
             { label: "Apply Safe Fixes", icon: "checkmark.svg", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.activeIncidents.length > 0 },
-            { label: "Open Health Dashboard", icon: "settings.svg", action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "health"]) },
+            { label: "Open Health Dashboard", icon: "settings.svg", action: () => Quickshell.execDetached(SU.ipcCall("SettingsHub", "openTab", "health")) },
             { separator: true },
             { label: "Restart Shell", icon: "arrow-clockwise.svg", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }
         ], { x: globalPos.x, y: globalPos.y, width: root.width, height: root.height });

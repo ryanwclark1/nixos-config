@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
 import "../PanelWidgetHelpers.js" as PanelHelpers
 
@@ -31,7 +32,7 @@ SharedWidgets.BarPill {
         {
             label: "Settings",
             icon: "settings.svg",
-            action: () => Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "model-usage"])
+            action: () => Quickshell.execDetached(SU.ipcCall("SettingsHub", "openTab", "model-usage"))
         }
     ]
 

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../../services"
+import "../../../../services/ShellUtils.js" as SU
 import ".."
 
 Item {
@@ -30,7 +31,7 @@ Item {
                 onClicked: {
                     if (root.settingsRoot)
                         root.settingsRoot.close();
-                    Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "displayConfig"]);
+                    Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "displayConfig"));
                 }
             }
         }

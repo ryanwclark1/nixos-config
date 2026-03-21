@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../shared"
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
 import "VpnHelpers.js" as VH
 
@@ -19,7 +20,7 @@ BasePopupMenu {
 
     function openNetworkMenu() {
         root.closeRequested();
-        Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "toggleSurface", "networkMenu"]);
+        Quickshell.execDetached(SU.ipcCall("Shell", "toggleSurface", "networkMenu"));
     }
 
     function otherVpnChipText() {

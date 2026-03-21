@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { shellQuote, terminalCommand } from "../../src/services/ShellUtils.js";
+import { shellQuote, terminalCommand, ipcCall } from "../../src/services/ShellUtils.js";
 
 describe("shellQuote", () => {
   it("wraps in single quotes", () => {
@@ -55,5 +55,40 @@ describe("terminalCommand", () => {
     expect(result[2]).toContain("kitty");
     expect(result[2]).toContain("foot");
     expect(result[2]).toContain("alacritty");
+  });
+});
+
+describe("ipcCall", () => {
+  it("builds quickshell ipc argv for target and method", () => {
+    expect(ipcCall("Shell", "reloadConfig")).toEqual([
+      "quickshell",
+      "ipc",
+      "call",
+      "Shell",
+      "reloadConfig",
+    ]);
+  });
+
+  it("stringifies extra surface or argument tokens", () => {
+    expect(ipcCall("SettingsHub", "openSetting", "tab", "Card", "Label")).toEqual([
+      "quickshell",
+      "ipc",
+      "call",
+      "SettingsHub",
+      "openSetting",
+      "tab",
+      "Card",
+      "Label",
+    ]);
+  });
+
+  it("coerces empty target/method to string", () => {
+    expect(ipcCall(null, undefined)).toEqual([
+      "quickshell",
+      "ipc",
+      "call",
+      "",
+      "",
+    ]);
   });
 });

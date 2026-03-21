@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
 import "../../../services" as Services
+import "../../../services/ShellUtils.js" as SU
 
 QtObject {
     id: root
@@ -17,7 +18,7 @@ QtObject {
             icon: "crop.svg",
             title: "Screenshot",
             subtitle: "Capture region, screen, or fullscreen",
-            clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "screenshotMenu"]
+            clickCommand: SU.ipcCall("Shell", "toggleSurface", "screenshotMenu")
         }
     ])
 

@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../shared"
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
@@ -60,7 +61,7 @@ BasePopupMenu {
       iconSize: Appearance.fontSizeLarge
       tooltipText: "Settings"
       onClicked: {
-        Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openTab", "model-usage"]);
+        Quickshell.execDetached(SU.ipcCall("SettingsHub", "openTab", "model-usage"));
         root.closeRequested();
       }
     }

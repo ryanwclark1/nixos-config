@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
 import "../../features/settings/components"
 
@@ -80,7 +81,7 @@ Rectangle {
             compact: true
             Layout.fillWidth: true
             onClicked: {
-                Quickshell.execDetached(["quickshell", "ipc", "call", "SystemStatsMenu", "toggle"]);
+                Quickshell.execDetached(SU.ipcCall("SystemStatsMenu", "toggle"));
             }
         }
     }

@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import "ShellUtils.js" as SU
 import "."
 
 QtObject {
@@ -66,7 +67,7 @@ QtObject {
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
-                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "audioMenu"]
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "audioMenu")
             },
             networkControls: {
                 id: "networkControls",
@@ -80,7 +81,7 @@ QtObject {
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
-                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "networkMenu"]
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "networkMenu")
             },
             vpnControls: {
                 id: "vpnControls",
@@ -94,7 +95,7 @@ QtObject {
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
-                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "vpnMenu"]
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "vpnMenu")
             },
             commandCenter: {
                 id: "commandCenter",
@@ -108,7 +109,7 @@ QtObject {
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
-                clickCommand: ["quickshell", "ipc", "call", "Shell", "toggleSurface", "controlCenter"]
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "controlCenter")
             }
         })
 

@@ -36,3 +36,12 @@ function terminalCommand(cmd) {
         result.push(extraArgs[k]);
     return result;
 }
+
+// argv for: quickshell ipc call <target> <method> [extra args...]
+// Usage: Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "controlCenter"));
+function ipcCall(target, method) {
+    var cmd = ["quickshell", "ipc", "call", String(target || ""), String(method || "")];
+    for (var i = 2; i < arguments.length; ++i)
+        cmd.push(String(arguments[i]));
+    return cmd;
+}

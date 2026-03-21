@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "ShellUtils.js" as SU
 import "../features/ai/services/AiProviders.js" as Providers
 import "../features/ai/services/AiProviderProfiles.js" as Profiles
 import "."
@@ -103,7 +104,7 @@ QtObject {
             root.sendMessage(prompt);
             // Open the AI chat surface automatically for high severity
             if (incident.severity === "error") {
-                Quickshell.execDetached(["quickshell", "ipc", "call", "SurfaceService", "openSurface", "aiChat"]);
+                Quickshell.execDetached(SU.ipcCall("SurfaceService", "openSurface", "aiChat"));
             }
         }
     }

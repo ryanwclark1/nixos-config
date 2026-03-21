@@ -6,6 +6,7 @@ import "../system/sections"
 import "../pomodoro"
 import "../todo"
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
 
 PanelWindow {
@@ -168,14 +169,14 @@ PanelWindow {
                 id: openSettingsTimer
                 interval: root.settingsOpenDelayMs
                 repeat: false
-                onTriggered: Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "open"])
+                onTriggered: Quickshell.execDetached(SU.ipcCall("SettingsHub", "open"))
             }
 
             Timer {
                 id: openScreenshotTimer
                 interval: root.screenshotOpenDelayMs
                 repeat: false
-                onTriggered: Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "screenshotMenu"])
+                onTriggered: Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "screenshotMenu"))
             }
 
             Item {

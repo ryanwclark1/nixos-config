@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../shared"
 
 Flow {
@@ -234,7 +235,7 @@ Flow {
                 // For now, we'll use a prompt via IPC to the AI assistant to rename it
                 var current = WorkspaceIdentityService.getWorkspaceName(modelData.id);
                 AiService.sendMessage("Rename workspace " + modelData.id + " from '" + current + "' to: ");
-                Quickshell.execDetached(["quickshell", "ipc", "call", "SurfaceService", "openSurface", "aiChat"]);
+                Quickshell.execDetached(SU.ipcCall("SurfaceService", "openSurface", "aiChat"));
             } else {
                 root.handleWorkspaceClick(modelData.id)
             }
