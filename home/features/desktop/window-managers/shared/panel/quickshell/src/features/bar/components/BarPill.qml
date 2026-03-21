@@ -63,7 +63,8 @@ MouseArea {
   }
 
   height: 28
-  width: measuredContentWidth() + horizontalPadding * 2
+  // Keep width >= height so radius-based pills never become a vertical capsule when content width is under-measured.
+  width: Math.max(height, measuredContentWidth() + horizontalPadding * 2)
   implicitWidth: width
   implicitHeight: height
   acceptedButtons: Qt.LeftButton | Qt.RightButton

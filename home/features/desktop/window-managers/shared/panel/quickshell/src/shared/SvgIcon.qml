@@ -14,6 +14,10 @@ Item {
     property string folder: "fluent"
     property int size: Appearance.iconSizeSmall
 
+    // Row/Column and BarPill use implicit sizes for measurement; explicit width/height alone stay 0 implicit.
+    implicitWidth: size
+    implicitHeight: size
+
     // Support "brands/icon-name.svg" in source — auto-splits folder
     readonly property string _resolvedFolder: {
         var idx = source.indexOf("/");
