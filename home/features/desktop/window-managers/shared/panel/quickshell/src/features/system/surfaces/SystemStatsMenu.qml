@@ -40,7 +40,7 @@ BasePopupMenu {
         if (statKey === "gpuStatus") return "Graphics processor telemetry";
         if (statKey === "diskStatus") return "Storage usage and mount points";
         if (statKey === "networkStatus") return "Interface throughput and history";
-        return compactMode ? "Actions first" : "Processes, services, and live telemetry";
+        return compactMode ? "Telemetry first" : "Live telemetry, processes, and services";
     }
 
     headerExtras: SharedWidgets.IconButton {
@@ -81,6 +81,16 @@ BasePopupMenu {
         columnSpacing: Appearance.paddingSmall
 
         SharedWidgets.SectionLabel {
+            label: "TELEMETRY"
+        }
+
+        CpuWidget { visible: root.showAll || root.statKey === "cpuStatus" }
+        RamWidget { visible: root.showAll || root.statKey === "ramStatus" }
+        GPUWidget { visible: root.showAll || root.statKey === "gpuStatus" }
+        DiskWidget { visible: root.showAll || root.statKey === "diskStatus" }
+        NetworkGraphs { visible: root.showAll || root.statKey === "networkStatus" }
+
+        SharedWidgets.SectionLabel {
             label: "ACTIONS"
             visible: root.showAll || root.statKey === "cpuStatus" || root.statKey === "ramStatus"
         }
@@ -93,15 +103,5 @@ BasePopupMenu {
             visible: root.showAll
             compactMode: root.compactMode
         }
-
-        SharedWidgets.SectionLabel {
-            label: "TELEMETRY"
-        }
-
-        CpuWidget { visible: root.showAll || root.statKey === "cpuStatus" }
-        RamWidget { visible: root.showAll || root.statKey === "ramStatus" }
-        GPUWidget { visible: root.showAll || root.statKey === "gpuStatus" }
-        DiskWidget { visible: root.showAll || root.statKey === "diskStatus" }
-        NetworkGraphs { visible: root.showAll || root.statKey === "networkStatus" }
     }
 }

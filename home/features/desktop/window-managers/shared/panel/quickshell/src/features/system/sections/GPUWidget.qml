@@ -13,6 +13,8 @@ SharedWidgets.CardBase {
 
     property string vramUsage: "0 / 0 MB"
     property real vramPercent: 0.0
+    /// No mem_info_vram_* sysfs (typical Intel iGPU unified memory) — not "missing VRAM".
+    property bool vramIsUnified: false
     property var gpuHistory: []
     property bool showProcesses: false
 
@@ -46,13 +48,22 @@ SharedWidgets.CardBase {
             if (lines.length >= 2) {
                 var used = (parseInt(lines[0], 10) || 0) / 1024 / 1024;
                 var total = (parseInt(lines[1], 10) || 0) / 1024 / 1024;
-                return { usage: Math.round(used) + " / " + Math.round(total) + " MB", percent: total > 0 ? (used / total) : 0 };
+                if (total > 0) {
+                    return {
+                        usage: Math.round(used) + " / " + Math.round(total) + " MB",
+                        percent: used / total,
+                        unified: false
+                    };
+                }
             }
-            return { usage: root.vramUsage, percent: root.vramPercent };
+            return { usage: root.vramUsage, percent: 0, unified: true };
         }
         onUpdated: {
-            root.vramUsage = vramPoll.value.usage;
-            root.vramPercent = vramPoll.value.percent;
+            root.vramIsUnified = vramPoll.value.unified;
+            if (!vramPoll.value.unified) {
+                root.vramUsage = vramPoll.value.usage;
+                root.vramPercent = vramPoll.value.percent;
+            }
         }
     }
 
@@ -131,10 +142,13 @@ SharedWidgets.CardBase {
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
                     label: "VRAM"
-                    value: AMDGPUService.available ? (MU.formatBytes(AMDGPUService.vramUsageBytes) + " / " + MU.formatBytes(AMDGPUService.vramTotalBytes)) : root.vramUsage
+                    value: AMDGPUService.available
+                        ? (MU.formatBytes(AMDGPUService.vramUsageBytes) + " / " + MU.formatBytes(AMDGPUService.vramTotalBytes))
+                        : (root.vramIsUnified ? "Unified with system RAM" : root.vramUsage)
                 }
 
                 SharedWidgets.MiniProgressBar {
+                    visible: AMDGPUService.available || !root.vramIsUnified
                     value: AMDGPUService.available ? AMDGPUService.vramPercent : root.vramPercent
                     barColor: Colors.primary
                 }
