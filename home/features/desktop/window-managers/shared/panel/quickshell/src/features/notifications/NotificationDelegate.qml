@@ -14,6 +14,7 @@ Rectangle {
   property bool isPopup: false
   property bool showContent: true
   property real swipeOffset: 0
+  property real _swipeStartX: 0
   property bool isSwiping: false
   property bool isUrgent: !!(notification && notification.urgency === NotificationUrgency.Critical)
   property bool isReplying: false
@@ -401,7 +402,5 @@ Rectangle {
         }
       }
     }
-
-    property real _swipeStartX: 0
   }
 }
