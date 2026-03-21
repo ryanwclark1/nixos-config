@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
+import "../models/SystemCardStyle.js" as SystemCardStyle
 
 SharedWidgets.CardBase {
     id: root
@@ -20,8 +21,8 @@ SharedWidgets.CardBase {
         return drives.length > 0 ? drives[0] : null;
     }
     readonly property real primaryPercent: _primaryDrive ? (Math.min(100, parseInt(_primaryDrive.percent, 10) || 0) / 100.0) : 0
-    readonly property color usageColor: primaryPercent >= 0.9 ? Colors.error
-        : (primaryPercent >= 0.75 ? Colors.warning : Colors.info)
+    readonly property color usageColor: SystemCardStyle.usageTierColor(
+        primaryPercent, Colors.info, Colors.warning, Colors.error, 0.75, 0.9)
 
     CommandPoll {
         interval: root._diskPollMs
@@ -57,12 +58,8 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
 
-            Text {
-                text: "DISK"
-                color: Colors.textDisabled
-                font.pixelSize: Appearance.fontSizeXS
-                font.weight: Font.Black
-                font.letterSpacing: Appearance.letterSpacingWide
+            SystemSectionTitle {
+                title: "DISK"
             }
 
             Item { Layout.fillWidth: true }
@@ -103,18 +100,16 @@ SharedWidgets.CardBase {
                             Layout.fillWidth: true
                             label: modelData.mount === "/" ? "Root (/)" : modelData.mount
                             value: modelData.used + " / " + modelData.total
-                            valueColor: {
-                                var pct = (parseInt(modelData.percent, 10) || 0) / 100.0;
-                                return pct >= 0.9 ? Colors.error : (pct >= 0.75 ? Colors.warning : Colors.text);
-                            }
+                            valueColor: SystemCardStyle.usageTierColor(
+                                (parseInt(modelData.percent, 10) || 0) / 100.0,
+                                Colors.text, Colors.warning, Colors.error, 0.75, 0.9)
                         }
 
                         SharedWidgets.MiniProgressBar {
                             value: Math.min(100, parseInt(modelData.percent, 10) || 0) / 100.0
-                            barColor: {
-                                var pct = (parseInt(modelData.percent, 10) || 0) / 100.0;
-                                return pct >= 0.9 ? Colors.error : (pct >= 0.75 ? Colors.warning : Colors.info);
-                            }
+                            barColor: SystemCardStyle.usageTierColor(
+                                (parseInt(modelData.percent, 10) || 0) / 100.0,
+                                Colors.info, Colors.warning, Colors.error, 0.75, 0.9)
                         }
                     }
                 }

@@ -4,6 +4,7 @@ import "../../../services"
 import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../widgets" as SharedWidgets
 import "../models/ModuleUtils.js" as MU
+import "../models/SystemCardStyle.js" as SystemCardStyle
 
 SharedWidgets.CardBase {
     id: root
@@ -67,8 +68,8 @@ SharedWidgets.CardBase {
         }
     }
 
-    readonly property color usageColor: SystemStatus.gpuPercent >= 0.9 ? Colors.error
-        : (SystemStatus.gpuPercent >= 0.7 ? Colors.warning : Colors.secondary)
+    readonly property color usageColor: SystemCardStyle.usageTierColor(
+        SystemStatus.gpuPercent, Colors.secondary, Colors.warning, Colors.error, 0.7, 0.9)
 
     ColumnLayout {
         id: gpuColumn
@@ -80,12 +81,8 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
 
-            Text {
-                text: AMDGPUService.available ? "AMD GPU" : "GPU"
-                color: Colors.textDisabled
-                font.pixelSize: Appearance.fontSizeXS
-                font.weight: Font.Black
-                font.letterSpacing: Appearance.letterSpacingWide
+            SystemSectionTitle {
+                title: AMDGPUService.available ? "AMD GPU" : "GPU"
             }
 
             Item { Layout.fillWidth: true }

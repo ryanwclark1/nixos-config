@@ -131,16 +131,21 @@ function statTooltipText(widgetType, widgetInstance, SystemStatus) {
     return "";
 }
 
-function widgetDisplayMode(widgetInstance) {
+var _displayModesBar = ["auto", "full", "compact", "icon"];
+var _displayModesSummary = ["auto", "full", "icon"];
+
+function _normalizedDisplayMode(widgetInstance, allowedModes) {
     var settings = widgetSettings(widgetInstance);
     var mode = String(settings.displayMode || "auto");
-    return ["auto", "full", "compact", "icon"].indexOf(mode) !== -1 ? mode : "auto";
+    return allowedModes.indexOf(mode) !== -1 ? mode : "auto";
+}
+
+function widgetDisplayMode(widgetInstance) {
+    return _normalizedDisplayMode(widgetInstance, _displayModesBar);
 }
 
 function widgetSummaryDisplayMode(widgetInstance) {
-    var settings = widgetSettings(widgetInstance);
-    var mode = String(settings.displayMode || "auto");
-    return ["auto", "full", "icon"].indexOf(mode) !== -1 ? mode : "auto";
+    return _normalizedDisplayMode(widgetInstance, _displayModesSummary);
 }
 
 function isCompactStatWidget(widgetInstance, vertical) {

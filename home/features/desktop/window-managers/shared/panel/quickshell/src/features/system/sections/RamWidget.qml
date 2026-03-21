@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../widgets" as SharedWidgets
+import "../models/SystemCardStyle.js" as SystemCardStyle
 
 SharedWidgets.CardBase {
     id: root
@@ -40,8 +41,8 @@ SharedWidgets.CardBase {
         }
     }
 
-    readonly property color usageColor: SystemStatus.ramPercent >= 0.9 ? Colors.error
-        : (SystemStatus.ramPercent >= 0.75 ? Colors.warning : Colors.accent)
+    readonly property color usageColor: SystemCardStyle.usageTierColor(
+        SystemStatus.ramPercent, Colors.accent, Colors.warning, Colors.error, 0.75, 0.9)
 
     ColumnLayout {
         id: ramColumn
@@ -53,12 +54,8 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
 
-            Text {
-                text: "MEMORY"
-                color: Colors.textDisabled
-                font.pixelSize: Appearance.fontSizeXS
-                font.weight: Font.Black
-                font.letterSpacing: Appearance.letterSpacingWide
+            SystemSectionTitle {
+                title: "MEMORY"
             }
 
             Item { Layout.fillWidth: true }

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../services"
+import "../../../services/PopupAnchorUtils.js" as PopupAnchor
 import "../../../widgets"
 
 // Lightweight popup surface for bar pill right-click context menus.
@@ -48,23 +49,12 @@ PopupWindow {
 
         var pos = root.barPosition;
         var gap = Appearance.spacingXS;
-
-        if (pos === "left" || pos === "right") {
-            // Side bars: popup beside the bar, vertically centered on trigger
-            root.anchor.rect.y = ty + th / 2 - root.implicitHeight / 2;
-            if (pos === "left")
-                root.anchor.rect.x = tx + tw + gap;
-            else
-                root.anchor.rect.x = tx - menuWidth - gap;
-        } else {
-            // Top / bottom bars: popup centered horizontally on trigger
-            root.anchor.rect.x = tx + tw / 2 - menuWidth / 2;
-
-            if (pos === "bottom")
-                root.anchor.rect.y = ty - root.implicitHeight - gap;
-            else
-                root.anchor.rect.y = ty + th + gap;
-        }
+        PopupAnchor.assignPopupAnchor(root.anchor.rect, {
+            x: tx,
+            y: ty,
+            width: tw,
+            height: th
+        }, pos, gap, menuWidth, root.implicitHeight);
 
         root.visible = true;
         FocusGrabManager.requestGrab("barContextMenu", function() { root.close(); });

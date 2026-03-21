@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../services"
+import "../services/PopupAnchorUtils.js" as PopupAnchor
 import "./widgets" as Widgets
 import "../widgets" as SharedWidgets
 
@@ -72,18 +73,8 @@ Item {
     function _updateRect() {
       if (!anchorItem || !anchorWindow) return;
       var r = anchorWindow.itemRect(anchorItem);
-      var gap = Config.popupGap;
-      var tw = reaperPopup.implicitWidth;
-      var th = reaperPopup.implicitHeight;
-      var edge = anchorEdge;
-
-      if (edge === "left" || edge === "right") {
-        anchor.rect.y = r.y + r.height / 2 - th / 2;
-        anchor.rect.x = edge === "left" ? r.x + r.width + gap : r.x - tw - gap;
-      } else {
-        anchor.rect.x = r.x + r.width / 2 - tw / 2;
-        anchor.rect.y = edge === "bottom" ? r.y - th - gap : r.y + r.height + gap;
-      }
+      PopupAnchor.assignPopupAnchor(reaperPopup.anchor.rect, r, anchorEdge, Config.popupGap,
+          reaperPopup.implicitWidth, reaperPopup.implicitHeight);
     }
 
     onAnchorItemChanged: _updateRect()

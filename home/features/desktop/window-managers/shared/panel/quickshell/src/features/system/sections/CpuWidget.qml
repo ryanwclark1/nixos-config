@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell.Io
 import "../../../services"
 import "../../../widgets" as SharedWidgets
+import "../models/SystemCardStyle.js" as SystemCardStyle
 
 SharedWidgets.CardBase {
     id: root
@@ -41,8 +42,8 @@ SharedWidgets.CardBase {
         onTriggered: _loadAvgFile.reload()
     }
 
-    readonly property color usageColor: SystemStatus.cpuPercent >= 0.9 ? Colors.error
-        : (SystemStatus.cpuPercent >= 0.7 ? Colors.warning : Colors.primary)
+    readonly property color usageColor: SystemCardStyle.usageTierColor(
+        SystemStatus.cpuPercent, Colors.primary, Colors.warning, Colors.error, 0.7, 0.9)
 
     ColumnLayout {
         id: cpuColumn
@@ -54,12 +55,8 @@ SharedWidgets.CardBase {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
 
-            Text {
-                text: "CPU"
-                color: Colors.textDisabled
-                font.pixelSize: Appearance.fontSizeXS
-                font.weight: Font.Black
-                font.letterSpacing: Appearance.letterSpacingWide
+            SystemSectionTitle {
+                title: "CPU"
             }
 
             Item { Layout.fillWidth: true }

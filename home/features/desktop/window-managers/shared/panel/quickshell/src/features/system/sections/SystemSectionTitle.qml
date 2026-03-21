@@ -1,5 +1,4 @@
 import QtQuick
-import "../../../services"
 
 Text {
     id: root

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../../services"
+import "../../../services/PopupAnchorUtils.js" as PopupAnchor
 import "../../../shared"
 
 PopupWindow {
@@ -26,18 +27,8 @@ PopupWindow {
   function _updateRect() {
     if (!anchorItem || !anchorWindow) return;
     var r = anchorWindow.itemRect(anchorItem);
-    var gap = Config.popupGap;
-    var pw = root.implicitWidth;
-    var ph = root.implicitHeight;
-    var edge = anchorEdge;
-
-    if (edge === "left" || edge === "right") {
-      anchor.rect.y = r.y + r.height / 2 - ph / 2;
-      anchor.rect.x = edge === "left" ? r.x + r.width + gap : r.x - pw - gap;
-    } else {
-      anchor.rect.x = r.x + r.width / 2 - pw / 2;
-      anchor.rect.y = edge === "bottom" ? r.y - ph - gap : r.y + r.height + gap;
-    }
+    PopupAnchor.assignPopupAnchor(root.anchor.rect, r, anchorEdge, Config.popupGap,
+        root.implicitWidth, root.implicitHeight);
   }
 
   onAnchorItemChanged: _updateRect()
