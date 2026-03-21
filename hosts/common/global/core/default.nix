@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   ...
 }:
@@ -11,6 +12,12 @@
     ./logging.nix
     ./environment.nix
   ];
+
+  # Tools like OpenAI Codex probe /usr/bin/bwrap (FHS path). NixOS only places
+  # /usr/bin/env there by default, so symlink the store bwrap after that step.
+  system.activationScripts.bwrapUsrBin = lib.stringAfter [ "usrbinenv" ] ''
+    ln -sfn ${pkgs.bubblewrap}/bin/bwrap /usr/bin/bwrap
+  '';
 
   # Common performance-related system packages
   environment.systemPackages = with pkgs; [
