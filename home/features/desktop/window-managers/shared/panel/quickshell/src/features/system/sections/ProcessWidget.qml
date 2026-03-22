@@ -45,7 +45,6 @@ SharedWidgets.CardBase {
     Layout.fillWidth: true
     Layout.preferredHeight: tableFocus.implicitHeight + root.pad * 2
 
-    Component.onCompleted: applyContextDefaultSort()
     onStatContextChanged: applyContextDefaultSort()
 
     function applyContextDefaultSort() {
@@ -402,6 +401,7 @@ SharedWidgets.CardBase {
         ProcessService.setDetailPid(selectedPid);
     }
     Component.onCompleted: {
+        applyContextDefaultSort();
         syncSelection();
         ProcessService.setDetailPid(selectedPid);
     }

@@ -15,3 +15,4 @@ Other `QS_*` prefixes may appear in scripts (for example verification timeouts i
 ## Code helpers
 
 - [ShellUtils.js](src/services/ShellUtils.js) `ipcCall(target, method, ...args)` builds the `quickshell ipc call` argv array used with `Quickshell.execDetached`. Shared launcher shortcuts live in [LauncherShellIpcActions.js](src/launcher/LauncherShellIpcActions.js).
+- Wallpaper picker grid thumbnails: [WallpaperService.qml](src/services/WallpaperService.qml) queues [qs-wallpaper-thumb](scripts/wallpaper-thumb.sh) when Freedesktop large thumbnails are missing. `DependencyService` resolves that managed command; WebP cache paths and keys stay aligned with [WallpaperThumbnailCache.js](src/shared/WallpaperThumbnailCache.js). The same binary is on `PATH` from [default.nix](default.nix) (`wallpaperThumbScript`) and reachable as `qs wallpaper-thumb` via [qs-cli.sh](scripts/qs-cli.sh).

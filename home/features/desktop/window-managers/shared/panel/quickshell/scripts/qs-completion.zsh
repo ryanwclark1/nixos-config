@@ -58,6 +58,7 @@ _qs() {
     'model-usage:AI model usage statistics'
     'network:Network management'
     'wallpaper:Wallpaper management'
+    'wallpaper-thumb:Generate WebP wallpaper grid thumbnail'
     'keybinds:Keybinding management'
     'bookmarks:Browser bookmarks'
     'run:Run commands'

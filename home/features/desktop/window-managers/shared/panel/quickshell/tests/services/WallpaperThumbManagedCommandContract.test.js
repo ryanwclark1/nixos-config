@@ -23,4 +23,23 @@ describe("qs-wallpaper-thumb managed command contract", () => {
     expect(nix).toContain("wallpaperThumbScript");
     expect(nix).toMatch(/home\.packages[\s\S]*wallpaperThumbScript/);
   });
+
+  it("qs CLI dispatches wallpaper-thumb to qs-wallpaper-thumb", () => {
+    const cli = readFileSync(resolve(quickshellRoot, "scripts/qs-cli.sh"), "utf8");
+    expect(cli).toContain("wallpaper-thumb");
+    expect(cli).toMatch(/wallpaper-thumb\)\s*\n\s*shift\s*\n\s*exec qs-wallpaper-thumb/s);
+  });
+
+  it("shell completions list wallpaper-thumb next to wallpaper", () => {
+    const bash = readFileSync(
+      resolve(quickshellRoot, "scripts/qs-completion.bash"),
+      "utf8"
+    );
+    expect(bash).toMatch(/wallpaper.*wallpaper-thumb/);
+    const zsh = readFileSync(
+      resolve(quickshellRoot, "scripts/qs-completion.zsh"),
+      "utf8"
+    );
+    expect(zsh).toContain("'wallpaper-thumb:");
+  });
 });

@@ -28,6 +28,7 @@ AI:
 Network & System:
   network [args]        Network management
   wallpaper [args]      Wallpaper management
+  wallpaper-thumb [args]  Generate WebP grid thumbnail (source, dest.webp)
   keybinds [args]       Keybinding management
   bookmarks [args]      Browser bookmarks
   run [args]            Run commands via runner
@@ -121,6 +122,10 @@ case "${1:-help}" in
   wallpaper|wallpapers)
     shift
     exec qs-wallpapers "$@"
+    ;;
+  wallpaper-thumb)
+    shift
+    exec qs-wallpaper-thumb "$@"
     ;;
   keybinds)
     shift

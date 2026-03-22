@@ -7,7 +7,7 @@ _qs_completions() {
   cur="${COMP_WORDS[COMP_CWORD]}"
   prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-  commands="toggle open close panic reload alt-tab screenshot ocr tts ai ai-stream model-usage network wallpaper keybinds bookmarks run bang-sync bang-search health plugin rofi help version"
+  commands="toggle open close panic reload alt-tab screenshot ocr tts ai ai-stream model-usage network wallpaper wallpaper-thumb keybinds bookmarks run bang-sync bang-search health plugin rofi help version"
 
   surface_ids="audioMenu bluetoothMenu networkMenu vpnMenu weatherMenu batteryMenu musicMenu clipboardMenu recordingMenu systemStatsMenu printerMenu privacyMenu sshMenu dateTimeMenu marketMenu modelUsageMenu screenshotMenu cavaPopup notifCenter controlCenter notepad aiChat commandPalette powerMenu colorPicker displayConfig fileBrowser systemMonitor wallhavenBrowser launcher overview"
 
