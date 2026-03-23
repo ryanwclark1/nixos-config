@@ -122,7 +122,7 @@ Item {
         var globalPos = root.mapToItem(null, 0, 0);
         root.contextMenuRequested([
             { label: "Check Health", icon: "board.svg", action: () => SystemStatus.refreshHealth() },
-            { label: "Apply Safe Fixes", icon: "checkmark.svg", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.activeIncidents.length > 0 },
+            { label: "Apply Safe Fixes", icon: "checkmark.svg", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.hasSafeFixableIncidents },
             { label: "Open Health Dashboard", icon: "settings.svg", action: () => Quickshell.execDetached(SU.ipcCall("SettingsHub", "openTab", "health")) },
             { separator: true },
             { label: "Restart Shell", icon: "arrow-clockwise.svg", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }

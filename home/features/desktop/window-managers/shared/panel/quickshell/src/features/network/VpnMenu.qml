@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../shared"
+import "../../shared" as Shared
 import "../../services"
 import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
@@ -15,6 +16,18 @@ BasePopupMenu {
     implicitHeight: compactMode ? 620 : 560
     title: "VPN Hub"
     subtitle: NetworkService.vpnPrimaryLabel + " • " + NetworkService.vpnStatusLabel(NetworkService.vpnPrimaryStatus)
+
+    property bool confirmingTailscaleDisconnect: false
+    property string confirmingVpnUuid: ""
+
+    Timer {
+        id: vpnConfirmTimer
+        interval: 3000
+        onTriggered: {
+            root.confirmingTailscaleDisconnect = false;
+            root.confirmingVpnUuid = "";
+        }
+    }
 
     function statusColor(statusKey) { return VH.statusColor(statusKey, Colors); }
 
@@ -176,15 +189,20 @@ BasePopupMenu {
                     implicitHeight: 40
                     radius: Appearance.radiusMedium
                     color: NetworkService.vpnPrimaryStatus === "connected"
-                        ? Colors.withAlpha(Colors.error, 0.14)
+                        ? (root.confirmingTailscaleDisconnect ? Colors.error : Colors.withAlpha(Colors.error, 0.14))
                         : Colors.primaryStrong
                     border.color: NetworkService.vpnPrimaryStatus === "connected" ? Colors.error : Colors.primary
                     border.width: 1
+                    Behavior on color { Shared.CAnim {} }
 
                     Text {
                         anchors.centerIn: parent
-                        text: NetworkService.vpnPrimaryStatus === "connected" ? "Disconnect Tailscale" : "Connect Tailscale"
-                        color: NetworkService.vpnPrimaryStatus === "connected" ? Colors.error : Colors.primary
+                        text: NetworkService.vpnPrimaryStatus === "connected"
+                            ? (root.confirmingTailscaleDisconnect ? "Confirm?" : "Disconnect Tailscale")
+                            : "Connect Tailscale"
+                        color: NetworkService.vpnPrimaryStatus === "connected"
+                            ? (root.confirmingTailscaleDisconnect ? Colors.background : Colors.error)
+                            : Colors.primary
                         font.pixelSize: Appearance.fontSizeSmall
                         font.weight: Font.Medium
                     }
@@ -194,10 +212,18 @@ BasePopupMenu {
                         cursorShape: Qt.PointingHandCursor
                         enabled: NetworkService.tailscaleInstalled
                         onClicked: {
-                            if (NetworkService.vpnPrimaryStatus === "connected")
-                                NetworkService.tailscaleDown();
-                            else
+                            if (NetworkService.vpnPrimaryStatus === "connected") {
+                                if (root.confirmingTailscaleDisconnect) {
+                                    NetworkService.tailscaleDown();
+                                    root.confirmingTailscaleDisconnect = false;
+                                    vpnConfirmTimer.stop();
+                                } else {
+                                    root.confirmingTailscaleDisconnect = true;
+                                    vpnConfirmTimer.restart();
+                                }
+                            } else {
                                 NetworkService.tailscaleUp();
+                            }
                         }
                     }
                 }
@@ -217,7 +243,17 @@ BasePopupMenu {
                 delegate: VpnProfileDelegate {
                     isActive: true
                     actionPending: NetworkService.pendingVpnProfileUuid === String(modelData.uuid || "")
-                    onActionClicked: NetworkService.disconnectVpnProfile(modelData.uuid)
+                    isConfirming: root.confirmingVpnUuid === String(modelData.uuid || "")
+                    onActionClicked: {
+                        if (root.confirmingVpnUuid === String(modelData.uuid || "")) {
+                            NetworkService.disconnectVpnProfile(modelData.uuid);
+                            root.confirmingVpnUuid = "";
+                            vpnConfirmTimer.stop();
+                        } else {
+                            root.confirmingVpnUuid = String(modelData.uuid || "");
+                            vpnConfirmTimer.restart();
+                        }
+                    }
                 }
             }
         }

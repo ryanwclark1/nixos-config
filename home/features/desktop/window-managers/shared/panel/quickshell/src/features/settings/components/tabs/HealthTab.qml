@@ -12,6 +12,16 @@ Item {
 
     Component.onCompleted: SystemStatus.refreshHealth()
 
+    readonly property bool hasSafeFixes: SystemStatus.hasSafeFixableIncidents
+
+    function formatIncidentStatus(status) {
+        var value = String(status || "").trim();
+        if (value === "")
+            return "";
+        var spaced = value.replace(/_/g, " ");
+        return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+    }
+
     readonly property color statusColor: {
         switch (SystemStatus.overallStatus) {
             case "healthy": return Colors.primary;
@@ -129,11 +139,33 @@ Item {
                         }
 
                         Text {
-                            visible: !!(modelData.message || modelData.description)
-                            text: modelData.message || modelData.description || ""
+                            visible: !!(modelData.summary || modelData.message || modelData.description)
+                            text: modelData.summary || modelData.message || modelData.description || ""
                             color: Colors.textSecondary
                             font.pixelSize: Appearance.fontSizeSmall
                             wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            visible: !!(modelData.status || modelData.last_seen || modelData.count)
+                            text: [
+                                root.formatIncidentStatus(modelData.status),
+                                modelData.count > 0 ? ("Seen " + modelData.count + "x") : "",
+                                modelData.last_seen ? ("Last seen " + modelData.last_seen) : ""
+                            ].filter(Boolean).join(" • ")
+                            color: Colors.textDisabled
+                            font.pixelSize: Appearance.fontSizeXS
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            visible: !!modelData.repro
+                            text: "Repro: " + modelData.repro
+                            color: Colors.textDisabled
+                            font.pixelSize: Appearance.fontSizeXS
+                            wrapMode: Text.Wrap
                             Layout.fillWidth: true
                         }
                     }
@@ -194,8 +226,17 @@ Item {
                 Layout.fillWidth: true
                 label: "Apply Safe Fixes"
                 iconName: "checkmark.svg"
-                visible: SystemStatus.activeIncidents.length > 0
+                visible: root.hasSafeFixes
                 onClicked: SystemStatus.applySafeFixes()
+            }
+
+            Text {
+                visible: SystemStatus.activeIncidents.length > 0 && !root.hasSafeFixes
+                text: "No safe fixes are available for the current incidents. Use the summaries above to address them manually."
+                color: Colors.textDisabled
+                font.pixelSize: Appearance.fontSizeSmall
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
             }
         }
     }

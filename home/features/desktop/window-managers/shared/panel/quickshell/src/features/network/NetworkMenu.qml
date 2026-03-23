@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import "../../shared"
+import "../../shared" as Shared
 import "../system/sections"
 import "../../services"
 import "../../services/ShellUtils.js" as SU
@@ -18,6 +19,17 @@ BasePopupMenu {
   readonly property bool isOffline: NetworkService.activePrimaryName === "Offline"
   readonly property bool primaryIsWifi: NetworkService.activePrimaryType === "wifi" || NetworkService.activePrimaryType === "802-11-wireless"
   readonly property bool primaryIsEthernet: NetworkService.activePrimaryType === "ethernet" || NetworkService.activePrimaryType === "802-3-ethernet"
+  property bool confirmingDisconnect: false
+  property string confirmingDisconnectSSID: ""
+
+  Timer {
+    id: disconnectConfirmTimer
+    interval: 3000
+    onTriggered: {
+      root.confirmingDisconnect = false;
+      root.confirmingDisconnectSSID = "";
+    }
+  }
   property string selectedSSID: ""
   property bool showAdvanced: false
 
@@ -159,24 +171,27 @@ BasePopupMenu {
               }
 
               Rectangle {
-                implicitWidth: Math.max(96, disconnectLabel.implicitWidth + 24)
+                implicitWidth: Math.max(96, (root.confirmingDisconnect ? 80 : disconnectLabel.implicitWidth) + 24)
                 height: 32
                 radius: height / 2
                 color: root.isOffline
                   ? Colors.primaryMid
-                  : Colors.errorLight
+                  : (root.confirmingDisconnect ? Colors.error : Colors.errorLight)
                 border.color: root.isOffline ? Colors.primary : Colors.error
                 border.width: 1
+                Behavior on color { Shared.CAnim {} }
 
                 Text {
                   id: disconnectLabel
                   anchors.centerIn: parent
                   text: root.isOffline
                     ? "Refresh"
-                    : (root.primaryIsWifi
-                        ? "Disconnect Wi-Fi"
-                        : (root.primaryIsEthernet ? "Disconnect Ethernet" : "Disconnect"))
-                  color: root.isOffline ? Colors.primary : Colors.error
+                    : (root.confirmingDisconnect
+                        ? "Confirm?"
+                        : (root.primaryIsWifi
+                            ? "Disconnect Wi-Fi"
+                            : (root.primaryIsEthernet ? "Disconnect Ethernet" : "Disconnect")))
+                  color: root.isOffline ? Colors.primary : (root.confirmingDisconnect ? Colors.background : Colors.error)
                   font.pixelSize: Appearance.fontSizeXS
                   font.weight: Font.Bold
                   font.capitalization: Font.AllUppercase
@@ -196,8 +211,19 @@ BasePopupMenu {
                   hoverEnabled: true
                   cursorShape: Qt.PointingHandCursor
                   onClicked: {
-                    if (root.isOffline) NetworkService.refreshData();
-                    else NetworkService.disconnectPrimary();
+                    if (root.isOffline) {
+                      NetworkService.refreshData();
+                      return;
+                    }
+
+                    if (root.confirmingDisconnect) {
+                      NetworkService.disconnectPrimary();
+                      root.confirmingDisconnect = false;
+                      disconnectConfirmTimer.stop();
+                    } else {
+                      root.confirmingDisconnect = true;
+                      disconnectConfirmTimer.restart();
+                    }
                   }
                 }
               }
@@ -514,9 +540,10 @@ BasePopupMenu {
                 radius: Appearance.radiusMedium
                 color: networkMouse.containsMouse
                   ? Colors.primarySubtle
-                  : (modelData.active ? Colors.primaryStrong : Colors.cardSurface)
-                border.color: modelData.active ? Colors.primary : Colors.border
+                  : (modelData.active ? (root.confirmingDisconnectSSID === modelData.ssid ? Colors.error : Colors.primaryStrong) : Colors.cardSurface)
+                border.color: modelData.active ? (root.confirmingDisconnectSSID === modelData.ssid ? Colors.error : Colors.primary) : Colors.border
                 border.width: 1
+                Behavior on color { Shared.CAnim {} }
 
                 SharedWidgets.InnerHighlight { hoveredOpacity: 0.25; hovered: modelData.active }
 
@@ -526,8 +553,8 @@ BasePopupMenu {
                   spacing: Appearance.paddingSmall
 
                   SharedWidgets.SvgIcon {
-                    source: modelData.active ? "checkmark.svg" : NetworkService.signalIcon(modelData.signal)
-                    color: modelData.active ? Colors.primary : Colors.textSecondary
+                    source: (root.confirmingDisconnectSSID === modelData.ssid) ? "checkmark.svg" : (modelData.active ? "checkmark.svg" : NetworkService.signalIcon(modelData.signal))
+                    color: modelData.active ? (root.confirmingDisconnectSSID === modelData.ssid ? Colors.background : Colors.primary) : Colors.textSecondary
                     size: Appearance.fontSizeLarge
                   }
 
@@ -536,7 +563,7 @@ BasePopupMenu {
                     spacing: 0
                     Text {
                       text: modelData.ssid
-                      color: Colors.text
+                      color: modelData.active && root.confirmingDisconnectSSID === modelData.ssid ? Colors.background : Colors.text
                       font.pixelSize: Appearance.fontSizeMedium
                       font.weight: modelData.active ? Font.DemiBold : Font.Normal
                       Layout.fillWidth: true
@@ -544,7 +571,7 @@ BasePopupMenu {
                     }
                     Text {
                       text: (modelData.security || "open") + " \u2022 " + (modelData.signal || "0") + "%"
-                      color: Colors.textSecondary
+                      color: modelData.active && root.confirmingDisconnectSSID === modelData.ssid ? Colors.background : Colors.textSecondary
                       font.pixelSize: Appearance.fontSizeXS
                       Layout.fillWidth: true
                       elide: Text.ElideRight
@@ -552,8 +579,8 @@ BasePopupMenu {
                   }
 
                   Text {
-                    text: modelData.active ? "Connected" : "Connect"
-                    color: modelData.active ? Colors.primary : Colors.textSecondary
+                    text: modelData.active ? (root.confirmingDisconnectSSID === modelData.ssid ? "Confirm?" : "Connected") : "Connect"
+                    color: modelData.active ? (root.confirmingDisconnectSSID === modelData.ssid ? Colors.background : Colors.primary) : Colors.textSecondary
                     font.pixelSize: Appearance.fontSizeSmall
                     font.weight: Font.Medium
                   }
@@ -566,7 +593,14 @@ BasePopupMenu {
                   cursorShape: Qt.PointingHandCursor
                   onClicked: {
                     if (modelData.active) {
-                      NetworkService.disconnectWifi(modelData.ssid);
+                      if (root.confirmingDisconnectSSID === modelData.ssid) {
+                        NetworkService.disconnectWifi(modelData.ssid);
+                        root.confirmingDisconnectSSID = "";
+                        disconnectConfirmTimer.stop();
+                      } else {
+                        root.confirmingDisconnectSSID = modelData.ssid;
+                        disconnectConfirmTimer.restart();
+                      }
                     } else if ((modelData.security || "") === "" || modelData.security === "--") {
                       NetworkService.connectWifi(modelData.ssid);
                     } else {

@@ -8,6 +8,7 @@ Rectangle {
   property bool _destroyed: false
   property bool _loggedWorkspaceApiUnavailable: false
   property bool _loggedEmptyWorkspaceList: false
+  property bool _allowEmptyWorkspaceWarning: false
   readonly property bool hasWorkspaceContent: workspaceApiAvailable && !!state && (state.workspaces || []).length > 0
   readonly property real contentWidth: vertical ? 28 : (strip.implicitWidth + 12)
   readonly property real contentHeight: vertical ? (strip.implicitHeight + 12) : 24
@@ -51,6 +52,17 @@ Rectangle {
     }
   }
 
+  Timer {
+    id: emptyWorkspaceWarningTimer
+    interval: 2000
+    repeat: false
+    running: true
+    onTriggered: {
+      root._allowEmptyWorkspaceWarning = true;
+      root._maybeLogWorkspaceStrip("startup");
+    }
+  }
+
   function _maybeLogWorkspaceStrip(context) {
     if (!Config.barWidgetLoadLogging)
       return;
@@ -63,6 +75,8 @@ Rectangle {
     }
     var len = (state && state.workspaces) ? state.workspaces.length : 0;
     if (len === 0) {
+      if (!root._allowEmptyWorkspaceWarning)
+        return;
       if (!_loggedEmptyWorkspaceList)
         Logger.w("Workspaces", "[" + context + "] no workspaces from compositor (strip hidden; check IPC / session env)");
       _loggedEmptyWorkspaceList = true;
@@ -80,7 +94,6 @@ Rectangle {
       _updateStateFromHyprland();
       Hyprland.rawEvent.connect(_onHyprlandEvent);
     }
-    Qt.callLater(function() { if (!root._destroyed) root._maybeLogWorkspaceStrip("startup"); });
   }
 
   Component.onDestruction: {

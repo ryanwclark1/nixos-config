@@ -32,7 +32,7 @@ SharedWidgets.CardBase {
 
   function toggleWorkspace(wsName) {
     if (!CompositorAdapter.supportsScratchpad) return;
-    Quickshell.execDetached(["hyprctl", "dispatch", "togglespecialworkspace", wsName]);
+    CompositorAdapter.toggleSpecialWorkspace(wsName);
   }
 
   function summonWindow(address) {

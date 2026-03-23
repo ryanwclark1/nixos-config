@@ -31,7 +31,6 @@ QtObject {
     function _showWelcome() {
         if (!_isFirstRun) return;
 
-        var compositor = CompositorAdapter.isNiri ? "Niri" : (CompositorAdapter.isHyprland ? "Hyprland" : "Compositor");
         ToastService.showNotice(
             "Welcome to Quickshell",
             "Your shell is ready. Press Super+S for settings, Super+Space for launcher."

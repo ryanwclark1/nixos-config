@@ -420,6 +420,14 @@ QtObject {
     }
   }
 
+  function toggleSpecialWorkspace(workspaceName) {
+    if (!supportsScratchpad) {
+      notifyUnsupported("Toggle special workspace");
+      return;
+    }
+    dispatchAction("togglespecialworkspace", workspaceName === undefined ? "" : String(workspaceName), "Toggle special workspace");
+  }
+
   function toggleOverview() {
     if (!supportsOverview) {
       notifyUnsupported("Toggle overview");

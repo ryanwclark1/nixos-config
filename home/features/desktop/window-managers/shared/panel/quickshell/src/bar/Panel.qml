@@ -694,7 +694,7 @@ Item {
             activeColor: Colors.withAlpha(Colors.error, 0.28)
             normalBorderColor: Colors.error
             activeBorderColor: Colors.error
-            tooltipText: "CRITICAL: High load or temperature detected"
+            tooltipText: SystemStatus.criticalSummary
 
             SharedWidgets.SvgIcon {
                 anchors.centerIn: parent

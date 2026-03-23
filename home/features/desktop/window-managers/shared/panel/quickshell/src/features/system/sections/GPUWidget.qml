@@ -37,12 +37,15 @@ SharedWidgets.CardBase {
     CommandPoll {
         id: vramPoll
         interval: root._vramPollMs
-        running: root.visible && !AMDGPUService.available
+        running: root.visible && !AMDGPUService.available && SystemStatus.gpuCardName !== ""
         command: ["sh", "-c",
-            "gpu_card=$(for c in /sys/class/drm/card[0-9]*/device/mem_info_vram_total; do "
-            + "echo \"$(cat \"$c\" 2>/dev/null || echo 0) $(dirname \"$(dirname \"$c\")\")\" ; done 2>/dev/null "
-            + "| sort -rn | head -1 | awk '{print $2}'); "
-            + "[ -n \"$gpu_card\" ] && cat \"$gpu_card/device/mem_info_vram_used\" \"$gpu_card/device/mem_info_vram_total\" 2>/dev/null | awk '{print $1}'"
+            "gpu_card=\"$1\"; "
+            + "[ -z \"$gpu_card\" ] && exit 0; "
+            + "gpu_path=\"/sys/class/drm/$gpu_card/device\"; "
+            + "[ -r \"$gpu_path/mem_info_vram_used\" ] && [ -r \"$gpu_path/mem_info_vram_total\" ] "
+            + "&& cat \"$gpu_path/mem_info_vram_used\" \"$gpu_path/mem_info_vram_total\" 2>/dev/null | awk '{print $1}'",
+            "qs-gpu-vram",
+            SystemStatus.gpuCardName
         ]
         parse: function(out) {
             var lines = String(out || "").trim().split("\n");

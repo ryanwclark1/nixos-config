@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../../../shared" as Shared
 import "../../../services"
 import "../../../widgets" as SharedWidgets
 
@@ -10,14 +11,16 @@ Rectangle {
     required property var modelData
     required property bool isActive
     property bool actionPending: false
+    property bool isConfirming: false
 
     signal actionClicked()
 
     implicitHeight: 56
     radius: Appearance.radiusMedium
-    color: Colors.cardSurface
-    border.color: Colors.border
+    color: root.isConfirming ? Colors.error : Colors.cardSurface
+    border.color: root.isConfirming ? Colors.error : Colors.border
     border.width: 1
+    Behavior on color { Shared.CAnim {} }
 
     RowLayout {
         anchors.fill: parent
@@ -26,8 +29,8 @@ Rectangle {
         spacing: Appearance.spacingS
 
         SharedWidgets.SvgIcon {
-            source: "wifi-off.svg"
-            color: root.isActive ? Colors.accent : Colors.textSecondary
+            source: root.isActive ? (root.isConfirming ? "checkmark.svg" : "wifi-off.svg") : "wifi-off.svg"
+            color: root.isConfirming ? Colors.background : (root.isActive ? Colors.accent : Colors.textSecondary)
             size: Appearance.fontSizeLarge
         }
 
@@ -37,7 +40,7 @@ Rectangle {
 
             Text {
                 text: root.modelData.name || "VPN"
-                color: Colors.text
+                color: root.isConfirming ? Colors.background : Colors.text
                 font.pixelSize: Appearance.fontSizeMedium
                 font.weight: Font.Medium
                 Layout.fillWidth: true
@@ -48,7 +51,7 @@ Rectangle {
                 text: root.isActive
                     ? (root.modelData.device !== "" ? (root.modelData.type + " • " + root.modelData.device) : root.modelData.type)
                     : (root.modelData.type || "vpn")
-                color: Colors.textSecondary
+                color: root.isConfirming ? Colors.background : Colors.textSecondary
                 font.pixelSize: Appearance.fontSizeXS
                 Layout.fillWidth: true
                 elide: Text.ElideRight
@@ -56,12 +59,12 @@ Rectangle {
         }
 
         Rectangle {
-            readonly property color actionColor: root.isActive ? Colors.error : Colors.primary
+            readonly property color actionColor: root.isActive ? (root.isConfirming ? Colors.background : Colors.error) : Colors.primary
             radius: Appearance.radiusPill
             color: root.actionPending
                 ? Colors.withAlpha(Colors.textSecondary, 0.12)
-                : (root.isActive ? Colors.withAlpha(Colors.error, 0.12) : Colors.primaryAccent)
-            border.color: root.actionPending ? Colors.border : actionColor
+                : (root.isActive ? (root.isConfirming ? Colors.background : Colors.withAlpha(Colors.error, 0.12)) : Colors.primaryAccent)
+            border.color: root.actionPending ? Colors.border : (root.isConfirming ? Colors.background : actionColor)
             border.width: 1
             implicitHeight: 28
             implicitWidth: actionLabel.implicitWidth + 20
@@ -71,8 +74,8 @@ Rectangle {
                 anchors.centerIn: parent
                 text: root.actionPending
                     ? (root.isActive ? "Disconnecting" : "Connecting")
-                    : (root.isActive ? "Disconnect" : "Connect")
-                color: root.actionPending ? Colors.textSecondary : parent.actionColor
+                    : (root.isActive ? (root.isConfirming ? "Confirm?" : "Disconnect") : "Connect")
+                color: root.actionPending ? Colors.textSecondary : (root.isConfirming ? Colors.error : parent.actionColor)
                 font.pixelSize: Appearance.fontSizeXS
                 font.weight: Font.DemiBold
             }

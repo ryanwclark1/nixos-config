@@ -1,4 +1,5 @@
 import QtQuick
+import "../../../shared"
 import "../../../services"
 import "../../../widgets" as SharedWidgets
 import "../VpnHelpers.js" as VH

@@ -19,7 +19,7 @@ Item {
   readonly property string expandDirection: widgetSettings.expandDirection || "right"
   readonly property bool showLabels: widgetSettings.showLabels === true
 
-  visible: CompositorAdapter.isHyprland && hasSpecialWorkspaces
+  visible: CompositorAdapter.supportsScratchpad && hasSpecialWorkspaces
 
   // ── State tracking ────────────────────────────
   property var specialWorkspaces: []
@@ -36,7 +36,7 @@ Item {
 
   // ── Hyprland integration ─────────────────────
   function updateSpecialWorkspaces() {
-    if (!CompositorAdapter.isHyprland) {
+    if (!CompositorAdapter.supportsScratchpad) {
       specialWorkspaces = [];
       return;
     }
@@ -83,7 +83,7 @@ Item {
   }
 
   Connections {
-    target: CompositorAdapter.isHyprland ? Hyprland : null
+    target: CompositorAdapter.supportsScratchpad ? Hyprland : null
     function onRawEvent(event) {
       if (event.name === "activespecial") {
         var data = String(event.data || "");
@@ -100,7 +100,7 @@ Item {
   Component.onDestruction: _destroyed = true
 
   Component.onCompleted: {
-    if (CompositorAdapter.isHyprland) {
+    if (CompositorAdapter.supportsScratchpad) {
       updateSpecialWorkspaces();
       try {
         var initial = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.specialWorkspace : null;
@@ -166,7 +166,7 @@ Item {
         onClicked: {
           if (root.expanded) {
             if (root.isOnSpecial)
-              Quickshell.execDetached(["hyprctl", "dispatch", "togglespecialworkspace"]);
+              CompositorAdapter.toggleSpecialWorkspace();
             root.manuallyExpanded = false;
           } else {
             root.manuallyExpanded = true;
@@ -248,7 +248,7 @@ Item {
           hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
           onClicked: {
-            Quickshell.execDetached(["hyprctl", "dispatch", "togglespecialworkspace", modelData.shortName]);
+            CompositorAdapter.toggleSpecialWorkspace(modelData.shortName);
           }
         }
 
@@ -293,7 +293,7 @@ Item {
         onClicked: {
           if (root.expanded) {
             if (root.isOnSpecial)
-              Quickshell.execDetached(["hyprctl", "dispatch", "togglespecialworkspace"]);
+              CompositorAdapter.toggleSpecialWorkspace();
             root.manuallyExpanded = false;
           } else {
             root.manuallyExpanded = true;
@@ -330,7 +330,7 @@ Item {
           anchors.fill: parent
           hoverEnabled: true
           cursorShape: Qt.PointingHandCursor
-          onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "togglespecialworkspace", modelData.shortName])
+          onClicked: CompositorAdapter.toggleSpecialWorkspace(modelData.shortName)
         }
       }
     }

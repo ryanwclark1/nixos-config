@@ -6,6 +6,7 @@ import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Services.UPower
 import "."
+import "GpuTelemetryHelpers.js" as GpuTelemetryHelpers
 
 QtObject {
   id: root
@@ -64,8 +65,8 @@ QtObject {
     stdout: StdioCollector {
       onStreamFinished: {
         try {
-          var data = JSON.parse(this.text);
-          root.overallStatus = data.status || "failure";
+          var data = root._parseJsonOutput(this.text, ({}));
+          root.overallStatus = root._normalizeHealthStatus(data.status);
           root._loadDetailedIncidents();
         } catch (e) {
           var snippet = String(this.text || "").replace(/\s+/g, " ").substring(0, 120);
@@ -84,7 +85,7 @@ QtObject {
     stdout: StdioCollector {
       onStreamFinished: {
         try {
-          root.pluginDiagnostics = JSON.parse(this.text);
+          root.pluginDiagnostics = root._parseJsonOutput(this.text, ({}));
         } catch (e) {
           var ps = String(this.text || "").replace(/\s+/g, " ").substring(0, 120);
           Logger.w("SystemStatus", "plugin-doctor JSON parse failed:", e, ps ? "stdout:" + ps : "");
@@ -108,6 +109,52 @@ QtObject {
     if (exitStatus !== undefined)
       details += " exitStatus=" + exitStatus;
     Logger.w("SystemStatus", details);
+  }
+
+  function _parseJsonOutput(rawText, fallbackValue) {
+    var text = String(rawText || "").trim();
+    if (text === "")
+      return fallbackValue;
+
+    var parseError = null;
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      parseError = e;
+    }
+
+    var lines = text.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+      var candidate = lines.slice(i).join("\n").trim();
+      if (candidate === "")
+        continue;
+      var firstChar = candidate.charAt(0);
+      if (firstChar !== "{" && firstChar !== "[")
+        continue;
+      try {
+        return JSON.parse(candidate);
+      } catch (_) {
+      }
+    }
+
+    throw parseError;
+  }
+
+  function _normalizeHealthStatus(status) {
+    switch (String(status || "").trim().toLowerCase()) {
+      case "healthy":
+        return "healthy";
+      case "warning":
+      case "safe_fix_pending":
+        return "warning";
+      case "manual_review_required":
+        return "manual_review_required";
+      case "failure":
+      case "detector_failed":
+        return "failure";
+      default:
+        return "failure";
+    }
   }
 
   function refreshHealth() {
@@ -146,7 +193,7 @@ QtObject {
     stdout: StdioCollector {
       onStreamFinished: {
         try { 
-          var nextIncidents = JSON.parse(this.text || "[]");
+          var nextIncidents = root._parseJsonOutput(this.text, []);
           // Check for genuinely new signatures to avoid notification spam
           var currentSigs = root.activeIncidents.map(function(i) { return i.signature; });
           for (var i = 0; i < nextIncidents.length; i++) {
@@ -174,18 +221,42 @@ QtObject {
 
   readonly property real cpuTempNum: parseFloat(cpuTemp) || 0
   readonly property real gpuTempNum: parseFloat(gpuTemp) || 0
-  readonly property real cpuUsageNum: parseFloat(cpuUsage) || 0
-  readonly property real ramUsageNum: parseFloat(ramUsage) || 0
 
-  readonly property bool hasHighLoad: cpuUsageNum > _cpuUsageHighThreshold || ramUsageNum > _ramUsageHighThreshold
+  readonly property bool hasHighLoad: cpuPercent >= (_cpuUsageHighThreshold / 100) || ramPercent >= (_ramUsageHighThreshold / 100)
   readonly property bool hasHighTemp: cpuTempNum > _cpuTempHighThreshold || gpuTempNum > _gpuTempHighThreshold
   readonly property bool isCritical: hasHighLoad || hasHighTemp || overallStatus === "failure"
+  readonly property bool hasSafeFixableIncidents: {
+    for (var i = 0; i < activeIncidents.length; i++) {
+      if (activeIncidents[i] && activeIncidents[i].safe_fix_available)
+        return true;
+    }
+    return false;
+  }
+  readonly property var criticalReasons: {
+    var reasons = [];
+    if (cpuPercent >= (_cpuUsageHighThreshold / 100))
+      reasons.push("CPU " + cpuUsage);
+    if (ramPercent >= (_ramUsageHighThreshold / 100))
+      reasons.push("RAM " + Math.round(ramPercent * 100) + "%");
+    if (cpuTempNum > _cpuTempHighThreshold)
+      reasons.push("CPU " + cpuTemp);
+    if (gpuTempNum > _gpuTempHighThreshold)
+      reasons.push("GPU " + gpuTemp);
+    if (overallStatus === "failure")
+      reasons.push("health check failure");
+    return reasons;
+  }
+  readonly property string criticalSummary: criticalReasons.length > 0
+      ? "CRITICAL: " + criticalReasons.join(" • ")
+      : "CRITICAL: Resource threshold exceeded"
 
   property string cpuTemp: "--"
   property string gpuTemp: "--"
   property string cpuUsage: "0%"
   property string ramUsage: "0GB"
   property string gpuUsage: "0%"
+  property string gpuCardName: ""
+  property string gpuPciAddress: ""
   property real cpuPercent: 0.0
   property real ramPercent: 0.0
   property real gpuPercent: 0.0
@@ -261,19 +332,26 @@ QtObject {
   readonly property string _statsHwScriptBase:
       "sensors_out=$(sensors 2>/dev/null); "
       + "cpu_temp=$(echo \"$sensors_out\" | awk '/Tctl:|Package id 0:|Tdie:|Core 0:/ {gsub(/[+°C]/, \"\", $0); for(i=1;i<=NF;i++) if($i ~ /^[0-9.]+$/) {print $i; exit}}'); "
-      + "gpu_temp=$(echo \"$sensors_out\" | awk '/edge:|junction:/ {gsub(/[+°C]/, \"\", $2); print $2; exit}'); "
   readonly property string _statsHwScriptMid:
-      "gpu_usage=\"\"; for f in /sys/class/drm/card[0-9]/device/gpu_busy_percent; do "
-      + "[ ! -r \"$f\" ] && continue; u=$(cat \"$f\" 2>/dev/null); [ -n \"$u\" ] && gpu_usage=$u && break; done; "
-  readonly property string _statsHwNvidiaTemp:
-      "if [ -z \"$gpu_temp\" ]; then gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
-  readonly property string _statsHwNvidiaUtil:
-      "if [ -z \"$gpu_usage\" ]; then gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); fi; "
+      "printf '%s\\n' \"$cpu_temp\"; "
+      + "for card in /sys/class/drm/card[0-9]; do "
+      + "[ -d \"$card/device\" ] || continue; "
+      + "busy=''; [ -r \"$card/device/gpu_busy_percent\" ] && busy=$(cat \"$card/device/gpu_busy_percent\" 2>/dev/null); "
+      + "vram_total=''; [ -r \"$card/device/mem_info_vram_total\" ] && vram_total=$(cat \"$card/device/mem_info_vram_total\" 2>/dev/null); "
+      + "temp=''; temp_input=$(find \"$card/device/hwmon\" -maxdepth 2 -name 'temp*_input' 2>/dev/null | sort | head -1); "
+      + "[ -n \"$temp_input\" ] && temp=$(awk '{printf \"%.1f\", $1/1000}' \"$temp_input\" 2>/dev/null); "
+      + "pci=$(basename \"$(readlink -f \"$card/device\")\"); "
+      + "printf 'gpu\\t%s\\t%s\\t%s\\t%s\\t%s\\n' \"$(basename \"$card\")\" \"$pci\" \"$busy\" \"$temp\" \"$vram_total\"; "
+      + "done; "
+  readonly property string _statsHwNvidiaFallback:
+      "if ! ls /sys/class/drm/card[0-9]/device/gpu_busy_percent >/dev/null 2>&1; then "
+      + "nvidia_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); "
+      + "nvidia_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1); "
+      + "printf 'nvidia\\t%s\\t%s\\n' \"$nvidia_usage\" \"$nvidia_temp\"; "
+      + "fi; "
   readonly property string _statsHwScript: root._statsHwScriptBase
-      + (root._nvidiaSmiAvailable ? root._statsHwNvidiaTemp : "")
       + root._statsHwScriptMid
-      + (root._nvidiaSmiAvailable ? root._statsHwNvidiaUtil : "")
-      + "printf '%s\\n%s\\n%s\\n' \"$cpu_temp\" \"$gpu_temp\" \"$gpu_usage\""
+      + (root._nvidiaSmiAvailable ? root._statsHwNvidiaFallback : "")
 
   function formatTemp(rawValue) {
     var parsed = parseFloat(rawValue);
@@ -292,6 +370,54 @@ QtObject {
     if (text.endsWith("\n"))
       text = text.slice(0, -1);
     return text === "" ? [] : text.split("\n");
+  }
+
+  function _parseHardwareStats(rawText) {
+    var lines = root.parseStatsOutput(rawText);
+    var next = {
+      cpuTempRaw: "",
+      gpuTempRaw: "",
+      gpuUsageRaw: "",
+      gpuCardName: "",
+      gpuPciAddress: "",
+    };
+
+    if (lines.length === 0)
+      return next;
+
+    next.cpuTempRaw = String(lines[0] || "").trim();
+
+    var gpuCandidates = [];
+    for (var i = 1; i < lines.length; i++) {
+      var line = String(lines[i] || "").trim();
+      if (line === "")
+        continue;
+      var parts = line.split("\t");
+      if (parts[0] === "gpu") {
+        gpuCandidates.push({
+          cardName: parts[1],
+          pciAddress: parts[2],
+          busyPercent: parts[3],
+          tempC: parts[4],
+          vramTotalBytes: parts[5],
+        });
+        continue;
+      }
+      if (parts[0] === "nvidia") {
+        next.gpuUsageRaw = String(parts[1] || "").trim();
+        next.gpuTempRaw = String(parts[2] || "").trim();
+      }
+    }
+
+    var selected = GpuTelemetryHelpers.selectPreferredGpuCandidate(gpuCandidates);
+    if (selected) {
+      next.gpuUsageRaw = selected.busyPercent;
+      next.gpuTempRaw = selected.tempC;
+      next.gpuCardName = selected.cardName;
+      next.gpuPciAddress = selected.pciAddress;
+    }
+
+    return next;
   }
 
   property var statsPoll: CommandPoll {
@@ -397,28 +523,28 @@ QtObject {
     interval: Math.max(4000, root.pollIntervalMs * 2)
     running: root.subscriberCount > 0
     command: ["sh", "-c", root._statsHwScript]
+    parse: function(out) { return root._parseHardwareStats(out); }
 
     onUpdated: {
-      var lines = root.parseStatsOutput(this.value);
-      if (lines.length >= 1) {
-        var c0 = String(lines[0] || "").trim();
-        if (c0 !== "")
-          root.cpuTemp = root.formatTemp(lines[0]);
-      }
-      if (lines.length >= 2) {
-        var c1 = String(lines[1] || "").trim();
-        if (c1 !== "")
-          root.gpuTemp = root.formatTemp(lines[1]);
-      }
-      if (lines.length >= 3) {
-        var gpuRaw = String(lines[2] || "").trim();
-        if (gpuRaw !== "") {
-          var gpuVal = parseInt(gpuRaw, 10);
-          if (!isNaN(gpuVal)) {
-            root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
-            root.gpuPercent = Colors.clamp01(gpuVal / 100);
-            root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
-          }
+      var data = statsHwPoll.value || ({});
+      var cpuRaw = String(data.cpuTempRaw || "").trim();
+      if (cpuRaw !== "")
+        root.cpuTemp = root.formatTemp(cpuRaw);
+
+      root.gpuCardName = String(data.gpuCardName || "");
+      root.gpuPciAddress = String(data.gpuPciAddress || "");
+
+      var gpuTempRaw = String(data.gpuTempRaw || "").trim();
+      if (gpuTempRaw !== "")
+        root.gpuTemp = root.formatTemp(gpuTempRaw);
+
+      var gpuUsageRaw = String(data.gpuUsageRaw || "").trim();
+      if (gpuUsageRaw !== "") {
+        var gpuVal = parseInt(gpuUsageRaw, 10);
+        if (!isNaN(gpuVal)) {
+          root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
+          root.gpuPercent = Colors.clamp01(gpuVal / 100);
+          root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
         }
       }
     }

@@ -417,32 +417,38 @@ main() {
   fi
   if [[ -s "${static_failure_log}" ]]; then
     signature="compositor-static-check-failed"
-    record_incident "${signature}" "open" "Compositor guard or fixture checks failed." "${static_failure_log}" "" "compositor-static.log"
+    record_incident "${signature}" "open" "Compositor guard or fixture checks failed." "${static_failure_log}" "" "compositor-static.log" >/dev/null
     summary_status=20
   fi
 
   service_state="$(systemctl --user is-active quickshell.service 2>/dev/null || true)"
+  if [[ "${since_window}" == "15 minutes ago" && "${service_state}" == "active" ]]; then
+    service_started_at="$(systemctl --user show quickshell.service -P ActiveEnterTimestamp 2>/dev/null || true)"
+    if [[ -n "${service_started_at}" ]]; then
+      since_window="${service_started_at}"
+    fi
+  fi
   if [[ "${service_state}" != "active" ]]; then
     printf 'quickshell.service state: %s\n' "${service_state}" > "${static_failure_log}"
-    record_incident "quickshell-service-inactive" "open" "quickshell.service is not active." "${static_failure_log}" "" "service-status.log"
+    record_incident "quickshell-service-inactive" "open" "quickshell.service is not active." "${static_failure_log}" "" "service-status.log" >/dev/null
     summary_status=20
   else
     if ! instance_id="$(discover_instance)"; then
       printf 'quickshell.service is active but no reachable IPC instance was found.\n' > "${static_failure_log}"
-      record_incident "quickshell-ipc-unreachable" "open" "No reachable quickshell IPC socket was found." "${static_failure_log}" "" "ipc.log"
+      record_incident "quickshell-ipc-unreachable" "open" "No reachable quickshell IPC socket was found." "${static_failure_log}" "" "ipc.log" >/dev/null
       summary_status=20
     else
       run_surface_probes "${instance_id}" "${settings_probe_log}" "${controls_probe_log}" "${notifications_probe_log}" || probe_rc=$?
       if (( ${probe_rc:-0} != 0 )); then
         case "${probe_rc}" in
           11)
-            record_incident "quickshell-settings-probe-failed" "open" "SettingsHub IPC probe failed." "${settings_probe_log}" "" "settings-probe.log"
+            record_incident "quickshell-settings-probe-failed" "open" "SettingsHub IPC probe failed." "${settings_probe_log}" "" "settings-probe.log" >/dev/null
             ;;
           12)
-            record_incident "quickshell-control-center-probe-failed" "open" "Control center IPC probe failed." "${controls_probe_log}" "" "control-center-probe.log"
+            record_incident "quickshell-control-center-probe-failed" "open" "Control center IPC probe failed." "${controls_probe_log}" "" "control-center-probe.log" >/dev/null
             ;;
           13)
-            record_incident "quickshell-notification-center-probe-failed" "open" "Notification center IPC probe failed." "${notifications_probe_log}" "" "notification-center-probe.log"
+            record_incident "quickshell-notification-center-probe-failed" "open" "Notification center IPC probe failed." "${notifications_probe_log}" "" "notification-center-probe.log" >/dev/null
             ;;
         esac
         summary_status=20
@@ -459,7 +465,7 @@ main() {
     count="$(rg -c -e "${pattern}" "${journal_log}" || true)"
     count="${count:-0}"
     if (( count >= threshold )); then
-      record_incident "${signature}" "open" "Matched ${count} journal entries for ${signature}." "${journal_log}" "" "journal.log"
+      record_incident "${signature}" "open" "Matched ${count} journal entries for ${signature}." "${journal_log}" "" "journal.log" >/dev/null
       summary_status=20
     fi
   done < <(jq -r '.[] | select(.kind == "journal") | .signature' "${rules_file}")
