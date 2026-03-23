@@ -8,6 +8,7 @@ config_dir="${QS_CONFIG_DIR:-${script_dir}/../src}"
 allow_hyprctl=(
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/DependencyService.qml"
+  "${config_dir}/bar/widgets/Workspaces.qml"
 )
 
 allow_hyprland_import=(
