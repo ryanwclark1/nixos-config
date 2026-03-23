@@ -16,9 +16,9 @@ QtObject {
   property double _rateLimitQuietUntil: 0 // epoch ms; refresh() no-ops until then
 
   // ── Named constants ──────────────────────────
-  readonly property int _refreshIntervalMs: 60000  // 1 min
-  readonly property int _retryIntervalMs: 10000    // 10s retry on failure
-  readonly property int _rateLimitBackoffMs: 6 * 60 * 60 * 1000 // Stooq daily cap — avoid hammering
+  readonly property int _refreshIntervalMs: 60 * 60 * 1000      // 1 hour
+  readonly property int _retryIntervalMs: 30 * 60 * 1000        // 30 min retry on transient failure
+  readonly property int _rateLimitBackoffMs: 12 * 60 * 60 * 1000 // Stooq daily cap — stand down for the rest of the session
   readonly property int _configDebounceMs: 500
 
   // Deferred activation flag

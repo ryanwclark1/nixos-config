@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import "../../services"
 
 Rectangle {
@@ -9,6 +10,7 @@ Rectangle {
   property bool _loggedWorkspaceApiUnavailable: false
   property bool _loggedEmptyWorkspaceList: false
   property bool _allowEmptyWorkspaceWarning: false
+  property bool _hyprctlFallbackPending: false
   readonly property bool hasWorkspaceContent: workspaceApiAvailable && !!state && (state.workspaces || []).length > 0
   readonly property real contentWidth: vertical ? 28 : (strip.implicitWidth + 12)
   readonly property real contentHeight: vertical ? (strip.implicitHeight + 12) : 24
@@ -91,6 +93,7 @@ Rectangle {
       _updateStateFromNiriService()
     }
     if (CompositorAdapter.isHyprland) {
+      _requestHyprctlWorkspaceSnapshot();
       _updateStateFromHyprland();
       Hyprland.rawEvent.connect(_onHyprlandEvent);
     }
@@ -112,15 +115,65 @@ Rectangle {
     }
   }
 
+  function _requestHyprctlWorkspaceSnapshot() {
+    if (!CompositorAdapter.isHyprland || root._hyprctlFallbackPending)
+      return;
+    root._hyprctlFallbackPending = true;
+    hyprctlWorkspaceSnapshot.running = true;
+  }
+
+  function _applyHyprctlWorkspaceSnapshot(raw) {
+    root._hyprctlFallbackPending = false;
+
+    var snapshot = null;
+    try {
+      snapshot = JSON.parse(String(raw || "").trim() || "{\"workspaces\":[],\"active\":null}");
+    } catch (e) {
+      Logger.w("Workspaces", "hyprctl workspace fallback parse failed", e);
+      return;
+    }
+
+    var wsValues = Array.isArray(snapshot.workspaces) ? snapshot.workspaces : [];
+    var workspaces = [];
+    var activeId = parseInt(String(snapshot.active && snapshot.active.id !== undefined ? snapshot.active.id : -1), 10);
+
+    for (var i = 0; i < wsValues.length; i++) {
+      var ws = wsValues[i];
+      if (!ws || ws.id <= 0)
+        continue;
+
+      workspaces.push({
+        id: ws.id,
+        name: String(ws.name || ws.id),
+        urgent: false,
+        windows: parseInt(String(ws.windows !== undefined ? ws.windows : 0), 10) || 0
+      });
+    }
+
+    workspaces.sort(function(a, b) { return a.id - b.id; });
+    if (workspaces.length === 0)
+      return;
+
+    state = {
+      workspaces: workspaces,
+      activeWorkspace: activeId > 0 ? activeId : root.state.activeWorkspace
+    };
+    _maybeLogWorkspaceStrip("hyprctl");
+  }
+
   function _updateStateFromHyprland() {
     var wsList = Hyprland.workspaces;
     if (!wsList) {
-      state = { workspaces: [], activeWorkspace: -1 };
-      _maybeLogWorkspaceStrip("hyprland");
+      _requestHyprctlWorkspaceSnapshot();
       return;
     }
 
     var wsValues = wsList.values || wsList;
+    if (!wsValues || wsValues.length === 0) {
+      _requestHyprctlWorkspaceSnapshot();
+      return;
+    }
+
     var workspaces = [];
     var activeId = -1;
 
@@ -145,6 +198,11 @@ Rectangle {
     }
 
     workspaces.sort(function(a, b) { return a.id - b.id; });
+    if (workspaces.length === 0) {
+      _requestHyprctlWorkspaceSnapshot();
+      return;
+    }
+
     state = {
       workspaces: workspaces,
       activeWorkspace: activeId
@@ -236,5 +294,21 @@ Rectangle {
     settings: root.settings
     showAddButton: root.showAddButton
     showMiniMap: root.showMiniMap
+  }
+
+  Process {
+    id: hyprctlWorkspaceSnapshot
+    running: false
+    command: [
+      "sh",
+      "-c",
+      "workspaces=$(hyprctl workspaces -j 2>/dev/null || printf '[]'); " +
+      "active=$(hyprctl activeworkspace -j 2>/dev/null || printf '{}'); " +
+      "printf '{\"workspaces\":%s,\"active\":%s}' \"$workspaces\" \"$active\""
+    ]
+    stdout: StdioCollector {
+      onStreamFinished: root._applyHyprctlWorkspaceSnapshot(this.text || "")
+    }
+    onExited: root._hyprctlFallbackPending = false
   }
 }
