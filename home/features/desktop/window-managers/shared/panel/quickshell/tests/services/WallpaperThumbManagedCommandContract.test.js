@@ -42,4 +42,13 @@ describe("qs-wallpaper-thumb managed command contract", () => {
     );
     expect(zsh).toContain("'wallpaper-thumb:");
   });
+
+  it("thumbnail helper preserves a .webp temp suffix and forces ffmpeg webp output", () => {
+    const script = readFileSync(
+      resolve(quickshellRoot, "scripts/wallpaper-thumb.sh"),
+      "utf8"
+    );
+    expect(script).toContain('.tmp.$$.webp');
+    expect(script).toContain("-f webp");
+  });
 });

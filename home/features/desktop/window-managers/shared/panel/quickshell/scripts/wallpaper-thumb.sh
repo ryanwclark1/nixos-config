@@ -23,13 +23,15 @@ if [[ -f "$dest" ]]; then
 fi
 
 mkdir -p "$(dirname "$dest")"
-tmp="${dest}.tmp.$$"
+tmp="$(dirname "$dest")/.$(basename "${dest%.webp}").tmp.$$.webp"
+trap 'rm -f "$tmp"' EXIT
 
 # Scale to max 256px (Freedesktop "large" convention); WebP for size.
 ffmpeg -hide_banner -loglevel error -y -i "$src" \
   -vf "scale=256:256:force_original_aspect_ratio=decrease" \
   -frames:v 1 \
-  -c:v libwebp -quality 82 \
+  -c:v libwebp -quality 82 -f webp \
   "$tmp"
 
 mv -f "$tmp" "$dest"
+trap - EXIT
