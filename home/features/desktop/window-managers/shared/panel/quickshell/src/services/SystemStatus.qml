@@ -213,7 +213,7 @@ QtObject {
 
   property Timer _healthTimer: Timer {
     interval: root._healthCheckIntervalMs
-    running: root.subscriberCount > 0
+    running: root.anyDemandActive
     repeat: true
     onTriggered: root.refreshHealth()
   }
@@ -295,11 +295,46 @@ QtObject {
       }
   }
 
-  property int pollIntervalMs: 2000
+  function refreshStats() {
+    if (!anyDemandActive)
+      return;
+    statsPoll.triggerPoll();
+    statsHwPoll.triggerPoll();
+  }
 
-  // Subscriber-based polling: only runs when at least one consumer is active.
+  property int pollIntervalMs: 2000
+  property int summarySubscriberCount: 0
+
+  // Subscriber-based polling: summary subscribers keep critical health fresh,
+  // while detailed subscribers enable the full telemetry path.
   // Use Ref { service: SystemStatus } for automatic lifecycle management.
   property int subscriberCount: 0
+  readonly property bool summaryDemandActive: summarySubscriberCount > 0
+  readonly property bool detailedDemandActive: subscriberCount > 0
+  readonly property bool anyDemandActive: summaryDemandActive || detailedDemandActive
+  readonly property int effectivePollIntervalMs: detailedDemandActive
+      ? Math.max(1000, pollIntervalMs)
+      : Math.max(5000, pollIntervalMs * 3)
+  readonly property int effectiveHwPollIntervalMs: detailedDemandActive
+      ? Math.max(4000, pollIntervalMs * 2)
+      : Math.max(15000, pollIntervalMs * 6)
+
+  function addSummarySubscriber() {
+    summarySubscriberCount++;
+  }
+
+  function removeSummarySubscriber() {
+    summarySubscriberCount = Math.max(0, summarySubscriberCount - 1);
+  }
+
+  onDetailedDemandActiveChanged: {
+    if (!detailedDemandActive) {
+      _netLastRx = 0;
+      _netLastTx = 0;
+      return;
+    }
+    refreshStats();
+  }
 
   // Probed once at startup — avoids `command -v nvidia-smi` on every fast stats tick.
   property bool _nvidiaSmiAvailable: false
@@ -316,7 +351,7 @@ QtObject {
   // RAM must be two separate printf fields: embedding "\n" inside one %s breaks the
   // fixed line layout (QML splits on "\n"), so disk_pct could be parsed as ramPercent;
   // parseFloat("71%") === 71 → clamp01 → 100% gauge while labels still look sane.
-  readonly property string _statsLiteScript:
+  readonly property string _statsLiteDetailedScript:
       "cpu_raw=$(grep '^cpu ' /proc/stat); "
       + "ram_usage_line=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
       + "ram_frac=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.8f\", used/total; else print \"0\"}' /proc/meminfo); "
@@ -327,6 +362,14 @@ QtObject {
       + "net_rx=$(cat /sys/class/net/$iface/statistics/rx_bytes); "
       + "net_tx=$(cat /sys/class/net/$iface/statistics/tx_bytes); fi; "
       + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' '' '' \"$cpu_raw\" '' \"$ram_usage_line\" \"$ram_frac\" \"$disk_pct\" \"$net_rx\" \"$net_tx\""
+  readonly property string _statsLiteSummaryScript:
+      "cpu_raw=$(grep '^cpu ' /proc/stat); "
+      + "ram_usage_line=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "ram_frac=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.8f\", used/total; else print \"0\"}' /proc/meminfo); "
+      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' '' '' \"$cpu_raw\" '' \"$ram_usage_line\" \"$ram_frac\" '' '' ''"
+  readonly property string _statsLiteScript: root.detailedDemandActive
+      ? root._statsLiteDetailedScript
+      : root._statsLiteSummaryScript
 
   // ── Slow path: temperatures + GPU utilization (less frequent) ──────────
   readonly property string _statsHwScriptBase:
@@ -422,8 +465,8 @@ QtObject {
 
   property var statsPoll: CommandPoll {
     id: statsPoll
-    interval: Math.max(1000, root.pollIntervalMs)
-    running: root.subscriberCount > 0
+    interval: root.effectivePollIntervalMs
+    running: root.anyDemandActive
     command: ["sh", "-c", root._statsLiteScript]
 
     property var lastTotal: 0
@@ -463,7 +506,8 @@ QtObject {
               var cpuVal = Math.round(usage * 100);
               root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
               root.cpuPercent = Colors.clamp01(usage);
-              root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
+              if (root.detailedDemandActive)
+                root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
             }
           }
           this.lastTotal = currentTotal;
@@ -471,7 +515,7 @@ QtObject {
         }
 
         var gpuRaw = String(lines[3] || "").trim();
-        if (gpuRaw !== "") {
+        if (root.detailedDemandActive && gpuRaw !== "") {
           var gpuVal = parseInt(gpuRaw, 10);
           if (!isNaN(gpuVal)) {
             root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
@@ -488,11 +532,12 @@ QtObject {
         // Reject misparsed fields (e.g. "71%" → 71, "65.0GB" → 65) from a shifted layout.
         if (!isNaN(ramVal) && ramVal >= 0 && ramVal <= 1.001) {
           root.ramPercent = Colors.clamp01(ramVal);
-          root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
+          if (root.detailedDemandActive)
+            root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
         }
 
         // Disk usage (line 6: e.g. "45%")
-        if (lines.length >= 7) {
+        if (root.detailedDemandActive && lines.length >= 7) {
           var diskRaw = parseInt(String(lines[6] || "").replace("%", ""), 10);
           if (!isNaN(diskRaw)) {
             root.diskPercent = Colors.clamp01(diskRaw / 100);
@@ -501,7 +546,7 @@ QtObject {
         }
 
         // Network throughput (lines 7-8: rx_bytes, tx_bytes)
-        if (lines.length >= 9) {
+        if (root.detailedDemandActive && lines.length >= 9) {
           var rx = parseInt(lines[7], 10) || 0;
           var tx = parseInt(lines[8], 10) || 0;
           if (root._netLastRx > 0) {
@@ -520,8 +565,8 @@ QtObject {
 
   property var statsHwPoll: CommandPoll {
     id: statsHwPoll
-    interval: Math.max(4000, root.pollIntervalMs * 2)
-    running: root.subscriberCount > 0
+    interval: root.effectiveHwPollIntervalMs
+    running: root.anyDemandActive
     command: ["sh", "-c", root._statsHwScript]
     parse: function(out) { return root._parseHardwareStats(out); }
 
@@ -539,7 +584,7 @@ QtObject {
         root.gpuTemp = root.formatTemp(gpuTempRaw);
 
       var gpuUsageRaw = String(data.gpuUsageRaw || "").trim();
-      if (gpuUsageRaw !== "") {
+      if (root.detailedDemandActive && gpuUsageRaw !== "") {
         var gpuVal = parseInt(gpuUsageRaw, 10);
         if (!isNaN(gpuVal)) {
           root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";

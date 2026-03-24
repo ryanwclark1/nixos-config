@@ -5,6 +5,11 @@ import {
   canonicalFileUri,
   quickshellThumbKey,
   freedesktopLargeFileUrl,
+  hasFreedesktopLargeMiss,
+  markFreedesktopLargeMiss,
+  hasQuickshellThumbMiss,
+  markQuickshellThumbMiss,
+  clearQuickshellThumbMiss,
 } from "../../src/shared/WallpaperThumbnailCache.js";
 
 describe("WallpaperThumbnailCache", () => {
@@ -42,5 +47,17 @@ describe("WallpaperThumbnailCache", () => {
     const expectedName = md5Hex(uri) + ".png";
     const u = freedesktopLargeFileUrl("/foo/bar.png", "/var/cache", "/home/x");
     expect(u).toBe("file:///var/cache/thumbnails/large/" + expectedName);
+  });
+
+  it("tracks missing thumbnail tiers to avoid repeated failures", () => {
+    expect(hasFreedesktopLargeMiss("/foo/bar.png")).toBe(false);
+    markFreedesktopLargeMiss("/foo/bar.png");
+    expect(hasFreedesktopLargeMiss("/foo/bar.png")).toBe(true);
+
+    expect(hasQuickshellThumbMiss("/foo/bar.png", 1700000000)).toBe(false);
+    markQuickshellThumbMiss("/foo/bar.png", 1700000000);
+    expect(hasQuickshellThumbMiss("/foo/bar.png", 1700000000)).toBe(true);
+    clearQuickshellThumbMiss("/foo/bar.png", 1700000000);
+    expect(hasQuickshellThumbMiss("/foo/bar.png", 1700000000)).toBe(false);
   });
 });

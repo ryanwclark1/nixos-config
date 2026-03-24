@@ -29,6 +29,10 @@ Item {
     property real pickerAlpha: 100
     property string _settingsExportText: ""
     property var _unsupportedImagePaths: ({})
+    readonly property int wallpaperThumbWidth: compactMode ? 92 : 108
+    readonly property int wallpaperThumbHeight: compactMode ? 72 : 80
+    readonly property int wallpaperThumbCellHeight: wallpaperThumbHeight + Appearance.spacingS
+    readonly property int wallpaperGridMaxHeight: compactMode ? 272 : 352
 
     function applyWallpaperFolder() {
         var trimmed = (wallpaperFolderInput || "").trim();
@@ -810,24 +814,52 @@ Item {
             }
         }
 
-        Flow {
+        Item {
             visible: !WallpaperService.scanning && WallpaperService.availableWallpapers.length > 0
             Layout.fillWidth: true
-            spacing: Appearance.spacingS
+            implicitHeight: Math.min(root.wallpaperGridMaxHeight, Math.max(root.wallpaperThumbHeight, wallpaperGrid.contentHeight))
 
-            Repeater {
+            GridView {
+                id: wallpaperGrid
+                anchors.fill: parent
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                cacheBuffer: root.wallpaperThumbCellHeight * 3
                 model: WallpaperService.availableWallpapers
-
-                delegate: WallpaperThumbnail {
-                    selectedMonitor: root.wallpaperSelectedMonitor
-                    unsupportedImagePaths: root._unsupportedImagePaths
-                    compactMode: root.compactMode
-                    onWallpaperSelected: path => {
-                        var mon = WTH.resolveMonitor(root.wallpaperSelectedMonitor);
-                        WallpaperService.setWallpaper(path, mon);
-                    }
-                    onImageUnsupported: path => root._markUnsupportedImage(path)
+                readonly property int columnCount: {
+                    var baseWidth = root.wallpaperThumbWidth + Appearance.spacingS;
+                    if (width <= 0)
+                        return 1;
+                    return Math.max(1, Math.floor((width + Appearance.spacingS) / baseWidth));
                 }
+                cellWidth: Math.max(root.wallpaperThumbWidth, Math.floor(width / Math.max(1, columnCount)))
+                cellHeight: root.wallpaperThumbCellHeight
+
+                delegate: Item {
+                    required property var modelData
+                    required property int index
+                    width: wallpaperGrid.cellWidth
+                    height: wallpaperGrid.cellHeight
+
+                    WallpaperThumbnail {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        modelData: parent.modelData
+                        index: parent.index
+                        selectedMonitor: root.wallpaperSelectedMonitor
+                        unsupportedImagePaths: root._unsupportedImagePaths
+                        compactMode: root.compactMode
+                        onWallpaperSelected: path => {
+                            var mon = WTH.resolveMonitor(root.wallpaperSelectedMonitor);
+                            WallpaperService.setWallpaper(path, mon);
+                        }
+                        onImageUnsupported: path => root._markUnsupportedImage(path)
+                    }
+                }
+            }
+
+            SharedWidgets.Scrollbar {
+                flickable: wallpaperGrid
             }
         }
 

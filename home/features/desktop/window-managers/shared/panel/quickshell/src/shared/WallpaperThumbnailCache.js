@@ -4,6 +4,9 @@
 // plus deterministic Quickshell disk cache keys (path + mtime), shared with qs-wallpaper-thumb.sh.
 // MD5 core matches the `md5` npm package (crypt word layout + endian swap).
 
+var _freedesktopLargeMisses = {};
+var _quickshellThumbMisses = {};
+
 /** UTF-8 encode string to byte array for MD5 input. */
 function _utf8Bytes(str) {
   var out = [];
@@ -226,4 +229,32 @@ function quickshellThumbFileUrl(absolutePath, mtime, xdgCacheHome, home) {
   var fsPath = quickshellThumbAbsolutePath(absolutePath, mtime, xdgCacheHome, home);
   if (!fsPath.length) return "";
   return "file://" + fsPath;
+}
+
+function _thumbMissKey(absolutePath, mtime) {
+  return String(absolutePath || "") + "\n" + String(mtime | 0);
+}
+
+function hasFreedesktopLargeMiss(absolutePath) {
+  return _freedesktopLargeMisses[String(absolutePath || "")] === true;
+}
+
+function markFreedesktopLargeMiss(absolutePath) {
+  var key = String(absolutePath || "");
+  if (key.length)
+    _freedesktopLargeMisses[key] = true;
+}
+
+function hasQuickshellThumbMiss(absolutePath, mtime) {
+  return _quickshellThumbMisses[_thumbMissKey(absolutePath, mtime)] === true;
+}
+
+function markQuickshellThumbMiss(absolutePath, mtime) {
+  var key = _thumbMissKey(absolutePath, mtime);
+  if (key.length)
+    _quickshellThumbMisses[key] = true;
+}
+
+function clearQuickshellThumbMiss(absolutePath, mtime) {
+  delete _quickshellThumbMisses[_thumbMissKey(absolutePath, mtime)];
 }

@@ -4,9 +4,9 @@ import "../shared/WallpaperThumbnailCache.js" as WTC
 import "../features/settings/components/tabs/WallpaperTabHelpers.js" as WTH
 import "../services"
 
-// Loads wallpaper grid previews with caching: tries Freedesktop large thumbnails, then
+// Loads wallpaper grid previews by trying Freedesktop large thumbnails, then the
 // Quickshell WebP cache (generated on demand via WallpaperService), then the original file.
-// Uses Qt Image.cache for decoded pixmap reuse while the shell stays open.
+// Avoids pinning decoded previews in the global Qt image cache.
 Image {
     id: root
 
@@ -23,10 +23,16 @@ Image {
     fillMode: Image.PreserveAspectCrop
     asynchronous: true
     smooth: true
-    cache: true
+    cache: false
     sourceSize: Qt.size(216, 160)
 
     function _syncSource() {
+        var nextTier = _tier;
+        if (nextTier === 0 && WTC.hasFreedesktopLargeMiss(imagePath))
+            nextTier = 1;
+        if (nextTier === 1 && WTC.hasQuickshellThumbMiss(imagePath, fileMtime) && thumbRev <= 0)
+            nextTier = 2;
+        _tier = nextTier;
         if (!imagePath || (unsupportedMap && unsupportedMap[imagePath])) {
             source = "";
             return;
@@ -65,6 +71,7 @@ Image {
     onThumbRevChanged: {
         if (!imagePath || thumbRev <= 0)
             return;
+        WTC.clearQuickshellThumbMiss(imagePath, fileMtime);
         if (_tier === 2) {
             _tier = 1;
             _syncSource();
@@ -74,9 +81,11 @@ Image {
     onStatusChanged: {
         if (status === Image.Error && source !== "") {
             if (_tier === 0) {
+                WTC.markFreedesktopLargeMiss(imagePath);
                 _tier = 1;
                 _syncSource();
             } else if (_tier === 1) {
+                WTC.markQuickshellThumbMiss(imagePath, fileMtime);
                 WallpaperService.requestThumbnail(imagePath, fileMtime);
                 _tier = 2;
                 _syncSource();
