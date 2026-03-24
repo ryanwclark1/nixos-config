@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
 // PrinterService — subscriber-based CUPS printer monitoring singleton.
 //
@@ -13,6 +14,9 @@ import Quickshell
 //   defaultPrinter — name of the system default printer
 //   hasPrinters   — convenience bool
 //   activeJobs    — total active job count across all printers
+//   availabilityKnown — true after the first CUPS web-interface probe completes
+//   hasWebInterface  — whether the active CUPS server exposes a reachable web UI
+//   webInterfaceUrl  — normalized browser URL for the active CUPS server
 
 QtObject {
   id: root
@@ -22,6 +26,12 @@ QtObject {
   property string defaultPrinter: ""
   readonly property bool hasPrinters: printers.length > 0
   property int activeJobs: 0
+  property bool _webProbeComplete: false
+  property bool _webProbeReachable: false
+  property string _activeServer: ""
+  property string webInterfaceUrl: ""
+  readonly property bool availabilityKnown: _webProbeComplete
+  readonly property bool hasWebInterface: availabilityKnown && _webProbeReachable && webInterfaceUrl !== ""
 
   // Subscriber-based lifecycle — increment via Ref { service: PrinterService }
   property int subscriberCount: 0
@@ -82,6 +92,40 @@ QtObject {
     }
   }
 
+  property Timer webInterfaceTimer: Timer {
+    interval: 30000
+    running: root.subscriberCount > 0
+    repeat: true
+    triggeredOnStart: true
+    onTriggered: root._refreshWebInterfaceState()
+  }
+
+  property Process _webInterfaceProbe: Process {
+    command: [
+      "sh", "-c",
+      "server=$(lpstat -H 2>/dev/null | head -n 1 | tr -d '\\r'); "
+      + "url=''; "
+      + "case \"$server\" in "
+      + "  */cups.sock) url='http://localhost:631/' ;; "
+      + "  '') url='' ;; "
+      + "  *:*) url=\"http://$server/\" ;; "
+      + "  *) url=\"http://$server:631/\" ;; "
+      + "esac; "
+      + "reachable=0; "
+      + "if [ -n \"$url\" ] && curl -fsSI --max-time 2 \"$url\" >/dev/null 2>&1; then "
+      + "  reachable=1; "
+      + "fi; "
+      + "printf 'SERVER:%s\\nURL:%s\\nREACHABLE:%s\\n' \"$server\" \"$url\" \"$reachable\""
+    ]
+    running: false
+
+    stdout: StdioCollector {
+      onStreamFinished: {
+        root._applyWebInterfaceProbe(this.text);
+      }
+    }
+  }
+
   // ── Actions ───────────────────────────────────────────────────────────────
 
   function setDefault(printerName) {
@@ -115,6 +159,12 @@ QtObject {
     _updatePrinterStatus(printerName, "disabled");
   }
 
+  function openWebInterface() {
+    if (!root.hasWebInterface)
+      return;
+    Quickshell.execDetached(["xdg-open", root.webInterfaceUrl]);
+  }
+
   // Internal: optimistic local status mutation before next poll arrives
   function _updatePrinterStatus(printerName, newStatus) {
     var updated = [];
@@ -132,5 +182,35 @@ QtObject {
   // Force an immediate refresh (called when PrinterMenu opens)
   function refresh() {
     printerPoll.triggerPoll();
+    _refreshWebInterfaceState();
+  }
+
+  function _refreshWebInterfaceState() {
+    if (_webInterfaceProbe.running)
+      return;
+    _webInterfaceProbe.running = true;
+  }
+
+  function _applyWebInterfaceProbe(rawText) {
+    var text = String(rawText || "");
+    var lines = text.split("\n");
+    var server = "";
+    var url = "";
+    var reachable = false;
+
+    for (var i = 0; i < lines.length; ++i) {
+      var line = String(lines[i] || "");
+      if (line.indexOf("SERVER:") === 0)
+        server = line.slice("SERVER:".length).trim();
+      else if (line.indexOf("URL:") === 0)
+        url = line.slice("URL:".length).trim();
+      else if (line.indexOf("REACHABLE:") === 0)
+        reachable = line.slice("REACHABLE:".length).trim() === "1";
+    }
+
+    root._activeServer = server;
+    root.webInterfaceUrl = url;
+    root._webProbeReachable = reachable && url !== "";
+    root._webProbeComplete = true;
   }
 }

@@ -286,12 +286,12 @@ var entries = [
     { tabId: "launcher-web", cardTitle: "Web Search Behavior", label: "Remember Web Provider", keywords: "web provider remember persist", type: "toggle" },
     { tabId: "launcher-web", cardTitle: "DuckDuckGo Bangs", label: "Enable !Bangs", keywords: "duckduckgo bangs shortcuts", type: "toggle" },
 
-    // ── Launcher (Modes) ─────────────────────────────
-    { tabId: "launcher-modes", cardTitle: "Runtime Behavior", label: "Background Preload", keywords: "launcher preload cache background", type: "toggle" },
-    { tabId: "launcher-modes", cardTitle: "Runtime Behavior", label: "Debug Launcher Timings", keywords: "launcher debug timing perf", type: "toggle" },
-    { tabId: "launcher-modes", cardTitle: "Runtime Behavior", label: "Show Runtime Metrics", keywords: "launcher runtime metrics stats", type: "toggle" },
-    { tabId: "launcher-modes", cardTitle: "Runtime Behavior", label: "Preload Failure Threshold", keywords: "launcher preload failure threshold", type: "slider" },
-    { tabId: "launcher-modes", cardTitle: "Runtime Behavior", label: "Preload Backoff", keywords: "launcher preload backoff retry", type: "slider" },
+    // ── Launcher (Runtime) ───────────────────────────
+    { tabId: "launcher-runtime", cardTitle: "Runtime Behavior", label: "Background Preload", keywords: "launcher preload cache background", type: "toggle" },
+    { tabId: "launcher-runtime", cardTitle: "Runtime Behavior", label: "Debug Launcher Timings", keywords: "launcher debug timing perf", type: "toggle" },
+    { tabId: "launcher-runtime", cardTitle: "Runtime Behavior", label: "Show Runtime Metrics", keywords: "launcher runtime metrics stats", type: "toggle" },
+    { tabId: "launcher-runtime", cardTitle: "Runtime Behavior", label: "Preload Failure Threshold", keywords: "launcher preload failure threshold", type: "slider" },
+    { tabId: "launcher-runtime", cardTitle: "Runtime Behavior", label: "Preload Backoff", keywords: "launcher preload backoff retry", type: "slider" },
 ];
 
 

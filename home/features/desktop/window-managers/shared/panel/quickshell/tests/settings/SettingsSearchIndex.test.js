@@ -14,12 +14,12 @@ const registryPath = resolve(componentsDir, "SettingsRegistry.qml");
 const SHELL_SECTION_FILE_BY_MODE = {
   system: "ShellSystemSection.qml",
   "control-center": "ShellControlCenterSection.qml",
-  launcher: "ShellLauncherSection.qml",
-  "launcher-general": "ShellLauncherSection.qml",
-  "launcher-search": "ShellLauncherSection.qml",
-  "launcher-web": "ShellLauncherSection.qml",
-  "launcher-modes": "ShellLauncherSection.qml",
-  "launcher-runtime": "ShellLauncherSection.qml",
+  launcher: "LauncherGeneralSection.qml",
+  "launcher-general": "LauncherGeneralSection.qml",
+  "launcher-search": "LauncherSearchSection.qml",
+  "launcher-web": "LauncherWebSection.qml",
+  "launcher-modes": "LauncherModesSection.qml",
+  "launcher-runtime": "LauncherRuntimeSection.qml",
 };
 
 function tabComponentMap() {

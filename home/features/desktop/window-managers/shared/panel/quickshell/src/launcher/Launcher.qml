@@ -23,7 +23,6 @@ import "LauncherCategoryHelpers.js" as CategoryHelpers
 import "LauncherTextHelpers.js" as TextHelpers
 import "LauncherWebProviders.js" as WebProviders
 import "LauncherFileOps.js" as FileOps
-import "CharacterData.js" as CharacterData
 import "../features/ssh" as SshFeature
 import "../features/settings/components/SettingsSearchIndex.js" as SettingsSearchIndex
 
@@ -31,10 +30,6 @@ PanelWindow {
     id: launcherRoot
 
     property bool _destroyed: false
-
-    Component.onCompleted: {
-        initialAppsPreloadTimer.restart();
-    }
 
     property var screenRef: screen || Quickshell.cursorScreen || Config.primaryScreen()
     screen: screenRef
@@ -214,7 +209,7 @@ PanelWindow {
     property var preloadFailureState: ({})
     property bool _wallpaperModeLoading: false
     property int _wallpaperLoadStartedAt: 0
-    property var launcherIconMap: ({})
+    readonly property var launcherIconMap: IconCatalogService.iconMap
     readonly property var availableToplevels: CompositorAdapter.toplevels || []
     property alias launcherMetrics: controller.launcherMetrics
     function refreshMediaPlayers() {
@@ -716,20 +711,6 @@ PanelWindow {
         }
     }
 
-    property Process iconResolverProc: Process {
-        running: true
-        command: ["qs-icon-resolver"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    launcherRoot.launcherIconMap = JSON.parse(this.text || "{}");
-                } catch (e) {
-                    Logger.w("Launcher", "icon map parse error:", e);
-                }
-            }
-        }
-    }
-
     property Process fileIndexProc: Process {
         property var _startedAt: 0
         running: false
@@ -802,13 +783,6 @@ PanelWindow {
         id: preloadDelayTimer
         interval: 100
         onTriggered: launcherRoot.startPreload()
-    }
-
-    Timer {
-        id: initialAppsPreloadTimer
-        interval: 50
-        repeat: false
-        onTriggered: launcherRoot.prewarmAppsCache()
     }
 
     Timer {
@@ -1892,8 +1866,8 @@ PanelWindow {
             recordLoadMetric("emoji", 0, true, true);
             return;
         }
-        setCached("emoji", CharacterData.characterEntries);
-        allItems = CharacterData.characterEntries;
+        setCached("emoji", EmojiCatalogService.characterEntries);
+        allItems = EmojiCatalogService.characterEntries;
         filterItems();
         buildLauncherHome();
         completeModeLoad("emoji", true, "");
@@ -3152,10 +3126,6 @@ PanelWindow {
         } else {
             executeSelection(activeModifiers);
         }
-    }
-
-    LauncherIpcHandler {
-        launcher: launcherRoot
     }
 
     Rectangle {

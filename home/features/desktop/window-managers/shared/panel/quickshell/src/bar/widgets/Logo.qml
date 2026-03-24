@@ -14,6 +14,7 @@ Item {
 
   SharedWidgets.Ref {
     service: SystemStatus
+    subscriptionMode: "summary"
   }
 
   property var anchorWindow: null

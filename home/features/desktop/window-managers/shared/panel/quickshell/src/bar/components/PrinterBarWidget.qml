@@ -14,14 +14,20 @@ SharedWidgets.BarPill {
     readonly property bool iconOnly: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
     readonly property string badgeStyle: PanelHelpers.widgetStringSetting(widgetInstance, "badgeStyle", "count", ["count", "dot", "off"])
 
-    visible: PrinterService.hasPrinters
-    tooltipText: PrinterService.activeJobs > 0 ? PrinterService.activeJobs + " print job" + (PrinterService.activeJobs !== 1 ? "s" : "") + " active" : (PrinterService.defaultPrinter ? PrinterService.defaultPrinter : "Printers")
+    visible: PrinterService.hasPrinters || PrinterService.hasWebInterface
+    tooltipText: PrinterService.activeJobs > 0 ? PrinterService.activeJobs + " print job" + (PrinterService.activeJobs !== 1 ? "s" : "") + " active" : (PrinterService.defaultPrinter ? PrinterService.defaultPrinter : (PrinterService.hasWebInterface ? "Manage Printing" : "Printers"))
     onClicked: root.triggerRequested(this)
     contextActions: [
         {
             label: "Open Printer Menu",
             icon: "print.svg",
             action: () => root.triggerRequested(root)
+        },
+        {
+            label: "Open CUPS Web Interface",
+            icon: "server.svg",
+            visible: PrinterService.hasWebInterface,
+            action: () => PrinterService.openWebInterface()
         }
     ]
 

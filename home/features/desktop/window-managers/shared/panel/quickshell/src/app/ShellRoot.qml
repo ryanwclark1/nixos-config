@@ -154,21 +154,12 @@ Scope {
     // Data-driven startup gate: true once config is loaded and colors are applied
     property bool startupComplete: Config.configReady && Colors.colorsReady
 
-    // Ensure ThemeService and HookService initialize early, then defer
-    // non-critical service init until after the first frame.
+    // Ensure theme and hook state is ready before the rest of the shell binds to it.
     Component.onCompleted: {
         var done = Logger.perf("ShellRoot", "startup");
         void ThemeService.activeThemeId;
         void HookService;
         void ColorExportService;
-        Qt.callLater(function() {
-            // Force-init deferred services by reading a property
-            var _ = WeatherService.subscriberCount;
-            _ = TodoService.totalCount;
-            _ = PomodoroService.progress;
-            _ = GameModeService.active;
-            _ = FirstRunService;
-        });
         done();
     }
 
@@ -339,7 +330,7 @@ Scope {
         }
     }
 
-    Launcher {
+    LauncherHost {
         id: launcher
     }
 

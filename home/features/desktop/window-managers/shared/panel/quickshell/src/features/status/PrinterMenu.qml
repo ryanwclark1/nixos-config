@@ -37,6 +37,12 @@ BasePopupMenu {
         font.weight: Font.DemiBold
       }
     },
+    SharedWidgets.IconButton {
+      visible: PrinterService.hasWebInterface
+      icon: "server.svg"
+      tooltipText: "Open CUPS Web Interface"
+      onClicked: PrinterService.openWebInterface()
+    },
     // Refresh button
     SharedWidgets.IconButton {
       icon: "arrow-clockwise.svg"

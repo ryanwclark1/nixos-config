@@ -19,9 +19,9 @@ const controlCenterPath = resolve(
   quickshellRoot,
   "src/features/settings/components/tabs/ShellControlCenterSection.qml"
 );
-const launcherSectionPath = resolve(
+const launcherWebSectionPath = resolve(
   quickshellRoot,
-  "src/features/settings/components/tabs/ShellLauncherSection.qml"
+  "src/features/settings/components/tabs/LauncherWebSection.qml"
 );
 const barWidgetsPath = resolve(
   quickshellRoot,
@@ -32,15 +32,15 @@ describe("settings reorder UI contract", () => {
   it("routes the targeted settings surfaces through shared reorder rows and buttons", () => {
     const launcherModes = readFileSync(launcherModeListPath, "utf8");
     const controlCenter = readFileSync(controlCenterPath, "utf8");
-    const launcher = readFileSync(launcherSectionPath, "utf8");
+    const launcherWeb = readFileSync(launcherWebSectionPath, "utf8");
     const barWidgets = readFileSync(barWidgetsPath, "utf8");
 
     expect(launcherModes).toContain("SettingsReorderRow {");
     expect(launcherModes).toContain("SettingsReorderButtons {");
     expect(controlCenter).toContain("SettingsReorderRow {");
     expect(controlCenter).toContain("SettingsReorderButtons {");
-    expect(launcher).toContain("SettingsReorderRow {");
-    expect(launcher).toContain("SettingsReorderButtons {");
+    expect(launcherWeb).toContain("SettingsReorderRow {");
+    expect(launcherWeb).toContain("SettingsReorderButtons {");
     expect(barWidgets).toContain("SettingsReorderRow {");
     expect(barWidgets).toContain("SettingsReorderButtons {");
   });
@@ -62,11 +62,11 @@ describe("settings reorder UI contract", () => {
   });
 
   it("does not reach into internal drag handle ids from consuming tabs", () => {
-    const launcher = readFileSync(launcherSectionPath, "utf8");
+    const launcherWeb = readFileSync(launcherWebSectionPath, "utf8");
     const barWidgets = readFileSync(barWidgetsPath, "utf8");
 
-    expect(launcher).toContain("active: webProviderRow.dragging");
-    expect(launcher).not.toMatch(/\bdragHandle\./);
+    expect(launcherWeb).toContain("active: webProviderRow.dragging");
+    expect(launcherWeb).not.toMatch(/\bdragHandle\./);
     expect(barWidgets).toContain("Drag.active: root.dragReorderEnabled && widgetRow.dragging");
     expect(barWidgets).not.toMatch(/\bwidgetRow\.dragHandle\b/);
   });

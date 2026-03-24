@@ -72,8 +72,7 @@ PanelWindow {
     }
 
     function refreshAll() {
-        if (!SystemStatus.statsPoll.running)
-            SystemStatus.statsPoll.running = true;
+        SystemStatus.refreshStats();
         ProcessService.refresh();
         ServiceUnitService.refresh();
         NetworkService.refreshData();

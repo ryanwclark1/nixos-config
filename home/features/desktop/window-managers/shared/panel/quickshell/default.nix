@@ -496,7 +496,9 @@ EOF
           "QT_STYLE_OVERRIDE=adwaita-dark"
         ];
 
-
+        StandardOutput = "journal";
+        StandardError = "journal";
+        SyslogIdentifier = "quickshell";
         Restart = "on-failure";
         RestartSec = 2;
       };

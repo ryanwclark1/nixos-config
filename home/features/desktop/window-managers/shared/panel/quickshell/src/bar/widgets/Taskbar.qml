@@ -15,7 +15,7 @@ Item {
   property int maxUnpinned: 0
 
   property var pinnedApps: []
-  property var iconMap: ({})
+  readonly property var iconMap: IconCatalogService.iconMap
   property bool seedPinnedApps: false
   readonly property var allToplevels: CompositorAdapter.toplevels
   readonly property bool niriEnriched: CompositorAdapter.isNiri && NiriService.available
@@ -164,17 +164,6 @@ Item {
     });
     pinnedApps = pinnedApps; // Trigger update
     savePinned();
-  }
-
-  Process {
-    id: iconResolverProc
-    command: ["qs-icon-resolver"]
-    running: true
-    stdout: StdioCollector {
-      onStreamFinished: {
-        try { root.iconMap = JSON.parse(this.text || "{}"); } catch(e) { Logger.w("Taskbar", "icon map parse error:", e) }
-      }
-    }
   }
 
   // Unified model: pinned apps, optional separator sentinel, then unpinned running apps

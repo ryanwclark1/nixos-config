@@ -16,9 +16,10 @@ Item {
     }
 
     // Widgets/menus hold Refs for Recording, Privacy, Printer, Media, Weather, Market.
-    // Keep SystemStatus here so minimal bars (no logo/stat pills) still get stats + isCritical.
-    SharedWidgets.ServiceRefList {
-        services: [SystemStatus]
+    // Keep a summary SystemStatus subscription here so minimal bars still surface health.
+    SharedWidgets.Ref {
+        service: SystemStatus
+        subscriptionMode: "summary"
     }
 
     property var manager: null

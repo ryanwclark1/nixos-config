@@ -4,7 +4,6 @@ import Quickshell
 import "ShellCoreHelpers.js" as Helpers
 import "../../../../launcher/LauncherModeData.js" as ModeData
 import "../../../../services"
-import "../../../../widgets" as SharedWidgets
 import ".."
 
 Item {
@@ -289,7 +288,15 @@ Item {
         }
     }
 
+    readonly property bool showLauncherHero: root.isLauncherSection
+        || root.isLauncherGeneralSection
+        || root.isLauncherSearchSection
+        || root.isLauncherWebSection
+        || root.isLauncherModesSection
+        || root.isLauncherRuntimeSection
+
     implicitHeight: launcherColumn.implicitHeight
+    implicitWidth: launcherColumn.implicitWidth
 
     ColumnLayout {
         id: launcherColumn
@@ -297,1047 +304,98 @@ Item {
         anchors.right: parent.right
         spacing: Appearance.spacingL
 
-        Rectangle {
-            visible: root.isLauncherSection || root.isLauncherGeneralSection || root.isLauncherSearchSection || root.isLauncherWebSection || root.isLauncherModesSection || root.isLauncherRuntimeSection
+        LauncherSettingsHero {
+            visible: root.showLauncherHero
             Layout.fillWidth: true
-            radius: Appearance.radiusLarge
-            color: Colors.withAlpha(Colors.primary, 0.08)
-            border.color: Colors.primaryMarked
-            border.width: 1
-            implicitHeight: launcherHeroColumn.implicitHeight + (root.compactMode ? Appearance.spacingM * 2 : Appearance.spacingL * 2)
-
-            ColumnLayout {
-                id: launcherHeroColumn
-                anchors.fill: parent
-                anchors.margins: root.compactMode ? Appearance.spacingM : Appearance.spacingL
-                spacing: Appearance.spacingM
-
-                Text {
-                    text: "LAUNCHER CONTROL DECK"
-                    color: Colors.primary
-                    font.pixelSize: Appearance.fontSizeXXS
-                    font.weight: Font.Black
-                    font.letterSpacing: Appearance.letterSpacingExtraWide
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Appearance.spacingM
-
-                    Rectangle {
-                        width: root.compactMode ? 42 : 48
-                        height: width
-                        radius: Appearance.radiusLarge
-                        color: Colors.primarySubtle
-                        border.color: Colors.primaryRing
-                        border.width: 1
-
-                        Loader {
-                            anchors.centerIn: parent
-                            sourceComponent: String(root.launcherHeroMeta.icon).endsWith(".svg") ? _launcherSvgIcon : _launcherNerdIcon
-                        }
-                        Component {
-                            id: _launcherSvgIcon
-                            SharedWidgets.SvgIcon { source: root.launcherHeroMeta.icon; color: Colors.primary; size: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL }
-                        }
-                        Component {
-                            id: _launcherNerdIcon
-                            Text {
-                                text: root.launcherHeroMeta.icon
-                                color: Colors.primary
-                                font.family: Appearance.fontMono
-                                font.pixelSize: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
-                            }
-                        }
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Appearance.spacingXXS
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: root.launcherHeroMeta.label
-                            color: Colors.text
-                            font.pixelSize: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeHuge
-                            font.weight: Font.Black
-                            wrapMode: Text.WordWrap
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: root.launcherHeroMeta.description
-                            color: Colors.textSecondary
-                            font.pixelSize: Appearance.fontSizeSmall
-                            wrapMode: Text.WordWrap
-                        }
-                    }
-                }
-
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Appearance.spacingS
-
-                    Repeater {
-                        model: root.launcherHeroTabs
-
-                        delegate: SharedWidgets.FilterChip {
-                            required property var modelData
-                            label: modelData.label
-                            icon: modelData.icon
-                            selected: modelData.id === root.currentLauncherTabId
-                            onClicked: root.selectLauncherTab(modelData.id)
-                        }
-                    }
-                }
-
-                Flow {
-                    Layout.fillWidth: true
-                    width: parent.width
-                    spacing: Appearance.spacingS
-
-                    Repeater {
-                        model: root.launcherHeroMeta.chips
-
-                        delegate: SharedWidgets.Chip {
-                            required property string modelData
-                            text: modelData
-                            icon: "info.svg"
-                            iconColor: Colors.primary
-                            textColor: Colors.text
-                            bgColor: Colors.withAlpha(Colors.primary, 0.1)
-                            borderColor: Colors.withAlpha(Colors.primary, 0.18)
-                        }
-                    }
-                }
-            }
+            compactMode: root.compactMode
+            currentLauncherTabId: root.currentLauncherTabId
+            launcherHeroMeta: root.launcherHeroMeta
+            launcherHeroTabs: root.launcherHeroTabs
+            selectTabFn: root.selectLauncherTab
         }
 
-        // ----- Launcher Behavior (general) ----------------------------------
-        SettingsCard {
+        LauncherGeneralSection {
             visible: root.isLauncherGeneralSection
             Layout.fillWidth: true
-            title: "Launcher Behavior"
-            iconName: "search-visual.svg"
-            description: "Choose the default launcher behavior and opening mode."
-
-            SettingsInfoCallout {
-                iconName: "globe-search.svg"
-                title: "Dedicated launcher settings"
-                body: "Launcher controls now live under their own settings section so search, modes, home layout, and diagnostics are easier to tune without digging through Shell settings."
-            }
-
-            SettingsModeRow {
-                label: "Default Mode"
-                icon: "info.svg"
-                currentValue: Config.launcherDefaultMode
-                options: root.defaultModeOptions()
-                onModeSelected: modeValue => Config.launcherDefaultMode = modeValue
-            }
-
-            SettingsFieldGrid {
-                maximumColumns: root.compactMode ? 1 : 2
-                minimumColumnWidth: root.launcherWideFieldMinimumWidth
-
-                SettingsToggleRow {
-                    label: "Show Mode Hints"
-                    icon: "keyboard.svg"
-                    configKey: "launcherShowModeHints"
-                }
-                SettingsToggleRow {
-                    label: "Keep Query on Mode Switch"
-                    icon: "timer.svg"
-                    configKey: "launcherKeepSearchOnModeSwitch"
-                }
-                SettingsToggleRow {
-                    label: "Paste Characters on Select"
-                    icon: "paste.svg"
-                    configKey: "launcherCharacterPasteOnSelect"
-                }
-                SettingsModeRow {
-                    label: "Tab Behavior"
-                    icon: "keyboard.svg"
-                    currentValue: Config.launcherTabBehavior
-                    options: [
-                        {
-                            value: "contextual",
-                            label: "Contextual",
-                            icon: "eye.svg"
-                        },
-                        {
-                            value: "results",
-                            label: "Results Only",
-                            icon: "search-visual.svg"
-                        },
-                        {
-                            value: "mode",
-                            label: "Mode Switch",
-                            icon: "keyboard.svg"
-                        }
-                    ]
-                    onModeSelected: modeValue => Config.launcherTabBehavior = modeValue
-                }
-                SettingsTextInputRow {
-                    label: "Character Trigger"
-                    leadingIcon: "add.svg"
-                    placeholderText: ":"
-                    text: Config.launcherCharacterTrigger
-                    onSubmitted: value => Config.launcherCharacterTrigger = value.trim() === "" ? ":" : value.trim()
-                    onTextEdited: value => Config.launcherCharacterTrigger = value.trim() === "" ? ":" : value.trim()
-                }
-            }
+            compactMode: root.compactMode
+            launcherWideFieldMinimumWidth: root.launcherWideFieldMinimumWidth
+            defaultModeOptionsFn: root.defaultModeOptions
         }
 
-        // ----- Home Layout (general) ----------------------------------------
-        SettingsCard {
-            visible: root.isLauncherGeneralSection
-            Layout.fillWidth: true
-            title: "Home Layout"
-            iconName: "terminal.svg"
-            description: "Control what the launcher home view shows before a search is entered."
-
-            SettingsFieldGrid {
-                maximumColumns: root.compactMode ? 1 : 2
-                minimumColumnWidth: root.launcherWideFieldMinimumWidth
-
-                SettingsToggleRow {
-                    label: "Show Home Sections"
-                    icon: "terminal.svg"
-                    configKey: "launcherShowHomeSections"
-                }
-                SettingsToggleRow {
-                    label: "App Category Filters"
-                    icon: "info.svg"
-                    configKey: "launcherDrunCategoryFiltersEnabled"
-                }
-            }
-
-            SettingsSliderRow {
-                label: "Recents History Limit"
-                icon: "arrow-counterclockwise.svg"
-                min: 4
-                max: 40
-                step: 1
-                value: Config.launcherRecentsLimit
-                unit: ""
-                onMoved: v => Config.launcherRecentsLimit = v
-            }
-
-            SettingsSliderRow {
-                label: "Recent Apps on Home"
-                icon: "arrow-counterclockwise.svg"
-                min: 1
-                max: 20
-                step: 1
-                value: Config.launcherRecentAppsLimit
-                unit: ""
-                onMoved: v => Config.launcherRecentAppsLimit = v
-            }
-
-            SettingsSliderRow {
-                label: "Suggestions on Home"
-                icon: "copy.svg"
-                min: 0
-                max: 12
-                step: 1
-                value: Config.launcherSuggestionsLimit
-                unit: ""
-                onMoved: v => Config.launcherSuggestionsLimit = v
-            }
-        }
-
-        // ----- Search Limits (search) ---------------------------------------
-        SettingsCard {
+        LauncherSearchSection {
             visible: root.isLauncherSearchSection
             Layout.fillWidth: true
-            title: "Search Limits"
-            iconName: "clock.svg"
-            description: "Tune search breadth, file query thresholds, and response timing."
-
-            SettingsSliderRow {
-                label: "Max Results"
-                icon: "clock.svg"
-                min: 20
-                max: 200
-                step: 5
-                value: Config.launcherMaxResults
-                onMoved: v => Config.launcherMaxResults = v
-            }
-
-            SettingsSliderRow {
-                label: "File Query Min Length"
-                icon: "document.svg"
-                min: 1
-                max: 6
-                value: Config.launcherFileMinQueryLength
-                onMoved: v => Config.launcherFileMinQueryLength = v
-            }
-
-            SettingsSliderRow {
-                label: "File Search Max Results"
-                icon: "document.svg"
-                min: 20
-                max: 300
-                step: 10
-                value: Config.launcherFileMaxResults
-                onMoved: v => Config.launcherFileMaxResults = v
-            }
-
-            SettingsTextInputRow {
-                label: "Default Search Directory"
-                leadingIcon: "folder.svg"
-                placeholderText: "Home (~)"
-                text: Config.launcherFileSearchRoot
-                onSubmitted: value => Config.launcherFileSearchRoot = value.trim() === "" ? "~" : value.trim()
-                onTextEdited: value => Config.launcherFileSearchRoot = value.trim() === "" ? "~" : value.trim()
-            }
-
-            SettingsToggleRow {
-                label: "Show Hidden Files"
-                icon: "sort.svg"
-                configKey: "launcherFileShowHidden"
-                enabledText: "Include dotfiles and hidden directories in file mode."
-                disabledText: "Hide dotfiles and hidden directories in file mode."
-            }
-
-            SettingsInfoCallout {
-                visible: !root.launcherFilePreviewToggleAvailable
-                iconName: "info.svg"
-                title: "File Preview Temporarily Disabled"
-                body: "The file preview pane is gated off by default while a QuickShell restart issue in files mode is being root-caused. Set QS_ENABLE_UNSTABLE_LAUNCHER_FILE_PREVIEW=1 only for debugging."
-            }
-
-            SettingsToggleRow {
-                visible: root.launcherFilePreviewToggleAvailable
-                label: "File Preview Pane"
-                icon: "image.svg"
-                configKey: "launcherFilePreviewEnabled"
-                enabledText: "Show a content preview beside file search results (Alt+P)."
-                disabledText: "Hide the file preview pane."
-            }
-
-            SettingsTextInputRow {
-                label: "File Opener"
-                leadingIcon: "document.svg"
-                placeholderText: "xdg-open"
-                text: Config.launcherFileOpener
-                onSubmitted: value => Config.launcherFileOpener = value.trim() === "" ? "xdg-open" : value.trim()
-                onTextEdited: value => Config.launcherFileOpener = value.trim() === "" ? "xdg-open" : value.trim()
-            }
-
-            SettingsSliderRow {
-                label: "Cache TTL"
-                icon: "timer.svg"
-                min: 30
-                max: 1800
-                step: 30
-                value: Config.launcherCacheTtlSec
-                unit: "s"
-                onMoved: v => Config.launcherCacheTtlSec = v
-            }
-
-            SettingsSliderRow {
-                label: "Search Debounce"
-                icon: "clock.svg"
-                min: 0
-                max: 250
-                step: 5
-                value: Config.launcherSearchDebounceMs
-                unit: "ms"
-                onMoved: v => Config.launcherSearchDebounceMs = v
-            }
-
-            SettingsSliderRow {
-                label: "File Search Debounce"
-                icon: "clock.svg"
-                min: 50
-                max: 1200
-                step: 10
-                value: Config.launcherFileSearchDebounceMs
-                unit: "ms"
-                onMoved: v => Config.launcherFileSearchDebounceMs = v
-            }
+            compactMode: root.compactMode
+            launcherFilePreviewToggleAvailable: root.launcherFilePreviewToggleAvailable
+            launcherWideFieldMinimumWidth: root.launcherWideFieldMinimumWidth
         }
 
-        // ----- Result Scoring (search) --------------------------------------
-        SettingsCard {
-            visible: root.isLauncherSearchSection
-            Layout.fillWidth: true
-            title: "Result Scoring"
-            iconName: "app-generic.svg"
-            description: "Adjust how launcher results are ranked across labels, commands, and metadata."
-
-            SettingsSectionLabel {
-                text: "RESULT SCORING WEIGHTS"
-            }
-
-            SettingsSliderRow {
-                label: "Name Weight"
-                icon: "keyboard.svg"
-                min: 0.1
-                max: 2.0
-                step: 0.05
-                value: Config.launcherScoreNameWeight
-                unit: ""
-                onMoved: v => Config.launcherScoreNameWeight = v
-            }
-
-            SettingsSliderRow {
-                label: "Title Weight"
-                icon: "keyboard.svg"
-                min: 0.1
-                max: 2.0
-                step: 0.05
-                value: Config.launcherScoreTitleWeight
-                unit: ""
-                onMoved: v => Config.launcherScoreTitleWeight = v
-            }
-
-            SettingsSliderRow {
-                label: "Exec/Class Weight"
-                icon: "terminal.svg"
-                min: 0.1
-                max: 2.0
-                step: 0.05
-                value: Config.launcherScoreExecWeight
-                unit: ""
-                onMoved: v => Config.launcherScoreExecWeight = v
-            }
-
-            SettingsSliderRow {
-                label: "Body Weight"
-                icon: "document.svg"
-                min: 0.1
-                max: 2.0
-                step: 0.05
-                value: Config.launcherScoreBodyWeight
-                unit: ""
-                onMoved: v => Config.launcherScoreBodyWeight = v
-            }
-
-            SettingsSliderRow {
-                label: "Category/Keywords Weight"
-                icon: "apps.svg"
-                min: 0.1
-                max: 2.0
-                step: 0.05
-                value: Config.launcherScoreCategoryWeight
-                unit: ""
-                onMoved: v => Config.launcherScoreCategoryWeight = v
-            }
-        }
-
-        // ----- Web Search Behavior (web) ------------------------------------
-        SettingsCard {
+        LauncherWebSection {
             visible: root.isLauncherWebSection
             Layout.fillWidth: true
-            title: "Web Search Behavior"
-            iconName: "globe-search.svg"
-            description: "Web-mode defaults and keyboard behavior."
-
-            SettingsFieldGrid {
-                maximumColumns: root.compactMode ? 1 : 2
-                minimumColumnWidth: 280
-
-                SettingsToggleRow {
-                    label: "Web Enter Uses Primary"
-                    icon: "globe-search.svg"
-                    configKey: "launcherWebEnterUsesPrimary"
-                }
-                SettingsToggleRow {
-                    label: "Web Number Hotkeys"
-                    icon: "keyboard.svg"
-                    configKey: "launcherWebNumberHotkeysEnabled"
-                }
-                SettingsToggleRow {
-                    label: "Remember Web Provider"
-                    icon: "globe-search.svg"
-                    configKey: "launcherRememberWebProvider"
-                }
+            compactMode: root.compactMode
+            webProviders: root.webProviders
+            orderedWebProvidersFn: root.orderedWebProviders
+            toggleWebProviderFn: root.toggleWebProvider
+            webProviderReorderState: webProviderReorderState
+            dragWebProviderKey: root.dragWebProviderKey
+            dragWebProviderTargetIndex: root.dragWebProviderTargetIndex
+            beginWebProviderDragFn: root.beginWebProviderDrag
+            moveDraggedWebProviderFn: root.moveDraggedWebProvider
+            clearWebProviderDragStateFn: root.clearWebProviderDragState
+            currentWebProviderDropIndexFn: root.currentWebProviderDropIndex
+            moveWebProviderFn: root.moveWebProvider
+            webProviderMetaFn: root.webProviderMeta
+            webAliasStringFn: root.webAliasString
+            setWebAliasStringFn: root.setWebAliasString
+            newEngineKey: root.newEngineKey
+            newEngineName: root.newEngineName
+            newEngineUrl: root.newEngineUrl
+            newEngineIcon: root.newEngineIcon
+            setNewEngineKeyFn: function(value) {
+                root.newEngineKey = value;
+            }
+            setNewEngineNameFn: function(value) {
+                root.newEngineName = value;
+            }
+            setNewEngineUrlFn: function(value) {
+                root.newEngineUrl = value;
+            }
+            setNewEngineIconFn: function(value) {
+                root.newEngineIcon = value;
             }
         }
 
-        // ----- Web Providers (web) ------------------------------------------
-        SettingsCard {
-            visible: root.isLauncherWebSection
-            Layout.fillWidth: true
-            title: "Web Providers"
-            iconName: "globe-search.svg"
-            description: "Enable providers and control the order shown in web mode."
-
-            SettingsSectionLabel {
-                text: "WEB PROVIDERS"
-            }
-
-            Flow {
-                Layout.fillWidth: true
-                spacing: Appearance.spacingS
-
-                Repeater {
-                    model: root.webProviders
-                    delegate: SharedWidgets.FilterChip {
-                        required property var modelData
-                        label: modelData.label
-                        icon: modelData.icon
-                        selected: root.orderedWebProviders().indexOf(modelData.key) !== -1
-                        onClicked: root.toggleWebProvider(modelData.key)
-                    }
-                }
-            }
-
-            Column {
-                id: webProviderOrderList
-                Layout.fillWidth: true
-                spacing: Appearance.spacingXS
-
-                Repeater {
-                    model: root.orderedWebProviders()
-                    delegate: SettingsReorderRow {
-                        id: webProviderRow
-                        required property int index
-                        required property var modelData
-                        reorderState: webProviderReorderState
-                        listId: "launcher-web-provider"
-                        itemId: String(webProviderRow.modelData || "")
-                        rowIndex: webProviderRow.index
-                        itemCount: root.orderedWebProviders().length
-                        listItem: webProviderOrderList
-                        compactMode: root.compactMode
-                        active: webProviderRow.dragging
-                        minimumHeight: root.compactMode ? 76 : 44
-                        beginDragFn: function(listId, itemId, index) {
-                            root.beginWebProviderDrag(itemId, index);
-                        }
-                        moveDraggedFn: function(listId, targetIndex) {
-                            return root.moveDraggedWebProvider(targetIndex);
-                        }
-                        clearDragStateFn: root.clearWebProviderDragState
-                        dropIndexFn: root.currentWebProviderDropIndex
-
-                        Rectangle {
-                            Layout.alignment: root.compactMode ? Qt.AlignTop : Qt.AlignVCenter
-                            border.color: Colors.border
-                            border.width: 1
-                            color: Colors.surface
-                            implicitHeight: 24
-                            implicitWidth: 24
-                            radius: Appearance.radiusCard
-
-                            SettingsMetricIcon {
-                                anchors.centerIn: parent
-                                iconColor: Colors.primary
-                                iconSize: Appearance.fontSizeSmall
-                                icon: {
-                                    for (var i = 0; i < root.webProviders.length; ++i) {
-                                        if (root.webProviders[i].key === webProviderRow.modelData)
-                                            return root.webProviders[i].icon;
-                                    }
-                                    return "globe-search.svg";
-                                }
-                            }
-                        }
-
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Appearance.spacingXS
-
-                            Text {
-                                Layout.fillWidth: true
-                                color: Colors.text
-                                font.pixelSize: Appearance.fontSizeSmall
-                                font.weight: Font.DemiBold
-                                wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap
-                                elide: root.compactMode ? Text.ElideNone : Text.ElideRight
-                                text: {
-                                    for (var i = 0; i < root.webProviders.length; ++i) {
-                                        if (root.webProviders[i].key === webProviderRow.modelData)
-                                            return root.webProviders[i].label;
-                                    }
-                                    return webProviderRow.modelData;
-                                }
-                            }
-
-                            Text {
-                                text: "Drag to reorder, or use the arrow buttons."
-                                color: Colors.textSecondary
-                                font.pixelSize: Appearance.fontSizeXS
-                                Layout.fillWidth: true
-                                wrapMode: Text.WordWrap
-                            }
-
-                            Flow {
-                                Layout.fillWidth: true
-                                Layout.preferredWidth: parent.width
-                                spacing: Appearance.spacingS
-
-                                SettingsReorderButtons {
-                                    moveUpEnabled: webProviderRow.index > 0
-                                    moveDownEnabled: webProviderRow.index < (root.orderedWebProviders().length - 1)
-                                    onMoveUp: root.moveWebProvider(webProviderRow.modelData, -1)
-                                    onMoveDown: root.moveWebProvider(webProviderRow.modelData, 1)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                SettingsDropIndicator {
-                    width: parent ? parent.width : 0
-                    active: root.dragWebProviderKey !== "" && root.dragWebProviderTargetIndex === root.orderedWebProviders().length
-                    visible: active
-                    label: "Drop at end of provider order"
-                }
-            }
-        }
-
-        // ----- Web Aliases (web) --------------------------------------------
-        SettingsCard {
-            visible: root.isLauncherWebSection
-            Layout.fillWidth: true
-            title: "Web Aliases"
-            iconName: "globe-search.svg"
-            description: "Customize short prefixes for each provider."
-
-            SettingsSectionLabel {
-                text: "WEB ALIASES"
-            }
-
-            SettingsInfoCallout {
-                iconName: "globe-search.svg"
-                title: "Alias format"
-                body: "Enter aliases separated by commas. Example: g, gg"
-            }
-
-            Repeater {
-                model: root.orderedWebProviders()
-
-                delegate: SettingsTextInputRow {
-                    id: aliasRow
-                    required property var modelData
-                    property bool syncingText: false
-                    label: root.webProviderMeta(modelData).label + " Aliases"
-                    leadingIcon: root.webProviderMeta(modelData).icon
-                    placeholderText: "comma-separated aliases"
-                    function syncFromConfig() {
-                        var next = root.webAliasString(modelData);
-                        if (text === next)
-                            return;
-                        syncingText = true;
-                        text = next;
-                        syncingText = false;
-                    }
-                    Component.onCompleted: syncFromConfig()
-                    onSubmitted: value => root.setWebAliasString(modelData, value)
-                    onTextEdited: value => {
-                        if (!syncingText)
-                            root.setWebAliasString(modelData, value);
-                    }
-
-                    Connections {
-                        target: Config
-                        function onLauncherWebAliasesChanged() {
-                            if (!aliasRow.inputActiveFocus)
-                                aliasRow.syncFromConfig();
-                        }
-                    }
-                }
-            }
-        }
-
-        // ----- Custom Search Engines (web) -----------------------------------
-        SettingsCard {
-            visible: root.isLauncherWebSection
-            Layout.fillWidth: true
-            title: "Custom Search Engines"
-            iconName: "globe-search.svg"
-            description: "Add your own search engines with URL templates. Use %s as the query placeholder."
-
-            SettingsSectionLabel {
-                text: "CUSTOM ENGINES"
-            }
-
-            Repeater {
-                model: Array.isArray(Config.launcherWebCustomEngines) ? Config.launcherWebCustomEngines : []
-                delegate: RowLayout {
-                    id: customEngineRow
-                    Layout.fillWidth: true
-                    required property int index
-                    required property var modelData
-                    spacing: Appearance.spacingS
-
-                    Rectangle {
-                        implicitWidth: 24
-                        implicitHeight: 24
-                        radius: Appearance.radiusCard
-                        color: Colors.surface
-                        border.color: Colors.border
-                        border.width: 1
-
-                        SettingsMetricIcon {
-                            anchors.centerIn: parent
-                            iconColor: Colors.primary
-                            iconSize: Appearance.fontSizeSmall
-                            icon: customEngineRow.modelData.icon || "globe-search.svg"
-                        }
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Appearance.spacingXXS
-
-                        Text {
-                            text: customEngineRow.modelData.name + " (" + customEngineRow.modelData.key + ")"
-                            color: Colors.text
-                            font.pixelSize: Appearance.fontSizeSmall
-                            font.weight: Font.DemiBold
-                        }
-
-                        Text {
-                            text: customEngineRow.modelData.exec
-                            color: Colors.textSecondary
-                            font.pixelSize: Appearance.fontSizeXS
-                            Layout.fillWidth: true
-                            elide: Text.ElideRight
-                        }
-                    }
-
-                    SettingsActionButton {
-                        compact: true
-                        iconName: "delete.svg"
-                        onClicked: {
-                            var engines = Config.launcherWebCustomEngines.slice();
-                            engines.splice(customEngineRow.index, 1);
-                            Config.launcherWebCustomEngines = engines;
-                        }
-                    }
-                }
-            }
-
-            SettingsInfoCallout {
-                visible: !Array.isArray(Config.launcherWebCustomEngines) || Config.launcherWebCustomEngines.length === 0
-                iconName: "globe-search.svg"
-                title: "No custom engines"
-                body: "Add a custom search engine below. It will appear in the web provider list."
-            }
-
-            SettingsSectionLabel {
-                text: "ADD NEW ENGINE"
-            }
-
-            SettingsTextInputRow {
-                label: "Key (short ID)"
-                placeholderText: "e.g. rustdoc"
-                text: root.newEngineKey
-                onSubmitted: value => root.newEngineKey = value
-                onTextEdited: value => root.newEngineKey = value
-            }
-
-            SettingsTextInputRow {
-                label: "Name"
-                placeholderText: "e.g. Rust Docs"
-                text: root.newEngineName
-                onSubmitted: value => root.newEngineName = value
-                onTextEdited: value => root.newEngineName = value
-            }
-
-            SettingsTextInputRow {
-                label: "URL Template"
-                placeholderText: "https://example.com/search?q=%s"
-                text: root.newEngineUrl
-                onSubmitted: value => root.newEngineUrl = value
-                onTextEdited: value => root.newEngineUrl = value
-            }
-
-            SettingsTextInputRow {
-                label: "Icon (optional)"
-                placeholderText: "Nerd Font icon"
-                text: root.newEngineIcon
-                onSubmitted: value => root.newEngineIcon = value
-                onTextEdited: value => root.newEngineIcon = value
-            }
-
-            SettingsActionButton {
-                Layout.fillWidth: true
-                label: "Add Custom Engine"
-                iconName: "add.svg"
-                enabled: root.newEngineKey.trim() !== "" && root.newEngineName.trim() !== "" && root.newEngineUrl.trim() !== ""
-                onClicked: {
-                    var engines = Array.isArray(Config.launcherWebCustomEngines) ? Config.launcherWebCustomEngines.slice() : [];
-                    var key = root.newEngineKey.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
-                    if (key === "")
-                        return;
-                    engines.push({
-                        key: key,
-                        name: root.newEngineName.trim(),
-                        exec: root.newEngineUrl.trim(),
-                        home: "",
-                        icon: root.newEngineIcon.trim() || "globe-search.svg"
-                    });
-                    Config.launcherWebCustomEngines = engines;
-                    root.newEngineKey = "";
-                    root.newEngineName = "";
-                    root.newEngineUrl = "";
-                    root.newEngineIcon = "";
-                }
-            }
-        }
-
-        // ----- DuckDuckGo Bangs (web) ----------------------------------------
-        SettingsCard {
-            visible: root.isLauncherWebSection
-            Layout.fillWidth: true
-            title: "DuckDuckGo Bangs"
-            iconName: "globe-search.svg"
-            description: "Use DDG !bangs for quick site searches (e.g. !gh quickshell, !w quantum)."
-
-            SettingsToggleRow {
-                label: "Enable !Bangs"
-                icon: "globe-search.svg"
-                configKey: "launcherWebBangsEnabled"
-            }
-
-            SettingsInfoCallout {
-                iconName: "globe-search.svg"
-                title: "How bangs work"
-                body: "Type ?!prefix query in web mode. The bang database must be synced first using the button below."
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Appearance.spacingS
-
-                SettingsActionButton {
-                    Layout.fillWidth: true
-                    label: "Sync Bang Database"
-                    iconName: "arrow-counterclockwise.svg"
-                    enabled: Config.launcherWebBangsEnabled
-                    onClicked: {
-                        Quickshell.execDetached(["qs-bang-sync"]);
-                        Config.launcherWebBangsLastSync = new Date().toISOString();
-                    }
-                }
-            }
-
-            Text {
-                visible: Config.launcherWebBangsLastSync !== ""
-                text: "Last synced: " + Config.launcherWebBangsLastSync
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
-                Layout.fillWidth: true
-            }
-
-            Text {
-                visible: Config.launcherWebBangsLastSync === "" && Config.launcherWebBangsEnabled
-                text: "Bang database not yet synced. Click 'Sync' to download."
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
-                Layout.fillWidth: true
-            }
-        }
-
-        // ----- Launcher Modes (modes) ---------------------------------------
-        SettingsCard {
+        LauncherModesSection {
             visible: root.isLauncherModesSection
             Layout.fillWidth: true
-            title: "Launcher Presets"
-            iconName: "keyboard.svg"
-            description: "Choose a focused default set, an extended power-user set, or everything."
-
-            SettingsInfoCallout {
-                iconName: "globe-search.svg"
-                title: "Sidebar vs advanced"
-                body: "Primary sidebar modes stay visible in the launcher. Advanced modes stay enabled, but live behind More and their prefixes."
-            }
-
-            Flow {
-                Layout.fillWidth: true
-                spacing: Appearance.spacingS
-
-                SettingsActionButton {
-                    width: root.compactMode ? implicitWidth : 0
-                    Layout.fillWidth: !root.compactMode
-                    label: "Focused"
-                    compact: true
-                    onClicked: root.applyModePreset("focused")
-                }
-
-                SettingsActionButton {
-                    width: root.compactMode ? implicitWidth : 0
-                    Layout.fillWidth: !root.compactMode
-                    label: "Extended"
-                    compact: true
-                    onClicked: root.applyModePreset("extended")
-                }
-
-                SettingsActionButton {
-                    width: root.compactMode ? implicitWidth : 0
-                    Layout.fillWidth: !root.compactMode
-                    label: "All"
-                    compact: true
-                    onClicked: root.applyModePreset("all")
-                }
-            }
+            compactMode: root.compactMode
+            orderedPrimaryModesFn: root.orderedPrimaryModes
+            orderedAdvancedModesFn: root.orderedAdvancedModes
+            disabledLauncherModesFn: root.disabledLauncherModes
+            applyModePresetFn: root.applyModePreset
+            primaryModeReorderState: primaryModeReorderState
+            advancedModeReorderState: advancedModeReorderState
+            beginPrimaryModeDragFn: root.beginPrimaryModeDrag
+            moveDraggedPrimaryModeFn: root.moveDraggedPrimaryMode
+            beginAdvancedModeDragFn: root.beginAdvancedModeDrag
+            moveDraggedAdvancedModeFn: root.moveDraggedAdvancedMode
+            clearModeDragStateFn: root.clearModeDragState
+            movePrimaryModeFn: root.movePrimaryMode
+            moveAdvancedModeFn: root.moveAdvancedMode
+            launcherModeMetaFn: root.launcherModeMeta
+            currentModeDropIndexFn: root.currentModeDropIndex
+            demoteLauncherModeFn: root.demoteLauncherMode
+            promoteLauncherModeFn: root.promoteLauncherMode
+            disableLauncherModeFn: root.disableLauncherMode
+            enableLauncherModeFn: root.enableLauncherMode
         }
 
-        SettingsCard {
-            visible: root.isLauncherModesSection
-            Layout.fillWidth: true
-            title: "Primary Sidebar"
-            iconName: "search-visual.svg"
-            description: "These modes stay pinned in the launcher sidebar."
-
-            LauncherModeList {
-                id: primaryModeOrderList
-                Layout.fillWidth: true
-                modeModel: root.orderedPrimaryModes()
-                reorderState: primaryModeReorderState
-                listId: "launcher-primary-mode"
-                compactMode: root.compactMode
-                beginDragFn: root.beginPrimaryModeDrag
-                moveDraggedFn: root.moveDraggedPrimaryMode
-                clearDragStateFn: root.clearModeDragState
-                moveModeFn: root.movePrimaryMode
-                modeMetaFn: root.launcherModeMeta
-                dropIndexFn: root.currentModeDropIndex
-                promoteLabel: "Advanced"
-                promoteFn: root.demoteLauncherMode
-                disableFn: root.disableLauncherMode
-                dropEndText: "Drop at end of primary sidebar"
-                dragHintText: "Drag to reorder within the primary sidebar, or use the arrow buttons."
-            }
-        }
-
-        SettingsCard {
-            visible: root.isLauncherModesSection
-            Layout.fillWidth: true
-            title: "Advanced / Prefix"
-            iconName: "options.svg"
-            description: "These modes stay enabled behind More. Prefix-first modes remain one keystroke away."
-
-            SettingsInfoCallout {
-                iconName: "globe-search.svg"
-                title: "Prefix-first modes"
-                body: "Settings, Run, SSH, and Web stay visible under the search field as prefix shortcuts even when they are not pinned in the sidebar."
-            }
-
-            LauncherModeList {
-                id: advancedModeOrderList
-                Layout.fillWidth: true
-                modeModel: root.orderedAdvancedModes()
-                reorderState: advancedModeReorderState
-                listId: "launcher-advanced-mode"
-                compactMode: root.compactMode
-                beginDragFn: root.beginAdvancedModeDrag
-                moveDraggedFn: root.moveDraggedAdvancedMode
-                clearDragStateFn: root.clearModeDragState
-                moveModeFn: root.moveAdvancedMode
-                modeMetaFn: root.launcherModeMeta
-                dropIndexFn: root.currentModeDropIndex
-                promoteLabel: "Primary"
-                promoteFn: root.promoteLauncherMode
-                disableFn: root.disableLauncherMode
-                dropEndText: "Drop at end of advanced modes"
-                dragHintText: "Drag to reorder within advanced modes, or use the arrow buttons."
-            }
-
-            SettingsInfoCallout {
-                visible: root.orderedAdvancedModes().length === 0
-                iconName: "globe-search.svg"
-                title: "No advanced modes"
-                body: "Enable another launcher mode to keep it available behind More."
-            }
-        }
-
-        SettingsCard {
-            visible: root.isLauncherModesSection
-            Layout.fillWidth: true
-            title: "Disabled Modes"
-            iconName: "dismiss.svg"
-            description: "Disabled modes are hidden from the launcher until you re-enable them."
-
-            Flow {
-                Layout.fillWidth: true
-                spacing: Appearance.spacingS
-
-                Repeater {
-                    model: root.disabledLauncherModes()
-
-                    delegate: SharedWidgets.FilterChip {
-                        required property var modelData
-                        label: root.launcherModeMeta(modelData).label
-                        icon: root.launcherModeMeta(modelData).icon
-                        selected: false
-                        onClicked: root.enableLauncherMode(modelData, false)
-                    }
-                }
-            }
-
-            SettingsInfoCallout {
-                visible: root.disabledLauncherModes().length === 0
-                iconName: "checkmark.svg"
-                title: "Everything is enabled"
-                body: "Use disable on a primary or advanced mode if you want to remove it from launcher cycling entirely."
-            }
-        }
-
-        // ----- Runtime Behavior (runtime) -----------------------------------
-        SettingsCard {
-            visible: root.isLauncherRuntimeSection
-            Layout.fillWidth: true
-            title: "Runtime Behavior"
-            iconName: "timer.svg"
-            description: "Preload policy and runtime metric visibility."
-
-            SettingsFieldGrid {
-                maximumColumns: root.compactMode ? 1 : 2
-                minimumColumnWidth: 280
-
-                SettingsToggleRow {
-                    label: "Background Preload"
-                    icon: "timer.svg"
-                    configKey: "launcherEnablePreload"
-                }
-                SettingsToggleRow {
-                    label: "Debug Launcher Timings"
-                    icon: "clock.svg"
-                    configKey: "launcherEnableDebugTimings"
-                }
-                SettingsToggleRow {
-                    label: "Show Runtime Metrics"
-                    icon: "board.svg"
-                    configKey: "launcherShowRuntimeMetrics"
-                }
-            }
-
-            SettingsSliderRow {
-                label: "Preload Failure Threshold"
-                icon: "timer.svg"
-                min: 1
-                max: 10
-                step: 1
-                value: Config.launcherPreloadFailureThreshold
-                unit: ""
-                onMoved: v => Config.launcherPreloadFailureThreshold = v
-            }
-
-            SettingsSliderRow {
-                label: "Preload Backoff"
-                icon: "clock.svg"
-                min: 10
-                max: 900
-                step: 10
-                value: Config.launcherPreloadFailureBackoffSec
-                unit: "s"
-                onMoved: v => Config.launcherPreloadFailureBackoffSec = v
-            }
-        }
-
-        LauncherDiagnosticsSettingsCard {
+        LauncherRuntimeSection {
             visible: root.isLauncherRuntimeSection
             Layout.fillWidth: true
             compactMode: root.compactMode
-            resetLauncherDefaults: function() { root.resetLauncherDefaults(); }
+            resetLauncherDefaultsFn: root.resetLauncherDefaults
         }
     }
 }
