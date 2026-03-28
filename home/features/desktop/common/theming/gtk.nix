@@ -154,6 +154,7 @@
       '';
     };
     gtk4 = {
+      theme = null;
       extraConfig = {
         # Removed gtk-application-prefer-dark-theme for libadwaita compatibility
         # Dark theme is handled by AdwStyleManager:color-scheme instead

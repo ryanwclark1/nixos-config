@@ -19,6 +19,7 @@ in
   programs.git = {
     enable = true;
     package = pkgs.git;
+    signing.format = null;
 
     settings = {
       user.name = "Ryan Clark";
