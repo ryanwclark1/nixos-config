@@ -3,6 +3,7 @@
   stdenv,
   rustPlatform,
   fetchFromGitHub,
+  fetchurl,
   installShellFiles,
   clang,
   cmake,
@@ -65,6 +66,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     # This helps prevent builds from hanging on resource-constrained systems
     # Adjust the number based on available RAM (4 is a safe default)
     CARGO_BUILD_JOBS = "4";
+    RUSTY_V8_ARCHIVE = fetchurl {
+      url = "https://github.com/denoland/rusty_v8/releases/download/v146.4.0/librusty_v8_release_x86_64-unknown-linux-gnu.a.gz";
+      sha256 = "0lqi57snhsgsq68vagy1h81s32qph2dshi32hhp3ladfwjclsjz6";
+    };
   };
 
   # NOTE: part of the test suite requires access to networking, local shells,
