@@ -5,6 +5,7 @@ set -eu -o pipefail
 # Get the directory where this script is located
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 packageFile="$scriptDir/default.nix"
+targetAttr="claude-code-npm"
 
 extract_npm_deps_hash() {
   local buildOutput="$1"
@@ -29,6 +30,7 @@ extract_npm_deps_hash() {
 
 SKIP_NPM_HASH=false
 REFRESH_HASHES=false
+CHECK_ONLY=false
 for arg in "$@"; do
   case "$arg" in
     --skip-npm-hash)
@@ -37,9 +39,12 @@ for arg in "$@"; do
     --refresh-hashes)
       REFRESH_HASHES=true
       ;;
+    --check-only)
+      CHECK_ONLY=true
+      ;;
     *)
       echo "Unknown argument: $arg" >&2
-      echo "Usage: $0 [--skip-npm-hash] [--refresh-hashes]" >&2
+      echo "Usage: $0 [--skip-npm-hash] [--refresh-hashes] [--check-only]" >&2
       exit 1
       ;;
   esac
@@ -68,6 +73,11 @@ echo "Latest version: $latestVersion"
 
 if [[ "$latestVersion" == "$currentVersion" ]] && [[ "$REFRESH_HASHES" != "true" ]]; then
   echo "Already up to date: $currentVersion"
+  exit 0
+fi
+
+if [[ "$CHECK_ONLY" == "true" ]]; then
+  echo "Update available: $currentVersion -> $latestVersion"
   exit 0
 fi
 
@@ -149,10 +159,8 @@ else
 
   BUILD_OUTPUT=""
   for build_cmd in \
-    "cd '$repoRoot' && nix build --no-link '.#packages.${SYSTEM}.claude-code' 2>&1" \
-    "cd '$repoRoot' && nix build --no-link .#claude-code 2>&1" \
-    "nix build --no-link -f '<nixpkgs>' -A claude-code 2>&1" \
-    "nix-build --no-out-link -A claude-code 2>&1"
+    "nix build --no-link 'path:${repoRoot}#packages.${SYSTEM}.${targetAttr}' 2>&1" \
+    "nix build --no-link 'path:${repoRoot}#${targetAttr}' 2>&1"
   do
     set +e
     BUILD_OUTPUT=$(eval "$build_cmd")

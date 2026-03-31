@@ -44,8 +44,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   buildInputs = [
     libclang
-    libcap
     openssl
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    libcap
   ];
 
   # NOTE: set LIBCLANG_PATH so bindgen can locate libclang, and adjust
@@ -99,6 +101,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   passthru = {
     updateScript = nix-update-script {
       extraArgs = [
+        "--use-github-releases"
         "--version-regex"
         "^rust-v(\\d+\\.\\d+\\.\\d+)$"
       ];

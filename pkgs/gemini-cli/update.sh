@@ -5,6 +5,19 @@ set -eu -o pipefail
 # Get the directory where this script is located
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 packageFile="$scriptDir/default.nix"
+helperScript="$scriptDir/../../scripts/lib/package-update-helpers.sh"
+
+if [[ ! -f "$helperScript" ]]; then
+  echo "Error: helper script not found at $helperScript" >&2
+  exit 1
+fi
+
+# shellcheck source=../../scripts/lib/package-update-helpers.sh
+source "$helperScript"
+
+repoRoot="$(cd "$scriptDir/../.." && pwd)"
+SYSTEM="${NIX_SYSTEM:-$(get_nix_system)}"
+beforeUpdatePath=""
 
 # Extract current version from package.nix
 currentVersion=$(grep -E '^\s*version\s*=' "$packageFile" | sed -E 's/.*version\s*=\s*"([^"]+)".*/\1/' | head -1)
@@ -15,6 +28,21 @@ if [[ -z "$currentVersion" ]]; then
 fi
 
 echo "Current version: $currentVersion"
+
+if [[ "${PACKAGE_UPDATE_ORCHESTRATED:-}" != "true" ]]; then
+  echo "Diffing local derivation against nixpkgs-unstable..."
+  report_upstream_derivation_diff "gemini-cli" "$packageFile" || true
+  echo ""
+
+  beforeUpdatePath=$(build_local_package_output_path "$repoRoot" "gemini-cli" "$SYSTEM" 2>/dev/null || true)
+  if [[ -n "$beforeUpdatePath" ]]; then
+    echo "Current closure:"
+    nix path-info -Shr "$beforeUpdatePath"
+    echo ""
+  else
+    echo "Warning: could not build current gemini-cli before update; skipping before/after closure diff" >&2
+  fi
+fi
 
 # Fetch latest stable release from GitHub API
 echo "Fetching latest release from GitHub..."
@@ -106,12 +134,6 @@ else
   echo "  (Use --skip-npm-hash to skip this step)"
   echo ""
 
-  # Get the repo root (assuming we're in a flake-based setup)
-  repoRoot="$(cd "$scriptDir/../.." && pwd)"
-
-  # Detect system architecture
-  SYSTEM="${NIX_SYSTEM:-$(nix eval --impure --expr 'builtins.currentSystem' 2>/dev/null || echo "x86_64-linux")}"
-
   # Try to build the package and capture the hash from error output
   # We'll try multiple build commands to find what works
   BUILD_OUTPUT=""
@@ -195,3 +217,16 @@ echo "  git diff $packageFile"
 echo ""
 echo "Backup saved to: ${packageFile}.bak"
 
+if [[ "${PACKAGE_UPDATE_ORCHESTRATED:-}" != "true" ]]; then
+  echo ""
+  echo "Validating updated package build..."
+  postUpdatePath=$(build_local_package_output_path "$repoRoot" "gemini-cli" "$SYSTEM")
+  echo "Updated closure:"
+  nix path-info -Shr "$postUpdatePath"
+
+  if [[ -n "$beforeUpdatePath" ]]; then
+    echo ""
+    echo "Closure diff:"
+    nix store diff-closures "$beforeUpdatePath" "$postUpdatePath" || true
+  fi
+fi

@@ -1,31 +1,33 @@
 {
   lib,
+  stdenv,
   buildNpmPackage,
   fetchzip,
+  bubblewrap,
   procps,
+  socat,
   writableTmpDirAsHomeHook,
   versionCheckHook,
 }:
 buildNpmPackage (finalAttrs: {
   pname = "claude-code";
-  version = "2.1.86";
+  version = "2.1.87";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${finalAttrs.version}.tgz";
-    hash = "sha256-Bo2Uj0doMbOK0H8nSzRvwWTcVYsQuP2E9KCauqISzQk=";
+    hash = "sha256-jorpY6ao1YgkoTgIk1Ae2BQCbqOuEtwzoIG36BP5nG4=";
   };
 
-  npmDepsHash = "sha256-/DITdMUtHiBQXjerNB8Pom6OaM0LpE6pWbD8njPfVqw=";
+  npmDepsHash = "sha256-Pr/KFS8RH03CvHvN6EdZf9R4dcAK/EbGd6UAm2s2Saw=";
 
   strictDeps = true;
 
   postPatch = ''
     cp ${./package-lock.json} package-lock.json
 
-    # Replace hardcoded `/bin/bash` with `/usr/bin/env bash` for Nix compatibility
     # https://github.com/anthropics/claude-code/issues/15195
     substituteInPlace cli.js \
-      --replace-warn '#!/bin/bash' '#!/usr/bin/env bash'
+      --replace-fail '#!/bin/sh' '#!/usr/bin/env sh'
   '';
 
   dontNpmBuild = true;
@@ -38,11 +40,19 @@ buildNpmPackage (finalAttrs: {
   postInstall = ''
     wrapProgram $out/bin/claude \
       --set DISABLE_AUTOUPDATER 1 \
+      --set-default FORCE_AUTOUPDATE_PLUGINS 1 \
+      --set DISABLE_INSTALLATION_CHECKS 1 \
       --unset DEV \
       --prefix PATH : ${
-        lib.makeBinPath [
-          procps # claude-code uses [node-tree-kill](https://github.com/pkrumins/node-tree-kill) which requires procps's pgrep(darwin) or ps(linux)
-        ]
+        lib.makeBinPath (
+          [
+            procps
+          ]
+          ++ lib.optionals stdenv.hostPlatform.isLinux [
+            bubblewrap
+            socat
+          ]
+        )
       }
   '';
 
