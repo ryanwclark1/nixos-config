@@ -35,11 +35,12 @@ The following packages are managed with custom versions:
 1. **code-cursor** - AI-powered code editor (Cursor IDE)
 2. **cursor-cli** - Cursor CLI tool
 3. **gemini-cli** - Google Gemini CLI
-4. **claude-code** - Anthropic Claude Code CLI
-5. **codex** - OpenAI Codex CLI
-6. **antigravity** - Antigravity IDE
-7. **kiro** - Kiro IDE
-8. **vscode-generic** - VS Code generic builder (from nixpkgs)
+4. **claude-code** - Anthropic Claude Code CLI (native binary default)
+5. **claude-code-npm** - Anthropic Claude Code CLI (npm fallback)
+6. **codex** - OpenAI Codex CLI
+7. **antigravity** - Antigravity IDE
+8. **kiro** - Kiro IDE
+9. **vscode-generic** - VS Code generic builder (from nixpkgs)
 
 ## Update Script Usage
 
@@ -67,7 +68,7 @@ The master update script (`scripts/update-packages.sh`) provides several command
 Each package has its own update script in `pkgs/<package-name>/update.sh`. These scripts:
 
 - Fetch the latest version from upstream sources
-- Calculate new SHA256 hashes for all platforms
+- Recalculate required source and dependency hashes where supported
 - Update the package definition files automatically
 - Show a git diff of changes for review
 
@@ -78,6 +79,8 @@ You can also run individual update scripts directly:
 ```bash
 cd pkgs/code-cursor && ./update.sh
 cd pkgs/cursor-cli && ./update.sh
+cd pkgs/claude-code-bin && ./update.sh
+cd pkgs/claude-code && ./update.sh
 # etc.
 ```
 
@@ -90,16 +93,18 @@ After updating packages, you may need to:
    git diff pkgs/<package-name>/
    ```
 
-2. **For npm packages** (gemini-cli, claude-code): Update `npmDepsHash`
+2. **For npm packages** (gemini-cli, claude-code-npm): Update `npmDepsHash`
    ```bash
    nix build .#<package-name>
    # Copy the hash from the error message and update default.nix
    ```
 
-3. **For Rust packages** (codex): Update `cargoHash`
+3. **For Rust packages** (codex): Verify the automatically refreshed `cargoHash`
    ```bash
-   nix build .#codex
-   # Copy the hash from the error message and update default.nix
+   ./pkgs/codex/update.sh
+   nix build .#packages.x86_64-linux.codex
+   # If hashes still drift for the same version, rerun:
+   # ./pkgs/codex/update.sh --refresh-hashes
    ```
 
 4. **Test the build**: Ensure the package builds correctly
@@ -170,13 +175,19 @@ If a package fails to build after updating:
 - Fetches from GitHub releases
 
 ### claude-code
-- Requires manual `npmDepsHash` update after version bump
-- Also updates `package-lock.json` automatically
+- Default package uses Anthropic's native binary release manifest
+- Updated from Anthropic's `latest` + `manifest.json`
+- Status checks use a non-mutating `--check-only` mode
+
+### claude-code-npm
+- Compatibility fallback package
+- Updates `package-lock.json` automatically
 - Fetches from npm registry
 
 ### codex
-- Requires manual `cargoHash` update after version bump
+- Automatically updates `cargoHash` during package refresh
 - Fetches from GitHub releases (tags prefixed with `rust-v`)
+- Keeps the upstream auto-updater disabled in the wrapped binary
 
 ### antigravity
 - Uses `information.json` for version tracking
@@ -186,4 +197,3 @@ If a package fails to build after updating:
 - Uses `sources.json` for version tracking
 - Fetches from Kiro's metadata API
 - Automatically extracts VSCode version from package
-

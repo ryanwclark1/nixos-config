@@ -81,7 +81,8 @@ These computers are managed by this Nix flake ❄️
 - `overlays/`: Package patches and version overrides
 - `pkgs/`: Custom packages and applications
   - `antigravity/`: Antigravity IDE
-  - `claude-code/`: Claude Code CLI
+  - `claude-code-bin/`: Claude Code native binary package
+  - `claude-code/`: Claude Code npm fallback package
   - `code-cursor/`: Cursor IDE
   - `codex/`: OpenAI Codex CLI
   - `colors/`: Color assets/tools

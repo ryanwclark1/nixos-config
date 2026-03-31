@@ -8,6 +8,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+HELPERS="$SCRIPT_DIR/lib/package-update-helpers.sh"
+
+# shellcheck source=./lib/package-update-helpers.sh
+source "$HELPERS"
+
+SYSTEM="${NIX_SYSTEM:-$(get_nix_system)}"
 
 # Color output
 RED='\033[0;31m'
@@ -21,7 +27,8 @@ declare -A PACKAGES=(
   [code-cursor]="pkgs/code-cursor"
   [cursor-cli]="pkgs/cursor-cli"
   [gemini-cli]="pkgs/gemini-cli"
-  [claude-code]="pkgs/claude-code"
+  [claude-code]="pkgs/claude-code-bin"
+  [claude-code-npm]="pkgs/claude-code"
   [codex]="pkgs/codex"
   [antigravity]="pkgs/antigravity"
   [kiro]="pkgs/kiro"
@@ -38,6 +45,12 @@ error() { echo -e "${RED}❌${NC} $1"; }
 update_package() {
   local pkg_name=$1
   local pkg_dir="${PACKAGES[$pkg_name]}"
+  local package_file
+  local update_script
+  local output
+  local pre_update_path=""
+  local build_output
+  local post_update_path
 
   if [[ -z "$pkg_dir" ]]; then
     error "Unknown package: $pkg_name"
@@ -45,27 +58,65 @@ update_package() {
   fi
 
   local full_path="$REPO_ROOT/$pkg_dir"
-  local update_script="$full_path/update.sh"
+  update_script="$full_path/update.sh"
+  package_file="$full_path/default.nix"
 
   if [[ ! -f "$update_script" ]]; then
-    error "Update script not found: $update_script"
-    return 1
+    if ! resolve_package_update_script_json "$REPO_ROOT" "$pkg_name" "$SYSTEM" >/dev/null 2>&1; then
+      error "Update script not found: $update_script"
+      return 1
+    fi
   fi
 
   info "Checking $pkg_name for updates..."
   echo ""
 
-  cd "$full_path"
-  local output
-  if output=$(bash "$update_script" 2>&1); then
+  if [[ -f "$package_file" ]]; then
+    info "Diffing local derivation against nixpkgs-unstable..."
+    report_upstream_derivation_diff "$pkg_name" "$package_file" || true
+    echo ""
+  fi
+
+  pre_update_path=$(build_local_package_output_path "$REPO_ROOT" "$pkg_name" "$SYSTEM" 2>/dev/null || true)
+  if [[ -n "$pre_update_path" ]]; then
+    info "Current closure:"
+    nix path-info -Shr "$pre_update_path"
+    echo ""
+  else
+    warning "Could not build current $pkg_name before update; skipping before/after closure diff"
+    echo ""
+  fi
+
+  cd "$REPO_ROOT"
+  if output=$(PACKAGE_UPDATE_ORCHESTRATED=true run_package_update_script "$REPO_ROOT" "$pkg_name" "$update_script" 2>&1); then
     # Check if the script reported "Already up to date"
     if echo "$output" | grep -q "Already up to date\|No update\|is already in"; then
       echo "$output" | grep -E "(Already up to date|No update|is already in)" || true
       echo ""
       return 0
     else
-      # Package was actually updated
       echo "$output"
+      echo ""
+
+      info "Validating updated $pkg_name build..."
+      if build_output=$(build_local_package_output_path "$REPO_ROOT" "$pkg_name" "$SYSTEM" 2>&1); then
+        post_update_path=$(echo "$build_output" | tail -n1)
+      else
+        error "$pkg_name build validation failed"
+        echo "$build_output"
+        echo ""
+        return 1
+      fi
+
+      info "Updated closure:"
+      nix path-info -Shr "$post_update_path"
+      if [[ -n "$pre_update_path" ]]; then
+        echo ""
+        info "Closure diff:"
+        nix store diff-closures "$pre_update_path" "$post_update_path" || true
+      fi
+      echo ""
+
       success "$pkg_name updated successfully"
       echo ""
       return 0
@@ -84,8 +135,22 @@ check_updates() {
   local pkg_dir="${PACKAGES[$pkg_name]}"
   local full_path="$REPO_ROOT/$pkg_dir"
   local update_script="$full_path/update.sh"
+  local output
 
   if [[ ! -f "$update_script" ]]; then
+    return 1
+  fi
+
+  if [[ "$pkg_name" == "claude-code" || "$pkg_name" == "claude-code-npm" ]]; then
+    cd "$REPO_ROOT"
+    if output=$(PACKAGE_UPDATE_ORCHESTRATED=true run_package_update_script "$REPO_ROOT" "$pkg_name" "$update_script" --check-only 2>&1); then
+      if echo "$output" | grep -q "Already up to date"; then
+        return 1
+      fi
+      if echo "$output" | grep -q "Update available"; then
+        return 0
+      fi
+    fi
     return 1
   fi
 
@@ -181,6 +246,13 @@ case "${1:-}" in
         version=$(grep -E '^\s*version\s*=' "$version_file" 2>/dev/null | sed -E 's/.*version\s*=\s*"([^"]+)".*/\1/' | head -1 || echo "")
       fi
 
+      if [[ -z "$version" || "$version" == "unknown" ]]; then
+        manifest_file="$REPO_ROOT/$pkg_dir/manifest.json"
+        if [[ -f "$manifest_file" ]]; then
+          version=$(jq -r '.version' "$manifest_file" 2>/dev/null || echo "unknown")
+        fi
+      fi
+
       # Special case for antigravity which uses information.json
       if [[ "$pkg" == "antigravity" ]] && [[ -z "$version" || "$version" == "unknown" ]]; then
         info_file="$REPO_ROOT/$pkg_dir/information.json"
@@ -213,4 +285,3 @@ case "${1:-}" in
     exit 1
     ;;
 esac
-
