@@ -1,6 +1,6 @@
 # Overlay to override packages with custom/newer versions
 # This uses the custom package definitions in pkgs/
-# Includes: code-cursor, cursor-cli, gemini-cli, claude-code, codex, antigravity, kiro, and vscode-generic
+# Includes: code-cursor, cursor-cli, gemini-cli, claude-code, claude-code-bin, claude-code-npm, codex, antigravity, kiro, and vscode-generic
 # Note: github-mcp-server is now available in nixpkgs and no longer needs a custom package
 final: prev: {
   # Override code-cursor with our custom version
@@ -28,8 +28,10 @@ final: prev: {
   # Override gemini-cli with our custom version
   gemini-cli = final.callPackage ../pkgs/gemini-cli { };
 
-  # Override claude-code with our custom version
-  claude-code = final.callPackage ../pkgs/claude-code { };
+  # Override Claude Code with our custom native binary package by default.
+  claude-code-bin = final.callPackage ../pkgs/claude-code-bin { };
+  claude-code-npm = final.callPackage ../pkgs/claude-code { };
+  claude-code = final.claude-code-bin;
 
   # Override codex with our custom version
   codex = final.callPackage ../pkgs/codex { };

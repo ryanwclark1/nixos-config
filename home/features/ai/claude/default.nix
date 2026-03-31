@@ -335,7 +335,7 @@ in
       fi
 
       # Launch Claude Code with environment variables
-      exec ${pkgs.claude-code}/bin/claude-code "$@"
+      exec ${pkgs.claude-code}/bin/claude "$@"
     '';
     executable = true;
   };
