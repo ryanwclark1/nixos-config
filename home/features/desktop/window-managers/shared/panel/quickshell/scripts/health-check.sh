@@ -279,38 +279,8 @@ run_surface_probes() {
   : > "${controls_log}"
   : > "${notifications_log}"
 
-  if ! run_probe_step "${settings_log}" quickshell ipc --id "${instance_id}" call SettingsHub close; then
-    return 11
-  fi
-  if ! run_probe_step "${settings_log}" quickshell ipc --id "${instance_id}" call SettingsHub openTabScrolled wallpaper 0; then
-    return 11
-  fi
-  sleep 0.4
-  if ! run_probe_step "${settings_log}" quickshell ipc --id "${instance_id}" call SettingsHub close; then
-    return 11
-  fi
-
-  if ! run_probe_step "${controls_log}" quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces; then
-    return 12
-  fi
-  if ! run_probe_step "${controls_log}" quickshell ipc --id "${instance_id}" call Shell openSurface controlCenter; then
-    return 12
-  fi
-  sleep 0.3
-  if ! run_probe_step "${controls_log}" quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces; then
-    return 12
-  fi
-
-  if ! run_probe_step "${notifications_log}" quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces; then
-    return 13
-  fi
-  if ! run_probe_step "${notifications_log}" quickshell ipc --id "${instance_id}" call Shell openSurface notifCenter; then
-    return 13
-  fi
-  sleep 0.3
-  if ! run_probe_step "${notifications_log}" quickshell ipc --id "${instance_id}" call Shell closeAllSurfaces; then
-    return 13
-  fi
+  # Visual IPC probes removed as they annoyingly cycle on the user's screen
+  # every time the health check runs.
 
   return 0
 }
