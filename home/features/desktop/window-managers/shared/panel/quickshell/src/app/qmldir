@@ -1,2 +1,3 @@
 ShellRoot 1.0 ShellRoot.qml
 ShellIpcHandler 1.0 ShellIpcHandler.qml
+LauncherHost 1.0 LauncherHost.qml
