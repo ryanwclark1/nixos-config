@@ -60,6 +60,15 @@ BasePopupMenu {
     availableCount = ac;
   }
 
+  Component {
+    id: _btSvgIcon
+    SharedWidgets.SvgIcon { source: parent.devIcon; color: parent.devColor; size: Appearance.fontSizeXL }
+  }
+  Component {
+    id: _btNerdIcon
+    Text { text: parent.devIcon; color: parent.devColor; font.family: Appearance.fontMono; font.pixelSize: Appearance.fontSizeXL }
+  }
+
   function deviceIcon(dev) {
     return IconHelpers.bluetoothDeviceIcon(dev);
   }
@@ -149,11 +158,10 @@ BasePopupMenu {
       anchors.margins: Appearance.paddingSmall
       spacing: Appearance.paddingSmall
 
-      Text {
-        text: root.deviceIcon(modelData)
-        color: iconColor
-        font.family: Appearance.fontMono
-        font.pixelSize: Appearance.fontSizeXL
+      Loader {
+        readonly property string devIcon: root.deviceIcon(_btCard.modelData)
+        readonly property color devColor: _btCard.iconColor
+        sourceComponent: devIcon.endsWith(".svg") ? _btSvgIcon : _btNerdIcon
       }
 
       ColumnLayout {
