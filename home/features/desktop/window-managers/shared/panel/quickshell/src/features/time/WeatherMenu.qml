@@ -8,7 +8,7 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMinWidth: 340; popupMaxWidth: 500; compactThreshold: 460
-  implicitHeight: compactMode ? 760 : 700
+  implicitHeight: compactMode ? 900 : 840
   title: "Weather"
   subtitle: WeatherService.location || "Local"
 
