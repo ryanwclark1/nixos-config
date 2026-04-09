@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { shellQuote, terminalCommand, ipcCall } from "../../src/services/ShellUtils.js";
+import { shellQuote, terminalCommand, ipcCall, shellSurfaceCall } from "../../src/services/ShellUtils.js";
 
 describe("shellQuote", () => {
   it("wraps in single quotes", () => {
@@ -89,6 +89,32 @@ describe("ipcCall", () => {
       "call",
       "",
       "",
+    ]);
+  });
+});
+
+describe("shellSurfaceCall", () => {
+  it("pads Shell surface calls with an empty screen name by default", () => {
+    expect(shellSurfaceCall("openSurface", "displayConfig")).toEqual([
+      "quickshell",
+      "ipc",
+      "call",
+      "Shell",
+      "openSurface",
+      "displayConfig",
+      "",
+    ]);
+  });
+
+  it("preserves explicit screen targeting", () => {
+    expect(shellSurfaceCall("toggleSurface", "weatherMenu", "focused")).toEqual([
+      "quickshell",
+      "ipc",
+      "call",
+      "Shell",
+      "toggleSurface",
+      "weatherMenu",
+      "focused",
     ]);
   });
 });

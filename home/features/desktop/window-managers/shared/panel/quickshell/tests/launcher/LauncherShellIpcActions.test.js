@@ -27,6 +27,33 @@ describe("shellDestinationAndPaletteHandlers", () => {
       "Shell",
       "openSurface",
       "aiChat",
+      "",
+    ]);
+  });
+
+  it("pads Shell surface opens for launcher destinations", () => {
+    const execDetached = vi.fn();
+    const h = shellDestinationAndPaletteHandlers(execDetached);
+    h.openNotifications();
+    h.openControlCenter();
+
+    expect(execDetached.mock.calls[0][0]).toEqual([
+      "quickshell",
+      "ipc",
+      "call",
+      "Shell",
+      "openSurface",
+      "notifCenter",
+      "",
+    ]);
+    expect(execDetached.mock.calls[1][0]).toEqual([
+      "quickshell",
+      "ipc",
+      "call",
+      "Shell",
+      "openSurface",
+      "controlCenter",
+      "",
     ]);
   });
 });

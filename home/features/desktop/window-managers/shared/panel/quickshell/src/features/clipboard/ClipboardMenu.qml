@@ -82,7 +82,7 @@ BasePopupMenu {
       tooltipText: "Screenshot tool"
       onClicked: {
         root.closeRequested();
-        Quickshell.execDetached(ShellUtils.ipcCall("Shell", "openSurface", "screenshotMenu"));
+        Quickshell.execDetached(ShellUtils.shellSurfaceCall("openSurface", "screenshotMenu"));
       }
     },
     SharedWidgets.IconButton {
