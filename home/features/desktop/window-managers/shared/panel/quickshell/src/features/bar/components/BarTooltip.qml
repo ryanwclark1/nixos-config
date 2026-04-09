@@ -17,6 +17,8 @@ Item {
   readonly property var effectiveAnchorItem: anchorItem ? anchorItem : (parent || null)
   readonly property bool usePopup: !!anchorWindow && !!effectiveAnchorItem
   readonly property bool useInlineTooltip: !usePopup && !!effectiveAnchorItem
+  readonly property int popupGap: Math.max(Appearance.spacingM, 14)
+  readonly property int popupSideMargin: Appearance.spacingS
   readonly property string anchorEdge: {
     if (anchorWindow && anchorWindow.tooltipEdge !== undefined && anchorWindow.tooltipEdge !== "")
       return String(anchorWindow.tooltipEdge);
@@ -90,10 +92,10 @@ Item {
     anchor.gravity: root.popupEdge
     anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
     anchor.margins {
-      top: Appearance.spacingS
-      bottom: Appearance.spacingS
-      left: Appearance.spacingS
-      right: Appearance.spacingS
+      top: root.popupEdge === Edges.Top ? root.popupGap : root.popupSideMargin
+      bottom: root.popupEdge === Edges.Bottom ? root.popupGap : root.popupSideMargin
+      left: root.popupEdge === Edges.Left ? root.popupGap : root.popupSideMargin
+      right: root.popupEdge === Edges.Right ? root.popupGap : root.popupSideMargin
     }
 
     visible: root.usePopup && root._shown && root.text !== ""

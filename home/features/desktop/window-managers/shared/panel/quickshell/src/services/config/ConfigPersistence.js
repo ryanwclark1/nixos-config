@@ -98,7 +98,7 @@ var _EXTRA_SECTION_KEYS = (function() {
 
 var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
 
-var CURRENT_VERSION = 4;
+var CURRENT_VERSION = 5;
 
 // Migration functions: each takes `data` and mutates it in place.
 // Index corresponds to the version being migrated FROM (0 → 1, 1 → 2, etc.).
@@ -142,6 +142,13 @@ var _MIGRATIONS = [
                 "commandPalette", "powerMenu", "colorPicker", "displayConfig",
                 "fileBrowser", "systemMonitor"
             ];
+    },
+    // v4 → v5: Remove stale AI model usage persistence keys.
+    function(data) {
+        if (!data.modelUsage || typeof data.modelUsage !== "object")
+            return;
+        delete data.modelUsage.barMetric;
+        delete data.modelUsage.refreshSec;
     }
 ];
 

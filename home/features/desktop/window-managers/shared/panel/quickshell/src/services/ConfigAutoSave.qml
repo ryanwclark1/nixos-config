@@ -602,12 +602,6 @@ QtObject {
         function onModelUsageActiveProviderChanged() {
             root.config.scheduleSave();
         }
-        function onModelUsageBarMetricChanged() {
-            root.config.scheduleSave();
-        }
-        function onModelUsageRefreshSecChanged() {
-            root.config.scheduleSave();
-        }
         function onWorkspaceShowEmptyChanged() {
             root.config.scheduleSave();
         }

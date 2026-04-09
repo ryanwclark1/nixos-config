@@ -391,7 +391,7 @@ RowLayout {
 
         SharedWidgets.SvgIcon {
             anchors.centerIn: parent
-            source: "history.svg"
+            source: "clock.svg"
             color: historyBtnMouse.containsMouse ? Colors.primary : Colors.textSecondary
             size: Appearance.fontSizeSmall
         }

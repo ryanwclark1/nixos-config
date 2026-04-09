@@ -295,7 +295,6 @@ PanelWindow {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: root.narrowHeader ? Appearance.spacingXS : Appearance.spacingS
-                clip: true
 
                 SharedWidgets.SvgIcon {
                     source: "sparkle.svg"
@@ -456,7 +455,7 @@ PanelWindow {
                     
                     SharedWidgets.SvgIcon {
                         anchors.centerIn: parent
-                        source: "history.svg"
+                        source: "clock.svg"
                         color: historyHover.containsMouse ? Colors.primary : Colors.textSecondary
                         size: Appearance.fontSizeLarge
                     }
@@ -837,7 +836,6 @@ PanelWindow {
                 border.color: inputField.activeFocus ? Colors.primary : Colors.border
                 border.width: inputField.activeFocus ? 1.5 : 1
                 radius: Appearance.radiusMedium
-                clip: true
                 Behavior on border.color {
                     enabled: !Colors.isTransitioning
                     CAnim {}

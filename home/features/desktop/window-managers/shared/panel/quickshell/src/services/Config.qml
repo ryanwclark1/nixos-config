@@ -144,8 +144,6 @@ QtObject {
     property bool modelUsageCodexEnabled: false
     property bool modelUsageGeminiEnabled: false
     property string modelUsageActiveProvider: "claude"
-    property string modelUsageBarMetric: "prompts" // prompts | tokens
-    property int modelUsageRefreshSec: 30
 
     // --- CONTROL CENTER ---
     readonly property int controlCenterWidthMin: 440

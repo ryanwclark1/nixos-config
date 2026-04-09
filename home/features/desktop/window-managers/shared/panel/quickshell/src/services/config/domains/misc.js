@@ -12,9 +12,7 @@ var modelUsage = {
         ["claudeEnabled", "modelUsageClaudeEnabled"],
         ["codexEnabled", "modelUsageCodexEnabled"],
         ["geminiEnabled", "modelUsageGeminiEnabled"],
-        ["activeProvider", "modelUsageActiveProvider"],
-        ["barMetric", "modelUsageBarMetric"],
-        ["refreshSec", "modelUsageRefreshSec"]
+        ["activeProvider", "modelUsageActiveProvider"]
     ]
 }
 
