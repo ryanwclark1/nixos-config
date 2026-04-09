@@ -28,10 +28,10 @@ describe("AI tooltip anchor contract", () => {
     expect(tooltipSource).toContain("function anchorRectPoint()");
     expect(tooltipSource).toContain("function chooseBestSide(pointValue)");
     expect(tooltipSource).toContain("PopupWindow {");
-    expect(tooltipSource).toContain("anchor.window: root.resolvedAnchorWindow");
-    expect(tooltipSource).not.toContain("anchor.item: root.effectiveAnchorItem");
-    expect(tooltipSource).toContain("anchor.rect.x: root.anchorRectX()");
-    expect(tooltipSource).toContain("anchor.rect.y: root.anchorRectY()");
+    expect(tooltipSource).toContain("anchor.item: root.effectiveAnchorItem");
+    expect(tooltipSource).not.toContain("anchor.window: root.resolvedAnchorWindow");
+    expect(tooltipSource).toContain("anchor.rect.x: root.anchorRectPoint().x");
+    expect(tooltipSource).toContain("anchor.rect.y: root.anchorRectPoint().y");
     expect(tooltipSource).toContain("property int popupAdjustment: PopupAdjustment.Flip | PopupAdjustment.Slide");
     expect(tooltipSource).toContain("popupTooltip.anchor.updateAnchor()");
   });

@@ -89,6 +89,7 @@ Item {
   Tooltip {
     anchors.fill: parent
     anchorItem: root.effectiveAnchorItem
+    anchorWindow: root.resolvedAnchorWindow
     text: root.text
     shortcut: root.shortcut
     shown: root._shown

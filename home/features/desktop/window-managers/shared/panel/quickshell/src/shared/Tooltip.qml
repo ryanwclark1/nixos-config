@@ -335,7 +335,7 @@ Item {
 
     PopupWindow {
         id: popupTooltip
-        anchor.window: root.resolvedAnchorWindow
+        anchor.item: root.effectiveAnchorItem
         anchor.edges: {
             switch (root.effectiveSide) {
                 case Qt.LeftEdge:
@@ -350,8 +350,8 @@ Item {
         }
         anchor.gravity: anchor.edges
         anchor.adjustment: root.popupAdjustment
-        anchor.rect.x: root.anchorRectX()
-        anchor.rect.y: root.anchorRectY()
+        anchor.rect.x: root.anchorRectPoint().x
+        anchor.rect.y: root.anchorRectPoint().y
         anchor.rect.width: 1
         anchor.rect.height: 1
         anchor.margins {

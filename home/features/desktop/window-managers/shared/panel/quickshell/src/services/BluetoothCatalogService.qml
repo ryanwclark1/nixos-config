@@ -225,7 +225,7 @@ QtObject {
         }
     }
 
-    Connections {
+    property Connections _adapterConnections: Connections {
         target: Bluetooth.defaultAdapter
         ignoreUnknownSignals: true
 
