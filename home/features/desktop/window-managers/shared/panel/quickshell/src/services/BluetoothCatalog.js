@@ -253,24 +253,3 @@ function subtitleForEntry(entry) {
         parts.push(entry.seenLabel);
     return parts.join(" • ");
 }
-
-export {
-    ENTRY_TTL_MS,
-    normalizeAddress,
-    normalizeUuid,
-    preferredName,
-    metadataFromDevice,
-    mergeEntry,
-    markMissingEntries,
-    sectionedEntries,
-    seenAgoLabel,
-    buildCompanyLookup,
-    buildServiceLookup,
-    buildAppearanceLookup,
-    companyName,
-    serviceNames,
-    appearanceName,
-    enrichEntry,
-    subtitleForEntry,
-    sortEntries
-};

@@ -11,6 +11,8 @@ Item {
 
   default property alias content: container.data
 
+  implicitWidth: container.implicitWidth + root.pad * 2
+  implicitHeight: container.implicitHeight + root.pad * 2
   Layout.fillWidth: true
 
   // Pseudo-shadow
