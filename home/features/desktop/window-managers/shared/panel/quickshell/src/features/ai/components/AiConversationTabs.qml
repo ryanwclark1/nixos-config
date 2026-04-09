@@ -260,7 +260,7 @@ RowLayout {
                         anchors.rightMargin: 6
                         anchors.verticalCenter: parent.verticalCenter
                         color: "transparent"
-                        opacity: !root.compactMode && (tabMouse.containsMouse || tabDelegate.isActive) ? 1 : 0
+                        opacity: (tabMouse.containsMouse || tabDelegate.isActive) ? 1 : 0
                         visible: opacity > 0
                         Behavior on opacity {
                             NumberAnimation { duration: Appearance.durationFast }

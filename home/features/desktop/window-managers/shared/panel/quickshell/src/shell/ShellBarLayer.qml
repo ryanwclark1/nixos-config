@@ -11,6 +11,7 @@ import "../features/network"
 import "../features/power"
 import "../features/screenshot"
 import "../features/ssh"
+import "../features/docker"
 import "../features/status"
 import "../features/system/surfaces"
 import "../features/time"
@@ -163,6 +164,11 @@ Item {
                                 implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 surfaceContext: barWindow.surfaceContext("sshMenu")
                                 Component.onCompleted: barWindow.wirePopup(this, "sshMenu")
+                            }
+                            DockerMenu {
+                                implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                surfaceContext: barWindow.surfaceContext("dockerMenu")
+                                Component.onCompleted: barWindow.wirePopup(this, "dockerMenu")
                             }
                             DateTimeMenu {
                                 implicitHeight: Math.min(560, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))

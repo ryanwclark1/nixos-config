@@ -73,12 +73,26 @@ ColumnLayout {
 
         // Docker Summary
         Rectangle {
+            id: dockerSummaryRect
             Layout.fillWidth: true
             height: 54
             radius: Appearance.radiusMedium
-            color: Colors.cardSurface
+            color: dockerSummaryHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
             border.color: ServiceUnitService.dockerStatus === "ready" ? Colors.border : Colors.warning
             border.width: 1
+
+            MouseArea {
+                id: dockerSummaryHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "dockerMenu", ""));
+                }
+            }
+
+            SharedWidgets.InnerHighlight { hoveredOpacity: 0.2; hovered: dockerSummaryHover.containsMouse }
+
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: Appearance.paddingSmall

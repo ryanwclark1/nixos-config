@@ -33,20 +33,20 @@ PanelWindow {
     mask: Region {
         item: slidePanel
     }
-    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: root.showContent ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     WlrLayershell.namespace: "quickshell"
 
     // --- State ---
     property bool showContent: false
     property int panelWidth: _persist.panelWidth
-    readonly property int panelMinWidth: 320
-    readonly property int panelMaxWidth: 600
+    readonly property int panelMinWidth: 360
+    readonly property int panelMaxWidth: 800
 
     PersistentProperties {
         id: _persist
         reloadableId: "aiChatState"
-        property int panelWidth: 420
+        property int panelWidth: 500
     }
     readonly property bool compactHeader: slidePanel.width < 420
     readonly property bool narrowHeader: slidePanel.width < 360
@@ -446,6 +446,57 @@ PanelWindow {
                     }
                 }
 
+                // History
+                Rectangle {
+                    id: historyButton
+                    width: 28
+                    height: 28
+                    radius: Appearance.radiusXS
+                    color: historyHover.containsMouse ? Colors.primaryGhost : "transparent"
+                    
+                    SharedWidgets.SvgIcon {
+                        anchors.centerIn: parent
+                        source: "history.svg"
+                        color: historyHover.containsMouse ? Colors.primary : Colors.textSecondary
+                        size: Appearance.fontSizeLarge
+                    }
+                    SharedWidgets.StateLayer {
+                        id: historyStateLayer
+                        hovered: historyHover.containsMouse
+                        pressed: historyHover.pressed
+                    }
+                    MouseArea {
+                        id: historyHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => {
+                            historyStateLayer.burst(mouse.x, mouse.y);
+                            var model = [];
+                            var allConvs = AiService.conversations.slice().sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+                            for (var i = 0; i < allConvs.length; i++) {
+                                var conv = allConvs[i];
+                                model.push({
+                                    label: conv.title,
+                                    icon: Providers.providerIcon(conv.provider),
+                                    action: (function(convId) {
+                                        return function() {
+                                            AiService.setActiveConversation(convId);
+                                        };
+                                    })(conv.id)
+                                });
+                            }
+                            var pos = parent.mapToItem(root.parent, 0, parent.height);
+                            historyMenu.model = model;
+                            historyMenu.popup(pos.x, pos.y + Appearance.spacingXS);
+                        }
+                    }
+                    Tooltip {
+                        text: "Chat History"
+                        shown: historyHover.containsMouse
+                    }
+                }
+
                 // New conversation
                 Rectangle {
                     id: newChatButton
@@ -555,15 +606,25 @@ PanelWindow {
                     RowLayout {
                         spacing: Appearance.spacingS
                         SharedWidgets.SvgIcon {
-                            source: "settings.svg"
+                            source: "terminal.svg"
                             color: Colors.accent
                             size: Appearance.fontSizeXL
                         }
-                        Text {
-                            text: "Suggested System Action"
-                            color: Colors.text
-                            font.pixelSize: Appearance.fontSizeSmall
-                            font.weight: Font.Bold
+                        Column {
+                            Layout.fillWidth: true
+                            Text {
+                                text: "AI Suggested Terminal Command"
+                                color: Colors.text
+                                font.pixelSize: Appearance.fontSizeSmall
+                                font.weight: Font.Bold
+                            }
+                            Text {
+                                text: "The AI suggested running this command. Review before executing."
+                                color: Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeXS
+                                wrapMode: Text.WordWrap
+                                width: parent.width
+                            }
                         }
                     }
 
@@ -578,7 +639,8 @@ PanelWindow {
                             text: AiService.pendingCommand ? AiService.pendingCommand.label : ""
                             color: Colors.text
                             font.pixelSize: Appearance.fontSizeMedium
-                            font.weight: Font.Bold
+                            font.weight: Font.DemiBold
+                            font.family: Appearance.fontMono
                         }
                     }
 
@@ -1272,7 +1334,13 @@ PanelWindow {
                 }
             }
         }
+
+        SharedWidgets.ContextMenu {
+            id: historyMenu
+            parent: root.parent
+        }
     }
+
 
     // ── Helpers ──────────────────────────────────
     Process {

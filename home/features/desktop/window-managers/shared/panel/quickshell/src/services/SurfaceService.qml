@@ -72,6 +72,11 @@ QtObject {
                 focusPolicy: "preserve-app-focus",
                 legacyFlags: ["sshMenuVisible"]
             },
+            dockerMenu: {
+                kind: "popup",
+                focusPolicy: "preserve-app-focus",
+                legacyFlags: ["dockerMenuVisible"]
+            },
             dateTimeMenu: {
                 kind: "popup",
                 focusPolicy: "preserve-app-focus",

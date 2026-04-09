@@ -12,7 +12,7 @@ Rectangle {
     visible: false
     width: 220
     height: dropdownCol.implicitHeight + Appearance.spacingS * 2
-    color: Colors.bgWidget
+    color: Colors.popupSurface
     border.color: Colors.border
     border.width: 1
     radius: Appearance.radiusMedium
