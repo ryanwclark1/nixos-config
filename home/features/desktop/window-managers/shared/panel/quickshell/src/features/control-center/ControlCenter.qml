@@ -254,7 +254,7 @@ PanelWindow {
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: Appearance.spacingS
-                                
+
                                 SharedWidgets.SectionLabel {
                                     label: "QUICK TOGGLES"
                                 }

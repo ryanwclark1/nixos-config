@@ -5,6 +5,7 @@ import "../../shared"
 import "../../services"
 import "../../services/ClipboardDisplayHelpers.js" as ClipboardDisplay
 import "../../services/SearchUtils.js" as SU
+import "../../services/ShellUtils.js" as ShellUtils
 import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
@@ -76,6 +77,14 @@ BasePopupMenu {
   }
 
   headerExtras: [
+    SharedWidgets.IconButton {
+      icon: "crop.svg"
+      tooltipText: "Screenshot tool"
+      onClicked: {
+        root.closeRequested();
+        Quickshell.execDetached(ShellUtils.ipcCall("Shell", "openSurface", "screenshotMenu"));
+      }
+    },
     SharedWidgets.IconButton {
       icon: ClipboardHistoryService.loading ? "download.svg" : "arrow-clockwise.svg"
       tooltipText: "Refresh"

@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import "../../../../services"
 import "../../../../widgets" as SharedWidgets
+import "../../../../shared" as Shared
 import ".."
 
 Item {
@@ -12,6 +13,11 @@ Item {
     property string tabId: ""
     property bool compactMode: false
     property bool tightSpacing: false
+
+    Shared.Ref {
+        service: SystemStatus
+        subscriptionMode: "detailed"
+    }
 
     SettingsTabPage {
         anchors.fill: parent
@@ -66,6 +72,75 @@ Item {
 
                             Text {
                                 text: Math.round(SystemStatus.ramPercent * 100) + "%"
+                                color: Colors.primary
+                                font.weight: Font.DemiBold
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Text {
+                                text: "Storage"
+                                color: Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeSmall
+                                Layout.fillWidth: true
+                            }
+
+                            Text {
+                                text: SystemStatus.diskUsage
+                                color: Colors.primary
+                                font.weight: Font.DemiBold
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Text {
+                                text: "CPU Temp"
+                                color: Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeSmall
+                                Layout.fillWidth: true
+                            }
+
+                            Text {
+                                text: SystemStatus.cpuTemp
+                                color: Colors.primary
+                                font.weight: Font.DemiBold
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            visible: SystemStatus.gpuTemp !== "--" && SystemStatus.gpuTemp !== ""
+
+                            Text {
+                                text: "GPU Temp"
+                                color: Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeSmall
+                                Layout.fillWidth: true
+                            }
+
+                            Text {
+                                text: SystemStatus.gpuTemp
+                                color: Colors.primary
+                                font.weight: Font.DemiBold
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Text {
+                                text: "Network"
+                                color: Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeSmall
+                                Layout.fillWidth: true
+                            }
+
+                            Text {
+                                text: SystemStatus.netDown + " ↓  " + SystemStatus.netUp + " ↑"
                                 color: Colors.primary
                                 font.weight: Font.DemiBold
                             }
