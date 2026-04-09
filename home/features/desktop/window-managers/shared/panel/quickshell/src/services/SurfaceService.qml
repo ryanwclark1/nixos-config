@@ -67,6 +67,11 @@ QtObject {
                 focusPolicy: "preserve-app-focus",
                 legacyFlags: ["marketMenuVisible"]
             },
+            modelUsageMenu: {
+                kind: "popup",
+                focusPolicy: "preserve-app-focus",
+                legacyFlags: ["modelUsageMenuVisible"]
+            },
             sshMenu: {
                 kind: "popup",
                 focusPolicy: "preserve-app-focus",

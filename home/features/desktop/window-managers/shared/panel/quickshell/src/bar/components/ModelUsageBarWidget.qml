@@ -32,8 +32,8 @@ SharedWidgets.BarPill {
         spacing: Appearance.spacingS
 
         SharedWidgets.SvgIcon {
-            source: ModelUsageService.providerIcon
-            color: ModelUsageService.providerColor
+            source: "board.svg"
+            color: Colors.text
             size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }

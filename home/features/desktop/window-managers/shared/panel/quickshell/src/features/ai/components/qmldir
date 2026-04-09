@@ -1,4 +1,4 @@
-AiConversationTabs 1.0 AiConversationTabs.qml
+AiConversationSidebar 1.0 AiConversationSidebar.qml
 AiMessageList 1.0 AiMessageList.qml
 AiTextBlock 1.0 AiTextBlock.qml
 AiCodeBlock 1.0 AiCodeBlock.qml

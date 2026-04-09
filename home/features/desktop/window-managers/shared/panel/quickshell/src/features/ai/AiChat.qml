@@ -52,9 +52,13 @@ PanelWindow {
     readonly property bool narrowHeader: slidePanel.width < 360
     readonly property bool compactFooter: slidePanel.width < 380
     readonly property bool narrowFooter: slidePanel.width < 340
+    readonly property bool historyOverlayMode: slidePanel.width < 640
+    readonly property int historySidebarWidth: historyOverlayMode ? Math.min(240, Math.max(200, slidePanel.width - 32)) : 220
+    readonly property bool showHeaderModelSummary: slidePanel.width >= 460
     property bool includeWindowContext: false
     property bool includeVisualContext: false
     property bool includeSelectionContext: false
+    property bool historyPaneOpen: false
 
     property var attachedFiles: []
     property string _pendingMsgText: ""
@@ -80,6 +84,7 @@ PanelWindow {
         } else {
             clearInteractiveFocus();
             providerDropdown.visible = false;
+            historyPaneOpen = false;
         }
     }
 
@@ -154,6 +159,30 @@ PanelWindow {
         ToastService.showNotice("Chat cleared", wasStreaming ? "Stream cancelled and messages were cleared." : "Messages and draft were cleared.");
     }
 
+    function _closeOtherConversationsWithNotice(id) {
+        var closed = AiService.closeOtherConversations(id);
+        if (closed > 0)
+            ToastService.showNotice("Other chats closed", closed + " chat" + (closed !== 1 ? "s" : "") + " closed. Use Ctrl+Shift+T to reopen.");
+    }
+
+    function _copyConversationToClipboard(id) {
+        var target = null;
+        for (var i = 0; i < AiService.conversations.length; i++) {
+            if (AiService.conversations[i].id === id) {
+                target = AiService.conversations[i];
+                break;
+            }
+        }
+        if (!target)
+            return;
+        var fullText = "";
+        var msgs = Array.isArray(target.messages) ? target.messages : [];
+        for (var j = 0; j < msgs.length; j++)
+            fullText += (msgs[j].role === "user" ? "### User\n" : "### Assistant\n") + msgs[j].content + "\n\n";
+        Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", fullText]);
+        ToastService.showNotice("Copied", "Conversation copied to clipboard");
+    }
+
     function _syncInputFromService() {
         if (inputField && inputField.text !== AiService.activeDraftText)
             inputField.text = AiService.activeDraftText;
@@ -198,7 +227,13 @@ PanelWindow {
         }
         layer.enabled: slideAnim.running || fadeAnim.running
 
-        Keys.onEscapePressed: root.closeRequested()
+        Keys.onEscapePressed: {
+            if (root.historyOverlayMode && root.historyPaneOpen) {
+                root.historyPaneOpen = false;
+            } else {
+                root.closeRequested();
+            }
+        }
         Keys.onPressed: event => {
             if (!root.showContent || !(event.modifiers & Qt.ControlModifier))
                 return;
@@ -294,7 +329,7 @@ PanelWindow {
             // ---- Header ----
             RowLayout {
                 Layout.fillWidth: true
-                spacing: root.narrowHeader ? Appearance.spacingXS : Appearance.spacingS
+                spacing: Appearance.spacingS
 
                 SharedWidgets.SvgIcon {
                     source: "sparkle.svg"
@@ -313,20 +348,13 @@ PanelWindow {
                     maximumLineCount: 1
                 }
 
-                Item {
-                    Layout.fillWidth: true
-                    visible: !root.narrowHeader
-                }
-
-                // Provider/model picker
                 Rectangle {
                     id: providerPickerBtn
+                    Layout.maximumWidth: 160
+                    Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.rightMargin: Appearance.spacingXS
-                    Layout.maximumWidth: 140
-                    width: providerPickerContent.implicitWidth + Appearance.spacingL
-                    height: 24
-                    visible: !root.compactHeader
+                    implicitWidth: providerPickerContent.implicitWidth + Appearance.spacingL
+                    implicitHeight: 28
                     radius: Appearance.radiusXXS
                     color: providerPickerMouse.containsMouse ? Colors.primaryGhost : "transparent"
                     border.color: providerPickerMouse.containsMouse ? Colors.primaryRing : "transparent"
@@ -336,7 +364,7 @@ PanelWindow {
                         id: providerPickerContent
                         anchors.centerIn: parent
                         spacing: Appearance.spacingXS
-                        width: Math.min(implicitWidth, 130)
+                        width: Math.min(implicitWidth, 146)
 
                         SharedWidgets.SvgIcon {
                             source: Providers.providerIcon(AiService.activeProvider)
@@ -346,11 +374,11 @@ PanelWindow {
                         }
                         Text {
                             id: providerPickerText
-                            text: AiService.activeModel
+                            text: root.showHeaderModelSummary ? (Providers.providerLabel(AiService.activeProvider) + " · " + AiService.activeModel) : Providers.providerLabel(AiService.activeProvider)
                             color: providerPickerMouse.containsMouse ? Colors.primary : Colors.textDisabled
                             font.pixelSize: Appearance.fontSizeXS
                             elide: Text.ElideRight
-                            width: Math.min(implicitWidth, 130 - parent.spacing - Appearance.fontSizeXS)
+                            width: Math.min(implicitWidth, 146 - parent.spacing - Appearance.fontSizeXS)
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -365,213 +393,81 @@ PanelWindow {
 
                     Tooltip {
                         text: "Change AI provider and model"
+                        anchorItem: providerPickerBtn
+                        anchorWindow: root
                         shown: providerPickerMouse.containsMouse
                     }
                 }
 
-                // Copy All
-                Rectangle {
-                    id: copyAllButton
-                    width: 28
-                    height: 28
-                    radius: Appearance.radiusXS
-                    color: "transparent"
-                    visible: !root.narrowHeader && AiService.activeMessages.length > 0
-                    SharedWidgets.SvgIcon {
-                        anchors.centerIn: parent
-                        source: "copy.svg"
-                        color: Colors.textSecondary
-                        size: Appearance.fontSizeLarge
-                    }
-                    SharedWidgets.StateLayer {
-                        id: copyAllStateLayer
-                        hovered: copyAllHover.containsMouse
-                        pressed: copyAllHover.pressed
-                    }
-                    MouseArea {
-                        id: copyAllHover
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: mouse => {
-                            copyAllStateLayer.burst(mouse.x, mouse.y);
-                            var fullText = "";
-                            var msgs = AiService.activeMessages;
-                            for (var i = 0; i < msgs.length; i++) {
-                                fullText += (msgs[i].role === "user" ? "### User\n" : "### Assistant\n") + msgs[i].content + "\n\n";
-                            }
-                            Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", fullText]);
-                            ToastService.showNotice("Copied", "Full conversation copied to clipboard");
-                        }
-                    }
-                    Tooltip {
-                        text: "Copy full conversation"
-                        shown: copyAllHover.containsMouse
-                    }
-                }
+                RowLayout {
+                    Layout.alignment: Qt.AlignRight
+                    spacing: Appearance.spacingXS
+                    Layout.minimumWidth: implicitWidth
 
-                // Clear conversation
-                Rectangle {
-                    id: clearChatButton
-                    width: 28
-                    height: 28
-                    radius: Appearance.radiusXS
-                    color: "transparent"
-                    visible: !root.narrowHeader && (AiService.activeMessages.length > 0 || AiService.activeDraftText.length > 0)
-                    SharedWidgets.SvgIcon {
-                        anchors.centerIn: parent
-                        source: "delete.svg"
-                        color: Colors.textSecondary
-                        size: Appearance.fontSizeLarge
+                    SharedWidgets.IconButton {
+                        icon: "apps.svg"
+                        size: 28
+                        iconSize: Appearance.fontSizeMedium
+                        iconColor: root.historyPaneOpen ? Colors.primary : Colors.textSecondary
+                        normalColor: root.historyPaneOpen ? Colors.primaryGhost : "transparent"
+                        hoverColor: Colors.primaryGhost
+                        activeColor: Colors.primaryGhost
+                        tooltipText: root.historyPaneOpen ? "Hide history" : "Show history"
+                        tooltipShortcut: root.historyOverlayMode ? "Esc" : ""
+                        tooltipAnchorWindow: root
+                        onClicked: root.historyPaneOpen = !root.historyPaneOpen
                     }
-                    SharedWidgets.StateLayer {
-                        id: clearChatStateLayer
-                        hovered: clearChatHover.containsMouse
-                        pressed: clearChatHover.pressed
-                    }
-                    MouseArea {
-                        id: clearChatHover
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: mouse => {
-                            clearChatStateLayer.burst(mouse.x, mouse.y);
-                            root._clearConversationWithNotice(AiService.activeConversationId);
-                        }
-                    }
-                    Tooltip {
-                        text: "Clear current chat messages"
-                        shown: clearChatHover.containsMouse
-                    }
-                }
 
-                // History
-                Rectangle {
-                    id: historyButton
-                    width: 28
-                    height: 28
-                    radius: Appearance.radiusXS
-                    color: historyHover.containsMouse ? Colors.primaryGhost : "transparent"
-                    
-                    SharedWidgets.SvgIcon {
-                        anchors.centerIn: parent
-                        source: "clock.svg"
-                        color: historyHover.containsMouse ? Colors.primary : Colors.textSecondary
-                        size: Appearance.fontSizeLarge
+                    SharedWidgets.IconButton {
+                        icon: "add.svg"
+                        size: 28
+                        iconSize: Appearance.fontSizeMedium
+                        tooltipText: "New conversation"
+                        tooltipShortcut: "Ctrl+N"
+                        tooltipAnchorWindow: root
+                        onClicked: AiService.newConversation()
                     }
-                    SharedWidgets.StateLayer {
-                        id: historyStateLayer
-                        hovered: historyHover.containsMouse
-                        pressed: historyHover.pressed
-                    }
-                    MouseArea {
-                        id: historyHover
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: mouse => {
-                            historyStateLayer.burst(mouse.x, mouse.y);
-                            var model = [];
-                            var allConvs = AiService.conversations.slice().sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-                            for (var i = 0; i < allConvs.length; i++) {
-                                var conv = allConvs[i];
-                                model.push({
-                                    label: conv.title,
-                                    icon: Providers.providerIcon(conv.provider),
-                                    action: (function(convId) {
-                                        return function() {
-                                            AiService.setActiveConversation(convId);
-                                        };
-                                    })(conv.id)
-                                });
-                            }
-                            var pos = parent.mapToItem(root, 0, parent.height);
-                            historyMenu.model = model;
-                            historyMenu.popup(pos.x, pos.y + Appearance.spacingXS);
-                        }
-                    }
-                    Tooltip {
-                        text: "Chat History"
-                        shown: historyHover.containsMouse
-                    }
-                }
 
-                // New conversation
-                Rectangle {
-                    id: newChatButton
-                    width: 28
-                    height: 28
-                    radius: Appearance.radiusXS
-                    color: newChatHover.containsMouse ? Colors.primaryGhost : "transparent"
-                    border.color: newChatHover.containsMouse ? Colors.primaryRing : "transparent"
-                    border.width: 1
-
-                    SharedWidgets.SvgIcon {
-                        anchors.centerIn: parent
-                        source: "add.svg"
-                        color: newChatHover.containsMouse ? Colors.primary : Colors.textSecondary
-                        size: Appearance.fontSizeLarge
-                    }
-                    SharedWidgets.StateLayer {
-                        id: newChatStateLayer
-                        hovered: newChatHover.containsMouse
-                        pressed: newChatHover.pressed
-                    }
-                    MouseArea {
-                        id: newChatHover
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: mouse => {
-                            newChatStateLayer.burst(mouse.x, mouse.y);
-                            AiService.newConversation();
-                        }
-                    }
-                    Tooltip {
-                        text: "New Conversation (Ctrl+N)"
-                        shown: newChatHover.containsMouse
-                    }
-                }
-
-                // Close button
-                Rectangle {
-                    id: closeBtn
-                    width: 28
-                    height: 28
-                    radius: Appearance.radiusMedium
-                    color: "transparent"
-                    SharedWidgets.SvgIcon {
-                        anchors.centerIn: parent
-                        source: "dismiss.svg"
-                        color: Colors.textSecondary
-                        size: Appearance.fontSizeLarge
-                    }
-                    SharedWidgets.StateLayer {
-                        id: closeStateLayer
-                        hovered: closeHover.containsMouse
-                        pressed: closeHover.pressed
-                    }
-                    MouseArea {
-                        id: closeHover
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: mouse => {
-                            closeStateLayer.burst(mouse.x, mouse.y);
-                            root.closeRequested();
-                        }
-                    }
-                    Tooltip {
-                        text: "Close AI Chat"
-                        shown: closeHover.containsMouse
+                    SharedWidgets.IconButton {
+                        icon: "dismiss.svg"
+                        size: 28
+                        iconSize: Appearance.fontSizeMedium
+                        tooltipText: "Close AI Chat"
+                        tooltipAnchorWindow: root
+                        onClicked: root.closeRequested()
                     }
                 }
             }
 
-            // ---- Conversation tabs ----
-            AiConversationTabs {
+            Item {
+                id: bodyArea
                 Layout.fillWidth: true
-            }
+                Layout.fillHeight: true
+
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: Appearance.spacingM
+
+                    AiConversationSidebar {
+                        Layout.preferredWidth: root.historySidebarWidth
+                        Layout.fillHeight: true
+                        visible: root.historyPaneOpen && !root.historyOverlayMode
+                        anchorWindow: root
+                        overlayMode: false
+                        open: root.historyPaneOpen
+                        closeConversationFn: root._closeConversationWithUndo
+                        clearConversationFn: root._clearConversationWithNotice
+                        copyConversationFn: root._copyConversationToClipboard
+                        duplicateConversationFn: AiService.duplicateConversationPrompt
+                        closeOthersFn: root._closeOtherConversationsWithNotice
+                        onCloseRequested: root.historyPaneOpen = false
+                    }
+
+                    ColumnLayout {
+                        id: mainContent
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        spacing: Appearance.spacingM
 
             // ---- Command Confirmation ----
             Rectangle {
@@ -819,6 +715,7 @@ PanelWindow {
             AiMessageList {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                anchorWindow: root
                 renderBlocksFn: root._renderBlocks
                 renderMarkdownFn: root._renderMarkdown
                 onQuickStartSelected: text => {
@@ -995,6 +892,8 @@ PanelWindow {
 
                             Tooltip {
                                 text: "Attach Active Window Title"
+                                anchorItem: windowContextToggle
+                                anchorWindow: root
                                 shown: winCtxHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -1033,6 +932,8 @@ PanelWindow {
 
                             Tooltip {
                                 text: "Attach Latest Screen Crop (Double-click to capture new)"
+                                anchorItem: visualContextToggle
+                                anchorWindow: root
                                 shown: visualCtxHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -1075,6 +976,8 @@ PanelWindow {
 
                             Tooltip {
                                 text: "Attach Current Selection (Middle-click/Primary)"
+                                anchorItem: selectionContextToggle
+                                anchorWindow: root
                                 shown: selCtxHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -1106,6 +1009,8 @@ PanelWindow {
 
                             Tooltip {
                                 text: "Extract Text from Screen (OCR)"
+                                anchorItem: ocrToggle
+                                anchorWindow: root
                                 shown: ocrHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -1148,6 +1053,8 @@ PanelWindow {
 
                             Tooltip {
                                 text: "Attach System Stats (CPU/RAM)"
+                                anchorItem: systemContextToggle
+                                anchorWindow: root
                                 shown: sysCtxHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -1245,6 +1152,54 @@ PanelWindow {
                     font.pixelSize: Appearance.fontSizeXS
                     visible: !root.compactFooter
                 }
+                }
+            }
+        }
+
+                Rectangle {
+                    anchors.fill: parent
+                    visible: root.historyPaneOpen && root.historyOverlayMode
+                    color: Colors.withAlpha(Colors.background, 0.3)
+                    radius: Appearance.radiusLarge
+                    z: 1
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.historyPaneOpen = false
+                    }
+                }
+
+                AiConversationSidebar {
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    width: root.historySidebarWidth
+                    z: 2
+                    visible: root.historyOverlayMode || historyPaneOpen
+                    x: root.historyOverlayMode && root.historyPaneOpen ? 0 : -width - Appearance.spacingS
+                    opacity: root.historyOverlayMode && root.historyPaneOpen ? 1.0 : 0.0
+                    Behavior on x {
+                        NumberAnimation {
+                            duration: Appearance.durationNormal
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Appearance.durationFast
+                        }
+                    }
+
+                    anchorWindow: root
+                    overlayMode: true
+                    open: root.historyPaneOpen
+                    closeConversationFn: root._closeConversationWithUndo
+                    clearConversationFn: root._clearConversationWithNotice
+                    copyConversationFn: root._copyConversationToClipboard
+                    duplicateConversationFn: AiService.duplicateConversationPrompt
+                    closeOthersFn: root._closeOtherConversationsWithNotice
+                    onCloseRequested: root.historyPaneOpen = false
+                }
             }
         }
 
@@ -1337,9 +1292,6 @@ PanelWindow {
             }
         }
 
-        SharedWidgets.ContextMenu {
-            id: historyMenu
-        }
     }
 
 

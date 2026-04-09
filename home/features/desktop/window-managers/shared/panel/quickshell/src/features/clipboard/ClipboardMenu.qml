@@ -10,8 +10,8 @@ import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  popupMaxWidth: 360; compactThreshold: 350
-  implicitHeight: compactMode ? 520 : 480
+  popupMaxWidth: 420; compactThreshold: 390
+  implicitHeight: compactMode ? 600 : 560
   title: "Clipboard"
   contentSpacing: Appearance.spacingM
   focusOnOpen: true

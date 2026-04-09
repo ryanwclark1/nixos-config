@@ -14,6 +14,7 @@ Rectangle {
     // Function references injected by AiChat.qml
     required property var renderBlocksFn    // function(text) -> blocks array
     required property var renderMarkdownFn  // function(text) -> HTML string (for system messages)
+    property var anchorWindow: null
 
     signal quickStartSelected(string text)
 
@@ -26,7 +27,7 @@ Rectangle {
     // Inline Component wrappers so Loader.sourceComponent works with the
     // extracted block types registered via qmldir.
     Component { id: textBlockComp;       AiTextBlock {}       }
-    Component { id: codeBlockComp;       AiCodeBlock {}       }
+    Component { id: codeBlockComp;       AiCodeBlock { anchorWindow: root.anchorWindow } }
     Component { id: streamTextBlockComp; AiStreamTextBlock {} }
     Component { id: thinkingBlockComp;   AiThinkingBlock {}   }
 
@@ -253,6 +254,8 @@ Rectangle {
                                 }
                                 Tooltip {
                                     text: "Copy message"
+                                    anchorItem: parent
+                                    anchorWindow: root.anchorWindow
                                     shown: userCopyHover.containsMouse
                                     preferredSide: Qt.LeftEdge
                                 }
@@ -317,6 +320,8 @@ Rectangle {
                                     }
                                     Tooltip {
                                         text: "Regenerate response"
+                                        anchorItem: parent
+                                        anchorWindow: root.anchorWindow
                                         shown: regenHover.containsMouse
                                         preferredSide: Qt.BottomEdge
                                     }
@@ -344,6 +349,8 @@ Rectangle {
                                     }
                                     Tooltip {
                                         text: "Copy response"
+                                        anchorItem: parent
+                                        anchorWindow: root.anchorWindow
                                         shown: assistCopyHover.containsMouse
                                         preferredSide: Qt.BottomEdge
                                     }
@@ -483,6 +490,8 @@ Rectangle {
                         }
                         Tooltip {
                             text: "Retry"
+                            anchorItem: parent
+                            anchorWindow: root.anchorWindow
                             shown: retryHover.containsMouse
                             preferredSide: Qt.TopEdge
                         }

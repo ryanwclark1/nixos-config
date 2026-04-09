@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import "../services"
 
 Item {
@@ -9,8 +10,15 @@ Item {
     property bool shown: false
     property int preferredSide: Qt.BottomEdge
     property int showDelay: 500
+    property Item anchorItem: null
+    property var anchorWindow: null
 
-    anchors.fill: parent
+    readonly property Item effectiveAnchorItem: anchorItem ? anchorItem : parent
+    readonly property bool usePopup: !!anchorWindow && !!effectiveAnchorItem
+    readonly property bool useInlineTooltip: !usePopup
+    readonly property bool bubbleVisible: text !== "" && (usePopup ? popupTooltip.visible : root.visible)
+
+    anchors.fill: useInlineTooltip ? parent : undefined
     visible: false
     // Render above siblings
     z: 1000
@@ -18,7 +26,12 @@ Item {
     Timer {
         id: showTimer
         interval: root.showDelay
-        onTriggered: root.visible = true
+        onTriggered: {
+            if (root.usePopup)
+                popupTooltip.visible = true;
+            else
+                root.visible = true;
+        }
     }
 
     onShownChanged: {
@@ -27,11 +40,13 @@ Item {
         } else {
             showTimer.stop();
             root.visible = false;
+            popupTooltip.visible = false;
         }
     }
 
     Rectangle {
         id: bubble
+        visible: root.useInlineTooltip
 
         readonly property int _paddingH: Appearance.spacingM
         readonly property int _paddingV: Appearance.spacingXS
@@ -62,8 +77,8 @@ Item {
         border.color: Colors.border
         border.width: 1
 
-        opacity: root.visible ? 1 : 0
-        scale: root.visible ? 1 : 0.92
+        opacity: root.bubbleVisible ? 1 : 0
+        scale: root.bubbleVisible ? 1 : 0.92
 
         Behavior on opacity { NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutCubic } }
         Behavior on scale   { NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutCubic } }
@@ -98,6 +113,92 @@ Item {
                     color: Colors.textSecondary
                     font.pixelSize: Appearance.fontSizeXS
                     font.family: Appearance.fontMono
+                }
+            }
+        }
+    }
+
+    PopupWindow {
+        id: popupTooltip
+        anchor.window: root.anchorWindow
+        anchor.item: root.effectiveAnchorItem
+        anchor.edges: {
+            switch (root.preferredSide) {
+                case Qt.LeftEdge:
+                    return Edges.Left;
+                case Qt.RightEdge:
+                    return Edges.Right;
+                case Qt.TopEdge:
+                    return Edges.Top;
+                default:
+                    return Edges.Bottom;
+            }
+        }
+        anchor.gravity: anchor.edges
+        anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
+        anchor.margins {
+            top: root.preferredSide === Qt.TopEdge ? Appearance.spacingS : Appearance.spacingXS
+            bottom: root.preferredSide === Qt.BottomEdge ? Appearance.spacingS : Appearance.spacingXS
+            left: root.preferredSide === Qt.LeftEdge ? Appearance.spacingS : Appearance.spacingXS
+            right: root.preferredSide === Qt.RightEdge ? Appearance.spacingS : Appearance.spacingXS
+        }
+
+        visible: false
+        color: "transparent"
+        implicitWidth: popupBubble.implicitWidth
+        implicitHeight: popupBubble.implicitHeight
+
+        Rectangle {
+            id: popupBubble
+
+            readonly property int paddingH: Appearance.spacingM
+            readonly property int paddingV: Appearance.spacingXS
+
+            implicitWidth: Math.min(280, popupRow.implicitWidth + paddingH * 2)
+            implicitHeight: popupRow.implicitHeight + paddingV * 2
+            width: implicitWidth
+            height: implicitHeight
+            radius: Appearance.radiusXS
+            color: Colors.withAlpha(Colors.surface, 0.95)
+            border.color: Colors.border
+            border.width: 1
+
+            opacity: root.bubbleVisible ? 1 : 0
+            scale: root.bubbleVisible ? 1 : 0.92
+
+            Behavior on opacity { NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutCubic } }
+            Behavior on scale   { NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutCubic } }
+
+            Row {
+                id: popupRow
+                anchors.centerIn: parent
+                spacing: Appearance.spacingXS
+
+                Text {
+                    width: Math.min(200, implicitWidth)
+                    text: root.text
+                    color: Colors.text
+                    font.pixelSize: Appearance.fontSizeSmall
+                    wrapMode: Text.WordWrap
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Rectangle {
+                    visible: root.shortcut !== ""
+                    anchors.verticalCenter: parent.verticalCenter
+                    radius: Appearance.radiusMicro
+                    color: Colors.withAlpha(Colors.text, 0.12)
+                    width: popupShortcutLabel.implicitWidth + Appearance.spacingXS * 2
+                    height: popupShortcutLabel.implicitHeight + 4
+
+                    Text {
+                        id: popupShortcutLabel
+                        anchors.centerIn: parent
+                        text: root.shortcut
+                        color: Colors.textSecondary
+                        font.pixelSize: Appearance.fontSizeXS
+                        font.family: Appearance.fontMono
+                    }
                 }
             }
         }

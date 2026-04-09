@@ -10,6 +10,7 @@ import "../../../widgets" as SharedWidgets
 Rectangle {
     id: root
     readonly property var blockData: parent ? parent.modelData : null
+    property var anchorWindow: null
     width: parent ? parent.width : 0
     height: codeHeader.height + codeEdit.implicitHeight + Appearance.spacingS * 2
     radius: Appearance.radiusXS
@@ -60,6 +61,8 @@ Rectangle {
             }
             Tooltip {
                 text: "Copy code"
+                anchorItem: parent
+                anchorWindow: root.anchorWindow
                 shown: codeCopyHover.containsMouse
                 preferredSide: Qt.LeftEdge
             }

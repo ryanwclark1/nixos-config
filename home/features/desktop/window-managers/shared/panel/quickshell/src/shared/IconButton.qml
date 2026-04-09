@@ -16,6 +16,7 @@ Rectangle {
 
   property string tooltipText: ""
   property string tooltipShortcut: ""
+  property var tooltipAnchorWindow: null
 
   signal clicked(real x, real y)
 
@@ -65,6 +66,8 @@ Rectangle {
   Tooltip {
     text: root.tooltipText
     shortcut: root.tooltipShortcut
+    anchorItem: root
+    anchorWindow: root.tooltipAnchorWindow
     shown: hoverArea.containsMouse && root.tooltipText !== ""
   }
 }

@@ -9,14 +9,15 @@ const quickshellRoot = resolve(__dirname, "..", "..");
 const widgetPath = resolve(quickshellRoot, "src/bar/components/ModelUsageBarWidget.qml");
 const menuPath = resolve(quickshellRoot, "src/features/model-usage/ModelUsageMenu.qml");
 const servicePath = resolve(quickshellRoot, "src/services/ModelUsageService.qml");
+const surfaceServicePath = resolve(quickshellRoot, "src/services/SurfaceService.qml");
 
 describe("AI Model Usage popup contract", () => {
-  it("keeps the bar widget focused on a single effective provider icon", () => {
+  it("keeps the bar widget focused on a single generic launch icon", () => {
     const source = readFileSync(widgetPath, "utf8");
 
     expect(source).toContain("tooltipText: ModelUsageService.displayTooltip");
-    expect(source).toContain("source: ModelUsageService.providerIcon");
-    expect(source).toContain("color: ModelUsageService.providerColor");
+    expect(source).toContain('source: "board.svg"');
+    expect(source).toContain("color: Colors.text");
     expect(source).not.toContain('visible: ModelUsageService.claudeEnabled');
     expect(source).not.toContain('visible: ModelUsageService.codexEnabled');
     expect(source).not.toContain('visible: ModelUsageService.geminiEnabled');
@@ -43,5 +44,13 @@ describe("AI Model Usage popup contract", () => {
     expect(source).toContain("if (root.enabledProviders.indexOf(root.activeProvider) >= 0)");
     expect(source).toContain("return root.enabledProviders[0];");
     expect(source).toContain('readonly property string displayTooltip: root.hasEnabledProviders');
+  });
+
+  it("registers the model usage popup in the shared surface registry", () => {
+    const source = readFileSync(surfaceServicePath, "utf8");
+
+    expect(source).toContain("modelUsageMenu: {");
+    expect(source).toContain('legacyFlags: ["modelUsageMenuVisible"]');
+    expect(source).toContain('focusPolicy: "preserve-app-focus"');
   });
 });
