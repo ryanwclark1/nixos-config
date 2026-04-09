@@ -782,72 +782,84 @@ BasePopupMenu {
           value: String(ModelUsageService.geminiLast24hSessions)
         }
 
-        Repeater {
-          model: {
-            var usage = ModelUsageService.geminiLast24hTokensByModel;
-            var items = [];
-            for (var k in usage) {
-              if (usage.hasOwnProperty(k))
-                items.push({
-                  model: k,
-                  input: usage[k].input || 0,
-                  output: usage[k].output || 0,
-                  cached: usage[k].cached || 0,
-                  thoughts: usage[k].thoughts || 0,
-                  total: usage[k].total || 0
-                });
-            }
-            items.sort(function(a, b) { return b.total - a.total; });
-            return items;
-          }
+        SharedWidgets.CollapsibleSection {
+          Layout.fillWidth: true
+          expanded: false
+          title: "By Model"
+          subtitle: "Expand to inspect 24-hour token distribution by Gemini model."
 
-          Rectangle {
+          ColumnLayout {
             Layout.fillWidth: true
-            radius: Appearance.radiusMedium
-            color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
-            border.color: Colors.border
-            border.width: 1
-            implicitHeight: gemini24hModelCol.implicitHeight + Appearance.spacingM * 2
-            required property var modelData
+            spacing: Appearance.spacingS
 
-            ColumnLayout {
-              id: gemini24hModelCol
-              anchors.fill: parent
-              anchors.margins: Appearance.spacingM
-              spacing: Appearance.spacingXXS
-
-              Text {
-                text: modelData.model
-                color: Colors.text
-                font.pixelSize: Appearance.fontSizeSmall
-                font.weight: Font.DemiBold
+            Repeater {
+              model: {
+                var usage = ModelUsageService.geminiLast24hTokensByModel;
+                var items = [];
+                for (var k in usage) {
+                  if (usage.hasOwnProperty(k))
+                    items.push({
+                      model: k,
+                      input: usage[k].input || 0,
+                      output: usage[k].output || 0,
+                      cached: usage[k].cached || 0,
+                      thoughts: usage[k].thoughts || 0,
+                      total: usage[k].total || 0
+                    });
+                }
+                items.sort(function(a, b) { return b.total - a.total; });
+                return items;
               }
 
-              RowLayout {
+              Rectangle {
                 Layout.fillWidth: true
-                spacing: Appearance.spacingM
+                radius: Appearance.radiusMedium
+                color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
+                border.color: Colors.border
+                border.width: 1
+                implicitHeight: gemini24hModelCol.implicitHeight + Appearance.spacingM * 2
+                required property var modelData
 
-                Text {
-                  text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
-                  color: Colors.textSecondary
-                  font.pixelSize: Appearance.fontSizeXS
-                }
-                Text {
-                  text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
-                  color: Colors.textSecondary
-                  font.pixelSize: Appearance.fontSizeXS
-                }
-                Text {
-                  visible: modelData.cached > 0
-                  text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cached)
-                  color: Colors.textDisabled
-                  font.pixelSize: Appearance.fontSizeXS
-                }
-                Text {
-                  visible: modelData.thoughts > 0
-                  text: "Think: " + ModelUsageService.formatTokenCount(modelData.thoughts)
-                  color: Colors.textDisabled
-                  font.pixelSize: Appearance.fontSizeXS
+                ColumnLayout {
+                  id: gemini24hModelCol
+                  anchors.fill: parent
+                  anchors.margins: Appearance.spacingM
+                  spacing: Appearance.spacingXXS
+
+                  Text {
+                    text: modelData.model
+                    color: Colors.text
+                    font.pixelSize: Appearance.fontSizeSmall
+                    font.weight: Font.DemiBold
+                  }
+
+                  RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Appearance.spacingM
+
+                    Text {
+                      text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
+                      color: Colors.textSecondary
+                      font.pixelSize: Appearance.fontSizeXS
+                    }
+                    Text {
+                      text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
+                      color: Colors.textSecondary
+                      font.pixelSize: Appearance.fontSizeXS
+                    }
+                    Text {
+                      visible: modelData.cached > 0
+                      text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cached)
+                      color: Colors.textDisabled
+                      font.pixelSize: Appearance.fontSizeXS
+                    }
+                    Text {
+                      visible: modelData.thoughts > 0
+                      text: "Think: " + ModelUsageService.formatTokenCount(modelData.thoughts)
+                      color: Colors.textDisabled
+                      font.pixelSize: Appearance.fontSizeXS
+                    }
+                  }
                 }
               }
             }
@@ -869,115 +881,114 @@ BasePopupMenu {
         anchors.margins: Appearance.spacingL
         spacing: Appearance.spacingS
 
-        Text {
-          text: "All-Time Stats"
-          color: Colors.text
-          font.pixelSize: Appearance.fontSizeMedium
-          font.weight: Font.Bold
-        }
-
-        Text {
-          text: "Longer-running Claude usage totals with per-model distribution."
-          color: Colors.textSecondary
-          font.pixelSize: Appearance.fontSizeXS
+        SharedWidgets.CollapsibleSection {
           Layout.fillWidth: true
-          wrapMode: Text.WordWrap
-        }
+          expanded: false
+          title: "All-Time Stats"
+          subtitle: "Longer-running Claude usage totals with per-model distribution."
 
-        SharedWidgets.InfoRow {
-          label: "Total Prompts"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.claudeTotalPrompts)
-        }
-
-        SharedWidgets.InfoRow {
-          label: "Total Sessions"
-          value: String(ModelUsageService.claudeTotalSessions)
-        }
-
-        SharedWidgets.InfoRow {
-          label: "Total Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.claudeTotalTokens)
-          valueColor: root.providerAccent
-        }
-
-        SharedWidgets.InfoRow {
-          visible: ModelUsageService.claudeFirstSessionDate !== ""
-          label: "First Session"
-          value: ModelUsageService.claudeFirstSessionDate
-        }
-
-        // Per-model breakdown
-        Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
-
-        Text {
-          text: "Per-Model Breakdown"
-          color: Colors.textSecondary
-          font.pixelSize: Appearance.fontSizeSmall
-          font.weight: Font.DemiBold
-        }
-
-        Repeater {
-          model: {
-            var usage = ModelUsageService.claudeModelUsage;
-            var items = [];
-            for (var k in usage) {
-              if (usage.hasOwnProperty(k)) {
-                var u = usage[k];
-                items.push({
-                  model: k,
-                  input: u.inputTokens || 0,
-                  output: u.outputTokens || 0,
-                  cacheRead: u.cacheReadInputTokens || 0,
-                  cacheCreation: u.cacheCreationInputTokens || 0
-                });
-              }
-            }
-            items.sort(function(a, b) {
-              return (b.input + b.output + b.cacheRead) - (a.input + a.output + a.cacheRead);
-            });
-            return items;
-          }
-
-          Rectangle {
+          ColumnLayout {
             Layout.fillWidth: true
-            radius: Appearance.radiusMedium
-            color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
-            border.color: Colors.border
-            border.width: 1
-            implicitHeight: claudeModelCol.implicitHeight + Appearance.spacingM * 2
-            required property var modelData
+            spacing: Appearance.spacingS
 
-            ColumnLayout {
-              id: claudeModelCol
-              anchors.fill: parent
-              anchors.margins: Appearance.spacingM
-              spacing: Appearance.spacingXXS
+            SharedWidgets.InfoRow {
+              label: "Total Prompts"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.claudeTotalPrompts)
+            }
 
-              Text {
-                text: ModelUsageService.friendlyModelName(modelData.model)
-                color: Colors.text
-                font.pixelSize: Appearance.fontSizeSmall
-                font.weight: Font.DemiBold
-              }
+            SharedWidgets.InfoRow {
+              label: "Total Sessions"
+              value: String(ModelUsageService.claudeTotalSessions)
+            }
 
-              RowLayout {
+            SharedWidgets.InfoRow {
+              label: "Total Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.claudeTotalTokens)
+              valueColor: root.providerAccent
+            }
+
+            SharedWidgets.InfoRow {
+              visible: ModelUsageService.claudeFirstSessionDate !== ""
+              label: "First Session"
+              value: ModelUsageService.claudeFirstSessionDate
+            }
+
+            SharedWidgets.CollapsibleSection {
+              Layout.fillWidth: true
+              expanded: false
+              title: "Per-Model Breakdown"
+              subtitle: "Expand to compare cumulative Claude model totals."
+
+              ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Appearance.spacingM
-                Text {
-                  text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
-                  color: Colors.textSecondary
-                  font.pixelSize: Appearance.fontSizeXS
-                }
-                Text {
-                  text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
-                  color: Colors.textSecondary
-                  font.pixelSize: Appearance.fontSizeXS
-                }
-                Text {
-                  visible: modelData.cacheRead > 0
-                  text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cacheRead)
-                  color: Colors.textDisabled
-                  font.pixelSize: Appearance.fontSizeXS
+                spacing: Appearance.spacingS
+
+                Repeater {
+                  model: {
+                    var usage = ModelUsageService.claudeModelUsage;
+                    var items = [];
+                    for (var k in usage) {
+                      if (usage.hasOwnProperty(k)) {
+                        var u = usage[k];
+                        items.push({
+                          model: k,
+                          input: u.inputTokens || 0,
+                          output: u.outputTokens || 0,
+                          cacheRead: u.cacheReadInputTokens || 0,
+                          cacheCreation: u.cacheCreationInputTokens || 0
+                        });
+                      }
+                    }
+                    items.sort(function(a, b) {
+                      return (b.input + b.output + b.cacheRead) - (a.input + a.output + a.cacheRead);
+                    });
+                    return items;
+                  }
+
+                  Rectangle {
+                    Layout.fillWidth: true
+                    radius: Appearance.radiusMedium
+                    color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
+                    border.color: Colors.border
+                    border.width: 1
+                    implicitHeight: claudeModelCol.implicitHeight + Appearance.spacingM * 2
+                    required property var modelData
+
+                    ColumnLayout {
+                      id: claudeModelCol
+                      anchors.fill: parent
+                      anchors.margins: Appearance.spacingM
+                      spacing: Appearance.spacingXXS
+
+                      Text {
+                        text: ModelUsageService.friendlyModelName(modelData.model)
+                        color: Colors.text
+                        font.pixelSize: Appearance.fontSizeSmall
+                        font.weight: Font.DemiBold
+                      }
+
+                      RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Appearance.spacingM
+                        Text {
+                          text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
+                          color: Colors.textSecondary
+                          font.pixelSize: Appearance.fontSizeXS
+                        }
+                        Text {
+                          text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
+                          color: Colors.textSecondary
+                          font.pixelSize: Appearance.fontSizeXS
+                        }
+                        Text {
+                          visible: modelData.cacheRead > 0
+                          text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cacheRead)
+                          color: Colors.textDisabled
+                          font.pixelSize: Appearance.fontSizeXS
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -999,94 +1010,93 @@ BasePopupMenu {
         anchors.margins: Appearance.spacingL
         spacing: Appearance.spacingS
 
-        Text {
-          text: "All-Time Stats"
-          color: Colors.text
-          font.pixelSize: Appearance.fontSizeMedium
-          font.weight: Font.Bold
-        }
-
-        Text {
-          text: "Gemini totals and primary-model distribution across stored sessions."
-          color: Colors.textSecondary
-          font.pixelSize: Appearance.fontSizeXS
+        SharedWidgets.CollapsibleSection {
           Layout.fillWidth: true
-          wrapMode: Text.WordWrap
-        }
+          expanded: false
+          title: "All-Time Stats"
+          subtitle: "Gemini totals and primary-model distribution across stored sessions."
 
-        SharedWidgets.InfoRow {
-          label: "Total Sessions"
-          value: String(ModelUsageService.geminiTotalSessions)
-        }
-
-        SharedWidgets.InfoRow {
-          label: "Total Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTotalTokens)
-          valueColor: root.providerAccent
-        }
-
-        SharedWidgets.InfoRow {
-          label: "Primary Model"
-          value: ModelUsageService.geminiModel
-        }
-
-        // Per-model breakdown
-        Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
-
-        Text {
-          visible: Object.keys(ModelUsageService.geminiTokensByModel).length > 1
-          text: "Per-Model Breakdown"
-          color: Colors.textSecondary
-          font.pixelSize: Appearance.fontSizeSmall
-          font.weight: Font.DemiBold
-        }
-
-        Repeater {
-          model: {
-            var usage = ModelUsageService.geminiTokensByModel;
-            var items = [];
-            for (var k in usage) {
-              if (usage.hasOwnProperty(k))
-                items.push({ model: k, input: usage[k].input || 0, output: usage[k].output || 0 });
-            }
-            items.sort(function(a, b) { return (b.input + b.output) - (a.input + a.output); });
-            return items;
-          }
-
-          Rectangle {
+          ColumnLayout {
             Layout.fillWidth: true
-            radius: Appearance.radiusMedium
-            color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
-            border.color: Colors.border
-            border.width: 1
-            implicitHeight: geminiModelCol.implicitHeight + Appearance.spacingM * 2
-            required property var modelData
+            spacing: Appearance.spacingS
 
-            ColumnLayout {
-              id: geminiModelCol
-              anchors.fill: parent
-              anchors.margins: Appearance.spacingM
-              spacing: Appearance.spacingXXS
+            SharedWidgets.InfoRow {
+              label: "Total Sessions"
+              value: String(ModelUsageService.geminiTotalSessions)
+            }
 
-              Text {
-                text: modelData.model
-                color: Colors.text
-                font.pixelSize: Appearance.fontSizeSmall
-                font.weight: Font.DemiBold
-              }
+            SharedWidgets.InfoRow {
+              label: "Total Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTotalTokens)
+              valueColor: root.providerAccent
+            }
 
-              RowLayout {
+            SharedWidgets.InfoRow {
+              label: "Primary Model"
+              value: ModelUsageService.geminiModel
+            }
+
+            SharedWidgets.CollapsibleSection {
+              Layout.fillWidth: true
+              expanded: false
+              visible: Object.keys(ModelUsageService.geminiTokensByModel).length > 1
+              title: "Per-Model Breakdown"
+              subtitle: "Expand to compare cumulative Gemini model totals."
+
+              ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Appearance.spacingM
-                Text {
-                  text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
-                  color: Colors.textSecondary
-                  font.pixelSize: Appearance.fontSizeXS
-                }
-                Text {
-                  text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
-                  color: Colors.textSecondary
-                  font.pixelSize: Appearance.fontSizeXS
+                spacing: Appearance.spacingS
+
+                Repeater {
+                  model: {
+                    var usage = ModelUsageService.geminiTokensByModel;
+                    var items = [];
+                    for (var k in usage) {
+                      if (usage.hasOwnProperty(k))
+                        items.push({ model: k, input: usage[k].input || 0, output: usage[k].output || 0 });
+                    }
+                    items.sort(function(a, b) { return (b.input + b.output) - (a.input + a.output); });
+                    return items;
+                  }
+
+                  Rectangle {
+                    Layout.fillWidth: true
+                    radius: Appearance.radiusMedium
+                    color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
+                    border.color: Colors.border
+                    border.width: 1
+                    implicitHeight: geminiModelCol.implicitHeight + Appearance.spacingM * 2
+                    required property var modelData
+
+                    ColumnLayout {
+                      id: geminiModelCol
+                      anchors.fill: parent
+                      anchors.margins: Appearance.spacingM
+                      spacing: Appearance.spacingXXS
+
+                      Text {
+                        text: modelData.model
+                        color: Colors.text
+                        font.pixelSize: Appearance.fontSizeSmall
+                        font.weight: Font.DemiBold
+                      }
+
+                      RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Appearance.spacingM
+                        Text {
+                          text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
+                          color: Colors.textSecondary
+                          font.pixelSize: Appearance.fontSizeXS
+                        }
+                        Text {
+                          text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
+                          color: Colors.textSecondary
+                          font.pixelSize: Appearance.fontSizeXS
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1165,90 +1175,96 @@ BasePopupMenu {
           valueColor: root.providerAccent
         }
 
-        Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
-
-        Text {
+        SharedWidgets.CollapsibleSection {
+          Layout.fillWidth: true
+          expanded: false
           visible: (ModelUsageService.codexTotalUsage.totalTokens || 0) > 0
-          text: "Current Session Usage"
-          color: Colors.textSecondary
-          font.pixelSize: Appearance.fontSizeSmall
-          font.weight: Font.DemiBold
+          title: "Current Session Usage"
+          subtitle: "Expand to inspect the running Codex session totals."
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Appearance.spacingS
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexTotalUsage.inputTokens || 0) > 0
+              label: "Input Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.inputTokens || 0)
+            }
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexTotalUsage.cachedInputTokens || 0) > 0
+              label: "Cached Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.cachedInputTokens || 0)
+            }
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexTotalUsage.outputTokens || 0) > 0
+              label: "Output Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.outputTokens || 0)
+            }
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexTotalUsage.reasoningTokens || 0) > 0
+              label: "Reasoning Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.reasoningTokens || 0)
+            }
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexTotalUsage.totalTokens || 0) > 0
+              label: "Total Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.totalTokens || 0)
+              valueColor: root.providerAccent
+            }
+          }
         }
 
-        SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexTotalUsage.inputTokens || 0) > 0
-          label: "Input Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.inputTokens || 0)
-        }
-
-        SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexTotalUsage.cachedInputTokens || 0) > 0
-          label: "Cached Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.cachedInputTokens || 0)
-        }
-
-        SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexTotalUsage.outputTokens || 0) > 0
-          label: "Output Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.outputTokens || 0)
-        }
-
-        SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexTotalUsage.reasoningTokens || 0) > 0
-          label: "Reasoning Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.reasoningTokens || 0)
-        }
-
-        SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexTotalUsage.totalTokens || 0) > 0
-          label: "Total Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.totalTokens || 0)
-          valueColor: root.providerAccent
-        }
-
-        Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
-
-        Text {
+        SharedWidgets.CollapsibleSection {
+          Layout.fillWidth: true
+          expanded: false
           visible: !!(
             (ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available)
             || (ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available)
           )
-          text: "Usage Limits"
-          color: Colors.textSecondary
-          font.pixelSize: Appearance.fontSizeSmall
-          font.weight: Font.DemiBold
-        }
+          title: "Usage Limits"
+          subtitle: "Expand to inspect current Codex rate windows."
 
-        SharedWidgets.InfoRow {
-          visible: !!(ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available)
-          label: {
-            var primary = ModelUsageService.codexRateLimits.primary;
-            return primary ? ModelUsageService.usageWindowLabel(primary.windowMinutes || 0) : "";
-          }
-          value: {
-            var primary = ModelUsageService.codexRateLimits.primary;
-            if (!primary || primary.usedPercent === undefined || primary.usedPercent < 0)
-              return "";
-            return primary.usedPercent.toFixed(1) + "% · resets in "
-              + ModelUsageService.formatUnixResetTime(primary.resetsAt || 0);
-          }
-          valueColor: root.providerAccent
-        }
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Appearance.spacingS
 
-        SharedWidgets.InfoRow {
-          visible: !!(ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available)
-          label: {
-            var secondary = ModelUsageService.codexRateLimits.secondary;
-            return secondary ? ModelUsageService.usageWindowLabel(secondary.windowMinutes || 0) : "";
+            SharedWidgets.InfoRow {
+              visible: !!(ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available)
+              label: {
+                var primary = ModelUsageService.codexRateLimits.primary;
+                return primary ? ModelUsageService.usageWindowLabel(primary.windowMinutes || 0) : "";
+              }
+              value: {
+                var primary = ModelUsageService.codexRateLimits.primary;
+                if (!primary || primary.usedPercent === undefined || primary.usedPercent < 0)
+                  return "";
+                return primary.usedPercent.toFixed(1) + "% · resets in "
+                  + ModelUsageService.formatUnixResetTime(primary.resetsAt || 0);
+              }
+              valueColor: root.providerAccent
+            }
+
+            SharedWidgets.InfoRow {
+              visible: !!(ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available)
+              label: {
+                var secondary = ModelUsageService.codexRateLimits.secondary;
+                return secondary ? ModelUsageService.usageWindowLabel(secondary.windowMinutes || 0) : "";
+              }
+              value: {
+                var secondary = ModelUsageService.codexRateLimits.secondary;
+                if (!secondary || secondary.usedPercent === undefined || secondary.usedPercent < 0)
+                  return "";
+                return secondary.usedPercent.toFixed(1) + "% · resets in "
+                  + ModelUsageService.formatUnixResetTime(secondary.resetsAt || 0);
+              }
+              valueColor: root.providerAccent
+            }
           }
-          value: {
-            var secondary = ModelUsageService.codexRateLimits.secondary;
-            if (!secondary || secondary.usedPercent === undefined || secondary.usedPercent < 0)
-              return "";
-            return secondary.usedPercent.toFixed(1) + "% · resets in "
-              + ModelUsageService.formatUnixResetTime(secondary.resetsAt || 0);
-          }
-          valueColor: root.providerAccent
         }
       }
     }
