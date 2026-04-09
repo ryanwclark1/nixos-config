@@ -18,14 +18,32 @@ Item {
 
     Process {
         id: aboutInfoProc
-        command: ["sh", "-c", "uname -r; echo '---'; hostname; echo '---'; uptime -p"]
+        command: ["sh", "-c", "uname -r; echo '---'; hostname; echo '---'; cat /proc/uptime 2>/dev/null | cut -d' ' -f1"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
                 var parts = (this.text || "").split("---");
                 root.aboutKernel = parts[0] ? parts[0].trim() : "";
                 root.aboutHostname = parts[1] ? parts[1].trim() : "";
-                root.aboutUptime = parts[2] ? parts[2].trim() : "";
+                
+                var uptimeSecs = parseFloat(String(parts[2] || "").trim() || "0");
+                if (isNaN(uptimeSecs) || uptimeSecs === 0) {
+                    root.aboutUptime = "…";
+                } else {
+                    var d = Math.floor(uptimeSecs / 86400);
+                    var h = Math.floor((uptimeSecs % 86400) / 3600);
+                    var m = Math.floor((uptimeSecs % 3600) / 60);
+                    var dStr = d > 0 ? d + (d === 1 ? " day" : " days") : "";
+                    var hStr = h > 0 ? h + (h === 1 ? " hour" : " hours") : "";
+                    var mStr = m + (m === 1 ? " minute" : " minutes");
+                    
+                    var p = [];
+                    if (dStr) p.push(dStr);
+                    if (hStr) p.push(hStr);
+                    p.push(mStr);
+                    
+                    root.aboutUptime = "up " + p.join(", ");
+                }
             }
         }
     }
