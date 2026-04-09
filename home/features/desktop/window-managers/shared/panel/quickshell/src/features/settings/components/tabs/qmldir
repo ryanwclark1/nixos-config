@@ -15,7 +15,6 @@ HooksTab 1.0 HooksTab.qml
 HotkeysTab 1.0 HotkeysTab.qml
 HyprlandTab 1.0 HyprlandTab.qml
 LauncherTab 1.0 LauncherTab.qml
-LauncherSettingsHero 1.0 LauncherSettingsHero.qml
 LauncherGeneralSection 1.0 LauncherGeneralSection.qml
 LauncherSearchSection 1.0 LauncherSearchSection.qml
 LauncherWebSection 1.0 LauncherWebSection.qml

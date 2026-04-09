@@ -8,6 +8,7 @@ const __dirname = dirname(__filename);
 const quickshellRoot = resolve(__dirname, "..", "..");
 const launcherSectionPath = resolve(quickshellRoot, "src/features/settings/components/tabs/ShellLauncherSection.qml");
 const tabsQmldirPath = resolve(quickshellRoot, "src/features/settings/components/tabs/qmldir");
+const componentsQmldirPath = resolve(quickshellRoot, "src/features/settings/components/qmldir");
 
 describe("ShellLauncherSection contract", () => {
   it("keeps new custom-engine form state on the section root and passes it to LauncherWebSection", () => {
@@ -49,8 +50,9 @@ describe("ShellLauncherSection contract", () => {
 
   it("exports extracted launcher components through the tabs qmldir", () => {
     const qmldir = readFileSync(tabsQmldirPath, "utf8");
+    const componentsQmldir = readFileSync(componentsQmldirPath, "utf8");
 
-    expect(qmldir).toContain("LauncherSettingsHero 1.0 LauncherSettingsHero.qml");
+    expect(componentsQmldir).toContain("LauncherSettingsHero 1.0 LauncherSettingsHero.qml");
     expect(qmldir).toContain("LauncherGeneralSection 1.0 LauncherGeneralSection.qml");
     expect(qmldir).toContain("LauncherSearchSection 1.0 LauncherSearchSection.qml");
     expect(qmldir).toContain("LauncherWebSection 1.0 LauncherWebSection.qml");

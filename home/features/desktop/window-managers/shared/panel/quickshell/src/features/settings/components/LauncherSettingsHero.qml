@@ -1,35 +1,28 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../services"
-import "."
+import "../../../widgets" as SharedWidgets
 
 Rectangle {
     id: root
 
-    property var settingsRoot: null
-    property string tabId: ""
-    property bool compactMode: false
-
-    readonly property var tabMeta: SettingsRegistry.findTab(tabId)
-    readonly property string titleText: tabMeta ? String(tabMeta.label || "Launcher") : "Launcher"
-    readonly property string descriptionText: tabMeta && tabMeta.description ? String(tabMeta.description) : "Tune the launcher runtime, search flow, and mode surfaces from one place."
-    readonly property var launcherTabs: ["launcher", "launcher-search", "launcher-web", "launcher-modes", "launcher-runtime"].map(function(id) {
-        return SettingsRegistry.findTab(id);
-    }).filter(function(tab) {
-        return !!tab;
-    })
+    required property bool compactMode
+    required property string currentLauncherTabId
+    required property var launcherHeroMeta
+    required property var launcherHeroTabs
+    required property var selectTabFn
 
     Layout.fillWidth: true
     radius: Appearance.radiusLarge
     color: Colors.withAlpha(Colors.primary, 0.08)
     border.color: Colors.primaryMarked
     border.width: 1
-    implicitHeight: heroColumn.implicitHeight + (compactMode ? Appearance.spacingM * 2 : Appearance.spacingL * 2)
+    implicitHeight: launcherHeroColumn.implicitHeight + (root.compactMode ? Appearance.spacingM * 2 : Appearance.spacingL * 2)
 
     ColumnLayout {
-        id: heroColumn
+        id: launcherHeroColumn
         anchors.fill: parent
-        anchors.margins: compactMode ? Appearance.spacingM : Appearance.spacingL
+        anchors.margins: root.compactMode ? Appearance.spacingM : Appearance.spacingL
         spacing: Appearance.spacingM
 
         Text {
@@ -45,17 +38,37 @@ Rectangle {
             spacing: Appearance.spacingM
 
             Rectangle {
-                width: compactMode ? 42 : 48
+                width: root.compactMode ? 42 : 48
                 height: width
                 radius: Appearance.radiusLarge
                 color: Colors.primarySubtle
                 border.color: Colors.primaryRing
                 border.width: 1
 
-                SettingsMetricIcon {
+                Loader {
                     anchors.centerIn: parent
-                    icon: tabMeta ? String(tabMeta.icon || "settings.svg") : "settings.svg"
-                    iconSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
+                    sourceComponent: String(root.launcherHeroMeta.icon).endsWith(".svg") ? launcherSvgIcon : launcherNerdIcon
+                }
+
+                Component {
+                    id: launcherSvgIcon
+
+                    SharedWidgets.SvgIcon {
+                        source: root.launcherHeroMeta.icon
+                        color: Colors.primary
+                        size: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
+                    }
+                }
+
+                Component {
+                    id: launcherNerdIcon
+
+                    Text {
+                        text: root.launcherHeroMeta.icon
+                        color: Colors.primary
+                        font.family: Appearance.fontMono
+                        font.pixelSize: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeXXL
+                    }
                 }
             }
 
@@ -65,16 +78,16 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: root.titleText
+                    text: root.launcherHeroMeta.label
                     color: Colors.text
-                    font.pixelSize: compactMode ? Appearance.fontSizeXL : Appearance.fontSizeHuge
+                    font.pixelSize: root.compactMode ? Appearance.fontSizeXL : Appearance.fontSizeHuge
                     font.weight: Font.Black
                     wrapMode: Text.WordWrap
                 }
 
                 Text {
                     Layout.fillWidth: true
-                    text: root.descriptionText
+                    text: root.launcherHeroMeta.description
                     color: Colors.textSecondary
                     font.pixelSize: Appearance.fontSizeSmall
                     wrapMode: Text.WordWrap
@@ -84,55 +97,38 @@ Rectangle {
 
         Flow {
             Layout.fillWidth: true
+            width: parent.width
             spacing: Appearance.spacingS
 
             Repeater {
-                model: root.launcherTabs
+                model: root.launcherHeroTabs
 
-                delegate: Rectangle {
+                delegate: SharedWidgets.FilterChip {
                     required property var modelData
+                    label: modelData.label
+                    icon: modelData.icon
+                    selected: modelData.id === root.currentLauncherTabId
+                    onClicked: root.selectTabFn(modelData.id)
+                }
+            }
+        }
 
-                    readonly property bool selected: String(modelData.id || "") === root.tabId
+        Flow {
+            Layout.fillWidth: true
+            width: parent.width
+            spacing: Appearance.spacingS
 
-                    radius: Appearance.radiusPill
-                    color: selected ? Colors.primarySubtle : Colors.withAlpha(Colors.surface, 0.7)
-                    border.color: selected ? Colors.primaryRing : Colors.border
-                    border.width: 1
-                    implicitHeight: 30
-                    implicitWidth: tabChipRow.implicitWidth + 20
+            Repeater {
+                model: root.launcherHeroMeta.chips
 
-                    RowLayout {
-                        id: tabChipRow
-                        anchors.centerIn: parent
-                        spacing: Appearance.spacingXS
-
-                        SettingsMetricIcon {
-                            icon: modelData.icon || "settings.svg"
-                            iconColor: selected ? Colors.primary : Colors.textSecondary
-                            iconSize: Appearance.fontSizeXS
-                        }
-
-                        Text {
-                            text: modelData.label || ""
-                            color: selected ? Colors.primary : Colors.text
-                            font.pixelSize: Appearance.fontSizeXS
-                            font.weight: selected ? Font.Bold : Font.DemiBold
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (!root.settingsRoot)
-                                return;
-                            if (root.settingsRoot.clearSettingHighlight)
-                                root.settingsRoot.clearSettingHighlight();
-                            if (root.settingsRoot.setCurrentTab)
-                                root.settingsRoot.setCurrentTab(String(modelData.id || ""));
-                        }
-                    }
+                delegate: SharedWidgets.Chip {
+                    required property string modelData
+                    text: modelData
+                    icon: "info.svg"
+                    iconColor: Colors.primary
+                    textColor: Colors.text
+                    bgColor: Colors.withAlpha(Colors.primary, 0.1)
+                    borderColor: Colors.withAlpha(Colors.primary, 0.18)
                 }
             }
         }

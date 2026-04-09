@@ -7,8 +7,8 @@ import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  popupMinWidth: 340; popupMaxWidth: 500; compactThreshold: 460
-  implicitHeight: compactMode ? 900 : 840
+  popupMinWidth: 380; popupMaxWidth: 600; compactThreshold: 500
+  implicitHeight: compactMode ? 1000 : 940
   title: "Weather"
   subtitle: WeatherService.location || "Local"
 
@@ -36,7 +36,7 @@ BasePopupMenu {
     SharedWidgets.ThemedContainer {
       variant: "card"
       Layout.fillWidth: true
-      implicitHeight: root.compactMode ? 182 : 132
+      implicitHeight: root.compactMode ? 210 : 156
 
       GridLayout {
         anchors.fill: parent
@@ -48,7 +48,7 @@ BasePopupMenu {
         SharedWidgets.AnimatedWeatherIcon {
           condition: WeatherService.condition
           color: Colors.accent
-          size: root.compactMode ? 38 : 46
+          size: root.compactMode ? 44 : 54
           Layout.alignment: Qt.AlignVCenter
         }
 
@@ -59,7 +59,7 @@ BasePopupMenu {
           Text {
             text: WeatherService.temp || "--"
             color: Colors.text
-            font.pixelSize: root.compactMode ? 32 : 38
+            font.pixelSize: root.compactMode ? 36 : 44
             font.weight: Font.Bold
           }
 
@@ -225,7 +225,7 @@ BasePopupMenu {
 
     Flickable {
       Layout.fillWidth: true
-      implicitHeight: 78
+      implicitHeight: 92
       visible: WeatherService.hourlyForecast.length > 0
       contentWidth: hourlyRow.width
       clip: true
@@ -241,8 +241,8 @@ BasePopupMenu {
 
           delegate: SharedWidgets.ThemedContainer {
             variant: "card"
-            width: 62
-            height: 72
+            width: 74
+            height: 86
 
             ColumnLayout {
               anchors.fill: parent
@@ -260,7 +260,7 @@ BasePopupMenu {
               SharedWidgets.SvgIcon {
                 source: Appearance.weatherIcon(modelData.condition)
                 color: Colors.accent
-                size: Appearance.fontSizeLarge
+                size: Appearance.fontSizeXL
                 Layout.alignment: Qt.AlignHCenter
               }
 
@@ -292,7 +292,7 @@ BasePopupMenu {
       model: WeatherService.forecast || []
       delegate: Rectangle {
         Layout.fillWidth: true
-        implicitHeight: root.compactMode ? 78 : 60
+        implicitHeight: root.compactMode ? 90 : 72
         radius: Appearance.radiusMedium
         color: forecastHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
         border.color: forecastHover.containsMouse ? Colors.primary : Colors.border
@@ -324,7 +324,7 @@ BasePopupMenu {
             color: Colors.text
             font.pixelSize: Appearance.fontSizeMedium
             font.weight: Font.DemiBold
-            Layout.preferredWidth: root.compactMode ? -1 : 76
+            Layout.preferredWidth: root.compactMode ? -1 : 88
             Layout.fillWidth: root.compactMode
           }
 

@@ -10,7 +10,8 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMinWidth: 400; popupMaxWidth: 620; compactThreshold: 580
-  implicitHeight: compactMode ? 740 : 680
+  // Tall enough for clock + calendar + weather strip without Flickable scroll on default scaling.
+  implicitHeight: compactMode ? 860 : 800
   title: "Date & Time"
   subtitle: Qt.formatDateTime(clock.date, "dddd, MMMM d")
 

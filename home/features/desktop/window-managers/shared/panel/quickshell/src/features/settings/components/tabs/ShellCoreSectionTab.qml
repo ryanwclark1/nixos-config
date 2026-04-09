@@ -24,6 +24,8 @@ Item {
         anchors.fill: parent
         settingsRoot: root.settingsRoot
         tabId: root.tabId
+        compactMode: root.compactMode
+        tightSpacing: root.tightSpacing
 
         ShellSystemSection {
             visible: root.isSystemSection
