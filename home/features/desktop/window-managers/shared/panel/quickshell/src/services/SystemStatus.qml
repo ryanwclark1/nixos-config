@@ -503,8 +503,7 @@ QtObject {
               var cpuVal = Math.round(usage * 100);
               root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
               root.cpuPercent = Colors.clamp01(usage);
-              if (root.detailedDemandActive)
-                root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
+              root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
             }
           }
           statsPoll.lastTotal = currentTotal;
@@ -529,8 +528,7 @@ QtObject {
         // Reject misparsed fields (e.g. "71%" → 71, "65.0GB" → 65) from a shifted layout.
         if (!isNaN(ramVal) && ramVal >= 0 && ramVal <= 1.001) {
           root.ramPercent = Colors.clamp01(ramVal);
-          if (root.detailedDemandActive)
-            root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
+          root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
         }
 
         // Disk usage (line 6: e.g. "45%")

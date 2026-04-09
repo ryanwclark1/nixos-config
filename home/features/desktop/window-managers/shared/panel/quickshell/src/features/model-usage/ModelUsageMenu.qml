@@ -8,8 +8,8 @@ import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  popupMinWidth: 340; popupMaxWidth: 420; compactThreshold: 380
-  implicitHeight: Math.min(660, scrollContent.implicitHeight + 100)
+  popupMinWidth: 420; popupMaxWidth: 560; compactThreshold: 460
+  implicitHeight: Math.min(760, scrollContent.implicitHeight + 120)
   title: "AI Model Usage"
   subtitle: ModelUsageService.providerLabel
 
@@ -368,7 +368,6 @@ BasePopupMenu {
       variant: "card"
       Layout.fillWidth: true
       visible: (root.showClaude && ModelUsageService.claudeRecentDays.length > 0)
-              || (root.showGemini && ModelUsageService.geminiRecentDays.length > 0)
               || (root.showCodex && ModelUsageService.codexRecentDays.length > 0)
       implicitHeight: chartCol.implicitHeight + Appearance.spacingL * 2
 
@@ -386,8 +385,7 @@ BasePopupMenu {
         }
 
         Repeater {
-          model: root.showGemini ? ModelUsageService.geminiRecentDays
-                               : root.showCodex ? ModelUsageService.codexRecentDays
+          model: root.showCodex ? ModelUsageService.codexRecentDays
                                  : ModelUsageService.claudeRecentDays
 
           RowLayout {
@@ -397,8 +395,7 @@ BasePopupMenu {
             required property int index
 
             readonly property int maxCount: {
-              var days = root.showGemini ? ModelUsageService.geminiRecentDays
-                                       : root.showCodex ? ModelUsageService.codexRecentDays
+              var days = root.showCodex ? ModelUsageService.codexRecentDays
                                          : ModelUsageService.claudeRecentDays;
               var m = 1;
               for (var i = 0; i < days.length; i++)
@@ -451,6 +448,98 @@ BasePopupMenu {
               font.weight: Font.DemiBold
               Layout.preferredWidth: 36
               horizontalAlignment: Text.AlignRight
+            }
+          }
+        }
+      }
+    }
+
+    SharedWidgets.ThemedContainer {
+      variant: "card"
+      Layout.fillWidth: true
+      visible: root.showGemini && ModelUsageService.geminiReady
+      implicitHeight: gemini24hCol.implicitHeight + Appearance.spacingL * 2
+
+      ColumnLayout {
+        id: gemini24hCol
+        anchors.fill: parent
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
+
+        Text {
+          text: "Last 24 Hours"
+          color: Colors.text
+          font.pixelSize: Appearance.fontSizeMedium
+          font.weight: Font.Bold
+        }
+
+        SharedWidgets.InfoRow {
+          label: "Prompts"
+          value: String(ModelUsageService.geminiLast24hPrompts)
+        }
+
+        SharedWidgets.InfoRow {
+          label: "Sessions"
+          value: String(ModelUsageService.geminiLast24hSessions)
+        }
+
+        Repeater {
+          model: {
+            var usage = ModelUsageService.geminiLast24hTokensByModel;
+            var items = [];
+            for (var k in usage) {
+              if (usage.hasOwnProperty(k))
+                items.push({
+                  model: k,
+                  input: usage[k].input || 0,
+                  output: usage[k].output || 0,
+                  cached: usage[k].cached || 0,
+                  thoughts: usage[k].thoughts || 0,
+                  total: usage[k].total || 0
+                });
+            }
+            items.sort(function(a, b) { return b.total - a.total; });
+            return items;
+          }
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Appearance.spacingXXS
+            required property var modelData
+
+            Text {
+              text: modelData.model
+              color: Colors.text
+              font.pixelSize: Appearance.fontSizeSmall
+              font.weight: Font.DemiBold
+            }
+
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: Appearance.spacingM
+
+              Text {
+                text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
+                color: Colors.textSecondary
+                font.pixelSize: Appearance.fontSizeXS
+              }
+              Text {
+                text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
+                color: Colors.textSecondary
+                font.pixelSize: Appearance.fontSizeXS
+              }
+              Text {
+                visible: modelData.cached > 0
+                text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cached)
+                color: Colors.textDisabled
+                font.pixelSize: Appearance.fontSizeXS
+              }
+              Text {
+                visible: modelData.thoughts > 0
+                text: "Think: " + ModelUsageService.formatTokenCount(modelData.thoughts)
+                color: Colors.textDisabled
+                font.pixelSize: Appearance.fontSizeXS
+              }
             }
           }
         }
@@ -679,6 +768,12 @@ BasePopupMenu {
         }
 
         SharedWidgets.InfoRow {
+          visible: ModelUsageService.codexRateLimits.planType !== ""
+          label: "Plan"
+          value: ModelUsageService.codexRateLimits.planType
+        }
+
+        SharedWidgets.InfoRow {
           label: "Model"
           value: ModelUsageService.codexModel
         }
@@ -693,6 +788,97 @@ BasePopupMenu {
           visible: (ModelUsageService.codexLatestSession.outputTokens || 0) > 0
           label: "Last Session Output"
           value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.outputTokens || 0)
+        }
+
+        SharedWidgets.InfoRow {
+          visible: (ModelUsageService.codexLatestSession.cachedInputTokens || 0) > 0
+          label: "Last Session Cache"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.cachedInputTokens || 0)
+        }
+
+        SharedWidgets.InfoRow {
+          visible: (ModelUsageService.codexLatestSession.reasoningTokens || 0) > 0
+          label: "Last Session Reasoning"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.reasoningTokens || 0)
+        }
+
+        SharedWidgets.InfoRow {
+          visible: (ModelUsageService.codexLatestSession.totalTokens || 0) > 0
+          label: "Last Session Total"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.totalTokens || 0)
+          valueColor: root.providerAccent
+        }
+
+        Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
+
+        Text {
+          visible: (ModelUsageService.codexTotalUsage.totalTokens || 0) > 0
+          text: "Current Session Usage"
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeSmall
+          font.weight: Font.DemiBold
+        }
+
+        SharedWidgets.InfoRow {
+          visible: (ModelUsageService.codexTotalUsage.inputTokens || 0) > 0
+          label: "Input Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.inputTokens || 0)
+        }
+
+        SharedWidgets.InfoRow {
+          visible: (ModelUsageService.codexTotalUsage.cachedInputTokens || 0) > 0
+          label: "Cached Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.cachedInputTokens || 0)
+        }
+
+        SharedWidgets.InfoRow {
+          visible: (ModelUsageService.codexTotalUsage.outputTokens || 0) > 0
+          label: "Output Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.outputTokens || 0)
+        }
+
+        SharedWidgets.InfoRow {
+          visible: (ModelUsageService.codexTotalUsage.reasoningTokens || 0) > 0
+          label: "Reasoning Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.reasoningTokens || 0)
+        }
+
+        SharedWidgets.InfoRow {
+          visible: (ModelUsageService.codexTotalUsage.totalTokens || 0) > 0
+          label: "Total Tokens"
+          value: ModelUsageService.formatTokenCount(ModelUsageService.codexTotalUsage.totalTokens || 0)
+          valueColor: root.providerAccent
+        }
+
+        Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
+
+        Text {
+          visible: (ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available)
+                || (ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available)
+          text: "Usage Limits"
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeSmall
+          font.weight: Font.DemiBold
+        }
+
+        SharedWidgets.InfoRow {
+          visible: ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available
+          label: ModelUsageService.usageWindowLabel(ModelUsageService.codexRateLimits.primary.windowMinutes)
+          value: ModelUsageService.codexRateLimits.primary.usedPercent >= 0
+            ? ModelUsageService.codexRateLimits.primary.usedPercent.toFixed(1) + "% · resets in "
+              + ModelUsageService.formatUnixResetTime(ModelUsageService.codexRateLimits.primary.resetsAt)
+            : ""
+          valueColor: root.providerAccent
+        }
+
+        SharedWidgets.InfoRow {
+          visible: ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available
+          label: ModelUsageService.usageWindowLabel(ModelUsageService.codexRateLimits.secondary.windowMinutes)
+          value: ModelUsageService.codexRateLimits.secondary.usedPercent >= 0
+            ? ModelUsageService.codexRateLimits.secondary.usedPercent.toFixed(1) + "% · resets in "
+              + ModelUsageService.formatUnixResetTime(ModelUsageService.codexRateLimits.secondary.resetsAt)
+            : ""
+          valueColor: root.providerAccent
         }
       }
     }

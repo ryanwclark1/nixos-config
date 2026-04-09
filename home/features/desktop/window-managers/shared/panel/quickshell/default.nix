@@ -46,7 +46,7 @@ let
   '';
 
   modelUsageScript = pkgs.writeShellScriptBin "qs-model-usage" ''
-    PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.curl}/bin:${pkgs.bc}/bin:$PATH"
+    PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:${pkgs.curl}/bin:${pkgs.bc}/bin:$PATH"
     ${builtins.readFile ./scripts/model-usage.sh}
   '';
 

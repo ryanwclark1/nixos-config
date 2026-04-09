@@ -27,6 +27,8 @@ describe("AI Model Usage popup contract", () => {
     const source = readFileSync(menuPath, "utf8");
 
     expect(source).toContain('title: "AI Model Usage"');
+    expect(source).toContain("popupMinWidth: 420; popupMaxWidth: 560; compactThreshold: 460");
+    expect(source).toContain("implicitHeight: Math.min(760, scrollContent.implicitHeight + 120)");
     expect(source).toContain('tooltipText: "Refresh"');
     expect(source).toContain('tooltipText: "Settings"');
     expect(source).toContain('label: "Claude Code"');
@@ -44,6 +46,22 @@ describe("AI Model Usage popup contract", () => {
     expect(source).toContain("if (root.enabledProviders.indexOf(root.activeProvider) >= 0)");
     expect(source).toContain("return root.enabledProviders[0];");
     expect(source).toContain('readonly property string displayTooltip: root.hasEnabledProviders');
+  });
+
+  it("exposes Codex session limits and Gemini 24-hour usage in the popup service contract", () => {
+    const menuSource = readFileSync(menuPath, "utf8");
+    const serviceSource = readFileSync(servicePath, "utf8");
+
+    expect(menuSource).toContain('text: "Last 24 Hours"');
+    expect(menuSource).toContain('text: "Current Session Usage"');
+    expect(menuSource).toContain('text: "Usage Limits"');
+    expect(serviceSource).toContain("property var codexTotalUsage: ({})");
+    expect(serviceSource).toContain("property var codexRateLimits: ({})");
+    expect(serviceSource).toContain("property int geminiLast24hPrompts: 0");
+    expect(serviceSource).toContain("property int geminiLast24hSessions: 0");
+    expect(serviceSource).toContain("property var geminiLast24hTokensByModel: ({})");
+    expect(serviceSource).toContain("function formatUnixResetTime(epochSeconds)");
+    expect(serviceSource).toContain("function usageWindowLabel(windowMinutes)");
   });
 
   it("registers the model usage popup in the shared surface registry", () => {

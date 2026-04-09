@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# qs-model-usage — reads local Claude Code / Codex CLI data files, outputs JSON
-# Usage: qs-model-usage claude | qs-model-usage codex
+# qs-model-usage — reads local Claude Code / Codex CLI / Gemini CLI data files, outputs JSON
+# Usage: qs-model-usage claude | qs-model-usage codex | qs-model-usage gemini
 set -euo pipefail
 
 provider="${1:-claude}"
@@ -20,6 +20,24 @@ format_tokens() {
   else
     printf "%d" "$n"
   fi
+}
+
+find_latest_jsonl_matching() {
+  local root="$1"
+  local jq_expr="$2"
+  if [ ! -d "$root" ]; then
+    return 0
+  fi
+
+  find "$root" -type f -name '*.jsonl' -printf '%T@ %p\n' 2>/dev/null \
+    | sort -nr \
+    | head -n 40 \
+    | while read -r _ path; do
+        if jq -e "$jq_expr" "$path" >/dev/null 2>&1; then
+          printf '%s\n' "$path"
+          break
+        fi
+      done
 }
 
 # ── Claude ───────────────────────────────────────────────────────
@@ -162,20 +180,6 @@ elif [ "$provider" = "codex" ]; then
   today_count="${today_count:-0}"
   codex_recent=$(echo "$codex_data" | jq -c '.recent // []')
 
-  # Try to read latest session for token info
-  sessions_dir="$codex_dir/sessions"
-  latest_tokens='{"inputTokens":0,"outputTokens":0,"model":"unknown"}'
-  if [ -d "$sessions_dir" ]; then
-    latest_session=$(ls -t "$sessions_dir"/*.json 2>/dev/null | head -1 || true)
-    if [ -n "$latest_session" ] && [ -f "$latest_session" ]; then
-      latest_tokens=$(jq '{
-        inputTokens: (.usage.input_tokens // 0),
-        outputTokens: (.usage.output_tokens // 0),
-        model: (.model // "unknown")
-      }' "$latest_session" 2>/dev/null || echo '{"inputTokens":0,"outputTokens":0,"model":"unknown"}')
-    fi
-  fi
-
   # Read config for model info
   config_file="$codex_dir/config.toml"
   model="unknown"
@@ -183,16 +187,62 @@ elif [ "$provider" = "codex" ]; then
     model=$(grep -oP 'model\s*=\s*"\K[^"]+' "$config_file" 2>/dev/null || echo "unknown")
   fi
 
+  sessions_dir="$codex_dir/sessions"
+  latest_token_event='{}'
+  latest_token_file=""
+  if [ -d "$sessions_dir" ]; then
+    latest_token_file=$(find_latest_jsonl_matching "$sessions_dir" 'select(.type == "event_msg" and .payload.type == "token_count")' || true)
+    if [ -n "$latest_token_file" ] && [ -f "$latest_token_file" ]; then
+      latest_token_event=$(jq -sc '
+        map(select(.type == "event_msg" and .payload.type == "token_count")) | last | .payload // {}
+      ' "$latest_token_file" 2>/dev/null || echo '{}')
+    fi
+  fi
+
+  if [ -z "${latest_token_event:-}" ] || [ "$latest_token_event" = "null" ]; then
+    latest_token_event='{}'
+  fi
+
   jq -n --argjson todayCount "$today_count" \
-        --argjson tokens "$latest_tokens" \
+        --argjson tokenEvent "$latest_token_event" \
         --arg model "$model" \
         --argjson recentDays "$codex_recent" \
     '{
       todayPrompts: $todayCount,
       todaySessions: 0,
       model: $model,
-      latestSession: $tokens,
-      recentDays: $recentDays
+      recentDays: $recentDays,
+      latestSession: {
+        inputTokens: ($tokenEvent.info.last_token_usage.input_tokens // 0),
+        cachedInputTokens: ($tokenEvent.info.last_token_usage.cached_input_tokens // 0),
+        outputTokens: ($tokenEvent.info.last_token_usage.output_tokens // 0),
+        reasoningTokens: ($tokenEvent.info.last_token_usage.reasoning_output_tokens // 0),
+        totalTokens: ($tokenEvent.info.last_token_usage.total_tokens // 0),
+        model: $model
+      },
+      totalUsage: {
+        inputTokens: ($tokenEvent.info.total_token_usage.input_tokens // 0),
+        cachedInputTokens: ($tokenEvent.info.total_token_usage.cached_input_tokens // 0),
+        outputTokens: ($tokenEvent.info.total_token_usage.output_tokens // 0),
+        reasoningTokens: ($tokenEvent.info.total_token_usage.reasoning_output_tokens // 0),
+        totalTokens: ($tokenEvent.info.total_token_usage.total_tokens // 0)
+      },
+      rateLimits: {
+        primary: {
+          available: ($tokenEvent.rate_limits.primary != null),
+          usedPercent: ($tokenEvent.rate_limits.primary.used_percent // -1),
+          windowMinutes: ($tokenEvent.rate_limits.primary.window_minutes // 0),
+          resetsAt: ($tokenEvent.rate_limits.primary.resets_at // 0)
+        },
+        secondary: {
+          available: ($tokenEvent.rate_limits.secondary != null),
+          usedPercent: ($tokenEvent.rate_limits.secondary.used_percent // -1),
+          windowMinutes: ($tokenEvent.rate_limits.secondary.window_minutes // 0),
+          resetsAt: ($tokenEvent.rate_limits.secondary.resets_at // 0)
+        },
+        credits: ($tokenEvent.rate_limits.credits // null),
+        planType: ($tokenEvent.rate_limits.plan_type // "")
+      }
     }'
 # ── Gemini ───────────────────────────────────────────────────────
 elif [ "$provider" = "gemini" ]; then
@@ -203,8 +253,8 @@ elif [ "$provider" = "gemini" ]; then
     exit 0
   fi
 
-  # Growth guard: cap at 200 session files (well over 7 days of data)
-  session_files=$(find "$gemini_dir" -name 'session-*.json' -type f 2>/dev/null | tail -200)
+  # Growth guard: cap at 300 chat session files.
+  session_files=$(find "$gemini_dir" -path '*/chats/session-*.json' -type f 2>/dev/null | tail -300)
   if [ -z "$session_files" ]; then
     echo "$json_fallback"
     exit 0
@@ -212,6 +262,7 @@ elif [ "$provider" = "gemini" ]; then
 
   # Date threshold for 7-day window (ISO prefix comparison)
   seven_days_ago=$(date -d "$today -6 days" +%Y-%m-%d)
+  last_24h_iso=$(date -u -d '24 hours ago' +"%Y-%m-%dT%H:%M:%SZ")
 
   # Extract lightweight metadata per file (skip content to avoid malformed Unicode)
   # Each file → one JSON line with date, user count, gemini tokens, model
@@ -219,6 +270,7 @@ elif [ "$provider" = "gemini" ]; then
   jq_filter='select(.startTime != null and (.startTime[:10] >= $ws)) |
     {
       date: .startTime[:10],
+      startTime: .startTime,
       userCount: [.messages[]? | select(.type == "user")] | length,
       geminiMsgs: [.messages[]? | select(.type == "gemini" and .tokens != null) |
         { model: (.model // "unknown"), input: (.tokens.input // 0),
@@ -232,7 +284,7 @@ elif [ "$provider" = "gemini" ]; then
     exit 0
   fi
 
-  echo "$extracted" | jq -s --arg today "$today" '
+  echo "$extracted" | jq -s --arg today "$today" --arg day24 "$last_24h_iso" '
     # Today sessions
     [.[] | select(.date == $today)] as $todaySessions |
     ([$todaySessions[].userCount] | add // 0) as $todayPrompts |
@@ -243,6 +295,20 @@ elif [ "$provider" = "gemini" ]; then
       cached: ([$todayGmMsgs[].cached] | add // 0),
       thoughts: ([$todayGmMsgs[].thoughts] | add // 0)
     } as $todayTokens |
+
+    # Last 24 hours
+    [.[] | select(.startTime >= $day24)] as $last24hSessions |
+    [$last24hSessions[].geminiMsgs[]?] as $last24hMsgs |
+    ($last24hMsgs | group_by(.model) | map({
+      key: .[0].model,
+      value: {
+        input: ([.[].input] | add // 0),
+        output: ([.[].output] | add // 0),
+        cached: ([.[].cached] | add // 0),
+        thoughts: ([.[].thoughts] | add // 0),
+        total: ([.[].total] | add // 0)
+      }
+    }) | from_entries) as $last24hTokensByModel |
 
     # Recent days
     (group_by(.date) | map({
@@ -267,6 +333,9 @@ elif [ "$provider" = "gemini" ]; then
       todayPrompts: $todayPrompts,
       todaySessions: ($todaySessions | length),
       todayTokens: $todayTokens,
+      last24hPrompts: ([$last24hSessions[].userCount] | add // 0),
+      last24hSessions: ($last24hSessions | length),
+      last24hTokensByModel: $last24hTokensByModel,
       totalSessions: length,
       totalTokens: $totalTokens,
       model: $model,

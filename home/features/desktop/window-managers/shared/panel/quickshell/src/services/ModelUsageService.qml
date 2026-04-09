@@ -43,6 +43,8 @@ QtObject {
   property int codexTodaySessions: 0
   property string codexModel: "unknown"
   property var codexLatestSession: ({})
+  property var codexTotalUsage: ({})
+  property var codexRateLimits: ({})
   property var codexRecentDays: []
 
   // ── Gemini state ─────────────────────────────────
@@ -55,6 +57,9 @@ QtObject {
   property string geminiModel: "unknown"
   property var geminiRecentDays: []
   property var geminiTokensByModel: ({})
+  property int geminiLast24hPrompts: 0
+  property int geminiLast24hSessions: 0
+  property var geminiLast24hTokensByModel: ({})
 
   // ── Provider selection ─────────────────────────────
   readonly property var enabledProviders: {
@@ -146,6 +151,28 @@ QtObject {
     return mins + "m";
   }
 
+  function formatUnixResetTime(epochSeconds) {
+    if (!epochSeconds || epochSeconds <= 0)
+      return "";
+    return root.formatResetTime(new Date(epochSeconds * 1000).toISOString());
+  }
+
+  function usageWindowLabel(windowMinutes) {
+    if (!windowMinutes || windowMinutes <= 0)
+      return "";
+    if (windowMinutes === 300)
+      return "5h";
+    if (windowMinutes === 1440)
+      return "24h";
+    if (windowMinutes === 10080)
+      return "Weekly";
+    if (windowMinutes % 1440 === 0)
+      return String(windowMinutes / 1440) + "d";
+    if (windowMinutes % 60 === 0)
+      return String(windowMinutes / 60) + "h";
+    return String(windowMinutes) + "m";
+  }
+
   function _resetClaudeUsage() {
     root.claudeReady = false;
     root.claudeTodayPrompts = 0;
@@ -166,6 +193,8 @@ QtObject {
     root.codexTodaySessions = 0;
     root.codexModel = "unknown";
     root.codexLatestSession = ({});
+    root.codexTotalUsage = ({});
+    root.codexRateLimits = ({});
     root.codexRecentDays = [];
   }
 
@@ -179,6 +208,9 @@ QtObject {
     root.geminiModel = "unknown";
     root.geminiRecentDays = [];
     root.geminiTokensByModel = ({});
+    root.geminiLast24hPrompts = 0;
+    root.geminiLast24hSessions = 0;
+    root.geminiLast24hTokensByModel = ({});
   }
 
   function refresh() {
@@ -299,6 +331,8 @@ QtObject {
           root.codexTodaySessions = data.todaySessions || 0;
           root.codexModel = data.model || "unknown";
           root.codexLatestSession = data.latestSession || {};
+          root.codexTotalUsage = data.totalUsage || {};
+          root.codexRateLimits = data.rateLimits || {};
           root.codexRecentDays = data.recentDays || [];
           root.codexReady = true;
         } catch (e) {
@@ -333,6 +367,9 @@ QtObject {
           root.geminiModel = data.model || "unknown";
           root.geminiRecentDays = data.recentDays || [];
           root.geminiTokensByModel = data.tokensByModel || {};
+          root.geminiLast24hPrompts = data.last24hPrompts || 0;
+          root.geminiLast24hSessions = data.last24hSessions || 0;
+          root.geminiLast24hTokensByModel = data.last24hTokensByModel || {};
           root.geminiReady = true;
         } catch (e) {
           Logger.w("ModelUsageService", "gemini parse error:", e);
