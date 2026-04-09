@@ -17,6 +17,8 @@ PomodoroBarWidget 1.0 PomodoroBarWidget.qml
 TodoBarWidget 1.0 TodoBarWidget.qml
 GameModeBarWidget 1.0 GameModeBarWidget.qml
 NightLightBarWidget 1.0 NightLightBarWidget.qml
+UnifiNetworkBarWidget 1.0 UnifiNetworkBarWidget.qml
+UnifiProtectBarWidget 1.0 UnifiProtectBarWidget.qml
 BarSurfacePill 1.0 BarSurfacePill.qml
 PanelBarInteractionLayer 1.0 PanelBarInteractionLayer.qml
 PanelShadowLayer 1.0 PanelShadowLayer.qml

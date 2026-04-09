@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
 import "../../../../services/IconHelpers.js" as IconHelpers
+import "../../../../services/BarWidgetInstancePolicy.js" as BarWidgetInstancePolicy
 import "../../../../widgets" as SharedWidgets
 import ".."
 import "BarWidgetPickerPolicy.js" as BarWidgetPickerPolicy
@@ -164,6 +165,7 @@ Item {
     function availableWidgetsForPicker() {
         var _revision = pickerCatalogRevision;
         var items = BarWidgetRegistry.search(widgetSearchQuery, "");
+        items = BarWidgetInstancePolicy.annotatePickerItems(items, currentSectionWidgets);
         if (!addSection)
             return items;
         return BarWidgetPickerPolicy.sortPickerItems(items, addSection, selectedBarVertical);
@@ -209,6 +211,10 @@ Item {
     function addWidget(widgetType) {
         if (!selectedBar)
             return;
+        if (!BarWidgetInstancePolicy.canAddToBar(currentSectionWidgets, widgetType)) {
+            ToastService.showNotice("Widget already on bar", "Remove the existing " + BarWidgetRegistry.displayName(widgetType) + " widget before adding another.");
+            return;
+        }
         var settings = BarWidgetRegistry.defaultSettings(widgetType);
         Config.addBarWidget(selectedBar.id, addSection, widgetType, settings);
         widgetPickerOpen = false;

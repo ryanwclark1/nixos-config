@@ -5,6 +5,16 @@ function _number(value, fallbackValue) {
     return isFinite(parsed) ? parsed : fallbackValue;
 }
 
+function normalizeScreenList(screens) {
+    if (!screens)
+        return [];
+    if (Array.isArray(screens))
+        return screens;
+    if (Array.isArray(screens.values))
+        return screens.values;
+    return screens;
+}
+
 function parseJsonOutput(rawText, fallbackValue) {
     var text = String(rawText || "").trim();
     if (text === "")
@@ -96,7 +106,7 @@ function normalizeMonitorList(rawMonitors) {
 }
 
 function fallbackMonitorsFromScreens(screens) {
-    var source = Array.isArray(screens) ? screens : [];
+    var source = normalizeScreenList(screens);
     var result = [];
     var xCursor = 0;
 

@@ -239,7 +239,7 @@ BasePopupMenu {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                   fullWeatherState.burst(mouse.x, mouse.y);
-                  Quickshell.execDetached(SU.ipcCall("Shell", "toggleSurface", "weatherMenu"));
+                  Quickshell.execDetached(SU.shellSurfaceCall("toggleSurface", "weatherMenu"));
                 }
               }
             }

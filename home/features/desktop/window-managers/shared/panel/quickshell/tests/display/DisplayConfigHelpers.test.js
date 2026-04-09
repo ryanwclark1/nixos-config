@@ -10,6 +10,7 @@ import {
   parseJsonOutput,
   normalizeMonitorList,
   fallbackMonitorsFromScreens,
+  normalizeScreenList,
 } from "../../src/features/display/DisplayConfigHelpers.js";
 
 const mkMonitor = (overrides = {}) => ({
@@ -143,6 +144,29 @@ describe("fallbackMonitorsFromScreens", () => {
       y: 0,
     });
     expect(result[1].x).toBe(2256);
+  });
+
+  it("accepts model-like screen collections with a values array", () => {
+    const result = fallbackMonitorsFromScreens({
+      values: [
+        { name: "DP-1", width: 1920, height: 1080, devicePixelRatio: 1 },
+      ],
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("DP-1");
+  });
+});
+
+describe("normalizeScreenList", () => {
+  it("returns arrays unchanged", () => {
+    const screens = [{ name: "DP-1" }];
+    expect(normalizeScreenList(screens)).toBe(screens);
+  });
+
+  it("unwraps .values arrays", () => {
+    const screens = { values: [{ name: "DP-1" }] };
+    expect(normalizeScreenList(screens)).toEqual([{ name: "DP-1" }]);
   });
 });
 

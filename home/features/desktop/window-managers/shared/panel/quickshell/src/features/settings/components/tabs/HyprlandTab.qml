@@ -31,7 +31,7 @@ Item {
                 onClicked: {
                     if (root.settingsRoot)
                         root.settingsRoot.close();
-                    Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "displayConfig"));
+                    Quickshell.execDetached(SU.shellSurfaceCall("openSurface", "displayConfig"));
                 }
             }
         }

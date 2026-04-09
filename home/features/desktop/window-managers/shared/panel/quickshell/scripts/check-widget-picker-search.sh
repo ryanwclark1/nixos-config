@@ -148,6 +148,19 @@ Item {
       console.log("BAR_HAS_PRINTER", hasValue(barAllTypes, "printer"));
       console.log("BAR_HAS_SYSTEM_MONITOR", hasValue(barAllTypes, "systemMonitor"));
       console.log("BAR_HAS_PLUGIN_TEST", hasValue(barAllTypes, "plugin:test-bar"));
+      var barAnnotated = barPicker.availableWidgetsForPicker();
+      var logoMeta = null;
+      var separatorMeta = null;
+      for (var i = 0; i < barAnnotated.length; ++i) {
+        if (String(barAnnotated[i].widgetType || "") === "logo")
+          logoMeta = barAnnotated[i];
+        if (String(barAnnotated[i].widgetType || "") === "separator")
+          separatorMeta = barAnnotated[i];
+      }
+      console.log("BAR_LOGO_CAN_ADD", !!(logoMeta && logoMeta.canAdd));
+      console.log("BAR_LOGO_INSTANCE_COUNT", logoMeta ? Number(logoMeta.instanceCount || 0) : -1);
+      console.log("BAR_LOGO_SECTIONS", logoMeta ? (logoMeta.existingSections || []).join(",") : "");
+      console.log("BAR_SEPARATOR_CAN_ADD", !!(separatorMeta && separatorMeta.canAdd));
       console.log("PLUGIN_SCAN_RUNNING", pluginScanRunning);
       console.log("PLUGIN_COUNT", (PluginService.plugins || []).length);
       console.log("PLUGIN_IDS", pluginIds(PluginService.plugins || []).join(","));
@@ -218,6 +231,26 @@ grep -q 'BAR_HAS_SYSTEM_MONITOR true' <<<"${output}" || {
 
 grep -q 'BAR_HAS_PLUGIN_TEST true' <<<"${output}" || {
   printf '[FAIL] Bar widget picker did not expose enabled plugin widgets.\n' >&2
+  exit 1
+}
+
+grep -q 'BAR_LOGO_CAN_ADD false' <<<"${output}" || {
+  printf '[FAIL] Bar widget picker did not block re-adding a singleton widget already present on the bar.\n' >&2
+  exit 1
+}
+
+grep -q 'BAR_LOGO_INSTANCE_COUNT 1' <<<"${output}" || {
+  printf '[FAIL] Bar widget picker did not report the existing singleton widget count.\n' >&2
+  exit 1
+}
+
+grep -q 'BAR_LOGO_SECTIONS left' <<<"${output}" || {
+  printf '[FAIL] Bar widget picker did not report the section containing the existing singleton widget.\n' >&2
+  exit 1
+}
+
+grep -q 'BAR_SEPARATOR_CAN_ADD true' <<<"${output}" || {
+  printf '[FAIL] Bar widget picker did not keep repeatable widgets addable.\n' >&2
   exit 1
 }
 

@@ -20,6 +20,25 @@ Rectangle {
     signal searchQueryEdited(string value)
     signal widgetAdded(string widgetType)
 
+    function occupancySectionsLabel(sections) {
+        var items = Array.isArray(sections) ? sections : [];
+        if (items.length === 0)
+            return "";
+        var labels = [];
+        for (var i = 0; i < items.length; ++i)
+            labels.push(root.sectionLabelFn(String(items[i] || "")));
+        return "In " + labels.join(" + ");
+    }
+
+    function occupancyCountLabel(modelData) {
+        var count = Number(modelData && modelData.instanceCount !== undefined ? modelData.instanceCount : 0);
+        if (!isFinite(count) || count <= 0)
+            return "";
+        if (count === 1)
+            return "1 on bar";
+        return String(Math.round(count)) + " on bar";
+    }
+
     anchors.fill: parent
     visible: root.open
     color: Qt.rgba(0, 0, 0, 0.45)
@@ -134,6 +153,44 @@ Rectangle {
                                     }
 
                                     Rectangle {
+                                        visible: Number(modelData.instanceCount || 0) > 0
+                                        radius: Appearance.radiusSmall
+                                        color: modelData.canAdd === false ? Colors.withAlpha(Colors.warning, 0.14) : Colors.cardSurface
+                                        border.color: modelData.canAdd === false ? Colors.warning : Colors.border
+                                        border.width: 1
+                                        implicitWidth: occupancyCountLabelText.implicitWidth + Appearance.spacingM
+                                        implicitHeight: occupancyCountLabelText.implicitHeight + Appearance.spacingXS
+
+                                        Text {
+                                            id: occupancyCountLabelText
+                                            anchors.centerIn: parent
+                                            text: root.occupancyCountLabel(modelData)
+                                            color: modelData.canAdd === false ? Colors.warning : Colors.textSecondary
+                                            font.pixelSize: Appearance.fontSizeXS
+                                            font.weight: Font.Medium
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        visible: Number(modelData.instanceCount || 0) > 0
+                                        radius: Appearance.radiusSmall
+                                        color: Colors.cardSurface
+                                        border.color: Colors.border
+                                        border.width: 1
+                                        implicitWidth: occupancySectionsLabelText.implicitWidth + Appearance.spacingM
+                                        implicitHeight: occupancySectionsLabelText.implicitHeight + Appearance.spacingXS
+
+                                        Text {
+                                            id: occupancySectionsLabelText
+                                            anchors.centerIn: parent
+                                            text: root.occupancySectionsLabel(modelData.existingSections)
+                                            color: Colors.textSecondary
+                                            font.pixelSize: Appearance.fontSizeXS
+                                            font.weight: Font.Medium
+                                        }
+                                    }
+
+                                    Rectangle {
                                         visible: root.verticalBar
                                         radius: Appearance.radiusSmall
                                         color: Colors.cardSurface
@@ -164,9 +221,10 @@ Rectangle {
 
                             SettingsActionButton {
                                 compact: true
-                                emphasized: true
-                                iconName: "add.svg"
-                                label: "Add"
+                                emphasized: modelData.canAdd !== false
+                                enabled: modelData.canAdd !== false
+                                iconName: modelData.canAdd === false ? "dismiss.svg" : "add.svg"
+                                label: modelData.canAdd === false ? "Added" : "Add"
                                 onClicked: root.widgetAdded(modelData.widgetType)
                             }
                         }
@@ -174,7 +232,7 @@ Rectangle {
 
                     Text {
                         width: parent.width
-                        visible: root.availableWidgets.length === 0
+                        visible: !Array.isArray(root.availableWidgets) || root.availableWidgets.length === 0
                         text: "No widgets match \"" + root.searchQuery + "\"."
                         color: Colors.textSecondary
                         font.pixelSize: Appearance.fontSizeSmall

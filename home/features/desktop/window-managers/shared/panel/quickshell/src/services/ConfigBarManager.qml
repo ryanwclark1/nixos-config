@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "BarPresetPolicy.js" as BarPresetPolicy
+import "BarWidgetInstancePolicy.js" as BarWidgetInstancePolicy
 
 // Internal helper for Config — manages bar configurations, widget instances,
 // screen assignment, conflict detection, and legacy bar migration.
@@ -595,6 +596,8 @@ QtObject {
   function addBarWidget(barId, section, widgetType, initialSettings) {
     var barConfig = barById(barId);
     if (!barConfig || ["left", "center", "right"].indexOf(section) === -1) return null;
+    if (!BarWidgetInstancePolicy.canAddToBar(barConfig.sectionWidgets, widgetType))
+      return null;
     var widgets = barSectionWidgets(barConfig, section).slice();
     var created = createWidgetInstance(widgetType, initialSettings);
     widgets.push(created);

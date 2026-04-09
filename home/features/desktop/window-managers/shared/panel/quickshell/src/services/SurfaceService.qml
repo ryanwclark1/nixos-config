@@ -82,6 +82,16 @@ QtObject {
                 focusPolicy: "preserve-app-focus",
                 legacyFlags: ["dockerMenuVisible"]
             },
+            unifiNetworkMenu: {
+                kind: "popup",
+                focusPolicy: "preserve-app-focus",
+                legacyFlags: ["unifiNetworkMenuVisible"]
+            },
+            unifiProtectMenu: {
+                kind: "popup",
+                focusPolicy: "preserve-app-focus",
+                legacyFlags: ["unifiProtectMenuVisible"]
+            },
             dateTimeMenu: {
                 kind: "popup",
                 focusPolicy: "preserve-app-focus",

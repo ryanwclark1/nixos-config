@@ -272,6 +272,8 @@ Item {
         "todo": todoComponent,
         "gameMode": gameModeComponent,
         "nightLight": nightLightComponent,
+        "unifiNetwork": unifiNetworkComponent,
+        "unifiProtect": unifiProtectComponent,
         "spacer": spacerComponent,
         "separator": separatorComponent
     })
@@ -1368,6 +1370,30 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: unifiNetworkComponent
+        UnifiNetworkBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            isActive: root.isSurfaceActive("unifiNetworkMenu")
+            onTriggerRequested: triggerItem => root.requestSurface("unifiNetworkMenu", triggerItem)
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: unifiProtectComponent
+        UnifiProtectBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            isActive: root.isSurfaceActive("unifiProtectMenu")
+            onTriggerRequested: triggerItem => root.requestSurface("unifiProtectMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }

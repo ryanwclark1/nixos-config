@@ -45,3 +45,13 @@ function ipcCall(target, method) {
         cmd.push(String(arguments[i]));
     return cmd;
 }
+
+// argv for fixed-arity Shell surface IPC:
+//   quickshell ipc call Shell <method> <surfaceId> <screenName>
+// screenName defaults to "" to match the live Shell IPC contract.
+function shellSurfaceCall(method, surfaceId, screenName) {
+    var resolvedScreen = screenName;
+    if (resolvedScreen === undefined || resolvedScreen === null)
+        resolvedScreen = "";
+    return ipcCall("Shell", method, surfaceId, resolvedScreen);
+}

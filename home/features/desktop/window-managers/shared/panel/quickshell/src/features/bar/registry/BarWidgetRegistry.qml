@@ -203,7 +203,13 @@ QtObject {
     { widgetType: "pomodoro", label: "Pomodoro Timer", icon: "pomodoro.svg", section: "right", description: "Focus/break timer with start, pause, skip, and reset controls." },
     { widgetType: "todo", label: "Todo", icon: "checkmark.svg", section: "right", description: "Pending task counter with clear-done shortcut." },
     { widgetType: "gameMode", label: "Game Mode", icon: "games.svg", section: "right", description: "Performance mode indicator — shows when game mode is active." },
-    { widgetType: "nightLight", label: "Night Light", icon: "weather-moon.svg", section: "right", description: "Night light indicator — shows when color temperature filter is active." }
+    { widgetType: "nightLight", label: "Night Light", icon: "weather-moon.svg", section: "right", description: "Night light indicator — shows when color temperature filter is active." },
+    { widgetType: "unifiNetwork", label: "UniFi Network", icon: "ubiquiti-symbolic.svg", section: "right", description: "UniFi network overview — devices, sites, and ISP health metrics.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] },
+    { widgetType: "unifiProtect", label: "UniFi Protect", icon: "unifi-protect-symbolic.svg", section: "right", description: "UniFi Protect cameras — snapshots and live RTSPS streams.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
+    ] }
   ]
 
   readonly property var pluginWidgets: {

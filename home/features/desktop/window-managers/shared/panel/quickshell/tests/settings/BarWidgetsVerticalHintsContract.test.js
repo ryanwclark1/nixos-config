@@ -33,6 +33,8 @@ describe("Bar widgets vertical hints contract", () => {
     expect(source).toContain("BarWidgetRegistry.summaryChips(widgetRow.widgetInstance, root.selectedBarPosition)");
     expect(source).toContain("verticalBar: root.selectedBarVertical");
     expect(source).toContain('import "BarWidgetPickerPolicy.js" as BarWidgetPickerPolicy');
+    expect(source).toContain("BarWidgetInstancePolicy.annotatePickerItems(items, currentSectionWidgets)");
+    expect(source).toContain("BarWidgetInstancePolicy.canAddToBar(currentSectionWidgets, widgetType)");
     expect(source).toContain('Config.applyBarWidgetPreset(root.selectedBar.id, "vertical-balanced")');
     expect(source).toContain("return BarWidgetPickerPolicy.sortPickerItems(items, addSection, selectedBarVertical);");
   });
@@ -41,6 +43,9 @@ describe("Bar widgets vertical hints contract", () => {
     const source = readFileSync(barWidgetPickerOverlayPath, "utf8");
 
     expect(source).toContain("required property bool verticalBar");
+    expect(source).toContain("occupancySectionsLabel");
+    expect(source).toContain("instanceCount");
+    expect(source).toContain('label: modelData.canAdd === false ? "Added" : "Add"');
     expect(source).toContain("BarWidgetRegistry.verticalHintLabel(modelData.widgetType)");
   });
 

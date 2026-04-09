@@ -55,6 +55,8 @@ singleton SystemStatus 1.0 SystemStatus.qml
 singleton ThemeService 1.0 ThemeService.qml
 singleton ToastService 1.0 ToastService.qml
 singleton TodoService 1.0 TodoService.qml
+singleton UnifiNetworkService 1.0 UnifiNetworkService.qml
+singleton UnifiProtectService 1.0 UnifiProtectService.qml
 singleton UsageTrackerService 1.0 UsageTrackerService.qml
 singleton WallhavenService 1.0 WallhavenService.qml
 singleton WallpaperService 1.0 WallpaperService.qml

@@ -105,7 +105,7 @@ PanelWindow {
           var raw = Helpers.parseJsonOutput(this.text || "[]", []);
           var result = Helpers.normalizeMonitorList(raw);
           if (result.length === 0) {
-            result = Helpers.fallbackMonitorsFromScreens(Quickshell.screens || []);
+            result = Helpers.fallbackMonitorsFromScreens(Quickshell.screens);
             if (result.length > 0)
               Logger.w("DisplayConfig", "Monitor probe returned no monitors; using Quickshell screen fallback.");
           }
@@ -114,7 +114,7 @@ PanelWindow {
           displayRoot._computeScaleFactor();
           if (result.length > 0) displayRoot.selectedIndex = 0;
         } catch (e) {
-          var fallback = Helpers.fallbackMonitorsFromScreens(Quickshell.screens || []);
+          var fallback = Helpers.fallbackMonitorsFromScreens(Quickshell.screens);
           if (fallback.length > 0) {
             Logger.w("DisplayConfig",
                      "Failed to parse monitor probe output; using Quickshell screen fallback.",

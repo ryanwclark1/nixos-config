@@ -197,6 +197,7 @@ Look for:
 - in `Bar Widgets`, open CPU / Memory / GPU settings and verify `Display Mode` and `Value Style` controls wrap cleanly in portrait/narrow layouts.
 - in `Bar Widgets`, verify compact and auto modes remain readable when long values are selected and that compact mode shortens long values instead of widening the layout.
 - in `Bar Widgets`, open `Add Widget` from left, center, and right and verify the picker shows the full widget catalog with search working across names/descriptions.
+- in `Bar Widgets`, verify picker rows show whether a widget is already on the selected bar and that singleton widgets already in use show a disabled add action, while repeatable widgets like separators remain addable.
 - in desktop widget edit mode, verify `Add Widget` opens the searchable catalog and that built-in and plugin desktop widgets appear in the same list.
 
 ## Harness Notes

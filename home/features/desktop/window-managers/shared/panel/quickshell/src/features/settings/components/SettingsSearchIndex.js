@@ -122,12 +122,12 @@ var entries = [
     { tabId: "night-light", cardTitle: "Location", label: "Longitude", keywords: "location longitude", type: "text" },
 
     // ── Lock Screen ──────────────────────────────────
-    { tabId: "lock-screen", cardTitle: "Features", label: "Compact Mode", keywords: "lock screen compact minimal", type: "toggle" },
-    { tabId: "lock-screen", cardTitle: "Features", label: "Media Controls", keywords: "lock screen media player", type: "toggle" },
-    { tabId: "lock-screen", cardTitle: "Features", label: "Weather", keywords: "lock screen weather", type: "toggle" },
-    { tabId: "lock-screen", cardTitle: "Features", label: "Session Buttons", keywords: "lock screen session power", type: "toggle" },
-    { tabId: "lock-screen", cardTitle: "Features", label: "Fingerprint Unlock", keywords: "lock screen fingerprint biometric", type: "toggle" },
-    { tabId: "lock-screen", cardTitle: "Features", label: "Lock Countdown", keywords: "lock timeout countdown", type: "slider" },
+    { tabId: "lock-screen", cardTitle: "Presentation Density", label: "Compact Mode", keywords: "lock screen compact minimal", type: "toggle" },
+    { tabId: "lock-screen", cardTitle: "Bottom Bar Modules", label: "Media Controls", keywords: "lock screen media player", type: "toggle" },
+    { tabId: "lock-screen", cardTitle: "Bottom Bar Modules", label: "Weather", keywords: "lock screen weather", type: "toggle" },
+    { tabId: "lock-screen", cardTitle: "Bottom Bar Modules", label: "Session Buttons", keywords: "lock screen session power", type: "toggle" },
+    { tabId: "lock-screen", cardTitle: "Unlock Method", label: "Fingerprint Unlock", keywords: "lock screen fingerprint biometric", type: "toggle" },
+    { tabId: "lock-screen", cardTitle: "Session Action Countdown", label: "Countdown Duration", keywords: "lock timeout countdown session shutdown reboot", type: "slider" },
 
     // ── Recording ────────────────────────────────────
     { tabId: "recording", cardTitle: "Capture", label: "Capture Source", keywords: "recording source portal screen", type: "mode" },

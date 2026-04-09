@@ -61,8 +61,8 @@ journalctl --user -f | rg 'quickshell|WARN|ERROR'
 
 ```bash
 quickshell ipc call SettingsHub open
-quickshell ipc call Shell openSurface controlCenter
-quickshell ipc call Shell openSurface notifCenter
+quickshell ipc call Shell openSurface controlCenter ""
+quickshell ipc call Shell openSurface notifCenter ""
 quickshell ipc call Launcher openDrun
 quickshell ipc call Launcher openFiles
 quickshell ipc call Launcher openWeb

@@ -67,11 +67,23 @@ case "${1:-help}" in
   # ── Surface Control ──────────────────────────
   toggle)
     shift
-    exec quickshell ipc call Shell toggleSurface "$@"
+    surface_id="${1:-}"
+    screen_name="${2:-}"
+    if [[ -z "${surface_id}" ]]; then
+      printf 'qs toggle: missing surface id\n' >&2
+      exit 2
+    fi
+    exec quickshell ipc call Shell toggleSurface "${surface_id}" "${screen_name}"
     ;;
   open)
     shift
-    exec quickshell ipc call Shell openSurface "$@"
+    surface_id="${1:-}"
+    screen_name="${2:-}"
+    if [[ -z "${surface_id}" ]]; then
+      printf 'qs open: missing surface id\n' >&2
+      exit 2
+    fi
+    exec quickshell ipc call Shell openSurface "${surface_id}" "${screen_name}"
     ;;
   close)
     exec quickshell ipc call Shell closeAllSurfaces

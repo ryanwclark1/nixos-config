@@ -385,6 +385,13 @@ QtObject {
     property int aiTimeout: 120                    // seconds, passed to curl --max-time
     property bool aiToolCallAutoReply: false        // auto-send tool output back to AI
 
+    // --- UNIFI ---
+    property string unifiApiKey: ""                // cloud API key for api.ui.com (X-API-Key header)
+    property int unifiPollInterval: 60             // seconds between cloud API polls
+    property string unifiProtectHost: ""           // local Protect controller IP/hostname
+    property string unifiProtectApiKey: ""         // local Protect API key
+    property int unifiProtectPollInterval: 30      // seconds between camera snapshot refreshes
+
     // --- STATE RECOVERY ---
     property string activeSurfaceId: ""
     onActiveSurfaceIdChanged: {

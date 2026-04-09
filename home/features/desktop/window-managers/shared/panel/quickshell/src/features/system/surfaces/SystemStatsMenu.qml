@@ -52,7 +52,7 @@ BasePopupMenu {
         tooltipText: "Open system monitor"
         onClicked: {
             root.closeRequested();
-            Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "systemMonitor"));
+            Quickshell.execDetached(SU.shellSurfaceCall("openSurface", "systemMonitor"));
         }
     }
 

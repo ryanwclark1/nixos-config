@@ -12,6 +12,8 @@ import "../features/power"
 import "../features/screenshot"
 import "../features/ssh"
 import "../features/docker"
+import "../features/unifi-network"
+import "../features/unifi-protect"
 import "../features/status"
 import "../features/system/surfaces"
 import "../features/time"
@@ -172,6 +174,16 @@ Item {
                                 implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 surfaceContext: barWindow.surfaceContext("dockerMenu")
                                 Component.onCompleted: barWindow.wirePopup(this, "dockerMenu")
+                            }
+                            UnifiNetworkMenu {
+                                implicitHeight: Math.min(640, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                surfaceContext: barWindow.surfaceContext("unifiNetworkMenu")
+                                Component.onCompleted: barWindow.wirePopup(this, "unifiNetworkMenu")
+                            }
+                            UnifiProtectMenu {
+                                implicitHeight: Math.min(660, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                surfaceContext: barWindow.surfaceContext("unifiProtectMenu")
+                                Component.onCompleted: barWindow.wirePopup(this, "unifiProtectMenu")
                             }
                             DateTimeMenu {
                                 implicitHeight: Math.min(560, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))

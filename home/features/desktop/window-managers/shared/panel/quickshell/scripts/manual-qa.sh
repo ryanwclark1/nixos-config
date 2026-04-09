@@ -39,10 +39,10 @@ open_settings() {
 }
 
 open_surfaces() {
-  quickshell ipc call Shell openSurface controlCenter
-  quickshell ipc call Shell openSurface notifCenter
-  quickshell ipc call Shell openSurface audioMenu
-  quickshell ipc call Shell openSurface networkMenu
+  quickshell ipc call Shell openSurface controlCenter ""
+  quickshell ipc call Shell openSurface notifCenter ""
+  quickshell ipc call Shell openSurface audioMenu ""
+  quickshell ipc call Shell openSurface networkMenu ""
 }
 
 open_launcher() {
