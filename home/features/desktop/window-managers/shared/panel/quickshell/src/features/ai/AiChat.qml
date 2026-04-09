@@ -356,8 +356,8 @@ PanelWindow {
                     implicitWidth: providerPickerContent.implicitWidth + Appearance.spacingL
                     implicitHeight: 28
                     radius: Appearance.radiusXXS
-                    color: providerPickerMouse.containsMouse ? Colors.primaryGhost : "transparent"
-                    border.color: providerPickerMouse.containsMouse ? Colors.primaryRing : "transparent"
+                    color: providerPickerMouse.containsMouse ? Colors.primaryGhost : Colors.textWash
+                    border.color: providerPickerMouse.containsMouse ? Colors.primaryRing : Colors.border
                     border.width: 1
 
                     Row {
@@ -368,14 +368,14 @@ PanelWindow {
 
                         SharedWidgets.SvgIcon {
                             source: Providers.providerIcon(AiService.activeProvider)
-                            color: providerPickerMouse.containsMouse ? Colors.primary : Colors.textDisabled
+                            color: providerPickerMouse.containsMouse ? Colors.text : Colors.textSecondary
                             size: Appearance.fontSizeXS
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
                             id: providerPickerText
                             text: root.showHeaderModelSummary ? (Providers.providerLabel(AiService.activeProvider) + " · " + AiService.activeModel) : Providers.providerLabel(AiService.activeProvider)
-                            color: providerPickerMouse.containsMouse ? Colors.primary : Colors.textDisabled
+                            color: providerPickerMouse.containsMouse ? Colors.text : Colors.textSecondary
                             font.pixelSize: Appearance.fontSizeXS
                             elide: Text.ElideRight
                             width: Math.min(implicitWidth, 146 - parent.spacing - Appearance.fontSizeXS)
@@ -873,14 +873,14 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Appearance.radiusXXS
-                            color: root.includeWindowContext ? Colors.primaryMid : "transparent"
-                            border.color: root.includeWindowContext ? Colors.primary : Colors.border
+                            color: root.includeWindowContext ? Colors.primaryMid : (winCtxHover.containsMouse ? Colors.textThin : Colors.textWash)
+                            border.color: root.includeWindowContext ? Colors.primary : (winCtxHover.containsMouse ? Colors.borderMedium : Colors.border)
                             border.width: 1
 
                             SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
                                 source: "app-generic.svg"
-                                color: root.includeWindowContext ? Colors.primary : Colors.textDisabled
+                                color: root.includeWindowContext ? Colors.primary : (winCtxHover.containsMouse ? Colors.text : Colors.textSecondary)
                                 size: Appearance.fontSizeSmall
                             }
                             MouseArea {
@@ -907,14 +907,14 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Appearance.radiusXXS
-                            color: root.includeVisualContext ? Colors.primaryMid : "transparent"
-                            border.color: root.includeVisualContext ? Colors.primary : Colors.border
+                            color: root.includeVisualContext ? Colors.primaryMid : (visualCtxHover.containsMouse ? Colors.textThin : Colors.textWash)
+                            border.color: root.includeVisualContext ? Colors.primary : (visualCtxHover.containsMouse ? Colors.borderMedium : Colors.border)
                             border.width: 1
 
                             SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
                                 source: "camera.svg"
-                                color: root.includeVisualContext ? Colors.primary : Colors.textDisabled
+                                color: root.includeVisualContext ? Colors.primary : (visualCtxHover.containsMouse ? Colors.text : Colors.textSecondary)
                                 size: Appearance.fontSizeSmall
                             }
                             MouseArea {
@@ -959,14 +959,14 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Appearance.radiusXXS
-                            color: root.includeSelectionContext ? Colors.primaryMid : "transparent"
-                            border.color: root.includeSelectionContext ? Colors.primary : Colors.border
+                            color: root.includeSelectionContext ? Colors.primaryMid : (selCtxHover.containsMouse ? Colors.textThin : Colors.textWash)
+                            border.color: root.includeSelectionContext ? Colors.primary : (selCtxHover.containsMouse ? Colors.borderMedium : Colors.border)
                             border.width: 1
 
                             SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
                                 source: "select-all.svg"
-                                color: root.includeSelectionContext ? Colors.primary : Colors.textDisabled
+                                color: root.includeSelectionContext ? Colors.primary : (selCtxHover.containsMouse ? Colors.text : Colors.textSecondary)
                                 size: Appearance.fontSizeSmall
                             }
                             MouseArea {
@@ -993,14 +993,14 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Appearance.radiusXXS
-                            color: AiService.isOcrBusy ? Colors.withAlpha(Colors.warning, 0.18) : "transparent"
-                            border.color: AiService.isOcrBusy ? Colors.warning : Colors.border
+                            color: AiService.isOcrBusy ? Colors.withAlpha(Colors.warning, 0.18) : (ocrHover.containsMouse ? Colors.textThin : Colors.textWash)
+                            border.color: AiService.isOcrBusy ? Colors.warning : (ocrHover.containsMouse ? Colors.borderMedium : Colors.border)
                             border.width: 1
 
                             SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
                                 source: "scan-text.svg"
-                                color: AiService.isOcrBusy ? Colors.warning : Colors.textDisabled
+                                color: AiService.isOcrBusy ? Colors.warning : (ocrHover.containsMouse ? Colors.text : Colors.textSecondary)
                                 size: Appearance.fontSizeSmall
                             }
                             MouseArea {
@@ -1038,14 +1038,14 @@ PanelWindow {
                             width: 24
                             height: 24
                             radius: Appearance.radiusXXS
-                            color: Config.aiSystemContext ? Colors.primaryMid : "transparent"
-                            border.color: Config.aiSystemContext ? Colors.primary : Colors.border
+                            color: Config.aiSystemContext ? Colors.primaryMid : (sysCtxHover.containsMouse ? Colors.textThin : Colors.textWash)
+                            border.color: Config.aiSystemContext ? Colors.primary : (sysCtxHover.containsMouse ? Colors.borderMedium : Colors.border)
                             border.width: 1
 
                             SharedWidgets.SvgIcon {
                                 anchors.centerIn: parent
                                 source: "board.svg"
-                                color: Config.aiSystemContext ? Colors.primary : Colors.textDisabled
+                                color: Config.aiSystemContext ? Colors.primary : (sysCtxHover.containsMouse ? Colors.text : Colors.textSecondary)
                                 size: Appearance.fontSizeSmall
                             }
                             MouseArea {

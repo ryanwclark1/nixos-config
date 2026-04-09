@@ -34,8 +34,8 @@ QtObject {
       { type: "toggle", key: "showGitStatus", label: "Git Status", icon: "git-branch.svg", enabledText: "Show inline repository status next to the active window title.", disabledText: "Hide inline repository status from the title widget." },
       { type: "toggle", key: "showMediaContext", label: "Media Context", icon: "music-note-2.svg", enabledText: "Show the mini media context badge when media is active.", disabledText: "Hide inline media context from the title widget." }
     ] },
-    { widgetType: "keyboardLayout", label: "Keyboard Layout", icon: "keyboard.svg", section: "right", description: "Current keyboard layout indicator.", hasSettings: true, defaultSettings: { labelMode: "short" }, settingsSchema: [
-      { type: "mode", key: "labelMode", label: "Label Mode", description: "Choose between the compact three-letter abbreviation or the full layout name.", options: [ { value: "short", label: "Short" }, { value: "full", label: "Full" } ] }
+    { widgetType: "keyboardLayout", label: "Keyboard Layout", icon: "keyboard.svg", section: "right", description: "Current keyboard layout indicator. Auto-hides unless multiple layouts are available.", hasSettings: true, defaultSettings: { labelMode: "short" }, settingsSchema: [
+      { type: "mode", key: "labelMode", label: "Label Mode", description: "Choose between the compact three-letter abbreviation or the full layout name. This widget only appears when the compositor exposes more than one keyboard layout.", options: [ { value: "short", label: "Short" }, { value: "full", label: "Full" } ] }
     ] },
     { widgetType: "taskbar", label: "Running Apps", icon: "apps.svg", section: "left", description: "Focused and running applications.", hasSettings: true, defaultSettings: { buttonSize: 32, iconSize: 20, showRunningIndicator: true, showSeparator: true, maxUnpinned: 0 }, settingsSchema: [
       { type: "slider", key: "buttonSize", label: "Button Size", icon: "crop.svg", min: 24, max: 56, step: 1 },
@@ -340,6 +340,17 @@ QtObject {
     return "Open";
   }
 
+  function _keyboardLayoutVisibilityChip() {
+    if (!Services.CompositorAdapter.supportsKeyboardLayouts)
+      return "Auto: Unavailable";
+
+    var names = Services.CompositorAdapter.niriKeyboardLayoutNames || [];
+    if (names.length > 1)
+      return "Auto: Shown";
+
+    return "Auto: Hidden";
+  }
+
   function summaryChips(widgetInstance, barPositionOrVertical) {
     if (!widgetInstance)
       return [];
@@ -393,6 +404,7 @@ QtObject {
     }
 
     if (widgetType === "keyboardLayout") {
+      chips.push(_keyboardLayoutVisibilityChip());
       chips.push("Label: " + (String(settings.labelMode || "short") === "full" ? "Full" : "Short"));
       return chips;
     }

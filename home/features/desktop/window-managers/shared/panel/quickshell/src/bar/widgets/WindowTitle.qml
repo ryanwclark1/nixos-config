@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import "../../services"
 import "../../widgets" as SharedWidgets
 
-Item {
+SharedWidgets.BarPill {
     id: root
 
     property var widgetInstance: null
@@ -24,13 +24,11 @@ Item {
     readonly property string activeTitle: CompositorAdapter.activeWindowTitle || ""
     readonly property string activeAppId: CompositorAdapter.activeWindowAppId || ""
 
+    tooltipText: root.activeTitle
     visible: activeTitle !== ""
-    implicitWidth: visible ? contentRow.implicitWidth : 0
-    implicitHeight: visible ? contentRow.implicitHeight : 0
 
     RowLayout {
         id: contentRow
-        anchors.centerIn: parent
         spacing: Appearance.spacingM
 
         // ── App Icon ───────────────────────────────

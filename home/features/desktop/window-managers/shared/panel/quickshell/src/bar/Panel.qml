@@ -758,6 +758,7 @@ Item {
         id: windowTitleComponent
         WindowTitle {
             property var widgetInstance: null
+            anchorWindow: root.anchorWindow
         }
     }
 
