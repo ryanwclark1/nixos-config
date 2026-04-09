@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "."
+import "../features/network/VpnHelpers.js" as VH
 
 // Centralized network state service.  Uses an event-driven Python D-Bus daemon
 // (qs-network-monitor) that subscribes to NetworkManager signals and emits JSON
@@ -54,22 +55,32 @@ QtObject {
     property string totalSent: ""
 
     // ── Tailscale ────────────────────────────────────
-    property string tailscaleStatus: "Offline"
+    property string tailscaleStatus: "Unavailable"
     property string tailscaleIp: ""
+    property var tailscaleIps: []
+    property string tailscaleBackendState: ""
+    property string tailscaleAuthUrl: ""
+    property var tailscaleHealth: []
+    property string tailscaleVersion: ""
+    property var tailscaleSelf: ({})
+    property var tailscaleTailnet: ({ name: "", magicDnsSuffix: "" })
+    property var tailscalePeers: []
+    property var tailscalePrefs: ({})
+    property var tailscaleProfiles: []
+    property var tailscaleExitNode: ({ id: "", ip: "", name: "", dnsName: "", allowLanAccess: false })
     readonly property string vpnPrimaryStatus: {
-        var state = String(tailscaleStatus || "Offline");
-        if (state === "Connected")
-            return "connected";
-        if (state === "Stopped")
-            return "stopped";
-        if (state === "Disconnected")
-            return "disconnected";
-        return "unavailable";
+        return VH.backendStateStatusKey(tailscaleBackendState);
     }
     readonly property string vpnPrimaryLabel: "Tailscale"
     readonly property string vpnPrimaryDetail: {
         if (vpnPrimaryStatus === "connected")
-            return tailscaleIp !== "" ? tailscaleIp : "Connected";
+            return tailscaleCurrentExitNodeLabel !== ""
+                ? tailscaleIp + " via " + tailscaleCurrentExitNodeLabel
+                : (tailscaleIp !== "" ? tailscaleIp : "Connected");
+        if (tailscaleNeedsMachineAuth)
+            return "Waiting for machine approval";
+        if (tailscaleNeedsLogin)
+            return tailscaleAuthUrl !== "" ? "Browser sign-in available" : "Sign in to continue";
         if (vpnPrimaryStatus === "stopped")
             return "Stopped";
         if (vpnPrimaryStatus === "disconnected")
@@ -83,15 +94,51 @@ QtObject {
     readonly property int vpnInactiveCount: vpnInactiveProfiles.length
     readonly property int vpnProfileCount: (vpnProfiles || []).length
     readonly property bool vpnHasSavedProfiles: vpnProfileCount > 0
-    readonly property bool vpnHasAnyOverlay: vpnPrimaryStatus === "connected" || vpnOtherCount > 0
+    readonly property bool vpnHasAnyOverlay: vpnPrimaryStatus === "connected" || vpnPrimaryStatus === "attention" || vpnOtherCount > 0
     readonly property bool tailscaleInstalled: DependencyService.isAvailable("tailscale")
-    readonly property bool tailscaleConnected: tailscaleStatus === "Connected"
+    readonly property bool tailscaleConnected: tailscaleBackendState === "Running"
+    readonly property bool tailscaleNeedsLogin: tailscaleBackendState === "NeedsLogin" || tailscaleBackendState === "NeedsMachineAuth"
+    readonly property bool tailscaleNeedsMachineAuth: tailscaleBackendState === "NeedsMachineAuth"
+    readonly property bool tailscaleLoggedOut: !!tailscalePrefs.LoggedOut
+    readonly property bool tailscaleWantRunning: !!tailscalePrefs.WantRunning
+    readonly property bool tailscaleAcceptDns: !!tailscalePrefs.CorpDNS
+    readonly property bool tailscaleAcceptRoutes: !!tailscalePrefs.RouteAll
+    readonly property bool tailscaleExitNodeAllowLanAccess: !!tailscalePrefs.ExitNodeAllowLANAccess
+    readonly property bool tailscaleRunSsh: !!tailscalePrefs.RunSSH
+    readonly property bool tailscaleShieldsUp: !!tailscalePrefs.ShieldsUp
+    readonly property bool tailscaleAdvertiseExitNode: VH.advertiseExitNodeEnabled(tailscalePrefs)
+    readonly property bool tailscaleStatefulFiltering: VH.statefulFilteringEnabled(tailscalePrefs)
+    readonly property string tailscaleHealthSummary: VH.healthSummary(tailscaleHealth)
+    readonly property var tailscaleOnlinePeers: (tailscalePeers || []).filter(function(peer) { return !!peer.online; })
+    readonly property var tailscaleActivePeers: (tailscalePeers || []).filter(function(peer) { return !!peer.active; })
+    readonly property var tailscaleExitNodes: (tailscalePeers || []).filter(function(peer) { return !!peer.exitNodeOption; })
+    readonly property int tailscalePeerCount: (tailscalePeers || []).length
+    readonly property int tailscaleOnlinePeerCount: tailscaleOnlinePeers.length
+    readonly property int tailscaleProfileCount: (tailscaleProfiles || []).length
+    readonly property var tailscaleCurrentProfile: {
+        var profiles = tailscaleProfiles || [];
+        for (var i = 0; i < profiles.length; ++i) {
+            if (profiles[i].selected)
+                return profiles[i];
+        }
+        return null;
+    }
+    readonly property string tailscaleCurrentProfileLabel: {
+        var profile = tailscaleCurrentProfile;
+        if (profile && profile.nickname)
+            return profile.nickname;
+        if (profile && profile.account)
+            return profile.account;
+        return "";
+    }
+    readonly property string tailscaleCurrentExitNodeLabel: VH.exitNodeLabel(tailscaleExitNode)
     readonly property bool nmcliInstalled: DependencyService.isAvailable("nmcli")
 
     // ── Refresh state ────────────────────────────────
     property bool isRefreshing: false
     property string pendingVpnProfileUuid: ""
     property string pendingVpnAction: ""
+    property string pendingTailscaleAction: ""
     property string lastVpnActionState: "idle"
     property string lastVpnActionMessage: ""
     property double lastVpnActionAt: 0
@@ -101,6 +148,10 @@ QtObject {
     property string _vpnActionSuccessMessage: ""
     property string _vpnActionFailureMessage: ""
     property var _vpnActionCommand: []
+    property string _tailscaleActionTitle: ""
+    property string _tailscaleActionSuccessMessage: ""
+    property string _tailscaleActionFailureMessage: ""
+    property var _tailscaleActionCommand: []
 
     // ═══════════════════════════════════════════════════
     //  Helper functions (unchanged public API)
@@ -154,9 +205,18 @@ QtObject {
     function vpnStatusLabel(statusValue) {
         var status = String(statusValue || "");
         if (status === "connected") return "Connected";
+        if (status === "attention") return tailscaleNeedsMachineAuth ? "Needs approval" : "Needs login";
         if (status === "stopped") return "Stopped";
         if (status === "disconnected") return "Disconnected";
         return "Unavailable";
+    }
+
+    function tailscalePeerLabel(peer) {
+        if (!peer)
+            return "Peer";
+        return String(peer.name || "").length > 0
+            ? String(peer.name || "")
+            : (String(peer.dnsName || "").length > 0 ? String(peer.dnsName || "") : "Peer");
     }
 
     function isVpnConnectionType(typeName) {
@@ -292,7 +352,7 @@ QtObject {
     function _runVpnProfileAction(profile, actionName, command, title, successMessage, failureMessage) {
         if (!profile || !profile.uuid)
             return false;
-        if (vpnActionProc.running) {
+        if (vpnActionProc.running || tailscaleActionProc.running) {
             ToastService.showNotice("VPN action pending", "Wait for the current VPN action to finish.");
             return false;
         }
@@ -304,6 +364,20 @@ QtObject {
         _vpnActionFailureMessage = String(failureMessage || "VPN action failed.");
         _vpnActionCommand = command || [];
         vpnActionProc.running = true;
+        return true;
+    }
+
+    function _runTailscaleAction(actionName, command, title, successMessage, failureMessage) {
+        if (vpnActionProc.running || tailscaleActionProc.running) {
+            ToastService.showNotice("Tailscale action pending", "Wait for the current network action to finish.");
+            return false;
+        }
+        pendingTailscaleAction = String(actionName || "");
+        _tailscaleActionTitle = String(title || "Tailscale updated");
+        _tailscaleActionSuccessMessage = String(successMessage || "Tailscale updated.");
+        _tailscaleActionFailureMessage = String(failureMessage || "Tailscale action failed.");
+        _tailscaleActionCommand = command || [];
+        tailscaleActionProc.running = true;
         return true;
     }
 
@@ -364,14 +438,161 @@ QtObject {
         );
     }
 
-    function tailscaleUp() {
-        Quickshell.execDetached(["tailscale", "up"]);
+    function tailscaleOpenAuthUrl() {
+        if (tailscaleAuthUrl === "")
+            return false;
+        Quickshell.execDetached(["xdg-open", tailscaleAuthUrl]);
+        ToastService.showNotice("Tailscale login", "Opened the browser sign-in flow.");
         queueRefresh();
+        return true;
     }
 
-    function tailscaleDown() {
-        Quickshell.execDetached(["tailscale", "down"]);
-        queueRefresh();
+    function tailscaleConnect() {
+        if (tailscaleNeedsLogin)
+            return tailscaleOpenAuthUrl() || _runTailscaleAction(
+                "login",
+                ["tailscale", "login", "--timeout", "2s"],
+                "Tailscale login",
+                "Started Tailscale login.",
+                "Could not start Tailscale login."
+            );
+        return _runTailscaleAction(
+            "connect",
+            ["tailscale", "up", "--timeout", "5s"],
+            "Tailscale connected",
+            "Tailscale is now connected.",
+            "Could not connect Tailscale."
+        );
+    }
+
+    function tailscaleUp() { return tailscaleConnect(); }
+
+    function tailscaleDisconnect() {
+        return _runTailscaleAction(
+            "disconnect",
+            ["tailscale", "down"],
+            "Tailscale disconnected",
+            "Tailscale is now disconnected.",
+            "Could not disconnect Tailscale."
+        );
+    }
+
+    function tailscaleDown() { return tailscaleDisconnect(); }
+
+    function tailscaleLogout() {
+        return _runTailscaleAction(
+            "logout",
+            ["tailscale", "logout"],
+            "Tailscale logged out",
+            "Tailscale account logged out.",
+            "Could not log out of Tailscale."
+        );
+    }
+
+    function tailscaleSwitchProfile(profileId) {
+        var id = String(profileId || "");
+        if (id === "")
+            return false;
+        return _runTailscaleAction(
+            "switch",
+            ["tailscale", "switch", id],
+            "Tailscale account switched",
+            "Switched Tailscale account.",
+            "Could not switch Tailscale account."
+        );
+    }
+
+    function tailscaleSelectExitNode(nodeValue) {
+        var node = String(nodeValue || "");
+        if (node === "")
+            return false;
+        return _runTailscaleAction(
+            "exitNode",
+            ["tailscale", "set", "--exit-node=" + node],
+            "Exit node updated",
+            "Exit node selection updated.",
+            "Could not update the exit node."
+        );
+    }
+
+    function tailscaleClearExitNode() {
+        return _runTailscaleAction(
+            "clearExitNode",
+            ["tailscale", "set", "--exit-node="],
+            "Exit node cleared",
+            "Direct tailnet routing restored.",
+            "Could not clear the exit node."
+        );
+    }
+
+    function tailscaleSetAcceptDns(enabled) {
+        return _runTailscaleAction(
+            "acceptDns",
+            ["tailscale", "set", "--accept-dns=" + (!!enabled)],
+            "DNS preference updated",
+            "Tailscale DNS preference updated.",
+            "Could not update DNS preference."
+        );
+    }
+
+    function tailscaleSetAcceptRoutes(enabled) {
+        return _runTailscaleAction(
+            "acceptRoutes",
+            ["tailscale", "set", "--accept-routes=" + (!!enabled)],
+            "Route preference updated",
+            "Tailscale route preference updated.",
+            "Could not update route preference."
+        );
+    }
+
+    function tailscaleSetExitNodeLanAccess(enabled) {
+        return _runTailscaleAction(
+            "exitNodeLan",
+            ["tailscale", "set", "--exit-node-allow-lan-access=" + (!!enabled)],
+            "Exit-node LAN access updated",
+            "Updated exit-node LAN access.",
+            "Could not update exit-node LAN access."
+        );
+    }
+
+    function tailscaleSetShieldsUp(enabled) {
+        return _runTailscaleAction(
+            "shieldsUp",
+            ["tailscale", "set", "--shields-up=" + (!!enabled)],
+            "Shields Up updated",
+            "Updated the Shields Up preference.",
+            "Could not update Shields Up."
+        );
+    }
+
+    function tailscaleSetSsh(enabled) {
+        return _runTailscaleAction(
+            "ssh",
+            ["tailscale", "set", "--ssh=" + (!!enabled)],
+            "Tailscale SSH updated",
+            "Updated the Tailscale SSH preference.",
+            "Could not update Tailscale SSH."
+        );
+    }
+
+    function tailscaleSetAdvertiseExitNode(enabled) {
+        return _runTailscaleAction(
+            "advertiseExitNode",
+            ["tailscale", "set", "--advertise-exit-node=" + (!!enabled)],
+            "Exit-node advertising updated",
+            "Updated exit-node advertising.",
+            "Could not update exit-node advertising."
+        );
+    }
+
+    function tailscaleSetStatefulFiltering(enabled) {
+        return _runTailscaleAction(
+            "statefulFiltering",
+            ["tailscale", "set", "--stateful-filtering=" + (!!enabled)],
+            "Stateful filtering updated",
+            "Updated stateful filtering.",
+            "Could not update stateful filtering."
+        );
     }
 
     // ═══════════════════════════════════════════════════
@@ -435,8 +656,19 @@ QtObject {
         root.publicIpv4 = msg.publicIpv4 || "";
         root.totalReceived = msg.totalReceived || "";
         root.totalSent = msg.totalSent || "";
-        root.tailscaleStatus = msg.tailscaleStatus || "Offline";
+        root.tailscaleStatus = msg.tailscaleStatus || "Unavailable";
         root.tailscaleIp = msg.tailscaleIp || "";
+        root.tailscaleIps = msg.tailscaleIps || [];
+        root.tailscaleBackendState = msg.tailscaleBackendState || "";
+        root.tailscaleAuthUrl = msg.tailscaleAuthUrl || "";
+        root.tailscaleHealth = msg.tailscaleHealth || [];
+        root.tailscaleVersion = msg.tailscaleVersion || "";
+        root.tailscaleSelf = msg.tailscaleSelf || ({});
+        root.tailscaleTailnet = msg.tailscaleTailnet || ({ name: "", magicDnsSuffix: "" });
+        root.tailscalePeers = msg.tailscalePeers || [];
+        root.tailscalePrefs = msg.tailscalePrefs || ({});
+        root.tailscaleProfiles = msg.tailscaleProfiles || [];
+        root.tailscaleExitNode = msg.tailscaleExitNode || ({ id: "", ip: "", name: "", dnsName: "", allowLanAccess: false });
         root.isRefreshing = false;
     }
 
@@ -458,6 +690,18 @@ QtObject {
 
     property Timer _vpnActionSettleRefresh: Timer {
         interval: 900
+        repeat: false
+        onTriggered: root.refreshData()
+    }
+
+    property Timer _tailscaleActionImmediateRefresh: Timer {
+        interval: 150
+        repeat: false
+        onTriggered: root.refreshData()
+    }
+
+    property Timer _tailscaleActionSettleRefresh: Timer {
+        interval: 1200
         repeat: false
         onTriggered: root.refreshData()
     }
@@ -496,6 +740,29 @@ QtObject {
             root.refreshData();
             root._vpnActionImmediateRefresh.restart();
             root._vpnActionSettleRefresh.restart();
+        }
+    }
+
+    property Process tailscaleActionProc: Process {
+        id: tailscaleActionProc
+        command: root._tailscaleActionCommand
+        running: false
+        onExited: (exitCode, exitStatus) => {
+            var wasSuccess = exitCode === 0;
+            var actionTitle = root._tailscaleActionTitle;
+            var successMessage = root._tailscaleActionSuccessMessage;
+            var failureMessage = root._tailscaleActionFailureMessage;
+            root.pendingTailscaleAction = "";
+            root.lastVpnActionState = wasSuccess ? "success" : "error";
+            root.lastVpnActionMessage = wasSuccess ? successMessage : failureMessage;
+            root.lastVpnActionAt = Date.now();
+            if (wasSuccess)
+                ToastService.showSuccess(actionTitle, successMessage);
+            else
+                ToastService.showError(actionTitle, failureMessage);
+            root.refreshData();
+            root._tailscaleActionImmediateRefresh.restart();
+            root._tailscaleActionSettleRefresh.restart();
         }
     }
 }

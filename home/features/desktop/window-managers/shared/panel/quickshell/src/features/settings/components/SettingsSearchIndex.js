@@ -39,7 +39,7 @@ var entries = [
     { tabId: "system", cardTitle: "Shell", label: "Floating Bar", keywords: "bar floating dock", type: "toggle" },
     { tabId: "system", cardTitle: "Shell", label: "Blur Effects", keywords: "blur glass", type: "toggle" },
     { tabId: "system", cardTitle: "Shell", label: "Debug Logging", keywords: "debug log verbose", type: "toggle" },
-    { tabId: "system", cardTitle: "Shell", label: "Notification Width", keywords: "notification popup width", type: "slider" },
+    { tabId: "system", cardTitle: "Shell", label: "Notification Center Width", keywords: "notification popup width", type: "slider" },
     { tabId: "system", cardTitle: "Shell", label: "Popup Duration", keywords: "notification popup timeout duration", type: "slider" },
     { tabId: "system", cardTitle: "Panel Enablement", label: "Notification Center", keywords: "panel enable disable memory", type: "toggle" },
     { tabId: "system", cardTitle: "Panel Enablement", label: "Control Center", keywords: "panel enable disable memory", type: "toggle" },

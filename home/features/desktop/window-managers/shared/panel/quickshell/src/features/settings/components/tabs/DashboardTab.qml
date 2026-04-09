@@ -140,7 +140,7 @@ Item {
                             }
 
                             Text {
-                                text: SystemStatus.netDown + " ↓  " + SystemStatus.netUp + " ↑"
+                                text: SystemStatus.netDown + " down  " + SystemStatus.netUp + " up"
                                 color: Colors.primary
                                 font.weight: Font.DemiBold
                             }

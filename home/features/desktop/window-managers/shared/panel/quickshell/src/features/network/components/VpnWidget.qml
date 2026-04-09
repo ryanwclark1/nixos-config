@@ -22,6 +22,10 @@ Row {
         var parts = ["Tailscale", statusLabel];
         if (statusKey === "connected" && NetworkService.tailscaleIp !== "")
             parts.push(NetworkService.tailscaleIp);
+        if (NetworkService.tailscaleCurrentExitNodeLabel)
+            parts.push("Exit " + NetworkService.tailscaleCurrentExitNodeLabel);
+        if (NetworkService.tailscaleHealthSummary)
+            parts.push(NetworkService.tailscaleHealthSummary);
         if (showOtherCount)
             parts.push(NetworkService.vpnOtherCount === 1 ? "1 other VPN" : NetworkService.vpnOtherCount + " other VPNs");
         if (!NetworkService.tailscaleInstalled)

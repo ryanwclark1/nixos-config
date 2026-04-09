@@ -5,6 +5,7 @@ import "../../shared"
 import "../../shared" as Shared
 import "../system/sections"
 import "../../services"
+import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
@@ -34,7 +35,7 @@ BasePopupMenu {
 
   function openVpnHub() {
     root.closeRequested();
-    Quickshell.execDetached(["xdg-open", "https://login.tailscale.com/admin/machines"]);
+    Quickshell.execDetached(SU.ipcCall("Shell", "toggleSurface", "vpnMenu", ""));
   }
 
   // Subscriber-based polling: NetworkService polls only while we're visible.

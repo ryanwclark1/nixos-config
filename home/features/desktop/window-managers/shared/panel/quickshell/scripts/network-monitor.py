@@ -149,6 +149,139 @@ def read_file(path):
         return ""
 
 
+def run_json_command(command, timeout=5, strip_comments=False):
+    """Run a command and decode JSON output."""
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        return None
+
+    if result.returncode != 0 and not result.stdout:
+        return None
+
+    lines = result.stdout.splitlines()
+    if strip_comments:
+        lines = [line for line in lines if not line.startswith("#")]
+    payload = "\n".join(lines).strip()
+    if not payload:
+        return None
+
+    try:
+        return json.loads(payload)
+    except json.JSONDecodeError:
+        return None
+
+
+def first_ipv4(addresses):
+    for item in addresses or []:
+        value = str(item or "")
+        if "." in value:
+            return value
+    values = [str(item or "") for item in (addresses or []) if str(item or "")]
+    return values[0] if values else ""
+
+
+def normalize_tailnet(current_tailnet, status_data):
+    if isinstance(current_tailnet, dict):
+        return {
+            "name": str(current_tailnet.get("Name", "") or current_tailnet.get("name", "")),
+            "magicDnsSuffix": str(status_data.get("MagicDNSSuffix", "") or ""),
+        }
+    if current_tailnet:
+        return {
+            "name": str(current_tailnet),
+            "magicDnsSuffix": str(status_data.get("MagicDNSSuffix", "") or ""),
+        }
+    return {
+        "name": "",
+        "magicDnsSuffix": str(status_data.get("MagicDNSSuffix", "") or ""),
+    }
+
+
+def normalize_profile(profile):
+    if not isinstance(profile, dict):
+        return {"id": "", "account": "", "nickname": "", "tailnet": "", "selected": False}
+    return {
+        "id": str(profile.get("id", "") or ""),
+        "account": str(profile.get("account", "") or ""),
+        "nickname": str(profile.get("nickname", "") or ""),
+        "tailnet": str(profile.get("tailnet", "") or ""),
+        "selected": bool(profile.get("selected", False)),
+    }
+
+
+def normalize_peer(peer_key, peer):
+    if not isinstance(peer, dict):
+        return None
+    addresses = peer.get("TailscaleIPs") or []
+    name = str(peer.get("HostName", "") or "")
+    dns_name = str(peer.get("DNSName", "") or "")
+    display_name = name or dns_name.split(".", 1)[0] if dns_name else ""
+    current_address = str(peer.get("CurAddr", "") or "")
+    if current_address == "":
+        relay = str(peer.get("Relay", "") or "")
+        if relay:
+            current_address = relay
+    return {
+        "id": str(peer.get("ID", "") or peer_key or ""),
+        "name": str(display_name or ""),
+        "hostName": name,
+        "dnsName": dns_name,
+        "os": str(peer.get("OS", "") or ""),
+        "online": bool(peer.get("Online", False)),
+        "active": bool(peer.get("Active", False)),
+        "exitNode": bool(peer.get("ExitNode", False)),
+        "exitNodeOption": bool(peer.get("ExitNodeOption", False)),
+        "tailscaleIps": [str(item or "") for item in addresses if str(item or "")],
+        "primaryIp": first_ipv4(addresses),
+        "currentAddress": current_address,
+        "shareeNode": bool(peer.get("ShareeNode", False)),
+    }
+
+
+def advertised_exit_node_enabled(prefs):
+    routes = prefs.get("AdvertiseRoutes", []) if isinstance(prefs, dict) else []
+    routes = [str(route or "") for route in routes or []]
+    return "0.0.0.0/0" in routes or "::/0" in routes
+
+
+def build_current_exit_node(status_data, prefs, peers):
+    prefs = prefs if isinstance(prefs, dict) else {}
+    self_node = status_data.get("Self") if isinstance(status_data, dict) else {}
+    self_node = self_node if isinstance(self_node, dict) else {}
+    exit_node_ip = str(prefs.get("ExitNodeIP", "") or "")
+    exit_node_id = str(prefs.get("ExitNodeID", "") or "")
+    current_label = ""
+    current_dns = ""
+
+    for peer in peers:
+        peer_ips = peer.get("tailscaleIps", []) or []
+        if exit_node_id and str(peer.get("id", "")) == exit_node_id:
+            current_label = str(peer.get("name", "") or peer.get("dnsName", "") or "")
+            current_dns = str(peer.get("dnsName", "") or "")
+            exit_node_ip = exit_node_ip or str(peer.get("primaryIp", "") or "")
+            break
+        if exit_node_ip and exit_node_ip in peer_ips:
+            current_label = str(peer.get("name", "") or peer.get("dnsName", "") or "")
+            current_dns = str(peer.get("dnsName", "") or "")
+            break
+
+    if current_label == "":
+        self_exit = self_node.get("ExitNodeStatus", {}) if isinstance(self_node, dict) else {}
+        if isinstance(self_exit, dict):
+            current_label = str(self_exit.get("Name", "") or self_exit.get("ID", "") or "")
+            current_dns = str(self_exit.get("DNSName", "") or "")
+            exit_node_ip = exit_node_ip or str(self_exit.get("TailscaleIP", "") or "")
+
+    return {
+        "id": exit_node_id,
+        "ip": exit_node_ip,
+        "name": current_label,
+        "dnsName": current_dns,
+        "allowLanAccess": bool(prefs.get("ExitNodeAllowLANAccess", False)),
+    }
+
+
 # ── State collection ──────────────────────────────────────
 
 def collect_wifi_radio():
@@ -450,27 +583,106 @@ def collect_internet_details(public_ipv4=""):
 
 
 def collect_tailscale():
-    """Get Tailscale status and IP."""
-    result = {"tailscaleStatus": "Unavailable", "tailscaleIp": ""}
-    try:
-        r = subprocess.run(["tailscale", "status", "--active"],
-                           capture_output=True, text=True, timeout=5)
-        if "Tailscale is stopped" in r.stdout:
-            result["tailscaleStatus"] = "Stopped"
-        elif r.returncode == 0 and r.stdout.strip():
-            result["tailscaleStatus"] = "Connected"
-        else:
-            result["tailscaleStatus"] = "Disconnected"
-    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+    """Get Tailscale status, prefs, profiles, and peers."""
+    result = {
+        "tailscaleStatus": "Unavailable",
+        "tailscaleIp": "",
+        "tailscaleIps": [],
+        "tailscaleBackendState": "",
+        "tailscaleAuthUrl": "",
+        "tailscaleHealth": [],
+        "tailscaleVersion": "",
+        "tailscaleSelf": {},
+        "tailscaleTailnet": {"name": "", "magicDnsSuffix": ""},
+        "tailscalePeers": [],
+        "tailscalePrefs": {},
+        "tailscaleProfiles": [],
+        "tailscaleExitNode": {"id": "", "ip": "", "name": "", "dnsName": "", "allowLanAccess": False},
+    }
+
+    status_data = run_json_command(
+        ["tailscale", "debug", "localapi", "GET", "/localapi/v0/status"],
+        timeout=5,
+        strip_comments=True,
+    )
+    if status_data is None:
+        status_data = run_json_command(["tailscale", "status", "--json"], timeout=5)
+    if status_data is None:
         return result
 
-    if result["tailscaleStatus"] == "Connected":
-        try:
-            r = subprocess.run(["tailscale", "ip", "-4"],
-                               capture_output=True, text=True, timeout=5)
-            result["tailscaleIp"] = r.stdout.strip().split("\n")[0] if r.returncode == 0 else ""
-        except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
-            pass
+    prefs_data = run_json_command(
+        ["tailscale", "debug", "localapi", "GET", "/localapi/v0/prefs"],
+        timeout=5,
+        strip_comments=True,
+    )
+    if prefs_data is None:
+        prefs_data = run_json_command(["tailscale", "debug", "prefs"], timeout=5)
+    if prefs_data is None:
+        prefs_data = {}
+
+    profiles_data = run_json_command(["tailscale", "switch", "--list", "--json"], timeout=5)
+    if not isinstance(profiles_data, list):
+        profiles_data = []
+
+    backend_state = str(status_data.get("BackendState", "") or "")
+    health = [str(item or "") for item in (status_data.get("Health") or []) if str(item or "")]
+    self_node = status_data.get("Self") if isinstance(status_data.get("Self"), dict) else {}
+    self_ips = [str(item or "") for item in (status_data.get("TailscaleIPs") or self_node.get("TailscaleIPs") or []) if str(item or "")]
+    peer_map = status_data.get("Peer") if isinstance(status_data.get("Peer"), dict) else {}
+    peers = []
+    for peer_key, peer in peer_map.items():
+        normalized_peer = normalize_peer(peer_key, peer)
+        if normalized_peer is not None:
+            peers.append(normalized_peer)
+    peers.sort(key=lambda item: (not item["online"], not item["active"], item["name"].lower(), item["dnsName"].lower()))
+
+    if backend_state == "Running":
+        status = "Connected"
+    elif backend_state == "Stopped":
+        status = "Stopped"
+    elif backend_state in ("NeedsLogin", "NeedsMachineAuth"):
+        status = backend_state
+    elif backend_state:
+        status = "Disconnected"
+    else:
+        status = "Unavailable"
+
+    result["tailscaleStatus"] = status
+    result["tailscaleBackendState"] = backend_state
+    result["tailscaleAuthUrl"] = str(status_data.get("AuthURL", "") or "")
+    result["tailscaleHealth"] = health
+    result["tailscaleVersion"] = str(status_data.get("Version", "") or "")
+    result["tailscaleIps"] = self_ips
+    result["tailscaleIp"] = first_ipv4(self_ips)
+    result["tailscaleSelf"] = {
+        "id": str(self_node.get("ID", "") or ""),
+        "hostName": str(self_node.get("HostName", "") or ""),
+        "dnsName": str(self_node.get("DNSName", "") or ""),
+        "online": bool(self_node.get("Online", False)),
+        "active": bool(self_node.get("Active", False)),
+        "tailscaleIps": self_ips,
+        "primaryIp": first_ipv4(self_ips),
+        "exitNodeOption": bool(self_node.get("ExitNodeOption", False)),
+        "advertiseExitNode": advertised_exit_node_enabled(prefs_data),
+    }
+    result["tailscaleTailnet"] = normalize_tailnet(status_data.get("CurrentTailnet"), status_data)
+    result["tailscalePeers"] = peers
+    result["tailscalePrefs"] = {
+        "RouteAll": bool(prefs_data.get("RouteAll", False)),
+        "ExitNodeAllowLANAccess": bool(prefs_data.get("ExitNodeAllowLANAccess", False)),
+        "CorpDNS": bool(prefs_data.get("CorpDNS", False)),
+        "RunSSH": bool(prefs_data.get("RunSSH", False)),
+        "WantRunning": bool(prefs_data.get("WantRunning", False)),
+        "LoggedOut": bool(prefs_data.get("LoggedOut", False)),
+        "ShieldsUp": bool(prefs_data.get("ShieldsUp", False)),
+        "AdvertiseTags": [str(tag or "") for tag in (prefs_data.get("AdvertiseTags") or []) if str(tag or "")],
+        "AdvertiseRoutes": [str(route or "") for route in (prefs_data.get("AdvertiseRoutes") or []) if str(route or "")],
+        "NoStatefulFiltering": bool(prefs_data.get("NoStatefulFiltering", False)),
+        "OperatorUser": str(prefs_data.get("OperatorUser", "") or ""),
+        "Hostname": str(prefs_data.get("Hostname", "") or ""),
+    }
+    result["tailscaleProfiles"] = [normalize_profile(profile) for profile in profiles_data]
+    result["tailscaleExitNode"] = build_current_exit_node(status_data, prefs_data, peers)
 
     return result
 
@@ -684,8 +896,21 @@ def poll_tailscale():
     """Poll Tailscale status every 15s."""
     try:
         ts = collect_tailscale()
-        if (ts["tailscaleStatus"] != _state.get("tailscaleStatus") or
-                ts["tailscaleIp"] != _state.get("tailscaleIp")):
+        if json.dumps(ts, sort_keys=True) != json.dumps({
+            "tailscaleStatus": _state.get("tailscaleStatus"),
+            "tailscaleIp": _state.get("tailscaleIp"),
+            "tailscaleIps": _state.get("tailscaleIps", []),
+            "tailscaleBackendState": _state.get("tailscaleBackendState"),
+            "tailscaleAuthUrl": _state.get("tailscaleAuthUrl"),
+            "tailscaleHealth": _state.get("tailscaleHealth", []),
+            "tailscaleVersion": _state.get("tailscaleVersion"),
+            "tailscaleSelf": _state.get("tailscaleSelf", {}),
+            "tailscaleTailnet": _state.get("tailscaleTailnet", {}),
+            "tailscalePeers": _state.get("tailscalePeers", []),
+            "tailscalePrefs": _state.get("tailscalePrefs", {}),
+            "tailscaleProfiles": _state.get("tailscaleProfiles", []),
+            "tailscaleExitNode": _state.get("tailscaleExitNode", {}),
+        }, sort_keys=True):
             schedule_snapshot()
     except Exception:
         pass
