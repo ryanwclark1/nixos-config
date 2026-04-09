@@ -39,6 +39,7 @@ PanelWindow {
     property bool showContent: false
     property string pendingSurfaceId: ""
     property var pendingSurfaceContext: null
+    property string _quickLinkSurfaceId: ""
     readonly property int maxLayerTextureSize: 4096
     readonly property int staggerDelay: 35
     readonly property int settingsOpenDelayMs: 130
@@ -76,6 +77,31 @@ PanelWindow {
         root.pendingSurfaceContext = context || null;
         root.closeRequested();
         openSurfaceTimer.restart();
+    }
+
+    // Widget ID → component source mapping for the Repeater+Loader
+    function widgetSource(widgetId) {
+        switch (String(widgetId || "")) {
+        case "mediaWidget":    return "../system/sections/MediaWidget.qml";
+        case "pomodoro":       return "../pomodoro/PomodoroWidget.qml";
+        case "todo":           return "../todo/TodoWidget.qml";
+        case "devOps":         return "../system/sections/DevOpsSection.qml";
+        case "brightness":     return "../system/sections/BrightnessSection.qml";
+        case "audioOutput":    return "../system/sections/AudioOutputSection.qml";
+        case "audioInput":     return "../system/sections/AudioInputSection.qml";
+        case "cpuGpuTemp":     return "../system/sections/CpuGpuTempSection.qml";
+        case "cpuWidget":      return "../system/sections/CpuWidget.qml";
+        case "systemGraphs":   return "../system/sections/SystemGraphs.qml";
+        case "processWidget":  return "../system/sections/ProcessWidget.qml";
+        case "networkGraphs":  return "../system/sections/NetworkGraphs.qml";
+        case "ramWidget":      return "../system/sections/RamWidget.qml";
+        case "diskWidget":     return "../system/sections/DiskWidget.qml";
+        case "gpuWidget":      return "../system/sections/GPUWidget.qml";
+        case "updateWidget":   return "../system/sections/UpdateWidget.qml";
+        case "scratchpad":     return "../system/sections/ScratchpadWidget.qml";
+        case "powerActions":   return "../system/sections/PowerActionsRow.qml";
+        default: return "";
+        }
     }
 
     onShowContentChanged: {
@@ -189,14 +215,13 @@ PanelWindow {
                 onTriggered: Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "screenshotMenu", ""))
             }
 
-            property string _quickLinkSurfaceId: ""
             Timer {
                 id: openQuickLinkTimer
                 interval: root.settingsOpenDelayMs
                 repeat: false
                 onTriggered: {
-                    if (parent._quickLinkSurfaceId)
-                        Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", parent._quickLinkSurfaceId, ""));
+                    if (root._quickLinkSurfaceId)
+                        Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", root._quickLinkSurfaceId, ""));
                 }
             }
             Timer {
@@ -249,13 +274,14 @@ PanelWindow {
                                 Layout.fillWidth: true
                             }
 
+                            // Quick Links (ordered, filtered by visibility)
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: Appearance.spacingS
-                                visible: Config.controlCenterShowQuickLinks
+                                visible: ControlCenterRegistry.visibleQuickLinkItems.length > 0
 
                                 Repeater {
-                                    model: ControlCenterRegistry.quickLinkItems
+                                    model: ControlCenterRegistry.visibleQuickLinkItems
                                     delegate: QuickLinkCard {
                                         required property var modelData
                                         icon: modelData.icon
@@ -267,7 +293,7 @@ PanelWindow {
                                                 openScreenshotTimer.restart();
                                             } else if (modelData.ipcTarget && modelData.ipcAction) {
                                                 var surfaceId = (modelData.clickCommand && modelData.clickCommand.length > 5) ? modelData.clickCommand[5] : "";
-                                                _quickLinkSurfaceId = surfaceId;
+                                                root._quickLinkSurfaceId = surfaceId;
                                                 openQuickLinkTimer.restart();
                                             } else if (Array.isArray(modelData.clickCommand) && modelData.clickCommand.length > 0) {
                                                 Quickshell.execDetached(modelData.clickCommand);
@@ -334,399 +360,47 @@ PanelWindow {
                             }
                         }
 
-                        // --- Group 2: Active Session ---
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Appearance.spacingLG
-                            opacity: root.entranceOpacity(1)
-                            scale: root.entranceScale(1)
-                            transform: Translate { y: root.entranceY(1) }
-                            layer.enabled: opacity > 0 && opacity < 1
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(5) } NumberAnimation { duration: root.entranceDuration(1); easing.type: Easing.OutBack } } }
+                        // --- Command Center Widgets (data-driven, user-ordered) ---
+                        Repeater {
+                            model: ControlCenterRegistry.visibleWidgetItems
 
-                            MediaWidget {
+                            delegate: Loader {
+                                id: widgetLoader
+                                required property var modelData
+                                required property int index
                                 Layout.fillWidth: true
-                            }
 
-                            // Pomodoro Timer
-                            PomodoroWidget {
-                                Layout.fillWidth: true
-                                visible: Config.controlCenterShowPomodoro && opacity > 0
-                            }
+                                readonly property int animIndex: 5 + index
+                                source: root.widgetSource(modelData.id)
+                                active: true
 
-                            // Todo List
-                            TodoWidget {
-                                Layout.fillWidth: true
-                                visible: Config.controlCenterShowTodo && opacity > 0
-                            }
+                                opacity: root.entranceOpacity(animIndex)
+                                scale: root.entranceScale(animIndex)
+                                transform: Translate { y: root.entranceY(animIndex) }
+                                layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                                Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(animIndex) } NumberAnimation { duration: root.entranceDuration(animIndex); easing.type: Easing.OutCubic } } }
+                                Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(animIndex) } NumberAnimation { duration: root.entranceDuration(animIndex); easing.type: Easing.OutBack } } }
 
-                            // DevOps & Services
-                            DevOpsSection {
-                                visible: Config.controlCenterShowDevOps
-                                showContent: root.showContent
-                                baseIndex: 10
-                                staggerDelay: root.staggerDelay
-                                onMenuRequested: (surfaceId, surfaceContext) => root.requestSurfaceAfterClose(surfaceId, surfaceContext)
-                            }
-                        }
-
-                        // --- Group 3: System Controls ---
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Appearance.spacingLG
-                            opacity: root.entranceOpacity(2)
-                            scale: root.entranceScale(2)
-                            transform: Translate { y: root.entranceY(2) }
-                            layer.enabled: opacity > 0 && opacity < 1
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(2); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(2); easing.type: Easing.OutBack } } }
-
-                            // Sliders
-                            ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Appearance.paddingMedium
-                            opacity: root.entranceOpacity(7)
-                            scale: root.entranceScale(7)
-                            transform: Translate { y: root.entranceY(7) }
-                            visible: (Config.controlCenterShowBrightness || Config.controlCenterShowAudioOutput || Config.controlCenterShowAudioInput) && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutBack } } }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: Appearance.spacingSM
-                                visible: Config.controlCenterShowBrightness
-
-                                Repeater {
-                                    model: BrightnessService.monitors
-                                    delegate: ColumnLayout {
-                                        required property var modelData
-                                        Layout.fillWidth: true
-                                        spacing: Appearance.spacingSM
-                                        RowLayout {
-                                            Layout.fillWidth: true
-                                            SharedWidgets.SvgIcon {
-                                                source: "weather-sunny.svg"
-                                                color: Colors.textDisabled
-                                                size: Appearance.fontSizeXS
-                                            }
-                                            Text {
-                                                text: BrightnessService.hasMultipleMonitors
-                                                    ? modelData.name.toUpperCase() : "BRIGHTNESS"
-                                                color: Colors.textDisabled
-                                                font.pixelSize: Appearance.fontSizeXS
-                                                font.weight: Font.Bold
-                                            }
-                                            Item { Layout.fillWidth: true }
-                                            Text {
-                                                text: modelData.available
-                                                    ? Math.round(modelData.brightness * 100) + "%" : "Unavailable"
-                                                color: modelData.available ? Colors.textSecondary : Colors.warning
-                                                font.pixelSize: Appearance.fontSizeXS
-                                            }
-                                        }
-                                        SharedWidgets.SliderTrack {
-                                            Layout.fillWidth: true
-                                            value: modelData.brightness
-                                            icon: "weather-sunny.svg"
-                                            enabled: modelData.available
-                                            opacity: enabled ? 1.0 : 0.4
-                                            onSliderMoved: v => BrightnessService.setBrightness(
-                                                modelData.name, Math.max(0.01, v))
-                                        }
-                                    }
-                                }
-
-                                Text {
-                                    visible: BrightnessService.monitors.length === 0
-                                    text: "No brightness devices detected"
-                                    color: Colors.textDisabled
-                                    font.pixelSize: Appearance.fontSizeXS
-                                    Layout.fillWidth: true
-                                }
-
-                                // Keyboard backlight slider
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: Appearance.spacingSM
-                                    visible: BrightnessService.kbdAvailable
-
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        SharedWidgets.SvgIcon {
-                                            source: "keyboard.svg"
-                                            color: Colors.textDisabled
-                                            size: Appearance.fontSizeXS
-                                        }
-                                        Text {
-                                            text: "KEYBOARD"
-                                            color: Colors.textDisabled
-                                            font.pixelSize: Appearance.fontSizeXS
-                                            font.weight: Font.Bold
-                                        }
-                                        Item { Layout.fillWidth: true }
-                                        Text {
-                                            text: Math.round(BrightnessService.kbdDevice.brightness * 100) + "%"
-                                            color: Colors.textSecondary
-                                            font.pixelSize: Appearance.fontSizeXS
-                                        }
-                                    }
-                                    SharedWidgets.SliderTrack {
-                                        Layout.fillWidth: true
-                                        value: BrightnessService.kbdDevice.brightness
-                                        icon: "keyboard.svg"
-                                        onSliderMoved: v => BrightnessService.setKbdBrightness(v)
-                                    }
+                                onLoaded: {
+                                    if (!item) return;
+                                    // Inject common properties where supported
+                                    if (item.hasOwnProperty("showContent"))
+                                        item.showContent = Qt.binding(function() { return root.showContent; });
+                                    if (item.hasOwnProperty("showSystemMonitorLauncher"))
+                                        item.showSystemMonitorLauncher = true;
+                                    if (item.hasOwnProperty("baseIndex"))
+                                        item.baseIndex = Qt.binding(function() { return widgetLoader.animIndex; });
+                                    if (item.hasOwnProperty("staggerDelay"))
+                                        item.staggerDelay = root.staggerDelay;
+                                    // DevOpsSection menu routing
+                                    if (item.hasOwnProperty("menuRequested"))
+                                        item.menuRequested.connect(function(surfaceId, surfaceContext) {
+                                            root.requestSurfaceAfterClose(surfaceId, surfaceContext);
+                                        });
                                 }
                             }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: Appearance.spacingSM
-                                visible: Config.controlCenterShowAudioOutput
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    SharedWidgets.SvgIcon {
-                                        source: "speaker.svg"
-                                        color: Colors.textDisabled
-                                        size: Appearance.fontSizeXS
-                                    }
-                                    Text {
-                                        text: "OUTPUT"
-                                        color: Colors.textDisabled
-                                        font.pixelSize: Appearance.fontSizeXS
-                                        font.weight: Font.Bold
-                                    }
-                                    Item {
-                                        Layout.fillWidth: true
-                                    }
-                                    SharedWidgets.NumericText {
-                                        text: AudioService.outputMuted ? "Muted" : Math.round(AudioService.outputVolume * 100) + "%"
-                                        color: Colors.textSecondary
-                                        font.pixelSize: Appearance.fontSizeXS
-                                    }
-                                }
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    spacing: Appearance.paddingSmall
-                                    SharedWidgets.MuteButton {
-                                        target: "@DEFAULT_AUDIO_SINK@"
-                                        muted: AudioService.outputMuted
-                                        icon: "speaker.svg"
-                                        mutedIcon: "speaker-mute.svg"
-                                        size: Appearance.iconSizeMedium
-                                        showBorder: true
-                                    }
-                                    SharedWidgets.SliderTrack {
-                                        Layout.fillWidth: true
-                                        value: AudioService.outputVolume
-                                        muted: AudioService.outputMuted
-                                        icon: "speaker.svg"
-                                        mutedIcon: "speaker-mute.svg"
-                                        onSliderMoved: v => AudioService.setVolume("@DEFAULT_AUDIO_SINK@", v)
-                                    }
-                                }
-                            }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: Appearance.spacingSM
-                                visible: Config.controlCenterShowAudioInput
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    SharedWidgets.SvgIcon {
-                                        source: "mic.svg"
-                                        color: Colors.textDisabled
-                                        size: Appearance.fontSizeXS
-                                    }
-                                    Text {
-                                        text: "INPUT"
-                                        color: Colors.textDisabled
-                                        font.pixelSize: Appearance.fontSizeXS
-                                        font.weight: Font.Bold
-                                    }
-                                    Item {
-                                        Layout.fillWidth: true
-                                    }
-                                    SharedWidgets.NumericText {
-                                        text: AudioService.inputMuted ? "Muted" : Math.round(AudioService.inputVolume * 100) + "%"
-                                        color: Colors.textSecondary
-                                        font.pixelSize: Appearance.fontSizeXS
-                                    }
-                                }
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    spacing: Appearance.paddingSmall
-                                    SharedWidgets.MuteButton {
-                                        target: "@DEFAULT_AUDIO_SOURCE@"
-                                        muted: AudioService.inputMuted
-                                        icon: "mic.svg"
-                                        mutedIcon: "mic-off.svg"
-                                        size: Appearance.iconSizeMedium
-                                        showBorder: true
-                                    }
-                                    SharedWidgets.SliderTrack {
-                                        Layout.fillWidth: true
-                                        value: AudioService.inputVolume
-                                        muted: AudioService.inputMuted
-                                        icon: "mic.svg"
-                                        mutedIcon: "mic-off.svg"
-                                        onSliderMoved: v => AudioService.setVolume("@DEFAULT_AUDIO_SOURCE@", v)
-                                    }
-                                }
-                            }
-                        }
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: Appearance.spacingM
-                            opacity: root.entranceOpacity(8)
-                            scale: root.entranceScale(8)
-                            transform: Translate { y: root.entranceY(8) }
-                            visible: Config.controlCenterShowCpuGpuTemp && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutBack } } }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 60
-                                color: Colors.bgWidget
-                                radius: Appearance.radiusSmall
-                                border.color: Colors.border
-                                border.width: 1
-                                Column {
-                                    anchors.centerIn: parent
-                                    spacing: Appearance.spacingXXS
-                                    Text {
-                                        text: "CPU TEMP"
-                                        color: Colors.textDisabled
-                                        font.pixelSize: Appearance.fontSizeXS
-                                        font.weight: Font.Bold
-                                    }
-                                    Text {
-                                        text: SystemStatus.cpuTemp
-                                        color: Colors.primary
-                                        font.pixelSize: Appearance.fontSizeLarge
-                                        font.weight: Font.Bold
-                                    }
-                                }
-                            }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 60
-                                color: Colors.bgWidget
-                                radius: Appearance.radiusSmall
-                                border.color: Colors.border
-                                border.width: 1
-                                Column {
-                                    anchors.centerIn: parent
-                                    spacing: Appearance.spacingXXS
-                                    Text {
-                                        text: "GPU TEMP"
-                                        color: Colors.textDisabled
-                                        font.pixelSize: Appearance.fontSizeXS
-                                        font.weight: Font.Bold
-                                    }
-                                    Text {
-                                        text: SystemStatus.gpuTemp
-                                        color: Colors.accent
-                                        font.pixelSize: Appearance.fontSizeLarge
-                                        font.weight: Font.Bold
-                                    }
-                                }
-                            }
-                        }
-
-                        CpuWidget {
-                            showSystemMonitorLauncher: true
-                            opacity: root.entranceOpacity(9)
-                            scale: root.entranceScale(9)
-                            transform: Translate { y: root.entranceY(9) }
-                            visible: Config.controlCenterShowCpuWidget && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutBack } } }
-                        }
-                        SystemGraphs {
-                            opacity: root.entranceOpacity(9)
-                            scale: root.entranceScale(9)
-                            transform: Translate { y: root.entranceY(9) }
-                            visible: Config.controlCenterShowSystemGraphs && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutBack } } }
-                        }
-                        ProcessWidget {
-                            opacity: root.entranceOpacity(10)
-                            scale: root.entranceScale(10)
-                            transform: Translate { y: root.entranceY(10) }
-                            visible: Config.controlCenterShowProcessWidget && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutBack } } }
-                        }
-                        NetworkGraphs {
-                            showSystemMonitorLauncher: true
-                            opacity: root.entranceOpacity(11)
-                            scale: root.entranceScale(11)
-                            transform: Translate { y: root.entranceY(11) }
-                            visible: Config.controlCenterShowNetworkGraphs && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutBack } } }
-                        }
-                        RamWidget {
-                            showSystemMonitorLauncher: true
-                            opacity: root.entranceOpacity(12)
-                            scale: root.entranceScale(12)
-                            transform: Translate { y: root.entranceY(12) }
-                            visible: Config.controlCenterShowRamWidget && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutBack } } }
-                        }
-                        DiskWidget {
-                            showSystemMonitorLauncher: true
-                            opacity: root.entranceOpacity(13)
-                            scale: root.entranceScale(13)
-                            transform: Translate { y: root.entranceY(13) }
-                            visible: Config.controlCenterShowDiskWidget && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutBack } } }
-                        }
-                        GPUWidget {
-                            showSystemMonitorLauncher: true
-                            opacity: root.entranceOpacity(14)
-                            scale: root.entranceScale(14)
-                            transform: Translate { y: root.entranceY(14) }
-                            visible: Config.controlCenterShowGpuWidget && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutBack } } }
-                        }
-                        UpdateWidget {
-                            opacity: root.entranceOpacity(15)
-                            scale: root.entranceScale(15)
-                            transform: Translate { y: root.entranceY(15) }
-                            visible: Config.controlCenterShowUpdateWidget && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutBack } } }
-                        }
-                        ScratchpadWidget {
-                            opacity: root.entranceOpacity(16)
-                            scale: root.entranceScale(16)
-                            transform: Translate { y: root.entranceY(16) }
-                            visible: Config.controlCenterShowScratchpad && opacity > 0
-                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(16) } NumberAnimation { duration: root.entranceDuration(16); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(16) } NumberAnimation { duration: root.entranceDuration(16); easing.type: Easing.OutBack } } }
                         }
                     }
-                }
                 }
 
                 SharedWidgets.Scrollbar {
@@ -735,13 +409,6 @@ PanelWindow {
                 SharedWidgets.OverscrollGlow {
                     flickable: ccFlick
                 }
-            }
-
-            PowerActionsRow {
-                visible: Config.controlCenterShowPowerActions
-                showContent: root.showContent
-                baseIndex: 17
-                staggerDelay: root.staggerDelay
             }
         }
     }

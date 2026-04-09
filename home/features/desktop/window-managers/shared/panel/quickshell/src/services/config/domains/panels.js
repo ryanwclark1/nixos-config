@@ -11,10 +11,13 @@ var controlCenter = {
     maps: [
         ["showQuickLinks", "controlCenterShowQuickLinks"],
         ["showMediaWidget", "controlCenterShowMediaWidget"],
+        ["quickLinkOrder", "controlCenterQuickLinkOrder"],
+        ["hiddenQuickLinks", "controlCenterHiddenQuickLinks"],
         ["toggleOrder", "controlCenterToggleOrder"],
         ["hiddenToggles", "controlCenterHiddenToggles"],
         ["pluginOrder", "controlCenterPluginOrder"],
         ["hiddenPlugins", "controlCenterHiddenPlugins"],
+        ["widgetOrder", "controlCenterWidgetOrder"],
         ["showPomodoro", "controlCenterShowPomodoro"],
         ["showTodo", "controlCenterShowTodo"],
         ["showDevOps", "controlCenterShowDevOps"],

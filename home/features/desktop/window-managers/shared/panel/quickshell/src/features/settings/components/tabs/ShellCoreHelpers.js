@@ -512,17 +512,35 @@ function orderedControlCenterPlugins(PluginService, Config) {
     });
 }
 
-function moveOrderedValue(Config, ControlCenterRegistry, PluginService, configKey, value, delta) {
-    var current = [];
-    if (configKey === "controlCenterToggleOrder")
-        current = orderedControlCenterToggles(ControlCenterRegistry, Config).map(function (item) {
-            return item.id;
-        });
-    else if (configKey === "controlCenterPluginOrder")
-        current = orderedControlCenterPlugins(PluginService, Config).map(function (item) {
-            return item.id;
-        });
+function orderedControlCenterQuickLinks(ControlCenterRegistry, Config) {
+    var order = Config && Array.isArray(Config.controlCenterQuickLinkOrder) ? Config.controlCenterQuickLinkOrder : [];
+    return SettingsReorderHelpers.orderCatalogItems(ControlCenterRegistry ? ControlCenterRegistry.quickLinkCatalog : [], order, function(item) {
+        return String(item && item.id || "");
+    });
+}
 
+function orderedControlCenterWidgets(ControlCenterRegistry, Config) {
+    var order = Config && Array.isArray(Config.controlCenterWidgetOrder) ? Config.controlCenterWidgetOrder : [];
+    return SettingsReorderHelpers.orderCatalogItems(ControlCenterRegistry ? ControlCenterRegistry.widgetCatalog : [], order, function(item) {
+        return String(item && item.id || "");
+    });
+}
+
+function _orderedIdsForConfigKey(Config, ControlCenterRegistry, PluginService, configKey) {
+    var items = [];
+    if (configKey === "controlCenterToggleOrder")
+        items = orderedControlCenterToggles(ControlCenterRegistry, Config);
+    else if (configKey === "controlCenterPluginOrder")
+        items = orderedControlCenterPlugins(PluginService, Config);
+    else if (configKey === "controlCenterQuickLinkOrder")
+        items = orderedControlCenterQuickLinks(ControlCenterRegistry, Config);
+    else if (configKey === "controlCenterWidgetOrder")
+        items = orderedControlCenterWidgets(ControlCenterRegistry, Config);
+    return items.map(function(item) { return item.id; });
+}
+
+function moveOrderedValue(Config, ControlCenterRegistry, PluginService, configKey, value, delta) {
+    var current = _orderedIdsForConfigKey(Config, ControlCenterRegistry, PluginService, configKey);
     var result = SettingsReorderHelpers.moveValueByDelta(current, value, delta);
     if (!result.changed)
         return;
@@ -530,22 +548,20 @@ function moveOrderedValue(Config, ControlCenterRegistry, PluginService, configKe
 }
 
 function moveDraggedOrderedValue(Config, ControlCenterRegistry, PluginService, configKey, state, targetIndex) {
-    var current = [];
-    if (configKey === "controlCenterToggleOrder")
-        current = orderedControlCenterToggles(ControlCenterRegistry, Config).map(function(item) {
-            return item.id;
-        });
-    else if (configKey === "controlCenterPluginOrder")
-        current = orderedControlCenterPlugins(PluginService, Config).map(function(item) {
-            return item.id;
-        });
-
+    var current = _orderedIdsForConfigKey(Config, ControlCenterRegistry, PluginService, configKey);
     var result = SettingsReorderHelpers.moveValueToTarget(current, String(state && state.sourceItemId || ""), targetIndex);
     SettingsReorderHelpers.clearState(state);
     if (!result.changed)
         return false;
     Config[configKey] = result.items.slice();
     return true;
+}
+
+function toggleWidgetVisibility(Config, ControlCenterRegistry, widgetId) {
+    var meta = ControlCenterRegistry ? ControlCenterRegistry.widgetMeta(widgetId) : null;
+    if (!meta || !meta.configKey)
+        return;
+    Config[meta.configKey] = !Config[meta.configKey];
 }
 
 function currentOrderedDropIndex(cardItem, rowIndex, listItem, count, dragOffsetY) {

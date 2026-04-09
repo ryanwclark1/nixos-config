@@ -1,4 +1,8 @@
+AudioInputSection 1.0 AudioInputSection.qml
+AudioOutputSection 1.0 AudioOutputSection.qml
+BrightnessSection 1.0 BrightnessSection.qml
 Calendar 1.0 Calendar.qml
+CpuGpuTempSection 1.0 CpuGpuTempSection.qml
 CircularGauge 1.0 CircularGauge.qml
 CpuWidget 1.0 CpuWidget.qml
 DevOpsSection 1.0 DevOpsSection.qml
