@@ -33,16 +33,16 @@ PanelWindow {
     WlrLayershell.namespace: "quickshell"
 
     property bool showContent: false
-    readonly property int telemetryColumnMinWidth: 320
-    readonly property int detailColumnMinWidth: 620
+    readonly property int telemetryColumnMinWidth: 360
+    readonly property int detailColumnMinWidth: 760
     property int panelWidth: _persist.panelWidth
     readonly property int panelMinWidth: telemetryColumnMinWidth + detailColumnMinWidth + Appearance.spacingM + (Appearance.paddingLarge * 2)
-    readonly property int panelMaxWidth: 1480
+    readonly property int panelMaxWidth: 1760
 
     PersistentProperties {
         id: _persist
         reloadableId: "systemMonitorPanelState"
-        property int panelWidth: 1120
+        property int panelWidth: 1360
     }
     property real _dragStartX: 0
     property real _dragStartWidth: 0
@@ -91,6 +91,17 @@ PanelWindow {
             serviceTable.focusTable();
             scrollDetailSectionIntoView(serviceTable);
         }
+    }
+
+    function jumpToSection(index) {
+        focusKeyboardSection(index);
+        if (index === 0) {
+            if (processTable && processTable.pulseJumpHighlight)
+                processTable.pulseJumpHighlight();
+            return;
+        }
+        if (serviceTable && serviceTable.pulseJumpHighlight)
+            serviceTable.pulseJumpHighlight();
     }
 
     function cycleKeyboardSection(delta) {
@@ -267,51 +278,75 @@ PanelWindow {
                     textColor: SystemStatus.isCritical ? Colors.error : Colors.success
                 }
 
-                SharedWidgets.Chip {
-                    icon: IconHelpers.degradedStatusIcon(ProcessService.detailDegraded, "window-multiple.svg")
-                    iconColor: ProcessService.detailStatus === "error" || ProcessService.detailStatus === "terminated"
-                        ? Colors.error
-                        : (ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary)
-                    text: "PROC " + String(ProcessService.detailStatus || "idle").toUpperCase()
-                    textColor: ProcessService.detailStatus === "error" || ProcessService.detailStatus === "terminated"
-                        ? Colors.error
-                        : (ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                RowLayout {
+                    spacing: Appearance.spacingS
+
+                    Text {
+                        text: "STATUS"
+                        color: Colors.textDisabled
+                        font.pixelSize: Appearance.fontSizeXS
+                        font.weight: Font.Bold
+                        font.letterSpacing: Appearance.letterSpacingWide
+                    }
+
+                    SharedWidgets.Chip {
+                        icon: IconHelpers.degradedStatusIcon(ProcessService.detailDegraded, "window-multiple.svg")
+                        iconColor: ProcessService.detailStatus === "error" || ProcessService.detailStatus === "terminated"
+                            ? Colors.error
+                            : (ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                        text: "PROC " + String(ProcessService.detailStatus || "idle").toUpperCase()
+                        textColor: ProcessService.detailStatus === "error" || ProcessService.detailStatus === "terminated"
+                            ? Colors.error
+                            : (ProcessService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                    }
+
+                    SharedWidgets.Chip {
+                        icon: IconHelpers.degradedStatusIcon(ServiceUnitService.detailDegraded, "settings.svg")
+                        iconColor: ServiceUnitService.detailStatus === "error" || ServiceUnitService.detailStatus === "missing"
+                            ? Colors.error
+                            : (ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                        text: "UNIT " + String(ServiceUnitService.detailStatus || "idle").toUpperCase()
+                        textColor: ServiceUnitService.detailStatus === "error" || ServiceUnitService.detailStatus === "missing"
+                            ? Colors.error
+                            : (ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary)
+                    }
+
+                    SharedWidgets.Chip {
+                        icon: IconHelpers.degradedStatusIcon(SystemIoTelemetryService.telemetryStatus === "degraded", "hard-drive.svg")
+                        iconColor: SystemIoTelemetryService.telemetryStatus === "degraded"
+                            ? Colors.warning
+                            : (SystemIoTelemetryService.telemetryStatus === "missing" ? Colors.error : Colors.textSecondary)
+                        text: "I/O " + String(SystemIoTelemetryService.telemetryStatus || "loading").toUpperCase()
+                        textColor: SystemIoTelemetryService.telemetryStatus === "degraded"
+                            ? Colors.warning
+                            : (SystemIoTelemetryService.telemetryStatus === "missing" ? Colors.error : Colors.textSecondary)
+                    }
                 }
 
-                SharedWidgets.Chip {
-                    icon: IconHelpers.degradedStatusIcon(ServiceUnitService.detailDegraded, "settings.svg")
-                    iconColor: ServiceUnitService.detailStatus === "error" || ServiceUnitService.detailStatus === "missing"
-                        ? Colors.error
-                        : (ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary)
-                    text: "UNIT " + String(ServiceUnitService.detailStatus || "idle").toUpperCase()
-                    textColor: ServiceUnitService.detailStatus === "error" || ServiceUnitService.detailStatus === "missing"
-                        ? Colors.error
-                        : (ServiceUnitService.detailDegraded ? Colors.warning : Colors.textSecondary)
-                }
+                RowLayout {
+                    spacing: Appearance.spacingS
 
-                SharedWidgets.Chip {
-                    icon: IconHelpers.degradedStatusIcon(SystemIoTelemetryService.telemetryStatus === "degraded", "hard-drive.svg")
-                    iconColor: SystemIoTelemetryService.telemetryStatus === "degraded"
-                        ? Colors.warning
-                        : (SystemIoTelemetryService.telemetryStatus === "missing" ? Colors.error : Colors.textSecondary)
-                    text: "I/O " + String(SystemIoTelemetryService.telemetryStatus || "loading").toUpperCase()
-                    textColor: SystemIoTelemetryService.telemetryStatus === "degraded"
-                        ? Colors.warning
-                        : (SystemIoTelemetryService.telemetryStatus === "missing" ? Colors.error : Colors.textSecondary)
-                }
+                    Text {
+                        text: "JUMP TO"
+                        color: Colors.textDisabled
+                        font.pixelSize: Appearance.fontSizeXS
+                        font.weight: Font.Bold
+                        font.letterSpacing: Appearance.letterSpacingWide
+                    }
 
-                SharedWidgets.FilterChip {
-                    label: "Processes"
-                    icon: "terminal.svg"
-                    selected: root.keyboardSectionIndex === 0
-                    onClicked: root.focusKeyboardSection(0)
-                }
+                    SharedWidgets.FilterChip {
+                        label: "Processes"
+                        icon: "terminal.svg"
+                        selected: root.keyboardSectionIndex === 0
+                        onClicked: root.jumpToSection(0)
+                    }
 
-                SharedWidgets.FilterChip {
-                    label: "Services"
-                    icon: "settings.svg"
-                    selected: root.keyboardSectionIndex === 1
-                    onClicked: root.focusKeyboardSection(1)
+                    SharedWidgets.FilterChip {
+                        label: "Services"
+                        icon: "settings.svg"
+                        selected: root.keyboardSectionIndex === 1
+                        onClicked: root.jumpToSection(1)
+                    }
                 }
 
                 SharedWidgets.IconButton {
@@ -345,7 +380,7 @@ PanelWindow {
 
                 Item {
                     Layout.minimumWidth: root.telemetryColumnMinWidth
-                    Layout.preferredWidth: Math.max(root.telemetryColumnMinWidth, Math.round(root.panelWidth * 0.36))
+                    Layout.preferredWidth: Math.max(root.telemetryColumnMinWidth, Math.round(root.panelWidth * 0.32))
                     Layout.fillHeight: true
 
                     Flickable {

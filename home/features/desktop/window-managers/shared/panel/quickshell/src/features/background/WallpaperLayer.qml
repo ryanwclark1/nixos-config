@@ -32,29 +32,11 @@ Item {
         visible: root.showSolid
     }
 
-    // Video wallpaper layer
-    MediaPlayer {
-        id: videoPlayer
-        source: root.effectiveShowVideo ? root.videoSource : ""
-        loops: MediaPlayer.Infinite
-        audioOutput: AudioOutput { muted: true }
-        videoOutput: videoOutput
-        onSourceChanged: {
-            if (source !== "") {
-                Logger.i("WallpaperLayer", "video wallpaper source activated", source);
-                play();
-            }
-        }
-        onErrorOccurred: (error, errorString) => {
-            Logger.w("WallpaperLayer", "Video playback error:", errorString);
-        }
-    }
-
-    VideoOutput {
-        id: videoOutput
+    Loader {
+        id: videoLayerLoader
         anchors.fill: parent
-        fillMode: VideoOutput.PreserveAspectCrop
-        visible: root.effectiveShowVideo && videoPlayer.playbackState === MediaPlayer.PlayingState
+        active: root.effectiveShowVideo && root.videoSource !== ""
+        sourceComponent: videoWallpaperComponent
     }
 
     Component.onCompleted: {
@@ -163,6 +145,38 @@ Item {
         if (transitionType === "zoom") return _zoomShader;
         if (transitionType === "radial") return _radialShader;
         return _fadeShader;
+    }
+
+    Component {
+        id: videoWallpaperComponent
+
+        Item {
+            anchors.fill: parent
+
+            MediaPlayer {
+                id: videoPlayer
+                source: root.videoSource
+                loops: MediaPlayer.Infinite
+                audioOutput: AudioOutput { muted: true }
+                videoOutput: videoOutput
+                onSourceChanged: {
+                    if (source !== "") {
+                        Logger.i("WallpaperLayer", "video wallpaper source activated", source);
+                        play();
+                    }
+                }
+                onErrorOccurred: (error, errorString) => {
+                    Logger.w("WallpaperLayer", "Video playback error:", errorString);
+                }
+            }
+
+            VideoOutput {
+                id: videoOutput
+                anchors.fill: parent
+                fillMode: VideoOutput.PreserveAspectCrop
+                visible: videoPlayer.playbackState === MediaPlayer.PlayingState
+            }
+        }
     }
 
     // ── Shader sources (GLSL ES 2.0, inline) ──────────────

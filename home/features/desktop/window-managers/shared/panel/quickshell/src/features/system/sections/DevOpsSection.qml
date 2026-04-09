@@ -264,7 +264,7 @@ ColumnLayout {
                 required property var modelData
 
                 Layout.fillWidth: true
-                implicitHeight: 42
+                implicitHeight: 48
                 radius: Appearance.radiusSmall
                 color: dockerHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
                 border.color: dockerHover.containsMouse ? Colors.primary : Colors.border
@@ -295,13 +295,28 @@ ColumnLayout {
                         size: Appearance.fontSizeLarge
                     }
 
-                    Text {
-                        text: modelData.name
-                        color: Colors.text
-                        font.pixelSize: Appearance.fontSizeXS
-                        font.weight: Font.DemiBold
-                        elide: Text.ElideRight
+                    ColumnLayout {
                         Layout.fillWidth: true
+                        spacing: 1
+
+                        Text {
+                            text: modelData.name
+                            color: Colors.text
+                            font.pixelSize: Appearance.fontSizeXS
+                            font.weight: Font.DemiBold
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            visible: String(modelData.image || "") !== ""
+                            text: String(modelData.image || "")
+                            color: Colors.textSecondary
+                            font.pixelSize: Appearance.fontSizeXXS
+                            font.family: Appearance.fontMono
+                            elide: Text.ElideMiddle
+                            Layout.fillWidth: true
+                        }
                     }
 
                     Row {

@@ -20,6 +20,7 @@ SharedWidgets.CardBase {
     property Item selectedRowItem: null
     property int lastSelectedIndex: -1
     property int _clockTick: 0
+    property bool jumpHighlighted: false
 
     readonly property string trimmedSearch: String(searchQuery || "").trim().toLowerCase()
     readonly property var visibleUnits: computeVisibleUnits()
@@ -51,6 +52,11 @@ SharedWidgets.CardBase {
     function clearTableFocus() {
         if (tableFocus.activeFocus)
             tableFocus.focus = false;
+    }
+
+    function pulseJumpHighlight() {
+        jumpHighlighted = true;
+        jumpHighlightTimer.restart();
     }
 
     function ensureSelectedVisible() {
@@ -253,6 +259,13 @@ SharedWidgets.CardBase {
         onTriggered: root._clockTick = root._clockTick + 1
     }
 
+    Timer {
+        id: jumpHighlightTimer
+        interval: 800
+        repeat: false
+        onTriggered: root.jumpHighlighted = false
+    }
+
     FocusScope {
         id: tableFocus
         Layout.fillWidth: true
@@ -399,9 +412,13 @@ SharedWidgets.CardBase {
                 Layout.fillWidth: true
                 radius: Appearance.radiusSmall
                 color: Colors.cardSurface
-                border.color: keyboardFocused ? Colors.primary : Colors.border
+                border.color: root.jumpHighlighted ? Colors.primary : (keyboardFocused ? Colors.primary : Colors.border)
                 border.width: 1
                 implicitHeight: tableColumn.implicitHeight + Appearance.spacingS * 2
+                Behavior on border.color {
+                    enabled: !Colors.isTransitioning
+                    CAnim {}
+                }
 
                 ColumnLayout {
                     id: tableColumn
@@ -551,6 +568,22 @@ SharedWidgets.CardBase {
                                 if (selected)
                                     root.selectedRowItem = this;
                             }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    color: Colors.withAlpha(Colors.primary, 0.1)
+                    border.color: Colors.withAlpha(Colors.primary, 0.35)
+                    border.width: 1
+                    opacity: root.jumpHighlighted ? 1.0 : 0.0
+                    visible: opacity > 0
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Appearance.durationSlow
                         }
                     }
                 }

@@ -455,7 +455,7 @@ QtObject {
       cycleTimer.running = Config.wallpaperCycleInterval > 0;
     }
     function onWallpaperDefaultFolderChanged() {
-      if (root._startupReady)
+      if (root._startupReady && Config.configReady)
         root.scanWallpapers("config-folder-change");
     }
   }

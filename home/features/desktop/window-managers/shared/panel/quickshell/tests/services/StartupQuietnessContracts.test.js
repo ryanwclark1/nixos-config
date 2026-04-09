@@ -66,6 +66,9 @@ describe("startup quietness contracts", () => {
     expect(audioSource).toContain('Logger.i("AudioService", "audio service disabled via QS_DEBUG_DISABLE_AUDIO_SERVICE")');
     expect(wallpaperLayerSource).toContain('QS_DEBUG_DISABLE_VIDEO_WALLPAPER');
     expect(wallpaperLayerSource).toContain('Logger.i("WallpaperLayer", "video wallpaper disabled via QS_DEBUG_DISABLE_VIDEO_WALLPAPER")');
+    expect(wallpaperLayerSource).toContain("Loader {");
+    expect(wallpaperLayerSource).toContain('active: root.effectiveShowVideo && root.videoSource !== ""');
+    expect(wallpaperLayerSource).toContain("sourceComponent: videoWallpaperComponent");
   });
 
   it("loads wallpaper inventory on demand when the wallpaper settings tab becomes visible", () => {
