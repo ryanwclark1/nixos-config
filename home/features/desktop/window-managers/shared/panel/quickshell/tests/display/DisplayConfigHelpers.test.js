@@ -7,6 +7,9 @@ import {
   arrangeExtend,
   arrangePrimaryOnly,
   computeScaleFactor,
+  parseJsonOutput,
+  normalizeMonitorList,
+  fallbackMonitorsFromScreens,
 } from "../../src/features/display/DisplayConfigHelpers.js";
 
 const mkMonitor = (overrides = {}) => ({
@@ -56,6 +59,90 @@ describe("cloneMonitor", () => {
     expect(clone).toEqual(orig);
     clone.x = 999;
     expect(orig.x).toBe(100);
+  });
+});
+
+describe("parseJsonOutput", () => {
+  it("parses clean JSON", () => {
+    expect(parseJsonOutput('[{"name":"DP-1"}]', [])).toEqual([{ name: "DP-1" }]);
+  });
+
+  it("parses JSON after prefixed log noise", () => {
+    const raw = "warning: extra output before json\n[{\"name\":\"DP-1\"}]";
+    expect(parseJsonOutput(raw, [])).toEqual([{ name: "DP-1" }]);
+  });
+
+  it("returns fallback for empty output", () => {
+    expect(parseJsonOutput("", [])).toEqual([]);
+  });
+});
+
+describe("normalizeMonitorList", () => {
+  it("normalizes hyprctl-style monitor records", () => {
+    const result = normalizeMonitorList([{
+      id: 1,
+      name: "DP-1",
+      description: "Main display",
+      width: 2560,
+      height: 1440,
+      refreshRate: 164.98,
+      x: 0,
+      y: 0,
+      scale: 1.25,
+      availableModes: ["2560x1440@164.98Hz", "2560x1440@60.00Hz"],
+    }]);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      id: 1,
+      name: "DP-1",
+      width: 2560,
+      height: 1440,
+      refreshRate: 164.98,
+      scale: 1.25,
+      x: 0,
+      y: 0,
+    });
+    expect(result[0].availableModes).toContain("2560x1440@164.98Hz");
+  });
+
+  it("normalizes object-based mode lists and refresh aliases", () => {
+    const result = normalizeMonitorList([{
+      output: "HDMI-A-1",
+      width: 1920,
+      height: 1080,
+      refresh: 59.94,
+      modes: [
+        { width: 1920, height: 1080, refresh: 59.94 },
+        { width: 1280, height: 720, refreshRate: 60.0 },
+      ],
+    }]);
+
+    expect(result[0].name).toBe("HDMI-A-1");
+    expect(result[0].availableModes).toEqual([
+      "1920x1080@59.94Hz",
+      "1280x720@60.00Hz",
+    ]);
+  });
+});
+
+describe("fallbackMonitorsFromScreens", () => {
+  it("creates a synthetic monitor list from Quickshell screens", () => {
+    const result = fallbackMonitorsFromScreens([
+      { name: "eDP-1", width: 2256, height: 1504, devicePixelRatio: 1.5 },
+      { name: "DP-3", width: 3840, height: 2160, devicePixelRatio: 2.0 },
+    ]);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({
+      name: "eDP-1",
+      width: 2256,
+      height: 1504,
+      scale: 1.5,
+      x: 0,
+      y: 0,
+    });
+    expect(result[1].x).toBe(2256);
   });
 });
 

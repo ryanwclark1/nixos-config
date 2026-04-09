@@ -5,6 +5,7 @@ singleton AudioService 1.0 AudioService.qml
 singleton AppCatalogService 1.0 AppCatalogService.qml
 singleton AutoHideCoordinator 1.0 AutoHideCoordinator.qml
 singleton BarWidgetRegistry 1.0 ../features/bar/registry/BarWidgetRegistry.qml
+singleton BluetoothCatalogService 1.0 BluetoothCatalogService.qml
 singleton BrightnessService 1.0 BrightnessService.qml
 singleton ClipboardHistoryService 1.0 ClipboardHistoryService.qml
 singleton ColorExportService 1.0 ColorExportService.qml

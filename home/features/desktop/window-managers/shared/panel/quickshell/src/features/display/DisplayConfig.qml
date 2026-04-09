@@ -67,6 +67,7 @@ PanelWindow {
   property var backupMonitors: []    // Snapshot taken before Apply
   property int selectedIndex: -1
   property bool loading: false
+  property string monitorProbeStderr: ""
 
   // Canvas viewport / auto-fit
   readonly property real canvasW: 700
@@ -89,6 +90,7 @@ PanelWindow {
     loading = true;
     monitors = [];
     selectedIndex = -1;
+    monitorProbeStderr = "";
     monitorLoadProc.running = true;
   }
 
@@ -100,48 +102,43 @@ PanelWindow {
       onStreamFinished: {
         displayRoot.loading = false;
         try {
-          var raw = JSON.parse(this.text || "[]");
-          var result = [];
-          for (var i = 0; i < raw.length; i++) {
-            var r = raw[i];
-            // availableModes may be an array of strings like "2560x1440@165.00Hz"
-            // or objects — handle both gracefully
-            var modes = [];
-            if (r.availableModes && Array.isArray(r.availableModes)) {
-              for (var j = 0; j < r.availableModes.length; j++) {
-                var m = r.availableModes[j];
-                if (typeof m === "string") modes.push(m);
-                else if (m && m.width && m.height && m.refreshRate)
-                  modes.push(m.width + "x" + m.height + "@" + m.refreshRate.toFixed(2) + "Hz");
-              }
-            }
-            // Always include the current mode if it's not already present
-            var curMode = r.width + "x" + r.height + "@" + (r.refreshRate ? r.refreshRate.toFixed(2) : "60.00") + "Hz";
-            if (modes.indexOf(curMode) === -1) modes.unshift(curMode);
-
-            result.push({
-              id: r.id,
-              name: r.name || ("Monitor " + i),
-              description: r.description || "",
-              width: r.width || 1920,
-              height: r.height || 1080,
-              refreshRate: r.refreshRate || 60.0,
-              x: r.x || 0,
-              y: r.y || 0,
-              scale: r.scale || 1.0,
-              availableModes: modes,
-              // Drag state (canvas pixels)
-              dragX: 0,
-              dragY: 0
-            });
+          var raw = Helpers.parseJsonOutput(this.text || "[]", []);
+          var result = Helpers.normalizeMonitorList(raw);
+          if (result.length === 0) {
+            result = Helpers.fallbackMonitorsFromScreens(Quickshell.screens || []);
+            if (result.length > 0)
+              Logger.w("DisplayConfig", "Monitor probe returned no monitors; using Quickshell screen fallback.");
           }
           displayRoot.monitors = result;
           displayRoot._syncDragPositions();
           displayRoot._computeScaleFactor();
           if (result.length > 0) displayRoot.selectedIndex = 0;
         } catch (e) {
-          Logger.e("DisplayConfig", "failed to parse monitors:", e);
+          var fallback = Helpers.fallbackMonitorsFromScreens(Quickshell.screens || []);
+          if (fallback.length > 0) {
+            Logger.w("DisplayConfig",
+                     "Failed to parse monitor probe output; using Quickshell screen fallback.",
+                     e,
+                     displayRoot.monitorProbeStderr ? "stderr:" + displayRoot.monitorProbeStderr : "");
+            displayRoot.monitors = fallback;
+            displayRoot._syncDragPositions();
+            displayRoot._computeScaleFactor();
+            displayRoot.selectedIndex = 0;
+            return;
+          }
+
+          Logger.e("DisplayConfig",
+                   "failed to parse monitors:",
+                   e,
+                   displayRoot.monitorProbeStderr ? "stderr:" + displayRoot.monitorProbeStderr : "");
         }
+      }
+    }
+    stderr: StdioCollector {
+      onStreamFinished: {
+        displayRoot.monitorProbeStderr = String(this.text || "").trim();
+        if (displayRoot.monitorProbeStderr.length > 0)
+          Logger.w("DisplayConfig", "monitor probe stderr:", displayRoot.monitorProbeStderr);
       }
     }
   }

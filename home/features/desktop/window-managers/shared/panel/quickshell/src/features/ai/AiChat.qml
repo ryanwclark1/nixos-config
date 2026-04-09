@@ -34,7 +34,7 @@ PanelWindow {
         item: slidePanel
     }
     WlrLayershell.layer: WlrLayer.Top
-    WlrLayershell.keyboardFocus: (root.showContent && (root.active || inputField.activeFocus)) ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: root.showContent ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     WlrLayershell.namespace: "quickshell"
 
     // --- State ---

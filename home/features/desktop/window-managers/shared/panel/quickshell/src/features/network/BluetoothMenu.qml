@@ -41,24 +41,10 @@ BasePopupMenu {
     else root.startScan();
   }
 
-  property bool isScanning: false
-  property int scanElapsed: 0
-  property int connectedCount: 0
-  property int pairedCount: 0
-  property int availableCount: 0
-
-  function updateCounts() {
-    var cc = 0, pc = 0, ac = 0;
-    for (var i = 0; i < Bluetooth.devices.values.length; i++) {
-      var d = Bluetooth.devices.values[i];
-      if (d.connected) cc++;
-      else if (d.paired) pc++;
-      else ac++;
-    }
-    connectedCount = cc;
-    pairedCount = pc;
-    availableCount = ac;
-  }
+  readonly property bool isScanning: BluetoothCatalogService.isScanning
+  readonly property int connectedCount: BluetoothCatalogService.connectedDevices.length
+  readonly property int pairedCount: BluetoothCatalogService.pairedDevices.length
+  readonly property int availableCount: BluetoothCatalogService.availableDevices.length
 
   Component {
     id: _btSvgIcon
@@ -83,49 +69,38 @@ BasePopupMenu {
     ]);
   }
 
-  function connectDevice(device) {
-    if (!device) return;
+  function findLiveDevice(address) {
+    return BluetoothCatalogService.findLiveDevice(address);
+  }
+
+  function connectDevice(address) {
+    if (!address) return;
     root.stopScan();
-    device.connect();
+    var device = findLiveDevice(address);
+    if (device) device.connect();
+    else Quickshell.execDetached(["bluetoothctl", "connect", address]);
+  }
+
+  function disconnectDevice(address) {
+    if (!address) return;
+    root.stopScan();
+    var device = findLiveDevice(address);
+    if (device) device.disconnect();
+    else Quickshell.execDetached(["bluetoothctl", "disconnect", address]);
   }
 
   function startScan() {
-    if (!hasAdapter || !effectiveBtEnabled || !Bluetooth.defaultAdapter) return;
-    Bluetooth.defaultAdapter.discovering = true;
-    isScanning = true;
-    scanElapsed = 0;
-    scanTimer.start();
+    BluetoothCatalogService.startScan();
   }
 
   function stopScan() {
-    if (hasAdapter && Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.discovering = false;
-    isScanning = false;
-    scanTimer.stop();
-    scanElapsed = 0;
+    BluetoothCatalogService.stopScan();
   }
 
   onVisibleChanged: {
     if (visible && effectiveBtEnabled) startScan();
     else if (!visible) stopScan();
-    if (visible) updateCounts();
   }
-
-  readonly property int _scanTickMs: 2000
-  readonly property int _scanTimeoutSec: 30
-
-  Timer {
-    id: scanTimer
-    interval: root._scanTickMs
-    repeat: true
-    onTriggered: {
-      scanElapsed += root._scanTickMs / 1000;
-      if (scanElapsed >= root._scanTimeoutSec) stopScan();
-    }
-  }
-
-  // Reactive device count watcher (ObjectModel doesn't expose countChanged signal)
-  readonly property int _btDeviceCount: (Bluetooth.devices && Bluetooth.devices.values) ? Bluetooth.devices.values.length : 0
-  on_BtDeviceCountChanged: root.updateCounts()
 
   component BtDeviceCard: Rectangle {
     id: _btCard
@@ -176,10 +151,10 @@ BasePopupMenu {
           Layout.fillWidth: true
         }
         Text {
-          text: modelData.address
+          text: modelData.subtitle || modelData.address
           color: Colors.textDisabled
           font.pixelSize: Appearance.fontSizeXS
-          visible: !!modelData.address
+          visible: !!(modelData.subtitle || modelData.address)
         }
       }
 
@@ -322,9 +297,9 @@ BasePopupMenu {
       SharedWidgets.SectionLabel { label: "CONNECTED"; visible: root.connectedCount > 0 }
 
       Repeater {
-        model: Bluetooth.devices
+        model: BluetoothCatalogService.connectedDevices
         delegate: BtDeviceCard {
-          visible: modelData.connected
+          visible: true
           iconColor: Colors.primary
           nameWeight: Font.DemiBold
           bgColor: Colors.primarySubtle
@@ -335,7 +310,7 @@ BasePopupMenu {
           actionIcon: "dismiss.svg"
           actionTooltip: "Disconnect"
           onChipClicked: {}
-          onActionClicked: modelData.disconnect()
+          onActionClicked: root.disconnectDevice(modelData.address)
         }
       }
 
@@ -343,15 +318,15 @@ BasePopupMenu {
       SharedWidgets.SectionLabel { label: "PAIRED"; visible: root.pairedCount > 0 }
 
       Repeater {
-        model: Bluetooth.devices
+        model: BluetoothCatalogService.pairedDevices
         delegate: BtDeviceCard {
-          visible: modelData.paired && !modelData.connected
+          visible: true
           iconColor: Colors.textSecondary
           chipText: "Connect"
           chipInteractive: true
           actionIcon: "delete.svg"
           actionTooltip: "Remove"
-          onChipClicked: root.connectDevice(modelData)
+          onChipClicked: root.connectDevice(modelData.address)
           onActionClicked: Quickshell.execDetached(["bluetoothctl", "remove", modelData.address])
         }
       }
@@ -376,9 +351,9 @@ BasePopupMenu {
       }
 
       Repeater {
-        model: Bluetooth.devices
+        model: BluetoothCatalogService.availableDevices
         delegate: BtDeviceCard {
-          visible: !modelData.paired && !modelData.connected
+          visible: true
           iconColor: Colors.textDisabled
           chipText: "Pair"
           chipInteractive: true

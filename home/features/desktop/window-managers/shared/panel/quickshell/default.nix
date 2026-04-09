@@ -110,6 +110,11 @@ let
     ${builtins.readFile ./scripts/network-monitor.py}
   '';
 
+  bluetoothMonitorScript = pkgs.writeScriptBin "qs-bluetooth-monitor" ''
+    #!${pkgs.python3.withPackages (ps: [ ps.dbus-python ps.pygobject3 ])}/bin/python3
+    ${builtins.readFile ./scripts/bluetooth-monitor.py}
+  '';
+
   iconResolverScript = pkgs.writeShellScriptBin "qs-icon-resolver" ''
     PATH="${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:$PATH"
     ${builtins.readFile ./scripts/icon-resolver.sh}
@@ -330,6 +335,7 @@ let
       polkitAgentScript
       networkScript
       networkMonitorScript
+      bluetoothMonitorScript
       iconResolverScript
       compositorGuardScript
       compositorSmokeScript

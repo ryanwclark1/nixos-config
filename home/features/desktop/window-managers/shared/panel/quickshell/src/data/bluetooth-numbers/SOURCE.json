@@ -1,0 +1,10 @@
+{
+  "upstream": "https://github.com/nordicsemi/bluetooth-numbers-database",
+  "commit": "f775114b057960b5f62d15c594c9335d112cb101",
+  "files": [
+    "company_ids.json",
+    "service_uuids.json",
+    "gap_appearance.json"
+  ],
+  "license": "MIT"
+}

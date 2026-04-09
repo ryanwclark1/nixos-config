@@ -1,5 +1,132 @@
 .pragma library
 
+function _number(value, fallbackValue) {
+    var parsed = Number(value);
+    return isFinite(parsed) ? parsed : fallbackValue;
+}
+
+function parseJsonOutput(rawText, fallbackValue) {
+    var text = String(rawText || "").trim();
+    if (text === "")
+        return fallbackValue;
+
+    var parseError = null;
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        parseError = e;
+    }
+
+    var lines = text.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+        var candidate = lines.slice(i).join("\n").trim();
+        if (candidate === "")
+            continue;
+        var firstChar = candidate.charAt(0);
+        if (firstChar !== "{" && firstChar !== "[")
+            continue;
+        try {
+            return JSON.parse(candidate);
+        } catch (_) {
+        }
+    }
+
+    throw parseError;
+}
+
+function normalizeMonitorList(rawMonitors) {
+    var source = Array.isArray(rawMonitors) ? rawMonitors : [];
+    var result = [];
+
+    for (var i = 0; i < source.length; i++) {
+        var mon = source[i] || {};
+        var width = _number(mon.width, _number(mon.currentMode && mon.currentMode.width, 1920));
+        var height = _number(mon.height, _number(mon.currentMode && mon.currentMode.height, 1080));
+        var refreshRate = _number(
+            mon.refreshRate,
+            _number(mon.refresh, _number(mon.currentMode && mon.currentMode.refreshRate, 60.0))
+        );
+        var scale = _number(mon.scale, 1.0);
+        var x = _number(mon.x, _number(mon.transformX, 0));
+        var y = _number(mon.y, _number(mon.transformY, 0));
+
+        var modes = [];
+        var availableModes = Array.isArray(mon.availableModes)
+            ? mon.availableModes
+            : (Array.isArray(mon.modes) ? mon.modes : []);
+
+        for (var j = 0; j < availableModes.length; j++) {
+            var mode = availableModes[j];
+            if (typeof mode === "string") {
+                modes.push(mode);
+                continue;
+            }
+
+            if (!mode)
+                continue;
+
+            var modeWidth = _number(mode.width, 0);
+            var modeHeight = _number(mode.height, 0);
+            var modeRefresh = _number(mode.refreshRate, _number(mode.refresh, 0));
+            if (modeWidth > 0 && modeHeight > 0 && modeRefresh > 0)
+                modes.push(modeWidth + "x" + modeHeight + "@" + modeRefresh.toFixed(2) + "Hz");
+        }
+
+        var currentMode = width + "x" + height + "@" + refreshRate.toFixed(2) + "Hz";
+        if (modes.indexOf(currentMode) === -1)
+            modes.unshift(currentMode);
+
+        result.push({
+            id: mon.id !== undefined ? mon.id : i,
+            name: String(mon.name || mon.output || ("Monitor " + (i + 1))),
+            description: String(mon.description || mon.make || mon.model || ""),
+            width: width,
+            height: height,
+            refreshRate: refreshRate,
+            x: x,
+            y: y,
+            scale: scale,
+            availableModes: modes,
+            dragX: 0,
+            dragY: 0
+        });
+    }
+
+    return result;
+}
+
+function fallbackMonitorsFromScreens(screens) {
+    var source = Array.isArray(screens) ? screens : [];
+    var result = [];
+    var xCursor = 0;
+
+    for (var i = 0; i < source.length; i++) {
+        var screen = source[i] || {};
+        var width = Math.max(1, Math.round(_number(screen.width, 1920)));
+        var height = Math.max(1, Math.round(_number(screen.height, 1080)));
+        var scale = _number(screen.devicePixelRatio, _number(screen.scaleFactor, 1.0));
+
+        result.push({
+            id: "screen-" + i,
+            name: String(screen.name || ("Monitor " + (i + 1))),
+            description: "Detected by Quickshell",
+            width: width,
+            height: height,
+            refreshRate: 60.0,
+            x: xCursor,
+            y: 0,
+            scale: scale,
+            availableModes: [width + "x" + height + "@60.00Hz"],
+            dragX: 0,
+            dragY: 0
+        });
+
+        xCursor += width;
+    }
+
+    return result;
+}
+
 // Extract unique resolutions from a modes array (e.g. ["2560x1440@165.00Hz", ...])
 function uniqueResolutions(modes) {
     var seen = {};

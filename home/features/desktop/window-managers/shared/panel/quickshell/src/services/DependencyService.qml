@@ -27,6 +27,9 @@ QtObject {
       "qs-ai-stream": {
         requires: []
       },
+      "qs-bluetooth-monitor": {
+        requires: []
+      },
       "qs-bookmarks": {
         requires: []
       },
