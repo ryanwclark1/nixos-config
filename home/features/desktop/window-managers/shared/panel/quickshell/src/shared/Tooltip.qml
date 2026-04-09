@@ -155,7 +155,6 @@ Item {
 
     PopupWindow {
         id: popupTooltip
-        anchor.window: root.resolvedAnchorWindow
         anchor.item: root.effectiveAnchorItem
         anchor.edges: {
             switch (root.preferredSide) {

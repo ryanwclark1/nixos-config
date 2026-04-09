@@ -23,7 +23,8 @@ describe("AI tooltip anchor contract", () => {
     expect(tooltipSource).toContain("root.Window.window");
     expect(tooltipSource).toContain("readonly property bool usePopup: !!resolvedAnchorWindow && !!effectiveAnchorItem");
     expect(tooltipSource).toContain("PopupWindow {");
-    expect(tooltipSource).toContain("anchor.window: root.resolvedAnchorWindow");
+    expect(tooltipSource).toContain("anchor.item: root.effectiveAnchorItem");
+    expect(tooltipSource).not.toContain("anchor.window: root.resolvedAnchorWindow");
     expect(tooltipSource).toContain("property int popupAdjustment: PopupAdjustment.Flip | PopupAdjustment.Slide");
     expect(tooltipSource).toContain("popupTooltip.anchor.updateAnchor()");
   });

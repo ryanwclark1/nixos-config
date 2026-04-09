@@ -22,7 +22,8 @@ describe("tooltip popup contract", () => {
     expect(barTooltipSource).toContain("return Qt.RightEdge;");
     expect(barTooltipSource).toContain("return Qt.LeftEdge;");
     expect(barTooltipSource).toContain("Tooltip {");
-    expect(barTooltipSource).toContain("anchorWindow: root.resolvedAnchorWindow");
+    expect(barTooltipSource).toContain("anchorItem: root.effectiveAnchorItem");
+    expect(barTooltipSource).not.toContain("anchorWindow: root.resolvedAnchorWindow");
     expect(barTooltipSource).toContain("preferredSide: root.tooltipSide");
     expect(barTooltipSource).not.toContain("PopupWindow {");
   });
