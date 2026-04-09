@@ -67,7 +67,7 @@ QtObject {
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
-                clickCommand: SU.ipcCall("Shell", "toggleSurface", "audioMenu")
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "audioMenu", "")
             },
             networkControls: {
                 id: "networkControls",
@@ -81,7 +81,7 @@ QtObject {
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
-                clickCommand: SU.ipcCall("Shell", "toggleSurface", "networkMenu")
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "networkMenu", "")
             },
             vpnControls: {
                 id: "vpnControls",
@@ -95,7 +95,7 @@ QtObject {
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
-                clickCommand: SU.ipcCall("Shell", "toggleSurface", "vpnMenu")
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "vpnMenu", "")
             },
             commandCenter: {
                 id: "commandCenter",
@@ -109,7 +109,7 @@ QtObject {
                 requiresConfirmation: false,
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
-                clickCommand: SU.ipcCall("Shell", "toggleSurface", "controlCenter")
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "controlCenter", "")
             }
         })
 

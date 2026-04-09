@@ -176,7 +176,7 @@ PanelWindow {
                 id: openScreenshotTimer
                 interval: root.screenshotOpenDelayMs
                 repeat: false
-                onTriggered: Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "screenshotMenu"))
+                onTriggered: Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "screenshotMenu", ""))
             }
 
             property string _quickLinkSurfaceId: ""
@@ -186,7 +186,7 @@ PanelWindow {
                 repeat: false
                 onTriggered: {
                     if (parent._quickLinkSurfaceId)
-                        Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", parent._quickLinkSurfaceId));
+                        Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", parent._quickLinkSurfaceId, ""));
                 }
             }
 
@@ -239,7 +239,7 @@ PanelWindow {
                                             if (modelData.id === "screenshotControls") {
                                                 openScreenshotTimer.restart();
                                             } else if (modelData.ipcTarget && modelData.ipcAction) {
-                                                var surfaceId = (modelData.clickCommand && modelData.clickCommand.length > 4) ? modelData.clickCommand[4] : "";
+                                                var surfaceId = (modelData.clickCommand && modelData.clickCommand.length > 5) ? modelData.clickCommand[5] : "";
                                                 _quickLinkSurfaceId = surfaceId;
                                                 openQuickLinkTimer.restart();
                                             } else if (Array.isArray(modelData.clickCommand) && modelData.clickCommand.length > 0) {

@@ -18,7 +18,7 @@ QtObject {
             icon: "crop.svg",
             title: "Screenshot",
             subtitle: "Capture region, screen, or fullscreen",
-            clickCommand: SU.ipcCall("Shell", "toggleSurface", "screenshotMenu")
+            clickCommand: SU.ipcCall("Shell", "toggleSurface", "screenshotMenu", "")
         }
     ])
 
