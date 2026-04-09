@@ -37,12 +37,6 @@ PanelWindow {
     WlrLayershell.keyboardFocus: (root.showContent && (root.active || inputField.activeFocus)) ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     WlrLayershell.namespace: "quickshell"
 
-    onActiveChanged: {
-        if (!active) {
-            clearInteractiveFocus();
-        }
-    }
-
     // --- State ---
     property bool showContent: false
     property int panelWidth: _persist.panelWidth
