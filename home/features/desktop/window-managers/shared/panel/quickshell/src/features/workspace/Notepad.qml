@@ -35,10 +35,12 @@ PanelWindow {
   property bool showContent: false
 
   // Notepad data
-  property int notepadWidth: 400
-  readonly property int notepadMinWidth: 300
-  readonly property int notepadMaxWidth: 600
-  property var tabs: [{ "id": 1, "title": "Notes", "content": "" }]
+  property int notepadWidth: 500
+  readonly property int notepadMinWidth: 360
+  readonly property int notepadMaxWidth: 800
+  readonly property bool compactHeader: slidePanel.width < 420
+  readonly property bool narrowHeader: slidePanel.width < 360
+  property var tabs: [{ "id": 1, "title": "Note 1", "content": "" }]
   property int activeTabId: 1
   property int nextTabId: 2
   property string searchQuery: ""
@@ -99,9 +101,9 @@ PanelWindow {
         activeTabId = found ? data.activeTabId : tabs[0].id;
       }
       if (data.notepadWidth !== undefined) {
-        notepadWidth = Math.max(notepadMinWidth, Math.min(notepadMaxWidth, data.notepadWidth));
+        notepadWidth = Math.max(notepadMinWidth, Math.min(notepadMaxWidth, data.notepadWidth === 400 ? 500 : data.notepadWidth));
       } else if (data.width !== undefined) {
-        notepadWidth = Math.max(notepadMinWidth, Math.min(notepadMaxWidth, data.width));
+        notepadWidth = Math.max(notepadMinWidth, Math.min(notepadMaxWidth, data.width === 400 ? 500 : data.width));
       }
     } catch (e) {
       Logger.e("Notepad", "failed to parse JSON:", e);
@@ -241,11 +243,26 @@ PanelWindow {
     if (!_loading) saveTimer.restart();
   }
 
+  function defaultTabTitle(index) {
+    return "Note " + Math.max(1, index);
+  }
+
+  function nextDefaultTabTitle() {
+    var used = ({});
+    for (var i = 0; i < tabs.length; i++) {
+      used[String(tabs[i].title || "").toLowerCase()] = true;
+    }
+    var counter = 1;
+    while (used[defaultTabTitle(counter).toLowerCase()])
+      counter += 1;
+    return defaultTabTitle(counter);
+  }
+
   // --- Tab Management ---
   function addTab() {
     var newId = nextTabId++;
     var newTabs = tabs.slice();
-    newTabs.push({ "id": newId, "title": "Tab " + newId, "content": "" });
+    newTabs.push({ "id": newId, "title": nextDefaultTabTitle(), "content": "" });
     tabs = newTabs;
     activeTabId = newId;
     scheduleSave();
@@ -279,14 +296,9 @@ PanelWindow {
 
   function removeTab(tabId) {
     if (tabs.length <= 1) return; // Can't delete last tab
-    var newTabs = [];
-    for (var i = 0; i < tabs.length; i++) {
-      if (tabs[i].id !== tabId) newConvs.push(tabs[i]); // Typo in original? (newConvs vs newTabs)
-    }
-    // Fixed typo from original
     var updatedTabs = [];
-    for (var j = 0; j < tabs.length; j++) {
-        if (tabs[j].id !== tabId) updatedTabs.push(tabs[j]);
+    for (var i = 0; i < tabs.length; i++) {
+        if (tabs[i].id !== tabId) updatedTabs.push(tabs[i]);
     }
     // If we deleted the active tab, switch to previous or first
     if (activeTabId === tabId) {
@@ -427,29 +439,42 @@ PanelWindow {
       // ---- Header ----
       RowLayout {
         Layout.fillWidth: true
+        spacing: root.narrowHeader ? Appearance.spacingXS : Appearance.spacingS
 
         SharedWidgets.SvgIcon {
           source: "edit.svg"
           color: Colors.text
-          size: Appearance.fontSizeXL
+          size: root.narrowHeader ? Appearance.fontSizeLarge : Appearance.fontSizeXL
+          Layout.alignment: Qt.AlignVCenter
         }
         Text {
+          Layout.fillWidth: true
+          Layout.minimumWidth: 0
           text: "Notepad"
           color: Colors.text
-          font.pixelSize: Appearance.fontSizeXL
+          font.pixelSize: root.narrowHeader ? Appearance.fontSizeLarge : Appearance.fontSizeXL
           font.weight: Font.DemiBold
           font.letterSpacing: Appearance.letterSpacingTight
+          elide: Text.ElideRight
+          maximumLineCount: 1
+          Layout.alignment: Qt.AlignVCenter
         }
 
-        Item { Layout.fillWidth: true }
+        Item {
+          Layout.fillWidth: true
+          visible: !root.narrowHeader
+        }
 
         // Search bar
         Rectangle {
           visible: root.isSearching
-          width: 140; height: 28; radius: Appearance.radiusMedium
+          width: root.compactHeader ? 112 : 140
+          height: 28
+          radius: Appearance.radiusMedium
           color: Colors.cardSurface
           border.color: searchInput.activeFocus ? Colors.primary : Colors.border
           border.width: 1
+          Layout.alignment: Qt.AlignVCenter
           
           TextInput {
             id: searchInput
@@ -471,6 +496,7 @@ PanelWindow {
           icon: "search-visual.svg"
           iconColor: root.isSearching ? Colors.primary : Colors.textDisabled
           tooltipText: root.isSearching ? "Hide search" : "Search"
+          Layout.alignment: Qt.AlignVCenter
           onClicked: {
             root.isSearching = !root.isSearching;
             if (!root.isSearching) root.searchQuery = "";
@@ -478,16 +504,25 @@ PanelWindow {
         }
 
         // Word / char counts
-        Text {
-          text: {
-            var c = root.activeContent;
-            var words = c.trim().length === 0 ? 0 : c.trim().split(/\s+/).length;
-            return words + "w  " + c.length + "c";
-          }
-          color: Colors.textDisabled
-          font.pixelSize: Appearance.fontSizeXS
+        Item {
+          visible: !root.narrowHeader
           Layout.alignment: Qt.AlignVCenter
+          Layout.preferredHeight: 28
           Layout.rightMargin: Appearance.spacingXS
+          implicitWidth: countText.implicitWidth
+
+          Text {
+            id: countText
+            anchors.verticalCenter: parent.verticalCenter
+            text: {
+              var c = root.activeContent;
+              var words = c.trim().length === 0 ? 0 : c.trim().split(/\s+/).length;
+              return words + "w  " + c.length + "c";
+            }
+            color: Colors.textDisabled
+            font.pixelSize: Appearance.fontSizeXS
+            verticalAlignment: Text.AlignVCenter
+          }
         }
 
         // Open file button
@@ -495,6 +530,7 @@ PanelWindow {
           size: 28; radius: Appearance.radiusXS
           icon: "folder-open.svg"
           tooltipText: "Open file"
+          Layout.alignment: Qt.AlignVCenter
           onClicked: root.openFileRequested()
         }
 
@@ -503,6 +539,7 @@ PanelWindow {
           size: 28; radius: Appearance.radiusXS
           icon: "save.svg"
           tooltipText: "Save as"
+          Layout.alignment: Qt.AlignVCenter
           onClicked: root.saveAsRequested(root.activeContent)
         }
 
@@ -511,6 +548,7 @@ PanelWindow {
           size: 28; radius: Appearance.radiusMedium
           icon: "dismiss.svg"
           tooltipText: "Close"
+          Layout.alignment: Qt.AlignVCenter
           onClicked: root.closeRequested()
         }
       }
@@ -518,12 +556,12 @@ PanelWindow {
       // ---- Tab bar ----
       RowLayout {
         Layout.fillWidth: true
-        spacing: Appearance.spacingSM
+        spacing: Appearance.spacingS
 
         // Scrollable tab strip
         Item {
           Layout.fillWidth: true
-          height: 32
+          height: Appearance.controlRowHeight
           clip: true
 
           Flickable {
@@ -554,19 +592,25 @@ PanelWindow {
                     (modelData.title.toLowerCase().indexOf(root.searchQuery.toLowerCase()) !== -1 || 
                      modelData.content.toLowerCase().indexOf(root.searchQuery.toLowerCase()) !== -1)
 
-                  width: isEditing ? tabEditInput.width + 16 : Math.min(tabLabelText.contentWidth + 36, 140)
-                  height: 28
+                  width: isEditing
+                    ? Math.min(tabEditInput.width + 22, 164)
+                    : Math.min(tabLabelText.contentWidth + 54, 164)
+                  height: 32
 
                   Behavior on width { Anim { duration: Appearance.durationFast } }
 
                   Rectangle {
                     id: tabBg
                     anchors.fill: parent
-                    radius: Appearance.radiusXXS
+                    radius: Appearance.radiusSmall
                     color: isActive
-                      ? Colors.primaryMid
-                      : (hasSearchMatch ? Colors.withAlpha(Colors.accent, 0.12) : Colors.bgWidget)
-                    border.color: isActive ? Colors.primary : (hasSearchMatch ? Colors.accent : Colors.border)
+                      ? Colors.highlightLight
+                      : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.05)
+                        : (hasSearchMatch ? Colors.withAlpha(Colors.accent, 0.12) : "transparent"))
+                    border.color: isActive
+                      ? Colors.primary
+                      : (tabMouse.containsMouse ? Colors.withAlpha(Colors.text, 0.25)
+                        : (hasSearchMatch ? Colors.accent : Colors.border))
                     border.width: (isActive || hasSearchMatch) ? 1.5 : 1
                     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
                     Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
@@ -578,6 +622,25 @@ PanelWindow {
                     }
                   }
 
+                  Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottomMargin: 1.5
+                    width: isActive ? parent.width - 20 : 0
+                    height: 2
+                    radius: Appearance.radiusXXXS
+                    color: Colors.primary
+                    opacity: isActive ? 1 : 0
+                    visible: width > 0
+
+                    Behavior on width {
+                      NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack }
+                    }
+                    Behavior on opacity {
+                      NumberAnimation { duration: Appearance.durationFast }
+                    }
+                  }
+
                   // Tab label (shown when not editing)
                   Text {
                     id: tabLabelText
@@ -585,9 +648,9 @@ PanelWindow {
                     anchors.leftMargin: Appearance.spacingS
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: deleteTabBtn.left
-                    anchors.rightMargin: Appearance.spacingXS
+                    anchors.rightMargin: 8
                     text: modelData.title
-                    color: isActive ? Colors.primary : Colors.textSecondary
+                    color: isActive ? Colors.primary : (tabMouse.containsMouse ? Colors.text : Colors.textSecondary)
                     font.pixelSize: Appearance.fontSizeSmall
                     font.weight: isActive ? Font.DemiBold : Font.Normal
                     elide: Text.ElideRight
@@ -631,13 +694,15 @@ PanelWindow {
                   // Delete tab button (visible on hover when more than 1 tab)
                   Rectangle {
                     id: deleteTabBtn
-                    width: 14; height: 14; radius: width / 2
+                    width: 16
+                    height: 16
+                    radius: width / 2
                     anchors.right: parent.right
-                    anchors.rightMargin: 5
+                    anchors.rightMargin: 6
                     anchors.verticalCenter: parent.verticalCenter
                     color: "transparent"
                     opacity: (tabMouse.containsMouse || tabDelegate.isActive) && root.tabs.length > 1 ? 1 : 0
-                    visible: root.tabs.length > 1
+                    visible: opacity > 0 && root.tabs.length > 1
                     Behavior on opacity { NumberAnimation { duration: Appearance.durationFast } }
 
                     SharedWidgets.StateLayer {
@@ -690,14 +755,17 @@ PanelWindow {
 
         // "+" add tab button
         Rectangle {
-          width: 28; height: 28; radius: Appearance.radiusXS
-          color: Colors.bgWidget
-          border.color: Colors.border; border.width: 1
+          width: 32
+          height: 32
+          radius: Appearance.radiusSmall
+          color: addTabMouse.containsMouse ? Colors.primaryGhost : Colors.bgWidget
+          border.color: addTabMouse.containsMouse ? Colors.primary : Colors.border
+          border.width: 1
 
           Text {
             anchors.centerIn: parent
             text: "+"
-            color: Colors.textSecondary
+            color: addTabMouse.containsMouse ? Colors.primary : Colors.textSecondary
             font.pixelSize: Appearance.fontSizeLarge
             font.weight: Font.Light
           }

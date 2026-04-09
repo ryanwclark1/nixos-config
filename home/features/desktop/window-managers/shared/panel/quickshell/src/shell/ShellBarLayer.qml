@@ -149,7 +149,7 @@ Item {
                             ScreenshotMenu { Component.onCompleted: barWindow.wirePopup(this, "screenshotMenu") }
 
                             WeatherMenu {
-                                implicitHeight: Math.min(600, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(660, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 Component.onCompleted: barWindow.wirePopup(this, "weatherMenu")
                             }
                             MarketMenu {
