@@ -45,10 +45,24 @@ PanelWindow {
   property string uptimeText: ""
   Process {
     id: uptimeProc
-    command: ["sh", "-c", "uptime -p | sed 's/^up //'"]
+    command: ["sh", "-c", "cat /proc/uptime 2>/dev/null | cut -d' ' -f1"]
     running: false
     stdout: StdioCollector {
-      onStreamFinished: root.uptimeText = (this.text || "").trim()
+      onStreamFinished: {
+        var uptimeSecs = parseFloat((this.text || "").trim() || "0");
+        if (isNaN(uptimeSecs) || uptimeSecs === 0) {
+            root.uptimeText = "";
+            return;
+        }
+        var d = Math.floor(uptimeSecs / 86400);
+        var h = Math.floor((uptimeSecs % 86400) / 3600);
+        var m = Math.floor((uptimeSecs % 3600) / 60);
+        var parts = [];
+        if (d > 0) parts.push(d + (d === 1 ? " day" : " days"));
+        if (h > 0) parts.push(h + (h === 1 ? " hour" : " hours"));
+        parts.push(m + (m === 1 ? " minute" : " minutes"));
+        root.uptimeText = parts.join(", ");
+      }
     }
   }
 

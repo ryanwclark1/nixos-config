@@ -30,14 +30,25 @@ SharedWidgets.CardBase {
             "sh",
             "-c",
             "printf '%s\\n%s\\n%s\\n' "
-            + "\"$(uptime -p 2>/dev/null | sed 's/^up //;s/ hours/h/;s/ hour/h/;s/ minutes/m/;s/ minute/m/')\" "
+            + "\"$(cat /proc/uptime 2>/dev/null | cut -d' ' -f1)\" "
             + "\"$(cut -d' ' -f1-3 /proc/loadavg 2>/dev/null)\" "
             + "\"$(free -h 2>/dev/null | awk '/^Swap:/ {print $3 \" / \" $2}')\""
         ]
         parse: function(out) {
             var lines = String(out || "").trim().split("\n");
+            var uptimeSecs = parseFloat(lines[0] || "0");
+            var uptimeText = "--";
+            if (!isNaN(uptimeSecs)) {
+                var d = Math.floor(uptimeSecs / 86400);
+                var h = Math.floor((uptimeSecs % 86400) / 3600);
+                var m = Math.floor((uptimeSecs % 3600) / 60);
+                uptimeText = "";
+                if (d > 0) uptimeText += d + "d ";
+                if (h > 0) uptimeText += h + "h ";
+                uptimeText += m + "m";
+            }
             return {
-                uptime: String(lines[0] || "--").trim() || "--",
+                uptime: String(uptimeText || "--").trim() || "--",
                 loadAverage: String(lines[1] || "--").trim() || "--",
                 swapUsage: String(lines[2] || "--").trim() || "--"
             };

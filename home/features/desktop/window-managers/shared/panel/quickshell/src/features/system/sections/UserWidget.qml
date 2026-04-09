@@ -21,8 +21,19 @@ Shared.ThemedContainer {
     id: uptimePoll
     interval: root._uptimePollMs
     running: root.visible
-    command: ["sh", "-c", "uptime -p | sed 's/up //;s/ hours/h/;s/ minutes/m/;s/ hour/h/;s/ minute/m/'"]
-    parse: function(out) { return String(out || "").trim() || "just started" }
+    command: ["sh", "-c", "cat /proc/uptime 2>/dev/null | cut -d' ' -f1"]
+    parse: function(out) {
+        var uptimeSecs = parseFloat(String(out || "").trim() || "0");
+        if (isNaN(uptimeSecs) || uptimeSecs === 0) return "just started";
+        var d = Math.floor(uptimeSecs / 86400);
+        var h = Math.floor((uptimeSecs % 86400) / 3600);
+        var m = Math.floor((uptimeSecs % 3600) / 60);
+        var text = "";
+        if (d > 0) text += d + "d ";
+        if (h > 0) text += h + "h ";
+        text += m + "m";
+        return text;
+    }
     onUpdated: root.uptime = uptimePoll.value
   }
 
