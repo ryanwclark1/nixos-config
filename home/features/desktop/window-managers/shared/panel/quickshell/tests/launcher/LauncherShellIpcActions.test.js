@@ -1,5 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { shellDestinationAndPaletteHandlers } from "../../src/launcher/LauncherShellIpcActions.js";
+import { readFileSync } from "fs";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const quickshellRoot = resolve(__dirname, "..", "..");
 
 describe("shellDestinationAndPaletteHandlers", () => {
   it("routes openSettings through execDetached with ipc argv", () => {
@@ -55,5 +62,16 @@ describe("shellDestinationAndPaletteHandlers", () => {
       "controlCenter",
       "",
     ]);
+  });
+
+  it("keeps SSH settings routed through the SettingsHub target", () => {
+    const launcherSource = readFileSync(
+      resolve(quickshellRoot, "src/launcher/Launcher.qml"),
+      "utf8"
+    );
+
+    expect(launcherSource).toContain('openSshSettings: function() {');
+    expect(launcherSource).toContain('SU.ipcCall("SettingsHub", "open")');
+    expect(launcherSource).not.toContain('SU.ipcCall("Shell", "openSurface", "settingsHub")');
   });
 });

@@ -2941,7 +2941,7 @@ PanelWindow {
                 Quickshell.execDetached(SU.terminalCommand.apply(null, ["exec " + _launcherSshCommand + " \"$@\""].concat(args)));
             },
             openSshSettings: function() {
-                Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "settingsHub"));
+                Quickshell.execDetached(SU.ipcCall("SettingsHub", "open"));
             },
             toggleOverview: function() { CompositorAdapter.toggleOverview(); }
         });

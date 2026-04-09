@@ -405,21 +405,7 @@ EOF
 
     home.file.".config/quickshell" = {
       force = true;
-      source = lib.cleanSourceWith {
-        src = ./src;
-        filter = path: type:
-          let baseName = builtins.baseNameOf path;
-          in type == "directory"
-            || lib.hasSuffix ".qml" baseName
-            || lib.hasSuffix ".js" baseName
-            || lib.hasSuffix ".json" baseName
-            || lib.hasSuffix ".svg" baseName
-            || lib.hasSuffix ".png" baseName
-            || lib.hasSuffix ".gif" baseName
-            || lib.hasSuffix ".frag" baseName
-            || lib.hasSuffix ".vert" baseName
-            || baseName == "qmldir";
-      };
+      source = ./src;
       recursive = true;
     };
 

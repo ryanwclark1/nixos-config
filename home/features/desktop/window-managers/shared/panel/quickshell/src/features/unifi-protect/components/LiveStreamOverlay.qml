@@ -95,7 +95,7 @@ Item {
                         required property string modelData
                         compact: true
                         label: modelData.charAt(0).toUpperCase() + modelData.slice(1)
-                        highlighted: root.selectedQuality === modelData
+                        emphasized: root.selectedQuality === modelData
                         onClicked: {
                             root.selectedQuality = modelData;
                             videoPlayer.stop();
