@@ -158,6 +158,23 @@ QtObject {
     property var controlCenterHiddenToggles: []
     property var controlCenterPluginOrder: []
     property var controlCenterHiddenPlugins: []
+    property bool controlCenterShowPomodoro: true
+    property bool controlCenterShowTodo: true
+    property bool controlCenterShowDevOps: true
+    property bool controlCenterShowBrightness: true
+    property bool controlCenterShowAudioOutput: true
+    property bool controlCenterShowAudioInput: true
+    property bool controlCenterShowCpuGpuTemp: true
+    property bool controlCenterShowCpuWidget: true
+    property bool controlCenterShowSystemGraphs: true
+    property bool controlCenterShowProcessWidget: true
+    property bool controlCenterShowNetworkGraphs: true
+    property bool controlCenterShowRamWidget: true
+    property bool controlCenterShowDiskWidget: true
+    property bool controlCenterShowGpuWidget: true
+    property bool controlCenterShowUpdateWidget: true
+    property bool controlCenterShowScratchpad: true
+    property bool controlCenterShowPowerActions: true
 
     // --- ON-SCREEN KEYBOARD ---
     property string oskLayout: "English (US)"

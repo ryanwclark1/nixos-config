@@ -179,6 +179,17 @@ PanelWindow {
                 onTriggered: Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "screenshotMenu"))
             }
 
+            property string _quickLinkSurfaceId: ""
+            Timer {
+                id: openQuickLinkTimer
+                interval: root.settingsOpenDelayMs
+                repeat: false
+                onTriggered: {
+                    if (parent._quickLinkSurfaceId)
+                        Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", parent._quickLinkSurfaceId));
+                }
+            }
+
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -219,16 +230,22 @@ PanelWindow {
                                 Repeater {
                                     model: ControlCenterRegistry.quickLinkItems
                                     delegate: QuickLinkCard {
+                                        required property var modelData
                                         icon: modelData.icon
                                         title: modelData.title
                                         subtitle: modelData.subtitle
-                                        clickCommand: modelData.clickCommand
-                                        clickAction: modelData.id === "screenshotControls"
-                                            ? function() {
-                                                root.closeRequested();
+                                        clickAction: function() {
+                                            root.closeRequested();
+                                            if (modelData.id === "screenshotControls") {
                                                 openScreenshotTimer.restart();
+                                            } else if (modelData.ipcTarget && modelData.ipcAction) {
+                                                var surfaceId = (modelData.clickCommand && modelData.clickCommand.length > 4) ? modelData.clickCommand[4] : "";
+                                                _quickLinkSurfaceId = surfaceId;
+                                                openQuickLinkTimer.restart();
+                                            } else if (Array.isArray(modelData.clickCommand) && modelData.clickCommand.length > 0) {
+                                                Quickshell.execDetached(modelData.clickCommand);
                                             }
-                                            : null
+                                        }
                                     }
                                 }
                             }
@@ -308,17 +325,18 @@ PanelWindow {
                             // Pomodoro Timer
                             PomodoroWidget {
                                 Layout.fillWidth: true
-                                visible: opacity > 0
+                                visible: Config.controlCenterShowPomodoro && opacity > 0
                             }
 
                             // Todo List
                             TodoWidget {
                                 Layout.fillWidth: true
-                                visible: opacity > 0
+                                visible: Config.controlCenterShowTodo && opacity > 0
                             }
 
                             // DevOps & Services
                             DevOpsSection {
+                                visible: Config.controlCenterShowDevOps
                                 showContent: root.showContent
                                 baseIndex: 10
                                 staggerDelay: root.staggerDelay
@@ -343,7 +361,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(7)
                             scale: root.entranceScale(7)
                             transform: Translate { y: root.entranceY(7) }
-                            visible: opacity > 0
+                            visible: (Config.controlCenterShowBrightness || Config.controlCenterShowAudioOutput || Config.controlCenterShowAudioInput) && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(7) } NumberAnimation { duration: root.entranceDuration(7); easing.type: Easing.OutBack } } }
@@ -351,6 +369,7 @@ PanelWindow {
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: Appearance.spacingSM
+                                visible: Config.controlCenterShowBrightness
 
                                 Repeater {
                                     model: BrightnessService.monitors
@@ -438,6 +457,7 @@ PanelWindow {
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: Appearance.spacingSM
+                                visible: Config.controlCenterShowAudioOutput
                                 RowLayout {
                                     Layout.fillWidth: true
                                     SharedWidgets.SvgIcon {
@@ -485,6 +505,7 @@ PanelWindow {
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: Appearance.spacingSM
+                                visible: Config.controlCenterShowAudioInput
                                 RowLayout {
                                     Layout.fillWidth: true
                                     SharedWidgets.SvgIcon {
@@ -536,7 +557,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(8)
                             scale: root.entranceScale(8)
                             transform: Translate { y: root.entranceY(8) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowCpuGpuTemp && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(8) } NumberAnimation { duration: root.entranceDuration(8); easing.type: Easing.OutBack } } }
@@ -590,11 +611,20 @@ PanelWindow {
                             }
                         }
 
+                        CpuWidget {
+                            opacity: root.entranceOpacity(9)
+                            scale: root.entranceScale(9)
+                            transform: Translate { y: root.entranceY(9) }
+                            visible: Config.controlCenterShowCpuWidget && opacity > 0
+                            layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutCubic } } }
+                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutBack } } }
+                        }
                         SystemGraphs {
                             opacity: root.entranceOpacity(9)
                             scale: root.entranceScale(9)
                             transform: Translate { y: root.entranceY(9) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowSystemGraphs && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(9) } NumberAnimation { duration: root.entranceDuration(9); easing.type: Easing.OutBack } } }
@@ -603,7 +633,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(10)
                             scale: root.entranceScale(10)
                             transform: Translate { y: root.entranceY(10) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowProcessWidget && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutBack } } }
@@ -612,7 +642,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(11)
                             scale: root.entranceScale(11)
                             transform: Translate { y: root.entranceY(11) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowNetworkGraphs && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutBack } } }
@@ -621,7 +651,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(12)
                             scale: root.entranceScale(12)
                             transform: Translate { y: root.entranceY(12) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowRamWidget && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutBack } } }
@@ -630,7 +660,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(13)
                             scale: root.entranceScale(13)
                             transform: Translate { y: root.entranceY(13) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowDiskWidget && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutBack } } }
@@ -639,7 +669,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(14)
                             scale: root.entranceScale(14)
                             transform: Translate { y: root.entranceY(14) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowGpuWidget && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(14) } NumberAnimation { duration: root.entranceDuration(14); easing.type: Easing.OutBack } } }
@@ -648,7 +678,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(15)
                             scale: root.entranceScale(15)
                             transform: Translate { y: root.entranceY(15) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowUpdateWidget && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(15) } NumberAnimation { duration: root.entranceDuration(15); easing.type: Easing.OutBack } } }
@@ -657,7 +687,7 @@ PanelWindow {
                             opacity: root.entranceOpacity(16)
                             scale: root.entranceScale(16)
                             transform: Translate { y: root.entranceY(16) }
-                            visible: opacity > 0
+                            visible: Config.controlCenterShowScratchpad && opacity > 0
                             layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
                             Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(16) } NumberAnimation { duration: root.entranceDuration(16); easing.type: Easing.OutCubic } } }
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(16) } NumberAnimation { duration: root.entranceDuration(16); easing.type: Easing.OutBack } } }
@@ -675,6 +705,7 @@ PanelWindow {
             }
 
             PowerActionsRow {
+                visible: Config.controlCenterShowPowerActions
                 showContent: root.showContent
                 baseIndex: 17
                 staggerDelay: root.staggerDelay

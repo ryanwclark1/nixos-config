@@ -72,6 +72,8 @@ Item {
         iconName: "options.svg"
         description: "Visibility and width of control center modules."
 
+        SettingsSectionLabel { text: "ESSENTIAL TOOLS" }
+
         SettingsFieldGrid {
             maximumColumns: root.compactMode ? 1 : 2
 
@@ -80,10 +82,109 @@ Item {
                 icon: "wifi-4.svg"
                 configKey: "controlCenterShowQuickLinks"
             }
+        }
+
+        SettingsSectionLabel { text: "ACTIVE SESSION" }
+
+        SettingsFieldGrid {
+            maximumColumns: root.compactMode ? 1 : 2
+
             SettingsToggleRow {
                 label: "Media Widget"
                 icon: "music-note-2.svg"
                 configKey: "controlCenterShowMediaWidget"
+            }
+            SettingsToggleRow {
+                label: "Pomodoro Timer"
+                icon: "timer.svg"
+                configKey: "controlCenterShowPomodoro"
+            }
+            SettingsToggleRow {
+                label: "Todo List"
+                icon: "checkbox-checked.svg"
+                configKey: "controlCenterShowTodo"
+            }
+            SettingsToggleRow {
+                label: "DevOps Section"
+                icon: "terminal-filled.svg"
+                configKey: "controlCenterShowDevOps"
+            }
+        }
+
+        SettingsSectionLabel { text: "SYSTEM CONTROLS" }
+
+        SettingsFieldGrid {
+            maximumColumns: root.compactMode ? 1 : 2
+
+            SettingsToggleRow {
+                label: "Brightness"
+                icon: "weather-sunny.svg"
+                configKey: "controlCenterShowBrightness"
+            }
+            SettingsToggleRow {
+                label: "Audio Output"
+                icon: "speaker.svg"
+                configKey: "controlCenterShowAudioOutput"
+            }
+            SettingsToggleRow {
+                label: "Audio Input"
+                icon: "mic.svg"
+                configKey: "controlCenterShowAudioInput"
+            }
+            SettingsToggleRow {
+                label: "CPU / GPU Temp"
+                icon: "temperature.svg"
+                configKey: "controlCenterShowCpuGpuTemp"
+            }
+            SettingsToggleRow {
+                label: "CPU Widget"
+                icon: "developer-board.svg"
+                configKey: "controlCenterShowCpuWidget"
+            }
+            SettingsToggleRow {
+                label: "System Graphs"
+                icon: "developer-board.svg"
+                configKey: "controlCenterShowSystemGraphs"
+            }
+            SettingsToggleRow {
+                label: "Process Widget"
+                icon: "arrow-sync.svg"
+                configKey: "controlCenterShowProcessWidget"
+            }
+            SettingsToggleRow {
+                label: "Network Graphs"
+                icon: "ethernet.svg"
+                configKey: "controlCenterShowNetworkGraphs"
+            }
+            SettingsToggleRow {
+                label: "RAM Widget"
+                icon: "board.svg"
+                configKey: "controlCenterShowRamWidget"
+            }
+            SettingsToggleRow {
+                label: "Disk Widget"
+                icon: "hard-drive.svg"
+                configKey: "controlCenterShowDiskWidget"
+            }
+            SettingsToggleRow {
+                label: "GPU Widget"
+                icon: "developer-board.svg"
+                configKey: "controlCenterShowGpuWidget"
+            }
+            SettingsToggleRow {
+                label: "Update Widget"
+                icon: "arrow-sync.svg"
+                configKey: "controlCenterShowUpdateWidget"
+            }
+            SettingsToggleRow {
+                label: "Scratchpad"
+                icon: "edit.svg"
+                configKey: "controlCenterShowScratchpad"
+            }
+            SettingsToggleRow {
+                label: "Power Actions"
+                icon: "power.svg"
+                configKey: "controlCenterShowPowerActions"
             }
         }
 

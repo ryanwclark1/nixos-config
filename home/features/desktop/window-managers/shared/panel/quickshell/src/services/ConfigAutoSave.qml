@@ -197,6 +197,57 @@ QtObject {
         function onControlCenterHiddenPluginsChanged() {
             root.config.scheduleSave();
         }
+        function onControlCenterShowPomodoroChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowTodoChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowDevOpsChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowBrightnessChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowAudioOutputChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowAudioInputChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowCpuGpuTempChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowCpuWidgetChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowSystemGraphsChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowProcessWidgetChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowNetworkGraphsChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowRamWidgetChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowDiskWidgetChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowGpuWidgetChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowUpdateWidgetChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowScratchpadChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterShowPowerActionsChanged() {
+            root.config.scheduleSave();
+        }
         function onOsdDurationChanged() {
             root.config.scheduleSave();
         }

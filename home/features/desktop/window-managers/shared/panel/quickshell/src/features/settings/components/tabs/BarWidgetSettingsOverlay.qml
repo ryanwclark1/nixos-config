@@ -125,7 +125,7 @@ Rectangle {
 
     Rectangle {
         width: Math.min(560, parent.width - root.overlayInset * 2)
-        height: Math.min(settingsFlick.contentHeight, parent.height - root.overlayInset * 2)
+        height: Math.min(settingsFlick.contentHeight + Appearance.paddingLarge * 2, parent.height - root.overlayInset * 2)
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: Math.max(root.overlayInset, (parent.height - height) / 2)

@@ -165,12 +165,28 @@ ColumnLayout {
         Repeater {
             model: ServiceUnitService.dockerContainers.slice(0, 3)
             delegate: Rectangle {
+                id: dockerRow
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Appearance.radiusSmall
-                color: Colors.cardSurface
-                border.color: Colors.border
+                color: dockerHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
+                border.color: dockerHover.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
+
+                MouseArea {
+                    id: dockerHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    acceptedButtons: Qt.LeftButton
+                    onClicked: {
+                        var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec " + SU.shellQuote(modelData.id) + " sh; else exit 1; fi";
+                        Quickshell.execDetached(SU.terminalCommand(cmd));
+                    }
+                }
+
+                SharedWidgets.InnerHighlight { hoveredOpacity: 0.2; hovered: dockerHover.containsMouse }
+
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: Appearance.spacingS
@@ -194,10 +210,10 @@ ColumnLayout {
                             icon: "terminal.svg"
                             size: 28
                             iconSize: 14
-                            iconColor: Colors.textDisabled
+                            iconColor: dockerHover.containsMouse ? Colors.primary : Colors.textDisabled
                             tooltipText: "Open shell"
                             onClicked: {
-                                var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec -it " + modelData.id + " sh; else exit 1; fi";
+                                var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec " + SU.shellQuote(modelData.id) + " sh; else exit 1; fi";
                                 Quickshell.execDetached(SU.terminalCommand(cmd));
                             }
                         }
@@ -205,7 +221,7 @@ ColumnLayout {
                             icon: "arrow-counterclockwise.svg"
                             size: 28
                             iconSize: 14
-                            iconColor: Colors.textDisabled
+                            iconColor: dockerHover.containsMouse ? Colors.primary : Colors.textDisabled
                             tooltipText: "View logs"
                             onClicked: {
                                 logOverlay.title = "Docker: " + modelData.name;
@@ -215,18 +231,20 @@ ColumnLayout {
                         }
                     }
                 }
+
             }
         }
 
         Repeater {
             model: ServiceUnitService.sshSessions.slice(0, 4)
             delegate: Rectangle {
+                id: sshRow
                 required property var modelData
                 Layout.fillWidth: true
                 implicitHeight: 42
                 radius: Appearance.radiusSmall
-                color: Colors.cardSurface
-                border.color: Colors.border
+                color: sshHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
+                border.color: sshHover.containsMouse ? Colors.primary : Colors.border
                 border.width: 1
 
                 readonly property string sessionType: modelData.type || "ssh"
@@ -242,16 +260,32 @@ ColumnLayout {
                     }
                 }
 
+                MouseArea {
+                    id: sshHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: sshRow.sessionType === "ssh" ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    acceptedButtons: Qt.LeftButton
+                    onClicked: {
+                        if (sshRow.sessionType === "ssh") {
+                            var host = sshRow.sessionLabel.split("@")[1] || sshRow.sessionLabel;
+                            Quickshell.execDetached(SU.terminalCommand("exec ssh \"$1\"", host));
+                        }
+                    }
+                }
+
+                SharedWidgets.InnerHighlight { hoveredOpacity: 0.2; hovered: sshHover.containsMouse }
+
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: Appearance.spacingS
                     SharedWidgets.SvgIcon {
-                        source: typeIcon
+                        source: sshRow.typeIcon
                         color: Colors.accent
                         size: Appearance.fontSizeLarge
                     }
                     Text {
-                        text: sessionLabel + (sessionCount > 1 ? " ×" + sessionCount : "")
+                        text: sshRow.sessionLabel + (sshRow.sessionCount > 1 ? " ×" + sshRow.sessionCount : "")
                         color: Colors.text
                         font.pixelSize: Appearance.fontSizeXS
                         font.weight: Font.DemiBold
@@ -259,22 +293,22 @@ ColumnLayout {
                         Layout.fillWidth: true
                     }
                     Text {
-                        visible: sessionType !== "ssh"
-                        text: sessionType.toUpperCase()
+                        visible: sshRow.sessionType !== "ssh"
+                        text: sshRow.sessionType.toUpperCase()
                         color: Colors.textSecondary
                         font.pixelSize: Appearance.fontSizeXXS
                         font.weight: Font.Medium
                     }
 
                     SharedWidgets.IconButton {
-                        visible: sessionType === "ssh"
+                        visible: sshRow.sessionType === "ssh"
                         icon: "terminal.svg"
                         size: 28
                         iconSize: 14
-                        iconColor: Colors.textDisabled
+                        iconColor: sshHover.containsMouse ? Colors.primary : Colors.textDisabled
                         tooltipText: "Open shell"
                         onClicked: {
-                            var host = sessionLabel.split("@")[1] || sessionLabel;
+                            var host = sshRow.sessionLabel.split("@")[1] || sshRow.sessionLabel;
                             Quickshell.execDetached(SU.terminalCommand("exec ssh \"$1\"", host));
                         }
                     }

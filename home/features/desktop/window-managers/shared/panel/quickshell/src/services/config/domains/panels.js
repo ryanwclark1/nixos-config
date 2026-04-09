@@ -14,7 +14,24 @@ var controlCenter = {
         ["toggleOrder", "controlCenterToggleOrder"],
         ["hiddenToggles", "controlCenterHiddenToggles"],
         ["pluginOrder", "controlCenterPluginOrder"],
-        ["hiddenPlugins", "controlCenterHiddenPlugins"]
+        ["hiddenPlugins", "controlCenterHiddenPlugins"],
+        ["showPomodoro", "controlCenterShowPomodoro"],
+        ["showTodo", "controlCenterShowTodo"],
+        ["showDevOps", "controlCenterShowDevOps"],
+        ["showBrightness", "controlCenterShowBrightness"],
+        ["showAudioOutput", "controlCenterShowAudioOutput"],
+        ["showAudioInput", "controlCenterShowAudioInput"],
+        ["showCpuGpuTemp", "controlCenterShowCpuGpuTemp"],
+        ["showCpuWidget", "controlCenterShowCpuWidget"],
+        ["showSystemGraphs", "controlCenterShowSystemGraphs"],
+        ["showProcessWidget", "controlCenterShowProcessWidget"],
+        ["showNetworkGraphs", "controlCenterShowNetworkGraphs"],
+        ["showRamWidget", "controlCenterShowRamWidget"],
+        ["showDiskWidget", "controlCenterShowDiskWidget"],
+        ["showGpuWidget", "controlCenterShowGpuWidget"],
+        ["showUpdateWidget", "controlCenterShowUpdateWidget"],
+        ["showScratchpad", "controlCenterShowScratchpad"],
+        ["showPowerActions", "controlCenterShowPowerActions"]
     ],
     extraKeys: {
         width: true
