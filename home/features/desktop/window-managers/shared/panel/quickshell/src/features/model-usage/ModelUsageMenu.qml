@@ -432,30 +432,6 @@ BasePopupMenu {
         }
 
         SharedWidgets.InfoRow {
-          visible: !!((ModelUsageService.claudeProfile.subscriptionType || "") !== "")
-          label: "Plan"
-          value: String(ModelUsageService.claudeProfile.subscriptionType || "").toUpperCase()
-        }
-
-        SharedWidgets.InfoRow {
-          visible: !!((ModelUsageService.claudeProfile.rateLimitTier || "") !== "")
-          label: "Tier"
-          value: ModelUsageService.claudeProfile.rateLimitTier || ""
-        }
-
-        SharedWidgets.InfoRow {
-          visible: !!((ModelUsageService.claudeProfile.billingType || "") !== "")
-          label: "Billing"
-          value: ModelUsageService.claudeProfile.billingType || ""
-        }
-
-        SharedWidgets.InfoRow {
-          visible: typeof ModelUsageService.claudeProfile.hasExtraUsageEnabled !== "undefined"
-          label: "Extra Usage"
-          value: ModelUsageService.claudeProfile.hasExtraUsageEnabled ? "Enabled" : "Disabled"
-        }
-
-        SharedWidgets.InfoRow {
           visible: !!(
             ModelUsageService.claudeUsageWindows.available
             && ModelUsageService.claudeUsageWindows.fiveHour
@@ -543,6 +519,48 @@ BasePopupMenu {
           wrapMode: Text.WordWrap
           Layout.fillWidth: true
         }
+
+        SharedWidgets.CollapsibleSection {
+          Layout.fillWidth: true
+          expanded: false
+          visible: !!(
+            (ModelUsageService.claudeProfile.subscriptionType || "") !== ""
+            || (ModelUsageService.claudeProfile.rateLimitTier || "") !== ""
+            || (ModelUsageService.claudeProfile.billingType || "") !== ""
+            || typeof ModelUsageService.claudeProfile.hasExtraUsageEnabled !== "undefined"
+          )
+          title: "Account Details"
+          subtitle: "Expand to inspect Claude subscription and billing metadata."
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Appearance.spacingS
+
+            SharedWidgets.InfoRow {
+              visible: !!((ModelUsageService.claudeProfile.subscriptionType || "") !== "")
+              label: "Plan"
+              value: String(ModelUsageService.claudeProfile.subscriptionType || "").toUpperCase()
+            }
+
+            SharedWidgets.InfoRow {
+              visible: !!((ModelUsageService.claudeProfile.rateLimitTier || "") !== "")
+              label: "Tier"
+              value: ModelUsageService.claudeProfile.rateLimitTier || ""
+            }
+
+            SharedWidgets.InfoRow {
+              visible: !!((ModelUsageService.claudeProfile.billingType || "") !== "")
+              label: "Billing"
+              value: ModelUsageService.claudeProfile.billingType || ""
+            }
+
+            SharedWidgets.InfoRow {
+              visible: typeof ModelUsageService.claudeProfile.hasExtraUsageEnabled !== "undefined"
+              label: "Extra Usage"
+              value: ModelUsageService.claudeProfile.hasExtraUsageEnabled ? "Enabled" : "Disabled"
+            }
+          }
+        }
       }
     }
 
@@ -592,28 +610,6 @@ BasePopupMenu {
           value: String(ModelUsageService.claudeTodayToolCalls)
         }
 
-        // Today tokens by model (Claude)
-        Repeater {
-          model: {
-            if (!root.showClaude) return [];
-            var tokens = ModelUsageService.claudeTodayTokensByModel;
-            var items = [];
-            for (var k in tokens) {
-              if (tokens.hasOwnProperty(k))
-                items.push({ model: k, count: tokens[k] });
-            }
-            return items;
-          }
-
-          SharedWidgets.InfoRow {
-            required property var modelData
-            label: ModelUsageService.friendlyModelName(modelData.model)
-            value: ModelUsageService.formatTokenCount(modelData.count) + " tokens"
-            valueColor: root.providerAccent
-          }
-        }
-
-        // Today token breakdown (Gemini)
         SharedWidgets.InfoRow {
           visible: root.showGemini && (ModelUsageService.geminiTodayTokens.input || 0) > 0
           label: "Input Tokens"
@@ -626,15 +622,65 @@ BasePopupMenu {
           value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.output || 0)
           valueColor: root.providerAccent
         }
-        SharedWidgets.InfoRow {
-          visible: root.showGemini && (ModelUsageService.geminiTodayTokens.cached || 0) > 0
-          label: "Cached Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.cached || 0)
+
+        SharedWidgets.CollapsibleSection {
+          Layout.fillWidth: true
+          expanded: false
+          visible: root.showClaude && Object.keys(ModelUsageService.claudeTodayTokensByModel).length > 0
+          title: "Claude Token Breakdown"
+          subtitle: "Expand to inspect today's token usage by Claude model."
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Appearance.spacingS
+
+            Repeater {
+              model: {
+                var tokens = ModelUsageService.claudeTodayTokensByModel;
+                var items = [];
+                for (var k in tokens) {
+                  if (tokens.hasOwnProperty(k))
+                    items.push({ model: k, count: tokens[k] });
+                }
+                return items;
+              }
+
+              SharedWidgets.InfoRow {
+                required property var modelData
+                label: ModelUsageService.friendlyModelName(modelData.model)
+                value: ModelUsageService.formatTokenCount(modelData.count) + " tokens"
+                valueColor: root.providerAccent
+              }
+            }
+          }
         }
-        SharedWidgets.InfoRow {
-          visible: root.showGemini && (ModelUsageService.geminiTodayTokens.thoughts || 0) > 0
-          label: "Thinking Tokens"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.thoughts || 0)
+
+        SharedWidgets.CollapsibleSection {
+          Layout.fillWidth: true
+          expanded: false
+          visible: root.showGemini && (
+            (ModelUsageService.geminiTodayTokens.cached || 0) > 0
+            || (ModelUsageService.geminiTodayTokens.thoughts || 0) > 0
+          )
+          title: "Gemini Token Details"
+          subtitle: "Expand to inspect cached and thinking token usage."
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Appearance.spacingS
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.geminiTodayTokens.cached || 0) > 0
+              label: "Cached Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.cached || 0)
+            }
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.geminiTodayTokens.thoughts || 0) > 0
+              label: "Thinking Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.thoughts || 0)
+            }
+          }
         }
       }
     }
@@ -1145,34 +1191,52 @@ BasePopupMenu {
         }
 
         SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexLatestSession.inputTokens || 0) > 0
-          label: "Last Session Input"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.inputTokens || 0)
-        }
-
-        SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexLatestSession.outputTokens || 0) > 0
-          label: "Last Session Output"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.outputTokens || 0)
-        }
-
-        SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexLatestSession.cachedInputTokens || 0) > 0
-          label: "Last Session Cache"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.cachedInputTokens || 0)
-        }
-
-        SharedWidgets.InfoRow {
-          visible: (ModelUsageService.codexLatestSession.reasoningTokens || 0) > 0
-          label: "Last Session Reasoning"
-          value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.reasoningTokens || 0)
-        }
-
-        SharedWidgets.InfoRow {
           visible: (ModelUsageService.codexLatestSession.totalTokens || 0) > 0
           label: "Last Session Total"
           value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.totalTokens || 0)
           valueColor: root.providerAccent
+        }
+
+        SharedWidgets.CollapsibleSection {
+          Layout.fillWidth: true
+          expanded: false
+          visible: !!(
+            (ModelUsageService.codexLatestSession.inputTokens || 0) > 0
+            || (ModelUsageService.codexLatestSession.outputTokens || 0) > 0
+            || (ModelUsageService.codexLatestSession.cachedInputTokens || 0) > 0
+            || (ModelUsageService.codexLatestSession.reasoningTokens || 0) > 0
+          )
+          title: "Latest Session Breakdown"
+          subtitle: "Expand to inspect the latest Codex session token mix."
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Appearance.spacingS
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexLatestSession.inputTokens || 0) > 0
+              label: "Input Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.inputTokens || 0)
+            }
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexLatestSession.outputTokens || 0) > 0
+              label: "Output Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.outputTokens || 0)
+            }
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexLatestSession.cachedInputTokens || 0) > 0
+              label: "Cached Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.cachedInputTokens || 0)
+            }
+
+            SharedWidgets.InfoRow {
+              visible: (ModelUsageService.codexLatestSession.reasoningTokens || 0) > 0
+              label: "Reasoning Tokens"
+              value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.reasoningTokens || 0)
+            }
+          }
         }
 
         SharedWidgets.CollapsibleSection {

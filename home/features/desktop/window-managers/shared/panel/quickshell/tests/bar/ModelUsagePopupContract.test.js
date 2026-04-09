@@ -55,8 +55,11 @@ describe("AI Model Usage popup contract", () => {
     const serviceSource = readFileSync(servicePath, "utf8");
 
     expect(menuSource).toContain('text: "Last 24 Hours"');
-    expect(menuSource).toContain('text: "Current Session Usage"');
-    expect(menuSource).toContain('text: "Usage Limits"');
+    expect(menuSource).toContain('title: "Latest Session Breakdown"');
+    expect(menuSource).toContain('title: "Current Session Usage"');
+    expect(menuSource).toContain('title: "Usage Limits"');
+    expect(menuSource).toContain('title: "Claude Token Breakdown"');
+    expect(menuSource).toContain('title: "Gemini Token Details"');
     expect(serviceSource).toContain("property var codexTotalUsage: ({})");
     expect(serviceSource).toContain("property var codexRateLimits: ({})");
     expect(serviceSource).toContain("property int geminiLast24hPrompts: 0");
