@@ -32,20 +32,31 @@ describe("critical OSD contract", () => {
     const configSource = readFileSync(configPath, "utf8");
 
     expect(configSource).toContain("property int osdCriticalCooldownMs: 300000");
+    expect(configSource).toContain("property int osdCriticalThermalSustainMs: 60000");
   });
 
-  it("limits the critical OSD to thermal and health-check failures instead of load spikes", () => {
+  it("limits the critical OSD to sustained thermal and health-check failures instead of load spikes", () => {
     const systemStatusSource = readFileSync(systemStatusPath, "utf8");
 
     expect(systemStatusSource).toContain(
-      'readonly property bool shouldShowCriticalOsd: hasHighTemp || overallStatus === "failure"',
+      "readonly property bool hasSustainedHighTemp: hasHighTemp",
     );
+    expect(systemStatusSource).toContain(
+      "&& (_lastThermalSampleAtMs - _highTempSinceMs) >= Math.max(0, Config.osdCriticalThermalSustainMs)",
+    );
+    expect(systemStatusSource).toContain(
+      'readonly property bool shouldShowCriticalOsd: hasSustainedHighTemp || overallStatus === "failure"',
+    );
+    expect(systemStatusSource).toContain("property double _highTempSinceMs: 0");
+    expect(systemStatusSource).toContain("property double _lastThermalSampleAtMs: 0");
     expect(systemStatusSource).toContain("readonly property var criticalOsdReasons: {");
+    expect(systemStatusSource).toContain('if (hasSustainedHighTemp && cpuTempNum > _cpuTempHighThreshold)');
     expect(systemStatusSource).toContain('reasons.push("CPU " + cpuTemp);');
+    expect(systemStatusSource).toContain('if (hasSustainedHighTemp && gpuTempNum > _gpuTempHighThreshold)');
     expect(systemStatusSource).toContain('reasons.push("GPU " + gpuTemp);');
     expect(systemStatusSource).toContain('reasons.push("health check failure");');
-    expect(systemStatusSource).not.toContain(
-      'readonly property bool shouldShowCriticalOsd: hasHighLoad || hasHighTemp || overallStatus === "failure"',
-    );
+    expect(systemStatusSource).toContain("root._lastThermalSampleAtMs = now;");
+    expect(systemStatusSource).toContain("if (root.hasHighTemp) {");
+    expect(systemStatusSource).toContain("root._highTempSinceMs = now;");
   });
 });

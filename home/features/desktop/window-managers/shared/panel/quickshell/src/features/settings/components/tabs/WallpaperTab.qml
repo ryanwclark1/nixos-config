@@ -118,6 +118,11 @@ Item {
         solidCopyProc.running = true;
     }
 
+    function ensureWallpaperInventory() {
+        if (WallpaperService.availableWallpapers.length === 0 && !WallpaperService.scanning)
+            WallpaperService.scanWallpapers();
+    }
+
     function pasteSolidColor() {
         if (!solidPasteProc.running)
             solidPasteProc.running = true;
@@ -319,9 +324,12 @@ Item {
     Component.onCompleted: {
         if (!wallpaperMonProc.running)
             wallpaperMonProc.running = true;
-        if (WallpaperService.availableWallpapers.length === 0)
-            WallpaperService.scanWallpapers();
         root.solidColorInput = "#" + (Config.wallpaperSolidColor || "000000ff").slice(0, 6);
+    }
+
+    onVisibleChanged: {
+        if (visible)
+            ensureWallpaperInventory();
     }
 
     Connections {

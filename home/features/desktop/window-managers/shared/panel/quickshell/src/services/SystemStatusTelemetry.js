@@ -1,3 +1,5 @@
+.pragma library
+
 function splitTaggedLine(line) {
     var text = String(line || "");
     var separatorIndex = text.indexOf("\t");

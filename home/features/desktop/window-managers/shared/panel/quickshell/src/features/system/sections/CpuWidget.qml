@@ -125,6 +125,7 @@ SharedWidgets.CardBase {
 
     readonly property color usageColor: SystemCardStyle.usageTierColor(
         SystemStatus.cpuPercent, Colors.primary, Colors.warning, Colors.error, 0.7, 0.9)
+    readonly property color cpuInfoSurface: Colors.withAlpha(root.usageColor, 0.08)
 
     ColumnLayout {
         id: cpuColumn
@@ -226,93 +227,123 @@ SharedWidgets.CardBase {
                 }
             }
 
-            ColumnLayout {
+            Rectangle {
                 Layout.fillWidth: true
                 visible: root.cpuInfo.model !== "--"
-                spacing: Appearance.spacingXXS
+                radius: Appearance.radiusSmall
+                color: root.cpuInfoSurface
+                border.color: Colors.withAlpha(root.usageColor, 0.24)
+                border.width: 1
+                implicitHeight: cpuInfoColumn.implicitHeight + Appearance.spacingM * 2
 
-                Text {
-                    text: root.cpuInfo.model
-                    color: Colors.text
-                    font.pixelSize: Appearance.fontSizeMedium
-                    font.weight: Font.DemiBold
-                    wrapMode: Text.Wrap
-                    maximumLineCount: 3
-                    elide: Text.ElideRight
-                }
+                ColumnLayout {
+                    id: cpuInfoColumn
+                    anchors.fill: parent
+                    anchors.margins: Appearance.spacingM
+                    spacing: Appearance.spacingS
 
-                Text {
-                    text: "Model"
-                    color: Colors.textDisabled
-                    font.pixelSize: Appearance.fontSizeXS
-                    font.weight: Font.Medium
-                }
-            }
+                    Text {
+                        Layout.fillWidth: true
+                        text: root.cpuInfo.model
+                        color: Colors.text
+                        font.pixelSize: Appearance.fontSizeMedium
+                        font.weight: Font.DemiBold
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 3
+                        elide: Text.ElideRight
+                    }
 
-            GridLayout {
-                Layout.fillWidth: true
-                columns: cpuColumn.width >= 460 ? 2 : 1
-                columnSpacing: Appearance.spacingM
-                rowSpacing: Appearance.spacingXS
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: Appearance.spacingXS
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Vendor"
-                    value: root.cpuInfo.vendor
-                }
+                        SharedWidgets.Chip {
+                            visible: root.cpuInfo.vendor !== "--"
+                            icon: "developer-board.svg"
+                            iconColor: root.usageColor
+                            text: root.cpuInfo.vendor
+                            textColor: root.usageColor
+                            bgColor: Colors.withAlpha(root.usageColor, 0.12)
+                            borderColor: Colors.withAlpha(root.usageColor, 0.18)
+                        }
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Architecture"
-                    value: root.cpuInfo.architecture
-                }
+                        SharedWidgets.Chip {
+                            visible: root.cpuInfo.architecture !== "--"
+                            icon: "code.svg"
+                            iconColor: Colors.textSecondary
+                            text: root.cpuInfo.architecture
+                            textColor: Colors.textSecondary
+                            bgColor: Colors.withAlpha(Colors.textSecondary, 0.08)
+                            borderColor: Colors.withAlpha(Colors.textSecondary, 0.14)
+                        }
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Cores"
-                    value: root.cpuInfo.cores
-                }
+                        SharedWidgets.Chip {
+                            visible: root.cpuInfo.cores !== "--"
+                            icon: "apps.svg"
+                            iconColor: Colors.primary
+                            text: root.cpuInfo.cores + " cores"
+                            textColor: Colors.primary
+                        }
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Threads"
-                    value: root.cpuInfo.threads
-                }
+                        SharedWidgets.Chip {
+                            visible: root.cpuInfo.threads !== "--"
+                            icon: "arrow-repeat.svg"
+                            iconColor: Colors.info
+                            text: root.cpuInfo.threads + " threads"
+                            textColor: Colors.info
+                        }
+                    }
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Threads/Core"
-                    value: root.cpuInfo.threadsPerCore
-                }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: 1
+                        radius: 1
+                        color: Colors.withAlpha(Colors.border, 0.7)
+                    }
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Sockets"
-                    value: root.cpuInfo.sockets
-                }
+                    GridLayout {
+                        Layout.fillWidth: true
+                        columns: cpuColumn.width >= 460 ? 2 : 1
+                        columnSpacing: Appearance.spacingM
+                        rowSpacing: Appearance.spacingXS
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Current Clock"
-                    value: root.cpuInfo.currentClock
-                }
+                        SharedWidgets.InfoRow {
+                            Layout.fillWidth: true
+                            label: "Threads/Core"
+                            value: root.cpuInfo.threadsPerCore
+                        }
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Max Clock"
-                    value: root.cpuInfo.maxClock
-                }
+                        SharedWidgets.InfoRow {
+                            Layout.fillWidth: true
+                            label: "Sockets"
+                            value: root.cpuInfo.sockets
+                        }
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Min Clock"
-                    value: root.cpuInfo.minClock
-                }
+                        SharedWidgets.InfoRow {
+                            Layout.fillWidth: true
+                            label: "Current Clock"
+                            value: root.cpuInfo.currentClock
+                        }
 
-                SharedWidgets.InfoRow {
-                    Layout.fillWidth: true
-                    label: "Boost"
-                    value: root.cpuInfo.boost
+                        SharedWidgets.InfoRow {
+                            Layout.fillWidth: true
+                            label: "Max Clock"
+                            value: root.cpuInfo.maxClock
+                        }
+
+                        SharedWidgets.InfoRow {
+                            Layout.fillWidth: true
+                            label: "Min Clock"
+                            value: root.cpuInfo.minClock
+                        }
+
+                        SharedWidgets.InfoRow {
+                            Layout.fillWidth: true
+                            label: "Boost"
+                            value: root.cpuInfo.boost
+                        }
+                    }
                 }
             }
         }

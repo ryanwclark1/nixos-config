@@ -13,6 +13,7 @@ const sshWidgetSettingsPath = resolve(quickshellRoot, "src/features/ssh/settings
 const wallpaperServicePath = resolve(quickshellRoot, "src/services/WallpaperService.qml");
 const audioServicePath = resolve(quickshellRoot, "src/services/AudioService.qml");
 const wallpaperLayerPath = resolve(quickshellRoot, "src/features/background/WallpaperLayer.qml");
+const wallpaperTabPath = resolve(quickshellRoot, "src/features/settings/components/tabs/WallpaperTab.qml");
 
 describe("startup quietness contracts", () => {
   it("keeps UsageTrackerService file reads silent when the usage file is missing", () => {
@@ -65,5 +66,14 @@ describe("startup quietness contracts", () => {
     expect(audioSource).toContain('Logger.i("AudioService", "audio service disabled via QS_DEBUG_DISABLE_AUDIO_SERVICE")');
     expect(wallpaperLayerSource).toContain('QS_DEBUG_DISABLE_VIDEO_WALLPAPER');
     expect(wallpaperLayerSource).toContain('Logger.i("WallpaperLayer", "video wallpaper disabled via QS_DEBUG_DISABLE_VIDEO_WALLPAPER")');
+  });
+
+  it("loads wallpaper inventory on demand when the wallpaper settings tab becomes visible", () => {
+    const source = readFileSync(wallpaperTabPath, "utf8");
+
+    expect(source).toContain("function ensureWallpaperInventory()");
+    expect(source).toContain("onVisibleChanged:");
+    expect(source).toContain("ensureWallpaperInventory();");
+    expect(source).not.toContain("Component.onCompleted: {\n        if (!wallpaperMonProc.running)\n            wallpaperMonProc.running = true;\n        if (WallpaperService.availableWallpapers.length === 0)");
   });
 });
