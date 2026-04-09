@@ -253,7 +253,8 @@ BasePopupMenu {
         anchors.fill: parent
         anchors.margins: Appearance.spacingXL
         columns: root.compactMode ? 1 : 3
-        spacing: Appearance.spacingL
+        rowSpacing: Appearance.spacingL
+        columnSpacing: Appearance.spacingL
 
         // Large provider icon
         Rectangle {
