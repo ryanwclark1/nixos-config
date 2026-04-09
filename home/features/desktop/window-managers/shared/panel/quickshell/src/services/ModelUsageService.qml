@@ -13,9 +13,8 @@ QtObject {
   // ── Config-driven ──────────────────────────────────
   readonly property bool claudeEnabled: Config.modelUsageClaudeEnabled
   readonly property bool codexEnabled: Config.modelUsageCodexEnabled
+  readonly property bool geminiEnabled: Config.modelUsageGeminiEnabled
   readonly property string activeProvider: Config.modelUsageActiveProvider
-  readonly property string barMetric: Config.modelUsageBarMetric
-  readonly property int _refreshMs: Config.modelUsageRefreshSec * 1000
   readonly property int _rateLimitMs: 300000 // 5 min
 
   // ── Claude state ───────────────────────────────────
@@ -47,7 +46,6 @@ QtObject {
   property var codexRecentDays: []
 
   // ── Gemini state ─────────────────────────────────
-  readonly property bool geminiEnabled: Config.modelUsageGeminiEnabled
   property bool geminiReady: false
   property int geminiTodayPrompts: 0
   property int geminiTodaySessions: 0
@@ -58,31 +56,55 @@ QtObject {
   property var geminiRecentDays: []
   property var geminiTokensByModel: ({})
 
-  // ── Computed display ───────────────────────────────
-  readonly property string displayText: _computeDisplayText()
-  readonly property string displayTooltip: _computeTooltip()
+  // ── Provider selection ─────────────────────────────
+  readonly property var enabledProviders: {
+    var providers = [];
+    if (root.claudeEnabled) providers.push("claude");
+    if (root.codexEnabled) providers.push("codex");
+    if (root.geminiEnabled) providers.push("gemini");
+    return providers;
+  }
+  readonly property bool hasEnabledProviders: enabledProviders.length > 0
+  readonly property string effectiveActiveProvider: {
+    if (!root.hasEnabledProviders) return "";
+    if (root.enabledProviders.indexOf(root.activeProvider) >= 0)
+      return root.activeProvider;
+    return root.enabledProviders[0];
+  }
+  readonly property string providerLabel: {
+    var p = root.effectiveActiveProvider;
+    if (p === "claude") return "Claude Code";
+    if (p === "gemini") return "Gemini CLI";
+    if (p === "codex") return "Codex CLI";
+    return "No Providers Enabled";
+  }
+  readonly property string displayTooltip: root.hasEnabledProviders
+    ? "AI Model Usage · " + root.providerLabel
+    : "AI Model Usage · No providers enabled"
 
   // ── Provider identity ────────────────────────────
   readonly property string providerIcon: {
-    var p = root.activeProvider;
+    var p = root.effectiveActiveProvider;
     if (p === "claude") return "brands/anthropic-symbolic.svg";
     if (p === "gemini") return "brands/google-gemini-symbolic.svg";
-    return "brands/openai-symbolic.svg";
+    if (p === "codex") return "brands/openai-symbolic.svg";
+    return "board.svg";
   }
   readonly property color providerColor: {
-    var p = root.activeProvider;
+    var p = root.effectiveActiveProvider;
     if (p === "claude") return "#cc785c";  // Warm terracotta
     if (p === "gemini") return "#4285F4";  // Google blue
-    return "#22c55e";                       // Green for Codex/OpenAI
+    if (p === "codex") return "#22c55e";   // Green for Codex/OpenAI
+    return "#94a3b8";
   }
   readonly property bool isReady: {
-    var p = root.activeProvider;
+    var p = root.effectiveActiveProvider;
     if (p === "claude") return root.claudeReady;
     if (p === "gemini") return root.geminiReady;
     return root.codexReady;
   }
   readonly property int todayPrompts: {
-    var p = root.activeProvider;
+    var p = root.effectiveActiveProvider;
     if (p === "claude") return root.claudeTodayPrompts;
     if (p === "gemini") return root.geminiTodayPrompts;
     return root.codexTodayPrompts;
@@ -174,51 +196,9 @@ QtObject {
   }
 
   function switchProvider() {
-    var providers = [];
-    if (root.claudeEnabled) providers.push("claude");
-    if (root.codexEnabled) providers.push("codex");
-    if (root.geminiEnabled) providers.push("gemini");
-    if (providers.length < 2) return;
-    var idx = providers.indexOf(root.activeProvider);
-    Config.modelUsageActiveProvider = providers[(idx + 1) % providers.length];
-  }
-
-  // ── Display computation ────────────────────────────
-  function _computeDisplayText() {
-    var p = root.activeProvider;
-    if (p === "claude") {
-      if (!root.claudeReady) return "--";
-      if (root.barMetric === "tokens") return formatTokenCount(root.claudeTotalTokens);
-      return String(root.claudeTodayPrompts);
-    }
-    if (p === "gemini") {
-      if (!root.geminiReady) return "--";
-      if (root.barMetric === "tokens") return formatTokenCount(root.geminiTotalTokens);
-      return String(root.geminiTodayPrompts);
-    }
-    if (!root.codexReady) return "--";
-    if (root.barMetric === "tokens") return "--";
-    return String(root.codexTodayPrompts);
-  }
-
-  function _computeTooltip() {
-    var p = root.activeProvider;
-    if (p === "claude") {
-      if (!root.claudeReady) return "Claude Code · No data";
-      var tip = "Claude Code · " + root.claudeTodayPrompts + " prompts today";
-      if (root.claudeTodaySessions > 0)
-        tip += " · " + root.claudeTodaySessions + " sessions";
-      return tip;
-    }
-    if (p === "gemini") {
-      if (!root.geminiReady) return "Gemini CLI · No data";
-      var gtip = "Gemini CLI · " + root.geminiTodayPrompts + " prompts today";
-      if (root.geminiTodaySessions > 0)
-        gtip += " · " + root.geminiTodaySessions + " sessions";
-      return gtip;
-    }
-    if (!root.codexReady) return "Codex CLI · No data";
-    return "Codex CLI · " + root.codexTodayPrompts + " prompts today";
+    if (root.enabledProviders.length < 2) return;
+    var idx = root.enabledProviders.indexOf(root.effectiveActiveProvider);
+    Config.modelUsageActiveProvider = root.enabledProviders[(idx + 1) % root.enabledProviders.length];
   }
 
   // ── Claude data process ────────────────────────────

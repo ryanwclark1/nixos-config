@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import {
   _MAPS,
   _applyMap,
@@ -33,6 +33,10 @@ function createConfig(overrides = {}) {
 }
 
 describe("ConfigPersistence round trip", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("round-trips representative settings domains through buildData/applyData", () => {
     const source = createConfig({
       barConfigs: [
@@ -104,8 +108,6 @@ describe("ConfigPersistence round trip", () => {
       modelUsageCodexEnabled: true,
       modelUsageGeminiEnabled: true,
       modelUsageActiveProvider: "codex",
-      modelUsageBarMetric: "tokens",
-      modelUsageRefreshSec: 45,
       launcherFileSearchRoot: "/workspace",
       launcherFileShowHidden: true,
       launcherFileOpener: "xdg-open",
@@ -153,7 +155,6 @@ describe("ConfigPersistence round trip", () => {
     expect(applied.displayProfiles).toEqual([{ id: "dock", outputs: ["DP-1"] }]);
     expect(applied.displayAutoProfile).toBe(true);
     expect(applied.modelUsageActiveProvider).toBe("codex");
-    expect(applied.modelUsageBarMetric).toBe("tokens");
     expect(applied.launcherFileSearchRoot).toBe("/workspace");
     expect(applied.launcherWebCustomEngines).toEqual([
       { key: "docs", name: "Docs", urlTemplate: "https://example.com?q=%s" },
@@ -164,5 +165,32 @@ describe("ConfigPersistence round trip", () => {
     expect(applied.wallpaperTransitionType).toBe("wipe");
     expect(applied.wallpaperTransitionDuration).toBe(2500);
     expect(applied.wallpaperUseShellRenderer).toBe(true);
+  });
+
+  it("migrates legacy model usage keys away before validation", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const applied = createConfig();
+    const legacyData = {
+      _version: 4,
+      modelUsage: {
+        claudeEnabled: true,
+        codexEnabled: true,
+        geminiEnabled: false,
+        activeProvider: "codex",
+        barMetric: "tokens",
+        refreshSec: 45,
+      },
+      controlCenter: { width: 440 },
+      bars: { selectedBarId: "", configs: [] },
+      plugins: { disabled: [], launcherTriggers: {}, launcherNoTrigger: {}, settings: {}, hotReload: false },
+    };
+
+    applyData(applied, legacyData);
+
+    expect(applied.modelUsageActiveProvider).toBe("codex");
+    expect(legacyData._version).toBe(5);
+    expect(legacyData.modelUsage).not.toHaveProperty("barMetric");
+    expect(legacyData.modelUsage).not.toHaveProperty("refreshSec");
+    expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining("modelUsage"));
   });
 });

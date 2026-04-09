@@ -18,13 +18,13 @@ Item {
         SettingsCard {
             title: "Providers"
             iconName: "settings.svg"
-            description: "Enable or disable usage tracking for each AI coding assistant."
+            description: "Enable the providers that should appear as tabs in the AI Model Usage popup."
 
             SettingsToggleRow {
                 label: "Claude Code"
                 icon: "brands/anthropic-symbolic.svg"
                 configKey: "modelUsageClaudeEnabled"
-                enabledText: "Claude Code usage is tracked and available in the panel."
+                enabledText: "Claude Code appears as an available provider in AI Model Usage."
                 disabledText: "Claude Code usage tracking is disabled."
             }
 
@@ -32,7 +32,7 @@ Item {
                 label: "Codex CLI"
                 icon: "brands/openai-symbolic.svg"
                 configKey: "modelUsageCodexEnabled"
-                enabledText: "Codex CLI usage is tracked and available in the panel."
+                enabledText: "Codex CLI appears as an available provider in AI Model Usage."
                 disabledText: "Codex CLI usage tracking is disabled."
             }
 
@@ -40,7 +40,7 @@ Item {
                 label: "Gemini CLI"
                 icon: "brands/google-gemini-symbolic.svg"
                 configKey: "modelUsageGeminiEnabled"
-                enabledText: "Gemini CLI usage is tracked and available in the panel."
+                enabledText: "Gemini CLI appears as an available provider in AI Model Usage."
                 disabledText: "Gemini CLI usage tracking is disabled."
             }
         }

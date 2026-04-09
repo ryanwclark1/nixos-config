@@ -686,7 +686,7 @@ QtObject {
             id: "model-usage",
             label: "AI Model Usage",
             shortLabel: "Usage",
-            description: "Track provider usage panels, polling, and usage display behavior.",
+            description: "Enable provider tabs and control which AI usage popup surfaces are available.",
             pageStyle: "catalog",
             icon: "board.svg",
             categoryId: "extensibility",

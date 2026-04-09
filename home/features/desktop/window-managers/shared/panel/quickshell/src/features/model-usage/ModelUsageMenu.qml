@@ -9,10 +9,9 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMinWidth: 340; popupMaxWidth: 420; compactThreshold: 380
-  implicitHeight: Math.min(660, contentCol.implicitHeight + 100)
+  implicitHeight: Math.min(660, scrollContent.implicitHeight + 100)
   title: "AI Model Usage"
-  subtitle: ModelUsageService.activeProvider === "claude" ? "Claude Code"
-         : ModelUsageService.activeProvider === "gemini" ? "Gemini CLI" : "Codex CLI"
+  subtitle: ModelUsageService.providerLabel
 
   // Provider-specific surface tint (like MusicMenu album accent)
   surfaceTint: Colors.withAlpha(root.providerAccent, 0.06)
@@ -20,53 +19,34 @@ BasePopupMenu {
   SharedWidgets.Ref { service: ModelUsageService }
 
   onVisibleChanged: {
-    if (visible && ModelUsageService.isReady) {
-       ModelUsageService.refresh();
-       if (ModelUsageService.claudeEnabled) {
-         ModelUsageService.refreshRateLimit();
-       }
-    } else if (visible && !ModelUsageService.isReady) {
-       ModelUsageService.refresh();
-       if (ModelUsageService.claudeEnabled) {
-         ModelUsageService.refreshRateLimit();
-       }
+    if (visible) {
+      ModelUsageService.refresh();
+      if (ModelUsageService.claudeEnabled)
+        ModelUsageService.refreshRateLimit();
     }
   }
 
   // ── Provider state ───────────────────────────────
-  readonly property bool showClaude: ModelUsageService.activeProvider === "claude"
-  readonly property bool showCodex: ModelUsageService.activeProvider === "codex"
-  readonly property bool showGemini: ModelUsageService.activeProvider === "gemini"
-  readonly property int enabledCount: (ModelUsageService.claudeEnabled ? 1 : 0)
-    + (ModelUsageService.codexEnabled ? 1 : 0)
-    + (ModelUsageService.geminiEnabled ? 1 : 0)
-  readonly property bool showProviderTabs: enabledCount > 1
+  readonly property bool showClaude: ModelUsageService.effectiveActiveProvider === "claude"
+  readonly property bool showCodex: ModelUsageService.effectiveActiveProvider === "codex"
+  readonly property bool showGemini: ModelUsageService.effectiveActiveProvider === "gemini"
+  readonly property bool showProviderTabs: ModelUsageService.enabledProviders.length > 1
 
   // Provider accent — flows through hero, charts, token values
   property color providerAccent: ModelUsageService.providerColor
   Behavior on providerAccent { ColorAnimation { duration: Appearance.durationNormal } }
 
-  // ── Provider tabs ──────────────────────────────────
+  // ── Header actions ────────────────────────────────
   headerExtras: [
-    Row {
-      visible: root.showProviderTabs
-      spacing: Appearance.spacingXS
-
-      Repeater {
-        model: {
-          var tabs = [];
-          if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude", icon: "brands/anthropic-symbolic.svg" });
-          if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex", icon: "brands/openai-symbolic.svg" });
-          if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini", icon: "brands/google-gemini-symbolic.svg" });
-          return tabs;
-        }
-        delegate: SharedWidgets.FilterChip {
-          required property var modelData
-          label: modelData.label
-          icon: modelData.icon
-          selected: ModelUsageService.activeProvider === modelData.key
-          onClicked: Config.modelUsageActiveProvider = modelData.key
-        }
+    SharedWidgets.IconButton {
+      icon: "arrow-counterclockwise.svg"
+      size: 28
+      iconSize: Appearance.fontSizeLarge
+      tooltipText: "Refresh"
+      onClicked: {
+        ModelUsageService.refresh();
+        if (ModelUsageService.claudeEnabled)
+          ModelUsageService.refreshRateLimit();
       }
     },
     SharedWidgets.IconButton {
@@ -82,10 +62,10 @@ BasePopupMenu {
   ]
 
   // ── Content cross-fade on provider switch ────
-  property string _prevProvider: ModelUsageService.activeProvider
+  property string _prevProvider: ModelUsageService.effectiveActiveProvider
   onProviderAccentChanged: {
-    if (_prevProvider !== ModelUsageService.activeProvider) {
-      _prevProvider = ModelUsageService.activeProvider;
+    if (_prevProvider !== ModelUsageService.effectiveActiveProvider) {
+      _prevProvider = ModelUsageService.effectiveActiveProvider;
       contentFade.restart();
     }
   }
@@ -103,10 +83,49 @@ BasePopupMenu {
     columnSpacing: Appearance.spacingM
     layer.enabled: contentFade.running
 
+    SharedWidgets.ThemedContainer {
+      variant: "card"
+      Layout.fillWidth: true
+      visible: ModelUsageService.hasEnabledProviders
+      implicitHeight: providerTabsWrap.implicitHeight + Appearance.spacingL * 2
+
+      Flow {
+        id: providerTabsWrap
+        anchors.fill: parent
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
+
+        Repeater {
+          model: {
+            var tabs = [];
+            if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude Code", icon: "brands/anthropic-symbolic.svg" });
+            if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex CLI", icon: "brands/openai-symbolic.svg" });
+            if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini CLI", icon: "brands/google-gemini-symbolic.svg" });
+            return tabs;
+          }
+
+          delegate: SharedWidgets.FilterChip {
+            required property var modelData
+            label: modelData.label
+            icon: modelData.icon
+            selected: ModelUsageService.effectiveActiveProvider === modelData.key
+            onClicked: Config.modelUsageActiveProvider = modelData.key
+          }
+        }
+      }
+    }
+
+    SharedWidgets.EmptyState {
+      Layout.fillWidth: true
+      visible: !ModelUsageService.hasEnabledProviders
+      icon: "board.svg"
+      message: "Enable at least one provider in AI Model Usage settings"
+    }
+
     // ── Hero Summary Card ───────────────────────────
     Rectangle {
       Layout.fillWidth: true
-      visible: ModelUsageService.isReady
+      visible: ModelUsageService.hasEnabledProviders && ModelUsageService.isReady
       implicitHeight: heroRow.implicitHeight + Appearance.spacingLG * 2
       radius: Appearance.radiusCard
       color: Colors.withAlpha(root.providerAccent, Colors.primaryFaint)
@@ -681,7 +700,7 @@ BasePopupMenu {
     // ── Empty state ─────────────────────────────────
     SharedWidgets.EmptyState {
       Layout.fillWidth: true
-      visible: !ModelUsageService.isReady
+      visible: ModelUsageService.hasEnabledProviders && !ModelUsageService.isReady
       icon: ModelUsageService.providerIcon
       message: root.showClaude ? "No Claude Code data found"
              : root.showGemini ? "No Gemini CLI data found"

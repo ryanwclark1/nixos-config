@@ -485,7 +485,7 @@ PanelWindow {
                                     })(conv.id)
                                 });
                             }
-                            var pos = parent.mapToItem(root.parent, 0, parent.height);
+                            var pos = parent.mapToItem(root, 0, parent.height);
                             historyMenu.model = model;
                             historyMenu.popup(pos.x, pos.y + Appearance.spacingXS);
                         }
@@ -1339,7 +1339,6 @@ PanelWindow {
 
         SharedWidgets.ContextMenu {
             id: historyMenu
-            parent: root.parent
         }
     }
 
