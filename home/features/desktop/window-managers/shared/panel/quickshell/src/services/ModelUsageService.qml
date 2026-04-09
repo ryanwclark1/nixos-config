@@ -35,6 +35,9 @@ QtObject {
   property real claudeRateLimitPercent: -1
   property string claudeRateLimitLabel: ""
   property string claudeRateLimitResetAt: ""
+  property var claudeProfile: ({})
+  property var claudeLiveRateLimit: ({})
+  property var claudeUsageWindows: ({})
   property int _lastRateLimitNotifiedTier: 0  // 0=none, 1=warning, 2=critical
 
   // ── Codex state ────────────────────────────────────
@@ -157,6 +160,18 @@ QtObject {
     return root.formatResetTime(new Date(epochSeconds * 1000).toISOString());
   }
 
+  function formatDurationSeconds(seconds) {
+    if (!seconds || seconds <= 0)
+      return "";
+    var hours = Math.floor(seconds / 3600);
+    var mins = Math.floor((seconds % 3600) / 60);
+    if (hours >= 24)
+      return Math.floor(hours / 24) + "d " + (hours % 24) + "h";
+    if (hours > 0)
+      return hours + "h " + mins + "m";
+    return mins + "m";
+  }
+
   function usageWindowLabel(windowMinutes) {
     if (!windowMinutes || windowMinutes <= 0)
       return "";
@@ -185,6 +200,9 @@ QtObject {
     root.claudeModelUsage = ({});
     root.claudeRecentDays = [];
     root.claudeFirstSessionDate = "";
+    root.claudeProfile = ({});
+    root.claudeLiveRateLimit = ({});
+    root.claudeUsageWindows = ({});
   }
 
   function _resetCodexUsage() {
@@ -278,12 +296,19 @@ QtObject {
           var raw = String(this.text || "").trim();
           if (!raw || raw.indexOf("{") !== 0) return;
           var data = JSON.parse(raw);
-          root.claudeRateLimitAvailable = !!data.available;
-          if (data.available && data.daily_usage !== undefined && data.daily_limit !== undefined) {
-            var pct = data.daily_limit > 0 ? (data.daily_usage / data.daily_limit * 100) : 0;
+          root.claudeProfile = data.profile || {};
+          root.claudeLiveRateLimit = data.liveRateLimit || {};
+          root.claudeUsageWindows = data.usageWindows || {};
+
+          var fiveHour = root.claudeUsageWindows.fiveHour || null;
+          root.claudeRateLimitAvailable = !!(fiveHour && fiveHour.utilization !== undefined && fiveHour.utilization !== null);
+          if (root.claudeRateLimitAvailable) {
+            var pct = Number(fiveHour.utilization || 0);
             root.claudeRateLimitPercent = Math.round(pct * 10) / 10;
-            root.claudeRateLimitLabel = data.daily_usage + " / " + data.daily_limit;
-            root.claudeRateLimitResetAt = data.reset_at || "";
+            root.claudeRateLimitLabel = Math.floor(pct) + "% used";
+            root.claudeRateLimitResetAt = fiveHour.resets_at
+              ? new Date(Number(fiveHour.resets_at) * 1000).toISOString()
+              : "";
 
             // Proactive rate limit toast
             var tier = pct >= 95 ? 2 : pct >= 80 ? 1 : 0;
@@ -302,7 +327,9 @@ QtObject {
           } else {
             root.claudeRateLimitPercent = -1;
             root.claudeRateLimitLabel = "";
-            root.claudeRateLimitResetAt = "";
+            root.claudeRateLimitResetAt = root.claudeLiveRateLimit.resetsAt
+              ? new Date(Number(root.claudeLiveRateLimit.resetsAt) * 1000).toISOString()
+              : "";
           }
         } catch (e) {
           root.claudeRateLimitAvailable = false;

@@ -32,6 +32,74 @@ BasePopupMenu {
   readonly property bool showGemini: ModelUsageService.effectiveActiveProvider === "gemini"
   readonly property bool showProviderTabs: ModelUsageService.enabledProviders.length > 1
 
+  function sumObjectValues(map) {
+    var total = 0;
+    if (!map)
+      return total;
+    for (var key in map) {
+      if (map.hasOwnProperty(key))
+        total += Number(map[key] || 0);
+    }
+    return total;
+  }
+
+  function recentPromptTotal(days) {
+    var total = 0;
+    if (!days)
+      return total;
+    for (var i = 0; i < days.length; i++)
+      total += Number(days[i].messageCount || 0);
+    return total;
+  }
+
+  function activeModelLabel() {
+    if (root.showClaude) {
+      var keys = Object.keys(ModelUsageService.claudeTodayTokensByModel);
+      return keys.length > 0 ? ModelUsageService.friendlyModelName(keys[0]) : "";
+    }
+    if (root.showGemini)
+      return ModelUsageService.geminiModel !== "unknown" ? ModelUsageService.geminiModel : "";
+    return ModelUsageService.codexModel !== "unknown" ? ModelUsageService.codexModel : "";
+  }
+
+  function providerSummaryTiles() {
+    if (root.showClaude) {
+      var fiveHour = ModelUsageService.claudeUsageWindows.fiveHour || {};
+      return [
+        { label: "Sessions", value: String(ModelUsageService.claudeTodaySessions || 0), accent: false },
+        { label: "Tool Calls", value: String(ModelUsageService.claudeTodayToolCalls || 0), accent: false },
+        { label: "Tokens Today", value: ModelUsageService.formatTokenCount(root.sumObjectValues(ModelUsageService.claudeTodayTokensByModel)), accent: true },
+        {
+          label: "5h Window",
+          value: fiveHour.utilization !== undefined && fiveHour.utilization !== null
+            ? Math.floor(Number(fiveHour.utilization || 0)) + "%"
+            : ((ModelUsageService.claudeLiveRateLimit.status || "") !== "" ? String(ModelUsageService.claudeLiveRateLimit.status) : "Unavailable"),
+          accent: true
+        }
+      ];
+    }
+    if (root.showGemini) {
+      return [
+        { label: "Sessions", value: String(ModelUsageService.geminiTodaySessions || 0), accent: false },
+        { label: "Input", value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.input || 0), accent: true },
+        { label: "Output", value: ModelUsageService.formatTokenCount(ModelUsageService.geminiTodayTokens.output || 0), accent: true },
+        { label: "24h Prompts", value: String(ModelUsageService.geminiLast24hPrompts || 0), accent: false }
+      ];
+    }
+    return [
+      { label: "Model", value: ModelUsageService.codexModel !== "unknown" ? ModelUsageService.codexModel : "Unknown", accent: true },
+      { label: "Latest Input", value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.inputTokens || 0), accent: false },
+      { label: "Latest Output", value: ModelUsageService.formatTokenCount(ModelUsageService.codexLatestSession.outputTokens || 0), accent: false },
+      { label: "7d Prompts", value: String(root.recentPromptTotal(ModelUsageService.codexRecentDays || [])), accent: true }
+    ];
+  }
+
+  function providerEmptyMessage() {
+    if (root.showClaude) return "No Claude Code data found yet";
+    if (root.showGemini) return "No Gemini CLI data found yet";
+    return "No Codex CLI data found yet";
+  }
+
   // Provider accent — flows through hero, charts, token values
   property color providerAccent: ModelUsageService.providerColor
   Behavior on providerAccent { ColorAnimation { duration: Appearance.durationNormal } }
@@ -183,9 +251,7 @@ BasePopupMenu {
         // Model badge
         Rectangle {
           visible: {
-            if (root.showClaude) return Object.keys(ModelUsageService.claudeTodayTokensByModel).length > 0;
-            if (root.showGemini) return ModelUsageService.geminiModel !== "unknown";
-            return ModelUsageService.codexModel !== "unknown";
+            return root.activeModelLabel() !== "";
           }
           Layout.alignment: Qt.AlignTop
           implicitWidth: modelBadgeText.implicitWidth + Appearance.spacingM * 2
@@ -197,14 +263,7 @@ BasePopupMenu {
           Text {
             id: modelBadgeText
             anchors.centerIn: parent
-            text: {
-              if (root.showClaude) {
-                var keys = Object.keys(ModelUsageService.claudeTodayTokensByModel);
-                return keys.length > 0 ? ModelUsageService.friendlyModelName(keys[0]) : "";
-              }
-              if (root.showGemini) return ModelUsageService.geminiModel;
-              return ModelUsageService.codexModel;
-            }
+            text: root.activeModelLabel()
             color: root.providerAccent
             font.pixelSize: Appearance.fontSizeXS
             font.weight: Font.DemiBold
@@ -214,11 +273,79 @@ BasePopupMenu {
       }
     }
 
-    // ── Rate Limit Section (Claude only) ─────────────
     SharedWidgets.ThemedContainer {
       variant: "card"
       Layout.fillWidth: true
-      visible: root.showClaude && ModelUsageService.claudeRateLimitAvailable
+      visible: ModelUsageService.hasEnabledProviders && ModelUsageService.isReady
+      implicitHeight: overviewCol.implicitHeight + Appearance.spacingL * 2
+
+      ColumnLayout {
+        id: overviewCol
+        anchors.fill: parent
+        anchors.margins: Appearance.spacingL
+        spacing: Appearance.spacingS
+
+        Text {
+          text: "Overview"
+          color: Colors.text
+          font.pixelSize: Appearance.fontSizeMedium
+          font.weight: Font.Bold
+        }
+
+        GridLayout {
+          Layout.fillWidth: true
+          columns: root.compactMode ? 2 : 4
+          columnSpacing: Appearance.spacingS
+          rowSpacing: Appearance.spacingS
+
+          Repeater {
+            model: root.providerSummaryTiles()
+
+            delegate: SharedWidgets.ThemedContainer {
+              required property var modelData
+              variant: "surface"
+              Layout.fillWidth: true
+              implicitHeight: tileCol.implicitHeight + Appearance.spacingM * 2
+
+              ColumnLayout {
+                id: tileCol
+                anchors.fill: parent
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingXXS
+
+                Text {
+                  text: modelData.label
+                  color: Colors.textDisabled
+                  font.pixelSize: Appearance.fontSizeXS
+                  font.weight: Font.Medium
+                  Layout.fillWidth: true
+                  wrapMode: Text.WordWrap
+                }
+
+                Text {
+                  text: modelData.value
+                  color: modelData.accent ? root.providerAccent : Colors.text
+                  font.pixelSize: Appearance.fontSizeMedium
+                  font.weight: Font.Bold
+                  Layout.fillWidth: true
+                  wrapMode: Text.WordWrap
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // ── Claude Limits Section ─────────────────────────
+    SharedWidgets.ThemedContainer {
+      variant: "card"
+      Layout.fillWidth: true
+      visible: root.showClaude && (
+        Object.keys(ModelUsageService.claudeProfile).length > 0
+        || Object.keys(ModelUsageService.claudeLiveRateLimit).length > 0
+        || ModelUsageService.claudeUsageWindows.reason !== undefined
+      )
       implicitHeight: rateLimitCol.implicitHeight + Appearance.spacingL * 2
 
       ColumnLayout {
@@ -228,56 +355,123 @@ BasePopupMenu {
         spacing: Appearance.spacingS
 
         Text {
-          text: "Rate Limit"
+          text: "Claude Limits"
           color: Colors.text
           font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
         }
 
-        // Progress bar
-        Rectangle {
-          Layout.fillWidth: true
-          implicitHeight: 8
-          radius: 4
-          color: Colors.withAlpha(Colors.text, Colors.primaryFaint)
-
-          Rectangle {
-            width: parent.width * Math.min(1, Math.max(0, ModelUsageService.claudeRateLimitPercent / 100))
-            height: parent.height
-            radius: parent.radius
-            color: ModelUsageService.claudeRateLimitPercent >= 90 ? Colors.error
-                 : ModelUsageService.claudeRateLimitPercent >= 70 ? Colors.warning
-                 : root.providerAccent
-
-            Behavior on width { NumberAnimation { duration: Appearance.durationMedium } }
-          }
+        SharedWidgets.InfoRow {
+          visible: !!((ModelUsageService.claudeProfile.subscriptionType || "") !== "")
+          label: "Plan"
+          value: String(ModelUsageService.claudeProfile.subscriptionType || "").toUpperCase()
         }
 
-        RowLayout {
-          Layout.fillWidth: true
-          Text {
-            text: ModelUsageService.claudeRateLimitLabel
-            color: Colors.textSecondary
-            font.pixelSize: Appearance.fontSizeSmall
+        SharedWidgets.InfoRow {
+          visible: !!((ModelUsageService.claudeProfile.rateLimitTier || "") !== "")
+          label: "Tier"
+          value: ModelUsageService.claudeProfile.rateLimitTier || ""
+        }
+
+        SharedWidgets.InfoRow {
+          visible: !!((ModelUsageService.claudeProfile.billingType || "") !== "")
+          label: "Billing"
+          value: ModelUsageService.claudeProfile.billingType || ""
+        }
+
+        SharedWidgets.InfoRow {
+          visible: typeof ModelUsageService.claudeProfile.hasExtraUsageEnabled !== "undefined"
+          label: "Extra Usage"
+          value: ModelUsageService.claudeProfile.hasExtraUsageEnabled ? "Enabled" : "Disabled"
+        }
+
+        SharedWidgets.InfoRow {
+          visible: !!(
+            ModelUsageService.claudeUsageWindows.available
+            && ModelUsageService.claudeUsageWindows.fiveHour
+            && ModelUsageService.claudeUsageWindows.fiveHour.utilization !== undefined
+            && ModelUsageService.claudeUsageWindows.fiveHour.utilization !== null
+          )
+          label: "5h Session"
+          value: {
+            var fiveHour = ModelUsageService.claudeUsageWindows.fiveHour;
+            if (!fiveHour || fiveHour.utilization === undefined || fiveHour.utilization === null)
+              return "";
+            return Math.floor(Number(fiveHour.utilization || 0))
+              + "% used · resets in "
+              + ModelUsageService.formatUnixResetTime(Number(fiveHour.resets_at || 0));
           }
-          Item { Layout.fillWidth: true }
-          Text {
-            text: ModelUsageService.claudeRateLimitPercent >= 0
-              ? ModelUsageService.claudeRateLimitPercent.toFixed(1) + "%"
-              : ""
-            color: ModelUsageService.claudeRateLimitPercent >= 90 ? Colors.error
-                 : ModelUsageService.claudeRateLimitPercent >= 70 ? Colors.warning
-                 : Colors.textSecondary
-            font.pixelSize: Appearance.fontSizeSmall
-            font.weight: Font.DemiBold
+          valueColor: root.providerAccent
+        }
+
+        SharedWidgets.InfoRow {
+          visible: !!(
+            !ModelUsageService.claudeUsageWindows.available
+            && (ModelUsageService.claudeLiveRateLimit.rateLimitType || "") === "five_hour"
+          )
+          label: "5h Session"
+          value: String(ModelUsageService.claudeLiveRateLimit.status || "unknown")
+            + ((ModelUsageService.claudeLiveRateLimit.resetsAt || 0) > 0
+              ? " · resets in " + ModelUsageService.formatUnixResetTime(Number(ModelUsageService.claudeLiveRateLimit.resetsAt || 0))
+              : "")
+          valueColor: root.providerAccent
+        }
+
+        SharedWidgets.InfoRow {
+          visible: !!(
+            ModelUsageService.claudeUsageWindows.available
+            && ModelUsageService.claudeUsageWindows.sevenDay
+            && ModelUsageService.claudeUsageWindows.sevenDay.utilization !== undefined
+            && ModelUsageService.claudeUsageWindows.sevenDay.utilization !== null
+          )
+          label: "Weekly"
+          value: {
+            var weekly = ModelUsageService.claudeUsageWindows.sevenDay;
+            if (!weekly || weekly.utilization === undefined || weekly.utilization === null)
+              return "";
+            return Math.floor(Number(weekly.utilization || 0))
+              + "% used · resets in "
+              + ModelUsageService.formatUnixResetTime(Number(weekly.resets_at || 0));
           }
+          valueColor: root.providerAccent
+        }
+
+        SharedWidgets.InfoRow {
+          visible: !!(
+            ModelUsageService.claudeUsageWindows.available
+            && ModelUsageService.claudeUsageWindows.sevenDaySonnet
+            && ModelUsageService.claudeUsageWindows.sevenDaySonnet.utilization !== undefined
+            && ModelUsageService.claudeUsageWindows.sevenDaySonnet.utilization !== null
+          )
+          label: "Sonnet Weekly"
+          value: {
+            var sonnetWeekly = ModelUsageService.claudeUsageWindows.sevenDaySonnet;
+            if (!sonnetWeekly || sonnetWeekly.utilization === undefined || sonnetWeekly.utilization === null)
+              return "";
+            return Math.floor(Number(sonnetWeekly.utilization || 0))
+              + "% used · resets in "
+              + ModelUsageService.formatUnixResetTime(Number(sonnetWeekly.resets_at || 0));
+          }
+          valueColor: root.providerAccent
         }
 
         Text {
-          visible: ModelUsageService.claudeRateLimitResetAt !== ""
-          text: "Resets in " + ModelUsageService.formatResetTime(ModelUsageService.claudeRateLimitResetAt)
+          visible: !!(
+            !ModelUsageService.claudeUsageWindows.available
+            && (ModelUsageService.claudeUsageWindows.reason || "") !== ""
+          )
+          text: {
+            if ((ModelUsageService.claudeUsageWindows.reason || "") === "rate_limited") {
+              var retry = Number(ModelUsageService.claudeUsageWindows.retryAfterSeconds || 0);
+              return "Weekly usage unavailable: Anthropic usage API is rate limited"
+                + (retry > 0 ? " · retry in " + ModelUsageService.formatDurationSeconds(retry) : "");
+            }
+            return "Weekly usage unavailable";
+          }
           color: Colors.textDisabled
           font.pixelSize: Appearance.fontSizeXS
+          wrapMode: Text.WordWrap
+          Layout.fillWidth: true
         }
       }
     }
@@ -311,7 +505,7 @@ BasePopupMenu {
         }
 
         SharedWidgets.InfoRow {
-          visible: root.showClaude
+          visible: root.showClaude && ModelUsageService.claudeTodayToolCalls > 0
           label: "Tool Calls"
           value: String(ModelUsageService.claudeTodayToolCalls)
         }
@@ -368,6 +562,7 @@ BasePopupMenu {
       variant: "card"
       Layout.fillWidth: true
       visible: (root.showClaude && ModelUsageService.claudeRecentDays.length > 0)
+              || (root.showGemini && ModelUsageService.geminiRecentDays.length > 0)
               || (root.showCodex && ModelUsageService.codexRecentDays.length > 0)
       implicitHeight: chartCol.implicitHeight + Appearance.spacingL * 2
 
@@ -385,7 +580,8 @@ BasePopupMenu {
         }
 
         Repeater {
-          model: root.showCodex ? ModelUsageService.codexRecentDays
+          model: root.showGemini ? ModelUsageService.geminiRecentDays
+                                 : root.showCodex ? ModelUsageService.codexRecentDays
                                  : ModelUsageService.claudeRecentDays
 
           RowLayout {
@@ -395,7 +591,8 @@ BasePopupMenu {
             required property int index
 
             readonly property int maxCount: {
-              var days = root.showCodex ? ModelUsageService.codexRecentDays
+              var days = root.showGemini ? ModelUsageService.geminiRecentDays
+                                         : root.showCodex ? ModelUsageService.codexRecentDays
                                          : ModelUsageService.claudeRecentDays;
               var m = 1;
               for (var i = 0; i < days.length; i++)
@@ -768,9 +965,9 @@ BasePopupMenu {
         }
 
         SharedWidgets.InfoRow {
-          visible: ModelUsageService.codexRateLimits.planType !== ""
+          visible: !!((ModelUsageService.codexRateLimits.planType || "") !== "")
           label: "Plan"
-          value: ModelUsageService.codexRateLimits.planType
+          value: ModelUsageService.codexRateLimits.planType || ""
         }
 
         SharedWidgets.InfoRow {
@@ -853,8 +1050,10 @@ BasePopupMenu {
         Item { implicitHeight: Appearance.spacingXS; Layout.fillWidth: true }
 
         Text {
-          visible: (ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available)
-                || (ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available)
+          visible: !!(
+            (ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available)
+            || (ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available)
+          )
           text: "Usage Limits"
           color: Colors.textSecondary
           font.pixelSize: Appearance.fontSizeSmall
@@ -862,22 +1061,34 @@ BasePopupMenu {
         }
 
         SharedWidgets.InfoRow {
-          visible: ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available
-          label: ModelUsageService.usageWindowLabel(ModelUsageService.codexRateLimits.primary.windowMinutes)
-          value: ModelUsageService.codexRateLimits.primary.usedPercent >= 0
-            ? ModelUsageService.codexRateLimits.primary.usedPercent.toFixed(1) + "% · resets in "
-              + ModelUsageService.formatUnixResetTime(ModelUsageService.codexRateLimits.primary.resetsAt)
-            : ""
+          visible: !!(ModelUsageService.codexRateLimits.primary && ModelUsageService.codexRateLimits.primary.available)
+          label: {
+            var primary = ModelUsageService.codexRateLimits.primary;
+            return primary ? ModelUsageService.usageWindowLabel(primary.windowMinutes || 0) : "";
+          }
+          value: {
+            var primary = ModelUsageService.codexRateLimits.primary;
+            if (!primary || primary.usedPercent === undefined || primary.usedPercent < 0)
+              return "";
+            return primary.usedPercent.toFixed(1) + "% · resets in "
+              + ModelUsageService.formatUnixResetTime(primary.resetsAt || 0);
+          }
           valueColor: root.providerAccent
         }
 
         SharedWidgets.InfoRow {
-          visible: ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available
-          label: ModelUsageService.usageWindowLabel(ModelUsageService.codexRateLimits.secondary.windowMinutes)
-          value: ModelUsageService.codexRateLimits.secondary.usedPercent >= 0
-            ? ModelUsageService.codexRateLimits.secondary.usedPercent.toFixed(1) + "% · resets in "
-              + ModelUsageService.formatUnixResetTime(ModelUsageService.codexRateLimits.secondary.resetsAt)
-            : ""
+          visible: !!(ModelUsageService.codexRateLimits.secondary && ModelUsageService.codexRateLimits.secondary.available)
+          label: {
+            var secondary = ModelUsageService.codexRateLimits.secondary;
+            return secondary ? ModelUsageService.usageWindowLabel(secondary.windowMinutes || 0) : "";
+          }
+          value: {
+            var secondary = ModelUsageService.codexRateLimits.secondary;
+            if (!secondary || secondary.usedPercent === undefined || secondary.usedPercent < 0)
+              return "";
+            return secondary.usedPercent.toFixed(1) + "% · resets in "
+              + ModelUsageService.formatUnixResetTime(secondary.resetsAt || 0);
+          }
           valueColor: root.providerAccent
         }
       }
@@ -888,9 +1099,7 @@ BasePopupMenu {
       Layout.fillWidth: true
       visible: ModelUsageService.hasEnabledProviders && !ModelUsageService.isReady
       icon: ModelUsageService.providerIcon
-      message: root.showClaude ? "No Claude Code data found"
-             : root.showGemini ? "No Gemini CLI data found"
-             : "No Codex CLI data found"
+      message: root.providerEmptyMessage()
     }
   }
 }

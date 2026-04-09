@@ -133,23 +133,116 @@ elif [ "$provider" = "claude-rate-limit" ]; then
     exit 0
   fi
 
-  # Probe the rate limit API
-  response=$(curl -s --max-time 10 \
-    -H "Authorization: Bearer $token" \
-    -H "Content-Type: application/json" \
-    "https://api.anthropic.com/api/oauth/usage" 2>/dev/null || echo "")
-
-  if [ -z "$response" ] || ! echo "$response" | jq empty 2>/dev/null; then
-    echo '{"available":false,"reason":"api error"}'
-    exit 0
+  curl_bin=$(command -v curl 2>/dev/null || true)
+  if [ -z "$curl_bin" ] && [ -x /run/current-system/sw/bin/curl ]; then
+    curl_bin=/run/current-system/sw/bin/curl
   fi
 
-  # Only mark available if there's no error field
-  if echo "$response" | jq -e '.error' >/dev/null 2>&1; then
-    echo "$response" | jq '{available: false, reason: "api_error"} + .'
-  else
-    echo "$response" | jq '{available: true} + .'
+  claude_bin=$(command -v claude 2>/dev/null || true)
+  if [ -z "$claude_bin" ] && [ -x "$HOME/.nix-profile/bin/claude" ]; then
+    claude_bin="$HOME/.nix-profile/bin/claude"
   fi
+
+  timeout_bin=$(command -v timeout 2>/dev/null || true)
+  if [ -z "$timeout_bin" ] && [ -x /run/current-system/sw/bin/timeout ]; then
+    timeout_bin=/run/current-system/sw/bin/timeout
+  fi
+
+  profile_json='{}'
+  usage_json='{"available":false,"reason":"unavailable","retryAfterSeconds":0,"fiveHour":null,"sevenDay":null,"sevenDaySonnet":null}'
+  live_rate_limit_json='{}'
+
+  if [ -n "$curl_bin" ] && [ -x "$curl_bin" ]; then
+    profile_response=$("$curl_bin" -sS --max-time 10 \
+      -H "Authorization: Bearer $token" \
+      -H "Content-Type: application/json" \
+      "https://api.anthropic.com/api/oauth/profile" 2>/dev/null || echo "")
+
+    if [ -n "$profile_response" ] && echo "$profile_response" | jq empty >/dev/null 2>&1; then
+      profile_json=$(echo "$profile_response" | jq '{
+        subscriptionType: (
+          if .account.has_claude_max then "max"
+          elif .account.has_claude_pro then "pro"
+          else ""
+          end
+        ),
+        rateLimitTier: (.organization.rate_limit_tier // ""),
+        organizationType: (.organization.organization_type // ""),
+        billingType: (.organization.billing_type // ""),
+        subscriptionStatus: (.organization.subscription_status // ""),
+        hasExtraUsageEnabled: (.organization.has_extra_usage_enabled // false),
+        organizationName: (.organization.name // "")
+      }')
+    fi
+
+    headers_file=$(mktemp)
+    body_file=$(mktemp)
+    "$curl_bin" -sS --max-time 10 -D "$headers_file" -o "$body_file" \
+      -H "Authorization: Bearer $token" \
+      -H "Content-Type: application/json" \
+      "https://api.anthropic.com/api/oauth/usage" >/dev/null 2>&1 || true
+
+    http_status=$(/run/current-system/sw/bin/head -n 1 "$headers_file" | awk '{print $2}')
+    retry_after=$(awk 'tolower($1)=="retry-after:" {gsub("\r","",$2); print $2; exit}' "$headers_file" 2>/dev/null || echo "0")
+    retry_after="${retry_after:-0}"
+
+    if [ "$http_status" = "200" ] && jq empty "$body_file" >/dev/null 2>&1; then
+      usage_json=$(jq '{
+        available: true,
+        reason: "",
+        retryAfterSeconds: 0,
+        fiveHour: (.five_hour // null),
+        sevenDay: (.seven_day // null),
+        sevenDaySonnet: (.seven_day_sonnet // null)
+      }' "$body_file")
+    elif [ "$http_status" = "429" ] && jq empty "$body_file" >/dev/null 2>&1; then
+      usage_json=$(jq -n \
+        --argjson retry "${retry_after:-0}" \
+        --slurpfile body "$body_file" '{
+          available: false,
+          reason: "rate_limited",
+          retryAfterSeconds: $retry,
+          fiveHour: null,
+          sevenDay: null,
+          sevenDaySonnet: null,
+          error: ($body[0].error // null)
+        }')
+    elif [ -f "$body_file" ] && jq empty "$body_file" >/dev/null 2>&1; then
+      usage_json=$(jq -n --slurpfile body "$body_file" '{
+        available: false,
+        reason: "api_error",
+        retryAfterSeconds: 0,
+        fiveHour: null,
+        sevenDay: null,
+        sevenDaySonnet: null,
+        error: ($body[0].error // null)
+      }')
+    fi
+
+    rm -f "$headers_file" "$body_file"
+  fi
+
+  if [ -n "$claude_bin" ] && [ -x "$claude_bin" ]; then
+    if [ -n "$timeout_bin" ] && [ -x "$timeout_bin" ]; then
+      live_output=$("$timeout_bin" 20s "$claude_bin" -p --output-format json "quota" 2>/dev/null || echo "")
+    else
+      live_output=$("$claude_bin" -p --output-format json "quota" 2>/dev/null || echo "")
+    fi
+    if [ -n "$live_output" ] && echo "$live_output" | jq empty >/dev/null 2>&1; then
+      live_rate_limit_json=$(echo "$live_output" | jq 'map(select(.type == "rate_limit_event")) | last.rate_limit_info // {}')
+    fi
+  fi
+
+  jq -n \
+    --argjson profile "$profile_json" \
+    --argjson usage "$usage_json" \
+    --argjson live "$live_rate_limit_json" '
+    {
+      available: (($profile | length) > 0) or (($live | length) > 0) or ($usage.available // false),
+      profile: $profile,
+      liveRateLimit: $live,
+      usageWindows: $usage
+    }'
 
 # ── Codex ────────────────────────────────────────────────────────
 elif [ "$provider" = "codex" ]; then
