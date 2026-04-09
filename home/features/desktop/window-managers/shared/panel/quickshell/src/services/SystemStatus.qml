@@ -481,7 +481,6 @@ QtObject {
 
         // CPU Usage calculation via /proc/stat delta
         var cpuParts = (lines[2] || "").split(/\s+/);
-        console.log("[SystemStatus] cpuParts length:", cpuParts.length, "parts:", JSON.stringify(cpuParts));
         if (cpuParts.length >= 5) {
           var user = parseInt(cpuParts[1], 10) || 0;
           var nice = parseInt(cpuParts[2], 10) || 0;
@@ -495,11 +494,9 @@ QtObject {
           var currentTotal = user + nice + system + idle + iowait + irq + softirq + steal;
           var currentIdle = idle + iowait;
 
-          console.log("[SystemStatus] lastTotal:", this.lastTotal, "currentTotal:", currentTotal);
-
-          if (this.lastTotal > 0) {
-            var totalDiff = currentTotal - this.lastTotal;
-            var idleDiff = currentIdle - this.lastIdle;
+          if (statsPoll.lastTotal > 0) {
+            var totalDiff = currentTotal - statsPoll.lastTotal;
+            var idleDiff = currentIdle - statsPoll.lastIdle;
 
             if (totalDiff > 0) {
               var usage = 1.0 - (idleDiff / totalDiff);
@@ -510,8 +507,8 @@ QtObject {
                 root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
             }
           }
-          this.lastTotal = currentTotal;
-          this.lastIdle = currentIdle;
+          statsPoll.lastTotal = currentTotal;
+          statsPoll.lastIdle = currentIdle;
         }
 
         var gpuRaw = String(lines[3] || "").trim();

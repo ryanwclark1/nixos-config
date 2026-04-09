@@ -82,7 +82,7 @@ QtObject {
       { type: "slider", key: "barCount", label: "Bar Count", icon: "device-eq.svg", min: 4, max: 20, step: 1 }
     ] },
     { widgetType: "idleInhibitor", label: "Idle Inhibitor", icon: "power-sleep-filled.svg", section: "center", description: "Toggle idle inhibit state." },
-    { widgetType: "modelUsage", label: "Model Usage", icon: "board.svg", section: "right", description: "AI coding assistant usage stats (Claude Code, Codex).", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
+    { widgetType: "modelUsage", label: "AI Model Usage", icon: "board.svg", section: "right", description: "AI coding assistant usage stats (Claude Code, Codex).", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its text/details, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] }
     ] },
     { widgetType: "weather", label: "Weather", icon: "weather-sunny.svg", section: "right", description: "Current weather and forecast popup.", hasSettings: true, defaultSettings: { displayMode: "auto" }, settingsSchema: [

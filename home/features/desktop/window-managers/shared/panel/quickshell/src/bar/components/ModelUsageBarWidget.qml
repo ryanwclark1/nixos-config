@@ -21,14 +21,7 @@ SharedWidgets.BarPill {
             icon: "arrow-counterclockwise.svg",
             action: () => ModelUsageService.refresh()
         },
-        {
-            label: "Switch Provider",
-            icon: "arrow-swap.svg",
-            visible: (ModelUsageService.claudeEnabled ? 1 : 0)
-                   + (ModelUsageService.codexEnabled ? 1 : 0)
-                   + (ModelUsageService.geminiEnabled ? 1 : 0) > 1,
-            action: () => ModelUsageService.switchProvider()
-        },
+
         {
             label: "Settings",
             icon: "settings.svg",
@@ -40,12 +33,27 @@ SharedWidgets.BarPill {
         spacing: Appearance.spacingS
 
         SharedWidgets.SvgIcon {
-            source: ModelUsageService.providerIcon
-            color: ModelUsageService.providerColor
+            visible: ModelUsageService.claudeEnabled
+            source: "brands/anthropic-symbolic.svg"
+            color: "#cc785c"
             size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter
+        }
 
-            Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationMedium } }
+        SharedWidgets.SvgIcon {
+            visible: ModelUsageService.codexEnabled
+            source: "brands/openai-symbolic.svg"
+            color: "#22c55e"
+            size: Appearance.fontSizeLarge
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        SharedWidgets.SvgIcon {
+            visible: ModelUsageService.geminiEnabled
+            source: "brands/google-gemini-symbolic.svg"
+            color: "#4285F4"
+            size: Appearance.fontSizeLarge
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 }

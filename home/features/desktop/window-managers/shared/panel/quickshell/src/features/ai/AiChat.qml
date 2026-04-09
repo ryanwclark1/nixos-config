@@ -913,6 +913,10 @@ PanelWindow {
                                 }
                             }
 
+                            Keys.onEscapePressed: {
+                                inputField.focus = false;
+                            }
+
                             Keys.onPressed: event => {
                                 if (event.key === Qt.Key_Return && !(event.modifiers & Qt.ShiftModifier)) {
                                     event.accepted = true;
@@ -951,9 +955,6 @@ PanelWindow {
                                         font.pixelSize: Appearance.fontSizeSmall
                                         elide: Text.ElideRight
                                         Layout.maximumWidth: 150
-                                        Keys.onEscapePressed: {
-                                            inputField.focus = false;
-                                        }
                                     }
 
                                     SharedWidgets.IconButton {
@@ -1207,8 +1208,6 @@ PanelWindow {
                                     sendStateLayer.burst(mouse.x, mouse.y);
                                     if (AiService.isStreaming) {
                                         AiService.cancelStream();
-                                        inputField.focus = false;
-                                        Quickshell.execDetached(SU.ipcCall("AiChat", "close"));
                                     } else {
                                         root._sendCurrentMessage();
                                     }
