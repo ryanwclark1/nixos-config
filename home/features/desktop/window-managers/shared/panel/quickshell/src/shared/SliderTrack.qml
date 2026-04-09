@@ -40,17 +40,7 @@ Rectangle {
     _pendingValue = -1;
   }
 
-  height: sliderMouse.pressed ? 32 : 28
-  Behavior on height { Anim { duration: Appearance.durationFast } }
-
-  transform: Scale {
-    origin.x: root.width / 2
-    origin.y: root.height / 2
-    xScale: sliderMouse.pressed ? 1.02 : 1.0
-    yScale: sliderMouse.pressed ? 0.96 : 1.0
-    Behavior on xScale { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
-    Behavior on yScale { NumberAnimation { duration: Appearance.durationNormal; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
-  }
+  height: 28
   color: sliderMouse.containsMouse ? Colors.surface : Colors.bgWidget
   radius: height / 2
   border.color: root.muted ? root.mutedColor : (sliderMouse.containsMouse ? root.activeColor : Colors.border)
@@ -129,8 +119,10 @@ Rectangle {
     border.width: 2
     border.color: root.muted ? root.mutedColor : root.activeColor
     z: 2
+    scale: sliderMouse.pressed ? 1.06 : (sliderMouse.containsMouse ? 1.02 : 1.0)
 
     Behavior on x { enabled: !Colors.isTransitioning; NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutCubic } }
+    Behavior on scale { enabled: !Colors.isTransitioning; NumberAnimation { duration: Appearance.durationFast; easing.type: Easing.OutCubic } }
     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
     Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 

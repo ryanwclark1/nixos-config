@@ -18,6 +18,10 @@ import "../shared/WallpaperThumbnailCache.js" as WTC
 QtObject {
   id: root
 
+  readonly property bool enableWallpaperStartupScan: (Quickshell.env("QS_ENABLE_WALLPAPER_STARTUP_SCAN") || "") === "1"
+  readonly property bool debugDisableWallpaperStartupScan: (Quickshell.env("QS_DEBUG_DISABLE_WALLPAPER_SCAN") || "") === "1"
+  readonly property int startupScanDelayMs: Math.max(250, parseInt(Quickshell.env("QS_WALLPAPER_STARTUP_SCAN_DELAY_MS") || "1800", 10) || 1800)
+
   // ---- Public state ----------------------------------------------------------
 
   // Map of monitorName → absolute image path, e.g. {"DP-1": "/home/user/Wallpapers/foo.jpg"}
@@ -69,11 +73,25 @@ QtObject {
 
   // ---- Public API ------------------------------------------------------------
 
+  function scheduleStartupScan(reason) {
+    if (!enableWallpaperStartupScan) {
+      Logger.i("WallpaperService", "startup wallpaper scan deferred until first use", String(reason || "startup"));
+      return;
+    }
+    if (debugDisableWallpaperStartupScan) {
+      Logger.i("WallpaperService", "startup wallpaper scan disabled", String(reason || "startup"));
+      return;
+    }
+    startupScanTimer.restart();
+    Logger.i("WallpaperService", "startup wallpaper scan scheduled", startupScanDelayMs + "ms", String(reason || "startup"));
+  }
+
   // Trigger an async rescan of all wallpaperSearchDirs.
   function scanWallpapers() {
     if (scanning) return;
     scanning = true;
     _scanStartTime = Date.now();
+    Logger.i("WallpaperService", "scan starting", wallpaperSearchDirs.length + " dir(s)", wallpaperDir);
     // Build a script that iterates each directory independently, safely quoting each
     // path via single-quotes so spaces in $HOME are handled correctly.
     // Wrap individual finds in a subshell group, then sort -u the combined output.
@@ -421,6 +439,13 @@ QtObject {
     }
   }
 
+  property Timer startupScanTimer: Timer {
+    interval: root.startupScanDelayMs
+    repeat: false
+    running: false
+    onTriggered: root.scanWallpapers()
+  }
+
   // React to interval config changes
   property Connections _cycleConfigWatcher: Connections {
     target: Config
@@ -621,7 +646,7 @@ QtObject {
         }
       }
     }
-    scanWallpapers();
+    scheduleStartupScan("Component.onCompleted");
     if (Config.wallpaperDynamicEnabled && Config.wallpaperDynamicManifest)
       loadDynamicManifest(Config.wallpaperDynamicManifest);
   }

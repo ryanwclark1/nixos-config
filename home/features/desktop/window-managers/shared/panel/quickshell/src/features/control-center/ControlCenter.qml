@@ -37,6 +37,8 @@ PanelWindow {
     property var manager: null
     property var shellRoot: null
     property bool showContent: false
+    property string pendingSurfaceId: ""
+    property var pendingSurfaceContext: null
     readonly property int maxLayerTextureSize: 4096
     readonly property int staggerDelay: 35
     readonly property int settingsOpenDelayMs: 130
@@ -70,8 +72,8 @@ PanelWindow {
     }
 
     function requestSurfaceAfterClose(surfaceId, context) {
-        _pendingSurfaceId = String(surfaceId || "");
-        _pendingSurfaceContext = context || null;
+        root.pendingSurfaceId = String(surfaceId || "");
+        root.pendingSurfaceContext = context || null;
         root.closeRequested();
         openSurfaceTimer.restart();
     }
@@ -188,8 +190,6 @@ PanelWindow {
             }
 
             property string _quickLinkSurfaceId: ""
-            property string _pendingSurfaceId: ""
-            property var _pendingSurfaceContext: null
             Timer {
                 id: openQuickLinkTimer
                 interval: root.settingsOpenDelayMs
@@ -204,16 +204,16 @@ PanelWindow {
                 interval: root.settingsOpenDelayMs
                 repeat: false
                 onTriggered: {
-                    if (!root.shellRoot || !parent._pendingSurfaceId)
+                    if (!root.shellRoot || !root.pendingSurfaceId)
                         return;
-                    var nextContext = parent._pendingSurfaceContext || ({});
+                    var nextContext = root.pendingSurfaceContext || ({});
                     if (root.screen && !nextContext.screen)
                         nextContext.screen = root.screen;
                     if (root.screen && !nextContext.screenName)
                         nextContext.screenName = Config.screenName(root.screen);
-                    root.shellRoot.openSurface(parent._pendingSurfaceId, nextContext);
-                    parent._pendingSurfaceId = "";
-                    parent._pendingSurfaceContext = null;
+                    root.shellRoot.openSurface(root.pendingSurfaceId, nextContext);
+                    root.pendingSurfaceId = "";
+                    root.pendingSurfaceContext = null;
                 }
             }
 

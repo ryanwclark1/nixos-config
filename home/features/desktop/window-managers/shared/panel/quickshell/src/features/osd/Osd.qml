@@ -29,6 +29,8 @@ Scope {
   property real displaySourceVolume: 0
   property bool displaySourceMuted: false
   property real displayKbdBrightness: 0
+  property double _lastCriticalOsdAt: 0
+  property string _lastCriticalSummaryShown: ""
 
   Component.onDestruction: {
     hideTimer.stop();
@@ -146,6 +148,24 @@ Scope {
     showOsd(type);
   }
 
+  function showCriticalOsdIfNeeded() {
+    if (!startupComplete || !SystemStatus.isCritical)
+      return;
+
+    var summary = String(SystemStatus.criticalSummary || "");
+    var now = Date.now();
+    var cooldownElapsed = root._lastCriticalOsdAt <= 0
+      || (now - root._lastCriticalOsdAt) >= Math.max(0, Config.osdCriticalCooldownMs);
+    var summaryChanged = summary !== root._lastCriticalSummaryShown;
+
+    if (!summaryChanged && !cooldownElapsed)
+      return;
+
+    root._lastCriticalSummaryShown = summary;
+    root._lastCriticalOsdAt = now;
+    showOsd("critical");
+  }
+
   IpcHandler {
     target: "Osd"
 
@@ -200,7 +220,12 @@ Scope {
   Connections {
     target: SystemStatus
     function onIsCriticalChanged() {
-      if (SystemStatus.isCritical) showOsd("critical");
+      if (SystemStatus.isCritical)
+        root.showCriticalOsdIfNeeded();
+    }
+    function onCriticalSummaryChanged() {
+      if (SystemStatus.isCritical)
+        root.showCriticalOsdIfNeeded();
     }
   }
 

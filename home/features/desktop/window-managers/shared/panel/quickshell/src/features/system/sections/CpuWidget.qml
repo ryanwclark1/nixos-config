@@ -204,48 +204,48 @@ SharedWidgets.CardBase {
             spacing: Appearance.spacingS
             visible: root.hasCpuInfo
 
-            Text {
-                text: "PROCESSOR INFO"
-                color: Colors.textDisabled
-                font.pixelSize: Appearance.fontSizeXS
-                font.weight: Font.Black
-                font.letterSpacing: Appearance.letterSpacingWide
-                font.capitalization: Font.AllUppercase
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Appearance.spacingS
+
+                Text {
+                    text: "PROCESSOR INFO"
+                    color: Colors.textDisabled
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.weight: Font.Black
+                    font.letterSpacing: Appearance.letterSpacingWide
+                    font.capitalization: Font.AllUppercase
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter
+                    implicitHeight: 1
+                    radius: 1
+                    color: Colors.withAlpha(root.usageColor, 0.35)
+                }
             }
 
-            Rectangle {
+            ColumnLayout {
                 Layout.fillWidth: true
                 visible: root.cpuInfo.model !== "--"
-                radius: Appearance.radiusSmall
-                color: Colors.cardSurface
-                border.color: Colors.withAlpha(Colors.border, 0.75)
-                border.width: 1
-                implicitHeight: modelColumn.implicitHeight + Appearance.spacingS * 2
+                spacing: Appearance.spacingXXS
 
-                ColumnLayout {
-                    id: modelColumn
-                    anchors.fill: parent
-                    anchors.margins: Appearance.spacingS
-                    spacing: Appearance.spacingXS
+                Text {
+                    text: root.cpuInfo.model
+                    color: Colors.text
+                    font.pixelSize: Appearance.fontSizeMedium
+                    font.weight: Font.DemiBold
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 3
+                    elide: Text.ElideRight
+                }
 
-                    Text {
-                        text: "MODEL"
-                        color: Colors.textDisabled
-                        font.pixelSize: Appearance.fontSizeXS
-                        font.weight: Font.Black
-                        font.letterSpacing: Appearance.letterSpacingWide
-                        font.capitalization: Font.AllUppercase
-                    }
-
-                    Text {
-                        text: root.cpuInfo.model
-                        color: Colors.text
-                        font.pixelSize: Appearance.fontSizeSmall
-                        font.weight: Font.DemiBold
-                        wrapMode: Text.Wrap
-                        maximumLineCount: 2
-                        elide: Text.ElideRight
-                    }
+                Text {
+                    text: "Model"
+                    color: Colors.textDisabled
+                    font.pixelSize: Appearance.fontSizeXS
+                    font.weight: Font.Medium
                 }
             }
 

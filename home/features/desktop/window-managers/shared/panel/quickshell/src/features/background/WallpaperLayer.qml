@@ -1,10 +1,13 @@
 import QtQuick
 import QtMultimedia
+import Quickshell
 import "../../services"
 
 Item {
     id: root
     anchors.fill: parent
+    readonly property bool debugDisableVideoWallpaper: (Quickshell.env("QS_DEBUG_DISABLE_VIDEO_WALLPAPER") || "") === "1"
+    readonly property bool effectiveShowVideo: root.showVideo && !root.debugDisableVideoWallpaper
 
     // Public API
     property url currentSource: ""
@@ -32,12 +35,15 @@ Item {
     // Video wallpaper layer
     MediaPlayer {
         id: videoPlayer
-        source: root.showVideo ? root.videoSource : ""
+        source: root.effectiveShowVideo ? root.videoSource : ""
         loops: MediaPlayer.Infinite
         audioOutput: AudioOutput { muted: true }
         videoOutput: videoOutput
         onSourceChanged: {
-            if (source !== "") play();
+            if (source !== "") {
+                Logger.i("WallpaperLayer", "video wallpaper source activated", source);
+                play();
+            }
         }
         onErrorOccurred: (error, errorString) => {
             Logger.w("WallpaperLayer", "Video playback error:", errorString);
@@ -48,7 +54,12 @@ Item {
         id: videoOutput
         anchors.fill: parent
         fillMode: VideoOutput.PreserveAspectCrop
-        visible: root.showVideo && videoPlayer.playbackState === MediaPlayer.PlayingState
+        visible: root.effectiveShowVideo && videoPlayer.playbackState === MediaPlayer.PlayingState
+    }
+
+    Component.onCompleted: {
+        if (root.debugDisableVideoWallpaper)
+            Logger.i("WallpaperLayer", "video wallpaper disabled via QS_DEBUG_DISABLE_VIDEO_WALLPAPER");
     }
 
     Image {

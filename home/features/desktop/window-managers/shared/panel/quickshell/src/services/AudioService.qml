@@ -8,16 +8,18 @@ import "ShellUtils.js" as SU
 
 QtObject {
     id: root
+    readonly property bool debugDisableAudioService: (Quickshell.env("QS_DEBUG_DISABLE_AUDIO_SERVICE") || "") === "1"
+    readonly property bool _pipewireReady: !debugDisableAudioService && Pipewire.ready
 
     readonly property int _wpctlPollIntervalMs: 1500
-    readonly property real _pipewireOutputVolume: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio
+    readonly property real _pipewireOutputVolume: !debugDisableAudioService && Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio
         ? AudioHelpers.normalizeVolume(Pipewire.defaultAudioSink.audio.volume, 1.0)
         : 0
-    readonly property bool _pipewireOutputMuted: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio ? Pipewire.defaultAudioSink.audio.muted : false
-    readonly property real _pipewireInputVolume: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio
+    readonly property bool _pipewireOutputMuted: !debugDisableAudioService && Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio ? Pipewire.defaultAudioSink.audio.muted : false
+    readonly property real _pipewireInputVolume: !debugDisableAudioService && Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio
         ? AudioHelpers.normalizeVolume(Pipewire.defaultAudioSource.audio.volume, 1.0)
         : 0
-    readonly property bool _pipewireInputMuted: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Pipewire.defaultAudioSource.audio.muted : false
+    readonly property bool _pipewireInputMuted: !debugDisableAudioService && Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Pipewire.defaultAudioSource.audio.muted : false
     readonly property var _outputWpctlState: _outputPoll.value
     readonly property var _inputWpctlState: _inputPoll.value
 
@@ -39,8 +41,8 @@ QtObject {
     // ── Filtered device lists (pin/hide applied) ────
     readonly property var filteredSinks: _filterDevices(sinks, Config.audioPinnedOutputs, Config.audioHiddenOutputs)
     readonly property var filteredSources: _filterDevices(sources, Config.audioPinnedInputs, Config.audioHiddenInputs)
-    readonly property int defaultSinkId: Pipewire.defaultAudioSink?.id ?? -1
-    readonly property int defaultSourceId: Pipewire.defaultAudioSource?.id ?? -1
+    readonly property int defaultSinkId: !debugDisableAudioService ? (Pipewire.defaultAudioSink?.id ?? -1) : -1
+    readonly property int defaultSourceId: !debugDisableAudioService ? (Pipewire.defaultAudioSource?.id ?? -1) : -1
 
     // ── Per-app audio streams ────────────────────
     readonly property var outputAppNodes: _buildAppNodes(true)
@@ -53,6 +55,8 @@ QtObject {
     // Track default sink/source AND their .audio sub-objects for reactive volume/muted bindings.
     property PwObjectTracker _defaultTracker: PwObjectTracker {
         objects: {
+            if (root.debugDisableAudioService)
+                return [];
             var out = [];
             if (Pipewire.defaultAudioSink) {
                 out.push(Pipewire.defaultAudioSink);
@@ -67,7 +71,7 @@ QtObject {
     }
 
     property PwObjectTracker _nodeTracker: PwObjectTracker {
-        objects: _allAudioNodes()
+        objects: root.debugDisableAudioService ? [] : _allAudioNodes()
     }
 
     property CommandPoll _outputPoll: CommandPoll {
@@ -86,18 +90,21 @@ QtObject {
 
     // ── Helpers ──────────────────────────────────
     function _sinkDescription() {
+        if (root.debugDisableAudioService) return "Audio service disabled";
         var sink = Pipewire.defaultAudioSink;
         if (!sink) return "No output device";
         return sink.description || sink.nickname || sink.name || "Unknown";
     }
 
     function _sourceDescription() {
+        if (root.debugDisableAudioService) return "Audio service disabled";
         var source = Pipewire.defaultAudioSource;
         if (!source) return "No input device";
         return source.description || source.nickname || source.name || "Unknown";
     }
 
     function _detectDeviceType() {
+        if (root.debugDisableAudioService) return "speaker";
         var sink = Pipewire.defaultAudioSink;
         if (!sink) return "speaker";
         var name = (sink.name || "").toLowerCase();
@@ -111,7 +118,7 @@ QtObject {
     }
 
     function _allAudioNodes() {
-        if (!Pipewire.ready) return [];
+        if (!root._pipewireReady) return [];
         var nodes = Pipewire.nodes?.values ?? [];
         var audio = [];
         for (var i = 0; i < nodes.length; i++) {
@@ -187,7 +194,7 @@ QtObject {
     }
 
     function _buildDeviceList(isSinkList) {
-        if (!Pipewire.ready) return [];
+        if (!root._pipewireReady) return [];
         var nodes = Pipewire.nodes?.values ?? [];
         var devices = [];
         var defaultId = isSinkList ? (Pipewire.defaultAudioSink?.id ?? -1)
@@ -234,7 +241,7 @@ QtObject {
     }
 
     function _buildAppNodes(isOutput) {
-        if (!Pipewire.ready) return [];
+        if (!root._pipewireReady) return [];
         var nodes = Pipewire.nodes?.values ?? [];
         var apps = [];
 
@@ -277,6 +284,7 @@ QtObject {
 
     // ── Actions (preserves existing API) ─────────
     function setVolume(target, value) {
+        if (root.debugDisableAudioService) return;
         var current = root._currentTargetVolume(target);
         var requested = AudioHelpers.normalizeVolume(value, 1.0);
         var clamped = Config.volumeProtectionEnabled
@@ -300,6 +308,7 @@ QtObject {
     }
 
     function setAppVolume(nodeRef, value) {
+        if (root.debugDisableAudioService) return;
         if (!nodeRef || !nodeRef.audio) return;
         var clamped = Colors.clamp01(AudioHelpers.normalizeVolume(value, 1.0));
         if (clamped > 0) nodeRef.audio.muted = false;
@@ -307,11 +316,13 @@ QtObject {
     }
 
     function toggleAppMute(nodeRef) {
+        if (root.debugDisableAudioService) return;
         if (!nodeRef || !nodeRef.audio) return;
         nodeRef.audio.muted = !nodeRef.audio.muted;
     }
 
     function toggleMute(target, currentlyMuted) {
+        if (root.debugDisableAudioService) return;
         var isSink = target === "@DEFAULT_AUDIO_SINK@";
         if (currentlyMuted === undefined)
             currentlyMuted = root._currentTargetMuted(target);
@@ -329,6 +340,7 @@ QtObject {
     }
 
     function setDefaultDevice(id) {
+        if (root.debugDisableAudioService) return;
         if (id < 0) return;
         var nodes = Pipewire.nodes?.values ?? [];
         for (var i = 0; i < nodes.length; i++) {
@@ -342,6 +354,14 @@ QtObject {
         }
         // Fallback to wpctl if node not found in tracker
         Quickshell.execDetached(["wpctl", "set-default", id.toString()]);
+    }
+
+    Component.onCompleted: {
+        if (root.debugDisableAudioService) {
+            Logger.i("AudioService", "audio service disabled via QS_DEBUG_DISABLE_AUDIO_SERVICE");
+            return;
+        }
+        Logger.i("AudioService", "audio service startup", root._pipewireReady ? "pipewire-ready" : "pipewire-pending");
     }
 
 }

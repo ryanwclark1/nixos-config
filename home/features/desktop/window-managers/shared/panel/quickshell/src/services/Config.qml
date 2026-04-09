@@ -188,6 +188,7 @@ QtObject {
     property string osdPosition: "top"
     property string osdStyle: "circular"
     property bool osdOverdrive: false
+    property int osdCriticalCooldownMs: 300000
 
     // --- DOCK ---
     property bool dockEnabled: true

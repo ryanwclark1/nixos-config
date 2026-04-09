@@ -13,5 +13,7 @@ SharedWidgets.IconButton {
     iconColor: Colors.primary
     tooltipText: "Open system monitor"
 
-    onClicked: Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "systemMonitor"))
+    onClicked: {
+        Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "systemMonitor", ""));
+    }
 }
