@@ -380,6 +380,62 @@ RowLayout {
     }
 
     Rectangle {
+        id: historyBtn
+        width: 32
+        height: 32
+        radius: Appearance.radiusSmall
+        color: historyBtnMouse.containsMouse ? Colors.primaryGhost : Colors.bgWidget
+        border.color: historyBtnMouse.containsMouse ? Colors.primary : Colors.border
+        border.width: 1
+        Layout.alignment: Qt.AlignVCenter
+
+        SharedWidgets.SvgIcon {
+            anchors.centerIn: parent
+            source: "history.svg"
+            color: historyBtnMouse.containsMouse ? Colors.primary : Colors.textSecondary
+            size: Appearance.fontSizeSmall
+        }
+
+        SharedWidgets.StateLayer {
+            id: historyStateLayer
+            hovered: historyBtnMouse.containsMouse
+            pressed: historyBtnMouse.pressed
+        }
+
+        MouseArea {
+            id: historyBtnMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: mouse => {
+                historyStateLayer.burst(mouse.x, mouse.y);
+                var model = [];
+                var allConvs = AiService.conversations.slice().sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+                for (var i = 0; i < allConvs.length; i++) {
+                    var conv = allConvs[i];
+                    model.push({
+                        label: conv.title,
+                        icon: Providers.providerIcon(conv.provider),
+                        action: (function(convId) {
+                            return function() {
+                                AiService.setActiveConversation(convId);
+                            };
+                        })(conv.id)
+                    });
+                }
+                var pos = parent.mapToItem(root.parent, 0, parent.height);
+                historyActionMenu.model = model;
+                historyActionMenu.popup(pos.x, pos.y + Appearance.spacingXS);
+            }
+        }
+
+        Tooltip {
+            text: "Chat History"
+            shown: historyBtnMouse.containsMouse
+        }
+    }
+
+    Rectangle {
         id: addConvBtn
         width: 32
         height: 32
@@ -428,6 +484,11 @@ RowLayout {
 
     SharedWidgets.ContextMenu {
         id: overflowMenu
+        parent: root.parent
+    }
+
+    SharedWidgets.ContextMenu {
+        id: historyActionMenu
         parent: root.parent
     }
 }

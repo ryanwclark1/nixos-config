@@ -34,8 +34,14 @@ PanelWindow {
         item: slidePanel
     }
     WlrLayershell.layer: WlrLayer.Top
-    WlrLayershell.keyboardFocus: root.showContent ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: (root.showContent && (root.active || inputField.activeFocus)) ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     WlrLayershell.namespace: "quickshell"
+
+    onActiveChanged: {
+        if (!active) {
+            clearInteractiveFocus();
+        }
+    }
 
     // --- State ---
     property bool showContent: false
@@ -945,6 +951,9 @@ PanelWindow {
                                         font.pixelSize: Appearance.fontSizeSmall
                                         elide: Text.ElideRight
                                         Layout.maximumWidth: 150
+                                        Keys.onEscapePressed: {
+                                            inputField.focus = false;
+                                        }
                                     }
 
                                     SharedWidgets.IconButton {
@@ -1198,6 +1207,8 @@ PanelWindow {
                                     sendStateLayer.burst(mouse.x, mouse.y);
                                     if (AiService.isStreaming) {
                                         AiService.cancelStream();
+                                        inputField.focus = false;
+                                        Quickshell.execDetached(SU.ipcCall("AiChat", "close"));
                                     } else {
                                         root._sendCurrentMessage();
                                     }
