@@ -32,7 +32,7 @@ QtObject {
         },
         {
             id: "displayControls",
-            icon: "desktop-monitor.svg",
+            icon: "desktop.svg",
             title: "Display",
             subtitle: "Monitor layout and brightness",
             ipcTarget: "Shell",
