@@ -168,7 +168,7 @@ BasePopupMenu {
           color: Colors.text
           font.pixelSize: Appearance.fontSizeSmall
           font.weight: Font.DemiBold
-          letterSpacing: Appearance.letterSpacingWide
+          font.letterSpacing: Appearance.letterSpacingWide
         }
 
         Text {
@@ -379,7 +379,7 @@ BasePopupMenu {
                   color: modelData.accent ? root.providerAccent : Colors.textDisabled
                   font.pixelSize: Appearance.fontSizeXS
                   font.weight: Font.Medium
-                  letterSpacing: Appearance.letterSpacingWide
+                  font.letterSpacing: Appearance.letterSpacingWide
                   Layout.fillWidth: true
                   wrapMode: Text.WordWrap
                 }
