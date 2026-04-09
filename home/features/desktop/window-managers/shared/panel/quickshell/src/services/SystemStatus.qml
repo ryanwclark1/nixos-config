@@ -398,9 +398,7 @@ QtObject {
 
   function formatTemp(rawValue) {
     var parsed = parseFloat(rawValue);
-    var res = isNaN(parsed) || parsed === 0 ? "--" : Math.round(parsed) + "°C";
-    if (res === "--") console.log("SystemStatus formatTemp got invalid/zero:", rawValue);
-    return res;
+    return isNaN(parsed) || parsed === 0 ? "--" : Math.round(parsed) + "°C";
   }
 
   function _formatRate(bytesPerSec) {

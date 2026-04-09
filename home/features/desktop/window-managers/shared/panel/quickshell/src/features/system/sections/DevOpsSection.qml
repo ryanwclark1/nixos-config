@@ -107,12 +107,26 @@ ColumnLayout {
 
         // SSH Summary
         Rectangle {
+            id: sshSummaryRect
             Layout.fillWidth: true
             height: 54
             radius: Appearance.radiusMedium
-            color: Colors.cardSurface
+            color: sshSummaryHover.containsMouse ? Colors.primaryFaint : Colors.cardSurface
             border.color: ServiceUnitService.sshStatus === "ready" ? Colors.border : Colors.warning
             border.width: 1
+
+            MouseArea {
+                id: sshSummaryHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", "sshMenu", ""));
+                }
+            }
+
+            SharedWidgets.InnerHighlight { hoveredOpacity: 0.2; hovered: sshSummaryHover.containsMouse }
+
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: Appearance.paddingSmall
@@ -180,8 +194,9 @@ ColumnLayout {
                     cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton
                     onClicked: {
-                        var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec " + SU.shellQuote(modelData.id) + " sh; else exit 1; fi";
-                        Quickshell.execDetached(SU.terminalCommand(cmd));
+                        logOverlay.title = "Docker: " + modelData.name;
+                        logOverlay.command = ServiceUnitService.getLogStreamCommand("docker", modelData.id);
+                        logOverlay.visible = true;
                     }
                 }
 
@@ -213,7 +228,7 @@ ColumnLayout {
                             iconColor: dockerHover.containsMouse ? Colors.primary : Colors.textDisabled
                             tooltipText: "Open shell"
                             onClicked: {
-                                var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec " + SU.shellQuote(modelData.id) + " sh; else exit 1; fi";
+                                var cmd = "runtime=$(command -v docker || command -v podman); if [ -n \"$runtime\" ]; then \"$runtime\" exec -it " + SU.shellQuote(modelData.id) + " /bin/sh; else exit 1; fi";
                                 Quickshell.execDetached(SU.terminalCommand(cmd));
                             }
                         }
