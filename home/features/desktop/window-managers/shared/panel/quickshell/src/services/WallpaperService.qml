@@ -88,11 +88,11 @@ QtObject {
   }
 
   // Trigger an async rescan of all wallpaperSearchDirs.
-  function scanWallpapers() {
+  function scanWallpapers(reason) {
     if (scanning) return;
     scanning = true;
     _scanStartTime = Date.now();
-    Logger.i("WallpaperService", "scan starting", wallpaperSearchDirs.length + " dir(s)", wallpaperDir);
+    Logger.i("WallpaperService", "scan starting", String(reason || "manual"), wallpaperSearchDirs.length + " dir(s)", wallpaperDir);
     // Build a script that iterates each directory independently, safely quoting each
     // path via single-quotes so spaces in $HOME are handled correctly.
     // Wrap individual finds in a subshell group, then sort -u the combined output.
@@ -444,7 +444,7 @@ QtObject {
     interval: root.startupScanDelayMs
     repeat: false
     running: false
-    onTriggered: root.scanWallpapers()
+    onTriggered: root.scanWallpapers("startup-timer")
   }
 
   // React to interval config changes
@@ -456,7 +456,7 @@ QtObject {
     }
     function onWallpaperDefaultFolderChanged() {
       if (root._startupReady)
-        root.scanWallpapers();
+        root.scanWallpapers("config-folder-change");
     }
   }
 

@@ -42,7 +42,7 @@ Item {
         }
         wallpaperFolderError = "";
         Config.wallpaperDefaultFolder = trimmed;
-        WallpaperService.scanWallpapers();
+        WallpaperService.scanWallpapers("wallpaper-tab-apply-folder");
     }
 
     function _markUnsupportedImage(path) {
@@ -120,7 +120,7 @@ Item {
 
     function ensureWallpaperInventory() {
         if (WallpaperService.availableWallpapers.length === 0 && !WallpaperService.scanning)
-            WallpaperService.scanWallpapers();
+            WallpaperService.scanWallpapers("wallpaper-tab-visible");
     }
 
     function pasteSolidColor() {
@@ -309,7 +309,7 @@ Item {
                     root.solidColorInput = "#" + (Config.wallpaperSolidColor || "000000ff").slice(0, 6);
                     WallpaperService.solidColorsByMonitor = Object.assign({}, Config.wallpaperSolidColorsByMonitor || {});
                     WallpaperService.solidColorActive = Object.keys(WallpaperService.solidColorsByMonitor).length > 0;
-                    WallpaperService.scanWallpapers();
+                    WallpaperService.scanWallpapers("wallpaper-tab-import");
                     if (skipped.length > 0)
                         ToastService.showNotice("Imported with skips", "Ignored invalid fields: " + skipped.join(", "));
                     else
@@ -804,7 +804,7 @@ Item {
                 label: "Rescan"
                 iconName: "arrow-clockwise.svg"
                 compact: true
-                onClicked: WallpaperService.scanWallpapers()
+                onClicked: WallpaperService.scanWallpapers("wallpaper-tab-refresh")
             }
         }
 

@@ -126,7 +126,7 @@ QtObject {
             if (code === 0) {
                 root.downloadComplete(_savedPath);
                 ToastService.showSuccess("Wallpaper downloaded", _savedPath.split("/").pop());
-                WallpaperService.scanWallpapers();
+                WallpaperService.scanWallpapers("wallhaven-download");
             } else {
                 root.downloadFailed("Download failed (exit " + code + ")");
                 ToastService.showError("Download failed", "Could not fetch wallpaper");

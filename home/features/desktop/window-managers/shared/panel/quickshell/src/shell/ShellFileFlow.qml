@@ -98,7 +98,7 @@ QtObject {
         shellRoot.closeSurface("fileBrowser");
         if (fileBrowserCaller === "wallpaper-folder") {
             Config.wallpaperDefaultFolder = folderPath;
-            WallpaperService.scanWallpapers();
+            WallpaperService.scanWallpapers("shell-file-flow-folder-change");
         }
         _resetState();
     }

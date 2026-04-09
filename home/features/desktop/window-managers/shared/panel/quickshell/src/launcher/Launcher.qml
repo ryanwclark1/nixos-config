@@ -1833,7 +1833,7 @@ PanelWindow {
             return;
         }
 
-        WallpaperService.scanWallpapers();
+        WallpaperService.scanWallpapers("launcher-wallpapers-mode");
         _wallpaperLoadStartedAt = startedAt;
         _wallpaperModeLoading = true;
         allItems = [];
