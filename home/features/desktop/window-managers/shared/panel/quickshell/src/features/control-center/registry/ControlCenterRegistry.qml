@@ -288,6 +288,10 @@ QtObject {
         return null;
     }
 
+    function isPinnedFooterWidget(widgetId) {
+        return String(widgetId || "") === "powerActions";
+    }
+
     function orderedWidgetItems() {
         var order = Array.isArray(Services.Config.controlCenterWidgetOrder) ? Services.Config.controlCenterWidgetOrder : [];
         var seen = ({});
@@ -297,6 +301,8 @@ QtObject {
         for (i = 0; i < order.length; i++) {
             var ordered = widgetMeta(order[i]);
             if (!ordered || seen[ordered.id])
+                continue;
+            if (isPinnedFooterWidget(ordered.id))
                 continue;
             // Check visibility via the per-widget config bool
             if (ordered.configKey && Services.Config[ordered.configKey] === false)
@@ -308,6 +314,8 @@ QtObject {
         for (i = 0; i < widgetCatalog.length; i++) {
             var fallback = widgetCatalog[i];
             if (seen[fallback.id])
+                continue;
+            if (isPinnedFooterWidget(fallback.id))
                 continue;
             if (fallback.configKey && Services.Config[fallback.configKey] === false)
                 continue;
@@ -329,6 +337,8 @@ QtObject {
             var ordered = widgetMeta(order[i]);
             if (!ordered || seen[ordered.id])
                 continue;
+            if (isPinnedFooterWidget(ordered.id))
+                continue;
             seen[ordered.id] = true;
             items.push(ordered);
         }
@@ -336,6 +346,8 @@ QtObject {
         for (i = 0; i < widgetCatalog.length; i++) {
             var fallback = widgetCatalog[i];
             if (seen[fallback.id])
+                continue;
+            if (isPinnedFooterWidget(fallback.id))
                 continue;
             seen[fallback.id] = true;
             items.push(fallback);

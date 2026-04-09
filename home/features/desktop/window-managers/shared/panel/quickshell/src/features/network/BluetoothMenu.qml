@@ -247,6 +247,7 @@ BasePopupMenu {
 
       Tooltip {
         text: root.isScanning ? "Stop scan" : "Scan for devices"
+        hoverPoint: Qt.point(scanBtnHover.mouseX, scanBtnHover.mouseY)
         shown: scanBtnHover.containsMouse
       }
     }

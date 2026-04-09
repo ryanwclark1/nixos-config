@@ -114,6 +114,7 @@ Rectangle {
     anchorItem: taskItem
     anchorWindow: taskItem.anchorWindow
     hovered: mouseArea.containsMouse
+    hoverPoint: Qt.point(mouseArea.mouseX, mouseArea.mouseY)
     text: taskItem.tooltipText
   }
 }

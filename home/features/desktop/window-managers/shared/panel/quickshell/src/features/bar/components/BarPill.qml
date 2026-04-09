@@ -205,6 +205,7 @@ MouseArea {
     anchorItem: root
     anchorWindow: root.anchorWindow
     hovered: root.containsMouse
+    hoverPoint: Qt.point(root.mouseX, root.mouseY)
     text: root.tooltipText
     shortcut: root.tooltipShortcut
   }

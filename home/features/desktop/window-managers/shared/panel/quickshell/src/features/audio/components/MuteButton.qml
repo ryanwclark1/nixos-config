@@ -67,6 +67,7 @@ Rectangle {
 
   Tooltip {
     text: root.muted ? "Unmute" : "Mute"
+    hoverPoint: Qt.point(hover.mouseX, hover.mouseY)
     shown: hover.containsMouse
   }
 }

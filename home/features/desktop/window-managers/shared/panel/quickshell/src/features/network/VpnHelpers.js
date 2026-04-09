@@ -137,3 +137,62 @@ function peerStatusDetail(peer) {
     }
     return "";
 }
+
+function vpnProfileTypeLabel(profile) {
+    var type = String(profile && profile.type || "").toLowerCase();
+    if (type === "wireguard")
+        return "WireGuard";
+    if (type === "tun")
+        return "Tunnel";
+    if (type === "vpn")
+        return "VPN";
+    return type !== "" ? type : "VPN";
+}
+
+function vpnProfileIcon(profile, isActive) {
+    var type = String(profile && profile.type || "").toLowerCase();
+    if (type === "wireguard")
+        return isActive ? "link.svg" : "shield.svg";
+    return isActive ? "globe-shield.svg" : "shield-lock.svg";
+}
+
+function vpnProfilePrimaryDetail(profile) {
+    if (!profile)
+        return "";
+    var parts = [vpnProfileTypeLabel(profile)];
+    var interfaceName = String(profile.interfaceName || profile.device || "").trim();
+    if (interfaceName !== "" && interfaceName !== String(profile.name || "").trim())
+        parts.push(interfaceName);
+    return parts.join(" • ");
+}
+
+function vpnProfileSecondaryDetail(profile) {
+    if (!profile)
+        return "";
+    var parts = [];
+    var primaryAddress = String(profile.primaryAddress || "").trim();
+    if (primaryAddress !== "")
+        parts.push(primaryAddress);
+    var routeCount = parseInt(profile.routeCount || "0", 10) || 0;
+    if (routeCount > 0)
+        parts.push(routeCount === 1 ? "1 route" : routeCount + " routes");
+    var listenPort = parseInt(profile.listenPort || "0", 10) || 0;
+    if (listenPort > 0)
+        parts.push("UDP " + listenPort);
+    if (profile.peerRoutes === true)
+        parts.push("Peer routes");
+    else if (profile.peerRoutes === false)
+        parts.push("Manual routes");
+    return parts.join(" • ");
+}
+
+function vpnProfileRouteDetail(profile) {
+    if (!profile || !Array.isArray(profile.routeDestinations))
+        return "";
+    var routes = profile.routeDestinations
+        .map(function(route) { return String(route || "").trim(); })
+        .filter(function(route) { return route !== ""; });
+    if (routes.length === 0)
+        return "";
+    return "Routes " + routes.join(", ");
+}

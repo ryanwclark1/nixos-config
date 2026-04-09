@@ -23,6 +23,7 @@ import {
   moveDraggedWebProvider,
   orderedControlCenterToggles,
   orderedControlCenterPlugins,
+  orderedControlCenterWidgets,
   moveOrderedValue,
   moveDraggedOrderedValue,
   toggleHiddenListValue,
@@ -55,6 +56,17 @@ const toggleRegistry = {
     { id: "dnd", label: "DND", icon: "D" },
     { id: "recording", label: "Recording", icon: "R" },
   ],
+};
+
+const controlCenterRegistry = {
+  widgetCatalog: [
+    { id: "mediaWidget", label: "Media Widget", configKey: "controlCenterShowMediaWidget" },
+    { id: "cpuWidget", label: "CPU Widget", configKey: "controlCenterShowCpuWidget" },
+    { id: "powerActions", label: "Power Actions", configKey: "controlCenterShowPowerActions" },
+  ],
+  isPinnedFooterWidget(widgetId) {
+    return widgetId === "powerActions";
+  },
 };
 
 const pluginService = {
@@ -409,6 +421,14 @@ describe("orderedWebProviders / moveDraggedWebProvider", () => {
 });
 
 describe("control center ordering helpers", () => {
+  it("excludes pinned footer widgets from the reorderable widget list", () => {
+    const config = { controlCenterWidgetOrder: ["powerActions", "cpuWidget"] };
+    expect(orderedControlCenterWidgets(controlCenterRegistry, config).map(item => item.id)).toEqual([
+      "cpuWidget",
+      "mediaWidget",
+    ]);
+  });
+
   it("orders quick toggles from the full toggle catalog", () => {
     const config = { controlCenterToggleOrder: ["dnd"] };
     expect(orderedControlCenterToggles(toggleRegistry, config).map(item => item.id)).toEqual([
@@ -455,6 +475,12 @@ describe("control center ordering helpers", () => {
     ).toBe(true);
     expect(config.controlCenterPluginOrder).toEqual(["battery", "weather", "vpn"]);
     expect(state.sourceItemId).toBe("");
+  });
+
+  it("drops pinned footer widgets from widget-order updates", () => {
+    const config = { controlCenterWidgetOrder: ["powerActions", "mediaWidget", "cpuWidget"] };
+    moveOrderedValue(config, controlCenterRegistry, pluginService, "controlCenterWidgetOrder", "cpuWidget", -1);
+    expect(config.controlCenterWidgetOrder).toEqual(["cpuWidget", "mediaWidget"]);
   });
 });
 

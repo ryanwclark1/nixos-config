@@ -256,6 +256,7 @@ Item {
           anchorItem: wsPill
           anchorWindow: root.anchorWindow
           hovered: wsHover.containsMouse
+          hoverPoint: Qt.point(wsHover.mouseX, wsHover.mouseY)
           text: modelData.shortName + (modelData.windows > 0 ? " (" + modelData.windows + " window" + (modelData.windows > 1 ? "s" : "") + ")" : " (empty)")
         }
       }

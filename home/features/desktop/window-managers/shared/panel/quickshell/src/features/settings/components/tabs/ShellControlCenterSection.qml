@@ -135,6 +135,19 @@ Item {
             body: "Drag rows to control the order inside the Control Center. Hidden items stay in the list so you can stage their position before turning them back on."
         }
 
+        SettingsCard {
+            title: "Pinned Footer"
+            iconName: "power.svg"
+            description: "Keep Power Actions visible at the bottom of the Command Center while the rest of the content scrolls."
+
+            SettingsToggleRow {
+                label: "Power Actions"
+                icon: "power.svg"
+                configKey: "controlCenterShowPowerActions"
+                description: "Always pinned to the bottom of the Command Center when enabled."
+            }
+        }
+
         // =====================================================================
         // QUICK LINKS
         // =====================================================================

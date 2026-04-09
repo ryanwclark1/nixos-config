@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import "../../../shared" as Shared
 import "../../../services"
 import "../../../widgets" as SharedWidgets
+import "../VpnHelpers.js" as VH
 
 Rectangle {
     id: root
@@ -15,7 +16,7 @@ Rectangle {
 
     signal actionClicked()
 
-    implicitHeight: 56
+    implicitHeight: contentLayout.implicitHeight + (Appearance.spacingM * 2)
     radius: Appearance.radiusMedium
     color: root.isConfirming ? Colors.error : Colors.cardSurface
     border.color: root.isConfirming ? Colors.error : Colors.border
@@ -29,12 +30,13 @@ Rectangle {
         spacing: Appearance.spacingS
 
         SharedWidgets.SvgIcon {
-            source: root.isActive ? (root.isConfirming ? "checkmark.svg" : "wifi-off.svg") : "wifi-off.svg"
+            source: root.isConfirming ? "checkmark.svg" : VH.vpnProfileIcon(root.modelData, root.isActive)
             color: root.isConfirming ? Colors.background : (root.isActive ? Colors.accent : Colors.textSecondary)
             size: Appearance.fontSizeLarge
         }
 
         ColumnLayout {
+            id: contentLayout
             Layout.fillWidth: true
             spacing: Appearance.spacingXXS
 
@@ -48,12 +50,30 @@ Rectangle {
             }
 
             Text {
-                text: root.isActive
-                    ? (root.modelData.device !== "" ? (root.modelData.type + " • " + root.modelData.device) : root.modelData.type)
-                    : (root.modelData.type || "vpn")
+                text: VH.vpnProfilePrimaryDetail(root.modelData)
                 color: root.isConfirming ? Colors.background : Colors.textSecondary
                 font.pixelSize: Appearance.fontSizeXS
                 Layout.fillWidth: true
+                elide: Text.ElideRight
+            }
+
+            Text {
+                visible: text !== ""
+                text: VH.vpnProfileSecondaryDetail(root.modelData)
+                color: root.isConfirming ? Colors.background : Colors.textSecondary
+                font.pixelSize: Appearance.fontSizeXS
+                Layout.fillWidth: true
+                elide: Text.ElideRight
+            }
+
+            Text {
+                visible: text !== ""
+                text: VH.vpnProfileRouteDetail(root.modelData)
+                color: root.isConfirming ? Colors.background : Colors.textSecondary
+                font.pixelSize: Appearance.fontSizeXS
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                maximumLineCount: 2
                 elide: Text.ElideRight
             }
         }

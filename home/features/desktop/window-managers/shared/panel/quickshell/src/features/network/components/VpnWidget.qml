@@ -41,7 +41,7 @@ Row {
     }
 
     SharedWidgets.SvgIcon {
-        source: "wifi-off.svg"
+        source: "shield-lock.svg"
         color: root.statusColor()
         size: Appearance.fontSizeLarge
         anchors.verticalCenter: parent.verticalCenter

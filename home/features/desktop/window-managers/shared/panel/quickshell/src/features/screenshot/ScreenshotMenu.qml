@@ -7,8 +7,10 @@ import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
     id: root
-    popupMinWidth: 280; popupMaxWidth: 320; compactThreshold: 300
-    implicitHeight: contentCol.implicitHeight + 40
+    popupMinWidth: 360; popupMaxWidth: 420; compactThreshold: 380
+    readonly property int _desiredHeight: compactMode ? 760 : 840
+    readonly property int _screenMaxHeight: screen ? Math.max(420, screen.height - 32) : 760
+    implicitHeight: Math.min(_desiredHeight, _screenMaxHeight)
     title: "Screenshot"
 
     readonly property var _historyModel: {
@@ -30,10 +32,11 @@ BasePopupMenu {
         return labels[mode] || mode;
     }
 
-    ColumnLayout {
+    SharedWidgets.ScrollableContent {
         id: contentCol
         Layout.fillWidth: true
-        spacing: Appearance.spacingS
+        Layout.fillHeight: true
+        columnSpacing: Appearance.spacingS
 
         // ── Capture mode buttons ──────────────────
         SharedWidgets.SectionLabel { label: "CAPTURE MODE" }

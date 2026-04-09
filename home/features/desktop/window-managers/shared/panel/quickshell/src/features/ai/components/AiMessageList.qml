@@ -256,6 +256,7 @@ Rectangle {
                                     text: "Copy message"
                                     anchorItem: parent
                                     anchorWindow: root.anchorWindow
+                                    hoverPoint: Qt.point(userCopyHover.mouseX, userCopyHover.mouseY)
                                     shown: userCopyHover.containsMouse
                                     preferredSide: Qt.LeftEdge
                                 }
@@ -322,6 +323,7 @@ Rectangle {
                                         text: "Regenerate response"
                                         anchorItem: parent
                                         anchorWindow: root.anchorWindow
+                                        hoverPoint: Qt.point(regenHover.mouseX, regenHover.mouseY)
                                         shown: regenHover.containsMouse
                                         preferredSide: Qt.BottomEdge
                                     }
@@ -351,6 +353,7 @@ Rectangle {
                                         text: "Copy response"
                                         anchorItem: parent
                                         anchorWindow: root.anchorWindow
+                                        hoverPoint: Qt.point(assistCopyHover.mouseX, assistCopyHover.mouseY)
                                         shown: assistCopyHover.containsMouse
                                         preferredSide: Qt.BottomEdge
                                     }
@@ -492,6 +495,7 @@ Rectangle {
                             text: "Retry"
                             anchorItem: parent
                             anchorWindow: root.anchorWindow
+                            hoverPoint: Qt.point(retryHover.mouseX, retryHover.mouseY)
                             shown: retryHover.containsMouse
                             preferredSide: Qt.TopEdge
                         }

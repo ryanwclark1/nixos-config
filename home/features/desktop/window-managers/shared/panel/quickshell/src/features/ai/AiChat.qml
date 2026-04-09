@@ -395,6 +395,7 @@ PanelWindow {
                         text: "Change AI provider and model"
                         anchorItem: providerPickerBtn
                         anchorWindow: root
+                        hoverPoint: Qt.point(providerPickerMouse.mouseX, providerPickerMouse.mouseY)
                         shown: providerPickerMouse.containsMouse
                     }
                 }
@@ -894,6 +895,7 @@ PanelWindow {
                                 text: "Attach Active Window Title"
                                 anchorItem: windowContextToggle
                                 anchorWindow: root
+                                hoverPoint: Qt.point(winCtxHover.mouseX, winCtxHover.mouseY)
                                 shown: winCtxHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -934,6 +936,7 @@ PanelWindow {
                                 text: "Attach Latest Screen Crop (Double-click to capture new)"
                                 anchorItem: visualContextToggle
                                 anchorWindow: root
+                                hoverPoint: Qt.point(visualCtxHover.mouseX, visualCtxHover.mouseY)
                                 shown: visualCtxHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -978,6 +981,7 @@ PanelWindow {
                                 text: "Attach Current Selection (Middle-click/Primary)"
                                 anchorItem: selectionContextToggle
                                 anchorWindow: root
+                                hoverPoint: Qt.point(selCtxHover.mouseX, selCtxHover.mouseY)
                                 shown: selCtxHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -1011,6 +1015,7 @@ PanelWindow {
                                 text: "Extract Text from Screen (OCR)"
                                 anchorItem: ocrToggle
                                 anchorWindow: root
+                                hoverPoint: Qt.point(ocrHover.mouseX, ocrHover.mouseY)
                                 shown: ocrHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }
@@ -1055,6 +1060,7 @@ PanelWindow {
                                 text: "Attach System Stats (CPU/RAM)"
                                 anchorItem: systemContextToggle
                                 anchorWindow: root
+                                hoverPoint: Qt.point(sysCtxHover.mouseX, sysCtxHover.mouseY)
                                 shown: sysCtxHover.containsMouse
                                 preferredSide: Qt.TopEdge
                             }

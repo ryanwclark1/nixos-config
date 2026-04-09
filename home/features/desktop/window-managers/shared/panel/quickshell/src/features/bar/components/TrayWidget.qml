@@ -89,6 +89,7 @@ Flow {
         anchorItem: trayItem
         anchorWindow: root.anchorWindow
         hovered: mouseArea.containsMouse
+        hoverPoint: Qt.point(mouseArea.mouseX, mouseArea.mouseY)
         text: modelData.tooltip || modelData.title || "Tray item"
       }
     }

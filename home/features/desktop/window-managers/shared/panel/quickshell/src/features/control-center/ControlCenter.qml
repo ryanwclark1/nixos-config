@@ -246,168 +246,206 @@ PanelWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                Flickable {
-                    id: ccFlick
+                ColumnLayout {
                     anchors.fill: parent
-                    contentHeight: mainCol.height
-                    clip: true
-                    boundsBehavior: Flickable.DragOverBounds
-                    flickableDirection: Flickable.VerticalFlick
+                    spacing: Appearance.spacingL
 
-                    ColumnLayout {
-                        id: mainCol
-                        width: parent.width
-                        spacing: Appearance.spacingXL
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
 
-                        // --- Group 1: Essential Tools ---
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: Appearance.spacingLG
-                            opacity: root.entranceOpacity(0)
-                            scale: root.entranceScale(0)
-                            transform: Translate { y: root.entranceY(0) }
-                            layer.enabled: opacity > 0 && opacity < 1
-                            Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutCubic } } }
-                            Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutBack } } }
+                        Flickable {
+                            id: ccFlick
+                            anchors.fill: parent
+                            contentHeight: mainCol.height
+                            clip: true
+                            boundsBehavior: Flickable.DragOverBounds
+                            flickableDirection: Flickable.VerticalFlick
 
-                            UserWidget {
-                                Layout.fillWidth: true
-                            }
-
-                            // Quick Links (ordered, filtered by visibility)
                             ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: Appearance.spacingS
-                                visible: ControlCenterRegistry.visibleQuickLinkItems.length > 0
+                                id: mainCol
+                                width: parent.width
+                                spacing: Appearance.spacingXL
 
-                                Repeater {
-                                    model: ControlCenterRegistry.visibleQuickLinkItems
-                                    delegate: QuickLinkCard {
-                                        required property var modelData
-                                        icon: modelData.icon
-                                        title: modelData.title
-                                        subtitle: modelData.subtitle
-                                        clickAction: function() {
-                                            root.closeRequested();
-                                            if (modelData.id === "screenshotControls") {
-                                                openScreenshotTimer.restart();
-                                            } else if (modelData.ipcTarget && modelData.ipcAction) {
-                                                var surfaceId = (modelData.clickCommand && modelData.clickCommand.length > 5) ? modelData.clickCommand[5] : "";
-                                                root._quickLinkSurfaceId = surfaceId;
-                                                openQuickLinkTimer.restart();
-                                            } else if (Array.isArray(modelData.clickCommand) && modelData.clickCommand.length > 0) {
-                                                Quickshell.execDetached(modelData.clickCommand);
+                                // --- Group 1: Essential Tools ---
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: Appearance.spacingLG
+                                    opacity: root.entranceOpacity(0)
+                                    scale: root.entranceScale(0)
+                                    transform: Translate { y: root.entranceY(0) }
+                                    layer.enabled: opacity > 0 && opacity < 1
+                                    Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutCubic } } }
+                                    Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(0) } NumberAnimation { duration: root.entranceDuration(0); easing.type: Easing.OutBack } } }
+
+                                    UserWidget {
+                                        Layout.fillWidth: true
+                                    }
+
+                                    // Quick Links (ordered, filtered by visibility)
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: Appearance.spacingS
+                                        visible: ControlCenterRegistry.visibleQuickLinkItems.length > 0
+
+                                        Repeater {
+                                            model: ControlCenterRegistry.visibleQuickLinkItems
+                                            delegate: QuickLinkCard {
+                                                required property var modelData
+                                                icon: modelData.icon
+                                                title: modelData.title
+                                                subtitle: modelData.subtitle
+                                                clickAction: function() {
+                                                    root.closeRequested();
+                                                    if (modelData.id === "screenshotControls") {
+                                                        openScreenshotTimer.restart();
+                                                    } else if (modelData.ipcTarget && modelData.ipcAction) {
+                                                        var surfaceId = (modelData.clickCommand && modelData.clickCommand.length > 5) ? modelData.clickCommand[5] : "";
+                                                        root._quickLinkSurfaceId = surfaceId;
+                                                        openQuickLinkTimer.restart();
+                                                    } else if (Array.isArray(modelData.clickCommand) && modelData.clickCommand.length > 0) {
+                                                        Quickshell.execDetached(modelData.clickCommand);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Quick Toggles Grid
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: Appearance.spacingS
+
+                                        SharedWidgets.SectionLabel {
+                                            label: "QUICK TOGGLES"
+                                        }
+
+                                        QuickToggleGrid {
+                                            manager: root.manager
+                                            showContent: root.showContent
+                                        }
+                                    }
+
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: Appearance.spacingS
+                                        visible: PluginService.visibleControlCenterPlugins.length > 0
+
+                                        Text {
+                                            text: "PLUGINS"
+                                            color: Colors.textDisabled
+                                            font.pixelSize: Appearance.fontSizeXS
+                                            font.weight: Font.Bold
+                                        }
+
+                                        Repeater {
+                                            model: PluginService.visibleControlCenterPlugins
+
+                                            delegate: Loader {
+                                                required property var modelData
+                                                Layout.fillWidth: true
+                                                source: (modelData.path || "") + (modelData.entryPoints && modelData.entryPoints.controlCenterWidget ? modelData.entryPoints.controlCenterWidget : "")
+
+                                                onStatusChanged: {
+                                                    if (status === Loader.Error)
+                                                        Logger.w("ControlCenter", "failed to load control-center plugin widget " + modelData.id + " from " + source);
+                                                    if (status === Loader.Ready && item) {
+                                                        var api = PluginService.getPluginAPI(modelData.id);
+                                                        if (api && item.hasOwnProperty("pluginApi"))
+                                                            item.pluginApi = api;
+                                                        if (item.hasOwnProperty("pluginManifest"))
+                                                            item.pluginManifest = modelData;
+                                                        if (item.hasOwnProperty("pluginService"))
+                                                            item.pluginService = PluginService;
+                                                        if (item.hasOwnProperty("controlCenterRoot"))
+                                                            item.controlCenterRoot = root;
+                                                        if (item.hasOwnProperty("manager"))
+                                                            item.manager = root.manager;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
 
-                            // Quick Toggles Grid
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: Appearance.spacingS
-
-                                SharedWidgets.SectionLabel {
-                                    label: "QUICK TOGGLES"
-                                }
-
-                                QuickToggleGrid {
-                                    manager: root.manager
-                                    showContent: root.showContent
-                                }
-                            }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: Appearance.spacingS
-                                visible: PluginService.visibleControlCenterPlugins.length > 0
-
-                                Text {
-                                    text: "PLUGINS"
-                                    color: Colors.textDisabled
-                                    font.pixelSize: Appearance.fontSizeXS
-                                    font.weight: Font.Bold
-                                }
-
+                                // --- Command Center Widgets (data-driven, user-ordered) ---
                                 Repeater {
-                                    model: PluginService.visibleControlCenterPlugins
+                                    model: ControlCenterRegistry.visibleWidgetItems
 
                                     delegate: Loader {
+                                        id: widgetLoader
                                         required property var modelData
+                                        required property int index
                                         Layout.fillWidth: true
-                                        source: (modelData.path || "") + (modelData.entryPoints && modelData.entryPoints.controlCenterWidget ? modelData.entryPoints.controlCenterWidget : "")
 
-                                        onStatusChanged: {
-                                            if (status === Loader.Error)
-                                                Logger.w("ControlCenter", "failed to load control-center plugin widget " + modelData.id + " from " + source);
-                                            if (status === Loader.Ready && item) {
-                                                var api = PluginService.getPluginAPI(modelData.id);
-                                                if (api && item.hasOwnProperty("pluginApi"))
-                                                    item.pluginApi = api;
-                                                if (item.hasOwnProperty("pluginManifest"))
-                                                    item.pluginManifest = modelData;
-                                                if (item.hasOwnProperty("pluginService"))
-                                                    item.pluginService = PluginService;
-                                                if (item.hasOwnProperty("controlCenterRoot"))
-                                                    item.controlCenterRoot = root;
-                                                if (item.hasOwnProperty("manager"))
-                                                    item.manager = root.manager;
-                                            }
+                                        readonly property int animIndex: 5 + index
+                                        source: root.widgetSource(modelData.id)
+                                        active: true
+
+                                        opacity: root.entranceOpacity(animIndex)
+                                        scale: root.entranceScale(animIndex)
+                                        transform: Translate { y: root.entranceY(animIndex) }
+                                        layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
+                                        Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(animIndex) } NumberAnimation { duration: root.entranceDuration(animIndex); easing.type: Easing.OutCubic } } }
+                                        Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(animIndex) } NumberAnimation { duration: root.entranceDuration(animIndex); easing.type: Easing.OutBack } } }
+
+                                        onLoaded: {
+                                            if (!item) return;
+                                            // Inject common properties where supported
+                                            if (item.hasOwnProperty("showContent"))
+                                                item.showContent = Qt.binding(function() { return root.showContent; });
+                                            if (item.hasOwnProperty("showSystemMonitorLauncher"))
+                                                item.showSystemMonitorLauncher = true;
+                                            if (item.hasOwnProperty("baseIndex"))
+                                                item.baseIndex = Qt.binding(function() { return widgetLoader.animIndex; });
+                                            if (item.hasOwnProperty("staggerDelay"))
+                                                item.staggerDelay = root.staggerDelay;
+                                            // DevOpsSection menu routing
+                                            if (item.hasOwnProperty("menuRequested"))
+                                                item.menuRequested.connect(function(surfaceId, surfaceContext) {
+                                                    root.requestSurfaceAfterClose(surfaceId, surfaceContext);
+                                                });
                                         }
                                     }
                                 }
                             }
                         }
 
-                        // --- Command Center Widgets (data-driven, user-ordered) ---
-                        Repeater {
-                            model: ControlCenterRegistry.visibleWidgetItems
+                        SharedWidgets.Scrollbar {
+                            flickable: ccFlick
+                        }
+                        SharedWidgets.OverscrollGlow {
+                            flickable: ccFlick
+                        }
+                    }
 
-                            delegate: Loader {
-                                id: widgetLoader
-                                required property var modelData
-                                required property int index
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: powerActionsColumn.implicitHeight + Appearance.spacingM * 2
+                        visible: Config.controlCenterShowPowerActions
+                        color: Colors.withAlpha(Colors.surface, 0.72)
+                        radius: Appearance.radiusMedium
+                        border.color: Colors.border
+                        border.width: 1
+
+                        ColumnLayout {
+                            id: powerActionsColumn
+                            anchors.fill: parent
+                            anchors.margins: Appearance.spacingM
+                            spacing: Appearance.spacingS
+
+                            SharedWidgets.SectionLabel {
+                                label: "POWER ACTIONS"
+                            }
+
+                            PowerActionsRow {
                                 Layout.fillWidth: true
-
-                                readonly property int animIndex: 5 + index
-                                source: root.widgetSource(modelData.id)
-                                active: true
-
-                                opacity: root.entranceOpacity(animIndex)
-                                scale: root.entranceScale(animIndex)
-                                transform: Translate { y: root.entranceY(animIndex) }
-                                layer.enabled: opacity > 0 && opacity < 1 && root.allowLayer(width, height)
-                                Behavior on opacity { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(animIndex) } NumberAnimation { duration: root.entranceDuration(animIndex); easing.type: Easing.OutCubic } } }
-                                Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(animIndex) } NumberAnimation { duration: root.entranceDuration(animIndex); easing.type: Easing.OutBack } } }
-
-                                onLoaded: {
-                                    if (!item) return;
-                                    // Inject common properties where supported
-                                    if (item.hasOwnProperty("showContent"))
-                                        item.showContent = Qt.binding(function() { return root.showContent; });
-                                    if (item.hasOwnProperty("showSystemMonitorLauncher"))
-                                        item.showSystemMonitorLauncher = true;
-                                    if (item.hasOwnProperty("baseIndex"))
-                                        item.baseIndex = Qt.binding(function() { return widgetLoader.animIndex; });
-                                    if (item.hasOwnProperty("staggerDelay"))
-                                        item.staggerDelay = root.staggerDelay;
-                                    // DevOpsSection menu routing
-                                    if (item.hasOwnProperty("menuRequested"))
-                                        item.menuRequested.connect(function(surfaceId, surfaceContext) {
-                                            root.requestSurfaceAfterClose(surfaceId, surfaceContext);
-                                        });
-                                }
+                                showContent: root.showContent
+                                baseIndex: 4
+                                staggerDelay: root.staggerDelay
                             }
                         }
                     }
-                }
-
-                SharedWidgets.Scrollbar {
-                    flickable: ccFlick
-                }
-                SharedWidgets.OverscrollGlow {
-                    flickable: ccFlick
                 }
             }
         }

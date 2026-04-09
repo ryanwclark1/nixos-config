@@ -264,6 +264,7 @@ Item {
 
                                     SharedWidgets.Tooltip {
                                         text: "Create template script"
+                                        hoverPoint: Qt.point(createTemplateMouse.mouseX, createTemplateMouse.mouseY)
                                         shown: createTemplateMouse.containsMouse
                                     }
                                 }

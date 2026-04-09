@@ -521,7 +521,16 @@ function orderedControlCenterQuickLinks(ControlCenterRegistry, Config) {
 
 function orderedControlCenterWidgets(ControlCenterRegistry, Config) {
     var order = Config && Array.isArray(Config.controlCenterWidgetOrder) ? Config.controlCenterWidgetOrder : [];
-    return SettingsReorderHelpers.orderCatalogItems(ControlCenterRegistry ? ControlCenterRegistry.widgetCatalog : [], order, function(item) {
+    var catalog = ControlCenterRegistry ? ControlCenterRegistry.widgetCatalog : [];
+    if (ControlCenterRegistry && ControlCenterRegistry.isPinnedFooterWidget) {
+        catalog = catalog.filter(function(item) {
+            return !ControlCenterRegistry.isPinnedFooterWidget(String(item && item.id || ""));
+        });
+        order = order.filter(function(itemId) {
+            return !ControlCenterRegistry.isPinnedFooterWidget(String(itemId || ""));
+        });
+    }
+    return SettingsReorderHelpers.orderCatalogItems(catalog, order, function(item) {
         return String(item && item.id || "");
     });
 }

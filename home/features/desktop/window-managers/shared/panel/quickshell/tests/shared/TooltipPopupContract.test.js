@@ -17,13 +17,14 @@ describe("tooltip popup contract", () => {
 
     expect(barTooltipSource).toContain("readonly property var resolvedAnchorWindow:");
     expect(barTooltipSource).toContain("readonly property int tooltipSide:");
+    expect(barTooltipSource).toContain("property point hoverPoint: Qt.point(-1, -1)");
     expect(barTooltipSource).toContain("return Qt.BottomEdge;");
     expect(barTooltipSource).toContain("return Qt.TopEdge;");
     expect(barTooltipSource).toContain("return Qt.RightEdge;");
     expect(barTooltipSource).toContain("return Qt.LeftEdge;");
     expect(barTooltipSource).toContain("Tooltip {");
     expect(barTooltipSource).toContain("anchorItem: root.effectiveAnchorItem");
-    expect(barTooltipSource).not.toContain("anchorWindow: root.resolvedAnchorWindow");
+    expect(barTooltipSource).toContain("hoverPoint: root.hoverPoint");
     expect(barTooltipSource).toContain("preferredSide: root.tooltipSide");
     expect(barTooltipSource).not.toContain("PopupWindow {");
   });
@@ -32,6 +33,7 @@ describe("tooltip popup contract", () => {
     const settingsColorRowSource = source("src/features/settings/components/SettingsColorRow.qml");
 
     expect(settingsColorRowSource).toContain("SharedWidgets.Tooltip {");
+    expect(settingsColorRowSource).toContain("hoverPoint: Qt.point(colorMouse.mouseX, colorMouse.mouseY)");
     expect(settingsColorRowSource).toContain("shown: colorMouse.containsMouse");
     expect(settingsColorRowSource).not.toContain("SharedWidgets.BarTooltip {");
   });

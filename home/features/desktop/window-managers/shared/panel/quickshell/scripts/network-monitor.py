@@ -17,6 +17,7 @@ Internal polling (not subprocess spawns):
 
 import json
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -106,6 +107,14 @@ def is_vpn_type(ctype):
     return t in ("vpn", "wireguard", "tun")
 
 
+def is_tailscale_connection(name="", device="", uuid=""):
+    fields = (name, device, uuid)
+    for value in fields:
+        if "tailscale" in str(value or "").lower():
+            return True
+    return False
+
+
 def signal_icon(sig):
     sig = int(sig or 0)
     if sig >= 80:
@@ -179,6 +188,102 @@ def first_ipv4(addresses):
             return value
     values = [str(item or "") for item in (addresses or []) if str(item or "")]
     return values[0] if values else ""
+
+
+def split_csv(value):
+    return [item.strip() for item in str(value or "").split(",") if item.strip()]
+
+
+def parse_yes_no(value):
+    text = str(value or "").strip().lower()
+    if text == "yes":
+        return True
+    if text == "no":
+        return False
+    return None
+
+
+def parse_ip4_routes(value):
+    routes = []
+    for chunk in str(value or "").split(" | "):
+        text = chunk.strip()
+        if not text:
+            continue
+        match = re.search(r"dst\s*=\s*([^,|]+)", text)
+        if match:
+            routes.append(match.group(1).strip())
+    return routes
+
+
+def collect_vpn_profile_runtime(uuid):
+    if not uuid:
+        return {}
+
+    try:
+        details = subprocess.run(
+            [
+                "nmcli",
+                "-g",
+                "connection.interface-name,ipv4.addresses,ipv4.gateway,ipv4.dns,"
+                "wireguard.listen-port,wireguard.peer-routes,wireguard.mtu",
+                "connection",
+                "show",
+                uuid,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        return {}
+
+    if details.returncode != 0:
+        return {}
+
+    lines = details.stdout.splitlines()
+    while len(lines) < 7:
+        lines.append("")
+
+    interface_name, addresses_text, gateway, dns_text, listen_port, peer_routes, mtu = [
+        str(item or "").strip() for item in lines[:7]
+    ]
+
+    try:
+        routes = subprocess.run(
+            ["nmcli", "-g", "IP4.ROUTE", "connection", "show", uuid],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        route_destinations = parse_ip4_routes(routes.stdout if routes.returncode == 0 else "")
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        route_destinations = []
+
+    tunnel_addresses = split_csv(addresses_text)
+    dns_servers = split_csv(dns_text)
+
+    try:
+        listen_port_value = int(listen_port) if listen_port else 0
+    except ValueError:
+        listen_port_value = 0
+
+    try:
+        mtu_value = int(mtu) if mtu else 0
+    except ValueError:
+        mtu_value = 0
+
+    return {
+        "interfaceName": interface_name,
+        "tunnelAddresses": tunnel_addresses,
+        "primaryAddress": tunnel_addresses[0] if tunnel_addresses else "",
+        "gateway": gateway,
+        "dnsServers": dns_servers,
+        "listenPort": listen_port_value,
+        "peerRoutes": parse_yes_no(peer_routes),
+        "routeDestinations": route_destinations,
+        "routeCount": len(route_destinations),
+        "mtu": mtu_value,
+    }
 
 
 def normalize_tailnet(current_tailnet, status_data):
@@ -419,6 +524,8 @@ def collect_vpn_profiles():
                 continue
             uuid = str(conn_settings.get("uuid", ""))
             name = str(conn_settings.get("id", ""))
+            if is_tailscale_connection(name=name, uuid=uuid):
+                continue
             is_active = uuid in active_uuids
             device = ""
             state = ""
@@ -427,6 +534,7 @@ def collect_vpn_profiles():
                     device = ac["device"]
                     state = ac["state"]
                     break
+            runtime = collect_vpn_profile_runtime(uuid)
             profiles.append({
                 "uuid": uuid,
                 "name": name,
@@ -434,6 +542,7 @@ def collect_vpn_profiles():
                 "device": device,
                 "state": state,
                 "active": is_active,
+                **runtime,
             })
         except dbus.DBusException:
             continue

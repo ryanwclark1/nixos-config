@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "."
 import "../../../services"
+import "../../../services/IconHelpers.js" as IconHelpers
 import "../../../shared"
 import "../../../widgets"
 
@@ -20,6 +21,9 @@ ColumnLayout {
   required property string emptyIcon
   required property string emptyMessage
   required property bool compactMode
+  property bool useCompactDevicePicker: false
+  property bool pickerExpanded: false
+  property int compactPickerMaxHeight: 224
 
   signal sliderMoved(real value)
 
@@ -27,6 +31,23 @@ ColumnLayout {
 
   function _percentText(value, muted) {
     return muted ? "Muted" : Math.round(value * 100) + "%";
+  }
+
+  function _currentDevice() {
+    for (var i = 0; i < root.deviceModel.length; ++i) {
+      if (root.deviceModel[i].id === root.defaultDeviceId)
+        return root.deviceModel[i];
+    }
+    return root.deviceModel.length > 0 ? root.deviceModel[0] : null;
+  }
+
+  function _devicePercentText(device) {
+    return device ? root._percentText(device.volume, device.muted) : "";
+  }
+
+  onUseCompactDevicePickerChanged: {
+    if (!useCompactDevicePicker)
+      pickerExpanded = false;
   }
 
   SectionLabel { label: root.sectionLabel }
@@ -108,9 +129,148 @@ ColumnLayout {
     }
   }
 
+  Rectangle {
+    id: compactPickerSummary
+    Layout.fillWidth: true
+    visible: root.useCompactDevicePicker && root.deviceModel.length > 0
+    implicitHeight: 52
+    radius: Appearance.radiusMedium
+    color: compactSummaryHover.containsMouse ? Colors.primarySubtle : Colors.cardSurface
+    border.color: root.pickerExpanded ? Colors.primary : Colors.border
+    border.width: 1
+
+    RowLayout {
+      anchors.fill: parent
+      anchors.margins: Appearance.paddingSmall
+      spacing: Appearance.paddingSmall
+
+      Loader {
+        readonly property string rowIcon: root._currentDevice() && root._currentDevice().isDefault ? "checkmark.svg" : root.icon
+        readonly property color rowColor: root._currentDevice() && root._currentDevice().isDefault ? Colors.primary : Colors.textSecondary
+        sourceComponent: rowIcon.endsWith(".svg") ? deviceRowSvgIcon : deviceRowGlyphIcon
+      }
+
+      ColumnLayout {
+        Layout.fillWidth: true
+        spacing: 0
+
+        Text {
+          text: root._currentDevice() ? root._currentDevice().name : ""
+          color: Colors.text
+          font.pixelSize: Appearance.fontSizeMedium
+          font.weight: Font.DemiBold
+          elide: Text.ElideRight
+          Layout.fillWidth: true
+        }
+
+        Text {
+          text: "Default device"
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          elide: Text.ElideRight
+        }
+      }
+
+      NumericText {
+        text: root._devicePercentText(root._currentDevice())
+        color: Colors.textSecondary
+        font.pixelSize: Appearance.fontSizeXS
+      }
+
+      SvgIcon {
+        source: IconHelpers.disclosureIcon(root.pickerExpanded)
+        color: root.pickerExpanded ? Colors.primary : Colors.textSecondary
+        size: Appearance.fontSizeMedium
+      }
+    }
+
+    MouseArea {
+      id: compactSummaryHover
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+      onClicked: root.pickerExpanded = !root.pickerExpanded
+    }
+  }
+
+  Rectangle {
+    id: compactPickerList
+    Layout.fillWidth: true
+    visible: root.useCompactDevicePicker && root.pickerExpanded && root.deviceModel.length > 0
+    radius: Appearance.radiusMedium
+    color: Colors.cardSurface
+    border.color: Colors.border
+    border.width: 1
+    implicitHeight: Math.min(compactPickerView.contentHeight + Appearance.spacingXS * 2, root.compactPickerMaxHeight)
+
+    ListView {
+      id: compactPickerView
+      anchors.fill: parent
+      anchors.margins: Appearance.spacingXS
+      clip: true
+      spacing: Appearance.spacingXXS
+      boundsBehavior: Flickable.StopAtBounds
+      implicitHeight: contentHeight
+      model: root.deviceModel
+
+      delegate: Rectangle {
+        id: compactDeviceCard
+        required property var modelData
+        required property int index
+        width: compactPickerView.width
+        height: 42
+        radius: Appearance.radiusSmall
+        property bool isDefault: modelData.id === root.defaultDeviceId
+        color: isDefault ? Colors.primaryStrong : (compactDeviceHover.containsMouse ? Colors.primarySubtle : "transparent")
+        border.color: isDefault ? Colors.primary : "transparent"
+        border.width: 1
+
+        RowLayout {
+          anchors.fill: parent
+          anchors.leftMargin: Appearance.paddingSmall
+          anchors.rightMargin: Appearance.paddingSmall
+          spacing: Appearance.paddingSmall
+
+          Loader {
+            readonly property string rowIcon: compactDeviceCard.isDefault ? "checkmark.svg" : root.icon
+            readonly property color rowColor: compactDeviceCard.isDefault ? Colors.primary : Colors.textSecondary
+            sourceComponent: rowIcon.endsWith(".svg") ? deviceRowSvgIcon : deviceRowGlyphIcon
+          }
+
+          Text {
+            text: modelData.name
+            color: Colors.text
+            font.pixelSize: Appearance.fontSizeSmall
+            font.weight: compactDeviceCard.isDefault ? Font.DemiBold : Font.Medium
+            elide: Text.ElideRight
+            Layout.fillWidth: true
+          }
+
+          NumericText {
+            text: root._devicePercentText(modelData)
+            color: Colors.textSecondary
+            font.pixelSize: Appearance.fontSizeXS
+          }
+        }
+
+        MouseArea {
+          id: compactDeviceHover
+          anchors.fill: parent
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: {
+            AudioService.setDefaultDevice(modelData.id);
+            root.pickerExpanded = false;
+          }
+        }
+      }
+    }
+  }
+
   // ── Device cards ─────────────────────────
   Repeater {
-    model: root.deviceModel
+    model: root.useCompactDevicePicker ? [] : root.deviceModel
     delegate: Rectangle {
       id: deviceCard
       Layout.fillWidth: true

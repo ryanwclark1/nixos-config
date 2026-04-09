@@ -244,6 +244,7 @@ Item {
         anchorItem: root
         anchorWindow: root.anchorWindow
         hovered: mouseArea.containsMouse && !iconContainer.dragging && !root.contextMenuVisible && !root.isRunning
+        hoverPoint: Qt.point(mouseArea.mouseX, mouseArea.mouseY)
     }
 
     // Window preview popup for running apps

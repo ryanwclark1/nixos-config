@@ -200,6 +200,7 @@ Rectangle {
     anchorItem: root
     anchorWindow: root.anchorWindow
     hovered: mediaMouse.containsMouse
+    hoverPoint: Qt.point(mediaMouse.mouseX, mediaMouse.mouseY)
     text: MediaService.trackTitle || (MediaService.currentPlayer ? MediaService.currentPlayer.identity : "Media controls") || "Media controls"
   }
 }

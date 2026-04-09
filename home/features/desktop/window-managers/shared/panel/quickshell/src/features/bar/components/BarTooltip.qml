@@ -11,6 +11,7 @@ Item {
   property bool hovered: false
   property Item anchorItem: null
   property var anchorWindow: null
+  property point hoverPoint: Qt.point(-1, -1)
   property int preferredSide: Qt.BottomEdge
   property int showDelay: 500
 
@@ -91,6 +92,7 @@ Item {
     text: root.text
     shortcut: root.shortcut
     shown: root._shown
+    hoverPoint: root.hoverPoint
     preferredSide: root.tooltipSide
     popupGap: root.popupGap
     popupSideMargin: root.popupSideMargin

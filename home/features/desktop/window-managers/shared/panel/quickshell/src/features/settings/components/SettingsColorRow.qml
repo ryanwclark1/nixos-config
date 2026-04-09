@@ -130,6 +130,7 @@ Rectangle {
 
                     SharedWidgets.Tooltip {
                         text: modelData.label
+                        hoverPoint: Qt.point(colorMouse.mouseX, colorMouse.mouseY)
                         shown: colorMouse.containsMouse
                     }
 

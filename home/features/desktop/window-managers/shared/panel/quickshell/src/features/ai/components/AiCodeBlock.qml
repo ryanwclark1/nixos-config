@@ -63,6 +63,7 @@ Rectangle {
                 text: "Copy code"
                 anchorItem: parent
                 anchorWindow: root.anchorWindow
+                hoverPoint: Qt.point(codeCopyHover.mouseX, codeCopyHover.mouseY)
                 shown: codeCopyHover.containsMouse
                 preferredSide: Qt.LeftEdge
             }

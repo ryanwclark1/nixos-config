@@ -70,6 +70,9 @@ require_literal "$network_service_qml" 'property var tailscalePeers: []' "Networ
 require_literal "${repo_root}/scripts/network-monitor.py" '"ownerLogin": str(owner.get("LoginName", "") or "")' "Network monitor maps Tailscale peer owner login"
 require_literal "${repo_root}/scripts/network-monitor.py" '"ownerName": str(owner.get("DisplayName", "") or "")' "Network monitor maps Tailscale peer owner name"
 require_literal "${repo_root}/scripts/network-monitor.py" '"lastSeen": str(peer.get("LastSeen", "") or "")' "Network monitor maps Tailscale peer last seen timestamps"
+require_literal "${repo_root}/scripts/network-monitor.py" 'if is_tailscale_connection(name=name, uuid=uuid):' "Network monitor excludes Tailscale from Other VPN profiles"
+require_literal "${repo_root}/scripts/network-monitor.py" '"routeDestinations": route_destinations,' "Network monitor maps VPN route destinations"
+require_literal "${repo_root}/scripts/network-monitor.py" '"listenPort": listen_port_value,' "Network monitor maps WireGuard listen port"
 require_literal "$network_service_qml" 'function tailscaleSwitchProfile(profileId) {' "NetworkService exposes Tailscale account switching"
 require_literal "$network_service_qml" 'function tailscaleSelectExitNode(nodeValue) {' "NetworkService exposes exit-node selection"
 require_literal "$network_service_qml" 'function tailscaleSetAcceptDns(enabled) {' "NetworkService exposes Tailscale DNS toggle"
@@ -84,6 +87,8 @@ require_literal "$vpn_menu_qml" 'Tailnet Machines' "VpnMenu shows the machine se
 require_literal "$vpn_menu_qml" 'Active VPN Profiles' "VpnMenu shows the active profile section"
 require_literal "$vpn_menu_qml" 'Available VPN Profiles' "VpnMenu shows the available profile section"
 require_literal "$network_menu_qml" 'NetworkService.vpnHasSavedProfiles' "NetworkMenu summary appears when saved VPN profiles exist"
+require_literal "${repo_root}/src/features/network/VpnHelpers.js" 'function vpnProfileRouteDetail(profile) {' "VPN helpers expose route-detail rendering"
+require_literal "${repo_root}/src/features/network/components/VpnProfileDelegate.qml" 'text: VH.vpnProfileSecondaryDetail(root.modelData)' "VpnProfileDelegate renders enriched VPN profile detail"
 
 printf '[INFO] VPN contract summary: %d pass, %d fail\n' "$pass_count" "$fail_count"
 (( fail_count == 0 ))

@@ -351,7 +351,7 @@ BasePopupMenu {
               spacing: Appearance.spacingS
 
               SharedWidgets.SvgIcon {
-                source: "wifi-off.svg"
+                source: "shield-lock.svg"
                 color: NetworkService.vpnPrimaryStatus === "connected" ? Colors.success
                   : (NetworkService.vpnPrimaryStatus === "stopped" ? Colors.warning : Colors.textSecondary)
                 size: Appearance.fontSizeXL

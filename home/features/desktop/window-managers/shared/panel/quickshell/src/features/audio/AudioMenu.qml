@@ -39,6 +39,7 @@ BasePopupMenu {
       emptyIcon: "speaker-off.svg"
       emptyMessage: "No output devices detected"
       compactMode: root.compactMode
+      useCompactDevicePicker: root.compactMode
       onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SINK@", v)
     }
 
@@ -54,6 +55,7 @@ BasePopupMenu {
       emptyIcon: "mic-off.svg"
       emptyMessage: "No input devices detected"
       compactMode: root.compactMode
+      useCompactDevicePicker: root.compactMode
       onSliderMoved: (v) => AudioService.setVolume("@DEFAULT_AUDIO_SOURCE@", v)
     }
 

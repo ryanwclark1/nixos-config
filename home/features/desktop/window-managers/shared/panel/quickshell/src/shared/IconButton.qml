@@ -68,6 +68,7 @@ Rectangle {
     shortcut: root.tooltipShortcut
     anchorItem: root
     anchorWindow: root.tooltipAnchorWindow
+    hoverPoint: Qt.point(hoverArea.mouseX, hoverArea.mouseY)
     shown: hoverArea.containsMouse && root.tooltipText !== ""
   }
 }

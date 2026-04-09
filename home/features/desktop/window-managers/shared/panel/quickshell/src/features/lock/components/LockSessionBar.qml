@@ -86,6 +86,7 @@ RowLayout {
             text: parent.label
             anchorItem: parent
             hovered: sessionMa.containsMouse
+            hoverPoint: Qt.point(sessionMa.mouseX, sessionMa.mouseY)
         }
     }
 }
