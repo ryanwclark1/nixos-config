@@ -62,7 +62,7 @@ Item {
                     delegate: Rectangle {
                         required property var modelData
 
-                        width: root.compactMode ? parent.width : Math.max(180, Math.floor((parent.width - Appearance.spacingM * 2) / 3))
+                        width: root.compactMode ? parent.width : Math.max(140, Math.floor((parent.width - Appearance.spacingM * 3) / 4))
                         implicitHeight: metricColumn.implicitHeight + Appearance.spacingM * 2
                         radius: Appearance.radiusLarge
                         color: Colors.withAlpha(Colors.surface, 0.38)
