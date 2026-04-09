@@ -226,6 +226,7 @@ QtObject {
   readonly property bool hasHighLoad: cpuPercent >= (_cpuUsageHighThreshold / 100) || ramPercent >= (_ramUsageHighThreshold / 100)
   readonly property bool hasHighTemp: cpuTempNum > _cpuTempHighThreshold || gpuTempNum > _gpuTempHighThreshold
   readonly property bool isCritical: hasHighLoad || hasHighTemp || overallStatus === "failure"
+  readonly property bool shouldShowCriticalOsd: hasHighTemp || overallStatus === "failure"
   readonly property bool hasSafeFixableIncidents: {
     for (var i = 0; i < activeIncidents.length; i++) {
       if (activeIncidents[i] && activeIncidents[i].safe_fix_available)
@@ -250,6 +251,19 @@ QtObject {
   readonly property string criticalSummary: criticalReasons.length > 0
       ? "CRITICAL: " + criticalReasons.join(" • ")
       : "CRITICAL: Resource threshold exceeded"
+  readonly property var criticalOsdReasons: {
+    var reasons = [];
+    if (cpuTempNum > _cpuTempHighThreshold)
+      reasons.push("CPU " + cpuTemp);
+    if (gpuTempNum > _gpuTempHighThreshold)
+      reasons.push("GPU " + gpuTemp);
+    if (overallStatus === "failure")
+      reasons.push("health check failure");
+    return reasons;
+  }
+  readonly property string criticalOsdSummary: criticalOsdReasons.length > 0
+      ? "CRITICAL: " + criticalOsdReasons.join(" • ")
+      : criticalSummary
 
   property string cpuTemp: "--"
   property string gpuTemp: "--"

@@ -149,10 +149,10 @@ Scope {
   }
 
   function showCriticalOsdIfNeeded() {
-    if (!startupComplete || !SystemStatus.isCritical)
+    if (!startupComplete || !SystemStatus.shouldShowCriticalOsd)
       return;
 
-    var summary = String(SystemStatus.criticalSummary || "");
+    var summary = String(SystemStatus.criticalOsdSummary || "");
     var now = Date.now();
     var cooldownElapsed = root._lastCriticalOsdAt <= 0
       || (now - root._lastCriticalOsdAt) >= Math.max(0, Config.osdCriticalCooldownMs);
@@ -219,12 +219,12 @@ Scope {
 
   Connections {
     target: SystemStatus
-    function onIsCriticalChanged() {
-      if (SystemStatus.isCritical)
+    function onShouldShowCriticalOsdChanged() {
+      if (SystemStatus.shouldShowCriticalOsd)
         root.showCriticalOsdIfNeeded();
     }
-    function onCriticalSummaryChanged() {
-      if (SystemStatus.isCritical)
+    function onCriticalOsdSummaryChanged() {
+      if (SystemStatus.shouldShowCriticalOsd)
         root.showCriticalOsdIfNeeded();
     }
   }

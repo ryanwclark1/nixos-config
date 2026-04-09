@@ -8,25 +8,44 @@ const __dirname = dirname(__filename);
 const quickshellRoot = resolve(__dirname, "..", "..");
 const osdPath = resolve(quickshellRoot, "src/features/osd/Osd.qml");
 const configPath = resolve(quickshellRoot, "src/services/Config.qml");
+const systemStatusPath = resolve(quickshellRoot, "src/services/SystemStatus.qml");
 
 describe("critical OSD contract", () => {
-  it("throttles repeated critical-state popups and re-shows when the summary changes", () => {
+  it("throttles repeated critical-state popups and re-shows when the OSD summary changes", () => {
     const osdSource = readFileSync(osdPath, "utf8");
 
     expect(osdSource).toContain("property double _lastCriticalOsdAt: 0");
     expect(osdSource).toContain('property string _lastCriticalSummaryShown: ""');
     expect(osdSource).toContain("function showCriticalOsdIfNeeded()");
+    expect(osdSource).toContain("if (!startupComplete || !SystemStatus.shouldShowCriticalOsd)");
+    expect(osdSource).toContain("var summary = String(SystemStatus.criticalOsdSummary || \"\");");
     expect(osdSource).toContain("var cooldownElapsed = root._lastCriticalOsdAt <= 0");
     expect(osdSource).toContain("var summaryChanged = summary !== root._lastCriticalSummaryShown;");
     expect(osdSource).toContain("if (!summaryChanged && !cooldownElapsed)");
     expect(osdSource).toContain("root._lastCriticalSummaryShown = summary;");
     expect(osdSource).toContain("root._lastCriticalOsdAt = now;");
-    expect(osdSource).toContain("function onCriticalSummaryChanged()");
+    expect(osdSource).toContain("function onShouldShowCriticalOsdChanged()");
+    expect(osdSource).toContain("function onCriticalOsdSummaryChanged()");
   });
 
   it("defines a dedicated critical OSD cooldown config", () => {
     const configSource = readFileSync(configPath, "utf8");
 
     expect(configSource).toContain("property int osdCriticalCooldownMs: 300000");
+  });
+
+  it("limits the critical OSD to thermal and health-check failures instead of load spikes", () => {
+    const systemStatusSource = readFileSync(systemStatusPath, "utf8");
+
+    expect(systemStatusSource).toContain(
+      'readonly property bool shouldShowCriticalOsd: hasHighTemp || overallStatus === "failure"',
+    );
+    expect(systemStatusSource).toContain("readonly property var criticalOsdReasons: {");
+    expect(systemStatusSource).toContain('reasons.push("CPU " + cpuTemp);');
+    expect(systemStatusSource).toContain('reasons.push("GPU " + gpuTemp);');
+    expect(systemStatusSource).toContain('reasons.push("health check failure");');
+    expect(systemStatusSource).not.toContain(
+      'readonly property bool shouldShowCriticalOsd: hasHighLoad || hasHighTemp || overallStatus === "failure"',
+    );
   });
 });

@@ -54,6 +54,7 @@ QtObject {
   property bool _colorNotify: true
   property var _queuedSolidApplies: []
   property bool _isCycleApply: false
+  property bool _startupReady: false
   property real _scanStartTime: 0
 
   // Signal emitted when wallpaper should change — WallpaperLayer listens to this
@@ -454,7 +455,8 @@ QtObject {
       cycleTimer.running = Config.wallpaperCycleInterval > 0;
     }
     function onWallpaperDefaultFolderChanged() {
-      root.scanWallpapers();
+      if (root._startupReady)
+        root.scanWallpapers();
     }
   }
 
@@ -649,6 +651,7 @@ QtObject {
     scheduleStartupScan("Component.onCompleted");
     if (Config.wallpaperDynamicEnabled && Config.wallpaperDynamicManifest)
       loadDynamicManifest(Config.wallpaperDynamicManifest);
+    _startupReady = true;
   }
 
   // ---- Private helpers -------------------------------------------------------
