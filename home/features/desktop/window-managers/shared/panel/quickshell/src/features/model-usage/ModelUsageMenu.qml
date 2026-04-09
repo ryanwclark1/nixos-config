@@ -10,7 +10,7 @@ BasePopupMenu {
   id: root
   popupMinWidth: 340; popupMaxWidth: 420; compactThreshold: 380
   implicitHeight: Math.min(660, contentCol.implicitHeight + 100)
-  title: "Model Usage"
+  title: "AI Model Usage"
   subtitle: ModelUsageService.activeProvider === "claude" ? "Claude Code"
          : ModelUsageService.activeProvider === "gemini" ? "Gemini CLI" : "Codex CLI"
 
@@ -42,7 +42,7 @@ BasePopupMenu {
         model: {
           var tabs = [];
           if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude", icon: "brands/anthropic-symbolic.svg" });
-          if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex", icon: "" });
+          if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex", icon: "brands/openai-symbolic.svg" });
           if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini", icon: "brands/google-gemini-symbolic.svg" });
           return tabs;
         }

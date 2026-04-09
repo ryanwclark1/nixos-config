@@ -475,12 +475,9 @@ QtObject {
     onUpdated: {
       var lines = root.parseStatsOutput(this.value);
       if (lines.length >= 6) {
-        var t0 = String(lines[0] || "").trim();
-        if (t0 !== "")
-          root.cpuTemp = root.formatTemp(lines[0]);
-        var t1 = String(lines[1] || "").trim();
-        if (t1 !== "")
-          root.gpuTemp = root.formatTemp(lines[1]);
+        // Temperatures are handled by statsHwPoll.
+        // We explicitly ignore lines 0 and 1 from _statsLiteScript to prevent stderr leaks
+        // from resetting cpuTemp / gpuTemp to "--".
 
         // CPU Usage calculation via /proc/stat delta
         var cpuParts = (lines[2] || "").split(/\s+/);

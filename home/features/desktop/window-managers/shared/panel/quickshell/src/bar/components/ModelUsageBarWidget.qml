@@ -47,14 +47,5 @@ SharedWidgets.BarPill {
 
             Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationMedium } }
         }
-
-        Text {
-            visible: PanelHelpers.isSummaryWidgetFull(widgetInstance, vertical)
-            text: ModelUsageService.displayText
-            color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
-            font.weight: Font.DemiBold
-            anchors.verticalCenter: parent.verticalCenter
-        }
     }
 }
