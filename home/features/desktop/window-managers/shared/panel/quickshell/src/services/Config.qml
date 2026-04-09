@@ -30,6 +30,10 @@ QtObject {
     property bool autoTransparency: false
 
     // --- NOTIFICATIONS ---
+    readonly property int notifCenterWidthMin: 360
+    readonly property int notifCenterWidthDefault: 440
+    readonly property int notifCenterWidthMax: 560
+    property int notifCenterWidth: notifCenterWidthDefault
     property int notifWidth: 350
     property int popupTimer: 5000
     property string notifPosition: "top_right"

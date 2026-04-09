@@ -114,6 +114,7 @@ describe("buildData", () => {
       barFloating: false,
       barMargin: 4,
       barOpacity: 0.9,
+      notifCenterWidth: 460,
       blurEnabled: true,
       glassOpacity: 0.8,
       settingsBackdropOpacity: 0.5,
@@ -132,6 +133,7 @@ describe("buildData", () => {
     const data = buildData(config);
     expect(data.bar).toBeDefined();
     expect(data.bar.height).toBe(40);
+    expect(data.notifications.centerWidth).toBe(460);
     expect(data.glass.blur).toBe(true);
     expect(data.bars.selectedBarId).toBe("bar1");
     expect(data.controlCenter.width).toBe(400);

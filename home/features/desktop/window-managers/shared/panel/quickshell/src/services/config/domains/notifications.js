@@ -3,6 +3,7 @@
 var sectionKey = "notifications"
 
 var maps = [
+    ["centerWidth", "notifCenterWidth"],
     ["width", "notifWidth"],
     ["popupTimer", "popupTimer"],
     ["position", "notifPosition"],

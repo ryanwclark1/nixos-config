@@ -70,6 +70,7 @@ Item {
         }
         notif.tracked = true;
         notif._receivedAt = new Date();
+        notif._archivedByShell = false;
 
         // Detect screenshot notifications — match by full body text key
         var bodyKey = (notif.body || "").trim();
@@ -85,8 +86,29 @@ Item {
         if (!notif.screenshotPath)
           root._maybeSpeakNotification(notif);
 
+        root._attachCloseHandler(notif);
         root._scheduleSave();
       }
+    }
+  }
+
+  Connections {
+    target: Config
+
+    function onNotifHistoryEnabledChanged() {
+      if (!Config.notifHistoryEnabled) {
+        root.clearArchive();
+        return;
+      }
+      root._pruneArchiveNow();
+    }
+
+    function onNotifHistoryMaxCountChanged() {
+      root._pruneArchiveNow();
+    }
+
+    function onNotifHistoryMaxAgeDaysChanged() {
+      root._pruneArchiveNow();
     }
   }
 
@@ -104,23 +126,17 @@ Item {
   // Archive a notification's data then dismiss it from tracked list
   function dismissNotification(notification) {
     if (!notification) return;
-    _archiveNotification(notification);
     notification.dismiss();
-    _scheduleSave();
   }
 
   // Dismiss all tracked notifications (optionally filtered by app name)
   function dismissAll(appName) {
     if (!server || !server.trackedNotifications) return;
-    // Archive all before dismissing
     for (var i = server.trackedNotifications.count - 1; i >= 0; i--) {
       var n = server.trackedNotifications.get(i);
-      if (n && (!appName || n.appName === appName)) {
-        _archiveNotification(n);
+      if (n && (!appName || n.appName === appName))
         n.dismiss();
-      }
     }
-    _scheduleSave();
   }
 
   function clearArchive() {
@@ -131,7 +147,10 @@ Item {
   // ── Internal ─────────────────────────────────
 
   function _archiveNotification(n) {
-    if (!n) return;
+    if (!n || !Config.notifHistoryEnabled || n.transient || n._archivedByShell)
+      return;
+
+    n._archivedByShell = true;
     var entry = {
       appName: n.appName || "",
       summary: n.summary || "",
@@ -140,11 +159,25 @@ Item {
       image: n.image || "",
       timestamp: Date.now()
     };
-    // Prepend to archive (newest first), limit to 100 entries
     var next = [entry];
-    for (var i = 0; i < Math.min(archivedNotifications.length, 99); i++)
+    for (var i = 0; i < archivedNotifications.length; i++)
       next.push(archivedNotifications[i]);
-    archivedNotifications = next;
+    archivedNotifications = _normalizeArchive(next);
+  }
+
+  function _attachCloseHandler(notification) {
+    if (!notification || notification._closeHandlerAttached)
+      return;
+
+    notification._closeHandlerAttached = true;
+    notification.closed.connect(function(reason) {
+      if (reason === NotificationCloseReason.Dismissed
+          || reason === NotificationCloseReason.Expired
+          || reason === NotificationCloseReason.CloseRequested) {
+        root._archiveNotification(notification);
+        root._scheduleSave();
+      }
+    });
   }
 
   function _scheduleSave() {
@@ -162,18 +195,37 @@ Item {
     if (!raw) return;
     try {
       var parsed = JSON.parse(raw);
-      // Prune entries older than 7 days
-      var now = Date.now();
-      var cutoff = now - (7 * 86400000);
-      var pruned = [];
-      for (var i = 0; i < parsed.length; i++) {
-        if ((parsed[i].timestamp || 0) > cutoff)
-          pruned.push(parsed[i]);
-      }
-      archivedNotifications = pruned;
+      archivedNotifications = _normalizeArchive(parsed);
     } catch (e) {
       Logger.e("NotificationManager", "Failed to load notification archive:", e);
     }
+  }
+
+  function _pruneArchiveNow() {
+    archivedNotifications = _normalizeArchive(archivedNotifications);
+    _scheduleSave();
+  }
+
+  function _normalizeArchive(entries) {
+    if (!Config.notifHistoryEnabled)
+      return [];
+
+    var maxCount = Math.max(0, parseInt(Config.notifHistoryMaxCount, 10) || 0);
+    var maxAgeDays = Math.max(1, parseInt(Config.notifHistoryMaxAgeDays, 10) || 1);
+    var cutoff = Date.now() - (maxAgeDays * 86400000);
+    var normalized = [];
+    var source = Array.isArray(entries) ? entries : [];
+
+    for (var i = 0; i < source.length; i++) {
+      var item = source[i];
+      if (!item || (item.timestamp || 0) <= cutoff)
+        continue;
+      normalized.push(item);
+      if (maxCount > 0 && normalized.length >= maxCount)
+        break;
+    }
+
+    return normalized;
   }
 
   // ── TTS Read-Aloud ─────────────────────────

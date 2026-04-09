@@ -22,6 +22,7 @@ function persistedConfigProperties() {
   [
     "barConfigs",
     "selectedBarId",
+    "notifCenterWidth",
     "controlCenterWidth",
     "disabledPlugins",
     "pluginLauncherTriggers",

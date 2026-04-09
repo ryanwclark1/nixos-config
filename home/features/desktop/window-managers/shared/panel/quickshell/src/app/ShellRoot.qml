@@ -241,7 +241,7 @@ Scope {
         active: Config.isPanelEnabled("notifCenter") && root.notifCenterVisible
         NotificationCenter {
             id: center
-            readonly property var layoutState: root.surfacePanelLayout(root.activeSurfaceContext, Config.controlCenterWidth)
+            readonly property var layoutState: root.surfacePanelLayout(root.activeSurfaceContext, Config.notifCenterWidth)
             screen: layoutState.screen
             manager: notifManager
             showContent: root.notifCenterVisible

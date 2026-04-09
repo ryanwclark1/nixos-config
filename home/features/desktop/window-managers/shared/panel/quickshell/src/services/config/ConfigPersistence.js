@@ -98,7 +98,7 @@ var _EXTRA_SECTION_KEYS = (function() {
 
 var REMOVED_PLUGIN_IDS = ["quickshell.ssh.monitor"];
 
-var CURRENT_VERSION = 5;
+var CURRENT_VERSION = 6;
 
 // Migration functions: each takes `data` and mutates it in place.
 // Index corresponds to the version being migrated FROM (0 → 1, 1 → 2, etc.).
@@ -149,6 +149,13 @@ var _MIGRATIONS = [
             return;
         delete data.modelUsage.barMetric;
         delete data.modelUsage.refreshSec;
+    },
+    // v5 → v6: Add a dedicated notification-center width.
+    function(data) {
+        if (!data.notifications)
+            data.notifications = {};
+        if (data.notifications.centerWidth === undefined)
+            data.notifications.centerWidth = 440;
     }
 ];
 
@@ -294,6 +301,12 @@ function applyData(config, data) {
     for (var section in _MAPS) {
         if (section === "launcher") continue;
         _applyMap(config, data[section], _MAPS[section]);
+    }
+
+    if (data.notifications && data.notifications.centerWidth !== undefined) {
+        var ncw = parseInt(data.notifications.centerWidth, 10);
+        if (!isNaN(ncw))
+            config.notifCenterWidth = Math.max(config.notifCenterWidthMin, Math.min(config.notifCenterWidthMax, ncw));
     }
 
     // controlCenter.width requires parseInt + clamp (not in table).

@@ -129,11 +129,8 @@ PanelWindow {
           onFinished: {
             if (!notification) return;
             if (notifWrapper._isAutoExpiry) {
-              // Auto-expired: hide popup but keep notification in trackedNotifications
-              // so it remains visible in the NotificationCenter
-              notifWrapper._expired = true;
+              notification.expire();
             } else {
-              // User-initiated: archive then fully dismiss
               if (root.manager)
                 root.manager.dismissNotification(notification);
               else

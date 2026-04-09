@@ -12,6 +12,9 @@ function clone(value) {
 
 function createConfig(overrides = {}) {
   return {
+    notifCenterWidthMin: 360,
+    notifCenterWidthDefault: 440,
+    notifCenterWidthMax: 560,
     controlCenterWidthMin: 440,
     controlCenterWidthDefault: 440,
     controlCenterWidthMax: 560,
@@ -49,6 +52,7 @@ describe("ConfigPersistence round trip", () => {
         },
       ],
       selectedBarId: "bar-vertical",
+      notifCenterWidth: 500,
       controlCenterWidth: 520,
       themeAutoScheduleEnabled: true,
       themeAutoScheduleMode: "sunrise_sunset",
@@ -125,6 +129,7 @@ describe("ConfigPersistence round trip", () => {
 
     const data = buildData(source);
     const applied = createConfig({
+      notifCenterWidth: 440,
       controlCenterWidth: 440,
       powerBatSuspendAction: "suspend",
     });
@@ -141,6 +146,7 @@ describe("ConfigPersistence round trip", () => {
         sectionWidgets: { left: [], center: [], right: [] },
       },
     ]);
+    expect(applied.notifCenterWidth).toBe(500);
     expect(applied.controlCenterWidth).toBe(520);
     expect(applied.themeAutoScheduleMode).toBe("sunrise_sunset");
     expect(applied.themeAutoLatitude).toBe("41.88");
@@ -188,9 +194,30 @@ describe("ConfigPersistence round trip", () => {
     applyData(applied, legacyData);
 
     expect(applied.modelUsageActiveProvider).toBe("codex");
-    expect(legacyData._version).toBe(5);
+    expect(legacyData._version).toBe(6);
     expect(legacyData.modelUsage).not.toHaveProperty("barMetric");
     expect(legacyData.modelUsage).not.toHaveProperty("refreshSec");
     expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining("modelUsage"));
+  });
+
+  it("migrates v5 configs to add a notification-center width default", () => {
+    const applied = createConfig({
+      notifCenterWidth: 360,
+    });
+    const legacyData = {
+      _version: 5,
+      notifications: {
+        width: 330,
+      },
+      bars: { selectedBarId: "", configs: [] },
+      plugins: { disabled: [], launcherTriggers: {}, launcherNoTrigger: {}, settings: {}, hotReload: false },
+    };
+
+    applyData(applied, legacyData);
+
+    expect(legacyData._version).toBe(6);
+    expect(legacyData.notifications.centerWidth).toBe(440);
+    expect(applied.notifCenterWidth).toBe(440);
+    expect(applied.notifWidth).toBe(330);
   });
 });

@@ -12,11 +12,12 @@ PanelWindow {
   id: root
   property bool _destroyed: false
 
-  property int panelWidth: Config.controlCenterWidth
+  property int panelWidth: Config.notifCenterWidth
   readonly property var edgeMargins: Config.reservedEdgesForScreen(screen, "")
   property int reservedTop: edgeMargins.top
   property int reservedRight: edgeMargins.right
   property int reservedBottom: edgeMargins.bottom
+  readonly property bool compactLayout: panelWidth < 420
 
   anchors {
     top: true
@@ -109,40 +110,96 @@ PanelWindow {
       spacing: Appearance.spacingLG
 
       // --- Header Area ---
-      RowLayout {
+      ColumnLayout {
         Layout.fillWidth: true
-        spacing: Appearance.spacingM
+        spacing: root.compactLayout ? Appearance.spacingS : Appearance.spacingM
 
-        ColumnLayout {
-          spacing: 0
-          Text {
-            text: "Notification Center"
-            color: Colors.text
-            font.pixelSize: Appearance.fontSizeHuge
-            font.weight: Font.DemiBold
-            font.letterSpacing: Appearance.letterSpacingTight
-          }
-          RowLayout {
-            spacing: Appearance.spacingS
-            visible: notifList.count > 0
-            Rectangle {
-              width: 8; height: 8; radius: 4; color: Colors.primary
-            }
+        RowLayout {
+          Layout.fillWidth: true
+          spacing: Appearance.spacingM
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 0
             Text {
-              text: notifList.count + " active notifications"
-              color: Colors.textDisabled
-              font.pixelSize: Appearance.fontSizeXXS
-              font.weight: Font.Medium
+              Layout.fillWidth: true
+              text: "Notification Center"
+              color: Colors.text
+              font.pixelSize: root.compactLayout ? Appearance.fontSizeXL : Appearance.fontSizeHuge
+              font.weight: Font.DemiBold
+              font.letterSpacing: Appearance.letterSpacingTight
+              elide: Text.ElideRight
+            }
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: Appearance.spacingS
+              visible: notifList.count > 0
+              Rectangle {
+                width: 8; height: 8; radius: 4; color: Colors.primary
+              }
+              Text {
+                Layout.fillWidth: true
+                text: notifList.count + " active notifications"
+                color: Colors.textDisabled
+                font.pixelSize: Appearance.fontSizeXXS
+                font.weight: Font.Medium
+                elide: Text.ElideRight
+              }
+            }
+          }
+
+          Item { Layout.fillWidth: true; visible: !root.compactLayout }
+
+          RowLayout {
+            visible: !root.compactLayout
+            spacing: Appearance.spacingXS
+            Layout.alignment: Qt.AlignRight
+            Layout.fillWidth: false
+            Layout.preferredWidth: implicitWidth
+            SharedWidgets.IconButton {
+              size: Appearance.iconSizeMedium
+              icon: IconHelpers.speechToggleIcon(Config.notifTtsEnabled)
+              iconColor: Config.notifTtsEnabled ? Colors.primary : Colors.textSecondary
+              tooltipText: Config.notifTtsEnabled ? "Disable read-aloud" : "Read notifications aloud"
+              onClicked: Config.notifTtsEnabled = !Config.notifTtsEnabled
+            }
+            SharedWidgets.IconButton {
+              size: Appearance.iconSizeMedium
+              icon: "stop.svg"
+              iconColor: Colors.error
+              tooltipText: "Stop speaking"
+              visible: !!(root.manager && root.manager.ttsSpeaking)
+              onClicked: if (root.manager) root.manager.stopSpeaking()
+            }
+            SharedWidgets.IconButton {
+              size: Appearance.iconSizeMedium
+              icon: IconHelpers.doNotDisturbIcon(root.manager && root.manager.dndEnabled)
+              iconColor: root.manager && root.manager.dndEnabled ? Colors.error : Colors.textSecondary
+              tooltipText: root.manager && root.manager.dndEnabled ? "Disable do not disturb" : "Do not disturb"
+              onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
+            }
+            SharedWidgets.IconButton {
+              size: Appearance.iconSizeMedium
+              icon: "archive.svg"
+              iconColor: Colors.textDisabled
+              tooltipText: "Clear all"
+              onClicked: if (root.manager) root.manager.dismissAll()
+            }
+            SharedWidgets.IconButton {
+              size: Appearance.iconSizeMedium
+              icon: "dismiss.svg"
+              tooltipText: "Close"
+              onClicked: root.closeRequested()
             }
           }
         }
 
-        Item { Layout.fillWidth: true }
-
         RowLayout {
+          visible: root.compactLayout
+          Layout.fillWidth: true
           spacing: Appearance.spacingXS
-          
-          // TTS Toggle
+          Layout.alignment: Qt.AlignLeft
+
           SharedWidgets.IconButton {
             size: Appearance.iconSizeMedium
             icon: IconHelpers.speechToggleIcon(Config.notifTtsEnabled)
@@ -151,7 +208,6 @@ PanelWindow {
             onClicked: Config.notifTtsEnabled = !Config.notifTtsEnabled
           }
 
-          // Stop Speaking — only visible while TTS is active
           SharedWidgets.IconButton {
             size: Appearance.iconSizeMedium
             icon: "stop.svg"
@@ -161,7 +217,6 @@ PanelWindow {
             onClicked: if (root.manager) root.manager.stopSpeaking()
           }
 
-          // DND Toggle
           SharedWidgets.IconButton {
             size: Appearance.iconSizeMedium
             icon: IconHelpers.doNotDisturbIcon(root.manager && root.manager.dndEnabled)
@@ -170,7 +225,6 @@ PanelWindow {
             onClicked: if (root.manager) root.manager.dndEnabled = !root.manager.dndEnabled
           }
 
-          // Clear all
           SharedWidgets.IconButton {
             size: Appearance.iconSizeMedium
             icon: "archive.svg"
@@ -179,7 +233,8 @@ PanelWindow {
             onClicked: if (root.manager) root.manager.dismissAll()
           }
 
-          // Close button
+          Item { Layout.fillWidth: true }
+
           SharedWidgets.IconButton {
             size: Appearance.iconSizeMedium
             icon: "dismiss.svg"
@@ -197,13 +252,16 @@ PanelWindow {
 
         SystemClock { id: dashClock; precision: SystemClock.Minutes }
 
-        RowLayout {
+        GridLayout {
           id: dashContent
           anchors.fill: parent
           anchors.margins: Appearance.paddingLarge
-          spacing: Appearance.spacingXL
+          columns: root.compactLayout ? 1 : 3
+          columnSpacing: root.compactLayout ? 0 : Appearance.spacingXL
+          rowSpacing: root.compactLayout ? Appearance.spacingM : 0
 
           ColumnLayout {
+            Layout.fillWidth: true
             spacing: 0
             Text {
               text: Qt.formatDateTime(dashClock.date, "HH:mm")
@@ -213,15 +271,23 @@ PanelWindow {
               font.letterSpacing: -1
             }
             Text {
+              Layout.fillWidth: true
               text: Qt.formatDateTime(dashClock.date, "dddd, MMMM d")
               color: Colors.primary
               font.pixelSize: Appearance.fontSizeSmall
               font.weight: Font.Bold
               opacity: 0.8
+              elide: Text.ElideRight
             }
           }
 
-          Rectangle { Layout.fillHeight: true; width: 1; color: Colors.border; opacity: 0.3 }
+          Rectangle {
+            visible: !root.compactLayout
+            Layout.fillHeight: true
+            width: 1
+            color: Colors.border
+            opacity: 0.3
+          }
 
           ColumnLayout {
             Layout.fillWidth: true
@@ -240,14 +306,17 @@ PanelWindow {
                 color: Colors.text
                 font.pixelSize: Appearance.fontSizeLarge
                 font.weight: Font.Bold
+                elide: Text.ElideRight
               }
             }
             Text {
+              Layout.fillWidth: true
               text: (WeatherService.condition || "Unknown")
               color: Colors.textSecondary
               font.pixelSize: Appearance.fontSizeXXS
               font.weight: Font.Black
               font.capitalization: Font.AllUppercase
+              elide: Text.ElideRight
             }
           }
         }
@@ -289,10 +358,12 @@ PanelWindow {
           }
           Text {
             Layout.alignment: Qt.AlignVCenter
+            Layout.fillWidth: true
             text: "Filter notifications..."
             color: Colors.textDisabled
             font.pixelSize: Appearance.fontSizeMedium
             visible: !searchInput.text && !searchInput.activeFocus
+            elide: Text.ElideRight
           }
         }
       }

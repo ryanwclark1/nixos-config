@@ -38,6 +38,9 @@ QtObject {
         function onNotifWidthChanged() {
             root.config.scheduleSave();
         }
+        function onNotifCenterWidthChanged() {
+            root.config.scheduleSave();
+        }
         function onPopupTimerChanged() {
             root.config.scheduleSave();
         }

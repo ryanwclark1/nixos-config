@@ -74,12 +74,12 @@ Item {
             }
 
             SettingsSliderRow {
-                label: "Notification Width"
+                label: "Notification Center Width"
                 icon: "alert.svg"
-                min: 280
-                max: 520
-                value: Config.notifWidth
-                onMoved: v => Config.notifWidth = v
+                min: Config.notifCenterWidthMin
+                max: Config.notifCenterWidthMax
+                value: Config.notifCenterWidth
+                onMoved: v => Config.notifCenterWidth = v
             }
 
             SettingsSliderRow {
