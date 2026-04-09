@@ -26,6 +26,7 @@ Item {
         tabId: root.tabId
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
+        hidePageHero: root.isAnyLauncherSection
 
         ShellSystemSection {
             visible: root.isSystemSection

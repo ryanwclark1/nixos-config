@@ -16,6 +16,7 @@ SharedWidgets.ScrollableContent {
     property string tabId: ""
     property bool compactMode: false
     property bool tightSpacing: false
+    property bool hidePageHero: false
 
     readonly property var tabMeta: SettingsRegistry.findTab(tabId)
     readonly property string resolvedTitle: title !== "" ? title : (tabMeta ? String(tabMeta.label || "") : "")
@@ -39,6 +40,7 @@ SharedWidgets.ScrollableContent {
     // Hero + tab bodies (SettingsCard children) must live in ScrollableContent's flick column
     // so long tabs scroll instead of clipping at the settings panel edge.
     SettingsPageHero {
+        visible: !root.hidePageHero
         Layout.fillWidth: true
         settingsRoot: root.resolvedSettingsRoot
         tabId: root.tabId
