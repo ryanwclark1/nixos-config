@@ -27,10 +27,12 @@ describe("AI Model Usage popup contract", () => {
     const source = readFileSync(menuPath, "utf8");
 
     expect(source).toContain('title: "AI Model Usage"');
-    expect(source).toContain("popupMinWidth: 420; popupMaxWidth: 560; compactThreshold: 460");
-    expect(source).toContain("implicitHeight: Math.min(760, scrollContent.implicitHeight + 120)");
+    expect(source).toContain("popupMinWidth: 440; popupMaxWidth: 600; compactThreshold: 500");
+    expect(source).toContain("implicitHeight: Math.min(780, scrollContent.implicitHeight + 120)");
     expect(source).toContain('tooltipText: "Refresh"');
     expect(source).toContain('tooltipText: "Settings"');
+    expect(source).toContain('text: "Providers"');
+    expect(source).toContain('text: "Overview"');
     expect(source).toContain('label: "Claude Code"');
     expect(source).toContain('label: "Codex CLI"');
     expect(source).toContain('label: "Gemini CLI"');

@@ -7,6 +7,7 @@ import Quickshell.Services.Mpris
 import Quickshell.Services.UPower
 import "."
 import "GpuTelemetryHelpers.js" as GpuTelemetryHelpers
+import "SystemStatusTelemetry.js" as SystemStatusTelemetry
 
 QtObject {
   id: root
@@ -254,12 +255,16 @@ QtObject {
   property string gpuTemp: "--"
   property string cpuUsage: "0%"
   property string ramUsage: "0GB"
+  property string ramTotal: "0GB"
+  property string swapUsage: "--"
   property string gpuUsage: "0%"
   property string gpuCardName: ""
   property string gpuPciAddress: ""
   property real cpuPercent: 0.0
   property real ramPercent: 0.0
   property real gpuPercent: 0.0
+  readonly property string ramPercentText: SystemStatusTelemetry.formatPercent(ramPercent)
+  readonly property string ramUsedTotalText: SystemStatusTelemetry.formatUsedTotal(ramUsage, ramTotal, "--")
 
   // Disk summary (lightweight, polled alongside main stats when subscribers > 0)
   property real diskPercent: 0.0
@@ -348,25 +353,30 @@ QtObject {
   }
 
   // ── Fast path: CPU/RAM/disk/net without sensors or GPU queries ─────────
-  // RAM must be two separate printf fields: embedding "\n" inside one %s breaks the
-  // fixed line layout (QML splits on "\n"), so disk_pct could be parsed as ramPercent;
-  // parseFloat("71%") === 71 → clamp01 → 100% gauge while labels still look sane.
+  // Emit tagged rows instead of positional placeholders so CommandPoll trimming
+  // cannot shift fields and corrupt CPU/RAM parsing.
   readonly property string _statsLiteDetailedScript:
       "cpu_raw=$(grep '^cpu ' /proc/stat); "
-      + "ram_usage_line=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "ram_used_text=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "ram_total_text=$(awk '/MemTotal/ {total=$2} END {if (total>0) printf \"%.1fGB\", total/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
       + "ram_frac=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.8f\", used/total; else print \"0\"}' /proc/meminfo); "
+      + "swap_used_text=$(awk '/SwapTotal/ {total=$2} /SwapFree/ {free=$2} END {used=total-free; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "swap_total_text=$(awk '/SwapTotal/ {total=$2} END {if (total>0) printf \"%.1fGB\", total/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
       + "disk_pct=$(df / 2>/dev/null | awk 'NR==2 {print $5}'); "
       + "iface=$(ip route show default 2>/dev/null | awk 'NR==1 {print $5}'); "
       + "net_rx=0; net_tx=0; "
       + "if [ -n \"$iface\" ] && [ -r \"/sys/class/net/$iface/statistics/rx_bytes\" ]; then "
       + "net_rx=$(cat /sys/class/net/$iface/statistics/rx_bytes); "
       + "net_tx=$(cat /sys/class/net/$iface/statistics/tx_bytes); fi; "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' '' '' \"$cpu_raw\" '' \"$ram_usage_line\" \"$ram_frac\" \"$disk_pct\" \"$net_rx\" \"$net_tx\""
+      + "printf 'cpu_raw\\t%s\\nram_used_text\\t%s\\nram_total_text\\t%s\\nram_frac\\t%s\\nswap_used_text\\t%s\\nswap_total_text\\t%s\\ndisk_pct\\t%s\\nnet_rx\\t%s\\nnet_tx\\t%s\\n' \"$cpu_raw\" \"$ram_used_text\" \"$ram_total_text\" \"$ram_frac\" \"$swap_used_text\" \"$swap_total_text\" \"$disk_pct\" \"$net_rx\" \"$net_tx\""
   readonly property string _statsLiteSummaryScript:
       "cpu_raw=$(grep '^cpu ' /proc/stat); "
-      + "ram_usage_line=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "ram_used_text=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "ram_total_text=$(awk '/MemTotal/ {total=$2} END {if (total>0) printf \"%.1fGB\", total/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
       + "ram_frac=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {avail=$2} END {used=total-avail; if (total>0) printf \"%.8f\", used/total; else print \"0\"}' /proc/meminfo); "
-      + "printf '%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n%s\\n' '' '' \"$cpu_raw\" '' \"$ram_usage_line\" \"$ram_frac\" '' '' ''"
+      + "swap_used_text=$(awk '/SwapTotal/ {total=$2} /SwapFree/ {free=$2} END {used=total-free; if (total>0) printf \"%.1fGB\", used/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "swap_total_text=$(awk '/SwapTotal/ {total=$2} END {if (total>0) printf \"%.1fGB\", total/1024/1024; else print \"0.0GB\"}' /proc/meminfo); "
+      + "printf 'cpu_raw\\t%s\\nram_used_text\\t%s\\nram_total_text\\t%s\\nram_frac\\t%s\\nswap_used_text\\t%s\\nswap_total_text\\t%s\\ndisk_pct\\t\\nnet_rx\\t\\nnet_tx\\t\\n' \"$cpu_raw\" \"$ram_used_text\" \"$ram_total_text\" \"$ram_frac\" \"$swap_used_text\" \"$swap_total_text\""
   readonly property string _statsLiteScript: root.detailedDemandActive
       ? root._statsLiteDetailedScript
       : root._statsLiteSummaryScript
@@ -413,6 +423,10 @@ QtObject {
     if (text.endsWith("\n"))
       text = text.slice(0, -1);
     return text === "" ? [] : text.split("\n");
+  }
+
+  function _parseLiteStats(rawText) {
+    return SystemStatusTelemetry.parseTaggedStats(rawText);
   }
 
   function _parseHardwareStats(rawText) {
@@ -468,92 +482,77 @@ QtObject {
     interval: root.effectivePollIntervalMs
     running: root.anyDemandActive
     command: ["sh", "-c", root._statsLiteScript]
+    parse: function(out) { return root._parseLiteStats(out); }
 
     property var lastTotal: 0
     property var lastIdle: 0
 
     onUpdated: {
-      var lines = root.parseStatsOutput(this.value);
-      if (lines.length >= 6) {
-        // Temperatures are handled by statsHwPoll.
-        // We explicitly ignore lines 0 and 1 from _statsLiteScript to prevent stderr leaks
-        // from resetting cpuTemp / gpuTemp to "--".
+      var data = statsPoll.value || ({});
 
-        // CPU Usage calculation via /proc/stat delta
-        var cpuParts = (lines[2] || "").split(/\s+/);
-        if (cpuParts.length >= 5) {
-          var user = parseInt(cpuParts[1], 10) || 0;
-          var nice = parseInt(cpuParts[2], 10) || 0;
-          var system = parseInt(cpuParts[3], 10) || 0;
-          var idle = parseInt(cpuParts[4], 10) || 0;
-          var iowait = parseInt(cpuParts[5], 10) || 0;
-          var irq = parseInt(cpuParts[6], 10) || 0;
-          var softirq = parseInt(cpuParts[7], 10) || 0;
-          var steal = parseInt(cpuParts[8], 10) || 0;
+      var cpuParts = String(data.cpuRaw || "").trim().split(/\s+/);
+      if (cpuParts.length >= 5) {
+        var user = parseInt(cpuParts[1], 10) || 0;
+        var nice = parseInt(cpuParts[2], 10) || 0;
+        var system = parseInt(cpuParts[3], 10) || 0;
+        var idle = parseInt(cpuParts[4], 10) || 0;
+        var iowait = parseInt(cpuParts[5], 10) || 0;
+        var irq = parseInt(cpuParts[6], 10) || 0;
+        var softirq = parseInt(cpuParts[7], 10) || 0;
+        var steal = parseInt(cpuParts[8], 10) || 0;
 
-          var currentTotal = user + nice + system + idle + iowait + irq + softirq + steal;
-          var currentIdle = idle + iowait;
+        var currentTotal = user + nice + system + idle + iowait + irq + softirq + steal;
+        var currentIdle = idle + iowait;
 
-          if (statsPoll.lastTotal > 0) {
-            var totalDiff = currentTotal - statsPoll.lastTotal;
-            var idleDiff = currentIdle - statsPoll.lastIdle;
+        if (statsPoll.lastTotal > 0) {
+          var totalDiff = currentTotal - statsPoll.lastTotal;
+          var idleDiff = currentIdle - statsPoll.lastIdle;
 
-            if (totalDiff > 0) {
-              var usage = 1.0 - (idleDiff / totalDiff);
-              var cpuVal = Math.round(usage * 100);
-              root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
-              root.cpuPercent = Colors.clamp01(usage);
-              root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
-            }
-          }
-          statsPoll.lastTotal = currentTotal;
-          statsPoll.lastIdle = currentIdle;
-        }
-
-        var gpuRaw = String(lines[3] || "").trim();
-        if (root.detailedDemandActive && gpuRaw !== "") {
-          var gpuVal = parseInt(gpuRaw, 10);
-          if (!isNaN(gpuVal)) {
-            root.gpuUsage = Math.max(0, Math.min(100, gpuVal)) + "%";
-            root.gpuPercent = Colors.clamp01(gpuVal / 100);
-            root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
+          if (totalDiff > 0) {
+            var usage = 1.0 - (idleDiff / totalDiff);
+            var cpuVal = Math.round(usage * 100);
+            root.cpuUsage = Math.max(0, Math.min(100, cpuVal)) + "%";
+            root.cpuPercent = Colors.clamp01(usage);
+            root.cpuHistory = root._pushHistory(root.cpuHistory, root.cpuPercent);
           }
         }
+        statsPoll.lastTotal = currentTotal;
+        statsPoll.lastIdle = currentIdle;
+      }
 
-        if (lines[4])
-          root.ramUsage = lines[4];
+      if (data.ramUsedText)
+        root.ramUsage = data.ramUsedText;
+      if (data.ramTotalText)
+        root.ramTotal = data.ramTotalText;
 
-        var ramRaw = lines[5] || "";
-        var ramVal = parseFloat(ramRaw);
-        // Reject misparsed fields (e.g. "71%" → 71, "65.0GB" → 65) from a shifted layout.
-        if (!isNaN(ramVal) && ramVal >= 0 && ramVal <= 1.001) {
-          root.ramPercent = Colors.clamp01(ramVal);
-          root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
+      var swapText = SystemStatusTelemetry.formatUsedTotal(data.swapUsedText, data.swapTotalText, "--");
+      if (swapText !== "--")
+        root.swapUsage = swapText;
+
+      var ramVal = parseFloat(String(data.ramFrac || ""));
+      if (!isNaN(ramVal) && ramVal >= 0 && ramVal <= 1.001) {
+        root.ramPercent = Colors.clamp01(ramVal);
+        root.ramHistory = root._pushHistory(root.ramHistory, root.ramPercent);
+      }
+
+      if (root.detailedDemandActive) {
+        var diskRaw = parseInt(String(data.diskPct || "").replace("%", ""), 10);
+        if (!isNaN(diskRaw)) {
+          root.diskPercent = Colors.clamp01(diskRaw / 100);
+          root.diskUsage = Math.max(0, Math.min(100, diskRaw)) + "%";
         }
 
-        // Disk usage (line 6: e.g. "45%")
-        if (root.detailedDemandActive && lines.length >= 7) {
-          var diskRaw = parseInt(String(lines[6] || "").replace("%", ""), 10);
-          if (!isNaN(diskRaw)) {
-            root.diskPercent = Colors.clamp01(diskRaw / 100);
-            root.diskUsage = Math.max(0, Math.min(100, diskRaw)) + "%";
-          }
+        var rx = parseInt(String(data.netRx || ""), 10) || 0;
+        var tx = parseInt(String(data.netTx || ""), 10) || 0;
+        if (root._netLastRx > 0) {
+          var diffRx = Math.max(0, rx - root._netLastRx);
+          var diffTx = Math.max(0, tx - root._netLastTx);
+          var dtSec = Math.max(0.001, statsPoll.interval / 1000);
+          root.netDown = root._formatRate(diffRx / dtSec);
+          root.netUp = root._formatRate(diffTx / dtSec);
         }
-
-        // Network throughput (lines 7-8: rx_bytes, tx_bytes)
-        if (root.detailedDemandActive && lines.length >= 9) {
-          var rx = parseInt(lines[7], 10) || 0;
-          var tx = parseInt(lines[8], 10) || 0;
-          if (root._netLastRx > 0) {
-            var diffRx = Math.max(0, rx - root._netLastRx);
-            var diffTx = Math.max(0, tx - root._netLastTx);
-            var dtSec = Math.max(0.001, root.pollIntervalMs / 1000);
-            root.netDown = root._formatRate(diffRx / dtSec);
-            root.netUp = root._formatRate(diffTx / dtSec);
-          }
-          root._netLastRx = rx;
-          root._netLastTx = tx;
-        }
+        root._netLastRx = rx;
+        root._netLastTx = tx;
       }
     }
   }

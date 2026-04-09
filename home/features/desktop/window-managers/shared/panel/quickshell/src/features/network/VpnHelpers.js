@@ -81,3 +81,59 @@ function exitNodeLabel(exitNode) {
         return label;
     return "";
 }
+
+function trimDnsName(value) {
+    var dns = String(value || "");
+    if (dns.endsWith("."))
+        return dns.slice(0, dns.length - 1);
+    return dns;
+}
+
+function peerOwnerLabel(peer) {
+    if (!peer)
+        return "";
+    var ownerName = String(peer.ownerName || "").trim();
+    if (ownerName !== "")
+        return ownerName;
+    return String(peer.ownerLogin || "").trim();
+}
+
+function peerRouteLabel(peer) {
+    if (!peer)
+        return "";
+    var currentAddress = String(peer.currentAddress || "").trim();
+    if (currentAddress !== "")
+        return currentAddress.indexOf(".") !== -1 || currentAddress.indexOf(":") !== -1
+            ? "Direct " + currentAddress
+            : "Relay " + currentAddress;
+    return "";
+}
+
+function formatTimestamp(value) {
+    var text = String(value || "").trim();
+    if (text === "" || text.indexOf("0001-01-01") === 0)
+        return "";
+    var date = new Date(text);
+    if (isNaN(date.getTime()))
+        return "";
+    var year = date.getFullYear();
+    var month = String(date.getMonth() + 1).padStart(2, "0");
+    var day = String(date.getDate()).padStart(2, "0");
+    var hour = String(date.getHours()).padStart(2, "0");
+    var minute = String(date.getMinutes()).padStart(2, "0");
+    return year + "-" + month + "-" + day + " " + hour + ":" + minute;
+}
+
+function peerStatusDetail(peer) {
+    if (!peer)
+        return "";
+    var routeLabel = peerRouteLabel(peer);
+    if (routeLabel !== "")
+        return routeLabel;
+    if (!peer.online) {
+        var lastSeen = formatTimestamp(peer.lastSeen);
+        if (lastSeen !== "")
+            return "Last seen " + lastSeen;
+    }
+    return "";
+}

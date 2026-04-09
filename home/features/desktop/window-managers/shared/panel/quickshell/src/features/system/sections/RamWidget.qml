@@ -11,9 +11,6 @@ SharedWidgets.CardBase {
     Layout.preferredHeight: ramColumn.implicitHeight + root.pad * 2
 
     property var ramHistory: []
-    property string swapUsage: "--"
-    property string ramDetail: "--"
-
     SharedWidgets.Ref { service: SystemStatus }
 
     Component.onCompleted: ramHistory = SystemStatus.ramHistory.slice(-30)
@@ -23,21 +20,6 @@ SharedWidgets.CardBase {
         function onRamHistoryChanged() {
             root.ramHistory = SystemStatus.ramHistory.slice(-30);
             ramSparkline.requestRepaint();
-        }
-    }
-
-    readonly property int _memPollMs: 5000
-
-    CommandPoll {
-        interval: root._memPollMs
-        running: root.visible
-        command: ["sh", "-c",
-            "free -h 2>/dev/null | awk '/^Mem:/ {print $3 \" / \" $2} /^Swap:/ {print $3 \" / \" $2}'"
-        ]
-        onUpdated: {
-            var lines = String(this.value || "").trim().split("\n");
-            root.ramDetail = String(lines[0] || "--").trim();
-            root.swapUsage = String(lines[1] || "--").trim();
         }
     }
 
@@ -61,9 +43,9 @@ SharedWidgets.CardBase {
             Item { Layout.fillWidth: true }
 
             SharedWidgets.Chip {
-                icon: "board.svg"
+                icon: "memory.svg"
                 iconColor: root.usageColor
-                text: SystemStatus.ramUsage
+                text: SystemStatus.ramPercentText
                 textColor: root.usageColor
             }
         }
@@ -76,8 +58,8 @@ SharedWidgets.CardBase {
             ResourceGauge {
                 value: SystemStatus.ramPercent
                 color: root.usageColor
-                icon: "board.svg"
-                label: Math.round(SystemStatus.ramPercent * 100) + "%"
+                icon: "memory.svg"
+                label: SystemStatus.ramPercentText
             }
 
             // Stats column
@@ -88,21 +70,21 @@ SharedWidgets.CardBase {
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
                     label: "Used / Total"
-                    value: root.ramDetail
+                    value: SystemStatus.ramUsedTotalText
                     valueColor: root.usageColor
                 }
 
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
                     label: "Usage"
-                    value: SystemStatus.ramUsage
+                    value: SystemStatus.ramPercentText
                     valueColor: root.usageColor
                 }
 
                 SharedWidgets.InfoRow {
                     Layout.fillWidth: true
                     label: "Swap"
-                    value: root.swapUsage
+                    value: SystemStatus.swapUsage
                 }
 
                 SharedWidgets.MiniProgressBar {

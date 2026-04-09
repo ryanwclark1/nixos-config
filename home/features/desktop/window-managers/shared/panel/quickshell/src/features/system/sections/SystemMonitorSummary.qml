@@ -13,7 +13,6 @@ SharedWidgets.CardBase {
 
     property string uptimeText: "--"
     property string loadAverage: "--"
-    property string swapUsage: "--"
     property int _clockTick: 0
 
     SharedWidgets.Ref { service: SystemStatus }
@@ -29,10 +28,9 @@ SharedWidgets.CardBase {
         command: [
             "sh",
             "-c",
-            "printf '%s\\n%s\\n%s\\n' "
+            "printf '%s\\n%s\\n' "
             + "\"$(cat /proc/uptime 2>/dev/null | cut -d' ' -f1)\" "
-            + "\"$(cut -d' ' -f1-3 /proc/loadavg 2>/dev/null)\" "
-            + "\"$(free -h 2>/dev/null | awk '/^Swap:/ {print $3 \" / \" $2}')\""
+            + "\"$(cut -d' ' -f1-3 /proc/loadavg 2>/dev/null)\""
         ]
         parse: function(out) {
             var lines = String(out || "").trim().split("\n");
@@ -49,15 +47,13 @@ SharedWidgets.CardBase {
             }
             return {
                 uptime: String(uptimeText || "--").trim() || "--",
-                loadAverage: String(lines[1] || "--").trim() || "--",
-                swapUsage: String(lines[2] || "--").trim() || "--"
+                loadAverage: String(lines[1] || "--").trim() || "--"
             };
         }
         onUpdated: {
             var next = hostPoll.value || {};
             root.uptimeText = String(next.uptime || "--");
             root.loadAverage = String(next.loadAverage || "--");
-            root.swapUsage = String(next.swapUsage || "--");
         }
     }
 
@@ -124,14 +120,14 @@ SharedWidgets.CardBase {
             }
 
             SharedWidgets.Chip {
-                icon: "board.svg"
+                icon: "memory.svg"
                 iconColor: Colors.accent
                 text: "RAM " + SystemStatus.ramUsage
                 textColor: Colors.accent
             }
 
             SharedWidgets.Chip {
-                icon: "developer-board.svg"
+                icon: "board.svg"
                 iconColor: Colors.secondary
                 text: "GPU " + SystemStatus.gpuUsage + "  " + SystemStatus.gpuTemp
                 textColor: Colors.secondary
@@ -231,7 +227,7 @@ SharedWidgets.CardBase {
             SharedWidgets.InfoRow {
                 Layout.fillWidth: true
                 label: "Swap"
-                value: root.swapUsage
+                value: SystemStatus.swapUsage
             }
 
             SharedWidgets.InfoRow {

@@ -8,8 +8,8 @@ import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  popupMinWidth: 420; popupMaxWidth: 560; compactThreshold: 460
-  implicitHeight: Math.min(760, scrollContent.implicitHeight + 120)
+  popupMinWidth: 440; popupMaxWidth: 600; compactThreshold: 500
+  implicitHeight: Math.min(780, scrollContent.implicitHeight + 120)
   title: "AI Model Usage"
   subtitle: ModelUsageService.providerLabel
 
@@ -148,54 +148,97 @@ BasePopupMenu {
     id: scrollContent
     Layout.fillWidth: true
     Layout.fillHeight: true
-    columnSpacing: Appearance.spacingM
+    columnSpacing: Appearance.spacingML
     layer.enabled: contentFade.running
 
     SharedWidgets.ThemedContainer {
-      variant: "card"
+      variant: "elevated"
       Layout.fillWidth: true
       visible: ModelUsageService.hasEnabledProviders
-      implicitHeight: providerTabsWrap.implicitHeight + Appearance.spacingL * 2
+      implicitHeight: providerSwitcherCol.implicitHeight + Appearance.spacingL * 2
 
-      Flow {
-        id: providerTabsWrap
+      ColumnLayout {
+        id: providerSwitcherCol
         anchors.fill: parent
         anchors.margins: Appearance.spacingL
         spacing: Appearance.spacingS
 
-        Repeater {
-          model: {
-            var tabs = [];
-            if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude Code", icon: "brands/anthropic-symbolic.svg" });
-            if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex CLI", icon: "brands/openai-symbolic.svg" });
-            if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini CLI", icon: "brands/google-gemini-symbolic.svg" });
-            return tabs;
-          }
+        Text {
+          text: "Providers"
+          color: Colors.text
+          font.pixelSize: Appearance.fontSizeSmall
+          font.weight: Font.DemiBold
+          letterSpacing: Appearance.letterSpacingWide
+        }
 
-          delegate: SharedWidgets.FilterChip {
-            required property var modelData
-            label: modelData.label
-            icon: modelData.icon
-            selected: ModelUsageService.effectiveActiveProvider === modelData.key
-            onClicked: Config.modelUsageActiveProvider = modelData.key
+        Text {
+          text: "Switch between enabled assistants. The bar icon follows the active provider."
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          wrapMode: Text.WordWrap
+        }
+
+        Flow {
+          id: providerTabsWrap
+          Layout.fillWidth: true
+          spacing: Appearance.spacingS
+
+          Repeater {
+            model: {
+              var tabs = [];
+              if (ModelUsageService.claudeEnabled) tabs.push({ key: "claude", label: "Claude Code", icon: "brands/anthropic-symbolic.svg" });
+              if (ModelUsageService.codexEnabled) tabs.push({ key: "codex", label: "Codex CLI", icon: "brands/openai-symbolic.svg" });
+              if (ModelUsageService.geminiEnabled) tabs.push({ key: "gemini", label: "Gemini CLI", icon: "brands/google-gemini-symbolic.svg" });
+              return tabs;
+            }
+
+            delegate: SharedWidgets.FilterChip {
+              required property var modelData
+              label: modelData.label
+              icon: modelData.icon
+              selected: ModelUsageService.effectiveActiveProvider === modelData.key
+              onClicked: Config.modelUsageActiveProvider = modelData.key
+            }
           }
         }
       }
     }
 
-    SharedWidgets.EmptyState {
+    SharedWidgets.ThemedContainer {
       Layout.fillWidth: true
       visible: !ModelUsageService.hasEnabledProviders
-      icon: "board.svg"
-      message: "Enable at least one provider in AI Model Usage settings"
+      implicitHeight: noProviderCol.implicitHeight + Appearance.spacingXL
+
+      ColumnLayout {
+        id: noProviderCol
+        anchors.centerIn: parent
+        width: Math.min(parent.width - Appearance.spacingXL * 2, 360)
+        spacing: Appearance.spacingS
+
+        SharedWidgets.EmptyState {
+          Layout.fillWidth: true
+          icon: "board.svg"
+          message: "Enable at least one provider in AI Model Usage settings"
+        }
+
+        Text {
+          text: "The popup becomes most useful when Claude, Codex, or Gemini is enabled here."
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          horizontalAlignment: Text.AlignHCenter
+          wrapMode: Text.WordWrap
+          Layout.fillWidth: true
+        }
+      }
     }
 
     // ── Hero Summary Card ───────────────────────────
     Rectangle {
       Layout.fillWidth: true
       visible: ModelUsageService.hasEnabledProviders && ModelUsageService.isReady
-      implicitHeight: heroRow.implicitHeight + Appearance.spacingLG * 2
-      radius: Appearance.radiusCard
+      implicitHeight: heroGrid.implicitHeight + Appearance.spacingXL * 2
+      radius: Appearance.radiusLarge
       color: Colors.withAlpha(root.providerAccent, Colors.primaryFaint)
       border.color: Colors.withAlpha(root.providerAccent, 0.18)
       border.width: 1
@@ -205,16 +248,18 @@ BasePopupMenu {
 
       SharedWidgets.InnerHighlight { }
 
-      RowLayout {
-        id: heroRow
+      GridLayout {
+        id: heroGrid
         anchors.fill: parent
-        anchors.margins: Appearance.spacingLG
+        anchors.margins: Appearance.spacingXL
+        columns: root.compactMode ? 1 : 3
         spacing: Appearance.spacingL
 
         // Large provider icon
         Rectangle {
-          Layout.preferredWidth: 52
-          Layout.preferredHeight: 52
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignTop
+          Layout.preferredWidth: 60
+          Layout.preferredHeight: 60
           radius: Appearance.radiusCard
           color: Colors.withAlpha(root.providerAccent, Colors.primarySubtle)
           Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationNormal } }
@@ -231,6 +276,7 @@ BasePopupMenu {
         // Big metric
         ColumnLayout {
           Layout.fillWidth: true
+          Layout.columnSpan: root.compactMode ? 1 : 1
           spacing: Appearance.spacingXXS
 
           Text {
@@ -246,6 +292,14 @@ BasePopupMenu {
             color: Colors.textSecondary
             font.pixelSize: Appearance.fontSizeSmall
           }
+
+          Text {
+            text: "Tracked from local assistant activity and refreshed on demand"
+            color: Colors.textDisabled
+            font.pixelSize: Appearance.fontSizeXS
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
+          }
         }
 
         // Model badge
@@ -253,7 +307,7 @@ BasePopupMenu {
           visible: {
             return root.activeModelLabel() !== "";
           }
-          Layout.alignment: Qt.AlignTop
+          Layout.alignment: root.compactMode ? Qt.AlignLeft : Qt.AlignTop
           implicitWidth: modelBadgeText.implicitWidth + Appearance.spacingM * 2
           implicitHeight: modelBadgeText.implicitHeight + Appearance.spacingSM * 2
           radius: height / 2
@@ -295,16 +349,23 @@ BasePopupMenu {
         GridLayout {
           Layout.fillWidth: true
           columns: root.compactMode ? 2 : 4
-          columnSpacing: Appearance.spacingS
-          rowSpacing: Appearance.spacingS
+          columnSpacing: Appearance.spacingM
+          rowSpacing: Appearance.spacingM
 
           Repeater {
             model: root.providerSummaryTiles()
 
-            delegate: SharedWidgets.ThemedContainer {
+            delegate: Rectangle {
               required property var modelData
-              variant: "surface"
               Layout.fillWidth: true
+              color: modelData.accent
+                ? Colors.withAlpha(root.providerAccent, Colors.primarySubtle)
+                : Colors.withAlpha(Colors.surface, Colors.opacitySurface)
+              border.color: modelData.accent
+                ? Colors.withAlpha(root.providerAccent, 0.2)
+                : Colors.border
+              border.width: 1
+              radius: Appearance.radiusMedium
               implicitHeight: tileCol.implicitHeight + Appearance.spacingM * 2
 
               ColumnLayout {
@@ -315,9 +376,10 @@ BasePopupMenu {
 
                 Text {
                   text: modelData.label
-                  color: Colors.textDisabled
+                  color: modelData.accent ? root.providerAccent : Colors.textDisabled
                   font.pixelSize: Appearance.fontSizeXS
                   font.weight: Font.Medium
+                  letterSpacing: Appearance.letterSpacingWide
                   Layout.fillWidth: true
                   wrapMode: Text.WordWrap
                 }
@@ -325,7 +387,7 @@ BasePopupMenu {
                 Text {
                   text: modelData.value
                   color: modelData.accent ? root.providerAccent : Colors.text
-                  font.pixelSize: Appearance.fontSizeMedium
+                  font.pixelSize: Appearance.fontSizeLarge
                   font.weight: Font.Bold
                   Layout.fillWidth: true
                   wrapMode: Text.WordWrap
@@ -579,6 +641,18 @@ BasePopupMenu {
           font.weight: Font.Bold
         }
 
+        Text {
+          text: String(root.recentPromptTotal(
+            root.showGemini ? ModelUsageService.geminiRecentDays
+            : root.showCodex ? ModelUsageService.codexRecentDays
+            : ModelUsageService.claudeRecentDays
+          )) + " prompts in the current 7-day window"
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          wrapMode: Text.WordWrap
+        }
+
         Repeater {
           model: root.showGemini ? ModelUsageService.geminiRecentDays
                                  : root.showCodex ? ModelUsageService.codexRecentDays
@@ -622,7 +696,7 @@ BasePopupMenu {
 
             Rectangle {
               Layout.fillWidth: true
-              implicitHeight: 14
+              implicitHeight: 16
               radius: Appearance.radiusXS3
               color: Colors.withAlpha(Colors.text, Colors.primaryFaint)
 
