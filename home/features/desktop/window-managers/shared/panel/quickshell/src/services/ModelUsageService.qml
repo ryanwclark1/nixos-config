@@ -362,20 +362,7 @@ QtObject {
     }
   }
 
-  // ── Polling timers ─────────────────────────────────
-  property Timer dataTimer: Timer {
-    interval: root._refreshMs
-    running: root._ready && root.subscriberCount > 0
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: root.refresh()
-  }
-
-  property Timer rateLimitTimer: Timer {
-    interval: root._rateLimitMs
-    running: root._ready && root.subscriberCount > 0 && root.claudeEnabled
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: root.refreshRateLimit()
-  }
+  // ── Polling timers removed ─────────────────────────
+  // Since active polling was deemed unimportant, we only fetch when the 
+  // dropdown/popup menu becomes visible (see ModelUsageMenu.qml).
 }

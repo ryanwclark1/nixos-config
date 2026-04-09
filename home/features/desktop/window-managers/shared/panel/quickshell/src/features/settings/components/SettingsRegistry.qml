@@ -684,7 +684,7 @@ QtObject {
         },
         {
             id: "model-usage",
-            label: "Model Usage",
+            label: "AI Model Usage",
             shortLabel: "Usage",
             description: "Track provider usage panels, polling, and usage display behavior.",
             pageStyle: "catalog",

@@ -19,6 +19,20 @@ BasePopupMenu {
 
   SharedWidgets.Ref { service: ModelUsageService }
 
+  onVisibleChanged: {
+    if (visible && ModelUsageService.isReady) {
+       ModelUsageService.refresh();
+       if (ModelUsageService.claudeEnabled) {
+         ModelUsageService.refreshRateLimit();
+       }
+    } else if (visible && !ModelUsageService.isReady) {
+       ModelUsageService.refresh();
+       if (ModelUsageService.claudeEnabled) {
+         ModelUsageService.refreshRateLimit();
+       }
+    }
+  }
+
   // ── Provider state ───────────────────────────────
   readonly property bool showClaude: ModelUsageService.activeProvider === "claude"
   readonly property bool showCodex: ModelUsageService.activeProvider === "codex"
