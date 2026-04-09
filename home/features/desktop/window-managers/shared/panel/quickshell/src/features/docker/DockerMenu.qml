@@ -22,6 +22,8 @@ BasePopupMenu {
   property var surfaceContext: null
   property string searchQuery: ""
 
+  SharedWidgets.Ref { service: ServiceUnitService }
+
   readonly property var filteredContainersResult: {
     var query = searchQuery.toLowerCase().trim();
     if (!query)

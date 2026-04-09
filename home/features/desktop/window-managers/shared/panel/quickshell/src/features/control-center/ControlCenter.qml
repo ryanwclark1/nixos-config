@@ -35,6 +35,7 @@ PanelWindow {
     WlrLayershell.namespace: "quickshell-control-center"
 
     property var manager: null
+    property var shellRoot: null
     property bool showContent: false
     readonly property int maxLayerTextureSize: 4096
     readonly property int staggerDelay: 35
@@ -66,6 +67,13 @@ PanelWindow {
         return width > 0 && height > 0
             && width <= maxLayerTextureSize
             && height <= maxLayerTextureSize;
+    }
+
+    function requestSurfaceAfterClose(surfaceId, context) {
+        _pendingSurfaceId = String(surfaceId || "");
+        _pendingSurfaceContext = context || null;
+        root.closeRequested();
+        openSurfaceTimer.restart();
     }
 
     onShowContentChanged: {
@@ -180,6 +188,8 @@ PanelWindow {
             }
 
             property string _quickLinkSurfaceId: ""
+            property string _pendingSurfaceId: ""
+            property var _pendingSurfaceContext: null
             Timer {
                 id: openQuickLinkTimer
                 interval: root.settingsOpenDelayMs
@@ -187,6 +197,23 @@ PanelWindow {
                 onTriggered: {
                     if (parent._quickLinkSurfaceId)
                         Quickshell.execDetached(SU.ipcCall("Shell", "openSurface", parent._quickLinkSurfaceId, ""));
+                }
+            }
+            Timer {
+                id: openSurfaceTimer
+                interval: root.settingsOpenDelayMs
+                repeat: false
+                onTriggered: {
+                    if (!root.shellRoot || !parent._pendingSurfaceId)
+                        return;
+                    var nextContext = parent._pendingSurfaceContext || ({});
+                    if (root.screen && !nextContext.screen)
+                        nextContext.screen = root.screen;
+                    if (root.screen && !nextContext.screenName)
+                        nextContext.screenName = Config.screenName(root.screen);
+                    root.shellRoot.openSurface(parent._pendingSurfaceId, nextContext);
+                    parent._pendingSurfaceId = "";
+                    parent._pendingSurfaceContext = null;
                 }
             }
 
@@ -340,6 +367,7 @@ PanelWindow {
                                 showContent: root.showContent
                                 baseIndex: 10
                                 staggerDelay: root.staggerDelay
+                                onMenuRequested: (surfaceId, surfaceContext) => root.requestSurfaceAfterClose(surfaceId, surfaceContext)
                             }
                         }
 

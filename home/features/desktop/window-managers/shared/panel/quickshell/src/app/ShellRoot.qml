@@ -258,6 +258,7 @@ Scope {
         readonly property var layoutState: root.surfacePanelLayout(root.activeSurfaceContext, Config.controlCenterWidth)
         screen: layoutState.screen
         manager: notifManager
+        shellRoot: root
         showContent: root.controlCenterVisible
         panelWidth: layoutState.width
         reservedTop: layoutState.top
