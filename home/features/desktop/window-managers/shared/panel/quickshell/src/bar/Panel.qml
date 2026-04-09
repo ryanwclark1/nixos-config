@@ -794,7 +794,7 @@ Item {
         StatPill {
             property var widgetInstance: null
             statKey: "ramStatus"
-            icon: "board.svg"
+            icon: "memory.svg"
             iconColor: Colors.accent
             label: "RAM"
             anchorWindow: root.anchorWindow
@@ -813,7 +813,7 @@ Item {
         StatPill {
             property var widgetInstance: null
             statKey: "gpuStatus"
-            icon: "developer-board.svg"
+            icon: "board.svg"
             iconColor: Colors.secondary
             label: "GPU"
             anchorWindow: root.anchorWindow

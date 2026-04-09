@@ -135,7 +135,10 @@ Item {
                             BluetoothMenu { Component.onCompleted: barWindow.wirePopup(this, "bluetoothMenu") }
                             AudioMenu { Component.onCompleted: barWindow.wirePopup(this, "audioMenu") }
                             NetworkMenu { Component.onCompleted: barWindow.wirePopup(this, "networkMenu") }
-                            VpnMenu { Component.onCompleted: barWindow.wirePopup(this, "vpnMenu") }
+                            VpnMenu {
+                                implicitHeight: Math.min(compactMode ? 900 : 980, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                Component.onCompleted: barWindow.wirePopup(this, "vpnMenu")
+                            }
                             ClipboardMenu { Component.onCompleted: barWindow.wirePopup(this, "clipboardMenu") }
                             RecordingMenu { Component.onCompleted: barWindow.wirePopup(this, "recordingMenu") }
                             PrivacyMenu { Component.onCompleted: barWindow.wirePopup(this, "privacyMenu") }

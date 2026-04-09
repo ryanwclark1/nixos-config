@@ -190,9 +190,9 @@ Item {
                 model: [
                     { icon: "developer-board.svg", label: "CPU Usage", value: SystemStatus.cpuUsage, warn: SystemStatus.cpuPercent >= 0.85 },
                     { icon: "temperature.svg", label: "CPU Temp", value: SystemStatus.cpuTemp, warn: SystemStatus.cpuTempNum > 85 },
-                    { icon: "board.svg", label: "RAM Usage", value: SystemStatus.ramUsage, warn: SystemStatus.ramPercent >= 0.9 },
-                    { icon: "developer-board.svg", label: "GPU Usage", value: SystemStatus.gpuUsage, warn: SystemStatus.gpuPercent >= 0.9 },
-                    { icon: "developer-board.svg", label: "GPU Temp", value: SystemStatus.gpuTemp, warn: SystemStatus.gpuTempNum > 80 },
+                    { icon: "memory.svg", label: "RAM Usage", value: SystemStatus.ramUsage, warn: SystemStatus.ramPercent >= 0.9 },
+                    { icon: "board.svg", label: "GPU Usage", value: SystemStatus.gpuUsage, warn: SystemStatus.gpuPercent >= 0.9 },
+                    { icon: "board.svg", label: "GPU Temp", value: SystemStatus.gpuTemp, warn: SystemStatus.gpuTempNum > 80 },
                     { icon: "hard-drive.svg", label: "Disk", value: SystemStatus.diskUsage, warn: SystemStatus.diskPercent >= 0.9 },
                     { icon: "download.svg", label: "Network Down", value: SystemStatus.netDown, warn: false },
                     { icon: "upload.svg", label: "Network Up", value: SystemStatus.netUp, warn: false }

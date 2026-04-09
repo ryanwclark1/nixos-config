@@ -210,13 +210,17 @@ def normalize_profile(profile):
     }
 
 
-def normalize_peer(peer_key, peer):
+def normalize_peer(peer_key, peer, user_map=None):
     if not isinstance(peer, dict):
         return None
+    user_map = user_map if isinstance(user_map, dict) else {}
     addresses = peer.get("TailscaleIPs") or []
     name = str(peer.get("HostName", "") or "")
     dns_name = str(peer.get("DNSName", "") or "")
     display_name = name or dns_name.split(".", 1)[0] if dns_name else ""
+    user_id = str(peer.get("UserID", "") or "")
+    owner = user_map.get(user_id) if user_id else None
+    owner = owner if isinstance(owner, dict) else {}
     current_address = str(peer.get("CurAddr", "") or "")
     if current_address == "":
         relay = str(peer.get("Relay", "") or "")
@@ -235,7 +239,11 @@ def normalize_peer(peer_key, peer):
         "tailscaleIps": [str(item or "") for item in addresses if str(item or "")],
         "primaryIp": first_ipv4(addresses),
         "currentAddress": current_address,
+        "relay": str(peer.get("Relay", "") or ""),
         "shareeNode": bool(peer.get("ShareeNode", False)),
+        "ownerLogin": str(owner.get("LoginName", "") or ""),
+        "ownerName": str(owner.get("DisplayName", "") or ""),
+        "lastSeen": str(peer.get("LastSeen", "") or ""),
     }
 
 
@@ -629,9 +637,10 @@ def collect_tailscale():
     self_node = status_data.get("Self") if isinstance(status_data.get("Self"), dict) else {}
     self_ips = [str(item or "") for item in (status_data.get("TailscaleIPs") or self_node.get("TailscaleIPs") or []) if str(item or "")]
     peer_map = status_data.get("Peer") if isinstance(status_data.get("Peer"), dict) else {}
+    user_map = status_data.get("User") if isinstance(status_data.get("User"), dict) else {}
     peers = []
     for peer_key, peer in peer_map.items():
-        normalized_peer = normalize_peer(peer_key, peer)
+        normalized_peer = normalize_peer(peer_key, peer, user_map)
         if normalized_peer is not None:
             peers.append(normalized_peer)
     peers.sort(key=lambda item: (not item["online"], not item["active"], item["name"].lower(), item["dnsName"].lower()))
