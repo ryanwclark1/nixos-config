@@ -11,6 +11,7 @@ SharedWidgets.CardBase {
 
     Layout.fillWidth: true
     Layout.preferredHeight: gpuColumn.implicitHeight + root.pad * 2
+    property bool showSystemMonitorLauncher: false
 
     property string vramUsage: "0 / 0 MB"
     property real vramPercent: 0.0
@@ -104,7 +105,7 @@ SharedWidgets.CardBase {
                 text: SystemStatus.gpuTemp
                 textColor: SystemStatus.gpuTempNum > 85 ? Colors.error : Colors.textSecondary
             }
-            
+
             SharedWidgets.IconButton {
                 visible: AMDGPUService.available
                 icon: IconHelpers.gpuProcessToggleIcon(root.showProcesses)
@@ -112,6 +113,10 @@ SharedWidgets.CardBase {
                 iconSize: Appearance.fontSizeSmall
                 tooltipText: root.showProcesses ? "Hide GPU processes" : "Show GPU processes"
                 onClicked: root.showProcesses = !root.showProcesses
+            }
+
+            SystemMonitorLaunchButton {
+                visible: root.showSystemMonitorLauncher
             }
         }
 

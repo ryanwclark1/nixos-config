@@ -259,7 +259,7 @@ BasePopupMenu {
 
             SettingsActionButton {
               compact: true
-              iconName: "text-description.svg"
+              iconName: "document.svg"
               label: "Logs"
               onClicked: {
                 logOverlay.title = "Docker: " + modelData.name;

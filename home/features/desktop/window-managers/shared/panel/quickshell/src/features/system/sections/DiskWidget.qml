@@ -9,6 +9,7 @@ SharedWidgets.CardBase {
 
     Layout.fillWidth: true
     Layout.preferredHeight: diskColumn.implicitHeight + root.pad * 2
+    property bool showSystemMonitorLauncher: false
 
     property var drives: []
     property var diskHistory: []
@@ -63,6 +64,10 @@ SharedWidgets.CardBase {
             }
 
             Item { Layout.fillWidth: true }
+
+            SystemMonitorLaunchButton {
+                visible: root.showSystemMonitorLauncher
+            }
 
             SharedWidgets.Chip {
                 visible: root._primaryDrive !== null

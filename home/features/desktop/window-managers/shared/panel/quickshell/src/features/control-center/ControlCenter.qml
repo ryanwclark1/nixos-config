@@ -640,6 +640,7 @@ PanelWindow {
                         }
 
                         CpuWidget {
+                            showSystemMonitorLauncher: true
                             opacity: root.entranceOpacity(9)
                             scale: root.entranceScale(9)
                             transform: Translate { y: root.entranceY(9) }
@@ -667,6 +668,7 @@ PanelWindow {
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(10) } NumberAnimation { duration: root.entranceDuration(10); easing.type: Easing.OutBack } } }
                         }
                         NetworkGraphs {
+                            showSystemMonitorLauncher: true
                             opacity: root.entranceOpacity(11)
                             scale: root.entranceScale(11)
                             transform: Translate { y: root.entranceY(11) }
@@ -676,6 +678,7 @@ PanelWindow {
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(11) } NumberAnimation { duration: root.entranceDuration(11); easing.type: Easing.OutBack } } }
                         }
                         RamWidget {
+                            showSystemMonitorLauncher: true
                             opacity: root.entranceOpacity(12)
                             scale: root.entranceScale(12)
                             transform: Translate { y: root.entranceY(12) }
@@ -685,6 +688,7 @@ PanelWindow {
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(12) } NumberAnimation { duration: root.entranceDuration(12); easing.type: Easing.OutBack } } }
                         }
                         DiskWidget {
+                            showSystemMonitorLauncher: true
                             opacity: root.entranceOpacity(13)
                             scale: root.entranceScale(13)
                             transform: Translate { y: root.entranceY(13) }
@@ -694,6 +698,7 @@ PanelWindow {
                             Behavior on scale { SequentialAnimation { PauseAnimation { duration: root.entranceDelay(13) } NumberAnimation { duration: root.entranceDuration(13); easing.type: Easing.OutBack } } }
                         }
                         GPUWidget {
+                            showSystemMonitorLauncher: true
                             opacity: root.entranceOpacity(14)
                             scale: root.entranceScale(14)
                             transform: Translate { y: root.entranceY(14) }

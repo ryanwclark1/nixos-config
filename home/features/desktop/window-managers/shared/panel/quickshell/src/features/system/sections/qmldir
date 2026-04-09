@@ -23,6 +23,7 @@ SystemCpuCores 1.0 SystemCpuCores.qml
 SystemGraphs 1.0 SystemGraphs.qml
 SystemIoHistory 1.0 SystemIoHistory.qml
 SystemMonitor 1.0 SystemMonitor.qml
+SystemMonitorLaunchButton 1.0 SystemMonitorLaunchButton.qml
 SystemMonitorSummary 1.0 SystemMonitorSummary.qml
 SystemSectionTitle 1.0 SystemSectionTitle.qml
 SystemServiceTable 1.0 SystemServiceTable.qml

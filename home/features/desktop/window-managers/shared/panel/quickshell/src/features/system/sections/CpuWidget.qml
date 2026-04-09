@@ -10,6 +10,7 @@ SharedWidgets.CardBase {
 
     Layout.fillWidth: true
     Layout.preferredHeight: cpuColumn.implicitHeight + root.pad * 2
+    property bool showSystemMonitorLauncher: false
 
     property var cpuHistory: []
     property string loadAverage: "--"
@@ -140,6 +141,10 @@ SharedWidgets.CardBase {
             }
 
             Item { Layout.fillWidth: true }
+
+            SystemMonitorLaunchButton {
+                visible: root.showSystemMonitorLauncher
+            }
 
             SharedWidgets.Chip {
                 visible: SystemStatus.cpuTemp !== "--"

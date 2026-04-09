@@ -11,6 +11,7 @@ SharedWidgets.CardBase {
 
     Layout.fillWidth: true
     Layout.preferredHeight: netColumn.implicitHeight + root.pad * 2
+    property bool showSystemMonitorLauncher: false
 
     property var downHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     property var upHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -116,6 +117,10 @@ SharedWidgets.CardBase {
             }
 
             Item { Layout.fillWidth: true }
+
+            SystemMonitorLaunchButton {
+                visible: root.showSystemMonitorLauncher
+            }
 
             SharedWidgets.Chip {
                 icon: IconHelpers.degradedStatusIcon(root.activeInterface === "offline", "ethernet.svg")

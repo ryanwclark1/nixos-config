@@ -178,7 +178,7 @@ BasePopupMenu {
             onClicked: NetworkService.refreshData()
         },
         SharedWidgets.IconButton {
-            icon: "globe.svg"
+            icon: "globe-search.svg"
             tooltipText: "Tailscale admin console"
             onClicked: root.openAdminConsole()
         },
@@ -1008,7 +1008,7 @@ BasePopupMenu {
                 spacing: Appearance.spacingS
 
                 SharedWidgets.SvgIcon {
-                    source: "globe.svg"
+                    source: "globe-search.svg"
                     color: Colors.primary
                     size: Appearance.fontSizeLarge
                 }

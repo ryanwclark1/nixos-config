@@ -423,6 +423,14 @@ BasePopupMenu {
           font.weight: Font.Bold
         }
 
+        Text {
+          text: "Subscription and rolling limit windows reported by Claude."
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          wrapMode: Text.WordWrap
+        }
+
         SharedWidgets.InfoRow {
           visible: !!((ModelUsageService.claudeProfile.subscriptionType || "") !== "")
           label: "Plan"
@@ -556,6 +564,18 @@ BasePopupMenu {
           color: Colors.text
           font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
+        }
+
+        Text {
+          text: root.showClaude
+            ? "Session activity and model usage for the current day."
+            : root.showGemini
+              ? "Today's Gemini prompt and token breakdown."
+              : "Today's Codex activity snapshot."
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          wrapMode: Text.WordWrap
         }
 
         SharedWidgets.InfoRow {
@@ -744,6 +764,14 @@ BasePopupMenu {
           font.weight: Font.Bold
         }
 
+        Text {
+          text: "Recent Gemini model activity across the rolling 24-hour window."
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          wrapMode: Text.WordWrap
+        }
+
         SharedWidgets.InfoRow {
           label: "Prompts"
           value: String(ModelUsageService.geminiLast24hPrompts)
@@ -773,43 +801,54 @@ BasePopupMenu {
             return items;
           }
 
-          ColumnLayout {
+          Rectangle {
             Layout.fillWidth: true
-            spacing: Appearance.spacingXXS
+            radius: Appearance.radiusMedium
+            color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: gemini24hModelCol.implicitHeight + Appearance.spacingM * 2
             required property var modelData
 
-            Text {
-              text: modelData.model
-              color: Colors.text
-              font.pixelSize: Appearance.fontSizeSmall
-              font.weight: Font.DemiBold
-            }
-
-            RowLayout {
-              Layout.fillWidth: true
-              spacing: Appearance.spacingM
+            ColumnLayout {
+              id: gemini24hModelCol
+              anchors.fill: parent
+              anchors.margins: Appearance.spacingM
+              spacing: Appearance.spacingXXS
 
               Text {
-                text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
+                text: modelData.model
+                color: Colors.text
+                font.pixelSize: Appearance.fontSizeSmall
+                font.weight: Font.DemiBold
               }
-              Text {
-                text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
-              }
-              Text {
-                visible: modelData.cached > 0
-                text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cached)
-                color: Colors.textDisabled
-                font.pixelSize: Appearance.fontSizeXS
-              }
-              Text {
-                visible: modelData.thoughts > 0
-                text: "Think: " + ModelUsageService.formatTokenCount(modelData.thoughts)
-                color: Colors.textDisabled
-                font.pixelSize: Appearance.fontSizeXS
+
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: Appearance.spacingM
+
+                Text {
+                  text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
+                  color: Colors.textSecondary
+                  font.pixelSize: Appearance.fontSizeXS
+                }
+                Text {
+                  text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
+                  color: Colors.textSecondary
+                  font.pixelSize: Appearance.fontSizeXS
+                }
+                Text {
+                  visible: modelData.cached > 0
+                  text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cached)
+                  color: Colors.textDisabled
+                  font.pixelSize: Appearance.fontSizeXS
+                }
+                Text {
+                  visible: modelData.thoughts > 0
+                  text: "Think: " + ModelUsageService.formatTokenCount(modelData.thoughts)
+                  color: Colors.textDisabled
+                  font.pixelSize: Appearance.fontSizeXS
+                }
               }
             }
           }
@@ -835,6 +874,14 @@ BasePopupMenu {
           color: Colors.text
           font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
+        }
+
+        Text {
+          text: "Longer-running Claude usage totals with per-model distribution."
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          wrapMode: Text.WordWrap
         }
 
         SharedWidgets.InfoRow {
@@ -891,36 +938,47 @@ BasePopupMenu {
             return items;
           }
 
-          ColumnLayout {
+          Rectangle {
             Layout.fillWidth: true
-            spacing: Appearance.spacingXXS
+            radius: Appearance.radiusMedium
+            color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: claudeModelCol.implicitHeight + Appearance.spacingM * 2
             required property var modelData
 
-            Text {
-              text: ModelUsageService.friendlyModelName(modelData.model)
-              color: Colors.text
-              font.pixelSize: Appearance.fontSizeSmall
-              font.weight: Font.DemiBold
-            }
+            ColumnLayout {
+              id: claudeModelCol
+              anchors.fill: parent
+              anchors.margins: Appearance.spacingM
+              spacing: Appearance.spacingXXS
 
-            RowLayout {
-              Layout.fillWidth: true
-              spacing: Appearance.spacingM
               Text {
-                text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
+                text: ModelUsageService.friendlyModelName(modelData.model)
+                color: Colors.text
+                font.pixelSize: Appearance.fontSizeSmall
+                font.weight: Font.DemiBold
               }
-              Text {
-                text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
-              }
-              Text {
-                visible: modelData.cacheRead > 0
-                text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cacheRead)
-                color: Colors.textDisabled
-                font.pixelSize: Appearance.fontSizeXS
+
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: Appearance.spacingM
+                Text {
+                  text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
+                  color: Colors.textSecondary
+                  font.pixelSize: Appearance.fontSizeXS
+                }
+                Text {
+                  text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
+                  color: Colors.textSecondary
+                  font.pixelSize: Appearance.fontSizeXS
+                }
+                Text {
+                  visible: modelData.cacheRead > 0
+                  text: "Cache: " + ModelUsageService.formatTokenCount(modelData.cacheRead)
+                  color: Colors.textDisabled
+                  font.pixelSize: Appearance.fontSizeXS
+                }
               }
             }
           }
@@ -946,6 +1004,14 @@ BasePopupMenu {
           color: Colors.text
           font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
+        }
+
+        Text {
+          text: "Gemini totals and primary-model distribution across stored sessions."
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          wrapMode: Text.WordWrap
         }
 
         SharedWidgets.InfoRow {
@@ -987,30 +1053,41 @@ BasePopupMenu {
             return items;
           }
 
-          ColumnLayout {
+          Rectangle {
             Layout.fillWidth: true
-            spacing: Appearance.spacingXXS
+            radius: Appearance.radiusMedium
+            color: Colors.withAlpha(Colors.surface, Colors.opacitySurface)
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: geminiModelCol.implicitHeight + Appearance.spacingM * 2
             required property var modelData
 
-            Text {
-              text: modelData.model
-              color: Colors.text
-              font.pixelSize: Appearance.fontSizeSmall
-              font.weight: Font.DemiBold
-            }
+            ColumnLayout {
+              id: geminiModelCol
+              anchors.fill: parent
+              anchors.margins: Appearance.spacingM
+              spacing: Appearance.spacingXXS
 
-            RowLayout {
-              Layout.fillWidth: true
-              spacing: Appearance.spacingM
               Text {
-                text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
+                text: modelData.model
+                color: Colors.text
+                font.pixelSize: Appearance.fontSizeSmall
+                font.weight: Font.DemiBold
               }
-              Text {
-                text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
-                color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeXS
+
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: Appearance.spacingM
+                Text {
+                  text: "In: " + ModelUsageService.formatTokenCount(modelData.input)
+                  color: Colors.textSecondary
+                  font.pixelSize: Appearance.fontSizeXS
+                }
+                Text {
+                  text: "Out: " + ModelUsageService.formatTokenCount(modelData.output)
+                  color: Colors.textSecondary
+                  font.pixelSize: Appearance.fontSizeXS
+                }
               }
             }
           }
@@ -1036,6 +1113,14 @@ BasePopupMenu {
           color: Colors.text
           font.pixelSize: Appearance.fontSizeMedium
           font.weight: Font.Bold
+        }
+
+        Text {
+          text: "Latest Codex session, current session totals, and any reported rate windows."
+          color: Colors.textSecondary
+          font.pixelSize: Appearance.fontSizeXS
+          Layout.fillWidth: true
+          wrapMode: Text.WordWrap
         }
 
         SharedWidgets.InfoRow {

@@ -9,7 +9,7 @@ function splitTaggedLine(line) {
     };
 }
 
-export function parseTaggedStats(rawText) {
+function parseTaggedStats(rawText) {
     var next = {
         cpuRaw: "",
         ramUsedText: "",
@@ -61,7 +61,7 @@ export function parseTaggedStats(rawText) {
     return next;
 }
 
-export function formatPercent(value) {
+function formatPercent(value) {
     var parsed = Number(value);
     if (!isFinite(parsed) || parsed < 0)
         return "--";
@@ -69,7 +69,7 @@ export function formatPercent(value) {
     return Math.round(clamped * 100) + "%";
 }
 
-export function formatUsedTotal(usedText, totalText, fallback) {
+function formatUsedTotal(usedText, totalText, fallback) {
     var used = String(usedText || "").trim();
     var total = String(totalText || "").trim();
     if (used !== "" && total !== "")

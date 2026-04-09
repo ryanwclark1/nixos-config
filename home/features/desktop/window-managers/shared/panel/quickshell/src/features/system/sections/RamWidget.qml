@@ -9,6 +9,7 @@ SharedWidgets.CardBase {
 
     Layout.fillWidth: true
     Layout.preferredHeight: ramColumn.implicitHeight + root.pad * 2
+    property bool showSystemMonitorLauncher: false
 
     property var ramHistory: []
     SharedWidgets.Ref { service: SystemStatus }
@@ -41,6 +42,10 @@ SharedWidgets.CardBase {
             }
 
             Item { Layout.fillWidth: true }
+
+            SystemMonitorLaunchButton {
+                visible: root.showSystemMonitorLauncher
+            }
 
             SharedWidgets.Chip {
                 icon: "memory.svg"
