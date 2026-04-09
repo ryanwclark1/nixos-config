@@ -128,9 +128,9 @@ Rectangle {
                     border.width: root.currentValue.toLowerCase() === modelData.value.toLowerCase() ? 2 : 1
                     clip: true
 
-                    SharedWidgets.BarTooltip {
+                    SharedWidgets.Tooltip {
                         text: modelData.label
-                        hovered: colorMouse.containsMouse
+                        shown: colorMouse.containsMouse
                     }
 
                     MouseArea {

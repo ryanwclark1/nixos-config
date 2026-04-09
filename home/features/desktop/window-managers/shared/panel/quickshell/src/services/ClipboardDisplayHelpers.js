@@ -16,6 +16,23 @@ function isImageContent(content) {
         || raw.indexOf("gif") !== -1;
 }
 
+function imagePreviewExtension(content) {
+    var raw = String(content || "").toLowerCase();
+    if (raw.indexOf("[[ binary data") === -1)
+        return "";
+    if (raw.indexOf("image/png") !== -1 || raw.indexOf(" png") !== -1)
+        return "png";
+    if (raw.indexOf("image/jpeg") !== -1 || raw.indexOf(" jpeg") !== -1 || raw.indexOf(" jpg") !== -1)
+        return "jpg";
+    if (raw.indexOf("image/webp") !== -1 || raw.indexOf(" webp") !== -1)
+        return "webp";
+    if (raw.indexOf("image/gif") !== -1 || raw.indexOf(" gif") !== -1)
+        return "gif";
+    if (raw.indexOf("image/bmp") !== -1 || raw.indexOf(" bmp") !== -1)
+        return "bmp";
+    return "";
+}
+
 function binarySummary(content) {
     var raw = String(content || "");
     var match = raw.match(/\[\[ binary data (.+?) \]\]/);

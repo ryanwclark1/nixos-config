@@ -15,29 +15,38 @@ Item {
   property int showDelay: 500
 
   readonly property var effectiveAnchorItem: anchorItem ? anchorItem : (parent || null)
-  readonly property bool usePopup: !!anchorWindow && !!effectiveAnchorItem
-  readonly property bool useInlineTooltip: !usePopup && !!effectiveAnchorItem
+  readonly property var resolvedAnchorWindow: {
+    if (anchorWindow)
+      return anchorWindow;
+    if (effectiveAnchorItem && effectiveAnchorItem.Window && effectiveAnchorItem.Window.window)
+      return effectiveAnchorItem.Window.window;
+    if (root.Window && root.Window.window)
+      return root.Window.window;
+    return null;
+  }
+  readonly property bool useInlineTooltip: !resolvedAnchorWindow && !!effectiveAnchorItem
   readonly property int popupGap: Math.max(Appearance.spacingM, 14)
   readonly property int popupSideMargin: Appearance.spacingS
   readonly property string anchorEdge: {
-    if (anchorWindow && anchorWindow.tooltipEdge !== undefined && anchorWindow.tooltipEdge !== "")
-      return String(anchorWindow.tooltipEdge);
-    if (anchorWindow && anchorWindow.barConfig && anchorWindow.barConfig.position)
-      return String(anchorWindow.barConfig.position);
+    var tooltipHost = resolvedAnchorWindow;
+    if (tooltipHost && tooltipHost.tooltipEdge !== undefined && tooltipHost.tooltipEdge !== "")
+      return String(tooltipHost.tooltipEdge);
+    if (tooltipHost && tooltipHost.barConfig && tooltipHost.barConfig.position)
+      return String(tooltipHost.barConfig.position);
     return "bottom";
   }
-  readonly property int popupEdge: {
+  readonly property int tooltipSide: {
     switch (anchorEdge) {
       case "top":
-        return Edges.Bottom;
+        return Qt.BottomEdge;
       case "bottom":
-        return Edges.Top;
+        return Qt.TopEdge;
       case "left":
-        return Edges.Right;
+        return Qt.RightEdge;
       case "right":
-        return Edges.Left;
+        return Qt.LeftEdge;
       default:
-        return Edges.Top;
+        return Qt.TopEdge;
     }
   }
 
@@ -78,78 +87,13 @@ Item {
 
   Tooltip {
     anchors.fill: parent
+    anchorItem: root.effectiveAnchorItem
+    anchorWindow: root.resolvedAnchorWindow
     text: root.text
     shortcut: root.shortcut
-    shown: root.useInlineTooltip && root._shown
-    preferredSide: root.preferredSide
-  }
-
-  PopupWindow {
-    id: popupTooltip
-    anchor.window: root.anchorWindow
-    anchor.item: root.effectiveAnchorItem
-    anchor.edges: root.popupEdge
-    anchor.gravity: root.popupEdge
-    anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
-    anchor.margins {
-      top: root.popupEdge === Edges.Top ? root.popupGap : root.popupSideMargin
-      bottom: root.popupEdge === Edges.Bottom ? root.popupGap : root.popupSideMargin
-      left: root.popupEdge === Edges.Left ? root.popupGap : root.popupSideMargin
-      right: root.popupEdge === Edges.Right ? root.popupGap : root.popupSideMargin
-    }
-
-    visible: root.usePopup && root._shown && root.text !== ""
-    color: "transparent"
-    implicitWidth: bubble.implicitWidth
-    implicitHeight: bubble.implicitHeight
-
-    Rectangle {
-      id: bubble
-
-      readonly property int paddingH: Appearance.spacingM
-      readonly property int paddingV: Appearance.spacingXS
-
-      implicitWidth: Math.min(280, tooltipRow.implicitWidth + paddingH * 2)
-      implicitHeight: tooltipRow.implicitHeight + paddingV * 2
-      width: implicitWidth
-      height: implicitHeight
-      radius: Appearance.radiusXS
-      color: Colors.withAlpha(Colors.surface, 0.95)
-      border.color: Colors.border
-      border.width: 1
-
-      Row {
-        id: tooltipRow
-        anchors.centerIn: parent
-        spacing: Appearance.spacingXS
-
-        Text {
-          width: Math.min(200, implicitWidth)
-          text: root.text
-          color: Colors.text
-          font.pixelSize: Appearance.fontSizeSmall
-          wrapMode: Text.WordWrap
-          anchors.verticalCenter: parent.verticalCenter
-        }
-
-        Rectangle {
-          visible: root.shortcut !== ""
-          anchors.verticalCenter: parent.verticalCenter
-          radius: Appearance.radiusMicro
-          color: Colors.withAlpha(Colors.text, 0.12)
-          width: shortcutLabel.implicitWidth + Appearance.spacingXS * 2
-          height: shortcutLabel.implicitHeight + 4
-
-          Text {
-            id: shortcutLabel
-            anchors.centerIn: parent
-            text: root.shortcut
-            color: Colors.textSecondary
-            font.pixelSize: Appearance.fontSizeXS
-            font.family: Appearance.fontMono
-          }
-        }
-      }
-    }
+    shown: root._shown
+    preferredSide: root.tooltipSide
+    popupGap: root.popupGap
+    popupSideMargin: root.popupSideMargin
   }
 }

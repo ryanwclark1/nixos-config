@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../services"
 import "../../../services/IconHelpers.js" as IconHelpers
+import "../../../shared"
 import "../../../widgets" as SharedWidgets
 
 SharedWidgets.CardBase {

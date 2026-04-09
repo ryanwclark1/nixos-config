@@ -12,9 +12,23 @@ Item {
     property int showDelay: 500
     property Item anchorItem: null
     property var anchorWindow: null
+    property int popupGap: Appearance.spacingS
+    property int popupSideMargin: Appearance.spacingXS
+    property int popupMaxWidth: 280
+    property int popupLabelMaxWidth: 200
+    property int popupAdjustment: PopupAdjustment.Flip | PopupAdjustment.Slide
 
     readonly property Item effectiveAnchorItem: anchorItem ? anchorItem : parent
-    readonly property bool usePopup: !!anchorWindow && !!effectiveAnchorItem
+    readonly property var resolvedAnchorWindow: {
+        if (anchorWindow)
+            return anchorWindow;
+        if (effectiveAnchorItem && effectiveAnchorItem.Window && effectiveAnchorItem.Window.window)
+            return effectiveAnchorItem.Window.window;
+        if (root.Window && root.Window.window)
+            return root.Window.window;
+        return null;
+    }
+    readonly property bool usePopup: !!resolvedAnchorWindow && !!effectiveAnchorItem
     readonly property bool useInlineTooltip: !usePopup
     readonly property bool bubbleVisible: text !== "" && (usePopup ? popupTooltip.visible : root.visible)
 
@@ -27,11 +41,19 @@ Item {
         id: showTimer
         interval: root.showDelay
         onTriggered: {
-            if (root.usePopup)
+            if (root.usePopup) {
+                root.updatePopupAnchor();
                 popupTooltip.visible = true;
-            else
+            } else {
                 root.visible = true;
+            }
         }
+    }
+
+    function updatePopupAnchor() {
+        if (!usePopup || !popupTooltip.visible || !popupTooltip.anchor || !popupTooltip.anchor.updateAnchor)
+            return;
+        popupTooltip.anchor.updateAnchor();
     }
 
     onShownChanged: {
@@ -44,6 +66,19 @@ Item {
         }
     }
 
+    onResolvedAnchorWindowChanged: Qt.callLater(updatePopupAnchor)
+    onEffectiveAnchorItemChanged: Qt.callLater(updatePopupAnchor)
+
+    Connections {
+        target: root.effectiveAnchorItem
+        ignoreUnknownSignals: true
+        function onXChanged() { root.updatePopupAnchor(); }
+        function onYChanged() { root.updatePopupAnchor(); }
+        function onWidthChanged() { root.updatePopupAnchor(); }
+        function onHeightChanged() { root.updatePopupAnchor(); }
+        function onVisibleChanged() { root.updatePopupAnchor(); }
+    }
+
     Rectangle {
         id: bubble
         visible: root.useInlineTooltip
@@ -52,7 +87,7 @@ Item {
         readonly property int _paddingV: Appearance.spacingXS
         readonly property int _gap: Appearance.spacingS
 
-        width: Math.min(280, tooltipRow.implicitWidth + _paddingH * 2)
+        width: Math.min(root.popupMaxWidth, tooltipRow.implicitWidth + _paddingH * 2)
         height: tooltipRow.implicitHeight + _paddingV * 2
 
         // Center horizontally (or vertically for left/right sides), offset past parent edge
@@ -90,7 +125,7 @@ Item {
 
             Text {
                 id: tooltipLabel
-                width: Math.min(200, implicitWidth)
+                width: Math.min(root.popupLabelMaxWidth, implicitWidth)
                 text: root.text
                 color: Colors.text
                 font.pixelSize: Appearance.fontSizeSmall
@@ -120,7 +155,7 @@ Item {
 
     PopupWindow {
         id: popupTooltip
-        anchor.window: root.anchorWindow
+        anchor.window: root.resolvedAnchorWindow
         anchor.item: root.effectiveAnchorItem
         anchor.edges: {
             switch (root.preferredSide) {
@@ -135,18 +170,22 @@ Item {
             }
         }
         anchor.gravity: anchor.edges
-        anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.SlideY
+        anchor.adjustment: root.popupAdjustment
         anchor.margins {
-            top: root.preferredSide === Qt.TopEdge ? Appearance.spacingS : Appearance.spacingXS
-            bottom: root.preferredSide === Qt.BottomEdge ? Appearance.spacingS : Appearance.spacingXS
-            left: root.preferredSide === Qt.LeftEdge ? Appearance.spacingS : Appearance.spacingXS
-            right: root.preferredSide === Qt.RightEdge ? Appearance.spacingS : Appearance.spacingXS
+            top: root.preferredSide === Qt.TopEdge ? root.popupGap : root.popupSideMargin
+            bottom: root.preferredSide === Qt.BottomEdge ? root.popupGap : root.popupSideMargin
+            left: root.preferredSide === Qt.LeftEdge ? root.popupGap : root.popupSideMargin
+            right: root.preferredSide === Qt.RightEdge ? root.popupGap : root.popupSideMargin
         }
 
         visible: false
         color: "transparent"
         implicitWidth: popupBubble.implicitWidth
         implicitHeight: popupBubble.implicitHeight
+        onVisibleChanged: {
+            if (visible)
+                Qt.callLater(root.updatePopupAnchor);
+        }
 
         Rectangle {
             id: popupBubble
@@ -154,7 +193,7 @@ Item {
             readonly property int paddingH: Appearance.spacingM
             readonly property int paddingV: Appearance.spacingXS
 
-            implicitWidth: Math.min(280, popupRow.implicitWidth + paddingH * 2)
+            implicitWidth: Math.min(root.popupMaxWidth, popupRow.implicitWidth + paddingH * 2)
             implicitHeight: popupRow.implicitHeight + paddingV * 2
             width: implicitWidth
             height: implicitHeight
@@ -175,7 +214,7 @@ Item {
                 spacing: Appearance.spacingXS
 
                 Text {
-                    width: Math.min(200, implicitWidth)
+                    width: Math.min(root.popupLabelMaxWidth, implicitWidth)
                     text: root.text
                     color: Colors.text
                     font.pixelSize: Appearance.fontSizeSmall

@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   isBinaryData,
   isImageContent,
+  imagePreviewExtension,
   binarySummary,
   displayText,
   launcherItem,
@@ -18,6 +19,13 @@ describe("ClipboardDisplayHelpers", () => {
     expect(binarySummary("[[ binary data 640x480 png ]]")).toBe("640x480 png");
     expect(displayText("[[ binary data 640x480 png ]]")).toBe("640x480 png");
     expect(displayText("plain clipboard text")).toBe("plain clipboard text");
+  });
+
+  it("maps previewable clipboard image markers to a stable file extension", () => {
+    expect(imagePreviewExtension("[[ binary data 640x480 png ]]")).toBe("png");
+    expect(imagePreviewExtension("[[ binary data image/jpeg ]]")).toBe("jpg");
+    expect(imagePreviewExtension("[[ binary data image/webp ]]")).toBe("webp");
+    expect(imagePreviewExtension("[[ binary data application/pdf ]]")).toBe("");
   });
 
   it("builds launcher clipboard items with image metadata", () => {

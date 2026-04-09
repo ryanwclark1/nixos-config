@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "ShellUtils.js" as SU
+import "ClipboardDisplayHelpers.js" as ClipboardDisplay
 import "."
 
 QtObject {
@@ -76,28 +77,47 @@ QtObject {
   }
 
   function _decodeImages(entries) {
-    var imageIds = [];
+    var imageJobs = [];
     for (var i = 0; i < entries.length; ++i) {
-      var c = String(entries[i].content || "");
-      if (c.indexOf("[[ binary data") !== -1 && (c.indexOf("png") !== -1 || c.indexOf("jpg") !== -1 || c.indexOf("jpeg") !== -1 || c.indexOf("bmp") !== -1 || c.indexOf("webp") !== -1))
-        imageIds.push(String(entries[i].id));
+      var ext = ClipboardDisplay.imagePreviewExtension(entries[i].content || "");
+      if (ext !== "")
+        imageJobs.push({ id: String(entries[i].id), ext: ext });
     }
-    if (imageIds.length === 0)
+    if (imageJobs.length === 0) {
+      root._decodedImages = ({});
+      root._imageGeneration += 1;
       return;
+    }
 
     var dir = root._cacheDir;
-    // safeId is always parseInt'd, and dir is a hardcoded path, so $1 is sufficient
-    var idList = [];
-    for (var j = 0; j < imageIds.length; ++j) {
-      var safeId = parseInt(imageIds[j], 10);
-      if (!isNaN(safeId))
-        idList.push(String(safeId));
+    // safeId is always parseInt'd, ext is derived from a fixed allow-list, and dir is a hardcoded path.
+    var jobArgs = [];
+    for (var j = 0; j < imageJobs.length; ++j) {
+      var safeId = parseInt(imageJobs[j].id, 10);
+      if (!isNaN(safeId)) {
+        jobArgs.push(String(safeId));
+        jobArgs.push(imageJobs[j].ext);
+      }
     }
-    if (idList.length === 0) return;
+    if (jobArgs.length === 0) {
+      root._decodedImages = ({});
+      root._imageGeneration += 1;
+      return;
+    }
     _imageDecodePoll.command = ["sh", "-c",
-      "d=\"$1\"; mkdir -p \"$d\"; shift; for id in \"$@\"; do cliphist decode \"$id\" > \"$d/$id.png\" 2>/dev/null & done; wait",
-      "sh", dir].concat(idList);
-    _imageDecodePoll._pendingIds = imageIds;
+      "d=\"$1\"; mkdir -p \"$d\"; shift; "
+      + "while [ \"$#\" -ge 2 ]; do "
+      + "id=\"$1\"; ext=\"$2\"; shift 2; out=\"$d/$id.$ext\"; "
+      + "rm -f \"$out\"; "
+      + "cliphist decode \"$id\" > \"$out\" 2>/dev/null || { rm -f \"$out\"; continue; }; "
+      + "mt=$(file -Lb --mime-type \"$out\" 2>/dev/null || true); "
+      + "case \"$mt\" in "
+      + "image/png|image/jpeg|image/webp|image/gif|image/bmp) printf '%s\\t%s\\n' \"$id\" \"$out\" ;; "
+      + "*) rm -f \"$out\" ;; "
+      + "esac; "
+      + "done",
+      "sh", dir].concat(jobArgs);
+    _imageDecodePoll._parsedMap = ({});
     _imageDecodePoll.running = true;
   }
 
@@ -175,19 +195,31 @@ QtObject {
   }
 
   property Process _imageDecodePoll: Process {
-    property var _pendingIds: []
+    property var _parsedMap: ({})
     running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var lines = String(this.text || "").trim().split("\n");
+        var next = {};
+        for (var i = 0; i < lines.length; ++i) {
+          var line = String(lines[i] || "").trim();
+          if (line === "")
+            continue;
+          var tabIndex = line.indexOf("\t");
+          if (tabIndex === -1)
+            continue;
+          var id = line.substring(0, tabIndex).trim();
+          var path = line.substring(tabIndex + 1).trim();
+          if (id !== "" && path !== "")
+            next[id] = path;
+        }
+        parent._parsedMap = next;
+      }
+    }
     onExited: (exitCode, _exitStatus) => {
       if (exitCode !== 0)
         return;
-      var newMap = {};
-      var ids = _pendingIds;
-      for (var i = 0; i < ids.length; ++i) {
-        var safeId = parseInt(ids[i], 10);
-        if (!isNaN(safeId))
-          newMap[String(safeId)] = root._cacheDir + "/" + safeId + ".png";
-      }
-      root._decodedImages = newMap;
+      root._decodedImages = Object.assign({}, _parsedMap);
       root._imageGeneration += 1;
     }
   }

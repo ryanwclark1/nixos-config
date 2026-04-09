@@ -18,9 +18,14 @@ describe("AI tooltip anchor contract", () => {
 
     expect(tooltipSource).toContain("property Item anchorItem: null");
     expect(tooltipSource).toContain("property var anchorWindow: null");
-    expect(tooltipSource).toContain("readonly property bool usePopup: !!anchorWindow && !!effectiveAnchorItem");
+    expect(tooltipSource).toContain("readonly property var resolvedAnchorWindow:");
+    expect(tooltipSource).toContain("effectiveAnchorItem.Window.window");
+    expect(tooltipSource).toContain("root.Window.window");
+    expect(tooltipSource).toContain("readonly property bool usePopup: !!resolvedAnchorWindow && !!effectiveAnchorItem");
     expect(tooltipSource).toContain("PopupWindow {");
-    expect(tooltipSource).toContain("anchor.window: root.anchorWindow");
+    expect(tooltipSource).toContain("anchor.window: root.resolvedAnchorWindow");
+    expect(tooltipSource).toContain("property int popupAdjustment: PopupAdjustment.Flip | PopupAdjustment.Slide");
+    expect(tooltipSource).toContain("popupTooltip.anchor.updateAnchor()");
   });
 
   it("wires AI chat controls through the anchored tooltip path", () => {
