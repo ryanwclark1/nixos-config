@@ -10,18 +10,32 @@ import "VpnHelpers.js" as VH
 
 BasePopupMenu {
     id: root
-    popupMinWidth: 360
-    popupMaxWidth: 420
-    compactThreshold: 430
-    implicitHeight: compactMode ? 760 : 820
+    popupMinWidth: 420
+    popupMaxWidth: 560
+    compactThreshold: 460
+    implicitHeight: compactMode ? 900 : 980
     title: "VPN Hub"
-    subtitle: NetworkService.vpnPrimaryLabel + " • " + NetworkService.vpnStatusLabel(NetworkService.vpnPrimaryStatus)
+    subtitle: root.activeView === "tailscale"
+        ? (NetworkService.vpnPrimaryLabel + " • " + NetworkService.vpnStatusLabel(NetworkService.vpnPrimaryStatus))
+        : root.otherVpnSubtitle()
 
     property bool confirmingPrimaryAction: false
     property bool confirmingLogout: false
     property string confirmingVpnUuid: ""
+    property string activeView: NetworkService.tailscaleInstalled ? "tailscale" : "vpnProfiles"
 
     function statusColor(statusKey) { return VH.statusColor(statusKey, Colors); }
+
+    function defaultView() {
+        return NetworkService.tailscaleInstalled ? "tailscale" : "vpnProfiles";
+    }
+
+    function ensureActiveView() {
+        if (!NetworkService.tailscaleInstalled && root.activeView === "tailscale")
+            root.activeView = "vpnProfiles";
+        else if (root.activeView !== "tailscale" && root.activeView !== "vpnProfiles")
+            root.activeView = root.defaultView();
+    }
 
     function openNetworkMenu() {
         root.closeRequested();
@@ -38,6 +52,22 @@ BasePopupMenu {
         if (NetworkService.tailscaleHealthSummary !== "")
             return NetworkService.tailscaleHealthSummary;
         return NetworkService.vpnPrimaryDetail;
+    }
+
+    function otherVpnSubtitle() {
+        var activeCount = Number(NetworkService.vpnOtherCount || 0);
+        var savedCount = Number(NetworkService.vpnProfileCount || 0);
+        return activeCount + " active • " + savedCount + " saved";
+    }
+
+    function otherVpnSummaryLabel() {
+        if (NetworkService.vpnProfileCount === 0)
+            return "No saved NetworkManager VPN profiles found.";
+        if (NetworkService.vpnOtherCount > 0)
+            return NetworkService.vpnOtherCount === 1
+                ? "1 active profile is connected."
+                : NetworkService.vpnOtherCount + " active profiles are connected.";
+        return "Saved VPN profiles are available to connect.";
     }
 
     function primaryActionLabel() {
@@ -99,6 +129,21 @@ BasePopupMenu {
         return parts.join(" • ");
     }
 
+    function peerOwnerText(peer) {
+        var owner = VH.peerOwnerLabel(peer);
+        return owner !== "" ? owner : "Unassigned";
+    }
+
+    function peerDnsText(peer) {
+        var dnsName = VH.trimDnsName(peer && peer.dnsName);
+        return dnsName !== "" ? dnsName : "No MagicDNS name";
+    }
+
+    function peerConnectionText(peer) {
+        var detail = VH.peerStatusDetail(peer);
+        return detail !== "" ? detail : (peer.online ? "Connected to tailnet" : "Offline");
+    }
+
     Timer {
         id: confirmTimer
         interval: 3000
@@ -115,8 +160,15 @@ BasePopupMenu {
     }
 
     onVisibleChanged: {
-        if (visible)
+        if (visible) {
+            root.ensureActiveView();
             NetworkService.refreshData();
+        }
+    }
+
+    Connections {
+        target: NetworkService
+        function onTailscaleInstalledChanged() { root.ensureActiveView(); }
     }
 
     headerExtras: [
@@ -143,9 +195,41 @@ BasePopupMenu {
         columnSpacing: Appearance.spacingM
 
         Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: tabRow.implicitHeight + (Appearance.spacingM * 2)
+            radius: Appearance.radiusLarge
+            color: Colors.cardSurface
+            border.color: Colors.border
+            border.width: 1
+
+            Flow {
+                id: tabRow
+                anchors.fill: parent
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingS
+
+                SharedWidgets.FilterChip {
+                    label: "Tailscale"
+                    icon: "wifi-4.svg"
+                    selected: root.activeView === "tailscale"
+                    enabled: NetworkService.tailscaleInstalled
+                    onClicked: root.activeView = "tailscale"
+                }
+
+                SharedWidgets.FilterChip {
+                    label: "Other VPNs"
+                    icon: "shield-lock.svg"
+                    selected: root.activeView === "vpnProfiles"
+                    onClicked: root.activeView = "vpnProfiles"
+                }
+            }
+        }
+
+        Rectangle {
             id: summaryCard
             readonly property color statusClr: root.statusColor(NetworkService.vpnPrimaryStatus)
             Layout.fillWidth: true
+            visible: root.activeView === "tailscale"
             radius: Appearance.radiusLarge
             color: Colors.popupSurface
             border.color: Colors.withAlpha(statusClr, 0.45)
@@ -312,7 +396,7 @@ BasePopupMenu {
 
                 GridLayout {
                     Layout.fillWidth: true
-                    columns: 2
+                    columns: compactMode ? 1 : 2
                     columnSpacing: Appearance.spacingM
                     rowSpacing: Appearance.spacingXS
 
@@ -336,8 +420,92 @@ BasePopupMenu {
 
                     SharedWidgets.InfoRow {
                         Layout.fillWidth: true
+                        label: "Tailnet"
+                        value: NetworkService.tailscaleTailnet.name !== "" ? NetworkService.tailscaleTailnet.name : "Unknown"
+                    }
+
+                    SharedWidgets.InfoRow {
+                        Layout.fillWidth: true
                         label: "Online"
                         value: NetworkService.tailscaleOnlinePeerCount.toString()
+                    }
+
+                    SharedWidgets.InfoRow {
+                        Layout.fillWidth: true
+                        label: "MagicDNS"
+                        value: NetworkService.tailscaleTailnet.magicDnsSuffix !== ""
+                            ? VH.trimDnsName(NetworkService.tailscaleTailnet.magicDnsSuffix)
+                            : "Unavailable"
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            visible: root.activeView === "vpnProfiles"
+            radius: Appearance.radiusLarge
+            color: Colors.cardSurface
+            border.color: Colors.border
+            border.width: 1
+            implicitHeight: otherSummaryLayout.implicitHeight + (Appearance.spacingM * 2)
+
+            ColumnLayout {
+                id: otherSummaryLayout
+                anchors.fill: parent
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingS
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Appearance.spacingM
+
+                    SharedWidgets.SvgIcon {
+                        source: "shield-lock.svg"
+                        color: Colors.primary
+                        size: Appearance.fontSizeHuge
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Appearance.spacingXXS
+
+                        Text {
+                            text: "Other VPNs"
+                            color: Colors.text
+                            font.pixelSize: Appearance.fontSizeLarge
+                            font.weight: Font.DemiBold
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
+                        }
+
+                        Text {
+                            text: root.otherVpnSummaryLabel()
+                            color: Colors.textSecondary
+                            font.pixelSize: Appearance.fontSizeSmall
+                            wrapMode: Text.Wrap
+                            Layout.fillWidth: true
+                        }
+                    }
+                }
+
+                Flow {
+                    Layout.fillWidth: true
+                    width: parent.width
+                    spacing: Appearance.spacingS
+
+                    SharedWidgets.Chip {
+                        text: NetworkService.vpnOtherCount === 1 ? "1 active" : NetworkService.vpnOtherCount + " active"
+                        textColor: Colors.textSecondary
+                        bgColor: Colors.chipSurface
+                        borderColor: Colors.border
+                    }
+
+                    SharedWidgets.Chip {
+                        text: NetworkService.vpnProfileCount === 1 ? "1 saved" : NetworkService.vpnProfileCount + " saved"
+                        textColor: Colors.textSecondary
+                        bgColor: Colors.chipSurface
+                        borderColor: Colors.border
                     }
                 }
             }
@@ -346,7 +514,7 @@ BasePopupMenu {
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
-            visible: NetworkService.tailscaleProfileCount > 0
+            visible: root.activeView === "tailscale" && NetworkService.tailscaleProfileCount > 0
 
             SharedWidgets.SectionLabel { label: "Tailnet Accounts" }
 
@@ -418,7 +586,7 @@ BasePopupMenu {
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
-            visible: NetworkService.tailscaleInstalled
+            visible: root.activeView === "tailscale" && NetworkService.tailscaleInstalled
 
             SharedWidgets.SectionLabel { label: "Exit Nodes" }
 
@@ -562,7 +730,7 @@ BasePopupMenu {
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
-            visible: NetworkService.tailscaleInstalled
+            visible: root.activeView === "tailscale" && NetworkService.tailscaleInstalled
 
             SharedWidgets.SectionLabel { label: "Runtime Preferences" }
 
@@ -655,9 +823,9 @@ BasePopupMenu {
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
-            visible: NetworkService.tailscalePeerCount > 0
+            visible: root.activeView === "tailscale" && NetworkService.tailscalePeerCount > 0
 
-            SharedWidgets.SectionLabel { label: "Peers" }
+            SharedWidgets.SectionLabel { label: "Tailnet Machines" }
 
             Repeater {
                 model: NetworkService.tailscalePeers
@@ -665,16 +833,17 @@ BasePopupMenu {
                 delegate: Rectangle {
                     required property var modelData
                     Layout.fillWidth: true
-                    implicitHeight: 60
+                    implicitHeight: machineCardLayout.implicitHeight + (Appearance.spacingM * 2)
                     radius: Appearance.radiusMedium
                     color: Colors.cardSurface
-                    border.color: Colors.border
+                    border.color: modelData.online ? Colors.withAlpha(Colors.success, 0.22) : Colors.border
                     border.width: 1
 
                     ColumnLayout {
+                        id: machineCardLayout
                         anchors.fill: parent
                         anchors.margins: Appearance.spacingM
-                        spacing: Appearance.spacingXS
+                        spacing: Appearance.spacingS
 
                         RowLayout {
                             Layout.fillWidth: true
@@ -690,28 +859,55 @@ BasePopupMenu {
                             }
 
                             SharedWidgets.Chip {
-                                visible: modelData.exitNodeOption
-                                text: "Exit"
+                                text: modelData.online ? "Online" : "Offline"
+                                textColor: modelData.online ? Colors.success : Colors.textSecondary
+                                bgColor: modelData.online
+                                    ? Colors.withAlpha(Colors.success, 0.12)
+                                    : Colors.chipSurface
+                                borderColor: modelData.online
+                                    ? Colors.withAlpha(Colors.success, 0.28)
+                                    : Colors.border
+                            }
+
+                            SharedWidgets.Chip {
+                                visible: modelData.active
+                                text: "Active"
                                 textColor: Colors.primary
                                 bgColor: Colors.primaryGhost
                                 borderColor: Colors.primarySubtle
                             }
 
                             SharedWidgets.Chip {
-                                visible: modelData.active
-                                text: "Active"
-                                textColor: Colors.success
-                                bgColor: Colors.withAlpha(Colors.success, 0.12)
-                                borderColor: Colors.withAlpha(Colors.success, 0.28)
+                                visible: modelData.exitNodeOption
+                                text: "Exit Node"
+                                textColor: Colors.warning
+                                bgColor: Colors.withAlpha(Colors.warning, 0.14)
+                                borderColor: Colors.withAlpha(Colors.warning, 0.3)
+                            }
+
+                            SharedWidgets.Chip {
+                                visible: modelData.shareeNode
+                                text: "Shared"
+                                textColor: Colors.textSecondary
+                                bgColor: Colors.chipSurface
+                                borderColor: Colors.border
                             }
                         }
 
                         Text {
-                            text: root.peerChipText(modelData) + (modelData.currentAddress !== "" ? " • " + modelData.currentAddress : "")
+                            text: root.peerChipText(modelData) + " • " + root.peerOwnerText(modelData)
                             color: Colors.textSecondary
                             font.pixelSize: Appearance.fontSizeXS
                             Layout.fillWidth: true
-                            elide: Text.ElideRight
+                            wrapMode: Text.Wrap
+                        }
+
+                        Text {
+                            text: root.peerDnsText(modelData) + " • " + root.peerConnectionText(modelData)
+                            color: Colors.textSecondary
+                            font.pixelSize: Appearance.fontSizeXS
+                            Layout.fillWidth: true
+                            wrapMode: Text.Wrap
                         }
                     }
                 }
@@ -721,7 +917,7 @@ BasePopupMenu {
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
-            visible: NetworkService.vpnOtherCount > 0
+            visible: root.activeView === "vpnProfiles" && NetworkService.vpnOtherCount > 0
 
             SharedWidgets.SectionLabel { label: "Active VPN Profiles" }
 
@@ -749,7 +945,7 @@ BasePopupMenu {
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
-            visible: NetworkService.vpnInactiveCount > 0
+            visible: root.activeView === "vpnProfiles" && NetworkService.vpnInactiveCount > 0
 
             SharedWidgets.SectionLabel { label: "Available VPN Profiles" }
 
@@ -766,6 +962,39 @@ BasePopupMenu {
 
         Rectangle {
             Layout.fillWidth: true
+            visible: root.activeView === "vpnProfiles" && NetworkService.vpnProfileCount === 0
+            implicitHeight: emptyOtherLayout.implicitHeight + (Appearance.spacingM * 2)
+            radius: Appearance.radiusMedium
+            color: Colors.cardSurface
+            border.color: Colors.border
+            border.width: 1
+
+            ColumnLayout {
+                id: emptyOtherLayout
+                anchors.fill: parent
+                anchors.margins: Appearance.spacingM
+                spacing: Appearance.spacingXS
+
+                Text {
+                    text: "No saved VPN profiles"
+                    color: Colors.text
+                    font.pixelSize: Appearance.fontSizeSmall
+                    font.weight: Font.DemiBold
+                }
+
+                Text {
+                    text: "WireGuard split tunnels and other NetworkManager VPNs will appear here when they are configured on this machine."
+                    color: Colors.textSecondary
+                    font.pixelSize: Appearance.fontSizeXS
+                    wrapMode: Text.Wrap
+                    Layout.fillWidth: true
+                }
+            }
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            visible: root.activeView === "tailscale"
             implicitHeight: 56
             radius: Appearance.radiusMedium
             color: Colors.cardSurface
