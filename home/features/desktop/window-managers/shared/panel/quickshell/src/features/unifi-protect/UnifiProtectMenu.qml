@@ -126,7 +126,7 @@ BasePopupMenu {
     Layout.fillWidth: true
     Layout.topMargin: 32
     visible: UnifiProtectService.status === "unconfigured"
-    icon: "unifi-protect-symbolic.svg"
+    icon: "brands/unifi-protect-symbolic.svg"
     iconSize: Appearance.iconSizeLarge
     message: "Set Protect host and API key in Settings to view cameras"
   }

@@ -245,7 +245,7 @@ BasePopupMenu {
     Layout.fillWidth: true
     Layout.topMargin: 32
     visible: UnifiNetworkService.status === "unconfigured"
-    icon: "ubiquiti-symbolic.svg"
+    icon: "brands/ubiquiti-symbolic.svg"
     iconSize: Appearance.iconSizeLarge
     message: "Add your UniFi API key in Settings to get started"
   }

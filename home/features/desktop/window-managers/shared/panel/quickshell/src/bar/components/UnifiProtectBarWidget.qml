@@ -9,7 +9,7 @@ SharedWidgets.BarPill {
     property bool vertical: false
     signal triggerRequested(var triggerItem)
 
-    visible: UnifiProtectService.configured
+    visible: true
     tooltipText: {
         if (UnifiProtectService.status === "unconfigured") return "UniFi Protect — not configured";
         if (UnifiProtectService.status === "error") return "UniFi Protect — " + UnifiProtectService.errorMessage;
@@ -24,7 +24,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Open UniFi Protect Menu",
-            icon: "unifi-protect-symbolic.svg",
+            icon: "brands/unifi-protect-symbolic.svg",
             action: () => root.triggerRequested(root)
         }
     ]
@@ -33,7 +33,7 @@ SharedWidgets.BarPill {
         spacing: Appearance.spacingS
 
         SharedWidgets.SvgIcon {
-            source: "unifi-protect-symbolic.svg"
+            source: "brands/unifi-protect-symbolic.svg"
             color: UnifiProtectService.status === "ready" ? Colors.text : Colors.textDisabled
             size: Appearance.fontSizeLarge
             anchors.verticalCenter: parent.verticalCenter

@@ -197,7 +197,7 @@ Item {
 
             SettingsActionButton {
                 compact: true
-                iconName: "open-external.svg"
+                iconName: "open.svg"
                 label: "Open in VLC"
                 visible: root.streamUrl !== ""
                 onClicked: {

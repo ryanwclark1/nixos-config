@@ -38,13 +38,13 @@ describe("system monitor launchers", () => {
   it("enables the launcher only on command center hardware cards", () => {
     const controlCenter = source("src/features/control-center/ControlCenter.qml");
 
-    expect(controlCenter).toContain("CpuWidget {");
-    expect(controlCenter).toContain("NetworkGraphs {");
-    expect(controlCenter).toContain("RamWidget {");
-    expect(controlCenter).toContain("DiskWidget {");
-    expect(controlCenter).toContain("GPUWidget {");
-
-    expect(controlCenter.match(/showSystemMonitorLauncher: true/g)).toHaveLength(5);
+    expect(controlCenter).toContain('case "cpuWidget":      return "../system/sections/CpuWidget.qml";');
+    expect(controlCenter).toContain('case "networkGraphs":  return "../system/sections/NetworkGraphs.qml";');
+    expect(controlCenter).toContain('case "ramWidget":      return "../system/sections/RamWidget.qml";');
+    expect(controlCenter).toContain('case "diskWidget":     return "../system/sections/DiskWidget.qml";');
+    expect(controlCenter).toContain('case "gpuWidget":      return "../system/sections/GPUWidget.qml";');
+    expect(controlCenter).toContain('if (item.hasOwnProperty("showSystemMonitorLauncher"))');
+    expect(controlCenter).toContain("item.showSystemMonitorLauncher = true;");
   });
 
   it("does not opt into launchers from the monitor surfaces themselves", () => {
