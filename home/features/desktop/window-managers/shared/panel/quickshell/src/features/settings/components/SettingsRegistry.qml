@@ -700,6 +700,23 @@ QtObject {
             }
         },
         {
+            id: "unifi",
+            label: "UniFi",
+            shortLabel: "UniFi",
+            description: "Configure UniFi cloud API and Protect controller connections for network monitoring and camera feeds.",
+            pageStyle: "catalog",
+            icon: "brands/ubiquiti-symbolic.svg",
+            categoryId: "extensibility",
+            order: 50,
+            component: "UnifiTab.qml",
+            searchTerms: ["unifi", "ubiquiti", "network", "protect", "camera", "api", "devices"],
+            owner: {
+                surface: "unifiNetworkMenu",
+                service: "UnifiNetworkService",
+                configDomain: "unifi"
+            }
+        },
+        {
             id: "health",
             label: "Diagnostics",
             shortLabel: "Diagnostics",
