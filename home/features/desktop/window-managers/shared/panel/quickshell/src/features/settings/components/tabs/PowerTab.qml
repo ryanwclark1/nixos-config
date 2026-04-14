@@ -109,7 +109,7 @@ Item {
                 label: "Monitor Off"
                 icon: "desktop.svg"
                 min: 1
-                max: 180
+                max: 1800
                 step: 1
                 value: Config.powerAcMonitorTimeout
                 unit: "min"
@@ -120,7 +120,7 @@ Item {
                 label: "Lock Screen"
                 icon: "lock-closed.svg"
                 min: 1
-                max: 240
+                max: 2400
                 step: 1
                 value: Config.powerAcLockTimeout
                 unit: "min"
@@ -131,7 +131,7 @@ Item {
                 label: "Suspend"
                 icon: "power-sleep.svg"
                 min: 1
-                max: 360
+                max: 3600
                 step: 1
                 value: Config.powerAcSuspendTimeout
                 unit: "min"
@@ -160,7 +160,7 @@ Item {
                 label: "Monitor Off"
                 icon: "desktop.svg"
                 min: 1
-                max: 120
+                max: 1200
                 step: 1
                 value: Config.powerBatMonitorTimeout
                 unit: "min"
@@ -171,7 +171,7 @@ Item {
                 label: "Lock Screen"
                 icon: "lock-closed.svg"
                 min: 1
-                max: 180
+                max: 1800
                 step: 1
                 value: Config.powerBatLockTimeout
                 unit: "min"
@@ -182,7 +182,7 @@ Item {
                 label: "Suspend"
                 icon: "power-sleep.svg"
                 min: 1
-                max: 240
+                max: 2400
                 step: 1
                 value: Config.powerBatSuspendTimeout
                 unit: "min"

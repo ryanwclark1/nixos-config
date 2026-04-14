@@ -1,11 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Wayland
 import Quickshell.Services.Notifications
 import "../../services"
 
 PanelWindow {
   id: root
+  property var screenModel: Config.primaryScreen()
+  screen: screenModel || Config.primaryScreen()
 
   readonly property var edgeMargins: Config.notificationMargins(screen)
 
@@ -23,6 +26,12 @@ PanelWindow {
   implicitWidth: Config.notifWidth
   implicitHeight: Math.max(1, col.implicitHeight)
   color: "transparent"
+  exclusionMode: ExclusionMode.Ignore
+
+  WlrLayershell.layer: WlrLayer.Overlay
+  WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+  WlrLayershell.namespace: "quickshell-notification-popups"
+
   mask: Region {
     item: col
   }

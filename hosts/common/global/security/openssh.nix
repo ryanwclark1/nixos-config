@@ -19,7 +19,10 @@ in
       enable = lib.mkDefault true;
       allowSFTP = lib.mkDefault true;
       openFirewall = lib.mkDefault true;
-      startWhenNeeded = lib.mkDefault true;
+      # Keep sshd running: socket activation (true) has been associated with failed
+      # inbound SSH after suspend/idle (e.g. nixpkgs#91351). A screen lock alone does
+      # not block SSH; loss of reachability usually means sleep or network drop.
+      startWhenNeeded = lib.mkDefault false;
       ports = [ 22 ];
       settings = {
         PasswordAuthentication = true;

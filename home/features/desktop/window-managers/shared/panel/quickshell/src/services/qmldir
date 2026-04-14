@@ -23,6 +23,7 @@ singleton IdleService 1.0 IdleService.qml
 singleton GameModeService 1.0 GameModeService.qml
 singleton DesktopWidgetRegistry 1.0 ../features/desktop/registry/DesktopWidgetRegistry.qml
 singleton HookService 1.0 HookService.qml
+singleton HypridleSyncService 1.0 HypridleSyncService.qml
 singleton IconCatalogService 1.0 IconCatalogService.qml
 singleton Logger 1.0 Logger.qml
 singleton MarketService 1.0 MarketService.qml

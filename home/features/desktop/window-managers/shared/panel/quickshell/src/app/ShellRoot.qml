@@ -159,6 +159,7 @@ Scope {
         var done = Logger.perf("ShellRoot", "startup");
         void ThemeService.activeThemeId;
         void HookService;
+        void HypridleSyncService;
         void ColorExportService;
         done();
     }

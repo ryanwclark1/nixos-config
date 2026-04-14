@@ -280,13 +280,13 @@ QtObject {
     property string nightLightLongitude: ""
 
     // --- POWER ---
-    property int powerAcMonitorTimeout: 15
-    property int powerAcLockTimeout: 20
-    property int powerAcSuspendTimeout: 45
+    property int powerAcMonitorTimeout: 300
+    property int powerAcLockTimeout: 300
+    property int powerAcSuspendTimeout: 600
     property string powerAcSuspendAction: "hibernate"
-    property int powerBatMonitorTimeout: 5
-    property int powerBatLockTimeout: 7
-    property int powerBatSuspendTimeout: 10
+    property int powerBatMonitorTimeout: 100
+    property int powerBatLockTimeout: 120
+    property int powerBatSuspendTimeout: 200
     property string powerBatSuspendAction: "suspend"
     property bool batteryAlertsEnabled: true
     property int batteryWarningThreshold: 20
