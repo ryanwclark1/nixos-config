@@ -102,6 +102,13 @@ Scope {
         return surfaceService.toggleSurface(surfaceId, context);
     }
 
+    function openSettingsHub(tabId) {
+        settingsHub.clearSettingHighlight();
+        if (tabId)
+            settingsHub.setCurrentTab(tabId);
+        settingsHub.open();
+    }
+
     function popupAnchorX(context, popupWidth, screenWidth) {
         return surfaceService.popupAnchorX(context, popupWidth, screenWidth);
     }

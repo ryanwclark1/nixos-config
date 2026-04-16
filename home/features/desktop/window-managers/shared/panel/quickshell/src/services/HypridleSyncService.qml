@@ -88,7 +88,7 @@ QtObject {
         });
     }
 
-    Connections {
+    property Connections _configConnections: Connections {
         target: Services.Config
         function onConfigReadyChanged() {
             root.scheduleApply();
@@ -119,7 +119,7 @@ QtObject {
         }
     }
 
-    Connections {
+    property Connections _powerSourceConnections: Connections {
         target: Services.SystemStatus
         function onIsBatteryPoweredChanged() {
             root.scheduleApply();

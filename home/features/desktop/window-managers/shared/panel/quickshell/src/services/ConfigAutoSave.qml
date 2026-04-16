@@ -200,6 +200,15 @@ QtObject {
         function onControlCenterHiddenPluginsChanged() {
             root.config.scheduleSave();
         }
+        function onControlCenterQuickLinkOrderChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterHiddenQuickLinksChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterWidgetOrderChanged() {
+            root.config.scheduleSave();
+        }
         function onControlCenterShowPomodoroChanged() {
             root.config.scheduleSave();
         }
