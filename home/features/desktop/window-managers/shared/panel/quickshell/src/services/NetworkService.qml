@@ -152,6 +152,10 @@ QtObject {
     property string _tailscaleActionSuccessMessage: ""
     property string _tailscaleActionFailureMessage: ""
     property var _tailscaleActionCommand: []
+    property string _clipboardActionTitle: ""
+    property string _clipboardActionSuccessMessage: ""
+    property string _clipboardActionFailureMessage: ""
+    property var _clipboardActionCommand: []
 
     // ═══════════════════════════════════════════════════
     //  Helper functions (unchanged public API)
@@ -595,6 +599,33 @@ QtObject {
         );
     }
 
+    function copyText(label, text) {
+        var value = String(text || "").trim();
+        if (value === "") {
+            ToastService.showNotice("Nothing to copy", String(label || "Value") + " is unavailable.");
+            return false;
+        }
+        if (clipboardActionProc.running) {
+            ToastService.showNotice("Copy pending", "Wait for the current clipboard action to finish.");
+            return false;
+        }
+        _clipboardActionTitle = "Copied";
+        _clipboardActionSuccessMessage = String(label || "Value") + " copied to clipboard.";
+        _clipboardActionFailureMessage = "No clipboard utility found (wl-copy/xclip).";
+        _clipboardActionCommand = [
+            "sh", "-c",
+            "if command -v wl-copy >/dev/null 2>&1; then "
+            + "printf '%s' \"$1\" | wl-copy; "
+            + "elif command -v xclip >/dev/null 2>&1; then "
+            + "printf '%s' \"$1\" | xclip -selection clipboard; "
+            + "else exit 127; fi",
+            "qs-network-copy",
+            value
+        ];
+        clipboardActionProc.running = true;
+        return true;
+    }
+
     // ═══════════════════════════════════════════════════
     //  Daemon Process + JSON dispatcher
     // ═══════════════════════════════════════════════════
@@ -763,6 +794,22 @@ QtObject {
             root.refreshData();
             root._tailscaleActionImmediateRefresh.restart();
             root._tailscaleActionSettleRefresh.restart();
+        }
+    }
+
+    property Process clipboardActionProc: Process {
+        id: clipboardActionProc
+        command: root._clipboardActionCommand
+        running: false
+        onExited: (exitCode, exitStatus) => {
+            var wasSuccess = exitCode === 0;
+            var actionTitle = root._clipboardActionTitle;
+            var successMessage = root._clipboardActionSuccessMessage;
+            var failureMessage = root._clipboardActionFailureMessage;
+            if (wasSuccess)
+                ToastService.showSuccess(actionTitle, successMessage);
+            else
+                ToastService.showError(actionTitle, failureMessage);
         }
     }
 }

@@ -19,12 +19,15 @@ set -uo pipefail
 SCRIPT_NAME="$(basename "$0")"
 SCREENSHOTS_DIR="${SCREENSHOTS_DIR:-$HOME/Pictures/Screenshots}"
 DEFAULT_FORMAT="png"
+SELECTION_TIMEOUT_SECONDS="${SELECTION_TIMEOUT_SECONDS:-20}"
 
-# Cleanup trap: always kill hyprpicker on exit (matches grimblast behavior)
+# Cleanup trap: always kill selection/freeze helpers on exit.
 cleanup() {
+    pkill slurp 2>/dev/null || true
     pkill hyprpicker 2>/dev/null || true
+    pkill wayfreeze 2>/dev/null || true
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM HUP
 
 # Dependency check function
 check_dependencies() {
@@ -215,8 +218,28 @@ freezescreen() {
     fi
 }
 
-killhyprpicker() {
+kill_freeze_helpers() {
     pkill hyprpicker 2>/dev/null || true
+    pkill wayfreeze 2>/dev/null || true
+}
+
+run_slurp() {
+    local input="${1:-}"
+    local mode="${2:-}"
+    local geometry=""
+    local timeout_cmd=()
+
+    if command -v timeout >/dev/null 2>&1; then
+        timeout_cmd=(timeout --foreground "${SELECTION_TIMEOUT_SECONDS}s")
+    fi
+
+    if [[ -n "$input" ]]; then
+        geometry=$(printf '%s\n' "$input" | "${timeout_cmd[@]}" slurp ${mode:+$mode} 2>/dev/null) || true
+    else
+        geometry=$("${timeout_cmd[@]}" slurp ${mode:+$mode} 2>/dev/null) || true
+    fi
+
+    echo "$geometry"
 }
 
 # Get rectangles for smart mode (windows and outputs on active workspace)
@@ -314,12 +337,12 @@ screenshot_with_grim() {
 
             # Use window rectangles if available, otherwise plain slurp
             if [[ -n "$rects" ]]; then
-                geometry=$(echo -n "$rects" | slurp) || true
+                geometry=$(run_slurp "$rects")
             else
-                geometry=$(slurp) || true
+                geometry=$(run_slurp)
             fi
 
-            killhyprpicker
+            kill_freeze_helpers
 
             [[ -z "$geometry" ]] && selection_cancelled=true
             ;;
@@ -331,8 +354,8 @@ screenshot_with_grim() {
                 if [[ "$freeze_flag" == "true" ]]; then
                     freezescreen
                 fi
-                geometry=$(echo "$rects" | slurp -r) || true
-                killhyprpicker
+                geometry=$(run_slurp "$rects" "-r")
+                kill_freeze_helpers
             fi
             [[ -z "$geometry" ]] && selection_cancelled=true
             ;;
@@ -354,7 +377,7 @@ screenshot_with_grim() {
 
             if [[ -z "$geometry" ]]; then
                 log "Could not determine active window geometry, falling back to area selection"
-                geometry=$(slurp) || true
+                geometry=$(run_slurp)
                 [[ -z "$geometry" ]] && selection_cancelled=true
             fi
             ;;
@@ -366,8 +389,8 @@ screenshot_with_grim() {
                 if [[ "$freeze_flag" == "true" ]]; then
                     freezescreen
                 fi
-                geometry=$(echo "$rects" | slurp) || true
-                killhyprpicker
+                geometry=$(run_slurp "$rects")
+                kill_freeze_helpers
 
                 # If selection is very small (< 20 pixels), assume user clicked on a window/output
                 if [[ "$geometry" =~ ^([0-9]+),([0-9]+)[[:space:]]([0-9]+)x([0-9]+)$ ]]; then
@@ -524,7 +547,7 @@ take_screenshot() {
 
     # Stop any existing instances to avoid conflicts
     pkill slurp 2>/dev/null || true
-    killhyprpicker
+    kill_freeze_helpers
 
     # Take screenshot using grim+slurp (no longer depends on grimblast)
     local result=0

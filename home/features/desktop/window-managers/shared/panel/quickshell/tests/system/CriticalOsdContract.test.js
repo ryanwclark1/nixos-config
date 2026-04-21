@@ -31,6 +31,7 @@ describe("critical OSD contract", () => {
   it("defines a dedicated critical OSD cooldown config", () => {
     const configSource = readFileSync(configPath, "utf8");
 
+    expect(configSource).toContain("property int criticalStateSustainMs: 15000");
     expect(configSource).toContain("property int osdCriticalCooldownMs: 300000");
     expect(configSource).toContain("property int osdCriticalThermalSustainMs: 60000");
   });
@@ -47,9 +48,21 @@ describe("critical OSD contract", () => {
     expect(systemStatusSource).toContain(
       'readonly property bool shouldShowCriticalOsd: hasSustainedHighTemp || overallStatus === "failure"',
     );
+    expect(systemStatusSource).toContain("readonly property bool hasSustainedHighLoad: hasHighLoad");
+    expect(systemStatusSource).toContain(
+      "&& (_lastLoadSampleAtMs - _highLoadSinceMs) >= Math.max(0, Config.criticalStateSustainMs)",
+    );
+    expect(systemStatusSource).toContain(
+      'readonly property bool isCritical: hasSustainedHighLoad || hasSustainedHighTemp || overallStatus === "failure"',
+    );
+    expect(systemStatusSource).toContain("property double _highLoadSinceMs: 0");
+    expect(systemStatusSource).toContain("property double _lastLoadSampleAtMs: 0");
     expect(systemStatusSource).toContain("property double _highTempSinceMs: 0");
     expect(systemStatusSource).toContain("property double _lastThermalSampleAtMs: 0");
     expect(systemStatusSource).toContain("readonly property var criticalOsdReasons: {");
+    expect(systemStatusSource).toContain("if (root.hasHighLoad) {");
+    expect(systemStatusSource).toContain("root._highLoadSinceMs = now;");
+    expect(systemStatusSource).toContain("root._lastLoadSampleAtMs = now;");
     expect(systemStatusSource).toContain('if (hasSustainedHighTemp && cpuTempNum > _cpuTempHighThreshold)');
     expect(systemStatusSource).toContain('reasons.push("CPU " + cpuTemp);');
     expect(systemStatusSource).toContain('if (hasSustainedHighTemp && gpuTempNum > _gpuTempHighThreshold)');

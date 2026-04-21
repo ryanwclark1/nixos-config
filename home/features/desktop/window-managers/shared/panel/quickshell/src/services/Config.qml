@@ -191,6 +191,7 @@ QtObject {
     property string osdPosition: "top"
     property string osdStyle: "circular"
     property bool osdOverdrive: false
+    property int criticalStateSustainMs: 15000
     property int osdCriticalCooldownMs: 300000
     property int osdCriticalThermalSustainMs: 60000
 
@@ -326,7 +327,7 @@ QtObject {
     property var wallpaperRecentSolidColors: []
     property string wallpaperTransitionType: "fade"     // fade | pixelate | wipe | none
     property int wallpaperTransitionDuration: 1500       // ms
-    property bool wallpaperUseShellRenderer: false       // true = shell renders wallpaper, false = use swww/external
+    property bool wallpaperUseShellRenderer: false       // true = shell renders wallpaper, false = use awww/external
     property bool wallpaperDynamicEnabled: false
     property string wallpaperDynamicManifest: ""         // path to manifest.json
     property bool wallpaperVideoEnabled: false

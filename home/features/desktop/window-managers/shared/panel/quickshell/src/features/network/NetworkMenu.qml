@@ -93,20 +93,35 @@ BasePopupMenu {
         width: 3; color: Colors.highlight
       }
 
-      Column {
+      RowLayout {
         anchors.fill: parent
         anchors.margins: Appearance.spacingM
-        spacing: Appearance.spacingXS
-        SharedWidgets.SectionLabel { label: modelData.label }
-        Text {
-          text: modelData.value
-          color: Colors.text
-          font.pixelSize: Appearance.fontSizeSmall
-          font.weight: Font.Medium
-          width: parent.width
-          wrapMode: Text.WrapAnywhere
-          maximumLineCount: 2
-          elide: Text.ElideRight
+        spacing: Appearance.spacingS
+
+        Column {
+          Layout.fillWidth: true
+          spacing: Appearance.spacingXS
+
+          SharedWidgets.SectionLabel { label: modelData.label }
+          Text {
+            text: modelData.value
+            color: Colors.text
+            font.pixelSize: Appearance.fontSizeSmall
+            font.weight: Font.Medium
+            width: parent.width
+            wrapMode: Text.WrapAnywhere
+            maximumLineCount: 2
+            elide: Text.ElideRight
+          }
+        }
+
+        SharedWidgets.IconButton {
+          Layout.alignment: Qt.AlignTop
+          visible: String(modelData.copyValue || "").trim() !== ""
+          icon: "copy.svg"
+          iconSize: Appearance.fontSizeMedium
+          tooltipText: String(modelData.copyTooltip || ("Copy " + modelData.label))
+          onClicked: NetworkService.copyText(String(modelData.copyLabel || modelData.label), String(modelData.copyValue || ""))
         }
       }
 
@@ -313,7 +328,13 @@ BasePopupMenu {
             Repeater {
               model: [
                 { label: "Connectivity", value: NetworkService.detailValue(NetworkService.connectivityStatus, "Unknown") },
-                { label: "Public IPv4", value: NetworkService.detailValue(NetworkService.publicIpv4, "Unavailable") },
+                {
+                  label: "Public IPv4",
+                  value: NetworkService.detailValue(NetworkService.publicIpv4, "Unavailable"),
+                  copyValue: NetworkService.publicIpv4,
+                  copyLabel: "Public IPv4",
+                  copyTooltip: "Copy public IPv4"
+                },
                 { label: "Downloaded", value: NetworkService.detailValue(NetworkService.totalReceived, "0 B") },
                 { label: "Uploaded", value: NetworkService.detailValue(NetworkService.totalSent, "0 B") }
               ]

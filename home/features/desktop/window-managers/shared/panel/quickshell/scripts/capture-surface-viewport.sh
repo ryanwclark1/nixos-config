@@ -441,7 +441,7 @@ surface_candidates_json() {
       def filtered($doc):
         entries($doc)
         | map(select((.pid // 0) == $shell_pid))
-        | map(select((.namespace // "") != "swww-daemon"))
+        | map(select((.namespace // "") != "awww-daemon"))
         | map(select(((.namespace // "") | startswith("quickshell-bar-")) | not))
         | map(select((.namespace // "") != "quickshell-toast" and (.namespace // "") != "quickshell-screen-decor"))
         | map(select((.w // 0) > 8 and (.h // 0) > 8))
@@ -786,7 +786,7 @@ main() {
   # Scan for health status (focus on quickshell, ignore system noise)
   local status="clean"
   local filtered_logs
-  filtered_logs="$(grep -i "quickshell" "${log_file}" | grep -viE "ignore|blueman|swww" || true)"
+  filtered_logs="$(grep -i "quickshell" "${log_file}" | grep -viE "ignore|blueman|awww" || true)"
 
   if [[ -n "${filtered_logs}" ]]; then
     if echo "${filtered_logs}" | grep -qiE "error|critical|failed|exception"; then

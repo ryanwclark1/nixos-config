@@ -18,22 +18,22 @@ let
         git pull origin main
     fi
 
-    # Set wallpaper using swww
-    if command -v swww &> /dev/null; then
-        # Ensure swww daemon is running
-        if ! pgrep -x "swww-daemon" > /dev/null; then
-            swww-daemon &
+    # Set wallpaper using awww
+    if command -v awww &> /dev/null; then
+        # Ensure awww daemon is running
+        if ! pgrep -x "awww-daemon" > /dev/null; then
+            awww-daemon &
             sleep 1 # Give it time to start
         fi
         # Set a random wallpaper (change to a specific one if needed)
-        swww img "$(find ${wallpapersDir} -type f | shuf -n1)"
+        awww img "$(find ${wallpapersDir} -type f | shuf -n1)"
     fi
   '';
 in
 {
   home.packages = with pkgs; [
     git
-    swww
+    awww
     syncScript
   ];
 
@@ -56,9 +56,9 @@ in
     Install = { WantedBy = [ "default.target" ]; };
   };
 
-  # Systemd timer to run the script every 6 hours
+  # Systemd timer to run the script daily
   systemd.user.timers.wallpapers-sync = {
-    Unit = { Description = "Run Wallpapers Sync every 6 hours"; };
+    Unit = { Description = "Run Wallpapers Sync daily"; };
     Timer = {
       OnBootSec = "5m";
       OnUnitActiveSec = "24h";

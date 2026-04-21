@@ -40,7 +40,9 @@ QtObject {
   readonly property string incidentRoot: Quickshell.env("HOME") + "/.local/state/quickshell/incidents"
   property bool _helperScriptsAvailable: false
   property bool _helperScriptWarningLogged: false
+  property double _highLoadSinceMs: 0
   property double _highTempSinceMs: 0
+  property double _lastLoadSampleAtMs: 0
   property double _lastThermalSampleAtMs: 0
 
   // ── Named constants ──────────────────────────
@@ -227,10 +229,13 @@ QtObject {
 
   readonly property bool hasHighLoad: cpuPercent >= (_cpuUsageHighThreshold / 100) || ramPercent >= (_ramUsageHighThreshold / 100)
   readonly property bool hasHighTemp: cpuTempNum > _cpuTempHighThreshold || gpuTempNum > _gpuTempHighThreshold
-  readonly property bool isCritical: hasHighLoad || hasHighTemp || overallStatus === "failure"
+  readonly property bool hasSustainedHighLoad: hasHighLoad
+      && _highLoadSinceMs > 0
+      && (_lastLoadSampleAtMs - _highLoadSinceMs) >= Math.max(0, Config.criticalStateSustainMs)
   readonly property bool hasSustainedHighTemp: hasHighTemp
       && _highTempSinceMs > 0
       && (_lastThermalSampleAtMs - _highTempSinceMs) >= Math.max(0, Config.osdCriticalThermalSustainMs)
+  readonly property bool isCritical: hasSustainedHighLoad || hasSustainedHighTemp || overallStatus === "failure"
   readonly property bool shouldShowCriticalOsd: hasSustainedHighTemp || overallStatus === "failure"
   readonly property bool hasSafeFixableIncidents: {
     for (var i = 0; i < activeIncidents.length; i++) {
@@ -241,9 +246,9 @@ QtObject {
   }
   readonly property var criticalReasons: {
     var reasons = [];
-    if (cpuPercent >= (_cpuUsageHighThreshold / 100))
+    if (hasSustainedHighLoad && cpuPercent >= (_cpuUsageHighThreshold / 100))
       reasons.push("CPU " + cpuUsage);
-    if (ramPercent >= (_ramUsageHighThreshold / 100))
+    if (hasSustainedHighLoad && ramPercent >= (_ramUsageHighThreshold / 100))
       reasons.push("RAM " + Math.round(ramPercent * 100) + "%");
     if (hasSustainedHighTemp && cpuTempNum > _cpuTempHighThreshold)
       reasons.push("CPU " + cpuTemp);
@@ -605,6 +610,14 @@ QtObject {
           root.gpuPercent = Colors.clamp01(gpuVal / 100);
           root.gpuHistory = root._pushHistory(root.gpuHistory, root.gpuPercent);
         }
+      }
+
+      root._lastLoadSampleAtMs = now;
+      if (root.hasHighLoad) {
+        if (root._highLoadSinceMs <= 0)
+          root._highLoadSinceMs = now;
+      } else {
+        root._highLoadSinceMs = 0;
       }
 
       root._lastThermalSampleAtMs = now;

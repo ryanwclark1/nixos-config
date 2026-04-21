@@ -875,7 +875,7 @@ Item {
         SettingsInfoCallout {
             iconName: "info.svg"
             title: "Wallpaper search directories"
-            body: "Requires swww, hyprpaper, or swaybg to apply wallpapers."
+            body: "Requires awww, hyprpaper, or swaybg to apply wallpapers."
 
             Repeater {
                 model: WallpaperService.wallpaperSearchDirs
