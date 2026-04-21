@@ -7,7 +7,11 @@
   useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
   # Get all build dependencies needed by generic.nix
   coreutils,
+  gawk,
+  getconf,
   gnugrep,
+  gnused,
+  jq,
   copyDesktopItems,
   makeDesktopItem,
   unzip,
@@ -38,6 +42,7 @@
   openssl,
   webkitgtk_4_1,
   ripgrep,
+  which,
   asar,
   bash,
 }:
@@ -53,16 +58,16 @@ let
   # Second argument set: package-specific arguments
 in
 (genericFunction {
-  inherit stdenv lib coreutils gnugrep copyDesktopItems makeDesktopItem unzip libsecret;
+  inherit stdenv lib coreutils gawk getconf gnugrep gnused jq copyDesktopItems makeDesktopItem unzip libsecret;
   inherit buildPackages at-spi2-atk autoPatchelfHook buildFHSEnv;
   inherit alsa-lib libgbm nss nspr libxrandr libxfixes libxext libxdamage libxcomposite;
   inherit libx11 libxkbfile libxcb systemdLibs fontconfig imagemagick libdbusmenu;
-  inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep asar bash;
+  inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep which asar bash;
 } {
   inherit useVSCodeRipgrep;
   commandLineArgs = extraCommandLineArgs;
 
-  version = "0.11.131";
+  version = "0.11.132";
   pname = "kiro";
 
   # You can find the current VSCode version in the About dialog:

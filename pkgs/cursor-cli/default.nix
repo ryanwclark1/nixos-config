@@ -3,6 +3,7 @@
   fetchurl,
   stdenv,
   autoPatchelfHook,
+  zlib,
 }:
 
 let
@@ -22,9 +23,10 @@ stdenv.mkDerivation {
 
   src = sources.${hostPlatform.system};
 
-  nativeBuildInputs = lib.optionals hostPlatform.isLinux [
-    autoPatchelfHook
+  nativeBuildInputs = lib.optionals hostPlatform.isLinux [ autoPatchelfHook ];
+  buildInputs = lib.optionals hostPlatform.isLinux [
     stdenv.cc.cc.lib
+    zlib
   ];
 
   installPhase = ''
@@ -55,5 +57,4 @@ stdenv.mkDerivation {
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
   };
 }
-
 
