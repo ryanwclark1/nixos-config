@@ -11,9 +11,12 @@ let
     sphinxBuilders = [ ];
     nativeBuildInputs = lib.filter (
       pkg:
-      pkg != pkgs.python3Packages.sphinxHook
-      && pkg != pkgs.python3Packages.sphinx-rtd-theme
-      && pkg != pkgs.python3Packages.sphinxcontrib-newsfeed
+      let
+        pkgName = pkg.pname or (lib.getName pkg);
+      in
+      !(lib.hasSuffix "sphinx-hook" pkgName)
+      && pkgName != "sphinx-rtd-theme"
+      && pkgName != "sphinxcontrib-newsfeed"
     ) old.nativeBuildInputs;
     postInstall = (old.postInstall or "") + ''
       # Keep expected multi-output derivation shape when docs are disabled.

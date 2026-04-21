@@ -70,6 +70,7 @@ in
           BatchMode = "no";
 
           # Security settings
+          ObscureKeystrokeTiming = "no";
           StrictHostKeyChecking = "ask";
           UserKnownHostsFile = "~/.ssh/known_hosts ~/.ssh/known_hosts2";
         };

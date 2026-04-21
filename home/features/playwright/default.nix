@@ -6,20 +6,30 @@
 }:
 
 {
-  home.packages = with pkgs; [
-    # Playwright CLI for global usage
-    # This provides the 'playwright' command
-    playwright
-    # Playwright browsers - includes all browser components:
-    # - Chromium (full browser)
-    # - Chromium Headless Shell (lightweight headless version)
-    # - Firefox
-    # - WebKit
-    # - FFmpeg (for video/audio recording and processing)
-    # Chromium is the default, but all others are available when needed
-    # Use playwright.browsers-chromium if you only want Chromium
-    playwright.browsers
-  ];
+  home.packages =
+    let
+      playwrightCli = pkgs.writeShellScriptBin "playwright" ''
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        # Ensure Playwright sees the Nix-provided browser bundle unless the
+        # caller has overridden it explicitly.
+        export PLAYWRIGHT_BROWSERS_PATH="''${PLAYWRIGHT_BROWSERS_PATH:-${lib.getLib pkgs.playwright.browsers}}"
+
+        exec ${pkgs.nodejs}/bin/node ${pkgs.playwright}/cli.js "$@"
+      '';
+    in
+    with pkgs;
+    [
+      # Upstream Playwright CLI assets. nixpkgs currently exposes the package
+      # contents but not a usable `playwright` executable in the profile.
+      playwright
+      playwrightCli
+
+      # Browser bundle used by the CLI on NixOS.
+      # Includes Chromium, Chromium Headless Shell, Firefox, WebKit, and FFmpeg.
+      playwright.browsers
+    ];
 
   # Environment variables for Playwright to find browsers
   # This ensures Playwright can locate all browsers and tools in NixOS
