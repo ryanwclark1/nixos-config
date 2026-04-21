@@ -77,10 +77,6 @@ in
     (writeShellScriptBin "mcp-process-config" (
       builtins.readFile ./scripts/mcp-process-config.sh
     ))
-    (writeShellScriptBin "update-gemini-cli" (builtins.readFile ./scripts/update-gemini-cli.sh))
-    (writeShellScriptBin "gemini-cli-version" (
-      builtins.readFile ./scripts/gemini-cli-version.sh
-    ))
   ];
 
   # Environment variables for Playwright
