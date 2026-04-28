@@ -6,7 +6,7 @@ MIMETYPE="$(file --dereference --brief --mime-type -- "$1")"
 
 case "$MIMETYPE" in
   text/html)
-    ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.elinks}/bin/elinks dump "$1"
+    ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.w3m}/bin/w3m -dump "$1"
     ;;
   text/*)
     ${pkgs.exiftool}/bin/exiftool -s $EXIF_TAGS "$1"; echo -e "\n"; ${pkgs.bat}/bin/bat --style=plain --paging=never --color=always -- "$1"

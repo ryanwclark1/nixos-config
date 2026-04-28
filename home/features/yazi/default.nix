@@ -66,7 +66,7 @@
     jq # JSON formatting and processing
 
     # Web content
-    elinks # HTML text rendering
+    w3m # HTML text rendering
 
     # Additional document tools
     pandoc # Document conversion
