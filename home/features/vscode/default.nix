@@ -196,7 +196,10 @@ in
 
   programs.vscode = {
     enable = true;
-    package = pkgs.vscode-fhs;
+    # The Microsoft VS Code derivation fetches its upstream tarball during
+    # builds, which makes home-manager switch depend on Microsoft's redirect
+    # hosts resolving. VSCodium is available from the NixOS binary cache.
+    package = pkgs.vscodium-fhs;
     mutableExtensionsDir = true;
     profiles = {
       default = {
