@@ -86,6 +86,37 @@
       # Keep PATH in sync from the client shell to avoid stale fnm shim paths.
       set -g update-environment "DISPLAY KRB5CCNAME MSYSTEM SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY PATH"
 
+      # ###################################
+      # # Configure the forceline plugin
+
+      # # Default / desktop settings
+      # set -g @forceline_theme "catppuccin-frappe"
+      # set -g @forceline_separator_style "powerline"
+      # set -g @forceline_window_flags "icon"
+      # set -g @forceline_window_number_position "left"
+      # set -g @forceline_status_connect_separator "yes"
+      # set -g @forceline_status_background "none"
+
+      # # Load the forceline plugin after setting options
+      # source-file ~/.config/tmux/plugins/tmux-forceline/forceline.tmux
+
+      # ###################################
+      # # Status line behavior
+
+      # set -g status-position bottom
+      # set -g status-justify centre
+      # set -g status-left-length 40
+      # set -g status-right-length 100
+
+      # # Mobile / Termius detection
+      # # Uses the attached client, not inherited session env
+      # set -g @is_mobile '#{||:#{m/ri:termius,#{client_termtype}},#{m/ri:termius,#{client_termname}}}'
+
+      # # Mobile gets a simple ASCII-safe status line.
+      # # Narrow desktop also falls back to a simplified layout.
+      # # Wider desktop gets full forceline rendering.
+      # set -g status-left '#{?#{E:@is_mobile},#[bold] #S ,#{?#{<:#{client_width},90},#[bold] #S ,#{E:@forceline_status_session}}}'
+      # set -g status-right '#{?#{E:@is_mobile},#[dim]#{pane_current_command} | %H:%M,#{?#{<:#{client_width},90},%H:%M,#{E:@forceline_status_cpu}#{E:@forceline_status_gpu}#{E:@forceline_status_memory}#{E:@forceline_status_datetime}}}'
 
       # Reload configuration with Prefix + r
       bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"

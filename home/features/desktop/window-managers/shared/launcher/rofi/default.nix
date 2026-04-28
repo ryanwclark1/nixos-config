@@ -448,7 +448,9 @@ in
       font = "Fira Code 12";
 
       modi = "drun,emoji,ssh,run,filebrowser,window,keys";
-      show-icons = mkLiteral "true";
+      # Booleans must be Nix bools here: mkLiteral in extraConfig is rendered as
+      # invalid top-level rasi blocks, not as properties inside configuration { }.
+      show-icons = true;
       display-drun = "  Apps";
       display-run = "  Run";
       display-filebrowser = "  Files";
@@ -462,17 +464,17 @@ in
       # SSH Settings
       ssh-client = "ssh";
       ssh-command = "{terminal} -e {ssh-client} {host} [-p {port}]";
-      parse-hosts = mkLiteral "true";
-      parse-known-hosts = mkLiteral "true";
+      parse-hosts = true;
+      parse-known-hosts = true;
 
       # Drun Settings
       drun-categories = "";
       drun-match-fields = "name,generic,exec,categories,keywords";
       drun-display-format = "{name} [<span weight='light' size='small'><i>({generic})</i></span>]";
-      drun-show-actions = mkLiteral "false";
+      drun-show-actions = false;
       drun-url-launcher = "xdg-open";
-      drun-use-desktop-cache = mkLiteral "false";
-      drun-reload-desktop-cache = mkLiteral "false";
+      drun-use-desktop-cache = false;
+      drun-reload-desktop-cache = false;
 
       # kb-mode-next = "Shift+Right,Tab";
       # kb-mode-previous = "Shift+Left,ISO_Left_Tab";
