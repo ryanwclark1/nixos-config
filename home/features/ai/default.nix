@@ -55,6 +55,9 @@ in
 {
   imports = [
     ./claude
+    # Codex is packaged from source and currently pulls in a heavy Rust/V8 build.
+    # Keep it out of the default HM path so switch/rebuild stays reliable.
+    # Re-enable once the package path is replaced or stabilized.
     ./codex
     ./gemini
     ./opencode

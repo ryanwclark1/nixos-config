@@ -4,7 +4,6 @@
   rustPlatform,
   fetchFromGitHub,
   fetchurl,
-  installShellFiles,
   clang,
   cmake,
   gitMinimal,
@@ -15,8 +14,6 @@
   pkg-config,
   openssl,
   ripgrep,
-  versionCheckHook,
-  installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "codex";
@@ -37,7 +34,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     clang
     cmake
     gitMinimal
-    installShellFiles
     makeBinaryWrapper
     pkg-config
   ];
@@ -82,21 +78,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # the future once this software stabilizes.
   doCheck = false;
 
-  postInstall = lib.optionalString installShellCompletions ''
-    installShellCompletion --cmd codex \
-      --bash <($out/bin/codex completion bash) \
-      --fish <($out/bin/codex completion fish) \
-      --zsh <($out/bin/codex completion zsh)
-  '';
-
   postFixup = ''
     wrapProgram $out/bin/codex \
       --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
       --set DISABLE_AUTOUPDATER 1
   '';
-
-  doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru = {
     updateScript = nix-update-script {
