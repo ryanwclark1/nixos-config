@@ -195,7 +195,6 @@ QtObject {
   }
 
   property Process _imageDecodePoll: Process {
-    property var _parsedMap: ({})
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -213,14 +212,9 @@ QtObject {
           if (id !== "" && path !== "")
             next[id] = path;
         }
-        parent._parsedMap = next;
+        root._decodedImages = Object.assign({}, next);
+        root._imageGeneration += 1;
       }
-    }
-    onExited: (exitCode, _exitStatus) => {
-      if (exitCode !== 0)
-        return;
-      root._decodedImages = Object.assign({}, _parsedMap);
-      root._imageGeneration += 1;
     }
   }
 
