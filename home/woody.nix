@@ -63,6 +63,7 @@
     ./features/vivid
     ./features/voxtype
     ./features/vscode
+    ./features/zed
     ./features/webapps
     ./features/wireless
     ./features/yazi

@@ -55,6 +55,7 @@
     ./features/tmux
     ./features/vivid
     ./features/vscode
+    ./features/zed
     ./features/webapps
     ./features/wireless
     ./features/yazi
