@@ -97,6 +97,8 @@ function normalizeMonitorList(rawMonitors) {
             y: y,
             scale: scale,
             availableModes: modes,
+            mirrorOf: "",
+            disabled: false,
             dragX: 0,
             dragY: 0
         });
@@ -127,6 +129,8 @@ function fallbackMonitorsFromScreens(screens) {
             y: 0,
             scale: scale,
             availableModes: [width + "x" + height + "@60.00Hz"],
+            mirrorOf: "",
+            disabled: false,
             dragX: 0,
             dragY: 0
         });
@@ -170,6 +174,8 @@ function cloneMonitor(m) {
         id: m.id, name: m.name, description: m.description,
         width: m.width, height: m.height, refreshRate: m.refreshRate,
         x: m.x, y: m.y, scale: m.scale,
+        mirrorOf: m.mirrorOf || "",
+        disabled: !!m.disabled,
         availableModes: m.availableModes,
         dragX: m.dragX, dragY: m.dragY
     };
@@ -181,11 +187,24 @@ function cloneMonitor(m) {
 
 // Mirror: stack all monitors at (0,0)
 function arrangeMirror(monitors) {
+    if (monitors.length === 0) return [];
+    var source = cloneMonitor(monitors[0]);
     var result = [];
     for (var i = 0; i < monitors.length; i++) {
         var m = cloneMonitor(monitors[i]);
         m.x = 0;
         m.y = 0;
+        m.disabled = false;
+        if (i === 0) {
+            m.mirrorOf = "";
+        } else {
+            // Hyprland mirroring follows the source output's logical mode.
+            m.width = source.width;
+            m.height = source.height;
+            m.refreshRate = source.refreshRate;
+            m.scale = source.scale;
+            m.mirrorOf = source.name;
+        }
         result.push(m);
     }
     return result;
@@ -207,6 +226,8 @@ function arrangeExtend(monitors) {
         var scaledH = m.height / m.scale;
         m.x = Math.round(xCursor);
         m.y = Math.round((maxH - scaledH) / 2);
+        m.mirrorOf = "";
+        m.disabled = false;
         xCursor += m.width / m.scale;
         result.push(m);
     }
@@ -221,12 +242,15 @@ function arrangePrimaryOnly(monitors) {
     var primary = cloneMonitor(monitors[0]);
     primary.x = 0;
     primary.y = 0;
+    primary.mirrorOf = "";
+    primary.disabled = false;
     result.push(primary);
     for (var i = 1; i < monitors.length; i++) {
         var m = cloneMonitor(monitors[i]);
-        // Mirror primary position — compositor handles disable
-        m.x = -99999;
+        m.x = 0;
         m.y = 0;
+        m.mirrorOf = "";
+        m.disabled = true;
         result.push(m);
     }
     return result;

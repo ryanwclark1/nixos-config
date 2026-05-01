@@ -17,6 +17,8 @@ const mkMonitor = (overrides = {}) => ({
   id: "m1", name: "DP-1", description: "Test",
   width: 2560, height: 1440, refreshRate: 165,
   x: 0, y: 0, scale: 1,
+  mirrorOf: "",
+  disabled: false,
   availableModes: [],
   dragX: 0, dragY: 0,
   ...overrides,
@@ -103,6 +105,8 @@ describe("normalizeMonitorList", () => {
       scale: 1.25,
       x: 0,
       y: 0,
+      mirrorOf: "",
+      disabled: false,
     });
     expect(result[0].availableModes).toContain("2560x1440@164.98Hz");
   });
@@ -171,13 +175,27 @@ describe("normalizeScreenList", () => {
 });
 
 describe("arrangeMirror", () => {
-  it("places all monitors at (0,0)", () => {
-    const monitors = [mkMonitor({ x: 100 }), mkMonitor({ id: "m2", x: 200 })];
+  it("places all monitors at (0,0) and mirrors secondary outputs to the first", () => {
+    const monitors = [
+      mkMonitor({ name: "eDP-1", x: 100, width: 2256, height: 1504, refreshRate: 60, scale: 1.5 }),
+      mkMonitor({ id: "m2", name: "DP-2", x: 200, width: 3840, height: 2160, refreshRate: 30, scale: 2 }),
+    ];
     const result = arrangeMirror(monitors);
     expect(result).toHaveLength(2);
     expect(result[0].x).toBe(0);
     expect(result[0].y).toBe(0);
+    expect(result[0].mirrorOf).toBe("");
+    expect(result[0].disabled).toBe(false);
     expect(result[1].x).toBe(0);
+    expect(result[1].y).toBe(0);
+    expect(result[1]).toMatchObject({
+      width: 2256,
+      height: 1504,
+      refreshRate: 60,
+      scale: 1.5,
+      mirrorOf: "eDP-1",
+      disabled: false,
+    });
   });
 });
 
@@ -208,11 +226,13 @@ describe("arrangeExtend", () => {
 });
 
 describe("arrangePrimaryOnly", () => {
-  it("keeps first at (0,0) and moves others off-screen", () => {
+  it("keeps the first monitor enabled and disables the rest", () => {
     const monitors = [mkMonitor(), mkMonitor({ id: "m2" })];
     const result = arrangePrimaryOnly(monitors);
     expect(result[0].x).toBe(0);
-    expect(result[1].x).toBe(-99999);
+    expect(result[0].disabled).toBe(false);
+    expect(result[1].x).toBe(0);
+    expect(result[1].disabled).toBe(true);
   });
 });
 
