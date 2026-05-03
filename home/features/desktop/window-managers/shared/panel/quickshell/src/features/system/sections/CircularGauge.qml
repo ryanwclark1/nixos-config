@@ -35,7 +35,6 @@ Item {
   Shape {
     id: shape
     anchors.fill: parent
-    layer.enabled: false
 
     ShapePath {
       fillColor: "transparent"
