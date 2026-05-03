@@ -33,10 +33,27 @@ PanelWindow {
 
     // Pinned = reserve vertical space so windows don't overlap the keyboard
     property bool pinned: Config.oskPinnedOnStartup
-    exclusiveZone: pinned && isVisible ? oskBg.height + 2 : 0
+    property real _measuredHeight: 320
+    readonly property real _contentHeight: _measuredHeight
+    exclusiveZone: pinned && isVisible ? _contentHeight + Appearance.spacingS + 2 : 0
 
-    implicitWidth:  oskBg.width
-    implicitHeight: oskBg.height + Appearance.spacingL   // room for shadow
+    function _recalcHeight() {
+        var h = Math.max(ctrlCol.implicitHeight, oskContent.implicitHeight) + (Appearance.paddingMedium * 2);
+        if (Math.abs(h - root._measuredHeight) > 1)
+            root._measuredHeight = h;
+    }
+
+    Connections {
+        target: ctrlCol
+        function onImplicitHeightChanged() { root._recalcHeight(); }
+    }
+    Connections {
+        target: oskContent
+        function onImplicitHeightChanged() { root._recalcHeight(); }
+    }
+
+    implicitWidth:  oskContent.implicitWidth + ctrlCol.implicitWidth + (Appearance.paddingMedium * 2) + Appearance.spacingM + 1
+    implicitHeight: _contentHeight + Appearance.spacingS + Appearance.spacingL   // room for shadow
 
     // ── Public API ───────────────────────────────────────────────────────────
     function open()   { root.isVisible = true;  }
@@ -85,20 +102,16 @@ PanelWindow {
         focus:        root.isVisible
         Keys.onEscapePressed: root.close()
 
-        implicitWidth:  (ctrlCol.implicitWidth + oskContent.implicitWidth + (Appearance.paddingMedium * 2) + Appearance.spacingM + 1)
-        implicitHeight: Math.max(ctrlCol.implicitHeight, oskContent.implicitHeight) + (Appearance.paddingMedium * 2)
+        height: root._contentHeight
 
         // We use a separate property for the calculated offset target to avoid binding loops
         // with implicitHeight during the layout/animation cycle.
-        property real _slideDownTarget: 200
+        property real _slideDownTarget: height + Appearance.spacingM
         property real _slideOffset: root.isVisible ? 0 : _slideDownTarget
 
-        Binding {
-            target: oskBg
-            property: "_slideDownTarget"
-            value: oskBg.implicitHeight + Appearance.spacingM
-            when: !root.isVisible
-            restoreMode: Binding.RestoreBindingOrValue
+        onHeightChanged: {
+            if (!root.isVisible)
+                _slideDownTarget = height + Appearance.spacingM;
         }
 
         Behavior on _slideOffset {
@@ -132,8 +145,6 @@ PanelWindow {
             id: oskRow
 
             anchors.centerIn: parent
-            width: parent.width - (Appearance.paddingMedium * 2)
-            height: parent.height - (Appearance.paddingMedium * 2)
             spacing: Appearance.spacingM
 
             // ── Control column (pin + hide) ───────────────────────────────────

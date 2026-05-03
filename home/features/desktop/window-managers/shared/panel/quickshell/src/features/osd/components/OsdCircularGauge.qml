@@ -28,6 +28,7 @@ ColumnLayout {
     value: Math.min(root.currentValue, 1.0)
     color: root.osdColor
     icon: root.osdIcon
+    iconSize: Math.round(Appearance.fontSizeXL * root.scaleFactor)
   }
 
   Text {

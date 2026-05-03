@@ -52,8 +52,8 @@ QtObject {
 
   // ── Named constants ──────────────────────────
   readonly property int _healthCheckIntervalMs: 300000  // 5 min
-  readonly property int _cpuUsageHighThreshold: 85
-  readonly property int _ramUsageHighThreshold: 90
+  readonly property real _cpuUsageHighThreshold: Config.cpuUsageHighThreshold
+  readonly property real _ramUsageHighThreshold: Config.ramUsageHighThreshold
   readonly property int _cpuTempHighThreshold: 85
   readonly property int _gpuTempHighThreshold: 80
 

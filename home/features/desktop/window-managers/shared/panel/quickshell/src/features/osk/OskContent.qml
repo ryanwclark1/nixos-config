@@ -18,7 +18,6 @@ Item {
 
     ColumnLayout {
         id: keyRows
-        anchors.fill: parent
         spacing: Appearance.spacingXS
 
         Repeater {
