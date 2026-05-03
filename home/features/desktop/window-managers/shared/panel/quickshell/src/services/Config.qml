@@ -191,7 +191,9 @@ QtObject {
     property string osdPosition: "top"
     property string osdStyle: "circular"
     property bool osdOverdrive: false
-    property int criticalStateSustainMs: 15000
+    property int criticalStateSustainMs: 60000 // 1 minute sustain before alert
+    property real cpuUsageHighThreshold: 92.0
+    property real ramUsageHighThreshold: 90.0
     property int osdCriticalCooldownMs: 300000
     property int osdCriticalThermalSustainMs: 60000
 

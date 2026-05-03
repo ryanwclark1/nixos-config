@@ -319,7 +319,7 @@ Scope {
           id: content
           anchors.fill: parent
           radius: root.isCriticalAlert ? Appearance.radiusLarge : (Config.osdStyle === "pill" ? height / 2 : Math.round(Config.osdSize * 0.15))
-          color: Colors.cardSurface
+          color: Colors.surfaceContainerHighest
           border.color: root.osdColor
           border.width: 2
 

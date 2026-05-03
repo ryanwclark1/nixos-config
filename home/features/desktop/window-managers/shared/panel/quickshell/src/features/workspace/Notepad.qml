@@ -593,8 +593,8 @@ PanelWindow {
                      modelData.content.toLowerCase().indexOf(root.searchQuery.toLowerCase()) !== -1)
 
                   width: isEditing
-                    ? Math.min(tabEditInput.width + 22, 164)
-                    : Math.min(tabLabelText.contentWidth + 54, 164)
+                    ? Math.min(tabEditInput.contentWidth + 26, 164)
+                    : Math.min(tabLabelText.implicitWidth + 54, 164)
                   height: 32
 
                   Behavior on width { Anim { duration: Appearance.durationFast } }

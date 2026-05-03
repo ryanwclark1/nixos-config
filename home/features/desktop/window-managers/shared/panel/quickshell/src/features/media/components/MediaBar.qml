@@ -7,8 +7,8 @@ import "../../../widgets"
 
 Rectangle {
   id: root
-  height: 24
-  implicitWidth: visible ? (mediaRow.width + 16) : 0
+  height: 24 * iconScale
+  implicitWidth: visible ? (mediaRow.width + 16 * iconScale) : 0
   width: implicitWidth
   radius: height / 2
   color: Colors.bgWidget
@@ -20,6 +20,8 @@ Rectangle {
   property int maxTextWidth: 150
   property bool showVisualizer: true
   property int visualizerBars: 8
+  property real iconScale: 1.0
+  property real fontScale: 1.0
   visible: MediaService.currentPlayer !== null
   readonly property bool visualizerVisible: !root.vertical && showVisualizer && MediaService.currentPlayer !== null && MediaService.isPlaying
   readonly property var visualizerValues: {
@@ -80,10 +82,10 @@ Rectangle {
   SvgIcon {
     anchors.verticalCenter: parent.verticalCenter
     anchors.left: parent.left
-    anchors.leftMargin: Appearance.spacingXS
+    anchors.leftMargin: Appearance.spacingXS * root.iconScale
     source: "previous.svg"
     color: Colors.primary
-    size: Appearance.fontSizeXS
+    size: Appearance.fontSizeXS * root.iconScale
     opacity: root._rewindFlashOpacity
     z: 2
   }
@@ -91,15 +93,16 @@ Rectangle {
   Row {
     id: mediaRow
     anchors.centerIn: parent
-    anchors.leftMargin: Appearance.spacingS
-    anchors.rightMargin: Appearance.spacingS
-    spacing: Appearance.spacingS
+    anchors.leftMargin: Appearance.spacingS * root.iconScale
+    anchors.rightMargin: Appearance.spacingS * root.iconScale
+    spacing: Appearance.spacingS * root.iconScale
 
     CircularGauge {
-      width: 18; height: 18
+      width: 18 * root.iconScale; height: 18 * root.iconScale
       anchors.verticalCenter: parent.verticalCenter
       value: MediaService.trackLength > 0 ? (MediaService.currentPosition / MediaService.trackLength) : 0
       thickness: 2
+      iconScale: root.iconScale
       color: MediaService.artAccentColor
       Behavior on color { enabled: !Colors.isTransitioning; ColorAnimation { duration: Appearance.durationEmphasis } }
       icon: IconHelpers.transportToggleIcon(MediaService.isPlaying)
@@ -108,21 +111,21 @@ Rectangle {
     Item {
       visible: root.visualizerVisible
       width: visible ? visualizerRow.width : 0
-      height: 16
+      height: 16 * root.iconScale
       anchors.verticalCenter: parent.verticalCenter
 
       Row {
         id: visualizerRow
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Appearance.spacingXXS
+        spacing: Appearance.spacingXXS * root.iconScale
 
         Repeater {
           model: root.visualizerValues
 
           delegate: Rectangle {
             required property var modelData
-            width: 3
-            height: 4 + Math.round(Math.max(0, Math.min(1, Number(modelData) || 0)) * 12)
+            width: 3 * root.iconScale
+            height: (4 * root.iconScale) + Math.round(Math.max(0, Math.min(1, Number(modelData) || 0)) * 12 * root.iconScale)
             radius: width / 2
             anchors.verticalCenter: parent.verticalCenter
             color: Colors.withAlpha(MediaService.artAccentColor, 0.9)
@@ -138,8 +141,8 @@ Rectangle {
     Item {
       id: marqueeContainer
       visible: !root.vertical && !root.iconOnly
-      width: visible ? Math.min(marqueeText.contentWidth, root.maxTextWidth) : 0
-      height: 20
+      width: visible ? Math.min(marqueeText.contentWidth, root.maxTextWidth * root.fontScale) : 0
+      height: 20 * root.iconScale
       clip: true
       anchors.verticalCenter: parent.verticalCenter
 
@@ -147,16 +150,16 @@ Rectangle {
         id: marqueeText
         text: MediaService.trackTitle + (MediaService.trackArtist ? " - " + MediaService.trackArtist : "")
         color: Colors.text
-        font.pixelSize: Appearance.fontSizeSmall
+        font.pixelSize: Appearance.fontSizeSmall * root.fontScale
         font.weight: Font.DemiBold
         anchors.verticalCenter: parent.verticalCenter
 
         SequentialAnimation on x {
-          running: marqueeText.contentWidth > root.maxTextWidth
+          running: marqueeText.contentWidth > root.maxTextWidth * root.fontScale
           loops: Animation.Infinite
-          NumberAnimation { from: 0; to: -(marqueeText.contentWidth - marqueeContainer.width + 10); duration: Appearance.durationMarquee; easing.type: Easing.Linear }
+          NumberAnimation { from: 0; to: -(marqueeText.contentWidth - marqueeContainer.width + 10 * root.iconScale); duration: Appearance.durationMarquee; easing.type: Easing.Linear }
           PauseAnimation { duration: Appearance.durationAmbientShort }
-          NumberAnimation { from: -(marqueeText.contentWidth - marqueeContainer.width + 10); to: 0; duration: Appearance.durationMarquee; easing.type: Easing.Linear }
+          NumberAnimation { from: -(marqueeText.contentWidth - marqueeContainer.width + 10 * root.iconScale); to: 0; duration: Appearance.durationMarquee; easing.type: Easing.Linear }
           PauseAnimation { duration: Appearance.durationAmbientShort }
         }
       }

@@ -913,6 +913,8 @@ Item {
             showVisualizer: root.widgetBooleanSetting(widgetInstance, "showVisualizer", true)
             visualizerBars: root.widgetIntegerSetting(widgetInstance, "visualizerBars", 8, 4, 20)
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
         }
     }
 
@@ -988,6 +990,8 @@ Item {
             property var widgetInstance: null
             isActive: root.isSurfaceActive("sshMenu")
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Connections {
@@ -1015,6 +1019,7 @@ Item {
     Component {
         id: networkComponent
         SharedWidgets.BarPill {
+            id: networkPill
             property var widgetInstance: null
             isActive: root.isSurfaceActive("networkMenu")
             anchorWindow: root.anchorWindow
@@ -1030,10 +1035,12 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Appearance.spacingS
+                spacing: Appearance.spacingS * networkPill.iconScale
                 SharedWidgets.NetworkWidget {
                     id: networkWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+                    iconScale: networkPill.iconScale
+                    fontScale: networkPill.fontScale
                 }
             }
         }

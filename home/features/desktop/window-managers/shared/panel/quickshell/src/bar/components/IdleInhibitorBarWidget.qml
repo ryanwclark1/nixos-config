@@ -10,6 +10,7 @@ Item {
     property var anchorWindow
     property bool inhibitorActive: _pidFile.text() !== ""
     property real iconScale: 1.0
+    property real fontScale: 1.0
     signal contextMenuRequested(var actions, rect triggerRect)
 
     implicitWidth: inhibitorPill.width
@@ -30,6 +31,7 @@ Item {
         hoverColor: root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.35) : Colors.highlightLight
         tooltipText: root.inhibitorActive ? "Idle inhibitor enabled" : "Idle inhibitor"
         iconScale: root.iconScale
+        fontScale: root.fontScale
         contextActions: [
             {
                 label: root.inhibitorActive ? "Disable Inhibitor" : "Enable Inhibitor",
