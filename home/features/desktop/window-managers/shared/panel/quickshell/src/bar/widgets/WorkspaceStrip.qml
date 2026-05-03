@@ -10,6 +10,8 @@ Flow {
   property var state: null
   property var settings: ({})
   property bool vertical: false
+  property real iconScale: 1.0
+  property real fontScale: 1.0
 
   readonly property bool showEmpty: settings.hasOwnProperty("showEmpty") ? settings.showEmpty : Config.workspaceShowEmpty
   property bool showAddButton: settings.hasOwnProperty("showAddButton") ? settings.showAddButton : Config.workspaceShowAddButton
@@ -29,14 +31,14 @@ Flow {
   readonly property color urgentColor: Config.workspaceUrgentColor !== "" ? Config.workspaceUrgentColor : Colors.error
 
   // Pill size presets
-  readonly property int pillHeight: pillSize === "compact" ? 16 : (pillSize === "large" ? 28 : 20)
-  readonly property int pillMinWidth: pillSize === "compact" ? 18 : (pillSize === "large" ? 30 : 22)
-  readonly property int pillFontSize: pillSize === "compact" ? Appearance.fontSizeXS : (pillSize === "large" ? Appearance.fontSizeMedium : Appearance.fontSizeSmall)
+  readonly property int pillHeight: (pillSize === "compact" ? 16 : (pillSize === "large" ? 28 : 20)) * iconScale
+  readonly property int pillMinWidth: (pillSize === "compact" ? 18 : (pillSize === "large" ? 30 : 22)) * iconScale
+  readonly property int pillFontSize: (pillSize === "compact" ? Appearance.fontSizeXS : (pillSize === "large" ? Appearance.fontSizeMedium : Appearance.fontSizeSmall)) * fontScale
 
   readonly property bool isGrid: layout === "grid"
   
   flow: vertical ? Flow.TopToBottom : (isGrid ? Flow.LeftToRight : Flow.LeftToRight)
-  spacing: Appearance.spacingSM
+  spacing: Appearance.spacingSM * iconScale
 
   // Helper for click behavior
   function handleWorkspaceClick(wsId) {
@@ -178,9 +180,9 @@ Flow {
       Rectangle {
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.margins: -4
-        width: 14; height: 14
-        radius: 7
+        anchors.margins: -4 * root.iconScale
+        width: 14 * root.iconScale; height: 14 * root.iconScale
+        radius: width / 2
         color: Colors.accent
         visible: root.showWindowCount && wsPill.windowCount > 0
         z: 3
@@ -189,7 +191,7 @@ Flow {
           anchors.centerIn: parent
           text: String(wsPill.windowCount)
           color: Colors.background
-          font.pixelSize: 9
+          font.pixelSize: 9 * root.fontScale
           font.weight: Font.Bold
         }
       }
@@ -198,8 +200,7 @@ Flow {
       Item {
         id: miniMap
         anchors.fill: parent
-        anchors.margins: 2
-        opacity: wsPill.isActive ? 0.4 : 0.6
+        anchors.margins: 2 * root.iconScale
         visible: root.showMiniMap && !!(modelData && modelData.windowData && modelData.windowData.length > 0)
         z: 1
 

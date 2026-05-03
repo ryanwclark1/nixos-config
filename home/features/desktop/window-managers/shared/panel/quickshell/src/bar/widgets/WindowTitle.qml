@@ -7,6 +7,8 @@ SharedWidgets.BarPill {
     id: root
 
     property var widgetInstance: null
+    property real fontScale: 1.0
+    property real iconScale: 1.0
     readonly property var widgetSettings: widgetInstance && widgetInstance.settings ? widgetInstance.settings : ({})
     property int maxTitleWidth: {
         var parsed = parseInt(widgetSettings.maxTitleWidth !== undefined ? widgetSettings.maxTitleWidth : 300, 10);
@@ -29,12 +31,12 @@ SharedWidgets.BarPill {
 
     RowLayout {
         id: contentRow
-        spacing: Appearance.spacingM
+        spacing: Appearance.spacingM * root.iconScale
 
         // ── App Icon ───────────────────────────────
         Rectangle {
             visible: root.showAppIcon
-            width: 22; height: 22; radius: Appearance.radiusXXS
+            width: 22 * root.iconScale; height: 22 * root.iconScale; radius: Appearance.radiusXXS * root.iconScale
             color: Colors.cardSurface
             border.color: Colors.border; border.width: 1
 
@@ -42,16 +44,16 @@ SharedWidgets.BarPill {
                 anchors.centerIn: parent
                 iconName: root.activeAppId
                 appName: root.activeTitle
-                iconSize: 16
+                iconSize: 16 * root.iconScale
                 fallbackIcon: "app-generic.svg"
             }
         }
 
         // ── Window Title ───────────────────────────
         Text {
-            Layout.maximumWidth: root.maxTitleWidth
+            Layout.maximumWidth: root.maxTitleWidth * root.iconScale
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             elide: Text.ElideRight
             text: root.activeTitle
@@ -62,6 +64,8 @@ SharedWidgets.BarPill {
             visible: root.showGitStatus
             windowTitle: root.activeTitle
             appId: root.activeAppId
+            iconScale: root.iconScale
+            fontScale: root.fontScale
         }
 
         // ── Inline Media Context ───────────────────
@@ -69,8 +73,8 @@ SharedWidgets.BarPill {
             id: mediaContext
             visible: root.showMediaContext && !!MediaService.currentPlayer && MediaService.trackTitle !== ""
 
-            implicitWidth: visible ? mediaRow.implicitWidth + Appearance.spacingM : 0
-            implicitHeight: 22
+            implicitWidth: visible ? mediaRow.implicitWidth + Appearance.spacingM * root.iconScale : 0
+            implicitHeight: 22 * root.iconScale
             radius: implicitHeight / 2
             color: Colors.withAlpha(MediaService.artAccentColor, 0.15)
             border.color: Colors.withAlpha(MediaService.artAccentColor, 0.3)
@@ -82,12 +86,12 @@ SharedWidgets.BarPill {
             RowLayout {
                 id: mediaRow
                 anchors.centerIn: parent
-                spacing: Appearance.spacingSM
+                spacing: Appearance.spacingSM * root.iconScale
 
                 SharedWidgets.SvgIcon {
                     source: MediaService.isPlaying ? "pause.svg" : "play.svg"
                     color: MediaService.artAccentColor
-                    size: Appearance.fontSizeSmall
+                    size: Appearance.fontSizeSmall * root.iconScale
 
                     MouseArea {
                         anchors.fill: parent
@@ -99,16 +103,16 @@ SharedWidgets.BarPill {
                 Text {
                     text: MediaService.trackTitle
                     color: Colors.text
-                    font.pixelSize: Appearance.fontSizeXXS
+                    font.pixelSize: Appearance.fontSizeXXS * root.fontScale
                     font.weight: Font.Bold
                     elide: Text.ElideRight
-                    Layout.maximumWidth: 120
+                    Layout.maximumWidth: 120 * root.iconScale
                 }
 
                 SharedWidgets.SvgIcon {
                     source: "arrow-right.svg"
                     color: Colors.textDisabled
-                    size: Appearance.fontSizeSmall
+                    size: Appearance.fontSizeSmall * root.iconScale
 
                     MouseArea {
                         anchors.fill: parent

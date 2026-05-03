@@ -23,6 +23,7 @@ Rectangle {
   property var toplevelRef: null
   property int buttonSize: 32
   property int iconSize: 20
+  property real iconScale: 1.0
   property bool showRunningIndicator: true
   
   signal pinToggled(var app)
@@ -47,8 +48,8 @@ Rectangle {
 
   // Running indicator dot
   Rectangle {
-    width: 4; height: 4; radius: Appearance.radiusMicro; color: taskItem.actualFocused ? Colors.primary : Colors.textDisabled
-    anchors.bottom: parent.bottom; anchors.bottomMargin: 2; anchors.horizontalCenter: parent.horizontalCenter
+    width: 4 * taskItem.iconScale; height: 4 * taskItem.iconScale; radius: Appearance.radiusMicro * taskItem.iconScale; color: taskItem.actualFocused ? Colors.primary : Colors.textDisabled
+    anchors.bottom: parent.bottom; anchors.bottomMargin: 2 * taskItem.iconScale; anchors.horizontalCenter: parent.horizontalCenter
     visible: showRunningIndicator && isRunning
   }
 

@@ -13,6 +13,8 @@ Item {
   property var widgetInstance: null
   property var anchorWindow: null
   property bool vertical: false
+  property real iconScale: 1.0
+  property real fontScale: 1.0
 
   readonly property var widgetSettings: widgetInstance && widgetInstance.settings ? widgetInstance.settings : ({})
   readonly property string mainIcon: widgetSettings.mainIcon || "󰖲"
@@ -113,9 +115,9 @@ Item {
   }
 
   // ── Sizing ───────────────────────────────────
-  readonly property int pillSize: Config.workspacePillSize === "compact" ? 16 : (Config.workspacePillSize === "large" ? 28 : 20)
-  readonly property int pillFont: Config.workspacePillSize === "compact" ? Appearance.fontSizeXS : (Config.workspacePillSize === "large" ? Appearance.fontSizeMedium : Appearance.fontSizeSmall)
-  readonly property int pillSpacing: Appearance.spacingSM
+  readonly property int pillSize: (Config.workspacePillSize === "compact" ? 16 : (Config.workspacePillSize === "large" ? 28 : 20)) * iconScale
+  readonly property int pillFont: (Config.workspacePillSize === "compact" ? Appearance.fontSizeXS : (Config.workspacePillSize === "large" ? Appearance.fontSizeMedium : Appearance.fontSizeSmall)) * fontScale
+  readonly property int pillSpacing: Appearance.spacingSM * iconScale
 
   readonly property int expandedCount: expanded ? specialWorkspaces.length : 0
   readonly property real totalSize: pillSize + (expandedCount > 0 ? pillSpacing + expandedCount * pillSize + (expandedCount - 1) * pillSpacing : 0)
@@ -141,7 +143,7 @@ Item {
       Layout.alignment: Qt.AlignVCenter
       implicitWidth: root.pillSize
       implicitHeight: root.pillSize
-      radius: Appearance.radiusXXS
+      radius: Appearance.radiusXXS * root.iconScale
       color: mainMouse.containsMouse ? Colors.highlightLight : (root.isOnSpecial ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
       border.color: root.isOnSpecial ? Colors.primary : Colors.border
       border.width: 1
@@ -183,14 +185,14 @@ Item {
         id: wsPill
         visible: root.expanded
         Layout.alignment: Qt.AlignVCenter
-        implicitWidth: root.showLabels ? Math.max(root.pillSize, wsLabel.implicitWidth + 12) : root.pillSize
+        implicitWidth: root.showLabels ? Math.max(root.pillSize, wsLabel.implicitWidth + 12 * root.iconScale) : root.pillSize
         implicitHeight: root.pillSize
-        radius: Appearance.radiusXXS
+        radius: Appearance.radiusXXS * root.iconScale
         readonly property bool isFocused: root.activeSpecial === modelData.name
 
         color: wsHover.containsMouse ? Colors.highlightLight : (isFocused ? Colors.withAlpha(Colors.primary, 0.2) : Colors.surface)
         border.color: isFocused ? Colors.primary : Colors.border
-        border.width: isFocused ? 2 : 1
+        border.width: isFocused ? (2 * root.iconScale) : 1
         Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
         Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
 
@@ -200,7 +202,7 @@ Item {
         Row {
           id: wsLabel
           anchors.centerIn: parent
-          spacing: Appearance.spacingXS
+          spacing: Appearance.spacingXS * root.iconScale
 
           Loader {
             anchors.verticalCenter: parent.verticalCenter
@@ -220,16 +222,16 @@ Item {
         // Window count indicator dots
         Row {
           anchors.bottom: parent.bottom
-          anchors.bottomMargin: 1
+          anchors.bottomMargin: 1 * root.iconScale
           anchors.horizontalCenter: parent.horizontalCenter
-          spacing: Appearance.spacingXXS
+          spacing: Appearance.spacingXXS * root.iconScale
           visible: modelData.windows > 0 && !root.showLabels
 
           Repeater {
             model: Math.min(modelData.windows, 4)
             Rectangle {
-              width: 3; height: 3
-              radius: 1.5
+              width: 3 * root.iconScale; height: 3 * root.iconScale
+              radius: width / 2
               color: wsPill.isFocused ? Colors.primary : Colors.textDisabled
             }
           }
