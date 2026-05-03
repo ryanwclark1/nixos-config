@@ -187,9 +187,9 @@ QtObject {
 
     function _readSamples() {
         if (_destroyed) return;
-        var rx = parseInt(String(rxFile.text || "").trim()) || 0;
-        var tx = parseInt(String(txFile.text || "").trim()) || 0;
-        var diskData = _parseDiskStats(diskStatsFile.text, selectedDiskDevice);
+        var rx = parseInt(String(rxFile.text() || "").trim()) || 0;
+        var tx = parseInt(String(txFile.text() || "").trim()) || 0;
+        var diskData = _parseDiskStats(diskStatsFile.text(), selectedDiskDevice);
         var readSectors = diskData.readSectors;
         var writeSectors = diskData.writeSectors;
         var now = Date.now();

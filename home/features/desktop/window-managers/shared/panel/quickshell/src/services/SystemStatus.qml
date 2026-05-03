@@ -35,8 +35,13 @@ QtObject {
   readonly property string quickshellRepoRoot: repoRoot + "/home/features/desktop/window-managers/shared/panel/quickshell"
   readonly property string defaultScriptRoot: quickshellRepoRoot + "/scripts"
   readonly property string scriptRoot: configuredScriptRoot !== "" ? configuredScriptRoot : defaultScriptRoot
+
+  // Prefer PATH-based binaries provided by Nix module wrappers, fall back to repo paths.
+  property string healthCheckCommand: "qs-health-check"
+  property string pluginDoctorCommand: "qs-plugin-doctor"
   readonly property string healthCheckScript: scriptRoot + "/health-check.sh"
   readonly property string pluginDoctorScript: scriptRoot + "/plugin-doctor.sh"
+
   readonly property string incidentRoot: Quickshell.env("HOME") + "/.local/state/quickshell/incidents"
   property bool _helperScriptsAvailable: false
   property bool _helperScriptWarningLogged: false
@@ -55,17 +60,45 @@ QtObject {
   readonly property bool isBatteryPowered: UPower.onBattery
 
   property Process _helperScriptProbe: Process {
-    command: ["sh", "-c", "test -f \"$1\" && test -f \"$2\"", "qs-system-status-probe", root.healthCheckScript, root.pluginDoctorScript]
+    // Check for both the PATH-based binaries and the fallback script files.
+    command: ["sh", "-c",
+      "if command -v \"$1\" >/dev/null 2>&1 && command -v \"$2\" >/dev/null 2>&1; then exit 0; fi; " +
+      "test -f \"$3\" && test -f \"$4\"",
+      "qs-system-status-probe",
+      root.healthCheckCommand, root.pluginDoctorCommand,
+      root.healthCheckScript, root.pluginDoctorScript
+    ]
     running: true
     onExited: (exitCode, exitStatus) => {
       root._helperScriptsAvailable = exitCode === 0;
       if (exitCode !== 0)
-        root._reportHelperScriptsUnavailable("helper scripts not executable", exitCode, exitStatus);
+        root._reportHelperScriptsUnavailable("helper scripts not found in PATH or at " + root.scriptRoot, exitCode, exitStatus);
     }
   }
 
+  function _runHealthCheck(applyFixes) {
+    if (applyFixes) {
+       _fixProc.command = ["sh", "-c",
+         "if command -v \"$1\" >/dev/null 2>&1; then exec \"$1\" --apply-safe-fixes; else exec bash \"$2\" --apply-safe-fixes; fi",
+         "qs-fix-run", root.healthCheckCommand, root.healthCheckScript];
+       _fixProc.running = true;
+       return;
+    }
+
+    // Determine which command to use based on what's available.
+    // We prefer the PATH-based wrappers as they handle environment setup correctly.
+    _healthProc.command = ["sh", "-c",
+      "if command -v \"$1\" >/dev/null 2>&1; then exec \"$1\"; else exec bash \"$2\"; fi",
+      "qs-health-run", root.healthCheckCommand, root.healthCheckScript];
+    _healthProc.running = true;
+
+    _pluginProc.command = ["sh", "-c",
+      "if command -v \"$1\" >/dev/null 2>&1; then exec \"$1\" --json; else exec bash \"$2\" --json; fi",
+      "qs-plugin-run", root.pluginDoctorCommand, root.pluginDoctorScript];
+    _pluginProc.running = true;
+  }
+
   property Process _healthProc: Process {
-    command: ["bash", root.healthCheckScript]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -78,14 +111,15 @@ QtObject {
           Logger.w("SystemStatus", "health-check JSON parse failed:", e, snippet ? "stdout:" + snippet : "");
           root.overallStatus = "failure";
         }
-        root.isHealthChecking = false;
-        root.lastHealthCheckTime = new Date();
       }
+    }
+    onExited: {
+      root.isHealthChecking = false;
+      root.lastHealthCheckTime = new Date();
     }
   }
 
   property Process _pluginProc: Process {
-    command: ["bash", root.pluginDoctorScript, "--json"]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -107,8 +141,6 @@ QtObject {
     var details = reason || "helper scripts unavailable";
     if (configuredScriptRoot !== "")
       details += " (QS_SCRIPT_ROOT=" + configuredScriptRoot + ")";
-    else
-      details += " (set QS_SCRIPT_ROOT to override " + defaultScriptRoot + ")";
     if (exitCode !== undefined)
       details += " exitCode=" + exitCode;
     if (exitStatus !== undefined)
@@ -169,8 +201,7 @@ QtObject {
       return;
     }
     isHealthChecking = true;
-    _healthProc.running = true;
-    _pluginProc.running = true;
+    _runHealthCheck(false);
   }
 
   function applySafeFixes() {
@@ -178,13 +209,13 @@ QtObject {
       _reportHelperScriptsUnavailable();
       return;
     }
-    if (!_fixProc.running)
-      _fixProc.running = true;
+    if (!_fixProc.running) {
+      _runHealthCheck(true);
+    }
   }
 
   property Process _fixProc: Process {
     running: false
-    command: ["bash", root.healthCheckScript, "--apply-safe-fixes"]
     onExited: root.refreshHealth()
   }
 
@@ -199,14 +230,24 @@ QtObject {
       onStreamFinished: {
         try { 
           var nextIncidents = root._parseJsonOutput(this.text, []);
-          // Check for genuinely new signatures to avoid notification spam
-          var currentSigs = root.activeIncidents.map(function(i) { return i.signature; });
+          
+          // Filter to only active (non-resolved) incidents
+          var activeOnly = [];
           for (var i = 0; i < nextIncidents.length; i++) {
-            if (currentSigs.indexOf(nextIncidents[i].signature) === -1) {
-              root.newIncident(nextIncidents[i]);
+            var status = String(nextIncidents[i].status || "").toLowerCase();
+            if (status !== "resolved") {
+              activeOnly.push(nextIncidents[i]);
             }
           }
-          root.activeIncidents = nextIncidents;
+
+          // Check for genuinely new signatures to avoid notification spam
+          var currentSigs = root.activeIncidents.map(function(i) { return i.signature; });
+          for (var j = 0; j < activeOnly.length; j++) {
+            if (currentSigs.indexOf(activeOnly[j].signature) === -1) {
+              root.newIncident(activeOnly[j]);
+            }
+          }
+          root.activeIncidents = activeOnly;
         } catch (e) {
           var is = String(this.text || "").replace(/\s+/g, " ").substring(0, 120);
           Logger.w("SystemStatus", "incidents JSON parse failed:", e, is ? "stdout:" + is : "");

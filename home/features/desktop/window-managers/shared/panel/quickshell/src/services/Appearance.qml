@@ -6,9 +6,9 @@ QtObject {
     id: appearance
 
     // ── Scale factors ──────────────────────────
-    readonly property real _fontScale: clampScale(Config.fontScale, 1.0)
-    readonly property real _radiusScale: clampScale(Config.radiusScale, 1.0)
-    readonly property real _spacingScale: clampScale(Config.spacingScale * Config.uiDensityScale, 1.0)
+    readonly property real _fontScale: clampScale(Config.fontScale, 0.8)
+    readonly property real _radiusScale: clampScale(Config.radiusScale, 0.1)
+    readonly property real _spacingScale: clampScale(Config.spacingScale * Config.uiDensityScale, 0.2)
 
     // Eco Mode: Auto-downscale animations on battery
     readonly property bool _isEcoMode: Config.autoEcoMode && SystemStatus.isBatteryPowered

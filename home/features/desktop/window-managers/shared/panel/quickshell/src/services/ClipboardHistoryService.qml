@@ -117,7 +117,6 @@ QtObject {
       + "esac; "
       + "done",
       "sh", dir].concat(jobArgs);
-    _imageDecodePoll._parsedMap = ({});
     _imageDecodePoll.running = true;
   }
 
