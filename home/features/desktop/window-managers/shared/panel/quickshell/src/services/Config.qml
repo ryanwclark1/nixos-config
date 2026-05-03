@@ -197,6 +197,11 @@ QtObject {
     property int osdCriticalCooldownMs: 300000
     property int osdCriticalThermalSustainMs: 60000
 
+    // --- FORGE (GH/GL) ---
+    property string githubToken: ""
+    property string gitlabToken: ""
+    property string gitlabHost: "gitlab.com"
+
     // --- DOCK ---
     property bool dockEnabled: true
     property bool dockAutoHide: false

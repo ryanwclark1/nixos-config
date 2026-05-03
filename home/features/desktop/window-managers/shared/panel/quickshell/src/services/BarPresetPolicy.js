@@ -9,13 +9,13 @@ var PRESET_SECTION_WIDGET_TYPES = {};
 PRESET_SECTION_WIDGET_TYPES[HORIZONTAL_DEFAULT_PRESET] = {
     left: ["logo", "workspaces", "windowTitle", "taskbar", "cpuStatus", "ramStatus"],
     center: ["dateTime", "mediaBar", "updates", "idleInhibitor"],
-    right: ["weather", "network", "bluetooth", "audio", "music", "privacy", "voxtype", "recording", "battery", "printer", "aiChat", "notepad", "controlCenter", "tray", "clipboard", "keyboardLayout", "notifications"]
+    right: ["weather", "network", "bluetooth", "audio", "music", "privacy", "voxtype", "serviceMonitor", "recording", "battery", "printer", "aiChat", "notepad", "controlCenter", "tray", "clipboard", "keyboardLayout", "notifications"]
 };
 
 PRESET_SECTION_WIDGET_TYPES[VERTICAL_BALANCED_PRESET] = {
     left: ["logo", "workspaces", "specialWorkspaces", "taskbar"],
     center: ["mediaBar", "updates", "idleInhibitor"],
-    right: ["network", "audio", "battery", "voxtype", "dateTime", "notifications", "tray", "controlCenter"]
+    right: ["network", "audio", "battery", "voxtype", "serviceMonitor", "dateTime", "notifications", "tray", "controlCenter"]
 };
 
 function _clone(value) {

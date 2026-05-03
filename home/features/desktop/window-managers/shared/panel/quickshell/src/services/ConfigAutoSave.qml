@@ -440,6 +440,21 @@ QtObject {
         function onDebugChanged() {
             root.config.scheduleSave();
         }
+        function onUnifiApiKeyChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiPollIntervalChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiProtectHostChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiProtectApiKeyChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiProtectPollIntervalChanged() {
+            root.config.scheduleSave();
+        }
         function onBarWidgetLoadLoggingChanged() {
             root.config.scheduleSave();
         }
