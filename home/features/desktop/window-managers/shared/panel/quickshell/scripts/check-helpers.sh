@@ -36,7 +36,7 @@ forbid_literal() {
   local needle="$2"
   local label="$3"
   if rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} — found in ${file}")
+    violations+=("${label} should not be present in ${file}")
   fi
 }
 

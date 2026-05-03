@@ -11,20 +11,14 @@ config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_general_settings_qml="${config_dir}/features/settings/components/tabs/LauncherGeneralSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 app_catalog_qml="${config_dir}/services/AppCatalogService.qml"
 
 violations=()
+source "${script_dir}/check-helpers.sh"
 
-require_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
-  fi
-}
-
+# Override require_pattern for pcre2+multiline
 require_pattern() {
   local file="$1"
   local pattern="$2"
@@ -39,8 +33,8 @@ require_literal "$config_qml" 'property bool launcherDrunCategoryFiltersEnabled:
 require_literal "$launcher_domain_js" '["drunCategoryFiltersEnabled", "launcherDrunCategoryFiltersEnabled"]' "drun category filters config persistence"
 
 # Settings exposure
-require_literal "$launcher_settings_qml" 'label: "App Category Filters"' "settings category filter toggle label"
-require_literal "$launcher_settings_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings category filter toggle binding"
+require_literal "$launcher_settings_qml" 'label: "App Category Filters"' "settings category filter toggle label" "$launcher_general_settings_qml"
+require_literal "$launcher_settings_qml" 'configKey: "launcherDrunCategoryFiltersEnabled"' "settings category filter toggle binding" "$launcher_general_settings_qml"
 require_literal "$launcher_helpers_js" 'Config.launcherDrunCategoryFiltersEnabled = false;' "settings category filter reset default"
 
 # Desktop app metadata extraction
@@ -77,10 +71,4 @@ require_literal "$launcher_home_qml" 'visible: root.showCategoryChips' "launcher
 require_literal "$launcher_home_qml" 'label: String(modelData.label || "All")' "launcher home compact chip label"
 require_literal "$launcher_home_qml" 'SharedWidgets.AppIcon {' "launcher home shared app icon usage"
 
-if (( ${#violations[@]} > 0 )); then
-  printf '%s\n' "Launcher category filters check failed:" >&2
-  printf '  - %s\n' "${violations[@]}" >&2
-  exit 1
-fi
-
-printf '%s\n' "Launcher category filters check passed."
+report_violations "Launcher category filters check"

@@ -20,6 +20,7 @@ launcher_metrics_box_qml="${config_dir}/launcher/LauncherMetricsBox.qml"
 launcher_text_helpers_js="${config_dir}/launcher/LauncherTextHelpers.js"
 settings_hub_qml="${config_dir}/features/settings/SettingsHub.qml"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_modes_settings_qml="${config_dir}/features/settings/components/tabs/LauncherModesSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
@@ -27,24 +28,7 @@ launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 config_launcher_js="${config_dir}/services/config/ConfigLauncher.js"
 
 violations=()
-
-require_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
-  fi
-}
-
-forbid_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} should not be present in ${file}")
-  fi
-}
+source "${script_dir}/check-helpers.sh"
 
 # Config/state wiring
 require_literal "$config_qml" 'property var launcherPrimaryModes: ["drun", "window", "files", "ai", "system"]' "primary sidebar config property"
@@ -92,8 +76,7 @@ require_literal "$launcher_content_panel_qml" 'statusText: launcher.escapeStatus
 require_literal "$launcher_content_panel_qml" 'LauncherPrefixStrip {' "prefix strip component usage"
 require_literal "$launcher_content_panel_qml" 'summaryText: launcher.modeSummaryText' "summary legend binding"
 require_literal "$launcher_content_panel_qml" 'helpExpanded: launcher.shortcutHelpExpanded' "legend help state binding"
-require_literal "$launcher_qml" 'Quickshell.execDetached(["quickshell", "ipc", "call", "SettingsHub", "openSetting", tabId, cardTitle || "", labelText || ""]);' "settings deep-link action"
-require_literal "$launcher_qml" 'openPowerMenu: function() { Quickshell.execDetached(["quickshell", "ipc", "call", "Shell", "openSurface", "powerMenu"]); },' "system destination action wiring"
+require_literal "$launcher_qml" 'SU.ipcCall("SettingsHub", "openSetting", tabId, cardTitle || "", labelText || "")' "settings deep-link action"
 require_literal "$launcher_sidebar_qml" 'label: root.launcher.sidebarOverflowExpanded ? "Hide More" : "More"' "sidebar more affordance"
 require_literal "$launcher_legend_qml" 'text: root.helpExpanded ? "Hide Help" : "Show Help"' "on-demand help toggle"
 require_literal "$launcher_search_field_qml" 'property string statusText: ""' "search field status text property"
@@ -106,19 +89,13 @@ require_literal "$launcher_executor_js" 'if (mode === "settings") {' "settings e
 require_literal "$launcher_text_helpers_js" 'if (mode === "settings")' "settings empty-state text"
 
 # Settings exposure
-require_literal "$launcher_settings_qml" 'title: "Launcher Presets"' "launcher presets card"
-require_literal "$launcher_settings_qml" 'label: "Focused"' "focused preset button"
-require_literal "$launcher_settings_qml" 'label: "Extended"' "extended preset button"
-require_literal "$launcher_settings_qml" 'title: "Primary Sidebar"' "primary sidebar card"
-require_literal "$launcher_settings_qml" 'title: "Advanced / Prefix"' "advanced modes card"
-require_literal "$launcher_settings_qml" 'title: "Disabled Modes"' "disabled modes card"
+require_literal "$launcher_settings_qml" 'title: "Launcher Presets"' "launcher presets card" "$launcher_modes_settings_qml"
+require_literal "$launcher_settings_qml" 'label: "Focused"' "focused preset button" "$launcher_modes_settings_qml"
+require_literal "$launcher_settings_qml" 'label: "Extended"' "extended preset button" "$launcher_modes_settings_qml"
+require_literal "$launcher_settings_qml" 'title: "Primary Sidebar"' "primary sidebar card" "$launcher_modes_settings_qml"
+require_literal "$launcher_settings_qml" 'title: "Advanced / Prefix"' "advanced modes card" "$launcher_modes_settings_qml"
+require_literal "$launcher_settings_qml" 'title: "Disabled Modes"' "disabled modes card" "$launcher_modes_settings_qml"
 require_literal "$settings_hub_qml" 'function openSetting(tabId, cardTitle, settingLabel) {' "settings hub openSetting helper"
 require_literal "$settings_hub_qml" 'function openSetting(tabId: string, cardTitle: string, settingLabel: string) {' "settings hub openSetting IPC mapping"
 
-if (( ${#violations[@]} > 0 )); then
-  printf '%s\n' "Launcher performance check failed:" >&2
-  printf '  - %s\n' "${violations[@]}" >&2
-  exit 1
-fi
-
-printf '%s\n' "Launcher performance check passed."
+report_violations "Launcher performance check"
