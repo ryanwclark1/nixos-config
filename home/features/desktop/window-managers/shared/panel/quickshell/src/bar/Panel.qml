@@ -276,6 +276,7 @@ Item {
         "notifications": notificationsComponent,
         "personality": personalityComponent,
         "pomodoro": pomodoroComponent,
+        "power": powerComponent,
         "todo": todoComponent,
         "gameMode": gameModeComponent,
         "nightLight": nightLightComponent,
@@ -1417,6 +1418,19 @@ Item {
             vertical: root.vertical
             iconScale: root.barIconScale
             fontScale: root.barFontScale
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: powerComponent
+        PowerBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
+            onTriggerRequested: triggerItem => root.requestSurface("powerMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }

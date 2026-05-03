@@ -14,6 +14,7 @@ PrinterBarWidget 1.0 PrinterBarWidget.qml
 NotificationsBarWidget 1.0 NotificationsBarWidget.qml
 VoxtypeBarWidget 1.0 VoxtypeBarWidget.qml
 PomodoroBarWidget 1.0 PomodoroBarWidget.qml
+PowerBarWidget 1.0 PowerBarWidget.qml
 TodoBarWidget 1.0 TodoBarWidget.qml
 GameModeBarWidget 1.0 GameModeBarWidget.qml
 NightLightBarWidget 1.0 NightLightBarWidget.qml

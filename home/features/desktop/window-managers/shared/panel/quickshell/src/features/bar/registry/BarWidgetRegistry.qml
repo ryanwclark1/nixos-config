@@ -151,6 +151,13 @@ QtObject {
       { type: "mode", key: "iconTheme", label: "Icon Theme", description: "Choose which voxtype icon theme the widget requests from the CLI.", options: [ { value: "nerd-font", label: "Nerd Font" }, { value: "emoji", label: "Emoji" }, { value: "material", label: "Material" }, { value: "phosphor", label: "Phosphor" }, { value: "codicons", label: "Codicons" }, { value: "omarchy", label: "Omarchy" }, { value: "minimal", label: "Minimal" }, { value: "dots", label: "Dots" }, { value: "arrows", label: "Arrows" }, { value: "text", label: "Text" } ] },
       { type: "slider", key: "refreshInterval", label: "Refresh Interval", icon: "clock.svg", min: 1, max: 10, step: 1, unit: "s" }
     ] },
+    { widgetType: "serviceMonitor", label: "Service Monitor", icon: "settings.svg", section: "right", description: "Monitor and control a systemd service.", hasSettings: true, repeatable: true, defaultSettings: { displayMode: "auto", serviceName: "syncthing.service", scope: "user", label: "", icon: "settings.svg" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this widget adapts to bar orientation automatically, always shows its label, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
+      { type: "text", key: "serviceName", label: "Service Name", icon: "settings.svg", placeholder: "syncthing.service" },
+      { type: "mode", key: "scope", label: "Scope", description: "Choose whether to monitor a user or system service.", options: [ { value: "user", label: "User" }, { value: "system", label: "System" } ] },
+      { type: "text", key: "label", label: "Custom Label", icon: "rename.svg", placeholder: "Optional label" },
+      { type: "text", key: "icon", label: "Custom Icon", icon: "app-generic.svg", placeholder: "settings.svg" }
+    ] },
     { widgetType: "recording", label: "Recording", icon: "record.svg", section: "right", description: "Active screen recording indicator.", hasSettings: true, defaultSettings: { displayMode: "auto", showPulseDot: true }, settingsSchema: [
       { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether the recording widget adapts to bar orientation automatically, always shows REC text, or stays icon-only.", options: [ { value: "auto", label: "Auto" }, { value: "full", label: "Full" }, { value: "icon", label: "Icon" } ] },
       { type: "toggle", key: "showPulseDot", label: "Pulse Dot", icon: "record.svg", enabledText: "Show the animated recording dot beside the label.", disabledText: "Hide the recording pulse dot." }
@@ -203,6 +210,10 @@ QtObject {
       { type: "mode", key: "reactionMode", label: "Reaction Mode", description: "Choose how the character reacts to system activity.", options: [ { value: "idle", label: "Idle" }, { value: "media", label: "Media" }, { value: "cpu", label: "CPU" }, { value: "beat", label: "Beat" } ] }
     ] },
     { widgetType: "pomodoro", label: "Pomodoro Timer", icon: "pomodoro.svg", section: "right", description: "Focus/break timer with start, pause, skip, and reset controls." },
+    { widgetType: "power", label: "Power", icon: "power.svg", section: "right", description: "System power and session controls.", hasSettings: true, defaultSettings: { displayMode: "icon", labelText: "Power" }, settingsSchema: [
+      { type: "mode", key: "displayMode", label: "Display Mode", description: "Choose whether this trigger stays icon-only or also shows a text label in the bar.", options: [ { value: "icon", label: "Icon" }, { value: "full", label: "Full" } ] },
+      { type: "text", key: "labelText", label: "Label Text", icon: "rename.svg", placeholder: "Power" }
+    ] },
     { widgetType: "todo", label: "Todo", icon: "checkmark.svg", section: "right", description: "Pending task counter with clear-done shortcut." },
     { widgetType: "gameMode", label: "Game Mode", icon: "games.svg", section: "right", description: "Performance mode indicator — shows when game mode is active." },
     { widgetType: "nightLight", label: "Night Light", icon: "weather-moon.svg", section: "right", description: "Night light indicator — shows when color temperature filter is active." },
