@@ -40,15 +40,19 @@ QtObject {
         fileBrowserOpenTimer.restart();
     }
 
-    function pickWallpaperFolder() {
+    function pickFolder(callerId) {
         reopenSettingsHubTimer.stop();
-        fileBrowserCaller = "wallpaper-folder";
+        fileBrowserCaller = callerId;
         reopenSettingsHubAfterFileBrowser = settingsHub.isOpen;
         if (settingsHub.isOpen)
             settingsHub.close();
         shellRoot.openSurface("fileBrowser");
-        fileBrowserOpenTimer.opMode = "__wallpaper_folder__";
+        fileBrowserOpenTimer.opMode = "__folder__";
         fileBrowserOpenTimer.restart();
+    }
+
+    function pickWallpaperFolder() {
+        root.pickFolder("wallpaper-folder");
     }
 
     function browseManifest() {
@@ -99,6 +103,10 @@ QtObject {
         if (fileBrowserCaller === "wallpaper-folder") {
             Config.wallpaperDefaultFolder = folderPath;
             WallpaperService.scanWallpapers("shell-file-flow-folder-change");
+        } else if (fileBrowserCaller === "recording-folder") {
+            Config.recordingOutputDir = folderPath;
+        } else if (fileBrowserCaller === "launcher-search-folder") {
+            Config.launcherFileSearchRoot = folderPath;
         }
         _resetState();
     }
@@ -125,7 +133,7 @@ QtObject {
                         extensions: ["jpg", "jpeg", "png", "webp", "gif"]
                     }
                 ], "open");
-            } else if (opMode === "__wallpaper_folder__") {
+            } else if (opMode === "__wallpaper_folder__" || opMode === "__folder__") {
                 root.fileBrowser.open(wallpaperDir, [], "folder");
             } else if (opMode === "__manifest__") {
                 root.fileBrowser.open(home, [

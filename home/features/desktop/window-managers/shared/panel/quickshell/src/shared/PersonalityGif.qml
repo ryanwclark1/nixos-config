@@ -8,10 +8,12 @@ Item {
     implicitHeight: 32
 
     property var widgetInstance: null
+    readonly property var settings: (widgetInstance && widgetInstance.settings) || {}
+    readonly property string reactionMode: settings.reactionMode || Config.personalityGifReactionMode
 
-    readonly property bool isMediaMode: Config.personalityGifReactionMode === "media"
-    readonly property bool isCpuMode: Config.personalityGifReactionMode === "cpu"
-    readonly property bool isBeatMode: Config.personalityGifReactionMode === "beat"
+    readonly property bool isMediaMode: reactionMode === "media"
+    readonly property bool isCpuMode: reactionMode === "cpu"
+    readonly property bool isBeatMode: reactionMode === "beat"
 
     readonly property bool shouldPlay: {
         if (!Config.personalityGifEnabled) return false;

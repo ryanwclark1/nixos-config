@@ -24,6 +24,8 @@ Item {
   property string compactValueText: ""
   property string tooltipText: ""
   property bool isActive: false
+  property real fontScale: 1.0
+  property real iconScale: 1.0
 
   signal clicked()
 
@@ -43,7 +45,9 @@ Item {
     anchorWindow: root.anchorWindow
     isActive: root.isActive || reaperPopup.isOpen
     tooltipText: root.tooltipText
-    horizontalPadding: (root.compact || root.iconOnly) ? 5 : 8
+    horizontalPadding: (root.compact || root.iconOnly) ? 5 * root.iconScale : 8 * root.iconScale
+    fontScale: root.fontScale
+    iconScale: root.iconScale
 
     onClicked: root.clicked()
     onSecondaryClicked: {
@@ -126,7 +130,7 @@ Item {
 
       SharedWidgets.NumericText {
         text: root.compactValueText
-        font.pixelSize: Appearance.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXXS * root.fontScale
         anchors.horizontalCenter: parent.horizontalCenter
       }
     }
@@ -135,7 +139,7 @@ Item {
   Component {
     id: wideContent
     Row {
-      spacing: Appearance.spacingS
+      spacing: Appearance.spacingS * root.iconScale
 
       Loader {
         anchors.verticalCenter: parent.verticalCenter
@@ -144,16 +148,16 @@ Item {
 
       SharedWidgets.NumericText {
         text: root.label + " " + root.valueText
-        font.pixelSize: Appearance.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeSmall * root.fontScale
         anchors.verticalCenter: parent.verticalCenter
       }
     }
   }
 
-  Component { id: _iconSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeMedium } }
-  Component { id: _iconNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
-  Component { id: _compactSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeMedium } }
-  Component { id: _compactNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
-  Component { id: _wideSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeLarge } }
-  Component { id: _wideNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeLarge; font.family: Appearance.fontMono } }
+  Component { id: _iconSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeLarge * root.iconScale } }
+  Component { id: _iconNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeLarge * root.iconScale; font.family: Appearance.fontMono } }
+  Component { id: _compactSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeLarge * root.iconScale } }
+  Component { id: _compactNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeLarge * root.iconScale; font.family: Appearance.fontMono } }
+  Component { id: _wideSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeIcon * root.iconScale } }
+  Component { id: _wideNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeIcon * root.iconScale; font.family: Appearance.fontMono } }
 }

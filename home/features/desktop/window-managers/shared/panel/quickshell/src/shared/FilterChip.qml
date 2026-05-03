@@ -10,7 +10,6 @@ Rectangle {
   property string label: ""
   property string icon: ""
   property bool selected: false
-  property bool enabled: true
   signal clicked()
 
   Accessible.role: Accessible.Button

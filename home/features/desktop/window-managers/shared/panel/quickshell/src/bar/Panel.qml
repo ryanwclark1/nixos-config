@@ -42,10 +42,17 @@ Item {
     readonly property int runtimeSpacing: Appearance.spacingM
     readonly property int verticalItemWidthCap: vertical ? Math.max(24, thickness) : 0
     readonly property int verticalBarWidthCap: vertical ? (verticalItemWidthCap + outerPadding * 2) : 0
-    readonly property real centerTargetOffset: 0
-    readonly property real centerMinOffset: outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0) - width / 2 + centerSection.width / 2
-    readonly property real centerMaxOffset: width / 2 - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width / 2
-    readonly property real centerClampedOffset: centerMinOffset > centerMaxOffset ? 0 : Math.max(centerMinOffset, Math.min(centerTargetOffset, centerMaxOffset))
+    readonly property real centerClampedOffset: {
+        if (root.vertical) {
+            var minV = outerPadding + leftSection.height + (leftSection.height > 0 ? runtimeSpacing : 0) - height / 2 + centerSection.height / 2;
+            var maxV = height / 2 - outerPadding - rightSection.height - (rightSection.height > 0 ? runtimeSpacing : 0) - centerSection.height / 2;
+            return minV > maxV ? 0 : Math.max(minV, Math.min(0, maxV));
+        } else {
+            var minH = outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0) - width / 2 + centerSection.width / 2;
+            var maxH = width / 2 - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width / 2;
+            return minH > maxH ? 0 : Math.max(minH, Math.min(0, maxH));
+        }
+    }
     readonly property real computedOpacity: (barConfig && barConfig.opacity !== undefined) ? barConfig.opacity : Config.barOpacity
     readonly property bool floatingBar: barConfig && barConfig.floating !== undefined ? !!barConfig.floating : Config.barFloating
     readonly property bool autoHide: !!(barConfig && barConfig.autoHide)
@@ -455,6 +462,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: root.vertical ? 0 : root.centerClampedOffset
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: root.vertical ? root.centerClampedOffset : 0
     }
 
     BarSectionRepeater {
@@ -615,6 +623,11 @@ Item {
                 onLoaded: {
                     if (item && item.widgetInstance !== undefined)
                         item.widgetInstance = parent.widgetInstance;
+                    if (item) {
+                        if (item.hasOwnProperty("fontScale")) item.fontScale = root.barFontScale;
+                        if (item.hasOwnProperty("iconScale")) item.iconScale = root.barIconScale;
+                        if (item.hasOwnProperty("panelRef")) item.panelRef = root;
+                    }
                     diagnosticWrapper.refreshDiagnosticState();
                 }
             }
@@ -748,8 +761,8 @@ Item {
             property var widgetInstance: null
             vertical: root.vertical
             anchorWindow: root.anchorWindow
-            buttonSize: root.widgetIntegerSetting(widgetInstance, "buttonSize", 32, 24, 56)
-            iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 20, 14, 36)
+            buttonSize: root.widgetIntegerSetting(widgetInstance, "buttonSize", 32, 24, 56) * root.barIconScale
+            iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 20, 14, 36) * root.barIconScale
             showRunningIndicator: root.widgetSettings(widgetInstance).showRunningIndicator !== false
             showSeparator: root.widgetSettings(widgetInstance).showSeparator !== false
             maxUnpinned: root.widgetIntegerSetting(widgetInstance, "maxUnpinned", 0, 0, 20)
@@ -1041,6 +1054,7 @@ Item {
     Component {
         id: audioComponent
         SharedWidgets.BarPill {
+            id: audioPill
             property var widgetInstance: null
             isActive: root.isSurfaceActive("audioMenu")
             anchorWindow: root.anchorWindow
@@ -1064,10 +1078,12 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Appearance.spacingS
+                spacing: Appearance.spacingS * audioPill.iconScale
                 SharedWidgets.AudioWidget {
                     id: audioWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+                    iconScale: audioPill.iconScale
+                    fontScale: audioPill.fontScale
                 }
             }
         }
@@ -1122,6 +1138,7 @@ Item {
     Component {
         id: batteryComponent
         SharedWidgets.BarPill {
+            id: batteryPill
             property var widgetInstance: null
             visible: batteryWidget.showBattery
             isActive: root.isSurfaceActive("batteryMenu")
@@ -1156,10 +1173,12 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Appearance.spacingXS
+                spacing: Appearance.spacingXS * batteryPill.iconScale
                 SharedWidgets.BatteryWidget {
                     id: batteryWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+                    iconScale: batteryPill.iconScale
+                    fontScale: batteryPill.fontScale
                 }
             }
         }
@@ -1219,9 +1238,9 @@ Item {
             property var widgetInstance: null
             vertical: root.vertical
             anchorWindow: root.anchorWindow
-            itemSize: root.widgetIntegerSetting(widgetInstance, "itemSize", 24, 18, 40)
-            iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 18, 12, 32)
-            itemSpacing: root.widgetIntegerSetting(widgetInstance, "spacing", Appearance.spacingS, 2, 16)
+            itemSize: root.widgetIntegerSetting(widgetInstance, "itemSize", 24, 18, 40) * root.barIconScale
+            iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 18, 12, 32) * root.barIconScale
+            itemSpacing: root.widgetIntegerSetting(widgetInstance, "spacing", Appearance.spacingS, 2, 16) * root.barIconScale
         }
     }
 
