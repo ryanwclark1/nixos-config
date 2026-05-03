@@ -14,7 +14,7 @@ BasePopupMenu {
   id: root
   popupMaxWidth: 400
   compactThreshold: 360
-  implicitHeight: compactMode ? 560 : 520
+  implicitHeight: compactMode ? 760 : 720
   title: "SSH"
   subtitle: sshData.importBusy ? "Refreshing aliases..." : "Hosts, aliases, and quick actions"
   contentSpacing: Appearance.spacingM

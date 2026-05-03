@@ -17,8 +17,29 @@ Rectangle {
     implicitHeight: 68
     radius: Appearance.radiusMedium
     color: Colors.bgWidget
-    border.color: Colors.border
-    border.width: 1
+    border.color: root.activeFocus ? Colors.primary : Colors.border
+    border.width: root.activeFocus ? 2 : 1
+
+    activeFocusOnTab: true
+    Accessible.role: Accessible.Button
+    Accessible.name: root.title
+    Accessible.description: root.subtitle
+    Accessible.onPressAction: root._handleTrigger()
+
+    function _handleTrigger() {
+        if (typeof root.clickAction === "function")
+            root.clickAction();
+        else if (Array.isArray(root.clickCommand) && root.clickCommand.length > 0)
+            Quickshell.execDetached(root.clickCommand);
+    }
+
+    Keys.onPressed: event => {
+        if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+            stateLayer.burst(width / 2, height / 2);
+            root._handleTrigger();
+            event.accepted = true;
+        }
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -80,11 +101,9 @@ Rectangle {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: mouse => {
+            root.forceActiveFocus();
             stateLayer.burst(mouse.x, mouse.y);
-            if (typeof root.clickAction === "function")
-                root.clickAction();
-            else if (Array.isArray(root.clickCommand) && root.clickCommand.length > 0)
-                Quickshell.execDetached(root.clickCommand);
+            root._handleTrigger();
         }
     }
 }

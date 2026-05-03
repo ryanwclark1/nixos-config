@@ -7,7 +7,7 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMaxWidth: 380; compactThreshold: 360
-  implicitHeight: compactMode ? 540 : 480
+  implicitHeight: compactMode ? 740 : 680
   title: "Printers"
   contentSpacing: Appearance.spacingM
 

@@ -10,7 +10,7 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMaxWidth: 360; compactThreshold: 350
-  implicitHeight: compactMode ? 430 : 400
+  implicitHeight: compactMode ? 630 : 600
   title: "Music"
   surfaceTint: Colors.withAlpha(root.dominantColor, 0.12)
 

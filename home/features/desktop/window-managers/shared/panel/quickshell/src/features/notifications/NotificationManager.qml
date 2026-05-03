@@ -30,7 +30,7 @@ Item {
 
   // Prune stale pending screenshot entries that were never matched
   Timer {
-    interval: 30000; running: true; repeat: true
+    interval: 30000; running: Object.keys(root._pendingScreenshotPaths).length > 0; repeat: true
     onTriggered: root._pruneStaleScreenshotPaths()
   }
 

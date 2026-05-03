@@ -11,7 +11,7 @@ BasePopupMenu {
   id: root
   popupMaxWidth: 460
   compactThreshold: 380
-  implicitHeight: compactMode ? 580 : 620
+  implicitHeight: compactMode ? 780 : 820
   title: "UniFi Network"
   subtitle: UnifiNetworkService.busy ? "Refreshing..." : _subtitle
   contentSpacing: Appearance.spacingM

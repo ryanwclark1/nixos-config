@@ -12,7 +12,7 @@ BasePopupMenu {
   id: root
   popupMinWidth: 340; popupMaxWidth: 396; compactThreshold: 420
   readonly property int detailColumns: compactMode ? 1 : 2
-  implicitHeight: compactMode ? 620 : 552
+  implicitHeight: compactMode ? 820 : 752
   title: "Networking"
   subtitle: root.isOffline ? "Network inspector" : NetworkService.activePrimaryName
 

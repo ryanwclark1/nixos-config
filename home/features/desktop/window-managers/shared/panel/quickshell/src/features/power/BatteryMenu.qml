@@ -12,7 +12,7 @@ BasePopupMenu {
   id: root
   popupMinWidth: 300; popupMaxWidth: 340; compactThreshold: 330
   readonly property int detailColumns: compactMode ? 1 : 2
-  implicitHeight: compactMode ? 430 : 380
+  implicitHeight: compactMode ? 630 : 580
   title: "Battery"
 
   property var device: UPower.displayDevice
