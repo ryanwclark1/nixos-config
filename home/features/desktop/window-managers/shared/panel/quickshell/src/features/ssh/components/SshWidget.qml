@@ -10,6 +10,8 @@ Item {
     property var anchorWindow: null
     property bool isActive: false
     property var currentContextActions: []
+    property real iconScale: 1.0
+    property real fontScale: 1.0
     signal contextMenuRequested(var actions, var triggerRect)
     signal surfaceRequested(var triggerItem, var surfaceContext)
     readonly property bool hasVisibleState: sshData.mergedHosts.length > 0 || sshData.importBusy || sshData.importErrors.length > 0 || sshData.showWhenEmpty
@@ -53,6 +55,8 @@ Item {
         enabled: root.hasVisibleState
         tooltipText: sshData.summaryTooltip()
         shimmerEnabled: true
+        iconScale: root.iconScale
+        fontScale: root.fontScale
         contextActions: root.currentContextActions
         onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         onClicked: {
@@ -70,18 +74,18 @@ Item {
         }
 
         Row {
-            spacing: Appearance.spacingSM
+            spacing: Appearance.spacingSM * root.iconScale
 
             SvgIcon {
                 source: "terminal.svg"
                 color: sshData.importErrors.length > 0 ? Colors.warning : Colors.primary
-                size: Appearance.fontSizeMedium
+                size: Appearance.fontSizeMedium * root.iconScale
             }
 
             Text {
                 text: sshData.importBusy ? "Refreshing..." : sshData.summaryLabel()
                 color: Colors.text
-                font.pixelSize: Appearance.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall * root.fontScale
                 font.weight: Font.Medium
             }
         }
