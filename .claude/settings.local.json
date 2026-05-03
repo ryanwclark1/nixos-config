@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(for file in /home/administrator/nixos-config/home/features/ai/claude/config/agents/*.md; do if ! grep -q \"^name:\" \"$file\"; then echo \"Missing name field: $file\"; fi; done)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "WebFetch(domain:mynixos.com)",
+      "Bash(ls -la /home/administrator/nixos-config/home/*.nix)",
+      "*",
+      "Bash(grep -r \"features\\\\.\" /home/administrator/nixos-config/home/*.nix)",
+      "Bash(*)",
+      "mcp__context7__resolve-library-id",
+      "WebFetch(domain:zed.dev)"
     ],
     "deny": [],
     "ask": []

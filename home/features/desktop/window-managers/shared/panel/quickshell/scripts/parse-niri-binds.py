@@ -241,7 +241,8 @@ def parse_niri_config(config_path: Path) -> dict:
         by_category[category].append({
             'mods': kb['mods'],
             'key': kb['key'],
-            'comment': kb['comment']
+            'comment': kb['comment'],
+            'action': kb['action']
         })
 
     category_order = [
@@ -321,7 +322,8 @@ def main():
             by_category[category].append({
                 'mods': kb['mods'],
                 'key': kb['key'],
-                'comment': kb['comment']
+                'comment': kb['comment'],
+                'action': kb['action']
             })
 
         category_order = [

@@ -30,6 +30,7 @@ allow_direct_compositor_checks=(
   "${config_dir}/features/settings/components/tabs/HotkeysTab.qml"
   "${config_dir}/services/CompositorAdapter.qml"
   "${config_dir}/services/GameModeService.qml"
+  "${config_dir}/services/HypridleSyncService.qml"
   "${config_dir}/services/NightLightService.qml"
   "${config_dir}/services/NiriBinds.qml"
   "${config_dir}/services/NiriService.qml"

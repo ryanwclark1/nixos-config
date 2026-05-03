@@ -8,6 +8,14 @@
 let
   repoRoot = builtins.toString ../../../../../../..;
   healthRules = pkgs.writeText "qs-health-rules.json" (builtins.readFile ./scripts/health-rules.json);
+  gstPluginPath = lib.makeSearchPath "lib/gstreamer-1.0" [
+    pkgs.gst_all_1.gstreamer.out
+    pkgs.gst_all_1.gst-plugins-base
+    pkgs.gst_all_1.gst-plugins-good
+    pkgs.gst_all_1.gst-plugins-bad
+    pkgs.gst_all_1.gst-plugins-ugly
+    pkgs.gst_all_1.gst-libav
+  ];
 
   qsRofiScript = pkgs.writeShellScriptBin "qs-rofi" ''
     PATH="${pkgs.quickshell}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:$PATH"
@@ -481,6 +489,7 @@ EOF
         Environment = [
           "QS_NIXOS_CONFIG=${repoRoot}"
           "PATH=%h/.local/bin:%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:${pkgs.quickshell}/bin:${pkgs.pipewire}/bin:${pkgs.networkmanager}/bin:${pkgs.tailscale}/bin:${pkgs.coreutils}/bin:${pkgs.findutils}/bin:${pkgs.gnugrep}/bin:${pkgs.bash}/bin:${pkgs.procps}/bin:${pkgs.wl-clipboard}/bin:${pkgs.power-profiles-daemon}/bin:${pkgs.ddcutil}/bin:${pkgs.grim}/bin:${pkgs.slurp}/bin:${pkgs.dbus}/bin:${pkgs.python3}/bin"
+          "GST_PLUGIN_SYSTEM_PATH_1_0=${gstPluginPath}"
           # Prefer VA-API via libvdpau-va-gl (in hardware.graphics.extraPackages) over probing NVIDIA VDPAU.
           "VDPAU_DRIVER=va_gl"
           "QS_NIRI_PARSER=${./scripts/parse-niri-binds.py}"
