@@ -54,4 +54,21 @@ describe("System monitor panel contract", () => {
     expect(serviceTable).toContain("function pulseJumpHighlight()");
     expect(serviceTable).toContain("opacity: root.jumpHighlighted ? 1.0 : 0.0");
   });
+
+  it("separates process state filters from list and tree view mode controls", () => {
+    const processWidget = source("src/features/system/sections/ProcessWidget.qml");
+
+    expect(processWidget).toContain("id: stateFilterFlow");
+    expect(processWidget).toContain("id: processViewModeRow");
+    expect(processWidget).toContain('label: "List"');
+    expect(processWidget).toContain('label: "Tree"');
+    expect(processWidget).toContain('selected: root.displayMode === "flat"');
+    expect(processWidget).toContain('selected: root.displayMode === "tree"');
+  });
+
+  it("keeps the process table subscribed when embedded outside system monitor surfaces", () => {
+    const processWidget = source("src/features/system/sections/ProcessWidget.qml");
+
+    expect(processWidget).toContain("SharedWidgets.Ref { service: ProcessService }");
+  });
 });

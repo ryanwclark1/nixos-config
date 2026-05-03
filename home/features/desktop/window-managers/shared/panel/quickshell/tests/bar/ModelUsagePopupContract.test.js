@@ -28,7 +28,7 @@ describe("AI Model Usage popup contract", () => {
 
     expect(source).toContain('title: "AI Model Usage"');
     expect(source).toContain("popupMinWidth: 440; popupMaxWidth: 600; compactThreshold: 500");
-    expect(source).toContain("implicitHeight: Math.min(780, scrollContent.implicitHeight + 120)");
+    expect(source).toContain("implicitHeight: Math.min(900, scrollContent.implicitHeight + 120)");
     expect(source).toContain('tooltipText: "Refresh"');
     expect(source).toContain('tooltipText: "Settings"');
     expect(source).toContain('text: "Providers"');
