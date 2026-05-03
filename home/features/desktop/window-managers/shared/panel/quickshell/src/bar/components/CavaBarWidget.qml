@@ -9,6 +9,7 @@ Item {
     required property var anchorWindow
     property bool vertical: false
     property bool isActive: false
+    property real iconScale: 1.0
     signal clicked(var triggerItem)
 
     SharedWidgets.Ref {
@@ -47,21 +48,22 @@ Item {
         anchorWindow: root.anchorWindow
         tooltipText: "Audio visualizer"
         cursorShape: Qt.PointingHandCursor
+        iconScale: root.iconScale
         clip: true
         onClicked: root.clicked(this)
 
         Row {
             anchors.centerIn: parent
-            spacing: Appearance.spacingXXS
-            height: 14
+            spacing: Appearance.spacingXXS * root.iconScale
+            height: 14 * root.iconScale
 
             Repeater {
                 model: root.cavaValues
                 delegate: Rectangle {
                     required property real modelData
-                    width: 2
-                    height: Math.max(2, modelData * parent.height)
-                    radius: 1
+                    width: 2 * root.iconScale
+                    height: Math.max(2 * root.iconScale, modelData * parent.height)
+                    radius: 1 * root.iconScale
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
 

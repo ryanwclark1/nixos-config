@@ -154,12 +154,12 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Appearance.spacingXS
+        spacing: Appearance.spacingXS * root.iconScale
 
         Text {
             text: root.statusText
             color: root.accentColor
-            font.pixelSize: Appearance.fontSizeXL
+            font.pixelSize: Appearance.fontSizeXL * root.iconScale
             font.family: root.statusFontFamily
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -168,7 +168,7 @@ SharedWidgets.BarPill {
             visible: !root.iconOnly
             text: root.statusLabel
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

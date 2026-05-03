@@ -10,6 +10,8 @@ Item {
     required property var anchorWindow
     property bool vertical: false
     property bool isActive: false
+    property real fontScale: 1.0
+    property real iconScale: 1.0
     signal clicked(var triggerItem)
     signal contextMenuRequested(var actions, rect triggerRect)
 
@@ -30,6 +32,8 @@ Item {
         isActive: root.isActive
         anchorWindow: root.anchorWindow
         tooltipText: Qt.formatDateTime(centerClock.date, "dddd, MMMM d yyyy")
+        fontScale: root.fontScale
+        iconScale: root.iconScale
         onClicked: root.clicked(this)
         contextActions: [
             {
@@ -49,18 +53,18 @@ Item {
             visible: root.iconOnly
             source: "clock.svg"
             color: Colors.text
-            size: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge * root.iconScale
         }
 
         Row {
             visible: !root.iconOnly
-            spacing: Appearance.spacingXS
+            spacing: Appearance.spacingXS * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: 1
+            anchors.verticalCenterOffset: 1 * root.iconScale
 
             Text {
                 color: Colors.text
-                font.pixelSize: Appearance.fontSizeMedium
+                font.pixelSize: Appearance.fontSizeMedium * root.fontScale
                 font.weight: Font.Bold
                 text: Qt.formatDateTime(centerClock.date, Config.timeUse24Hour ? (Config.timeShowSeconds ? "HH:mm:ss" : "HH:mm") : (Config.timeShowSeconds ? "hh:mm:ss AP" : "hh:mm AP"))
                 anchors.verticalCenter: parent.verticalCenter
@@ -69,7 +73,7 @@ Item {
             Text {
                 visible: root.showDate && Config.timeShowBarDate
                 color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall * root.fontScale
                 font.weight: Font.Medium
                 text: {
                     if (Config.timeBarDateStyle === "month_day")

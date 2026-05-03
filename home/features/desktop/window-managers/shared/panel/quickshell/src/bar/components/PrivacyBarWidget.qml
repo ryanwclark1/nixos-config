@@ -42,12 +42,12 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Appearance.spacingXS
+        spacing: Appearance.spacingXS * root.iconScale
 
         Rectangle {
             visible: root.showPulseDot
-            width: 7
-            height: 7
+            width: 7 * root.iconScale
+            height: 7 * root.iconScale
             radius: width / 2
             color: Colors.warning
             anchors.verticalCenter: parent.verticalCenter
@@ -72,7 +72,7 @@ SharedWidgets.BarPill {
         SharedWidgets.SvgIcon {
             source: PrivacyService.activeIcon
             color: Colors.warning
-            size: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -80,7 +80,7 @@ SharedWidgets.BarPill {
             visible: !root.iconOnly
             text: PrivacyService.activeLabel || "Privacy"
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

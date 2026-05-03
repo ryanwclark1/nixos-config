@@ -36,7 +36,7 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Appearance.spacingXS
+        spacing: Appearance.spacingXS * root.iconScale
 
         Loader {
             sourceComponent: (root.iconText || "").endsWith(".svg") ? _bspSvg : _bspNerd
@@ -46,7 +46,7 @@ SharedWidgets.BarPill {
             SharedWidgets.SvgIcon {
                 source: root.iconText
                 color: Colors.text
-                size: root.iconSize
+                size: root.iconSize * root.iconScale
             }
         }
         Component {
@@ -54,7 +54,7 @@ SharedWidgets.BarPill {
             Text {
                 text: root.iconText
                 color: Colors.text
-                font.pixelSize: root.iconSize
+                font.pixelSize: root.iconSize * root.iconScale
                 font.family: Appearance.fontMono
             }
         }
@@ -62,7 +62,7 @@ SharedWidgets.BarPill {
         Text {
             visible: root.panelRef ? !root.panelRef.triggerWidgetIconOnly(root.widgetInstance) : true
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             text: root.panelRef ? root.panelRef.triggerWidgetLabel(root.widgetInstance, root.defaultLabel) : root.defaultLabel
             anchors.verticalCenter: parent.verticalCenter

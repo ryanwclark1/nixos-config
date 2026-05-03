@@ -26,7 +26,7 @@ SharedWidgets.BarPill {
     SharedWidgets.SvgIcon {
         anchors.centerIn: parent
         color: Colors.warning
-        size: Appearance.fontSizeLarge
+        size: Appearance.fontSizeLarge * root.iconScale
         source: "games.svg"
     }
 }

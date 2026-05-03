@@ -7,8 +7,11 @@ import "../../widgets" as SharedWidgets
 
 Item {
   id: root
-  width: iconOnly ? 30 : Math.max(30, logoRow.implicitWidth + 12)
-  height: 30
+  property real fontScale: 1.0
+  property real iconScale: 1.0
+
+  width: (iconOnly ? 30 : Math.max(30, logoRow.implicitWidth + 12)) * iconScale
+  height: 30 * iconScale
   implicitWidth: width
   implicitHeight: height
 
@@ -84,13 +87,13 @@ Item {
   Row {
     id: logoRow
     anchors.centerIn: parent
-    spacing: Appearance.spacingXS
+    spacing: Appearance.spacingXS * root.iconScale
 
     SharedWidgets.SvgIcon {
       anchors.verticalCenter: parent.verticalCenter
       source: "brands/nixos-symbolic.svg"
       color: root.statusColor
-      size: Appearance.fontSizeXL
+      size: Appearance.fontSizeXL * root.iconScale
     }
 
     Text {
@@ -98,7 +101,7 @@ Item {
       anchors.verticalCenter: parent.verticalCenter
       text: root.labelText
       color: Colors.text
-      font.pixelSize: Appearance.fontSizeSmall
+      font.pixelSize: Appearance.fontSizeSmall * root.fontScale
       font.weight: Font.DemiBold
     }
   }

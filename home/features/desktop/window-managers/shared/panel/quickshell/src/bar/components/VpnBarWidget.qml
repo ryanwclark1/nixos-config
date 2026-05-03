@@ -30,23 +30,25 @@ SharedWidgets.BarPill {
         }
     ]
     Row {
-        spacing: Appearance.spacingS
+        spacing: Appearance.spacingS * root.iconScale
         BoundComponent {
             id: vpnWidgetLoader
             source: Qt.resolvedUrl("../../features/network/components/VpnWidget.qml")
             property bool iconOnly: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
             property string labelMode: root.labelMode
             property bool showOtherVpnCount: root.showOtherVpnCount
+            property real iconScale: root.iconScale
+            property real fontScale: root.fontScale
         }
 
         Row {
             visible: !vpnWidgetLoader.item
-            spacing: Appearance.spacingS
+            spacing: Appearance.spacingS * root.iconScale
 
             SharedWidgets.SvgIcon {
                 source: "globe-shield.svg"
                 color: Colors.textSecondary
-                size: Appearance.fontSizeLarge
+                size: Appearance.fontSizeLarge * root.iconScale
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -54,7 +56,7 @@ SharedWidgets.BarPill {
                 visible: !PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
                 text: "VPN"
                 color: Colors.textSecondary
-                font.pixelSize: Appearance.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall * root.fontScale
                 font.weight: Font.DemiBold
                 anchors.verticalCenter: parent.verticalCenter
             }

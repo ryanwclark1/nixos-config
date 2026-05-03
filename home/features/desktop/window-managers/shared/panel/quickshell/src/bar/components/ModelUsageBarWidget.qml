@@ -3,6 +3,7 @@ import Quickshell
 import "../../services"
 import "../../services/ShellUtils.js" as SU
 import "../../widgets" as SharedWidgets
+import "../PanelWidgetHelpers.js" as PanelHelpers
 
 SharedWidgets.BarPill {
     id: root
@@ -11,6 +12,8 @@ SharedWidgets.BarPill {
     signal triggerRequested(var triggerItem)
 
     SharedWidgets.Ref { service: ModelUsageService }
+
+    readonly property bool iconOnly: PanelHelpers.isSummaryWidgetIconOnly(widgetInstance, vertical)
 
     tooltipText: ModelUsageService.displayTooltip
     onClicked: root.triggerRequested(this)
@@ -29,12 +32,21 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Appearance.spacingS
+        spacing: Appearance.spacingS * root.iconScale
 
         SharedWidgets.SvgIcon {
-            source: "board.svg"
+            source: root.iconOnly ? ModelUsageService.providerIcon : "board.svg"
+            color: ModelUsageService.providerColor
+            size: Appearance.fontSizeLarge * root.iconScale
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+            visible: !root.iconOnly
+            text: ModelUsageService.formatTokenCount(ModelUsageService.todayPrompts)
             color: Colors.text
-            size: Appearance.fontSizeLarge
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
+            font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }
     }

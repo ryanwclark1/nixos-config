@@ -30,12 +30,12 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Appearance.spacingS
+        spacing: Appearance.spacingS * root.iconScale
 
         SharedWidgets.SvgIcon {
             source: "brands/ubiquiti-symbolic.svg"
-            color: UnifiNetworkService.status === "ready" ? Colors.text : Colors.textDisabled
-            size: Appearance.fontSizeLarge
+            color: UnifiNetworkService.status === "ready" ? Colors.primary : Colors.textDisabled
+            size: Appearance.fontSizeIcon * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -43,7 +43,7 @@ SharedWidgets.BarPill {
             visible: PanelHelpers.isSummaryWidgetFull(widgetInstance, vertical) && UnifiNetworkService.status === "ready"
             text: UnifiNetworkService.onlineDevices + "/" + UnifiNetworkService.totalDevices
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

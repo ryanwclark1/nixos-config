@@ -58,19 +58,19 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Appearance.spacingS
+        spacing: Appearance.spacingS * root.iconScale
 
         SharedWidgets.SvgIcon {
             source: "music-note-2.svg"
             color: Colors.primary
-            size: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Item {
             visible: !root.iconOnly
-            width: visible ? Math.min(musicTitleText.contentWidth, root.maxTextWidth) : 0
-            height: 20
+            width: visible ? Math.min(musicTitleText.contentWidth, root.maxTextWidth * root.fontScale) : 0
+            height: 20 * root.iconScale
             clip: true
             anchors.verticalCenter: parent.verticalCenter
 
@@ -78,7 +78,7 @@ SharedWidgets.BarPill {
                 id: musicTitleText
                 text: MediaService.trackTitle || ""
                 color: Colors.text
-                font.pixelSize: Appearance.fontSizeSmall
+                font.pixelSize: Appearance.fontSizeSmall * root.fontScale
                 font.weight: Font.DemiBold
                 anchors.verticalCenter: parent.verticalCenter
             }

@@ -29,12 +29,12 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Appearance.spacingS
+        spacing: Appearance.spacingS * root.iconScale
 
         SharedWidgets.SvgIcon {
             source: "data-trending.svg"
             color: Colors.accent
-            size: Appearance.fontSizeLarge
+            size: Appearance.fontSizeLarge * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -42,7 +42,7 @@ SharedWidgets.BarPill {
             visible: PanelHelpers.isSummaryWidgetFull(widgetInstance, vertical) && !!firstSymbol
             text: firstSymbol ? firstSymbol.close : "--"
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

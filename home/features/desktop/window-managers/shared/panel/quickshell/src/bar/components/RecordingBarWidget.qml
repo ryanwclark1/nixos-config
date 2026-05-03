@@ -37,12 +37,12 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Appearance.spacingS
+        spacing: Appearance.spacingS * root.iconScale
 
         Rectangle {
             visible: root.showPulseDot
-            width: 8
-            height: 8
+            width: 8 * root.iconScale
+            height: 8 * root.iconScale
             radius: width / 2
             color: Colors.error
             anchors.verticalCenter: parent.verticalCenter
@@ -66,7 +66,7 @@ SharedWidgets.BarPill {
             visible: !root.iconOnly
             text: "REC"
             color: Colors.error
-            font.pixelSize: Appearance.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS * root.fontScale
             font.weight: Font.Bold
             anchors.verticalCenter: parent.verticalCenter
         }
