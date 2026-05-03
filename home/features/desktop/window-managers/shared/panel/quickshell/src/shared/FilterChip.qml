@@ -12,16 +12,26 @@ Rectangle {
   property bool selected: false
   signal clicked()
 
+  activeFocusOnTab: true
   Accessible.role: Accessible.Button
   Accessible.name: root.label
   Accessible.checked: root.selected
+  Accessible.onPressAction: root.clicked()
+
+  Keys.onPressed: event => {
+    if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+      stateLayer.burst(width / 2, height / 2);
+      root.clicked();
+      event.accepted = true;
+    }
+  }
 
   implicitWidth: row.implicitWidth + 24
   implicitHeight: 32
   radius: height / 2
   color: selected ? Colors.highlight : Colors.bgWidget
-  border.color: selected ? Colors.primary : Colors.border
-  border.width: 1
+  border.color: root.activeFocus ? Colors.primary : (selected ? Colors.primary : Colors.border)
+  border.width: root.activeFocus ? 2 : 1
   opacity: enabled ? 1.0 : 0.4
 
   Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }

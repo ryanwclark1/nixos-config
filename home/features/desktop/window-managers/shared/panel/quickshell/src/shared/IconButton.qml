@@ -20,15 +20,26 @@ Rectangle {
 
   signal clicked(real x, real y)
 
+  activeFocusOnTab: true
   Accessible.role: Accessible.Button
   Accessible.name: root.tooltipText || root.icon
   Accessible.description: root.tooltipText
   Accessible.onPressAction: root.clicked(width / 2, height / 2)
 
+  Keys.onPressed: event => {
+      if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+          stateLayer.burst(width / 2, height / 2);
+          root.clicked(width / 2, height / 2);
+          event.accepted = true;
+      }
+  }
+
   width: size
   height: size
   radius: height / 2
   color: hoverArea.pressed ? root.activeColor : (hoverArea.containsMouse ? root.hoverColor : root.normalColor)
+  border.color: root.activeFocus ? Colors.primary : "transparent"
+  border.width: root.activeFocus ? 2 : 0
 
   Loader {
     anchors.centerIn: parent

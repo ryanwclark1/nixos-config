@@ -4,8 +4,10 @@ import "../widgets" as SharedWidgets
 
 Item {
     id: root
-    implicitWidth: 32
-    implicitHeight: 32
+    property real fontScale: 1.0
+    property real iconScale: 1.0
+    implicitWidth: 32 * iconScale
+    implicitHeight: 32 * iconScale
 
     property var widgetInstance: null
     readonly property var settings: (widgetInstance && widgetInstance.settings) || {}

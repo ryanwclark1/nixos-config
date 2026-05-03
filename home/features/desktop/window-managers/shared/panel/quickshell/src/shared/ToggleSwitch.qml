@@ -14,10 +14,18 @@ Item {
   property bool checked: false
   signal toggled()
 
+  activeFocusOnTab: true
   Accessible.role: Accessible.CheckBox
   Accessible.name: "Toggle"
   Accessible.checked: root.checked
   Accessible.onToggleAction: root.toggled()
+
+  Keys.onPressed: event => {
+    if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+      root.toggled();
+      event.accepted = true;
+    }
+  }
 
   implicitWidth: 44
   implicitHeight: 24
@@ -30,8 +38,8 @@ Item {
     color: root.checked
       ? Colors.primary
       : Colors.borderLight
-    border.color: root.checked ? "transparent" : Colors.border
-    border.width: root.checked ? 0 : 1
+    border.color: root.activeFocus ? Colors.primary : (root.checked ? "transparent" : Colors.border)
+    border.width: root.activeFocus ? 2 : (root.checked ? 0 : 1)
 
     Behavior on color { enabled: !Colors.isTransitioning; CAnim {} }
     Behavior on border.color { enabled: !Colors.isTransitioning; CAnim {} }
