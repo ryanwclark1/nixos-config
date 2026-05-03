@@ -12,7 +12,6 @@ Rectangle {
     property string description: ""
     property bool emphasized: false
     property bool compact: false
-    property bool enabled: true
 
     signal clicked(var mouse)
 

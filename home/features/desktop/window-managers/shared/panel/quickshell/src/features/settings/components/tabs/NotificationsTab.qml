@@ -669,5 +669,73 @@ Item {
                 }
             }
         }
+
+        SettingsSectionGroup {
+            title: "Test & Diagnostics"
+            description: "Trigger test notifications to verify your placement, theme, and timeout settings."
+
+            SettingsCard {
+                title: "Test Notifications"
+                iconName: "alert.svg"
+                description: "Verify system-wide notification behavior with various urgency levels and attachments."
+
+                SettingsListRow {
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Appearance.spacingXXS
+                        Text { text: "Urgency Levels"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.DemiBold }
+                        Text { text: "Test how different priorities affect popup duration and visibility."; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXS }
+                    }
+
+                    RowLayout {
+                        spacing: Appearance.spacingS
+                        SettingsActionButton {
+                            label: "Low"
+                            iconName: "info.svg"
+                            compact: true
+                            onClicked: Quickshell.execDetached(["notify-send", "-u", "low", "-a", "Quickshell Test", "Low Urgency", "This notification uses the 'Low' timeout setting."])
+                        }
+                        SettingsActionButton {
+                            label: "Normal"
+                            iconName: "info.svg"
+                            compact: true
+                            onClicked: Quickshell.execDetached(["notify-send", "-u", "normal", "-a", "Quickshell Test", "Normal Urgency", "This notification uses the 'Normal' timeout setting."])
+                        }
+                        SettingsActionButton {
+                            label: "Critical"
+                            iconName: "alert.svg"
+                            emphasized: true
+                            compact: true
+                            onClicked: Quickshell.execDetached(["notify-send", "-u", "critical", "-a", "Quickshell Test", "Critical Urgency", "This notification uses the 'Critical' timeout setting and requires manual action to dismiss."])
+                        }
+                    }
+                }
+
+                SettingsListRow {
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Appearance.spacingXXS
+                        Text { text: "Rich Content"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.weight: Font.DemiBold }
+                        Text { text: "Test layouts with icons and interactive action buttons."; color: Colors.textSecondary; font.pixelSize: Appearance.fontSizeXS }
+                    }
+
+                    RowLayout {
+                        spacing: Appearance.spacingS
+                        SettingsActionButton {
+                            label: "With Icon"
+                            iconName: "image.svg"
+                            compact: true
+                            onClicked: Quickshell.execDetached(["notify-send", "-a", "Quickshell Test", "-i", "camera-photo", "Icon Test", "This notification includes an application icon."])
+                        }
+                        SettingsActionButton {
+                            label: "With Actions"
+                            iconName: "navigation.svg"
+                            compact: true
+                            onClicked: Quickshell.execDetached(["notify-send", "-a", "Quickshell Test", "--action=open=Open", "--action=dismiss=Dismiss", "Action Test", "This notification includes interactive buttons."])
+                        }
+                    }
+                }
+            }
+        }
     }
 }

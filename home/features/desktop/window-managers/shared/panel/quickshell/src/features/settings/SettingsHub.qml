@@ -57,6 +57,7 @@ PanelWindow {
   property string pendingTabId: ""
   signal browseWallpaper(string monitorName)
   signal pickWallpaperFolder()
+  signal pickFolder(string callerId)
   signal browseManifest()
 
   // Window-manager layout state (loaded from Hyprland options when supported).
