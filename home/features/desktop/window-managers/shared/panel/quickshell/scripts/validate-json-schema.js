@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
+import fs from "fs";
 
 function usage() {
   console.error("Usage: validate-json-schema.js <schema.json> <data.json>");

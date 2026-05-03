@@ -16,18 +16,11 @@ config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 config_launcher_js="${config_dir}/services/config/ConfigLauncher.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_search_settings_qml="${config_dir}/features/settings/components/tabs/LauncherSearchSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 
 violations=()
-
-require_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
-  fi
-}
+source "${script_dir}/check-helpers.sh"
 
 require_literal "$config_qml" 'property string launcherFileSearchRoot: "~"' "launcher file search root config"
 require_literal "$config_qml" 'property bool launcherFileShowHidden: false' "launcher file hidden toggle config"
@@ -41,9 +34,9 @@ require_literal "$config_launcher_js" 'config.launcherFileOpener = normalizeLaun
 require_literal "$launcher_helpers_js" 'Config.launcherFileSearchRoot = "~";' "launcher file root reset"
 require_literal "$launcher_helpers_js" 'Config.launcherFileShowHidden = false;' "launcher file hidden reset"
 require_literal "$launcher_helpers_js" 'Config.launcherFileOpener = "xdg-open";' "launcher file opener reset"
-require_literal "$launcher_settings_qml" 'label: "Default Search Directory"' "launcher settings file root row"
-require_literal "$launcher_settings_qml" 'configKey: "launcherFileShowHidden"' "launcher settings hidden toggle row"
-require_literal "$launcher_settings_qml" 'label: "File Opener"' "launcher settings file opener row"
+require_literal "$launcher_settings_qml" 'label: "Default Search Directory"' "launcher settings file root row" "$launcher_search_settings_qml"
+require_literal "$launcher_settings_qml" 'configKey: "launcherFileShowHidden"' "launcher settings hidden toggle row" "$launcher_search_settings_qml"
+require_literal "$launcher_settings_qml" 'label: "File Opener"' "launcher settings file opener row" "$launcher_search_settings_qml"
 require_literal "$launcher_qml" 'readonly property string fileSearchRootResolved: resolveFileSearchRoot(fileSearchRootSetting)' "launcher resolved file root property"
 require_literal "$launcher_qml" 'readonly property bool fileSearchShowHidden: diagnosticFileSearchShowHiddenOverrideActive' "launcher hidden toggle property"
 require_literal "$launcher_qml" 'readonly property string fileOpenerCommand: {' "launcher file opener property"
@@ -72,10 +65,4 @@ require_literal "$launcher_parser_js" 'function iconForFile(name, extension, kin
 require_literal "$launcher_parser_js" 'icon: iconForFile(name, extension, kind)' "launcher parser assigns file icon"
 require_literal "$launcher_text_js" 'return "Start typing to search " + _humanFileRootLabel(fileRootLabel, "Home");' "launcher text helper file root title"
 
-if (( ${#violations[@]} > 0 )); then
-  printf '%s\n' "Launcher file search check failed:" >&2
-  printf '  - %s\n' "${violations[@]}" >&2
-  exit 1
-fi
-
-printf '%s\n' "Launcher file search check passed."
+report_violations "Launcher file search check"

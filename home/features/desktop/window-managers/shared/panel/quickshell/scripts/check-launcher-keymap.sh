@@ -10,19 +10,13 @@ config_qml="${config_dir}/services/Config.qml"
 config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_general_settings_qml="${config_dir}/features/settings/components/tabs/LauncherGeneralSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 
 violations=()
+source "${script_dir}/check-helpers.sh"
 
-require_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
-  fi
-}
-
+# Override require_pattern for this script's pcre2+multiline needs
 require_pattern() {
   local file="$1"
   local pattern="$2"
@@ -104,14 +98,8 @@ require_literal "$launcher_domain_js" '["tabBehavior", "launcherTabBehavior"]' "
 
 # Settings must expose tab behavior and reset default.
 require_literal "$launcher_helpers_js" 'Config.launcherTabBehavior = "contextual";' "launcher default reset for tab behavior"
-require_literal "$launcher_settings_qml" 'label: "Tab Behavior"' "Tab Behavior settings row label"
-require_literal "$launcher_settings_qml" 'currentValue: Config.launcherTabBehavior' "Tab Behavior settings current value binding"
-require_literal "$launcher_settings_qml" 'onModeSelected: modeValue => Config.launcherTabBehavior = modeValue' "Tab Behavior settings update binding"
+require_literal "$launcher_settings_qml" 'label: "Tab Behavior"' "Tab Behavior settings row label" "$launcher_general_settings_qml"
+require_literal "$launcher_settings_qml" 'currentValue: Config.launcherTabBehavior' "Tab Behavior settings current value binding" "$launcher_general_settings_qml"
+require_literal "$launcher_settings_qml" 'onModeSelected: modeValue => Config.launcherTabBehavior = modeValue' "Tab Behavior settings update binding" "$launcher_general_settings_qml"
 
-if (( ${#violations[@]} > 0 )); then
-  printf '%s\n' "Launcher keymap check failed:" >&2
-  printf '  - %s\n' "${violations[@]}" >&2
-  exit 1
-fi
-
-printf '%s\n' "Launcher keymap check passed."
+report_violations "Launcher keymap check"
