@@ -6,11 +6,13 @@ import "../VpnHelpers.js" as VH
 
 Row {
     id: root
-    spacing: Appearance.spacingS
+    spacing: Appearance.spacingS * iconScale
 
     property bool iconOnly: false
     property string labelMode: "status"
     property bool showOtherVpnCount: true
+    property real iconScale: 1.0
+    property real fontScale: 1.0
 
     readonly property string statusKey: NetworkService.vpnPrimaryStatus
     readonly property string statusLabel: NetworkService.vpnStatusLabel(statusKey)
@@ -43,30 +45,30 @@ Row {
     SharedWidgets.SvgIcon {
         source: "shield-lock.svg"
         color: root.statusColor()
-        size: Appearance.fontSizeLarge
+        size: Appearance.fontSizeLarge * root.iconScale
         anchors.verticalCenter: parent.verticalCenter
     }
 
     Row {
         visible: !root.iconOnly
-        spacing: Appearance.spacingSM
+        spacing: Appearance.spacingSM * root.iconScale
         anchors.verticalCenter: parent.verticalCenter
 
         Text {
             text: "Tailscale"
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Rectangle {
-            radius: Appearance.radiusXS
+            radius: Appearance.radiusXS * root.iconScale
             color: Colors.withAlpha(root.statusColor(), 0.14)
             border.color: Colors.withAlpha(root.statusColor(), 0.35)
             border.width: 1
-            implicitHeight: 18
-            implicitWidth: detailText.implicitWidth + 10
+            implicitHeight: 18 * root.iconScale
+            implicitWidth: detailText.implicitWidth + 10 * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
 
             Text {
@@ -74,19 +76,19 @@ Row {
                 anchors.centerIn: parent
                 text: root.detailLabel
                 color: root.statusColor()
-                font.pixelSize: Appearance.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS * root.fontScale
                 font.weight: Font.DemiBold
             }
         }
 
         Rectangle {
             visible: root.showOtherCount
-            radius: Appearance.radiusXS
+            radius: Appearance.radiusXS * root.iconScale
             color: Colors.withAlpha(Colors.accent, 0.14)
             border.color: Colors.withAlpha(Colors.accent, 0.35)
             border.width: 1
-            implicitHeight: 18
-            implicitWidth: otherVpnText.implicitWidth + 10
+            implicitHeight: 18 * root.iconScale
+            implicitWidth: otherVpnText.implicitWidth + 10 * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
 
             Text {
@@ -94,7 +96,7 @@ Row {
                 anchors.centerIn: parent
                 text: NetworkService.vpnOtherCount > 1 ? NetworkService.vpnOtherCount + " VPN" : "VPN"
                 color: Colors.accent
-                font.pixelSize: Appearance.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS * root.fontScale
                 font.weight: Font.DemiBold
             }
         }

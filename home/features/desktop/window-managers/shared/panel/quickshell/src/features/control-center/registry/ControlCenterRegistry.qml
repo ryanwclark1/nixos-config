@@ -64,7 +64,7 @@ QtObject {
             subtitle: "Resources and processes",
             ipcTarget: "Shell",
             ipcAction: "toggleSurface",
-            clickCommand: SU.ipcCall("Shell", "toggleSurface", "systemStatsMenu", "")
+            clickCommand: SU.ipcCall("Shell", "toggleSurface", "systemMonitor", "")
         }
     ])
 

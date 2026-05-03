@@ -83,7 +83,11 @@ function normalizeMonitorList(rawMonitors) {
         }
 
         var currentMode = width + "x" + height + "@" + refreshRate.toFixed(2) + "Hz";
-        if (modes.indexOf(currentMode) === -1)
+        var exists = false;
+        for (var k = 0; k < modes.length; k++) {
+            if (modes[k] === currentMode) { exists = true; break; }
+        }
+        if (!exists)
             modes.unshift(currentMode);
 
         result.push({
@@ -155,6 +159,7 @@ function uniqueResolutions(modes) {
 
 // Get available refresh rates for a given resolution string
 function ratesForResolution(modes, resolution) {
+    var seen = {};
     var result = [];
     for (var i = 0; i < modes.length; i++) {
         var at = modes[i].indexOf("@");
@@ -162,9 +167,14 @@ function ratesForResolution(modes, resolution) {
         var res = modes[i].substring(0, at);
         if (res === resolution) {
             var rate = modes[i].substring(at + 1).replace("Hz", "");
-            result.push(rate);
+            if (!seen[rate]) {
+                seen[rate] = true;
+                result.push(rate);
+            }
         }
     }
+    // Sort descending by numeric value
+    result.sort(function(a, b) { return parseFloat(b) - parseFloat(a); });
     return result;
 }
 

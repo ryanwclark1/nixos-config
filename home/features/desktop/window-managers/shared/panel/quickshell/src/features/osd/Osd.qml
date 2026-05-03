@@ -304,12 +304,10 @@ Scope {
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "quickshell-osd"
 
-        // Size depends on style
-        implicitWidth: Math.max(1, root.isCriticalAlert ? criticalWidth : (Config.osdStyle === "pill" ? pillWidth : Config.osdSize))
-        implicitHeight: Math.max(1, root.isCriticalAlert ? criticalHeight : (Config.osdStyle === "pill" ? pillHeight : Config.osdSize))
+        // Size depends on style. Scaling factors derived from baseline 180px circular OSD.
+        implicitWidth: Math.max(1, root.isCriticalAlert ? criticalWidth : (Config.osdStyle === "pill" ? Math.round(Config.osdSize * 1.55) : Config.osdSize))
+        implicitHeight: Math.max(1, root.isCriticalAlert ? criticalHeight : (Config.osdStyle === "pill" ? Math.round(Config.osdSize * 0.31) : Config.osdSize))
 
-        readonly property int pillWidth: 280
-        readonly property int pillHeight: 56
         readonly property int criticalWidth: 320
         readonly property int criticalHeight: 148
 
@@ -320,7 +318,7 @@ Scope {
         Rectangle {
           id: content
           anchors.fill: parent
-          radius: root.isCriticalAlert ? Appearance.radiusLarge : (Config.osdStyle === "pill" ? height / 2 : 28)
+          radius: root.isCriticalAlert ? Appearance.radiusLarge : (Config.osdStyle === "pill" ? height / 2 : Math.round(Config.osdSize * 0.15))
           color: Colors.cardSurface
           border.color: root.osdColor
           border.width: 2

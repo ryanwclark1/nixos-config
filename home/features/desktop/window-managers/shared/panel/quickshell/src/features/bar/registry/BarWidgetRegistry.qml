@@ -199,7 +199,9 @@ QtObject {
       { type: "slider", key: "length", label: "Length", icon: "crop.svg", min: 8, max: 64, step: 1 },
       { type: "slider", key: "opacity", label: "Opacity", icon: "weather-moon.svg", min: 0.1, max: 1.0, step: 0.05, unit: "%" }
     ] },
-    { widgetType: "personality", label: "Personality", icon: "people.svg", section: "center", description: "Animated personality GIF widget." },
+    { widgetType: "personality", label: "Personality", icon: "people.svg", section: "center", description: "Animated personality GIF widget.", hasSettings: true, defaultSettings: { reactionMode: "media" }, settingsSchema: [
+      { type: "mode", key: "reactionMode", label: "Reaction Mode", description: "Choose how the character reacts to system activity.", options: [ { value: "idle", label: "Idle" }, { value: "media", label: "Media" }, { value: "cpu", label: "CPU" }, { value: "beat", label: "Beat" } ] }
+    ] },
     { widgetType: "pomodoro", label: "Pomodoro Timer", icon: "pomodoro.svg", section: "right", description: "Focus/break timer with start, pause, skip, and reset controls." },
     { widgetType: "todo", label: "Todo", icon: "checkmark.svg", section: "right", description: "Pending task counter with clear-done shortcut." },
     { widgetType: "gameMode", label: "Game Mode", icon: "games.svg", section: "right", description: "Performance mode indicator — shows when game mode is active." },
@@ -508,6 +510,11 @@ QtObject {
       var triggerLabel = String(settings.labelText !== undefined ? settings.labelText : fallback).trim();
       chips.push("Display: " + (String(settings.displayMode || "icon") === "full" ? "Full" : "Icon"));
       chips.push("Label: " + (triggerLabel.length > 0 ? triggerLabel : fallback));
+      return chips;
+    }
+
+    if (widgetType === "personality") {
+      chips.push("Mode: " + String(settings.reactionMode || "media").toUpperCase());
       return chips;
     }
 

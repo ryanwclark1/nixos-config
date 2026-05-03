@@ -310,18 +310,6 @@ SharedWidgets.CardBase {
 
                         SharedWidgets.InfoRow {
                             Layout.fillWidth: true
-                            label: "Threads/Core"
-                            value: root.cpuInfo.threadsPerCore
-                        }
-
-                        SharedWidgets.InfoRow {
-                            Layout.fillWidth: true
-                            label: "Sockets"
-                            value: root.cpuInfo.sockets
-                        }
-
-                        SharedWidgets.InfoRow {
-                            Layout.fillWidth: true
                             label: "Current Clock"
                             value: root.cpuInfo.currentClock
                         }

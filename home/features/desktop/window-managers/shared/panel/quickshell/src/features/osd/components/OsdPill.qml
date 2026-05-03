@@ -14,10 +14,12 @@ RowLayout {
   required property string osdType
   required property bool isLockKey
 
+  readonly property real scaleFactor: parent.height / 56.0
+
   anchors.fill: parent
-  anchors.leftMargin: Appearance.spacingL
-  anchors.rightMargin: Appearance.spacingL
-  spacing: Appearance.spacingM
+  anchors.leftMargin: Appearance.spacingL * scaleFactor
+  anchors.rightMargin: Appearance.spacingL * scaleFactor
+  spacing: Appearance.spacingM * scaleFactor
 
   function triggerPulse() {
     pillIconPulse.restart();
@@ -25,8 +27,8 @@ RowLayout {
 
   Item {
     id: pillIconContainer
-    implicitWidth: pillIconLoader.item ? pillIconLoader.item.implicitWidth : Appearance.fontSizeXL
-    implicitHeight: pillIconLoader.item ? pillIconLoader.item.implicitHeight : Appearance.fontSizeXL
+    implicitWidth: pillIconLoader.item ? pillIconLoader.item.implicitWidth : Appearance.fontSizeXL * scaleFactor
+    implicitHeight: pillIconLoader.item ? pillIconLoader.item.implicitHeight : Appearance.fontSizeXL * scaleFactor
     scale: 1.0
 
     Loader {
@@ -34,8 +36,8 @@ RowLayout {
       anchors.centerIn: parent
       sourceComponent: String(root.osdIcon).endsWith(".svg") ? _pillSvg : _pillNerd
     }
-    Component { id: _pillSvg; SharedWidgets.SvgIcon { source: root.osdIcon; color: root.osdColor; size: Appearance.fontSizeXL } }
-    Component { id: _pillNerd; Text { text: root.osdIcon; color: root.osdColor; font.pixelSize: Appearance.fontSizeXL; font.family: Appearance.fontMono } }
+    Component { id: _pillSvg; SharedWidgets.SvgIcon { source: root.osdIcon; color: root.osdColor; size: Appearance.fontSizeXL * root.scaleFactor } }
+    Component { id: _pillNerd; Text { text: root.osdIcon; color: root.osdColor; font.pixelSize: Appearance.fontSizeXL * root.scaleFactor; font.family: Appearance.fontMono } }
 
     SequentialAnimation {
       id: pillIconPulse
@@ -48,7 +50,7 @@ RowLayout {
   Item {
     id: osdTrack
     Layout.fillWidth: true
-    Layout.preferredHeight: osdTrackMouse.pressed ? 12 : 6
+    Layout.preferredHeight: (osdTrackMouse.pressed ? 12 : 6) * root.scaleFactor
     Behavior on Layout.preferredHeight { NumberAnimation { duration: Appearance.durationSnap; easing.type: Easing.OutCubic } }
 
     Rectangle {
@@ -62,7 +64,7 @@ RowLayout {
       model: root.isLockKey ? [] : [0.25, 0.50, 0.75]
       Rectangle {
         x: osdTrack.width * modelData - 1
-        y: -1; width: 2; height: osdTrack.height + 2
+        y: -1 * root.scaleFactor; width: 2 * root.scaleFactor; height: osdTrack.height + 2 * root.scaleFactor
         radius: Appearance.radiusXXXS
         color: Colors.withAlpha(Colors.text, 0.2)
         visible: (root.currentValue / root.maxValue) < modelData
@@ -85,9 +87,9 @@ RowLayout {
     Rectangle {
       visible: root.maxValue > 1.0 && !root.isLockKey
       x: parent.width * (1.0 / root.maxValue)
-      y: -2
-      width: 2
-      height: parent.height + 4
+      y: -2 * root.scaleFactor
+      width: 2 * root.scaleFactor
+      height: parent.height + 4 * root.scaleFactor
       radius: Appearance.radiusXXXS
       color: Colors.borderMedium
     }
@@ -96,8 +98,8 @@ RowLayout {
     MouseArea {
       id: osdTrackMouse
       anchors.fill: parent
-      anchors.topMargin: -12
-      anchors.bottomMargin: -12
+      anchors.topMargin: -12 * root.scaleFactor
+      anchors.bottomMargin: -12 * root.scaleFactor
       enabled: !root.isLockKey
       hoverEnabled: true
       cursorShape: root.isLockKey ? Qt.ArrowCursor : Qt.PointingHandCursor
@@ -124,10 +126,10 @@ RowLayout {
   Text {
     text: root.osdLabel
     color: Colors.text
-    font.pixelSize: Appearance.fontSizeMedium
+    font.pixelSize: Appearance.fontSizeMedium * root.scaleFactor
     font.weight: Font.Bold
     font.family: Appearance.fontMono
-    Layout.minimumWidth: 70
+    Layout.minimumWidth: 70 * root.scaleFactor
     horizontalAlignment: Text.AlignRight
   }
 }

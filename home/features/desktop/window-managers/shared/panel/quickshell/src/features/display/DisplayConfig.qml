@@ -40,8 +40,9 @@ PanelWindow {
       return;
     }
     isOpen = true;
-    _loadMonitors();
+    openRefreshTimer.attempts = 0;
     openRefreshTimer.restart();
+    _loadMonitors();
   }
 
   function close() {
@@ -55,6 +56,14 @@ PanelWindow {
 
   function toggle() {
     isOpen ? close() : open();
+  }
+
+  onIsOpenChanged: {
+    if (isOpen) {
+      // Ensure we have a fresh command and trigger an immediate load attempt
+      monitorLoadProc.command = CompositorAdapter.monitorListCommand();
+      Qt.callLater(_loadMonitors);
+    }
   }
 
   IpcHandler {
@@ -90,21 +99,42 @@ PanelWindow {
 
   // ── Monitor loading ───────────────────────────────────────────────
   function _loadMonitors() {
+    // Ensure command is up to date before running
+    monitorLoadProc.command = CompositorAdapter.monitorListCommand();
+    if (monitorLoadProc.running) monitorLoadProc.running = false;
     loading = true;
-    monitors = [];
-    selectedIndex = -1;
+    // Don't clear immediately if we already have some monitors to avoid flickering,
+    // unless we have none at all.
+    if (monitors.length === 0) selectedIndex = -1;
     monitorProbeStderr = "";
     monitorLoadProc.running = true;
   }
 
   Timer {
     id: openRefreshTimer
-    interval: 350
-    repeat: false
+    interval: 600
+    repeat: true
+    property int attempts: 0
     onTriggered: {
-      if (!displayRoot.isOpen || monitorLoadProc.running)
+      if (!displayRoot.isOpen) { stop(); return; }
+      
+      // If we have monitors, we can stop retrying.
+      if (displayRoot.monitors.length > 0) {
+        stop();
         return;
-      displayRoot._loadMonitors();
+      }
+
+      attempts++;
+      if (attempts > 5) {
+        // Give up after 5 attempts (~3 seconds total)
+        stop();
+        return;
+      }
+
+      // If not already running, try another load
+      if (!monitorLoadProc.running) {
+        displayRoot._loadMonitors();
+      }
     }
   }
 
@@ -647,7 +677,7 @@ PanelWindow {
             ColumnLayout {
               id: settingsPane
               anchors { left: parent.left; right: parent.right; top: parent.top; margins: Appearance.spacingLG }
-              spacing: Appearance.spacingML
+              spacing: Appearance.spacingL
 
               // Section label
               Text {
@@ -665,230 +695,123 @@ PanelWindow {
                 Layout.fillWidth: true
               }
 
-              RowLayout {
-                spacing: Appearance.spacingL
+              GridLayout {
+                columns: 2
+                columnSpacing: Appearance.spacingXL
+                rowSpacing: Appearance.spacingL
                 Layout.fillWidth: true
 
-                // Resolution selector
+                // 1. Resolution
                 ColumnLayout {
-                  spacing: Appearance.spacingSM
                   Layout.fillWidth: true
+                  Layout.columnSpan: 2
+                  spacing: Appearance.spacingS
 
                   Text { text: "RESOLUTION"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
 
-                  ScrollView {
+                  Flow {
+                    id: resFlow
                     Layout.fillWidth: true
-                    height: 68
-                    clip: true
-                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-
-                    ListView {
-                      id: resList
+                    spacing: Appearance.spacingS
+                    property string currentRes: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
+                                                  ? displayRoot._currentResolution(displayRoot.monitors[displayRoot.selectedIndex])
+                                                  : ""
+                    Repeater {
                       model: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
                              ? displayRoot._uniqueResolutions(displayRoot.monitors[displayRoot.selectedIndex].availableModes)
                              : []
-                      clip: true
-                      orientation: ListView.Horizontal
-                      spacing: Appearance.spacingSM
-
-                      property string currentRes: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
-                                                  ? displayRoot._currentResolution(displayRoot.monitors[displayRoot.selectedIndex])
-                                                  : ""
-
                       delegate: Rectangle {
                         required property string modelData
-                        required property int index
-
-                        width: resLabel.implicitWidth + 20
-                        height: 34
-                        radius: Appearance.radiusXS
-                        color: resList.currentRes === modelData
-                               ? Colors.highlight : Colors.bgWidget
-                        border.color: resList.currentRes === modelData
-                                      ? Colors.primary : Colors.border
-                        border.width: 1
-
-                        Text {
-                          id: resLabel
-                          anchors.centerIn: parent
-                          text: modelData
-                          color: resList.currentRes === modelData
-                                 ? Colors.primary : Colors.text
-                          font.pixelSize: Appearance.fontSizeSmall
-                          font.family: Appearance.fontMono
-                          font.weight: Font.DemiBold
-                        }
-
-                        MouseArea {
-                          anchors.fill: parent
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: {
-                            if (displayRoot.selectedIndex < 0) return;
-                            var modes = displayRoot.monitors[displayRoot.selectedIndex].availableModes;
-                            var rates = displayRoot._ratesForResolution(modes, modelData);
-                            var rate = rates.length > 0 ? rates[0] : "60.00";
-                            displayRoot._applyModeString(displayRoot.selectedIndex, modelData, rate);
-                          }
-                        }
+                        width: resLabel.implicitWidth + 24; height: 32; radius: Appearance.radiusXS
+                        color: resFlow.currentRes === modelData ? Colors.highlight : Colors.bgWidget
+                        border.color: resFlow.currentRes === modelData ? Colors.primary : Colors.border; border.width: 1
+                        Text { id: resLabel; anchors.centerIn: parent; text: modelData; color: resFlow.currentRes === modelData ? Colors.primary : Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.family: Appearance.fontMono; font.weight: Font.DemiBold }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: {
+                          if (displayRoot.selectedIndex < 0) return;
+                          var modes = displayRoot.monitors[displayRoot.selectedIndex].availableModes;
+                          var rates = displayRoot._ratesForResolution(modes, modelData);
+                          var rate = rates.length > 0 ? rates[0] : "60.00";
+                          displayRoot._applyModeString(displayRoot.selectedIndex, modelData, rate);
+                        }}
                       }
                     }
                   }
                 }
 
-                // Refresh rate selector
+                // 2. Refresh Rate
                 ColumnLayout {
-                  spacing: Appearance.spacingSM
-                  Layout.preferredWidth: 180
-
+                  Layout.fillWidth: true
+                  spacing: Appearance.spacingS
                   Text { text: "REFRESH RATE"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
-
-                  ScrollView {
+                  Flow {
+                    id: rateFlow
                     Layout.fillWidth: true
-                    height: 68
-                    clip: true
-                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-
-                    ListView {
-                      id: rateList
+                    spacing: Appearance.spacingS
+                    property string currentRate: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
+                                                   ? displayRoot.monitors[displayRoot.selectedIndex].refreshRate.toFixed(2)
+                                                   : ""
+                    Repeater {
                       model: {
                         if (displayRoot.selectedIndex < 0 || displayRoot.monitors.length === 0) return [];
                         var mon = displayRoot.monitors[displayRoot.selectedIndex];
                         return displayRoot._ratesForResolution(mon.availableModes, displayRoot._currentResolution(mon));
                       }
-                      clip: true
-                      orientation: ListView.Horizontal
-                      spacing: Appearance.spacingSM
-
-                      property string currentRate: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
-                                                   ? displayRoot.monitors[displayRoot.selectedIndex].refreshRate.toFixed(2)
-                                                   : ""
-
                       delegate: Rectangle {
                         required property string modelData
-                        required property int index
-
-                        property bool isCurrent: modelData === rateList.currentRate
-
-                        width: rateLabel.implicitWidth + 20
-                        height: 34
-                        radius: Appearance.radiusXS
-                        color: isCurrent ? Colors.highlight : Colors.bgWidget
-                        border.color: isCurrent ? Colors.primary : Colors.border
-                        border.width: 1
-
-                        Text {
-                          id: rateLabel
-                          anchors.centerIn: parent
-                          text: modelData + "Hz"
-                          color: isCurrent ? Colors.primary : Colors.text
-                          font.pixelSize: Appearance.fontSizeSmall
-                          font.family: Appearance.fontMono
-                          font.weight: Font.DemiBold
-                        }
-
-                        MouseArea {
-                          anchors.fill: parent
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: {
-                            if (displayRoot.selectedIndex < 0 || displayRoot.monitors.length === 0) return;
-                            var mon = displayRoot.monitors[displayRoot.selectedIndex];
-                            displayRoot._applyModeString(displayRoot.selectedIndex,
-                                                         displayRoot._currentResolution(mon), modelData);
-                          }
-                        }
+                        width: rateLabel.implicitWidth + 24; height: 32; radius: Appearance.radiusXS
+                        color: modelData === rateFlow.currentRate ? Colors.highlight : Colors.bgWidget
+                        border.color: modelData === rateFlow.currentRate ? Colors.primary : Colors.border; border.width: 1
+                        Text { id: rateLabel; anchors.centerIn: parent; text: modelData + "Hz"; color: modelData === rateFlow.currentRate ? Colors.primary : Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.family: Appearance.fontMono; font.weight: Font.DemiBold }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: {
+                          if (displayRoot.selectedIndex < 0 || displayRoot.monitors.length === 0) return;
+                          var mon = displayRoot.monitors[displayRoot.selectedIndex];
+                          displayRoot._applyModeString(displayRoot.selectedIndex, displayRoot._currentResolution(mon), modelData);
+                        }}
                       }
                     }
                   }
                 }
 
-                // Scale selector
-                ColumnLayout {
-                  spacing: Appearance.spacingSM
-                  Layout.preferredWidth: 220
+                // 3. Scale & Position
+                RowLayout {
+                  Layout.fillWidth: true
+                  spacing: Appearance.spacingXL
 
-                  Text { text: "SCALE"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
-
-                  Flow {
-                    Layout.fillWidth: true
-                    spacing: Appearance.spacingSM
-
-                    Repeater {
-                      model: ["1.00", "1.25", "1.50", "1.75", "2.00"]
-
-                      delegate: Rectangle {
-                        required property string modelData
-
-                        property bool isCurrent: {
-                          if (displayRoot.selectedIndex < 0 || displayRoot.monitors.length === 0) return false;
-                          return Math.abs(displayRoot.monitors[displayRoot.selectedIndex].scale - parseFloat(modelData)) < 0.01;
-                        }
-
-                        width: scaleLabel.implicitWidth + 16
-                        height: 30
-                        radius: Appearance.radiusXS
-                        color: isCurrent ? Colors.highlight : Colors.bgWidget
-                        border.color: isCurrent ? Colors.primary : Colors.border
-                        border.width: 1
-
-                        Text {
-                          id: scaleLabel
-                          anchors.centerIn: parent
-                          text: modelData + "×"
-                          color: isCurrent ? Colors.primary : Colors.text
-                          font.pixelSize: Appearance.fontSizeSmall
-                          font.family: Appearance.fontMono
-                          font.weight: Font.DemiBold
-                        }
-
-                        MouseArea {
-                          anchors.fill: parent
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: {
+                  ColumnLayout {
+                    spacing: Appearance.spacingS
+                    Text { text: "SCALE"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
+                    Flow {
+                      spacing: Appearance.spacingS
+                      Repeater {
+                        model: ["1.00", "1.25", "1.50", "1.75", "2.00"]
+                        delegate: Rectangle {
+                          required property string modelData
+                          property bool isCurrent: {
+                            if (displayRoot.selectedIndex < 0 || displayRoot.monitors.length === 0) return false;
+                            return Math.abs(displayRoot.monitors[displayRoot.selectedIndex].scale - parseFloat(modelData)) < 0.01;
+                          }
+                          width: scaleLabel.implicitWidth + 20; height: 32; radius: Appearance.radiusXS
+                          color: isCurrent ? Colors.highlight : Colors.bgWidget
+                          border.color: isCurrent ? Colors.primary : Colors.border; border.width: 1
+                          Text { id: scaleLabel; anchors.centerIn: parent; text: modelData + "×"; color: isCurrent ? Colors.primary : Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.family: Appearance.fontMono; font.weight: Font.DemiBold }
+                          MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: {
                             if (displayRoot.selectedIndex < 0) return;
-                            displayRoot._updateMonitorSetting(displayRoot.selectedIndex,
-                                                              "scale", parseFloat(modelData));
-                          }
+                            displayRoot._updateMonitorSetting(displayRoot.selectedIndex, "scale", parseFloat(modelData));
+                          }}
                         }
                       }
                     }
                   }
-                }
 
-                // Position readout
-                ColumnLayout {
-                  spacing: Appearance.spacingSM
-                  Layout.preferredWidth: 110
-
-                  Text { text: "POSITION"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
-
-                  Rectangle {
-                    width: 100; height: 46
-                    radius: Appearance.radiusSmall
-                    color: Colors.bgWidget
-                    border.color: Colors.border
-                    border.width: 1
-
-                    ColumnLayout {
-                      anchors.centerIn: parent
-                      spacing: Appearance.spacingXXS
-
-                      Text {
-                        text: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
-                              ? ("X: " + displayRoot.monitors[displayRoot.selectedIndex].x)
-                              : "X: —"
-                        color: Colors.text
-                        font.pixelSize: Appearance.fontSizeSmall
-                        font.family: Appearance.fontMono
-                        Layout.alignment: Qt.AlignHCenter
-                      }
-                      Text {
-                        text: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0
-                              ? ("Y: " + displayRoot.monitors[displayRoot.selectedIndex].y)
-                              : "Y: —"
-                        color: Colors.text
-                        font.pixelSize: Appearance.fontSizeSmall
-                        font.family: Appearance.fontMono
-                        Layout.alignment: Qt.AlignHCenter
+                  ColumnLayout {
+                    spacing: Appearance.spacingS
+                    Text { text: "POSITION"; color: Colors.textDisabled; font.pixelSize: Appearance.fontSizeXS; font.weight: Font.Black; font.letterSpacing: Appearance.letterSpacingExtraWide }
+                    Rectangle {
+                      width: 120; height: 40; radius: Appearance.radiusXS; color: Colors.bgWidget; border.color: Colors.border; border.width: 1
+                      RowLayout {
+                        anchors.centerIn: parent; spacing: Appearance.spacingM
+                        Text { text: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0 ? ("X: " + displayRoot.monitors[displayRoot.selectedIndex].x) : "X: —"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.family: Appearance.fontMono }
+                        Text { text: displayRoot.selectedIndex >= 0 && displayRoot.monitors.length > 0 ? ("Y: " + displayRoot.monitors[displayRoot.selectedIndex].y) : "Y: —"; color: Colors.text; font.pixelSize: Appearance.fontSizeSmall; font.family: Appearance.fontMono }
                       }
                     }
                   }

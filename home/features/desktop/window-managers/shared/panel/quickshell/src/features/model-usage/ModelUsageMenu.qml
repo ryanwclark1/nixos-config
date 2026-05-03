@@ -8,8 +8,8 @@ import "../../widgets" as SharedWidgets
 
 BasePopupMenu {
   id: root
-  popupMinWidth: 440; popupMaxWidth: 600; compactThreshold: 500
-  implicitHeight: Math.min(780, scrollContent.implicitHeight + 120)
+  popupMinWidth: 500; popupMaxWidth: 720; compactThreshold: 600
+  implicitHeight: Math.min(1000, scrollContent.implicitHeight + 120)
   title: "AI Model Usage"
   subtitle: ModelUsageService.providerLabel
 

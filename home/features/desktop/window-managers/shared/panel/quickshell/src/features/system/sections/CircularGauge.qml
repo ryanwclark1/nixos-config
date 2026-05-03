@@ -9,11 +9,14 @@ Item {
   property color color: Colors.primary
   property int thickness: 2
   property string icon: ""
-  readonly property real safeThickness: Math.max(1, Math.min(root.thickness, Math.min(root.width, root.height) / 2))
+  property real iconScale: 1.0
+  readonly property real safeThickness: Math.max(1, Math.min(root.thickness * root.iconScale, Math.min(root.width, root.height) / 2))
   readonly property real innerDiameter: Math.max(0, Math.min(root.width, root.height) - (safeThickness * 2))
 
-  width: 24
-  height: 24
+  width: 24 * iconScale
+  height: 24 * iconScale
+  implicitWidth: width
+  implicitHeight: height
 
   Item {
     id: innerContent

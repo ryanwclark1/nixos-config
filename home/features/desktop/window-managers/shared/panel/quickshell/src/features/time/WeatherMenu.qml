@@ -8,7 +8,7 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMinWidth: 380; popupMaxWidth: 600; compactThreshold: 500
-  implicitHeight: compactMode ? 1000 : 940
+  implicitHeight: compactMode ? 1060 : 1000
   title: "Weather"
   subtitle: WeatherService.location || "Local"
 
@@ -225,7 +225,7 @@ BasePopupMenu {
 
     Flickable {
       Layout.fillWidth: true
-      implicitHeight: 92
+      implicitHeight: 100
       visible: WeatherService.hourlyForecast.length > 0
       contentWidth: hourlyRow.width
       clip: true
@@ -242,7 +242,7 @@ BasePopupMenu {
           delegate: SharedWidgets.ThemedContainer {
             variant: "card"
             width: 74
-            height: 86
+            height: 94
 
             ColumnLayout {
               anchors.fill: parent

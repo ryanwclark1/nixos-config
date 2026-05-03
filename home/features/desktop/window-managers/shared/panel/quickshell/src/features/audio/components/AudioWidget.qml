@@ -6,8 +6,10 @@ import "../../../services/IconHelpers.js" as IconHelpers
 
 Row {
   id: root
-  spacing: Appearance.spacingSM
+  spacing: Appearance.spacingSM * iconScale
   property bool iconOnly: false
+  property real iconScale: 1.0
+  property real fontScale: 1.0
 
   readonly property string tooltipText: {
     if (AudioService.outputMuted) return "Audio muted";
@@ -21,7 +23,8 @@ Row {
       color: AudioService.outputMuted ? Colors.error : Colors.text
       icon: IconHelpers.audioOutputIcon(AudioService.outputVolume, AudioService.outputMuted, AudioService.outputDeviceType)
       thickness: 3
-      width: 22; height: 22
+      width: 22 * root.iconScale; height: 22 * root.iconScale
+      iconScale: root.iconScale
     }
 
   Text {
@@ -34,7 +37,7 @@ Row {
         return Math.round(v * 100) + "%";
     }
     color: Colors.text
-    font.pixelSize: Appearance.fontSizeSmall
+    font.pixelSize: Appearance.fontSizeSmall * root.fontScale
     font.weight: Font.DemiBold
     anchors.verticalCenter: parent.verticalCenter
   }

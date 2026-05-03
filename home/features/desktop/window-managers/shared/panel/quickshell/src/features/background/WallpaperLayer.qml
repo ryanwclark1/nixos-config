@@ -157,7 +157,6 @@ Item {
                 id: videoPlayer
                 source: root.videoSource
                 loops: MediaPlayer.Infinite
-                audioOutput: AudioOutput { muted: true }
                 videoOutput: videoOutput
                 onSourceChanged: {
                     if (source !== "") {

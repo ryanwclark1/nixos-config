@@ -118,7 +118,6 @@ Item {
 
             MediaPlayer {
                 id: videoPlayer
-                audioOutput: AudioOutput { muted: true }
                 videoOutput: videoOutput
                 onErrorOccurred: (error, errorString) => {
                     Logger.w("UnifiProtect", "Stream playback error:", errorString);

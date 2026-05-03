@@ -85,11 +85,22 @@ PanelWindow {
         focus:        root.isVisible
         Keys.onEscapePressed: root.close()
 
-        implicitWidth:  oskRow.implicitWidth  + Appearance.paddingMedium * 2
-        implicitHeight: oskRow.implicitHeight + Appearance.paddingMedium * 2
+        implicitWidth:  (ctrlCol.implicitWidth + oskContent.implicitWidth + (Appearance.paddingMedium * 2) + Appearance.spacingM + 1)
+        implicitHeight: Math.max(ctrlCol.implicitHeight, oskContent.implicitHeight) + (Appearance.paddingMedium * 2)
 
-        // ── Slide-up enter / slide-down exit ─────────────────────────────────
-        property real _slideOffset: root.isVisible ? 0 : implicitHeight + Appearance.spacingM
+        // We use a separate property for the calculated offset target to avoid binding loops
+        // with implicitHeight during the layout/animation cycle.
+        property real _slideDownTarget: 200
+        property real _slideOffset: root.isVisible ? 0 : _slideDownTarget
+
+        Binding {
+            target: oskBg
+            property: "_slideDownTarget"
+            value: oskBg.implicitHeight + Appearance.spacingM
+            when: !root.isVisible
+            restoreMode: Binding.RestoreBindingOrValue
+        }
+
         Behavior on _slideOffset {
             NumberAnimation {
                 id: _enterAnim
@@ -120,17 +131,14 @@ PanelWindow {
         RowLayout {
             id: oskRow
 
-            anchors {
-                fill:          parent
-                leftMargin:    Appearance.paddingMedium
-                rightMargin:   Appearance.paddingMedium
-                topMargin:     Appearance.paddingMedium
-                bottomMargin:  Appearance.paddingMedium
-            }
+            anchors.centerIn: parent
+            width: parent.width - (Appearance.paddingMedium * 2)
+            height: parent.height - (Appearance.paddingMedium * 2)
             spacing: Appearance.spacingM
 
             // ── Control column (pin + hide) ───────────────────────────────────
             ColumnLayout {
+                id: ctrlCol
                 spacing: Appearance.spacingXS
                 Layout.alignment: Qt.AlignVCenter
 
