@@ -53,8 +53,7 @@ var entries = [
     { tabId: "system", cardTitle: "Panel Enablement", label: "System Monitor", keywords: "panel enable disable memory", type: "toggle" },
 
     // ── Control Center ───────────────────────────────
-    { tabId: "control-center", cardTitle: "Control Center", label: "Quick Links", keywords: "links shortcuts", type: "toggle" },
-    { tabId: "control-center", cardTitle: "Control Center", label: "Media Widget", keywords: "media player music", type: "toggle" },
+    { tabId: "control-center", cardTitle: "Pinned Footer", label: "Power Actions", keywords: "links shortcuts", type: "toggle" },
     { tabId: "control-center", cardTitle: "Control Center", label: "Control Center Width", keywords: "width size", type: "slider" },
 
     // ── OSD ──────────────────────────────────────────

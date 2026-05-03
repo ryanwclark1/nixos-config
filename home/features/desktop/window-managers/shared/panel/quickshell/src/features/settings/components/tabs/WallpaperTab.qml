@@ -473,11 +473,12 @@ Item {
             Layout.fillWidth: true
             spacing: Appearance.spacingS
 
-            SettingsTextInputRow {
+            SettingsDirectoryPickerRow {
                 Layout.fillWidth: true
                 label: "Default wallpaper folder"
                 placeholderText: "~/.config/wallpapers"
                 leadingIcon: "folder.svg"
+                callerId: "wallpaper-folder"
                 text: root.wallpaperFolderInput
                 errorText: root.wallpaperFolderError
                 onTextEdited: value => root.wallpaperFolderInput = value
@@ -488,12 +489,6 @@ Item {
                     compact: true
                     emphasized: true
                     onClicked: root.applyWallpaperFolder()
-                }
-
-                SettingsActionButton {
-                    label: "Pick Folder"
-                    compact: true
-                    onClicked: if (root.settingsRoot) root.settingsRoot.pickWallpaperFolder()
                 }
             }
 
