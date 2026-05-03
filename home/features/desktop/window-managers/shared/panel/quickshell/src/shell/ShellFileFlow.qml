@@ -134,7 +134,12 @@ QtObject {
                     }
                 ], "open");
             } else if (opMode === "__wallpaper_folder__" || opMode === "__folder__") {
-                root.fileBrowser.open(wallpaperDir, [], "folder");
+                var startDir = wallpaperDir;
+                if (fileBrowserCaller === "recording-folder" && Config.recordingOutputDir)
+                    startDir = Config.recordingOutputDir;
+                else if (fileBrowserCaller === "launcher-search-folder" && Config.launcherFileSearchRoot)
+                    startDir = Config.launcherFileSearchRoot;
+                root.fileBrowser.open(startDir, [], "folder");
             } else if (opMode === "__manifest__") {
                 root.fileBrowser.open(home, [
                     {

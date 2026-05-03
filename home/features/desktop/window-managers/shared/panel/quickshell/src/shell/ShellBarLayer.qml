@@ -154,39 +154,39 @@ Item {
                             ScreenshotMenu { Component.onCompleted: barWindow.wirePopup(this, "screenshotMenu") }
 
                             WeatherMenu {
-                                implicitHeight: Math.min(660, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(960, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 Component.onCompleted: barWindow.wirePopup(this, "weatherMenu")
                             }
                             MarketMenu {
-                                implicitHeight: Math.min(600, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(800, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 Component.onCompleted: barWindow.wirePopup(this, "marketMenu")
                             }
                             ModelUsageMenu {
-                                implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(820, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 Component.onCompleted: barWindow.wirePopup(this, "modelUsageMenu")
                             }
                             SshMenu {
-                                implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(840, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 surfaceContext: barWindow.surfaceContext("sshMenu")
                                 Component.onCompleted: barWindow.wirePopup(this, "sshMenu")
                             }
                             DockerMenu {
-                                implicitHeight: Math.min(620, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(840, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 surfaceContext: barWindow.surfaceContext("dockerMenu")
                                 Component.onCompleted: barWindow.wirePopup(this, "dockerMenu")
                             }
                             UnifiNetworkMenu {
-                                implicitHeight: Math.min(640, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(860, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 surfaceContext: barWindow.surfaceContext("unifiNetworkMenu")
                                 Component.onCompleted: barWindow.wirePopup(this, "unifiNetworkMenu")
                             }
                             UnifiProtectMenu {
-                                implicitHeight: Math.min(660, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(900, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 surfaceContext: barWindow.surfaceContext("unifiProtectMenu")
                                 Component.onCompleted: barWindow.wirePopup(this, "unifiProtectMenu")
                             }
                             DateTimeMenu {
-                                implicitHeight: Math.min(560, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
+                                implicitHeight: Math.min(860, root.shellRoot.popupMaxHeight((barWindow.screen && barWindow.screen.height) ? barWindow.screen.height : barWindow.height))
                                 Component.onCompleted: barWindow.wirePopup(this, "dateTimeMenu")
                             }
                             CavaPopup {

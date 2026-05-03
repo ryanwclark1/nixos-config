@@ -37,6 +37,7 @@ in
     Service = {
       Environment = [
         "HSA_OVERRIDE_GFX_VERSION=11.0.0"
+        "PATH=${lib.makeBinPath [ pkgs.wtype pkgs.wl-clipboard ]}:/run/current-system/sw/bin"
       ];
     };
 

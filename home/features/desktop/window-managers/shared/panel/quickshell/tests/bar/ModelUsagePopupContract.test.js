@@ -16,19 +16,16 @@ describe("AI Model Usage popup contract", () => {
     const source = readFileSync(widgetPath, "utf8");
 
     expect(source).toContain("tooltipText: ModelUsageService.displayTooltip");
-    expect(source).toContain('source: "board.svg"');
-    expect(source).toContain("color: Colors.text");
-    expect(source).not.toContain('visible: ModelUsageService.claudeEnabled');
-    expect(source).not.toContain('visible: ModelUsageService.codexEnabled');
-    expect(source).not.toContain('visible: ModelUsageService.geminiEnabled');
+    expect(source).toContain('source: root.iconOnly ? ModelUsageService.providerIcon : "board.svg"');
+    expect(source).toContain("color: ModelUsageService.providerColor");
   });
 
   it("keeps the popup title and provider tabs centered on AI Model Usage", () => {
     const source = readFileSync(menuPath, "utf8");
 
     expect(source).toContain('title: "AI Model Usage"');
-    expect(source).toContain("popupMinWidth: 440; popupMaxWidth: 600; compactThreshold: 500");
-    expect(source).toContain("implicitHeight: Math.min(900, scrollContent.implicitHeight + 120)");
+    expect(source).toContain("popupMinWidth: 500; popupMaxWidth: 720; compactThreshold: 600");
+    expect(source).toContain("implicitHeight: Math.min(1000, scrollContent.implicitHeight + 120)");
     expect(source).toContain('tooltipText: "Refresh"');
     expect(source).toContain('tooltipText: "Settings"');
     expect(source).toContain('text: "Providers"');
@@ -37,7 +34,7 @@ describe("AI Model Usage popup contract", () => {
     expect(source).toContain('label: "Codex CLI"');
     expect(source).toContain('label: "Gemini CLI"');
     expect(source).toContain('selected: ModelUsageService.effectiveActiveProvider === modelData.key');
-    expect(source).toContain('message: "Enable at least one provider in AI Model Usage settings"');
+    expect(source).toContain('message: root.providerEmptyMessage()');
   });
 
   it("falls back to the first enabled provider when the saved provider is unavailable", () => {

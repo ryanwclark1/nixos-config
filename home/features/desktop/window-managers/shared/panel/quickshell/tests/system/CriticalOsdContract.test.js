@@ -31,7 +31,7 @@ describe("critical OSD contract", () => {
   it("defines a dedicated critical OSD cooldown config", () => {
     const configSource = readFileSync(configPath, "utf8");
 
-    expect(configSource).toContain("property int criticalStateSustainMs: 15000");
+    expect(configSource).toContain("property int criticalStateSustainMs: 60000");
     expect(configSource).toContain("property int osdCriticalCooldownMs: 300000");
     expect(configSource).toContain("property int osdCriticalThermalSustainMs: 60000");
   });
