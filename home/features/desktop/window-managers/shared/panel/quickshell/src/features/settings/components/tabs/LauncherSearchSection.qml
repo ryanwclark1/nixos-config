@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
-import ".." as Components
+import ".."
 
 ColumnLayout {
     id: root
@@ -47,7 +47,7 @@ ColumnLayout {
             onMoved: v => Config.launcherFileMaxResults = v
         }
 
-        Components.SettingsDirectoryPickerRow {
+        SettingsDirectoryPickerRow {
             label: "Default Search Directory"
             callerId: "launcher-search-folder"
             leadingIcon: "folder.svg"

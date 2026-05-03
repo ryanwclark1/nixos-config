@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
-import ".." as Components
+import ".."
 
 Item {
     id: root
@@ -220,7 +220,7 @@ Item {
                 iconName: "folder.svg"
                 description: "Leave blank to use the default Videos directory."
 
-                Components.SettingsDirectoryPickerRow {
+                SettingsDirectoryPickerRow {
                     label: "Output Directory"
                     callerId: "recording-folder"
                     leadingIcon: "folder.svg"

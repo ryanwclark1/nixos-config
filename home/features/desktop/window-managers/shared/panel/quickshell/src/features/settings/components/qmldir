@@ -5,7 +5,6 @@ SettingsCard 1.0 SettingsCard.qml
 SettingsColorRow 1.0 SettingsColorRow.qml
 SettingsContent 1.0 SettingsContent.qml
 SettingsDataRow 1.0 SettingsDataRow.qml
-SettingsDirectoryPickerRow 1.0 SettingsDirectoryPickerRow.qml
 SettingsDropIndicator 1.0 SettingsDropIndicator.qml
 SettingsDragHandle 1.0 SettingsDragHandle.qml
 SettingsFieldGrid 1.0 SettingsFieldGrid.qml

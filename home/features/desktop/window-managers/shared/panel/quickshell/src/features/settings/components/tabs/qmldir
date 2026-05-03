@@ -38,6 +38,7 @@ PresetsTab 1.0 PresetsTab.qml
 PrivacyTab 1.0 PrivacyTab.qml
 RecordingTab 1.0 RecordingTab.qml
 ScreenshotTab 1.0 ScreenshotTab.qml
+SettingsDirectoryPickerRow 1.0 SettingsDirectoryPickerRow.qml
 ShellCoreSectionTab 1.0 ShellCoreSectionTab.qml
 ShellSystemSection 1.0 ShellSystemSection.qml
 ShellLauncherSection 1.0 ShellLauncherSection.qml
