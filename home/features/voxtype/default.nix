@@ -19,7 +19,8 @@ in
     model.name = "medium.en";
     service.enable = true;
     settings = {
-      hotkey.enabled = false;
+      hotkey.enabled = true;
+      hotkey.key = "PAUSE";
       whisper.language = "en";
       output = {
         mode = "type";
@@ -31,6 +32,12 @@ in
   systemd.user.services.voxtype = {
     Unit = {
       ConditionEnvironment = "WAYLAND_DISPLAY";
+    };
+
+    Service = {
+      Environment = [
+        "HSA_OVERRIDE_GFX_VERSION=11.0.0"
+      ];
     };
 
     Install = lib.mkForce { };
