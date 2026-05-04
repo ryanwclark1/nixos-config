@@ -116,6 +116,11 @@ Rectangle {
     anchors.fill: parent
     hoverEnabled: root.enabled
     cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-    onClicked: (mouse) => { if (!root.enabled) return; stateLayer.burst(mouse.x, mouse.y); root.clicked(); }
+    onClicked: (mouse) => {
+      if (!root.enabled) return;
+      root.forceActiveFocus();
+      stateLayer.burst(mouse.x, mouse.y);
+      root.clicked();
+    }
   }
 }

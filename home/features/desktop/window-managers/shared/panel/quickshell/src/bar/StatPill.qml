@@ -49,6 +49,53 @@ Item {
     fontScale: root.fontScale
     iconScale: root.iconScale
 
+    readonly property bool showSparkline: (root.statKey === "cpuStatus" || root.statKey === "ramStatus" || root.statKey === "gpuStatus") && !root.iconOnly
+    readonly property var historyData: {
+      if (root.statKey === "cpuStatus") return SystemStatus.cpuHistory;
+      if (root.statKey === "ramStatus") return SystemStatus.ramHistory;
+      if (root.statKey === "gpuStatus") return SystemStatus.gpuHistory;
+      return [];
+    }
+
+    Canvas {
+      id: sparklineCanvas
+      anchors.fill: parent
+      anchors.topMargin: parent.height * 0.4
+      anchors.bottomMargin: 4
+      anchors.leftMargin: 12
+      anchors.rightMargin: 12
+      visible: pill.showSparkline
+      opacity: 0.4
+      renderTarget: Canvas.FramebufferObject
+
+      onPaint: {
+        var ctx = getContext("2d");
+        ctx.reset();
+        if (pill.historyData.length < 2) return;
+        
+        var w = width / (pill.historyData.length - 1);
+        var h = height;
+
+        ctx.beginPath();
+        for (var i = 0; i < pill.historyData.length; i++) {
+          var x = i * w;
+          var y = h - (pill.historyData[i] * h * 0.8);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = root.iconColor;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      Connections {
+        target: SystemStatus
+        function onCpuHistoryChanged() { if (root.statKey === "cpuStatus") sparklineCanvas.requestPaint(); }
+        function onRamHistoryChanged() { if (root.statKey === "ramStatus") sparklineCanvas.requestPaint(); }
+        function onGpuHistoryChanged() { if (root.statKey === "gpuStatus") sparklineCanvas.requestPaint(); }
+      }
+    }
+
     onClicked: root.clicked()
     onSecondaryClicked: {
       if (root.statKey === "cpuStatus" || root.statKey === "ramStatus") {
