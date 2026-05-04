@@ -1,22 +1,22 @@
 {
-  "version": "0-unstable-2026-04-17",
-  "release": "2026.04.17-787b533",
+  "version": "0-unstable-2026-05-01",
+  "release": "2026.05.01-eea359f",
   "sources": {
     "x86_64-linux": {
-      "url": "https://downloads.cursor.com/lab/2026.04.17-787b533/linux/x64/agent-cli-package.tar.gz",
-      "hash": "sha256-lCsrWDI5SXcV8jkDNuuOLfNnNwO9FnvVn3vjOifhXFo="
+      "url": "https://downloads.cursor.com/lab/2026.05.01-eea359f/linux/x64/agent-cli-package.tar.gz",
+      "hash": "sha256-Y7F6DsD0tzvz7VQKJNUTkb/gHDfVlh3/rcu/GosCSZw="
     },
     "aarch64-linux": {
-      "url": "https://downloads.cursor.com/lab/2026.04.17-787b533/linux/arm64/agent-cli-package.tar.gz",
-      "hash": "sha256-mFGR/8YG2hMX4TmfmTBkgfWGQ/NF7SJSAzsBFQTHgM4="
+      "url": "https://downloads.cursor.com/lab/2026.05.01-eea359f/linux/arm64/agent-cli-package.tar.gz",
+      "hash": "sha256-jAbwaDTHRyto3wc1NGKInHsoSygKKjoyPqHf0mlyrek="
     },
     "x86_64-darwin": {
-      "url": "https://downloads.cursor.com/lab/2026.04.17-787b533/darwin/x64/agent-cli-package.tar.gz",
-      "hash": "sha256-7nghaUUppXQOvezl9NWtFV3SmN7gOW69dFc1mRW91Xk="
+      "url": "https://downloads.cursor.com/lab/2026.05.01-eea359f/darwin/x64/agent-cli-package.tar.gz",
+      "hash": "sha256-olycdHtBsfphxGfoZi0TAU/Fk7wecLmWPtRBpircFG8="
     },
     "aarch64-darwin": {
-      "url": "https://downloads.cursor.com/lab/2026.04.17-787b533/darwin/arm64/agent-cli-package.tar.gz",
-      "hash": "sha256-A54ySMrLb2283LGbr/rBUyCVaCM2xXCKcWUUpCSVIcI="
+      "url": "https://downloads.cursor.com/lab/2026.05.01-eea359f/darwin/arm64/agent-cli-package.tar.gz",
+      "hash": "sha256-dQHcrtApbJ+ue6VmyP0x4IWS/n7Ew+9oRdAaunLx/hQ="
     }
   }
 }

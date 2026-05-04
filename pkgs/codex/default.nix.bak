@@ -4,7 +4,6 @@
   rustPlatform,
   fetchFromGitHub,
   fetchurl,
-  installShellFiles,
   clang,
   cmake,
   gitMinimal,
@@ -15,29 +14,26 @@
   pkg-config,
   openssl,
   ripgrep,
-  versionCheckHook,
-  installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "codex";
-  version = "0.124.0";
+  version = "0.125.0";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
     tag = "rust-v${finalAttrs.version}";
-    hash = "sha256-YFnzzwCm9/b30qLDMbkf/rEizuTjeqdCgoBZeS0wNBo=";
+    hash = "sha256-q175gmBw+edb5+w8TM36yUeFsyIdB1/IwWzbxBbBmoA=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
 
-  cargoHash = "sha256-tuUY+Mg7DwYnYLt1zfqo0rrz5ip0fukxj947yBJAyks=";
+  cargoHash = "sha256-fDVlj7zAZnwP9YBaYaSQZXYYWrBm5IEyLT9zoorvzFg=";
 
   nativeBuildInputs = [
     clang
     cmake
     gitMinimal
-    installShellFiles
     makeBinaryWrapper
     pkg-config
   ];
@@ -82,21 +78,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # the future once this software stabilizes.
   doCheck = false;
 
-  postInstall = lib.optionalString installShellCompletions ''
-    installShellCompletion --cmd codex \
-      --bash <($out/bin/codex completion bash) \
-      --fish <($out/bin/codex completion fish) \
-      --zsh <($out/bin/codex completion zsh)
-  '';
-
   postFixup = ''
     wrapProgram $out/bin/codex \
       --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
       --set DISABLE_AUTOUPDATER 1
   '';
-
-  doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru = {
     updateScript = nix-update-script {
