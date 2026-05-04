@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
-import ".."
+import ".." as Components
 
 Item {
     id: root
@@ -25,7 +25,7 @@ Item {
         return path !== "" ? path : "~/Videos";
     }
 
-    SettingsTabPage {
+    Components.SettingsTabPage {
         anchors.fill: parent
         settingsRoot: root.settingsRoot
         tabId: root.tabId
@@ -34,7 +34,7 @@ Item {
         compactMode: root.compactMode
         tightSpacing: root.tightSpacing
 
-        SettingsSectionGroup {
+        Components.SettingsSectionGroup {
             title: "Recording Overview"
             description: "Capture source, default quality, audio inclusion, and storage destination at a glance."
 
@@ -83,7 +83,7 @@ Item {
                             anchors.margins: Appearance.spacingM
                             spacing: Appearance.spacingXS
 
-                            SettingsMetricIcon { icon: modelData.icon }
+                            Components.SettingsMetricIcon { icon: modelData.icon }
 
                             Text {
                                 Layout.fillWidth: true
@@ -109,16 +109,16 @@ Item {
             }
         }
 
-        SettingsSectionGroup {
+        Components.SettingsSectionGroup {
             title: "Capture Defaults"
             description: "Default source, frame rate, quality, and cursor behavior for new recordings."
 
-            SettingsCard {
+            Components.SettingsCard {
                 title: "Capture"
                 iconName: "fullscreen.svg"
                 description: "Default source and visual capture behavior for screen recording."
 
-                SettingsModeRow {
+                Components.SettingsModeRow {
                     label: "Capture Source"
                     currentValue: Config.recordingCaptureSource
                     options: [
@@ -134,7 +134,7 @@ Item {
                     onModeSelected: value => Config.recordingCaptureSource = value
                 }
 
-                SettingsModeRow {
+                Components.SettingsModeRow {
                     label: "Frame Rate"
                     currentValue: String(Config.recordingFps)
                     options: [
@@ -154,7 +154,7 @@ Item {
                     onModeSelected: value => Config.recordingFps = parseInt(value, 10) || 60
                 }
 
-                SettingsModeRow {
+                Components.SettingsModeRow {
                     label: "Quality"
                     currentValue: Config.recordingQuality
                     options: [
@@ -174,7 +174,7 @@ Item {
                     onModeSelected: value => Config.recordingQuality = value
                 }
 
-                SettingsToggleRow {
+                Components.SettingsToggleRow {
                     label: "Record Cursor"
                     icon: "video.svg"
                     configKey: "recordingRecordCursor"
@@ -184,16 +184,16 @@ Item {
             }
         }
 
-        SettingsSectionGroup {
+        Components.SettingsSectionGroup {
             title: "Audio Capture"
             description: "Control whether desktop output, microphone input, or both are included by default."
 
-            SettingsCard {
+            Components.SettingsCard {
                 title: "Audio"
                 iconName: "speaker.svg"
                 description: "Choose which audio sources are included by default."
 
-                SettingsToggleRow {
+                Components.SettingsToggleRow {
                     label: "Desktop Audio"
                     icon: "speaker.svg"
                     configKey: "recordingIncludeDesktopAudio"
@@ -201,7 +201,7 @@ Item {
                     disabledText: "System output audio is not captured."
                 }
 
-                SettingsToggleRow {
+                Components.SettingsToggleRow {
                     label: "Microphone"
                     icon: "mic-off.svg"
                     configKey: "recordingIncludeMicrophoneAudio"
@@ -211,16 +211,16 @@ Item {
             }
         }
 
-        SettingsSectionGroup {
+        Components.SettingsSectionGroup {
             title: "Storage"
             description: "Choose where recordings land when the recording flow completes."
 
-            SettingsCard {
+            Components.SettingsCard {
                 title: "Storage"
                 iconName: "folder.svg"
                 description: "Leave blank to use the default Videos directory."
 
-                SettingsDirectoryPickerRow {
+                Components.SettingsDirectoryPickerRow {
                     label: "Output Directory"
                     callerId: "recording-folder"
                     leadingIcon: "folder.svg"

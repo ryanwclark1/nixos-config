@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
-import ".."
+import ".." as Components
 
 ColumnLayout {
     id: root
@@ -12,13 +12,13 @@ ColumnLayout {
 
     spacing: Appearance.spacingL
 
-    SettingsCard {
+    Components.SettingsCard {
         Layout.fillWidth: true
         title: "Search Limits"
         iconName: "clock.svg"
         description: "Tune search breadth, file query thresholds, and response timing."
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Max Results"
             icon: "clock.svg"
             min: 20
@@ -28,7 +28,7 @@ ColumnLayout {
             onMoved: v => Config.launcherMaxResults = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "File Query Min Length"
             icon: "document.svg"
             min: 1
@@ -37,7 +37,7 @@ ColumnLayout {
             onMoved: v => Config.launcherFileMinQueryLength = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "File Search Max Results"
             icon: "document.svg"
             min: 20
@@ -47,7 +47,7 @@ ColumnLayout {
             onMoved: v => Config.launcherFileMaxResults = v
         }
 
-        SettingsDirectoryPickerRow {
+        Components.SettingsDirectoryPickerRow {
             label: "Default Search Directory"
             callerId: "launcher-search-folder"
             leadingIcon: "folder.svg"
@@ -57,7 +57,7 @@ ColumnLayout {
             onTextEdited: value => Config.launcherFileSearchRoot = value.trim() === "" ? "~" : value.trim()
         }
 
-        SettingsToggleRow {
+        Components.SettingsToggleRow {
             label: "Show Hidden Files"
             icon: "sort.svg"
             configKey: "launcherFileShowHidden"
@@ -65,14 +65,14 @@ ColumnLayout {
             disabledText: "Hide dotfiles and hidden directories in file mode."
         }
 
-        SettingsInfoCallout {
+        Components.SettingsInfoCallout {
             visible: !root.launcherFilePreviewToggleAvailable
             iconName: "info.svg"
             title: "File Preview Temporarily Disabled"
             body: "The file preview pane is gated off by default while a QuickShell restart issue in files mode is being root-caused. Set QS_ENABLE_UNSTABLE_LAUNCHER_FILE_PREVIEW=1 only for debugging."
         }
 
-        SettingsToggleRow {
+        Components.SettingsToggleRow {
             visible: root.launcherFilePreviewToggleAvailable
             label: "File Preview Pane"
             icon: "image.svg"
@@ -81,7 +81,7 @@ ColumnLayout {
             disabledText: "Hide the file preview pane."
         }
 
-        SettingsTextInputRow {
+        Components.SettingsTextInputRow {
             label: "File Opener"
             leadingIcon: "document.svg"
             placeholderText: "xdg-open"
@@ -90,7 +90,7 @@ ColumnLayout {
             onTextEdited: value => Config.launcherFileOpener = value.trim() === "" ? "xdg-open" : value.trim()
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Cache TTL"
             icon: "timer.svg"
             min: 30
@@ -101,7 +101,7 @@ ColumnLayout {
             onMoved: v => Config.launcherCacheTtlSec = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Search Debounce"
             icon: "clock.svg"
             min: 0
@@ -112,7 +112,7 @@ ColumnLayout {
             onMoved: v => Config.launcherSearchDebounceMs = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "File Search Debounce"
             icon: "clock.svg"
             min: 50
@@ -124,17 +124,17 @@ ColumnLayout {
         }
     }
 
-    SettingsCard {
+    Components.SettingsCard {
         Layout.fillWidth: true
         title: "Result Scoring"
         iconName: "app-generic.svg"
         description: "Adjust how launcher results are ranked across labels, commands, and metadata."
 
-        SettingsSectionLabel {
+        Components.SettingsSectionLabel {
             text: "RESULT SCORING WEIGHTS"
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Name Weight"
             icon: "keyboard.svg"
             min: 0.1
@@ -145,7 +145,7 @@ ColumnLayout {
             onMoved: v => Config.launcherScoreNameWeight = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Title Weight"
             icon: "keyboard.svg"
             min: 0.1
@@ -156,7 +156,7 @@ ColumnLayout {
             onMoved: v => Config.launcherScoreTitleWeight = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Exec/Class Weight"
             icon: "terminal.svg"
             min: 0.1
@@ -167,7 +167,7 @@ ColumnLayout {
             onMoved: v => Config.launcherScoreExecWeight = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Body Weight"
             icon: "document.svg"
             min: 0.1
@@ -178,7 +178,7 @@ ColumnLayout {
             onMoved: v => Config.launcherScoreBodyWeight = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Category/Keywords Weight"
             icon: "apps.svg"
             min: 0.1

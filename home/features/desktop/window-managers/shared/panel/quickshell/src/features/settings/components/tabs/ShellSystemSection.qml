@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
-import ".."
+import ".." as Components
 
 Item {
     id: root
@@ -40,32 +40,32 @@ Item {
         anchors.fill: parent
         spacing: Appearance.spacingL
 
-        SettingsCard {
+        Components.SettingsCard {
             id: card
             Layout.fillWidth: true
             title: "Shell"
             iconName: "settings.svg"
             description: "Core shell visuals and transient notification behavior."
 
-            SettingsFieldGrid {
+            Components.SettingsFieldGrid {
                 maximumColumns: root.compactMode ? 1 : 2
 
-                SettingsToggleRow {
+                Components.SettingsToggleRow {
                     label: "Floating Bar"
                     icon: "settings.svg"
                     configKey: "barFloating"
                 }
-                SettingsToggleRow {
+                Components.SettingsToggleRow {
                     label: "Blur Effects"
                     icon: "weather-sunny.svg"
                     configKey: "blurEnabled"
                 }
-                SettingsToggleRow {
+                Components.SettingsToggleRow {
                     label: "Debug Logging"
                     icon: "bug.svg"
                     configKey: "debug"
                 }
-                SettingsToggleRow {
+                Components.SettingsToggleRow {
                     label: "Bar Widget Load Logging"
                     icon: "alert.svg"
                     description: "Log to journal when bar widgets are disabled, fail to load, stay pending, or report zero size."
@@ -73,7 +73,7 @@ Item {
                 }
             }
 
-            SettingsSliderRow {
+            Components.SettingsSliderRow {
                 label: "Notification Center Width"
                 icon: "alert.svg"
                 min: Config.notifCenterWidthMin
@@ -82,7 +82,7 @@ Item {
                 onMoved: v => Config.notifCenterWidth = v
             }
 
-            SettingsSliderRow {
+            Components.SettingsSliderRow {
                 label: "Popup Duration"
                 icon: "timer.svg"
                 min: 2000
@@ -94,18 +94,18 @@ Item {
             }
         }
 
-        SettingsCard {
+        Components.SettingsCard {
             Layout.fillWidth: true
             title: "Panel Enablement"
             iconName: "options.svg"
             description: "Disable unused panels to reduce memory. Changes take effect on next toggle."
 
-            SettingsFieldGrid {
+            Components.SettingsFieldGrid {
                 maximumColumns: root.compactMode ? 1 : 2
 
                 Repeater {
                     model: root._panelDefs
-                    delegate: SettingsToggleRow {
+                    delegate: Components.SettingsToggleRow {
                         required property var modelData
                         label: modelData.label
                         icon: modelData.icon
@@ -115,7 +115,7 @@ Item {
                 }
             }
 
-            SettingsInfoCallout {
+            Components.SettingsInfoCallout {
                 iconName: "info.svg"
                 title: "Memory savings"
                 body: "Disabled panels are never created, saving memory and startup time. Re-enable any time."

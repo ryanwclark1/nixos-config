@@ -279,6 +279,11 @@ var entries = [
     { tabId: "launcher-search", cardTitle: "Result Scoring", label: "Body Weight", keywords: "search score body weight", type: "slider" },
     { tabId: "launcher-search", cardTitle: "Result Scoring", label: "Category/Keywords Weight", keywords: "search score category keywords weight", type: "slider" },
 
+    // ── Forge ────────────────────────────────────────
+    { tabId: "forge", cardTitle: "GitHub", label: "Access Token", keywords: "github gh token api notification", type: "password" },
+    { tabId: "forge", cardTitle: "GitLab", label: "GitLab Host", keywords: "gitlab host url server", type: "text" },
+    { tabId: "forge", cardTitle: "GitLab", label: "Access Token", keywords: "gitlab token api notification todo", type: "password" },
+
     // ── Launcher (Web) ───────────────────────────────
     { tabId: "launcher-web", cardTitle: "Web Search Behavior", label: "Web Enter Uses Primary", keywords: "web search enter primary provider", type: "toggle" },
     { tabId: "launcher-web", cardTitle: "Web Search Behavior", label: "Web Number Hotkeys", keywords: "web number hotkeys provider", type: "toggle" },

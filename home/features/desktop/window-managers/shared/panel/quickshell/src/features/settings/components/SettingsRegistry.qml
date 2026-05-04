@@ -717,6 +717,23 @@ QtObject {
             }
         },
         {
+            id: "forge",
+            label: "Forge",
+            shortLabel: "Forge",
+            description: "Configure GitHub and GitLab notifications and todo monitoring.",
+            pageStyle: "catalog",
+            icon: "brands/github.svg",
+            categoryId: "extensibility",
+            order: 60,
+            component: "ForgeTab.qml",
+            searchTerms: ["forge", "github", "gitlab", "notifications", "token"],
+            owner: {
+                surface: "",
+                service: "ForgeService",
+                configDomain: "forge"
+            }
+        },
+        {
             id: "health",
             label: "Diagnostics",
             shortLabel: "Diagnostics",
