@@ -2,6 +2,7 @@ import QtQuick
 import "../../../shared"
 import "../../../services"
 import "../../../widgets" as SharedWidgets
+import ".."
 
 SettingsTextInputRow {
     id: root

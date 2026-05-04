@@ -46,6 +46,7 @@ ShellControlCenterSection 1.0 ShellControlCenterSection.qml
 SystemTab 1.0 SystemTab.qml
 ThemeTab 1.0 ThemeTab.qml
 TimeWeatherTab 1.0 TimeWeatherTab.qml
+UnifiTab 1.0 UnifiTab.qml
 WallpaperCycleSlider 1.0 WallpaperCycleSlider.qml
 WallpaperPreviewContainer 1.0 WallpaperPreviewContainer.qml
 WallpaperSolidPicker 1.0 WallpaperSolidPicker.qml
