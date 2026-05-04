@@ -19,6 +19,7 @@ singleton DependencyService 1.0 DependencyService.qml
 singleton EmojiCatalogService 1.0 EmojiCatalogService.qml
 singleton FirstRunService 1.0 FirstRunService.qml
 singleton FocusGrabManager 1.0 FocusGrabManager.qml
+singleton ForgeService 1.0 ForgeService.qml
 singleton IdleService 1.0 IdleService.qml
 singleton GameModeService 1.0 GameModeService.qml
 singleton DesktopWidgetRegistry 1.0 ../features/desktop/registry/DesktopWidgetRegistry.qml
