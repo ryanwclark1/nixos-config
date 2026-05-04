@@ -13,11 +13,16 @@ in
     inputs.voxtype.homeManagerModules.default
   ];
 
+  home.packages = with pkgs; [
+    wtype
+    wl-clipboard
+  ];
+
   programs.voxtype = {
     enable = true;
     package = inputs.voxtype.packages.${system}.rocm;
     model.name = "medium.en";
-    service.enable = true;
+    service.enable = false;
     settings = {
       hotkey.enabled = true;
       hotkey.key = "PAUSE";
@@ -31,6 +36,8 @@ in
 
   systemd.user.services.voxtype = {
     Unit = {
+      Description = "VoxType push-to-talk voice-to-text daemon";
+      After = [ "graphical-session.target" ];
       ConditionEnvironment = "WAYLAND_DISPLAY";
     };
 
@@ -39,8 +46,16 @@ in
         "HSA_OVERRIDE_GFX_VERSION=11.0.0"
         "PATH=${lib.makeBinPath [ pkgs.wtype pkgs.wl-clipboard ]}:/run/current-system/sw/bin"
       ];
+      ExecSearchPath = [
+        "${pkgs.wtype}/bin"
+        "${pkgs.wl-clipboard}/bin"
+      ];
+      Restart = lib.mkForce "always";
+      RestartSec = lib.mkForce 3;
     };
 
-    Install = lib.mkForce { };
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
   };
 }
