@@ -20,9 +20,6 @@ Rectangle {
   activeFocusOnTab: true
   Accessible.role: Accessible.Slider
   Accessible.name: root.icon || "Slider"
-  Accessible.value: Math.round(root.value * 100) + "%"
-  Accessible.onIncreaseAction: root._flushSliderValue(root.value + 0.05)
-  Accessible.onDecreaseAction: root._flushSliderValue(root.value - 0.05)
 
   Keys.onPressed: event => {
     var step = 0.05;

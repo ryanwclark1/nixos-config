@@ -10,6 +10,38 @@ Item {
   property real fontScale: 1.0
   property real iconScale: 1.0
 
+  activeFocusOnTab: true
+  Accessible.role: Accessible.Button
+  Accessible.name: root.labelText
+  Accessible.description: root.tooltipText
+  Accessible.onPressAction: root._handleTrigger()
+
+  function _handleTrigger() {
+    Quickshell.execDetached(SU.ipcCall("Launcher", "openDrun"));
+  }
+
+  function _handleContextMenu() {
+    var globalPos = root.mapToItem(null, 0, 0);
+    root.contextMenuRequested([
+        { label: "Check Health", icon: "board.svg", action: () => SystemStatus.refreshHealth() },
+        { label: "Apply Safe Fixes", icon: "checkmark.svg", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.hasSafeFixableIncidents },
+        { label: "Open Health Dashboard", icon: "settings.svg", action: () => Quickshell.execDetached(SU.ipcCall("SettingsHub", "openTab", "health")) },
+        { separator: true },
+        { label: "Restart Shell", icon: "arrow-clockwise.svg", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }
+    ], { x: globalPos.x, y: globalPos.y, width: root.width, height: root.height });
+  }
+
+  Keys.onPressed: event => {
+    if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+      stateLayer.burst(width / 2, height / 2);
+      root._handleTrigger();
+      event.accepted = true;
+    } else if (event.key === Qt.Key_Menu) {
+      root._handleContextMenu();
+      event.accepted = true;
+    }
+  }
+
   width: (iconOnly ? 30 : Math.max(30, logoRow.implicitWidth + 12)) * iconScale
   height: 30 * iconScale
   implicitWidth: width
@@ -75,6 +107,8 @@ Item {
     anchors.fill: parent
     radius: Appearance.radiusSmall
     color: "transparent"
+    border.color: root.activeFocus ? Colors.primary : "transparent"
+    border.width: root.activeFocus ? 2 : 0
 
     SharedWidgets.StateLayer {
       id: stateLayer
@@ -119,18 +153,12 @@ Item {
     cursorShape: Qt.PointingHandCursor
     acceptedButtons: Qt.LeftButton | Qt.RightButton
     onClicked: (mouse) => {
+      root.forceActiveFocus();
       stateLayer.burst(mouse.x, mouse.y);
       if (mouse.button === Qt.LeftButton) {
-        Quickshell.execDetached(SU.ipcCall("Launcher", "openDrun"));
+        root._handleTrigger();
       } else {
-        var globalPos = root.mapToItem(null, 0, 0);
-        root.contextMenuRequested([
-            { label: "Check Health", icon: "board.svg", action: () => SystemStatus.refreshHealth() },
-            { label: "Apply Safe Fixes", icon: "checkmark.svg", action: () => SystemStatus.applySafeFixes(), visible: SystemStatus.hasSafeFixableIncidents },
-            { label: "Open Health Dashboard", icon: "settings.svg", action: () => Quickshell.execDetached(SU.ipcCall("SettingsHub", "openTab", "health")) },
-            { separator: true },
-            { label: "Restart Shell", icon: "arrow-clockwise.svg", action: () => Quickshell.execDetached(["systemctl", "--user", "restart", "quickshell"]) }
-        ], { x: globalPos.x, y: globalPos.y, width: root.width, height: root.height });
+        root._handleContextMenu();
       }
     }
   }
