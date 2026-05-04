@@ -455,6 +455,15 @@ QtObject {
         function onUnifiProtectPollIntervalChanged() {
             root.config.scheduleSave();
         }
+        function onGithubTokenChanged() {
+            root.config.scheduleSave();
+        }
+        function onGitlabTokenChanged() {
+            root.config.scheduleSave();
+        }
+        function onGitlabHostChanged() {
+            root.config.scheduleSave();
+        }
         function onBarWidgetLoadLoggingChanged() {
             root.config.scheduleSave();
         }
