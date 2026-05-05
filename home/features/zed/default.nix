@@ -6,7 +6,7 @@
 {
   home.packages = with pkgs; [
     nil
-    nixfmt-rfc-style
+    nixfmt
     biome
     taplo
     rust-analyzer

@@ -158,7 +158,7 @@
           "Mod+Alt+L".action.spawn = [ "hyprlock" ];
           "Mod+Ctrl+E".action.spawn = [ "qs-rofi" "-show" "emoji" ];
           "Mod+Ctrl+C".action.spawn = [ "qs-rofi" "-show" "calc" ];
-          "Mod+Shift+T".action.spawn = [ "voxtype" "toggle" ];
+          "Mod+V".action.spawn = [ "voxtype" "record" "toggle" ];
           "Mod+F1".action.spawn = [ "qs-rofi" "-show" "keybinds" ];
 
           # Screenshot (using shared Wayland script)
@@ -180,7 +180,7 @@
           "Mod+Shift+Escape".action.spawn = [ "quickshell" "ipc" "call" "Shell" "panicClose" ];
 
           # Clipboard history
-          "Mod+V".action.spawn = [ "sh" "-c" "cliphist list | rofi -dmenu | cliphist decode | wl-copy" ];
+          "Mod+Ctrl+V".action.spawn = [ "sh" "-c" "cliphist list | rofi -dmenu | cliphist decode | wl-copy" ];
           "Mod+Shift+V".action.spawn = [ "sh" "-c" "cliphist list | rofi -dmenu -theme ~/.config/rofi/style/cliphist.rasi | cliphist decode | wl-copy" ];
 
           # Web search

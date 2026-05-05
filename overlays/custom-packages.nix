@@ -67,4 +67,23 @@ final: prev: {
     callPackageWithoutMeta (import ../pkgs/kiro) {
       callPackage = callPackageWithoutMeta;
     };
+
+  # Fix Wireshark hash mismatch for version 4.6.5
+  # The upstream hash changed or was incorrectly specified in nixpkgs
+  wireshark = prev.wireshark.overrideAttrs (oldAttrs: {
+    src = prev.fetchFromGitLab {
+      repo = "wireshark";
+      owner = "wireshark";
+      tag = "v4.6.5";
+      hash = "sha256-Zvrwxjp4LK2J3QnxmPxKKrU01YHQvPyp54UWzeGNCjA=";
+    };
+  });
+  wireshark-cli = prev.wireshark-cli.overrideAttrs (oldAttrs: {
+    src = prev.fetchFromGitLab {
+      repo = "wireshark";
+      owner = "wireshark";
+      tag = "v4.6.5";
+      hash = "sha256-Zvrwxjp4LK2J3QnxmPxKKrU01YHQvPyp54UWzeGNCjA=";
+    };
+  });
 }

@@ -15,10 +15,10 @@ describe("System monitor panel contract", () => {
   it("opens wider by default and reserves more width for detail tables", () => {
     const panel = source("src/features/system/surfaces/SystemMonitorPanel.qml");
 
-    expect(panel).toContain("readonly property int telemetryColumnMinWidth: 360");
-    expect(panel).toContain("readonly property int detailColumnMinWidth: 760");
-    expect(panel).toContain("readonly property int panelMaxWidth: 1760");
-    expect(panel).toContain("property int panelWidth: 1360");
+    expect(panel).toContain("readonly property int telemetryColumnMinWidth: 400");
+    expect(panel).toContain("readonly property int detailColumnMinWidth: 1100");
+    expect(panel).toContain("readonly property int panelMaxWidth: 2560");
+    expect(panel).toContain("property int panelWidth: 1700");
     expect(panel).toContain("Math.round(root.panelWidth * 0.32)");
   });
 
