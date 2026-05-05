@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 
 const moduleText = readFileSync(resolve(__dirname, "../../default.nix"), "utf8");
 const wallpaperLayerText = readFileSync(resolve(__dirname, "../../src/features/background/WallpaperLayer.qml"), "utf8");
-const liveStreamOverlayText = readFileSync(resolve(__dirname, "../../src/features/unifi-protect/components/LiveStreamOverlay.qml"), "utf8");
+const liveStreamOverlayText = readFileSync(resolve(__dirname, "../../src/features/unifi_protect/components/LiveStreamOverlay.qml"), "utf8");
 
 describe("quickshell systemd GStreamer environment", () => {
   it("exposes GStreamer plugins needed by Qt Multimedia in the user service", () => {
