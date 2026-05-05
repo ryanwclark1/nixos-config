@@ -57,6 +57,12 @@ BasePopupMenu {
     ClipboardHistoryService.deleteEntry(item.id);
   }
 
+  function openClipboardImage(path) {
+    if (!path)
+      return;
+    Quickshell.execDetached(["xdg-open", path]);
+  }
+
   readonly property var filteredItemsResult: {
     var items = Array.isArray(clipboardItems) ? clipboardItems : [];
     return SU.filterByFuzzy(items, searchQuery, function(it) {
@@ -240,6 +246,19 @@ BasePopupMenu {
               }
 
               SharedWidgets.IconButton {
+                id: openBtn
+                icon: "open.svg"
+                size: 24
+                visible: clipCard.isImage && clipCard.imageSrc !== ""
+                iconSize: Appearance.fontSizeSmall
+                iconColor: Colors.textDisabled
+                stateColor: Colors.primary
+                tooltipText: "Open in viewer"
+                onClicked: root.openClipboardImage(clipCard.imageSrc)
+                z: 10
+              }
+
+              SharedWidgets.IconButton {
                 id: deleteBtn
                 icon: "delete.svg"
                 size: 24
@@ -261,7 +280,7 @@ BasePopupMenu {
             cursorShape: Qt.PointingHandCursor
             onEntered: root.selectedIndex = index
             onClicked: (mouse) => {
-              if (deleteBtn.containsMouse) {
+              if (deleteBtn.containsMouse || (openBtn && openBtn.containsMouse)) {
                 mouse.accepted = false;
                 return;
               }
