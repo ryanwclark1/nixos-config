@@ -42,7 +42,7 @@ SharedWidgets.BarPill {
         },
         {
             label: "Open GitHub",
-            icon: "brands/github.svg",
+            icon: "brands/github-symbolic.svg",
             visible: Config.githubToken !== "",
             action: () => Quickshell.execDetached(["xdg-open", "https://github.com/notifications"])
         },
@@ -65,7 +65,7 @@ SharedWidgets.BarPill {
         spacing: Appearance.spacingXS * root.iconScale
 
         SharedWidgets.SvgIcon {
-            source: "brands/github.svg"
+            source: "brands/github-symbolic.svg"
             color: root.accentColor
             size: Appearance.fontSizeMedium * root.iconScale
             anchors.verticalCenter: parent.verticalCenter

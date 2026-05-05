@@ -29,15 +29,15 @@ Item {
 
     SettingsTabPage {
         anchors.fill: parent
-        tabId: root.tabId
-        title: "Forge"
-        iconName: "brands/github.svg"
+        SettingsPage {
+            tabId: root.tabId
+            title: "Forge"
+            iconName: "brands/github-symbolic.svg"
 
-        SettingsCard {
-            title: "GitHub"
-            iconName: "brands/github.svg"
-            description: "Monitor your GitHub notifications directly in the bar."
-
+            SettingsCard {
+                title: "GitHub"
+                iconName: "brands/github-symbolic.svg"
+                description: "Monitor your GitHub notifications directly in the bar."
             SettingsInfoCallout {
                 body: "Requires the 'gh' CLI and a Personal Access Token with 'notifications' scope."
             }

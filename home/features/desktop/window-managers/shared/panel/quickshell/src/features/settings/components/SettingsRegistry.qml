@@ -722,7 +722,7 @@ QtObject {
             shortLabel: "Forge",
             description: "Configure GitHub and GitLab notifications and todo monitoring.",
             pageStyle: "catalog",
-            icon: "brands/github.svg",
+            icon: "brands/github-symbolic.svg",
             categoryId: "extensibility",
             order: 60,
             component: "ForgeTab.qml",
