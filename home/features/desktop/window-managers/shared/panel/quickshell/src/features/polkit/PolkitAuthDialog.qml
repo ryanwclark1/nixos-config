@@ -140,6 +140,7 @@ PanelWindow {
                     left: parent.left
                     right: parent.right
                     top: parent.top
+                    bottom: parent.bottom
                     margins: Appearance.paddingLarge
                 }
                 spacing: Appearance.spacingL
@@ -158,7 +159,7 @@ PanelWindow {
                     Layout.alignment: Qt.AlignHCenter
                     text: "Authentication Required"
                     color: Colors.text
-                    font.pixelSize: Appearance.fontSizeHuge
+                    font.pixelSize: Appearance.fontSizeXXL
                     font.weight: Font.Bold
                     font.letterSpacing: Appearance.letterSpacingTight
                 }
@@ -245,7 +246,7 @@ PanelWindow {
                     Rectangle {
                         Layout.fillWidth: true
                         height: 40
-                        radius: Appearance.radiusSmall
+                        radius: Appearance.radiusMedium
                         color: Colors.highlightLight
                         border.color: Colors.border
                         border.width: 1
@@ -277,7 +278,7 @@ PanelWindow {
                     Rectangle {
                         Layout.fillWidth: true
                         height: 40
-                        radius: Appearance.radiusSmall
+                        radius: Appearance.radiusMedium
                         color: pamContext.attemptsExhausted
                             ? Colors.highlightLight
                             : Colors.withAlpha(Colors.primary, 0.15)

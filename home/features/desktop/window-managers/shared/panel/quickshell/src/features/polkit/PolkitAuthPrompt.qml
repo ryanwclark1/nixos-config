@@ -9,7 +9,7 @@ ColumnLayout {
     required property PolkitPamContext pamContext
     signal submitRequested()
 
-    spacing: Appearance.spacingL
+    spacing: Appearance.spacingM
 
     property real shakeOffset: 0
     transform: Translate { x: root.shakeOffset }
