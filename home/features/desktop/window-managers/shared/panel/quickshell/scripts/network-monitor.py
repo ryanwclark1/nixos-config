@@ -574,6 +574,19 @@ def collect_primary_details(active_conns):
     }
 
     if not primary_path or str(primary_path) == "/":
+        # Fallback: pick first non-VPN active connection
+        non_vpn = [c for c in active_conns if not is_vpn_type(c["type"])]
+        if non_vpn:
+            # We need the path of the active connection to get its properties.
+            # NM property ActiveConnections returns the paths.
+            ac_paths = get_nm_property("ActiveConnections") or []
+            for ac_path in ac_paths:
+                uuid = safe_get_prop(_bus, str(ac_path), NM_ACTIVE_IFACE, "Uuid")
+                if str(uuid) == non_vpn[0]["uuid"]:
+                    primary_path = ac_path
+                    break
+
+    if not primary_path or str(primary_path) == "/":
         # Check connectivity anyway
         conn_state = get_nm_property("Connectivity")
         # NM_CONNECTIVITY: 0=unknown, 1=none, 2=portal, 3=limited, 4=full

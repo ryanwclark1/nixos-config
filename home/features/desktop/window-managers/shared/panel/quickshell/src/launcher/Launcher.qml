@@ -2829,8 +2829,8 @@ PanelWindow {
             return;
         }
         fileSearchDebounceTimer.stop();
-        // Zero debounce for fast modes — drun/calc/emoji filter takes <5ms
-        if (Config.launcherSearchDebounceMs <= 0 || mode === "calc" || mode === "drun" || mode === "emoji") {
+        // Zero debounce for fast modes — calc filter takes <5ms
+        if (Config.launcherSearchDebounceMs <= 0 || mode === "calc") {
             applySearchRefresh(false);
             return;
         }
