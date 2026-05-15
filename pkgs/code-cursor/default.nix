@@ -135,6 +135,15 @@ in
     nativeBuildInputs =
       (oldAttrs.nativeBuildInputs or [ ]) ++ lib.optionals hostPlatform.isDarwin [ undmg ];
 
+    # Cursor bundles both glibc and musl variants of some native addons.
+    # The musl binaries are optional on glibc systems, so don't make
+    # autoPatchelf fail the build trying to resolve musl libc for them.
+    autoPatchelfIgnoreMissingDeps =
+      (oldAttrs.autoPatchelfIgnoreMissingDeps or [ ])
+      ++ lib.optionals (hostPlatform.isLinux && hostPlatform.system == "x86_64-linux") [
+        "libc.musl-x86_64.so.1"
+      ];
+
     passthru = (oldAttrs.passthru or { }) // {
       inherit sources;
     };
