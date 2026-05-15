@@ -7,7 +7,37 @@
 
 let
   system = pkgs.stdenv.hostPlatform.system;
-  voxtypePkg = inputs.voxtype.packages.${system}.vulkan;
+  voxtypeUnwrapped = inputs.voxtype.packages.${system}.voxtype-vulkan-unwrapped.overrideAttrs (old: {
+    # Upstream's default Rust check builds examples. The Cohere ONNX inspection
+    # example references optional ONNX deps while this package only enables Vulkan.
+    cargoTestFlags = (old.cargoTestFlags or [ ]) ++ [
+      "--lib"
+      "--bins"
+      "--tests"
+    ];
+  });
+
+  voxtypePkg = pkgs.symlinkJoin {
+    name = "voxtype-vulkan-wrapped-${voxtypeUnwrapped.version}";
+    paths = [ voxtypeUnwrapped ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/voxtype \
+        --prefix PATH : ${
+          lib.makeBinPath (with pkgs; [
+            wtype
+            dotool
+            wl-clipboard
+            ydotool
+            xdotool
+            xclip
+            libnotify
+            pciutils
+          ])
+        }
+    '';
+    inherit (voxtypeUnwrapped) meta;
+  };
 
   whisperModel = pkgs.fetchurl {
     url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.en.bin";

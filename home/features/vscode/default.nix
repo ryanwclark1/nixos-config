@@ -13,13 +13,13 @@ in
     ./custom.theme/themes/theme.json.nix
   ];
 
-  home.file.".config/vscode/plugins/custom.theme/package.json" = {
+  home.file.".config/VSCodium/plugins/custom.theme/package.json" = {
     force = true;
     source = ./custom.theme/package.json;
   };
 
   # MCP Configuration
-  home.file.".config/Code/User/mcp.json" = {
+  home.file.".config/VSCodium/User/mcp.json" = {
     force = true;
     text = builtins.toJSON {
       servers = {
@@ -194,7 +194,7 @@ in
     tailwindcss_4
   ];
 
-  programs.vscode = {
+  programs.vscodium = {
     enable = true;
     # The Microsoft VS Code derivation fetches its upstream tarball during
     # builds, which makes home-manager switch depend on Microsoft's redirect
@@ -216,8 +216,8 @@ in
                 }
                 ''
                   mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
-                  ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
-                  ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
+                  ln -s ${config.home.homeDirectory}/.config/VSCodium/plugins/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
+                  ln -s ${config.home.homeDirectory}/.config/VSCodium/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
                 '';
           in
           [
