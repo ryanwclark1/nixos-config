@@ -12,9 +12,10 @@
         #!/usr/bin/env bash
         set -euo pipefail
 
-        # Ensure Playwright sees the Nix-provided browser bundle unless the
-        # caller has overridden it explicitly.
-        export PLAYWRIGHT_BROWSERS_PATH="''${PLAYWRIGHT_BROWSERS_PATH:-${lib.getLib pkgs.playwright.browsers}}"
+        # Ensure Playwright sees the browser bundle built with this exact
+        # nixpkgs Playwright version. Keeping an older value from a long-lived
+        # shell points Playwright at the wrong browser revision.
+        export PLAYWRIGHT_BROWSERS_PATH="${lib.getLib pkgs.playwright.browsers}"
 
         exec ${pkgs.nodejs}/bin/node ${pkgs.playwright}/cli.js "$@"
       '';
