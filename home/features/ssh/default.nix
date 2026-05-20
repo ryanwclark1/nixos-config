@@ -8,12 +8,10 @@
 let
   # Common host configuration shared across multiple hosts
   commonHostConfig = {
-    user = "administrator";
-    identityFile = "~/.ssh/ssh_host_ed25519_key";
-    identitiesOnly = true;
-    extraOptions = {
-      PreferredAuthentications = "publickey";
-    };
+    User = "administrator";
+    IdentityFile = "~/.ssh/ssh_host_ed25519_key";
+    IdentitiesOnly = "yes";
+    PreferredAuthentications = "publickey";
   };
 in
 {
@@ -24,7 +22,7 @@ in
   #
   # IMPORTANT: ~/.ssh/config is fully managed by Nix through this configuration.
   # DO NOT manually edit ~/.ssh/config - it will be overwritten on rebuild.
-  # To add new hosts, add entries to the matchBlocks section below, then rebuild.
+  # To add new hosts, add entries to the settings section below, then rebuild.
   #
   # IDE TOOLS (VSCode, Cursor, etc.):
   # These tools can write to ~/.ssh/config.local, which is automatically included.
@@ -32,135 +30,124 @@ in
   # own entries to config.local without conflicts.
   programs.ssh = {
     enable = true;
-    # Disable default config to avoid deprecation warning
-    # We explicitly set the defaults we want in matchBlocks."*"
-    enableDefaultConfig = false;
 
-    matchBlocks = {
-      # Default settings for all hosts (replaces enableDefaultConfig defaults)
+    settings = {
+      # Default settings for all hosts
       "*" = {
         # Key management
-        addKeysToAgent = "confirm";
-        identitiesOnly = false;
-        hashKnownHosts = false;
+        AddKeysToAgent = "confirm";
+        IdentitiesOnly = "no";
+        HashKnownHosts = "no";
 
         # Connection optimization
-        compression = true;
+        Compression = "yes";
 
         # Security: agent and X11 forwarding disabled by default
-        forwardAgent = false;
-        forwardX11 = false;
-        forwardX11Trusted = false;
+        ForwardAgent = "no";
+        ForwardX11 = "no";
+        ForwardX11Trusted = "no";
 
-        # Additional options that aren't directly supported in matchBlocks
-        extraOptions = {
-          # ControlMaster: connection multiplexing for faster subsequent connections
-          # Note: kssh (Kitty's SSH wrapper) may override these with its own control socket
-          ControlMaster = "auto";
-          ControlPath = "~/.ssh/control-%r@%h:%p";
-          ControlPersist = "10m";
+        # ControlMaster: connection multiplexing for faster subsequent connections
+        # Note: kssh (Kitty's SSH wrapper) may override these with its own control socket
+        ControlMaster = "auto";
+        ControlPath = "~/.ssh/control-%r@%h:%p";
+        ControlPersist = "10m";
 
-          # Keep connections alive
-          ServerAliveInterval = "60";
-          ServerAliveCountMax = "5";
-          TCPKeepAlive = "yes";
+        # Keep connections alive
+        ServerAliveInterval = 60;
+        ServerAliveCountMax = 5;
+        TCPKeepAlive = "yes";
 
-          # Connection settings
-          ConnectTimeout = "10";
-          BatchMode = "no";
+        # Connection settings
+        ConnectTimeout = 10;
+        BatchMode = "no";
 
-          # Security settings
-          ObscureKeystrokeTiming = "no";
-          StrictHostKeyChecking = "ask";
-          UserKnownHostsFile = "~/.ssh/known_hosts ~/.ssh/known_hosts2";
-        };
+        # Security settings
+        ObscureKeystrokeTiming = "no";
+        StrictHostKeyChecking = "ask";
       };
 
       # ============================================
       # Host configurations
       # ============================================
       # To add a new host:
-      # 1. Add a new entry in matchBlocks with the host alias as the key
+      # 1. Add a new entry in settings with the host alias as the key
       # 2. Use commonHostConfig for standard settings, or define custom config
       # 3. Rebuild with: home-manager switch
       #
       # Example for a new host:
       #   "myhost" = commonHostConfig // {
-      #     hostname = "myhost.example.com";
-      #     port = 2222;  # Optional: custom port
+      #     HostName = "myhost.example.com";
+      #     Port = 2222;  # Optional: custom port
       #   };
       #
       # For hosts with different settings:
       #   "customhost" = {
-      #     user = "differentuser";
-      #     hostname = "customhost.example.com";
-      #     identityFile = "~/.ssh/custom_key";
-      #     extraOptions = {
-      #       PreferredAuthentications = "publickey,password";
-      #     };
+      #     User = "differentuser";
+      #     HostName = "customhost.example.com";
+      #     IdentityFile = "~/.ssh/custom_key";
+      #     PreferredAuthentications = "publickey,password";
       #   };
       # ============================================
 
       "woody" = commonHostConfig // {
-        hostname = "woody";
+        HostName = "woody";
       };
 
       "frametop" = commonHostConfig // {
-        hostname = "frametop";
+        HostName = "frametop";
       };
 
       # Direct IP connections
       "10.10.100.56" = commonHostConfig // {
-        hostname = "10.10.100.56";
+        HostName = "10.10.100.56";
       };
 
       "155.138.220.196" = commonHostConfig // {
-        hostname = "155.138.220.196";
+        HostName = "155.138.220.196";
       };
 
       "10.10.100.129" = commonHostConfig // {
-        hostname = "10.10.100.129";
+        HostName = "10.10.100.129";
       };
     };
 
-    # Additional SSH config that will be appended to the generated config
-    # Use this for any SSH options that aren't easily expressible in matchBlocks
-    extraConfig = ''
-      # Include IDE-managed config (VSCode, Cursor, etc. can write here)
-      # SSH will silently ignore this if the file doesn't exist
-      Include ~/.ssh/config.local
-    '';
   };
 
-  # Ensure ~/.ssh/config.local exists for IDE tools (VSCode, Cursor, etc.)
-  # This file is writable by IDE tools and is automatically included in the SSH config
-  # The file is created with proper permissions if it doesn't exist
-  home.activation.ensureSshConfigLocal = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    SSH_CONFIG_LOCAL="${config.home.homeDirectory}/.ssh/config.local"
-    if [ ! -f "$SSH_CONFIG_LOCAL" ]; then
-      touch "$SSH_CONFIG_LOCAL"
-      chmod 600 "$SSH_CONFIG_LOCAL"
-      echo "# IDE-managed SSH configuration" > "$SSH_CONFIG_LOCAL"
-      echo "# This file is automatically included by ~/.ssh/config" >> "$SSH_CONFIG_LOCAL"
-      echo "# VSCode, Cursor, and other IDE tools can safely write to this file" >> "$SSH_CONFIG_LOCAL"
-      echo "# without conflicts with the Nix-managed main config" >> "$SSH_CONFIG_LOCAL"
+  # Redirect the Nix-managed SSH config to a different file
+  # This allows the main ~/.ssh/config to be a standard, writable file
+  home.file.".ssh/config".target = lib.mkForce ".ssh/config_nix";
+
+  # Ensure ~/.ssh/config exists, is writable, and includes the Nix-managed config
+  home.activation.ensureSshConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    SSH_CONFIG="${config.home.homeDirectory}/.ssh/config"
+    NIX_SSH_CONFIG="${config.home.homeDirectory}/.ssh/config_nix"
+    
+    # If the main config is a symlink (from previous home-manager generations), remove it
+    if [ -L "$SSH_CONFIG" ]; then
+      rm "$SSH_CONFIG"
+    fi
+    
+    # Create the file if it doesn't exist
+    if [ ! -f "$SSH_CONFIG" ]; then
+      touch "$SSH_CONFIG"
+      chmod 600 "$SSH_CONFIG"
+      echo "# Writable SSH configuration file" > "$SSH_CONFIG"
+      echo "# Programs can write to this file directly." >> "$SSH_CONFIG"
+      echo "Include ~/.ssh/config_nix" >> "$SSH_CONFIG"
+      echo "" >> "$SSH_CONFIG"
+    else
+      # If the file exists, ensure it includes the Nix config
+      if ! grep -q "Include ~/.ssh/config_nix" "$SSH_CONFIG" 2>/dev/null; then
+        # We prepend the Include directive to ensure Nix config takes precedence or at least is loaded
+        TMP_CONF=$(mktemp)
+        echo "Include ~/.ssh/config_nix" > "$TMP_CONF"
+        cat "$SSH_CONFIG" >> "$TMP_CONF"
+        cat "$TMP_CONF" > "$SSH_CONFIG"
+        rm "$TMP_CONF"
+      fi
     fi
   '';
-
-  # Ensure ~/.ssh/config is fully managed by Nix
-  # This removes any manual ~/.ssh/config file and ensures Nix has full control
-  # If you have existing manual entries, migrate them to matchBlocks above before rebuilding
-  # home.activation.removeManualSshConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-  #   if [ -f "$HOME/.ssh/config" ] && ! [ -L "$HOME/.ssh/config" ]; then
-  #     # Check if the file is managed by home-manager (contains "Home Manager" comment)
-  #     if ! grep -q "Home Manager" "$HOME/.ssh/config" 2>/dev/null; then
-  #       echo "Warning: Found manual ~/.ssh/config file that is not managed by Nix."
-  #       echo "Backing it up to ~/.ssh/config.backup.$(date +%Y%m%d_%H%M%S)"
-  #       cp "$HOME/.ssh/config" "$HOME/.ssh/config.backup.$(date +%Y%m%d_%H%M%S)"
-  #       echo "Please migrate any needed entries to home/features/ssh/default.nix"
-  #     fi
-  #   fi
-  # '';
 
   # Helper script to clean up stale SSH control sockets
   home.file."${config.home.homeDirectory}/.local/bin/ssh-cleanup" = {
