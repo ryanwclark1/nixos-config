@@ -23,7 +23,9 @@ in
         backend = "wpa_supplicant";
       };
       ethernet = {
-        macAddress = "random";
+        # 'preserve' ensures the hardware MAC is used, preventing the machine
+        # from being assigned a new IP address by DHCP on reboot/update (which happens with 'random')
+        macAddress = "preserve";
       };
       # Configure IPv6 privacy extensions through connection profiles
       ensureProfiles.profiles = {
