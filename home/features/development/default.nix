@@ -6,19 +6,21 @@
 {
 
   imports = [
+    ./android.nix
     ./build.nix
     ./go.nix
     ./js.nix
+    ./kotlin.nix
     ./lua.nix
-    # ./python.nix
+    ./python.nix
     ./rust.nix
     ./sql.nix
+    ./swift.nix
     ./uv.nix
   ];
 
 
   home.packages = with pkgs; [
-    pipx
     jsonnet-bundler
     jsonnet
     # GRPC
@@ -30,8 +32,6 @@
     protolint
     # System debugging (moved from desktop/common)
     d-spy # D-Bus debugger
-  ] ++ (with pkgs.python313Packages; [
-    pyyaml
-  ]);
+  ];
 
 }

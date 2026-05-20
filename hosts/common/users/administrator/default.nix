@@ -44,6 +44,7 @@ in
           "adm"
         ]
         ++ ifTheyExist [
+          "adbusers"
           "deluge"
           "docker"
           "git"
