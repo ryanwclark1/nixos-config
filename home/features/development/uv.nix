@@ -1,4 +1,4 @@
-# A modern, maintained replacement for ls.
+# An extremely fast Python package and project manager, written in Rust.
 {
   lib,
   config,

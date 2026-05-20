@@ -15,8 +15,13 @@ in
 {
   home.packages = with pkgs; [
     # sqlfluff # Temporarily disabled due to dependency conflict (click version issue)
+    # Using uvx alias below instead.
     pgcliWithFixedCliHelpers
     sqlite
     lazysql # SQL Tui
   ];
+
+  home.shellAliases = {
+    sqlfluff = "uvx sqlfluff";
+  };
 }
