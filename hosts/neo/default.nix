@@ -8,18 +8,15 @@
 }:
 let
   user = "administrator";
-  hostName = "mini";
+  hostName = "neo";
 in
 {
   imports = [
     inputs.home-manager.darwinModules.home-manager
-    # ../../home/mini.nix
+    inputs.nix-homebrew.darwinModules.nix-homebrew
   ];
-  # ++
-  # (builtins.attrValues outputs.darwinModules);
 
   home-manager = {
-    # useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "bak";
     extraSpecialArgs = {
@@ -34,16 +31,12 @@ in
     home = "/Users/${user}";
   };
 
-  # The platform the configuration will be used on.
-  # Remove allowBroken
   nixpkgs = {
     hostPlatform = lib.mkDefault "aarch64-darwin";
     config.allowBroken = lib.mkDefault true;
     config.allowUnfree = true;
   };
 
-  # List packages installed in system profile. To search by name, run:
-  # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     neovim
     alacritty
@@ -53,24 +46,29 @@ in
     git
   ];
 
-  # homebrew = {
-  #   enable = true;
-  #   brews = [
-  #     "mas"
-  #   ];
-  #   casks = [
-  #     "hammerspoon"
-  #     "firefox"
-  #     "iina"
-  #     "the-unarchiver"
-  #   ];
-  #   # masApps = {
-  #   #   "Yoink" = 457622435;
-  #   # };
-  #   onActivation.cleanup = "zap";
-  # };
+  # Homebrew integration via nix-homebrew
+  nix-homebrew = {
+    enable = true;
+    user = "${user}";
+    autoMigrate = true;
+  };
 
-  # programs.home-manager.enable = true;
+  homebrew = {
+    enable = true;
+    onActivation = {
+      autoUpdate = true;
+      cleanup = "zap";
+    };
+    casks = [
+      "google-chrome"
+      "antigravity"
+      "claude"
+      "codex"
+      "gemini"
+      "aerospace"
+    ];
+  };
+
   programs.zsh.enable = true;
 
   fonts = {
@@ -112,13 +110,11 @@ in
       done
     '';
 
-
   system.defaults = {
     dock = {
-      autohide  = true;
+      autohide = true;
       persistent-apps = [
         "${pkgs.alacritty}/Applications/Alacritty.app"
-        # "/Applications/Firefox.app"
         "/System/Applications/Calendar.app"
       ];
     };
@@ -130,7 +126,6 @@ in
       FXPreferredViewStyle = "clmv";
     };
 
-    # loginwindow.GuestEnabled  = false;
     NSGlobalDomain = {
       AppleICUForce24HourTime = true;
       AppleInterfaceStyle = "Dark";
@@ -138,14 +133,11 @@ in
     };
   };
 
-  # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
-  # nix.package = pkgs.nix;
 
   nix = {
     package = lib.mkDefault pkgs.nixVersions.latest;
     settings = {
-      # Necessary for using flakes on this system.
       experimental-features = [
         "nix-command"
         "flakes"
@@ -153,15 +145,6 @@ in
       warn-dirty = false;
     };
   };
-  # nix.package = pkgs.nix;
 
-  # Enable alternative shell support in nix-darwin.
-  # programs.fish.enable = true;
-
-  # Set Git commit hash for darwin-version.
-  # system.configurationRevision = self.rev or self.dirtyRev or null;
-
-  # Used for backwards compatibility, please read the changelog before changing.
-  # $ darwin-rebuild changelog
   system.stateVersion = 5;
 }

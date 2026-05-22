@@ -320,6 +320,15 @@
             inherit inputs outputs;
           };
         };
+        neo = nix-darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          modules = [
+            ./hosts/neo
+          ];
+          specialArgs = {
+            inherit inputs outputs;
+          };
+        };
       };
 
       homeConfigurations = {
@@ -353,6 +362,15 @@
         "administrator@mini" = lib.homeManagerConfiguration {
           modules = [
             ./home/mini.nix
+          ];
+          pkgs = pkgsFor.aarch64-darwin;
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
+        };
+        "administrator@neo" = lib.homeManagerConfiguration {
+          modules = [
+            ./home/neo.nix
           ];
           pkgs = pkgsFor.aarch64-darwin;
           extraSpecialArgs = {
