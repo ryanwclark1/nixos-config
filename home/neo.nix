@@ -15,7 +15,6 @@
     ./features/fd
     ./features/fzf
     ./features/git
-    ./features/kitty
     ./features/lazygit
     ./features/ripgrep
     ./features/starship
