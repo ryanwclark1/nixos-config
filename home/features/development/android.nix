@@ -1,11 +1,13 @@
 {
   pkgs,
+  lib,
   ...
 }:
 
 {
   home.packages = with pkgs; [
-    android-studio
     android-tools
+  ] ++ lib.optionals stdenv.isLinux [
+    android-studio
   ];
 }

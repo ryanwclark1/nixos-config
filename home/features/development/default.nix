@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   ...
 }:
 
@@ -30,6 +31,7 @@
     # Protobuf
     protobuf
     protolint
+  ] ++ lib.optionals stdenv.isLinux [
     # System debugging (moved from desktop/common)
     d-spy # D-Bus debugger
   ];

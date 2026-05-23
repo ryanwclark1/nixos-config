@@ -8,8 +8,10 @@
   imports = [
     ./features/shell
     ./features/atuin
+    ./features/ai/gemini
     ./features/bat
     ./features/cli
+    ./features/development
     ./features/eza
     ./features/fastfetch
     ./features/fd

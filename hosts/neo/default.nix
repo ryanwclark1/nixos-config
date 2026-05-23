@@ -17,6 +17,7 @@ in
   ];
 
   home-manager = {
+    useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "bak";
     extraSpecialArgs = {
@@ -35,6 +36,7 @@ in
     hostPlatform = lib.mkDefault "aarch64-darwin";
     config.allowBroken = lib.mkDefault true;
     config.allowUnfree = true;
+    overlays = builtins.attrValues outputs.overlays;
   };
 
   environment.systemPackages = with pkgs; [
@@ -58,14 +60,18 @@ in
       autoUpdate = true;
       cleanup = "zap";
     };
+    taps = [
+      "nikitabobko/tap"
+    ];
     casks = [
       "google-chrome"
       "antigravity"
+      "antigravity-cli"
       "claude"
       "codex"
-      "gemini"
       "aerospace"
       "ghostty"
+      "cursor"
     ];
   };
 
