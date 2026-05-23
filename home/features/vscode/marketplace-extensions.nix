@@ -33,12 +33,6 @@
     version = "1.38.1";
   },
   {
-    name = "gemini-cli-vscode-ide-companion";
-    publisher = "Google";
-    sha256 = "sha256-gJ7ghOOrk4kvzReqfB6ZRhFonOdpJXcPh7voBgCwqPg=";
-    version = "0.20.0";
-  },
-  {
     name = "grafana-alloy";
     publisher = "grafana";
     sha256 = "sha256-XcoiEDCPp6GzYQDhJArZBEWxSnZrSTHofIyLFegsbh0=";

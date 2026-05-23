@@ -19,7 +19,6 @@ echo ""
 MANAGED_EXTENSIONS=(
   "DavidAnson.vscode-markdownlint"
   "GitHub.remotehub"
-  "Google.gemini-cli-vscode-ide-companion"
   "Gruntfuggly.todo-tree"
   "MS-python.vscode-pylance"
   "SureshNettur.pwc"
