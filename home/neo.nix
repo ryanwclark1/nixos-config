@@ -8,7 +8,7 @@
   imports = [
     ./features/shell
     ./features/atuin
-    ./features/ai/gemini
+    ./features/ai/antigravity
     ./features/bat
     ./features/cli
     ./features/development
