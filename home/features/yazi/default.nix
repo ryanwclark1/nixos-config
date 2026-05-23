@@ -35,67 +35,67 @@
     executable = true;
   };
 
-  home.packages = with pkgs; [
-    # Core file analysis
-    file # File type detection (MIME types)
-    exiftool # Metadata extraction
+  home.packages =
+    with pkgs;
+    [
+      # Core file analysis
+      file # File type detection (MIME types)
+      exiftool # Metadata extraction
 
-    # Image/Video processing
-    ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-    ueberzugpp # Yazi image display (Linux only, requires wayland)
-    ] ++ [
-    ffmpegthumbnailer # Legacy video thumbnails (can be removed eventually)
-    ffmpeg # Modern video thumbnail generation
-    chafa # Terminal image display
-    librsvg # SVG handling
-    imagemagick # Enhanced image processing for AVIF, HEIF, JPEG XL
+      # Image/Video processing
+      ffmpegthumbnailer # Legacy video thumbnails (can be removed eventually)
+      ffmpeg # Modern video thumbnail generation
+      chafa # Terminal image display
+      librsvg # SVG handling
+      imagemagick # Enhanced image processing for AVIF, HEIF, JPEG XL
 
-    # Document processing
-    poppler-utils # PDF text extraction (pdftotext, pdfinfo)
-    epub2txt2 # EPUB text extraction
-    xlsx2csv # Excel/spreadsheet conversion
-    odt2txt # OpenDocument text extraction
+      # Document processing
+      poppler-utils # PDF text extraction (pdftotext, pdfinfo)
+      epub2txt2 # EPUB text extraction
+      xlsx2csv # Excel/spreadsheet conversion
+      odt2txt # OpenDocument text extraction
 
-    # Archive handling
-    atool # Universal archive tool
-    p7zip # 7z archive support
-    ouch # Fast archive operations
+      # Archive handling
+      atool # Universal archive tool
+      p7zip # 7z archive support
+      ouch # Fast archive operations
 
-    # Data processing
-    mediainfo # Audio/video metadata
-    hexyl # Binary file viewer
-    miller # CSV/data processing (mlr)
-    jq # JSON formatting and processing
+      # Data processing
+      mediainfo # Audio/video metadata
+      hexyl # Binary file viewer
+      miller # CSV/data processing (mlr)
+      jq # JSON formatting and processing
 
-    # Web content
-    w3m # HTML text rendering
+      # Web content
+      w3m # HTML text rendering
 
-    # Additional document tools
-    pandoc # Document conversion
+      # Additional document tools
+      pandoc # Document conversion
 
-    # Archive utilities
-    unzip # ZIP extraction
-    unar # Archive listing (provides lsar command)
+      # Archive utilities
+      unzip # ZIP extraction
+      unar # Archive listing (provides lsar command)
 
-    # Development tools
-    bat # Syntax highlighting (should be available via programs.bat)
+      # Development tools
+      bat # Syntax highlighting (should be available via programs.bat)
 
-    # Utilities
-    ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-    ripdrag # Drag and drop support (Linux only, requires wayland)
-    ] ++ [
-    sqlite # Database inspection
-    transmission_4 # Torrent info (transmission-show)
+      # Utilities
+      sqlite # Database inspection
+      transmission_4 # Torrent info (transmission-show)
 
-    # Enhanced preview tools
-    tree # Directory tree visualization
-    fd # Fast file finding
-    ripgrep # Fast text searching
+      # Enhanced preview tools
+      tree # Directory tree visualization
+      fd # Fast file finding
+      ripgrep # Fast text searching
 
-    # Builtin plugin dependencies
-    fzf # Required for builtin fzf plugin (fuzzy file finder)
-    zoxide # Required for builtin zoxide plugin (directory jumping)
-  ];
+      # Builtin plugin dependencies
+      fzf # Required for builtin fzf plugin (fuzzy file finder)
+      zoxide # Required for builtin zoxide plugin (directory jumping)
+    ]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+      ueberzugpp # Yazi image display (Linux only, requires wayland)
+      ripdrag # Drag and drop support (Linux only, requires wayland)
+    ];
 
   programs.yazi = {
     enable = true;
@@ -152,7 +152,74 @@
         {
           on = [ "y" ];
           run = [
-            ''
+            ''  home.packages =
+    with pkgs;
+    [
+      # Core file analysis
+      file # File type detection (MIME types)
+      exiftool # Metadata extraction
+
+      # Image/Video processing
+    ]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+      ueberzugpp # Yazi image display (Linux only, requires wayland)
+    ]
+    ++ [
+      ffmpegthumbnailer # Legacy video thumbnails (can be removed eventually)
+      ffmpeg # Modern video thumbnail generation
+      chafa # Terminal image display
+      librsvg # SVG handling
+      imagemagick # Enhanced image processing for AVIF, HEIF, JPEG XL
+
+      # Document processing
+      poppler-utils # PDF text extraction (pdftotext, pdfinfo)
+      epub2txt2 # EPUB text extraction
+      xlsx2csv # Excel/spreadsheet conversion
+      odt2txt # OpenDocument text extraction
+
+      # Archive handling
+      atool # Universal archive tool
+      p7zip # 7z archive support
+      ouch # Fast archive operations
+
+      # Data processing
+      mediainfo # Audio/video metadata
+      hexyl # Binary file viewer
+      miller # CSV/data processing (mlr)
+      jq # JSON formatting and processing
+
+      # Web content
+      w3m # HTML text rendering
+
+      # Additional document tools
+      pandoc # Document conversion
+
+      # Archive utilities
+      unzip # ZIP extraction
+      unar # Archive listing (provides lsar command)
+
+      # Development tools
+      bat # Syntax highlighting (should be available via programs.bat)
+
+      # Utilities
+    ]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+      ripdrag # Drag and drop support (Linux only, requires wayland)
+    ]
+    ++ [
+      sqlite # Database inspection
+      transmission_4 # Torrent info (transmission-show)
+
+      # Enhanced preview tools
+      tree # Directory tree visualization
+      fd # Fast file finding
+      ripgrep # Fast text searching
+
+      # Builtin plugin dependencies
+      fzf # Required for builtin fzf plugin (fuzzy file finder)
+      zoxide # Required for builtin zoxide plugin (directory jumping)
+    ];
+
               shell 'for path in "$@"; do echo "file://$path"; done | wl-copy -t text/uri-list' --confirm
             ''
             "yank"
