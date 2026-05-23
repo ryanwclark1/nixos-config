@@ -2,7 +2,7 @@
 #!nix-shell -i bash -p curl jq nix-prefetch
 set -eu -o pipefail
 
-scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 infoFile="$scriptDir/information.json"
 
 # This script is a template. Antigravity IDE 2.0+ does not currently have a public update API 

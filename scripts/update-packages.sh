@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd)"
 HELPERS="$SCRIPT_DIR/lib/package-update-helpers.sh"
 
 # shellcheck source=./lib/package-update-helpers.sh
@@ -29,7 +29,6 @@ declare -A PACKAGES=(
   [antigravity-cli]="pkgs/antigravity-cli"
   [antigravity-ide]="pkgs/antigravity-ide"
   [claude-code]="pkgs/claude-code-bin"
-  [claude-code-npm]="pkgs/claude-code"
   [codex]="pkgs/codex"
   [antigravity]="pkgs/antigravity"
   [kiro]="pkgs/kiro"
@@ -142,7 +141,7 @@ check_updates() {
     return 1
   fi
 
-  if [[ "$pkg_name" == "claude-code" || "$pkg_name" == "claude-code-npm" ]]; then
+  if [[ "$pkg_name" == "claude-code" ]]; then
     cd "$REPO_ROOT"
     if output=$(PACKAGE_UPDATE_ORCHESTRATED=true run_package_update_script "$REPO_ROOT" "$pkg_name" "$update_script" --check-only 2>&1); then
       if echo "$output" | grep -q "Already up to date"; then
