@@ -103,9 +103,13 @@ final: prev: {
     };
   });
   # Disable failing tests in pipx 1.8.0 due to python 3.13 test incompatibilities
-  pipx = prev.pipx.overrideAttrs (oldAttrs: {
-    doCheck = false;
-    pytestFlagsArray = [];
-    checkPhase = "";
-  });
+  pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+    (python-final: python-prev: {
+      pipx = python-prev.pipx.overrideAttrs (oldAttrs: {
+        doCheck = false;
+        pytestFlagsArray = [];
+        checkPhase = "";
+      });
+    })
+  ];
 }
