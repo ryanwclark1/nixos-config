@@ -102,4 +102,10 @@ final: prev: {
       hash = "sha256-Zvrwxjp4LK2J3QnxmPxKKrU01YHQvPyp54UWzeGNCjA=";
     };
   });
+  # Disable failing tests in pipx 1.8.0 due to python 3.13 test incompatibilities
+  pipx = prev.pipx.overrideAttrs (oldAttrs: {
+    doCheck = false;
+    pytestFlagsArray = [];
+    checkPhase = "";
+  });
 }
