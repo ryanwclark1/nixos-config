@@ -15,472 +15,110 @@
 ![Static Badge](https://img.shields.io/badge/%20-a3be8c?style=for-the-badge&labelColor=a3be8c&color=a3be8c)
 ![Static Badge](https://img.shields.io/badge/%20-b48ead?style=for-the-badge&labelColor=b48ead&color=b48ead)
 
-# NixOS & Home Manager Configurations
-
-
+# ❄️ NixOS & Home Manager Configurations
 
 [![GitHub stars](https://img.shields.io/github/stars/ryanwclark1/nixos-config?color=8fbcbb&labelColor=3b4252&style=for-the-badge&logo=starship&logoColor=8fbcbb)](https://github.com/ryanwclark1/nixos-config/stargazers)
-[![GitHub repo size](https://img.shields.io/github/repo-size/ryanwclark1/nixos-config?color=88c0d0&labelColor=3b4252&style=for-the-badge&logo=github&logoColor=88c0d0)](https://github.com/ryanwclark1/nixos-config/)
 [![NixOS](https://img.shields.io/badge/NixOS-unstable-blue.svg?style=for-the-badge&labelColor=3b4252&logo=NixOS&logoColor=81a1c1&color=81a1c1)](https://nixos.org)
 [![License](https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=MIT&colorA=3b4252&colorB=5e81ac&logo=unlicense&logoColor=5e81ac)](https://github.com/ryanwclark1/nixos-config/blob/main/LICENSE)
 
-
-
-This repository contains a [Nix Flake](https://zero-to-nix.com/concepts/flakes) for configuring my computers and/or home environment.
-It is not intended to be a drop in configuration for your computer, but you are welcome to use it as a reference or starting point for your own configuration.
-**If you are looking for a more generic NixOS configuration, I recommend [nix-starter-configs](https://github.com/Misterio77/nix-starter-configs).** 👍️
-These computers are managed by this Nix flake ❄️
-
-|   Hostname   |          Board           |         CPU         |  RAM  |       Primary GPU        | Role  |  OS   | State |
-| :----------: | :----------------------: | :-----------------: | :---: | :----------------------: | :---: | :---: | :---: |
-|   `woody`    |  [ROG-STRIX-B650E-WIFI]  | [AMD Ryzen 9 7900X] | 64GB  | [AMD Radeon RX 7800 XT]  |   🖥️   |   ❄️   |   ✅   |
-|  `frametop`  | [Framework-13in-12thGen] |  [Intel i7-1260P]   | 64GB  | [Intel Iris XE Graphics] |   💻️   |   ❄️   |   ✅   |
-|    `mini`    |        [Mac mini]        |     [Apple M4]      | 16GB  |  [Apple Integrated GPU]  |   🖥️   |   🍎   |   ✅   |
-|   `accent`   |      Remote Server       |       Various       |  8GB  |           N/A            |   ☁️   |   ❄️   |   ✅   |
-|    `vlad`    |      Remote Server       |       Various       |  4GB  |           N/A            |   ☁️   |   ❄️   |   ✅   |
-| `lighthouse` |      Remote Server       |       Various       |  8GB  |           N/A            |   ☁️   |   ❄️   |   ✅   |
-|  `ansible`   |      Remote Server       |       Various       |  4GB  |           N/A            |   ☁️   |   ❄️   |   ✅   |
-
-**Key**
-
-- 🎭️ : Dual boot
-- 🖥️ : Desktop
-- 💻️ : Laptop
-- 🎮️ : Games Machine
-- 🐄 : Virtual Machine
-- ☁️ : Server
-
-## Structure
-
-- `home/`: Home Manager configurations accessible via `home-manager switch --flake .#user@host`
-  - `features/`: Modular feature configurations organized by category
-    - `ai/`: AI tools and assistants with **SuperClaude Framework**
-      - Claude with 20 specialized agents and MCP server integration
-      - Framework docs live in `home/features/ai/claude/config/`
-      - Claude, Codex, Gemini, Ollama, OpenCode, and more
-    - `desktop/`: Desktop environments and window managers (Hyprland, GNOME, etc.)
-      - Omarchy-inspired utilities and keybindings
-      - Modern Wayland compositor configurations
-    - `development/`: Development tools and languages (Rust, Go, Python with uv, JavaScript/Node.js, Lua, SQL, build tools)
-    - `shell/`: Shell configurations (Bash, Fish, Zsh, etc.)
-    - `media/`: Media applications and tools
-    - `productivity/`: Productivity applications
-    - And many more organized feature modules
-  - `global/`: Global Home Manager settings
-  - `$HOST_NAME.nix`: Host-specific Home Manager configurations
-- `hosts/`: NixOS system configurations accessible via `nixos-rebuild --flake`
-  - `common/`: Shared configurations consumed by machine-specific ones
-    - `global/`: Core system configurations applied to all machines
-    - `optional/`: Opt-in configurations (desktop environments, services, tools)
-    - `users/`: User account configurations
-  - `$HOST_NAME/`: Machine-specific configurations with hardware support
-    - Hardware configurations leveraging [NixOS Hardware modules](https://github.com/NixOS/nixos-hardware)
-    - Service configurations
-    - Performance optimizations
-    - Monitoring setups (woody has comprehensive Grafana/Prometheus/Loki stack)
-- `overlays/`: Package patches and version overrides
-- `pkgs/`: Custom packages and applications
-  - `antigravity/`: Antigravity IDE
-  - `claude-code-bin/`: Claude Code native binary package
-  - `claude-code/`: Claude Code npm fallback package
-  - `code-cursor/`: Cursor IDE
-  - `codex/`: OpenAI Codex CLI
-  - `colors/`: Color assets/tools
-  - `cursor-cli/`: Cursor CLI
-  - `gemini-cli/`: Gemini CLI
-  - `github-mcp-server/`: GitHub MCP server
-  - `kiro/`: Kiro IDE
-  - `multiviewer/`: Multiviewer
-  - `vscode-generic/`: VS Code generic builder
-- `templates/`: Project templates for different languages (C, Node.js, Rust)
-- `scripts/`: Update scripts for custom packages
-- `secrets/`: Encrypted secrets in `secrets/secrets.yaml` managed by [sops-nix]
-- `docs/`: Documentation and configuration guides (see `docs/secrets.md`, `docs/home-manager.md`)
-- `omarchy/`: Omarchy-inspired configuration and utilities
-- [flake.nix]: Entrypoint for hosts and home configurations
-- [Makefile]: Commands for managing Nix, secrets, and system operations
-
-
-## Installing 💾
-
-- Boot off a .iso image created by this flake using `build-iso-desktop` or `build-iso-console` (*see below*)
-- Put the .iso image on a USB drive
-- Boot the target computer from the USB drive
-- Two installation options are available:
-  1 Use the graphical Calamares installer to install an ad-hoc system
-  2 Run `install-system <hostname> <username>` from a terminal
-   - The install script uses [Disko] or `disks.sh` to automatically partition and format the disks, then uses my flake via `nixos-install` to complete a full-system installation
-   - This flake is copied to the target user's home directory as `~/Zero/nix-config`
-   - The `nixos-enter` command is used to automatically chroot into the new system and apply the Home Manager configuration.
-- Reboot 🥾
-
-
-All you need is nix (any version). Run:
-```
-nix-shell
-```
-
-If you already have nix 2.4+, git, and have already enabled `flakes` and
-`nix-command`, you can also use the non-legacy command:
-```
-nix develop
-```
-
-`nixos-rebuild --flake .#<hostname>` To build system configurations
-
-`home-manager switch --flake .#<user>@<host>` To build user configurations (see `docs/home-manager.md`)
-
-`nix build` (or shell or run) To build and use packages
-
-`sops` To manage secrets
-
-## Applying Changes ✨
-
-I clone this repo to `~/nix-config`. NixOS and Home Manager changes are applied separately because I have some non-NixOS hosts.
-
-```bash
-gh repo clone ryanwclark1/nix-config ~/nix-config
-```
-
-### Makefile Commands
-
-The [Makefile](Makefile) provides convenient commands for system management:
-
-**System Management:**
-- `make woody` - Switch to woody configuration
-- `make switch i=<hostname>` - Switch to specified host configuration
-- `make up` - Update flake inputs
-- `make upp i=<input>` - Update specific flake input
-- `make gc` - Garbage collect and optimize system
-- `make fmt` - Format Nix files
-
-**Key Management:**
-- `make keygen` - Generate SSH and Age keys
-- `make rsa_key` - Generate RSA SSH key
-- `make ed25519_key` - Generate Ed25519 SSH key
-- `make age_key` - Generate Age key pair
-- `make get_age_public_key` - Display Age public key
-
-**Development:**
-- `make get-vscode-sha` - Get SHA256 for VSCode packages
-- `make get-vscode-extension-sha` - Get SHA256 for VSCode extensions
-
-**Dry Run:**
-- `make woody-dryrun` - Dry run woody configuration
-- `make frametop-dryrun` - Dry run frametop configuration
-
-### ISO 📀
-
-The `build-iso` script is included that creates .iso images from this flake. The following modes are available:
-
-- `build-iso console` (*terminal environment*): Includes `install-system` for automated installation.
-- `build-iso desktop` (*desktop environment*): Includes `install-system` and [Calamares](https://calamares.io/) installation.
-
-Live images will be left in `~/$HOME/nix-config/result/iso/` and are also injected into `~/Quickemu/nixos-console` and `~/Quickemu/nixos-desktop` respectively.
-The console .iso image is also periodically built and published via [GitHub [Actions](./.github/workflows) and are available in [this](https://github.com/ryanwclark1/nix-config/releases) project's Releases](https://github.com/ryanwclark1/nix-config/releases).
-
-## What's in the box? 🎁
-
-Nix is configured with [flake support](https://zero-to-nix.com/concepts/flakes) and the [unified CLI](https://zero-to-nix.com/concepts/nix#unified-cli) enabled.
-
-See the Structure section above for the directory layout and key entry points.
-
-### Development Tools 🛠️
-
-Comprehensive development environment with support for multiple languages and tools:
-
-**Languages & Runtimes:**
-- **Rust**: Full Rust toolchain with cargo
-- **Go**: Go programming language and toolchain
-- **Python**: Python development with **uv** (modern, fast Python package manager)
-  - uv provides faster dependency resolution and virtual environment management
-  - Python preference set to "managed" for automatic version handling
-- **JavaScript/Node.js**: Node.js with npm and Git integration
-- **Lua**: Lua programming language and toolchain
-- **SQL**: SQL development tools and utilities
-
-**Build & Protocol Tools:**
-- **gRPC**: grpcurl, evans, and grpc tools for gRPC development
-- **Protobuf**: Protocol buffer compiler and protolint
-- **JSONnet**: JSONnet templating language and jsonnet-bundler
-- **pipx**: Python package installer for isolated environments
-
-**System Debugging:**
-- **d-spy**: D-Bus debugger for system introspection
-- **pyyaml**: Python YAML library for configuration management
-
-All development tools are modularly configured and can be enabled per-host as needed.
-
-### The Shell 🐚
-
-Multiple shell configurations are supported:
-
-- **Bash**: Traditional shell with enhanced features
-- **Fish**: User-friendly shell with syntax highlighting
-- **Zsh**: Powerful shell with Oh My Zsh integration
-- **Ion**: Modern shell for system administration
-- **NuShell**: Data-focused shell
-
-**Shell Features:**
-- Starship prompt for all shells
-- FZF integration for fuzzy finding
-- Zoxide for smart directory navigation
-- Atuin for shell history search
-- Carapace for shell completions
-
-### AI Tools & Assistants 🤖
-
-This configuration includes comprehensive AI tooling with the **SuperClaude Framework** for advanced development workflows.
-
-#### SuperClaude Framework
-
-An elite AI development framework integrating **20 specialized agents** and structured knowledge management:
-
-**Core Documentation:**
-- **`home/features/ai/claude/config/PLANNING.md`**: Architecture principles, design decisions, and absolute rules for NixOS configuration
-- **`home/features/ai/claude/config/TASK.md`**: Task management system with priorities, backlog, and completion tracking
-- **`home/features/ai/claude/config/KNOWLEDGE.md`**: Accumulated insights, best practices, and NixOS/Nix troubleshooting
-
-**Specialized Agents (20):**
-- **nix-systems-specialist**: Elite Nix ecosystem expert for NixOS, Home Manager, and flakes
-- **ai-engineer**: Advanced AI/LLM systems specialist for RAG architectures and multi-agent orchestration
-- **debugger**: Modern distributed systems debugging with cloud-native observability
-- **system-architect**: System design and architecture patterns
-- **backend-architect**: Backend systems and API design
-- **frontend-architect**: Frontend architecture and UX patterns
-- **devops-architect**: Infrastructure and deployment automation
-- **security-engineer**: Security analysis and hardening
-- **performance-engineer**: Performance optimization and profiling
-- **test-automator**: Test automation, quality engineering, TDD/BDD, and comprehensive testing strategies
-- **code-reviewer**: Code review and best practices
-- **refactoring-expert**: Code refactoring and technical debt management
-- **docs-architect**: Technical documentation, docs-as-code, and modern documentation workflows
-- **requirements-analyst**: Requirements gathering and analysis
-- **python-expert**: Python development and ecosystem
-- **learning-guide**: Educational content and mentoring
-- **socratic-mentor**: Socratic method teaching approach
-- **deep-research-agent**: In-depth research and analysis
-- **business-panel-experts**: Business strategy and decision-making
-
-**AI Assistants:**
-- **Claude**: Anthropic's Claude with MCP server integration and SuperClaude framework
-- **Codex**: OpenAI Codex CLI
-- **Gemini**: Google's Gemini AI with CLI tools
-- **Qwen**: Alibaba's Qwen AI models
-
-**Development Tools:**
-- **Cursor**: AI-powered code editor
-- **Open WebUI**: Web interface for local AI models
-- **Ollama**: Local AI model management
-
-**Features:**
-- MCP (Model Context Protocol) server configurations (Context7, Serena, Sequential, Playwright)
-- Multiple operation modes (Brainstorming, Deep Research, Task Management, Orchestration)
-- Docker-based AI service deployments
-- Local model hosting capabilities
-- Structured knowledge base and best practices
-- Integration with development workflows
-
-### Monitoring & Observability 📊
-
-Comprehensive monitoring stack primarily on woody (desktop):
-
-**Core Stack:**
-- **Prometheus**: Metrics collection and storage
-- **Grafana**: Visualization and dashboards
-- **Loki**: Log aggregation and analysis
-- **Grafana Alloy**: Metrics and log collection agent
-- **Alertmanager**: Alert routing and management
-
-**Monitoring Coverage:**
-- System metrics (CPU, memory, disk, network)
-- Container metrics (Docker, Podman)
-- Application metrics
-- Log analysis and correlation
-- Custom dashboards for different use cases
-- Multi-host monitoring capabilities
-
-**Features:**
-- Automated service discovery
-- Custom alerting rules
-- Log processing and filtering
-- Performance optimization insights
-- Security monitoring
-- Network traffic analysis
-
-
-### The Desktop 🖥️
-
-This configuration supports multiple desktop environments and window managers:
-
-**Window Managers:**
-- **Hyprland**: Primary Wayland compositor with comprehensive configuration
-  - Custom keybindings and workspace management
-  - Waybar integration with custom modules
-  - Screenshot utilities and media controls
-  - Omarchy-inspired utilities and keybindings
-  - Mako notification daemon with system info notifications
-  - See [docs/hyprland.md](docs/hyprland.md) for complete keybinding reference
-- **Niri**: Alternative Wayland compositor (experimental)
-
-**Desktop Environments:**
-- **GNOME**: Full GNOME desktop with extensions
-- **XFCE**: Lightweight desktop environment
-- **Plasma**: KDE Plasma desktop
-
-**Common Features:**
-- Font configuration using [Work Sans](https://fonts.google.com/specimen/Work+Sans) and [Fira Code](https://fonts.google.com/specimen/Fira+Code)
-- [Pipewire] for audio management
-- Bluetooth support
-- [Avahi] for network discovery
-- [CUPS] for printing
-- [SANE] for scanner support
-- [NetworkManager] for network management
-- Stylix theming integration
-
-| Desktop  |   System    |    Configuration     |        Theme         |
-| :------: | :---------: | :------------------: | :------------------: |
-| Hyprland |   Wayland   | Custom configuration |    Nord-inspired     |
-|  GNOME   | Wayland/X11 |    Standard GNOME    | Adwaita + Extensions |
-|   XFCE   |     X11     |  Lightweight setup   |       Adwaita        |
-|  Plasma  | X11/Wayland |      KDE Plasma      |        Breeze        |
-
-### Omarchy Integration 🎨
-
-This configuration includes utilities and features inspired by [Omarchy](https://omarchy.org), DHH's beautiful, modern & opinionated Linux distribution.
-
-**System Notification Utilities:**
-- **os-battery-show**: Display battery status, level, charging state, and time remaining with smart icons
-  - Keybinding: `SUPER+CTRL+B`
-- **os-time-show**: Display current time, date, week number, and timezone information
-  - Keybinding: `SUPER+CTRL+T`
-
-**Wayland Utilities:**
-- **keybindings-menu**: Interactive keybindings reference with walker
-  - Keybinding: `SUPER+/`
-- **toggle-nightlight**: Toggle hyprsunset nightlight mode for eye comfort
-  - Keybinding: `SUPER+CTRL+N`
-- **toggle-idle**: Toggle hypridle idle management on/off
-  - Keybinding: `SUPER+CTRL+I`
-- **toggle-transparency**: Toggle window opacity/transparency in Hyprland
-  - Keybinding: `SUPER+CTRL+O`
-- **window-pop**: Pop window out (float and pin across workspaces)
-  - Keybinding: `SUPER+CTRL+P`
-- **workspace-toggle-gaps**: Toggle workspace gaps on/off for maximized screen space
-  - Keybinding: `SUPER+CTRL+G`
-
-**Features:**
-- Mako notification daemon for clean, minimal notifications
-- System information at a glance without requiring a status bar
-- Enhanced window management for improved productivity
-- Modern Wayland-native utilities
-
-All scripts are organized in `~/.local/bin/scripts/` with proper categorization by scope (system, wayland, rofi).
-
-![Alt](https://repobeats.axiom.co/api/embed/5ef4c6a66687d5e71cbe2ed39ec352a4d055aabf.svg "Repobeats analytics image")
-
-## Post-install Checklist
-
-Things I currently need to do manually after installation.
-
-### Secrets
-
-- [ ] Provision `~/.config/sops/age/keys.txt`. Optionally handled by `install-system`.
-- [ ] Add `ssh-to-age -i /etc/ssh/ssh_host_ed25519_key.pub` to `.sops.yaml`.
-- [ ] Run `sops updatekeys secrets/secrets.yaml`
-- [ ] Run `gpg-restore`
-- [ ] LastPass - authenticate
-- [ ] Authy - activate
-- [ ] 1Password - authenticate
-
-### Services
-
-Reboot and systemd-boot should now offer the option to boot NixOS and Windows.
-
-## TODO 🗒️
-
-Things I should do or improve:
-
-### Infrastructure
-- [ ] Migrate Borg Backups to [borgmatic](https://torsion.org/borgmatic/) via NixOS modules and Home Manager
-- [ ] Integrate [notify](https://github.com/projectdiscovery/notify)
-- [ ] Integrate [homepage](https://github.com/benphelps/homepage)
-- [ ] Set up automated monitoring alerts
-- [ ] Implement automated backup verification
-
-### Development
-- [ ] Add more language templates (Python, Go, Haskell)
-- [ ] Improve development environment consistency across hosts
-- [ ] Add more AI model integrations
-- [ ] Enhance MCP server configurations
-- [ ] Expand SQL development tooling
-- [ ] Add additional build system integrations
-
-### Desktop
-- [ ] Improve Niri configuration and stability
-- [ ] Add more desktop environment options
-- [ ] Enhance Hyprland plugin ecosystem
-- [ ] Improve multi-monitor support
-
-### Security
-- [ ] Implement automated security updates
-- [ ] Add intrusion detection systems
-- [ ] Enhance secret management workflows
-- [ ] Improve SSH key rotation automation
-
-
-
-## Inspirations 🧑‍🏫
-
-This configuration draws inspiration from several excellent NixOS setups and community resources:
-
-**Configuration References:**
-- [nome from Luc Perkins](https://github.com/the-nix-way/nome)
-- [nixos-config from Cole Helbling](https://github.com/cole-h/nixos-config)
-- [flake from Ana Hoverbear](https://github.com/Hoverbear-Consulting/flake)
-- [Jon Seager's nixos-config](https://github.com/jnsgruk/nixos-config)
-- [Aaron Honeycutt's nix-configs](https://gitlab.com/ahoneybun/nix-configs)
-- [Matthew Croughan's nixcfg](https://github.com/MatthewCroughan/nixcfg)
-- [Will Taylor's dotfiles](https://github.com/wiltaylor/dotfiles)
-
-**Installation & Setup:**
-The [Disko] implementation and automated installation are inspired by:
-- [Setting up my new laptop: nix style](https://bmcgee.ie/posts/2022/12/setting-up-my-new-laptop-nix-style/)
-- [Setting up my machines: nix style](https://aldoborrero.com/posts/2023/01/15/setting-up-my-machines-nix-style/)
-
-**Desktop Configuration:**
-- [Declarative GNOME configuration with NixOS](https://hoverbear.org/blog/declarative-gnome-configuration-in-nixos/)
-- [nix-starter-configs](https://github.com/Misterio77/nix-starter-configs) - Great starting point for new users
-
-**Community Resources:**
-- [NixOS Community](https://github.com/search?q=nixos+configuration)
-- [NixOS Wiki](https://nixos.wiki/)
-- [Zero to Nix](https://zero-to-nix.com/)
-
-## Links & References
-
-**Core Technologies:**
-- [NixOS](https://nixos.org/) - The Linux distribution
-- [Home Manager](https://github.com/nix-community/home-manager) - User environment management
-- [Disko](https://github.com/nix-community/disko) - Declarative disk partitioning
-- [sops-nix](https://github.com/Mic92/sops-nix) - Secrets management
-
-**Hardware:**
-- [AMD Ryzen 9 7900X](https://www.amd.com/en/products/cpu/amd-ryzen-9-7900x)
-- [Framework-13in-12thGen](https://frame.work/products/laptop-diy-12-gen-intel?q=processor)
-- [Intel i7-1260P](https://www.intel.com/content/www/us/en/products/sku/226254/intel-core-i71260p-processor-18m-cache-up-to-4-70-ghz/specifications.html)
-- [Intel Iris XE Graphics](https://www.intel.com/content/www/us/en/products/details/discrete-gpus/iris-xe.html)
-- [ROG-STRIX-B650E-WIFI](https://rog.asus.com/us/motherboards/rog-strix/rog-strix-b650e-f-gaming-wifi-model/)
-- [AMD Radeon RX 7800 XT](https://www.amd.com/en/products/graphics/amd-radeon-rx-7800-xt)
-- [Mac mini](https://www.apple.com/mac-mini/)
-
-**System Services:**
-- [Pipewire](https://pipewire.org/) - Audio and video handling
-- [Avahi](https://avahi.org/) - Network service discovery
-- [CUPS](https://www.cups.org/) - Printing system
-- [SANE](https://sane-project.org/) - Scanner access
-- [NetworkManager](https://networkmanager.dev/) - Network management
+A comprehensive, modular [Nix Flake](https://zero-to-nix.com/concepts/flakes) for managing a multi-host fleet across Linux (NixOS) and macOS (nix-darwin).
+
+## 🖥️ Fleet Overview
+
+| Hostname | Platform | Role | CPU | RAM | Primary GPU | Status |
+| :--- | :---: | :---: | :--- | :---: | :--- | :---: |
+| `woody` | ❄️ | 🖥️ | [AMD Ryzen 9 7900X] | 64GB | [AMD Radeon RX 7800 XT] | ✅ |
+| `neo` | 🍎 | 💻️ | [Apple M4] | 16GB | [Apple Integrated GPU] | ✅ |
+| `mini` | 🍎 | 🖥️ | [Apple M4] | 16GB | [Apple Integrated GPU] | ✅ |
+| `frametop` | ❄️ | 💻️ | [Intel i7-1260P] | 64GB | [Intel Iris XE Graphics] | ✅ |
+| `accent` | ❄️ | ☁️ | Remote Server | 8GB | N/A | ✅ |
+| `vlad` | ❄️ | ☁️ | Remote Server | 4GB | N/A | ✅ |
+| `lighthouse`| ❄️ | ☁️ | Remote Server | 8GB | N/A | ✅ |
+
+**Key:** 🖥️ Desktop • 💻️ Laptop • ☁️ Server • 🍎 macOS • ❄️ NixOS
 
 ---
 
-*This configuration is actively maintained and updated. Feel free to use it as inspiration for your own NixOS setup!*
+## 🚀 Key Features
+
+### 🤖 SuperClaude Framework
+An elite AI development ecosystem integrated directly into the workspace.
+- **20 Specialized Agents**: Tailored personas for everything from Nix systems to Security engineering.
+- **Knowledge Management**: Structured `PLANNING.md`, `TASK.md`, and `KNOWLEDGE.md` for continuous learning.
+- **MCP Integration**: Model Context Protocol servers for Context7, Playwright, and Sequential Thinking.
+- **Multi-Assistant Support**: Deeply configured setups for Claude, Gemini, Codex, and local Ollama models.
+
+### 📊 Observability Stack
+Production-grade monitoring primarily hosted on `woody`:
+- **Metrics**: Prometheus & Grafana for system-wide performance tracking.
+- **Logging**: Loki for centralized log aggregation.
+- **Agents**: Grafana Alloy for telemetry collection.
+- **Alerting**: Alertmanager for proactive system health notifications.
+
+### 🎨 The Desktop Experience
+Modern, high-performance Wayland environments:
+- **Hyprland & Niri**: Fully declarative Wayland compositors.
+- **Omarchy Integration**: DHH-inspired system utilities (`os-battery-show`, `os-time-show`).
+- **Stylix**: Unified theming across applications using the Nord color palette.
+- **Custom Scripts**: Unified `screenshot.sh` and clipboard management.
+
+### 🛠️ Development Environments
+Isolated, reproducible toolchains for modern engineering:
+- **Languages**: Rust, Go, Python (via `uv`), Node.js, Lua, SQL.
+- **Tooling**: Protobuf/gRPC suite, JSONnet, and advanced system debuggers.
+- **IDEs**: Declarative configurations for Cursor, VS Code, and Ghostty.
+
+---
+
+## 🏗️ Repository Structure
+
+- `home/`: Home Manager modules and host-specific user configs.
+  - `features/`: Modular features (AI, Shell, Development, Desktop, etc.)
+  - `global/`: Shared user settings.
+- `hosts/`: System-level configurations (NixOS and nix-darwin).
+  - `common/`: Shared system traits and optional service modules.
+- `pkgs/`: Custom packages and builders (antigravity, claude-code, gemini-cli, etc.).
+- `omarchy/`: Custom bin utilities and distribution logic.
+- `scripts/`: Maintenance and update scripts.
+- `secrets/`: Encrypted secrets managed via `sops-nix`.
+
+---
+
+## 🛠️ Usage
+
+### Quick Start
+```bash
+# Enter the development shell
+nix develop # or nix-shell
+
+# Apply NixOS configuration
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# Apply Home Manager configuration
+home-manager switch --flake .#<user>@<host>
+
+# Apply Darwin configuration
+darwin-rebuild switch --flake .#<hostname>
+```
+
+### Management via Makefile
+- `make switch i=<host>`: Rebuild specific host.
+- `make woody`: Rebuild the primary desktop.
+- `make up`: Update all flake inputs.
+- `make gc`: Perform system cleanup and garbage collection.
+- `make fmt`: Format all Nix files in the repository.
+
+---
+
+## 📜 Documentation
+- [Home Manager Guide](docs/home-manager.md)
+- [Secrets Management](docs/secrets.md)
+- [Hyprland Keybindings](docs/hyprland.md)
+- [Screenshot Consolidation](docs/screenshot-scripts-consolidation.md)
+
+---
+
+## 🧑‍🏫 Inspirations
+Heavily influenced by [Omarchy](https://omarchy.org), [Misterio77's starter configs](https://github.com/Misterio77/nix-starter-configs), and the Nix community's best practices.
+
+*Generated with ❤️ by Gemini CLI*
