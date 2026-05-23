@@ -41,7 +41,9 @@
     exiftool # Metadata extraction
 
     # Image/Video processing
-    ueberzugpp # Yazi image display
+    ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+    ueberzugpp # Yazi image display (Linux only, requires wayland)
+    ] ++ [
     ffmpegthumbnailer # Legacy video thumbnails (can be removed eventually)
     ffmpeg # Modern video thumbnail generation
     chafa # Terminal image display
@@ -79,7 +81,9 @@
     bat # Syntax highlighting (should be available via programs.bat)
 
     # Utilities
-    ripdrag # Drag and drop support
+    ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+    ripdrag # Drag and drop support (Linux only, requires wayland)
+    ] ++ [
     sqlite # Database inspection
     transmission_4 # Torrent info (transmission-show)
 
