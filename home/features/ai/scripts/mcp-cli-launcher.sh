@@ -207,13 +207,13 @@ launch_qwen_code() {
     fi
 }
 
-launch_gemini_cli() {
+launch_antigravity_cli() {
     local servers="$1"
-    if command -v gemini-cli >/dev/null 2>&1; then
-        # Gemini CLI MCP integration
-        gemini-cli --mcp "$MCP_PROCESSED_CONFIG" "$@"
+    if command -v agy >/dev/null 2>&1; then
+        # Antigravity CLI MCP integration
+        agy --mcp "$MCP_PROCESSED_CONFIG" "$@"
     else
-        echo "Error: gemini-cli not found in PATH" >&2
+        echo "Error: agy not found in PATH" >&2
         return 1
     fi
 }
@@ -234,7 +234,7 @@ Commands:
   crush             Launch Crush with MCP support
   goose             Launch Goose CLI with MCP support
   qwen-code         Launch Qwen Code with MCP support
-  gemini-cli        Launch Gemini CLI with MCP support
+  agy               Launch Antigravity CLI with MCP support
 
 Examples:
   $(basename "$0") list
@@ -307,9 +307,9 @@ main() {
             process_mcp_config "$MCP_CONFIG_FILE" "$MCP_PROCESSED_CONFIG"
             launch_qwen_code "" "$@"
             ;;
-        "gemini-cli")
+        "agy")
             process_mcp_config "$MCP_CONFIG_FILE" "$MCP_PROCESSED_CONFIG"
-            launch_gemini_cli "" "$@"
+            launch_antigravity_cli "" "$@"
             ;;
         "help"|"-h"|"--help")
             usage

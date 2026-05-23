@@ -1,10 +1,22 @@
 {
-  "version": "1.23.2",
-  "vscodeVersion": "1.107.0",
+  "version": "2.0.1",
+  "vscodeVersion": "2.0.1",
   "sources": {
-    "aarch64-linux": {"url":"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/1.23.2-4781536860569600/linux-arm/Antigravity.tar.gz","sha256":"64d11085f17edc691adbe8952d59887f257d58448705dc2a19dfa23890d36df1"},
-    "x86_64-linux": {"url":"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/1.23.2-4781536860569600/linux-x64/Antigravity.tar.gz","sha256":"5232a4048ff4fa15685d9a981ba4fba573e297f3efc9b76f638e794baf775725"},
-    "x86_64-darwin": {"url":"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/1.23.2-4781536860569600/darwin-x64/Antigravity.zip","sha256":"86437909f7e1c85d987b02130d3464b3d004d07904d5c893989ac3c924d11357"},
-    "aarch64-darwin": {"url":"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/1.23.2-4781536860569600/darwin-arm/Antigravity.zip","sha256":"4a8a90feed7078dae30d1dbcb268a0497c103ba76df7012a4467587aa7cffdf8"}
+    "x86_64-linux": {
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/linux-x64/Antigravity.tar.gz",
+      "sha256": "0727e1f56961b6d2347941f278da69cc6c17de3befe988524848cd167380e9ab"
+    },
+    "aarch64-linux": {
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/linux-arm/Antigravity.tar.gz",
+      "sha256": "5af56cc9dda954f369a61045b7da2f348bcb0b3507d272b4c0e9aa7cd6175d9b"
+    },
+    "x86_64-darwin": {
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/darwin-x64/Antigravity.zip",
+      "sha256": "39c9a34035094c7dee38ff4610146fb98e58ac31355116beea11b2ff0f822fa9"
+    },
+    "aarch64-darwin": {
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/darwin-arm/Antigravity.zip",
+      "sha256": "e3f861e7ba76c12bc309e775002b326d5e48b3408537a4709144273e8f8eb573"
+    }
   }
 }

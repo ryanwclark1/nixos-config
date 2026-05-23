@@ -25,8 +25,8 @@ final: prev: {
   # Override cursor-cli with our custom version
   cursor-cli = final.callPackage ../pkgs/cursor-cli { };
 
-  # Override gemini-cli with our custom version
-  gemini-cli = final.callPackage ../pkgs/gemini-cli { };
+  # Override antigravity-cli with our custom version
+  antigravity-cli = final.callPackage ../pkgs/antigravity-cli { };
 
   # Override Claude Code with our custom native binary package by default.
   claude-code-bin = final.callPackage ../pkgs/claude-code-bin { };
@@ -54,6 +54,22 @@ final: prev: {
       # Add playwright.browsers to FHS environment so browsers are available for Playwright
       # This coordinates with home-manager playwright settings
       # Falls back to null if playwright.browsers is not available
+      playwright-browsers = playwrightBrowsers;
+    };
+
+  # Override antigravity-ide with our custom version
+  # Same workaround as code-cursor: exclude meta from auto-filling
+  antigravity-ide =
+    let
+      pkgsWithoutMeta = builtins.removeAttrs final [ "meta" ];
+      callPackageWithoutMeta = final.lib.callPackageWith pkgsWithoutMeta;
+      playwrightBrowsers =
+        if final ? playwright && final.playwright ? browsers
+        then final.playwright.browsers
+        else null;
+    in
+    callPackageWithoutMeta (import ../pkgs/antigravity-ide) {
+      callPackage = callPackageWithoutMeta;
       playwright-browsers = playwrightBrowsers;
     };
 

@@ -74,17 +74,17 @@ in
 } {
   inherit commandLineArgs useVSCodeRipgrep;
   inherit (information) version vscodeVersion;
-  pname = "antigravity";
+  pname = "antigravity-ide";
 
-  executableName = "antigravity";
-  longName = "Antigravity";
-  shortName = "Antigravity";
-  libraryName = "antigravity";
-  iconName = "antigravity";
+  executableName = "antigravity-ide";
+  longName = "Antigravity IDE";
+  shortName = "Antigravity IDE";
+  libraryName = "antigravity-ide";
+  iconName = "antigravity-ide";
 
   src = fetchurl { inherit (source) url sha256; };
 
-  sourceRoot = if hostPlatform.isDarwin then "Antigravity.app" else "Antigravity-${if hostPlatform.isAarch64 then "arm64" else "x64"}";
+  sourceRoot = if hostPlatform.isDarwin then "Antigravity.app" else "Antigravity IDE";
 
   # When running inside an FHS environment, ensure browsers are available for Playwright
   # This coordinates with home-manager playwright settings (PLAYWRIGHT_BROWSERS_PATH)
@@ -124,7 +124,7 @@ in
   updateScript = ./update.sh;
 
   meta = {
-    mainProgram = "antigravity";
+    mainProgram = "antigravity-ide";
     description = "Agentic development platform, evolving the IDE into the agent-first era";
     homepage = "https://antigravity.google";
     downloadPage = "https://antigravity.google/download";
