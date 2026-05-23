@@ -75,6 +75,8 @@
   # Customize FHS environment
   # Function that takes default buildFHSEnv arguments and returns modified arguments
   customizeFHSEnv ? args: args,
+
+  postInstall ? null,
 }:
 
 stdenv.mkDerivation (
@@ -183,6 +185,7 @@ stdenv.mkDerivation (
       src
       sourceRoot
       dontFixup
+      postInstall
       ;
 
     passthru = {

@@ -120,6 +120,15 @@ in
       }
     );
 
+  postInstall = ''
+    rm -f "$out/bin/antigravity"
+    cat > "$out/bin/antigravity" <<EOF
+#!/bin/sh
+exec "$out/lib/antigravity/antigravity" "\$@"
+EOF
+    chmod +x "$out/bin/antigravity"
+  '';
+
   tests = { };
   updateScript = ./update.sh;
 
