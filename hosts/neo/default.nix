@@ -135,16 +135,8 @@ in
 
   system.primaryUser = user;
 
-  nix = {
-    package = lib.mkDefault pkgs.nixVersions.latest;
-    settings = {
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      warn-dirty = false;
-    };
-  };
+  # Determinate installer manages the Nix daemon; disable nix-darwin's management.
+  nix.enable = false;
 
   system.stateVersion = 5;
 }
