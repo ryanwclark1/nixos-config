@@ -383,26 +383,28 @@ stdenv.mkDerivation (
       lib.optionalString stdenv.hostPlatform.isLinux (
         # disable update checks
         ''
-          tmpProductJson="$(mktemp)"
-          jq 'del(.updateUrl, .backupUpdateUrl)' resources/app/product.json > "$tmpProductJson"
-          mv "$tmpProductJson" resources/app/product.json
+          if [ -f resources/app/product.json ]; then
+            tmpProductJson="$(mktemp)"
+            jq 'del(.updateUrl, .backupUpdateUrl)' resources/app/product.json > "$tmpProductJson"
+            mv "$tmpProductJson" resources/app/product.json
+          else
+            echo "Warning: resources/app/product.json not found, skipping updateUrl removal"
+          fi
         ''
         # this is a fix for "save as root" functionality
         + ''
           packed="resources/app/node_modules.asar"
           unpacked="resources/app/node_modules"
-          asar extract "$packed" "$unpacked"
-          substituteInPlace $unpacked/@vscode/sudo-prompt/index.js \
-            --replace-fail "/usr/bin/pkexec" "/run/wrappers/bin/pkexec" \
-            --replace-fail "/bin/bash" "${bash}/bin/bash"
-          rm -rf "$packed"
-        ''
-        # without this symlink loading JsChardet, the library that is used for auto encoding detection when files.autoGuessEncoding is true,
-        # fails to load with: electron/js2c/renderer_init: Error: Cannot find module 'jschardet'
-        # and the window immediately closes which renders VSCode unusable
-        # see https://github.com/NixOS/nixpkgs/issues/152939 for full log
-        + ''
-          ln -rs "$unpacked" "$packed"
+          if [ -f "$packed" ]; then
+            asar extract "$packed" "$unpacked"
+            substituteInPlace $unpacked/@vscode/sudo-prompt/index.js \
+              --replace-fail "/usr/bin/pkexec" "/run/wrappers/bin/pkexec" \
+              --replace-fail "/bin/bash" "${bash}/bin/bash"
+            rm -rf "$packed"
+            ln -rs "$unpacked" "$packed"
+          else
+            echo "Warning: $packed not found, skipping save as root fix"
+          fi
         ''
       )
       + (

@@ -150,7 +150,11 @@ in
       productJson="${
         if stdenv.hostPlatform.isDarwin then "Contents/Resources" else "resources"
       }/app/product.json"
-      data=$(jq 'del(.updateUrl)' "$productJson")
-      echo "$data" > "$productJson"
+      if [ -f "$productJson" ]; then
+        data=$(jq 'del(.updateUrl)' "$productJson")
+        echo "$data" > "$productJson"
+      else
+        echo "Warning: $productJson not found, skipping updateUrl removal"
+      fi
     '';
   })
