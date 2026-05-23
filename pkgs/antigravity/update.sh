@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-infoFile="$scriptDir/information.json"
+infoFile="$scriptDir/sources.json"
 
 currentVersion=$(jq -r '.version' "$infoFile" 2>/dev/null || echo "0.0.0")
 

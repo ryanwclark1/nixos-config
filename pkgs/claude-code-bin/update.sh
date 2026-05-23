@@ -5,7 +5,7 @@ set -euo pipefail
 
 BASE_URL="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MANIFEST_PATH="$SCRIPT_DIR/manifest.json"
+MANIFEST_PATH="$SCRIPT_DIR/sources.json"
 
 usage() {
   echo "Usage: $0 [--check-only]" >&2

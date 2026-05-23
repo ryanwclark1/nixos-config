@@ -9,7 +9,7 @@
 let
   pname = "antigravity-cli";
   # Read version and sources from a separate file for easier updates
-  info = lib.importJSON ./information.json;
+  info = lib.importJSON ./sources.json;
   version = info.version;
   
   src = fetchurl {
@@ -48,6 +48,8 @@ stdenv.mkDerivation {
 
     runHook postInstall
   '';
+
+  passthru.updateScript = ./update.sh;
 
   meta = with lib; {
     description = "Official CLI for Antigravity, the agentic development platform";

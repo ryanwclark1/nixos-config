@@ -53,7 +53,7 @@
 
 let
   inherit (stdenv) hostPlatform;
-  information = (lib.importJSON ./information.json);
+  information = (lib.importJSON ./sources.json);
   source =
     information.sources."${hostPlatform.system}"
       or (throw "antigravity: unsupported system ${hostPlatform.system}");
@@ -142,19 +142,4 @@ in
       Zaczero
     ];
   };
-}).overrideAttrs
-  (oldAttrs: {
-    # Disable update checks
-    nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ jq ];
-    postPatch = (oldAttrs.postPatch or "") + ''
-      productJson="${
-        if stdenv.hostPlatform.isDarwin then "Contents/Resources" else "resources"
-      }/app/product.json"
-      if [ -f "$productJson" ]; then
-        data=$(jq 'del(.updateUrl)' "$productJson")
-        echo "$data" > "$productJson"
-      else
-        echo "Warning: $productJson not found, skipping updateUrl removal"
-      fi
-    '';
-  })
+})

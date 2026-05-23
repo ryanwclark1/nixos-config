@@ -247,19 +247,13 @@ case "${1:-}" in
       fi
 
       if [[ -z "$version" || "$version" == "unknown" ]]; then
-        manifest_file="$REPO_ROOT/$pkg_dir/manifest.json"
-        if [[ -f "$manifest_file" ]]; then
-          version=$(jq -r '.version' "$manifest_file" 2>/dev/null || echo "unknown")
+        sources_file="$REPO_ROOT/$pkg_dir/sources.json"
+        if [[ -f "$sources_file" ]]; then
+          version=$(jq -r '.version' "$sources_file" 2>/dev/null || echo "unknown")
         fi
       fi
 
-      # Special case for antigravity, antigravity-ide and antigravity-cli which use information.json
-      if [[ "$pkg" == "antigravity" || "$pkg" == "antigravity-ide" || "$pkg" == "antigravity-cli" ]] && [[ -z "$version" || "$version" == "unknown" ]]; then
-        info_file="$REPO_ROOT/$pkg_dir/information.json"
-        if [[ -f "$info_file" ]]; then
-          version=$(jq -r '.version' "$info_file" 2>/dev/null || echo "unknown")
-        fi
-      fi
+
 
       if [[ -n "$version" && "$version" != "unknown" ]]; then
         echo "  - $pkg (v$version)"

@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-infoFile="$scriptDir/information.json"
+infoFile="$scriptDir/sources.json"
 
 # This script is a template. Antigravity IDE 2.0+ does not currently have a public update API 
 # that returns the "IDE" (VS Code) specific builds separate from the Hub.
