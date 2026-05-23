@@ -59,7 +59,7 @@ in
     # Keep it out of the default HM path so switch/rebuild stays reliable.
     # Re-enable once the package path is replaced or stabilized.
     ./codex
-    ./gemini
+    ./antigravity
     ./opencode
   ];
   home.packages = with pkgs; [

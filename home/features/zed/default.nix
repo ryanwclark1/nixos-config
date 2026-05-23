@@ -195,7 +195,7 @@
         codex-acp = {
           type = "registry";
         };
-        gemini = {
+        antigravity = {
           type = "registry";
         };
       };
