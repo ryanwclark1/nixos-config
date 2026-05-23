@@ -2,7 +2,7 @@
 
 # MCP CLI Launcher
 # Launches CLI tools with MCP server integration
-# Supports: aider, codex, crush, goose-cli, claude-code, qwen-code, gemini-cli
+# Supports: aider, codex, crush, goose-cli, claude-code, qwen-code, antigravity-cli
 
 set -euo pipefail
 

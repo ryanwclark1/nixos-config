@@ -33,14 +33,16 @@ stdenv.mkDerivation {
     mkdir -p $out/bin
     cp antigravity $out/bin/agy
 
+    runHook postInstall
+  '';
+
+  postFixup = ''
     # Generate shell completions
     $out/bin/agy completion bash > agy.bash
     $out/bin/agy completion zsh > agy.zsh
     $out/bin/agy completion fish > agy.fish
 
     installShellCompletion agy.bash agy.zsh agy.fish
-
-    runHook postInstall
   '';
 
   meta = with lib; {
