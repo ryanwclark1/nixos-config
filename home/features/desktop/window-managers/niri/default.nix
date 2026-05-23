@@ -7,11 +7,6 @@
 
 {
   programs = {
-    # Configure niriswitcher
-    niriswitcher = {
-      enable = true;
-    };
-
     # Home Manager exposes `programs.niri.settings`/`package` here; the NixOS
     # module owns session enablement.
     niri = {

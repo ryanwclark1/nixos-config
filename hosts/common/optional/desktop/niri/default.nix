@@ -36,7 +36,6 @@
   environment = {
     systemPackages = with pkgs; [
       # niri package is automatically provided by programs.niri.enable
-      niriswitcher  # backup switcher
     ];
 
     variables.NIXOS_OZONE_WL = "1";
