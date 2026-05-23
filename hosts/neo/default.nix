@@ -40,7 +40,6 @@ in
   environment.systemPackages = with pkgs; [
     neovim
     alacritty
-    inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default
     mkalias
     tmux
     git
@@ -66,6 +65,7 @@ in
       "codex"
       "gemini"
       "aerospace"
+      "ghostty"
     ];
   };
 
