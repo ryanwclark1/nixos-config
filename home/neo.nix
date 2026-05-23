@@ -19,7 +19,7 @@
     ./features/ripgrep
     ./features/starship
     ./features/tmux
-    ./features/yazi
+    # ./features/yazi # disabled — has Linux-only deps (wayland) that break on darwin
     ./features/zoxide
   ];
 
