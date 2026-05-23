@@ -30,7 +30,6 @@ final: prev: {
 
   # Override Claude Code with our custom native binary package by default.
   claude-code-bin = final.callPackage ../pkgs/claude-code-bin { };
-  claude-code-npm = final.callPackage ../pkgs/claude-code { };
   claude-code = final.claude-code-bin;
 
   # Override codex with our custom version
