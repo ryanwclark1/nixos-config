@@ -31,7 +31,7 @@
     git.enable = true;
   };
 
-  home.username = lib.mkDefault "administrator";
+  home.username = lib.mkDefault "ryanclark";
   home.stateVersion = lib.mkDefault "24.11";
   home.homeDirectory = lib.mkForce "/Users/${config.home.username}";
 }

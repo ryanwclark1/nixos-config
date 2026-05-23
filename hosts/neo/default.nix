@@ -7,7 +7,7 @@
   ...
 }:
 let
-  user = "administrator";
+  user = "ryanclark";
   hostName = "neo";
 in
 {
@@ -133,7 +133,7 @@ in
     };
   };
 
-  services.nix-daemon.enable = true;
+  system.primaryUser = user;
 
   nix = {
     package = lib.mkDefault pkgs.nixVersions.latest;

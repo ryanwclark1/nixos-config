@@ -368,7 +368,7 @@
             inherit inputs outputs;
           };
         };
-        "administrator@neo" = lib.homeManagerConfiguration {
+        "ryanclark@neo" = lib.homeManagerConfiguration {
           modules = [
             ./home/neo.nix
           ];
