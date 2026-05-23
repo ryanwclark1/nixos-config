@@ -30,6 +30,7 @@ in
   # own entries to config.local without conflicts.
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = lib.mkForce false;
 
     settings = {
       # Default settings for all hosts
