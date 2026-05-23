@@ -26,7 +26,8 @@ NC='\033[0m' # No Color
 declare -A PACKAGES=(
   [code-cursor]="pkgs/code-cursor"
   [cursor-cli]="pkgs/cursor-cli"
-  [gemini-cli]="pkgs/gemini-cli"
+  [antigravity-cli]="pkgs/antigravity-cli"
+  [antigravity-ide]="pkgs/antigravity-ide"
   [claude-code]="pkgs/claude-code-bin"
   [claude-code-npm]="pkgs/claude-code"
   [codex]="pkgs/codex"
@@ -253,8 +254,8 @@ case "${1:-}" in
         fi
       fi
 
-      # Special case for antigravity which uses information.json
-      if [[ "$pkg" == "antigravity" ]] && [[ -z "$version" || "$version" == "unknown" ]]; then
+      # Special case for antigravity, antigravity-ide and antigravity-cli which use information.json
+      if [[ "$pkg" == "antigravity" || "$pkg" == "antigravity-ide" || "$pkg" == "antigravity-cli" ]] && [[ -z "$version" || "$version" == "unknown" ]]; then
         info_file="$REPO_ROOT/$pkg_dir/information.json"
         if [[ -f "$info_file" ]]; then
           version=$(jq -r '.version' "$info_file" 2>/dev/null || echo "unknown")
