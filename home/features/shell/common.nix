@@ -78,7 +78,6 @@
   home.packages = with pkgs; [
 
     fd
-    eza
     bat
     procs
     delta
