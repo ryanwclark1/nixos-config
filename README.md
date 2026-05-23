@@ -77,7 +77,7 @@ Isolated, reproducible toolchains for modern engineering:
   - `global/`: Shared user settings.
 - `hosts/`: System-level configurations (NixOS and nix-darwin).
   - `common/`: Shared system traits and optional service modules.
-- `pkgs/`: Custom packages and builders (antigravity, claude-code, gemini-cli, etc.).
+- `pkgs/`: Custom packages and builders (antigravity, antigravity-cli, antigravity-ide, claude-code, etc.).
 - `omarchy/`: Custom bin utilities and distribution logic.
 - `scripts/`: Maintenance and update scripts.
 - `secrets/`: Encrypted secrets managed via `sops-nix`.
