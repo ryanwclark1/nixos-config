@@ -1,22 +1,22 @@
 {
-  "version": "2.0.1",
-  "vscodeVersion": "2.0.1",
+  "version": "2.0.6",
+  "vscodeVersion": "2.0.6",
   "sources": {
     "x86_64-linux": {
-      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/linux-x64/Antigravity.tar.gz",
-      "sha256": "0727e1f56961b6d2347941f278da69cc6c17de3befe988524848cd167380e9ab"
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.6-5413878570549248/linux-x64/Antigravity.tar.gz",
+      "sha256": "ad1e04535149b07c27030eb1ead40f4efda388cb39020bcbb9accdfb49e44cc5"
     },
     "aarch64-linux": {
-      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/linux-arm/Antigravity.tar.gz",
-      "sha256": "5af56cc9dda954f369a61045b7da2f348bcb0b3507d272b4c0e9aa7cd6175d9b"
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.6-5413878570549248/linux-arm/Antigravity.tar.gz",
+      "sha256": "02fc7f47650582ac72b845853b514de6c83ea7a4cd8a8d739e1a8688db2f45a9"
     },
     "x86_64-darwin": {
-      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/darwin-x64/Antigravity.zip",
-      "sha256": "39c9a34035094c7dee38ff4610146fb98e58ac31355116beea11b2ff0f822fa9"
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.6-5413878570549248/darwin-x64/Antigravity.zip",
+      "sha256": "d59701038af4faf912063fca8c9cbc20ab3b7cbde3e435b85ed3659b01963a69"
     },
     "aarch64-darwin": {
-      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/darwin-arm/Antigravity.zip",
-      "sha256": "e3f861e7ba76c12bc309e775002b326d5e48b3408537a4709144273e8f8eb573"
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.6-5413878570549248/darwin-arm/Antigravity.zip",
+      "sha256": "2456e68dc74be401fb2c6a3d32f8e1dc7b8bcb316950ae9bd9181b0f2da38638"
     }
   }
 }
