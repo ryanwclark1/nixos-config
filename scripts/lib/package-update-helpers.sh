@@ -14,9 +14,6 @@ resolve_upstream_package_name() {
     claude-code)
       printf 'claude-code-bin\n'
       ;;
-    claude-code-npm)
-      printf 'claude-code\n'
-      ;;
     *)
       printf '%s\n' "$1"
       ;;
