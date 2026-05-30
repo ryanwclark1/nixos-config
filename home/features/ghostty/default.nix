@@ -28,10 +28,17 @@
       window-theme = "ghostty";
       window-padding-x = 4;
       window-padding-y = 4;
+      window-padding-balance = true;
+      window-show-tab-bar = "always";
+      window-new-tab-position = "end";
       confirm-close-surface = false;
-      resize-overlay = "never";
+      resize-overlay = "after-first";
+      resize-overlay-position = "top-right";
+      unfocused-split-opacity = 0.85;
       gtk-toolbar-style = "flat";
       gtk-titlebar = false;
+      gtk-tabs-location = "bottom";
+      gtk-single-instance = true;
 
       # Cursor
       cursor-style = "block";
@@ -39,17 +46,33 @@
 
       # Shell integration
       # Removed ssh-env to prevent OSC 7 host warnings with remote hostnames
-      shell-integration-features = "no-cursor";
+      shell-integration-features = "cursor,no-sudo,title,no-ssh-env,no-ssh-terminfo,path";
 
       # Background
       background-opacity = 0.9;
       background-blur = true;
 
       # Behavior
+      focus-follows-mouse = true;
       copy-on-select = true;
+      right-click-action = "copy-or-paste";
+      clipboard-read = "allow";
+      clipboard-write = "allow";
+      clipboard-paste-protection = true;
+      clipboard-paste-bracketed-safe = true;
+      clipboard-trim-trailing-spaces = true;
+      link-url = true;
+      link-previews = true;
+      app-notifications = "clipboard-copy,config-reload";
       auto-update = "off";
       # Slow down mouse scrolling for finer control
-      mouse-scroll-multiplier = 0.95;
+      mouse-scroll-multiplier = "precision:0.85,discrete:2";
+
+      # Quick terminal
+      quick-terminal-position = "top";
+      quick-terminal-screen = "main";
+      quick-terminal-autohide = true;
+      quick-terminal-keyboard-interactivity = "exclusive";
 
       # Dynamic color integration with quickshell ColorExportService
       # Silently skipped if file doesn't exist yet (? prefix)
@@ -57,8 +80,38 @@
 
       # Keybindings
       keybind = [
-        "ctrl+shift+c=copy_to_clipboard"
+        "performable:ctrl+shift+c=copy_to_clipboard:mixed"
         "ctrl+shift+v=paste_from_clipboard"
+        "ctrl+shift+,=reload_config"
+        "ctrl+,=open_config"
+        "ctrl+shift+n=new_window"
+        "ctrl+shift+t=new_tab"
+        "ctrl+shift+w=close_tab:this"
+        "ctrl+shift+q=close_window"
+        "ctrl+shift+o=new_split:right"
+        "ctrl+shift+e=new_split:down"
+        "ctrl+shift+h=goto_split:left"
+        "ctrl+shift+j=goto_split:down"
+        "ctrl+shift+k=goto_split:up"
+        "ctrl+shift+l=goto_split:right"
+        "ctrl+alt+h=resize_split:left,10"
+        "ctrl+alt+j=resize_split:down,10"
+        "ctrl+alt+k=resize_split:up,10"
+        "ctrl+alt+l=resize_split:right,10"
+        "ctrl+shift+x=toggle_split_zoom"
+        "ctrl+shift+p=toggle_command_palette"
+        "ctrl+shift+b=toggle_background_opacity"
+        "ctrl+shift+space=toggle_quick_terminal"
+        "ctrl+enter=toggle_fullscreen"
+        "alt+1=goto_tab:1"
+        "alt+2=goto_tab:2"
+        "alt+3=goto_tab:3"
+        "alt+4=goto_tab:4"
+        "alt+5=goto_tab:5"
+        "alt+6=goto_tab:6"
+        "alt+7=goto_tab:7"
+        "alt+8=goto_tab:8"
+        "alt+9=last_tab"
       ];
     };
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
