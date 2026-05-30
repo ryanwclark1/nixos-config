@@ -204,12 +204,12 @@ history:
 gc:
 	$(eval MACHINE_NAME := $(shell hostname))
 	@echo "Machine Name: $$MACHINE_NAME"
-	echo "Wiping profile history older than 7 days..."; \
-	sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d; \
+	echo "Wiping profile history older than 3 days..."; \
+	sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 3d; \
 	echo "Running garbage collection..."; \
 	sudo nix store gc; \
 	echo "Deleting old generations of garbage..."; \
-	sudo nix-collect-garbage --delete-older-than 7d; \
+	sudo nix-collect-garbage --delete-older-than 3d; \
 	echo "Rebuilding NixOS for machine $$MACHINE_NAME..."; \
 	sudo nixos-rebuild boot --flake .#$$MACHINE_NAME
 
