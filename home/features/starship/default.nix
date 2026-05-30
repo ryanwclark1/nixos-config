@@ -32,6 +32,11 @@ let
   base17 = "f4b8e4"; # pink - bright purple
 in
 {
+  home.file.".local/bin/starship" = {
+    source = "${config.programs.starship.package}/bin/starship";
+    force = true;
+  };
+
   programs.starship = {
     enable = true;
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
@@ -70,13 +75,16 @@ in
         "$kubernetes"
         "$lua"
         "$nodejs"
+        "$package"
         "$php"
         "$rust"
         "$swift"
+        "$terraform"
         "$zig"
         "[](fg:#${base0F} bg:#${base06})"
         "$docker_context"
         "$nix_shell"
+        "$conda"
         "[](fg:#${base06})"
         "$fill"
         "[](fg:#${base0E})"
@@ -464,7 +472,7 @@ in
         description = "Show when in a Nix flake directory";
         symbol = "󱄅 ";
         style = "bg:#${base0E} fg:#${base00}";
-        when = ''test -f flake.nix || test -f flake.lock'';
+        when = "test -f flake.nix || test -f flake.lock";
         format = "[$symbol]($style)";
         disabled = true;
       };
@@ -474,7 +482,7 @@ in
         description = "Show when in a git worktree";
         symbol = "󰧨 ";
         style = "bg:#${base05} fg:#${base00}";
-        when = ''git rev-parse --git-dir 2>/dev/null | grep -q worktrees'';
+        when = "git rev-parse --git-dir 2>/dev/null | grep -q worktrees";
         format = "[$symbol]($style)";
         disabled = true;
       };
