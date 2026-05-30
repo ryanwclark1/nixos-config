@@ -155,8 +155,8 @@ in
         { mime = "application/{pdf,doc,rtf}", fg = "#${base0B}" },
 
         # Fallback
-        { name = "*", fg = "#${base05}" },
-        { name = "*/", fg = "#${base0D}" }
+        { url = "*", fg = "#${base05}" },
+        { url = "*/", fg = "#${base0D}" }
       ]
 
       [spot]
