@@ -62,6 +62,11 @@ in
         # Connection settings
         ConnectTimeout = 10;
         BatchMode = "no";
+        SendEnv = [
+          "COLORTERM"
+          "TERM_PROGRAM"
+          "TERM_PROGRAM_VERSION"
+        ];
 
         # Security settings
         ObscureKeystrokeTiming = "no";
@@ -119,34 +124,46 @@ in
   # This allows the main ~/.ssh/config to be a standard, writable file
   home.file.".ssh/config".target = lib.mkForce ".ssh/config_nix";
 
-  # Ensure ~/.ssh/config exists, is writable, and includes the Nix-managed config
+  # Ensure ~/.ssh/config exists, is writable, and includes managed/local config fragments
   home.activation.ensureSshConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     SSH_CONFIG="${config.home.homeDirectory}/.ssh/config"
     NIX_SSH_CONFIG="${config.home.homeDirectory}/.ssh/config_nix"
-    
+    LOCAL_SSH_CONFIG="${config.home.homeDirectory}/.ssh/config.local"
+
     # If the main config is a symlink (from previous home-manager generations), remove it
     if [ -L "$SSH_CONFIG" ]; then
       rm "$SSH_CONFIG"
     fi
-    
+
     # Create the file if it doesn't exist
     if [ ! -f "$SSH_CONFIG" ]; then
       touch "$SSH_CONFIG"
       chmod 600 "$SSH_CONFIG"
       echo "# Writable SSH configuration file" > "$SSH_CONFIG"
       echo "# Programs can write to this file directly." >> "$SSH_CONFIG"
+      echo "Include ~/.ssh/config.local" >> "$SSH_CONFIG"
       echo "Include ~/.ssh/config_nix" >> "$SSH_CONFIG"
       echo "" >> "$SSH_CONFIG"
     else
-      # If the file exists, ensure it includes the Nix config
-      if ! grep -q "Include ~/.ssh/config_nix" "$SSH_CONFIG" 2>/dev/null; then
-        # We prepend the Include directive to ensure Nix config takes precedence or at least is loaded
-        TMP_CONF=$(mktemp)
-        echo "Include ~/.ssh/config_nix" > "$TMP_CONF"
-        cat "$SSH_CONFIG" >> "$TMP_CONF"
-        cat "$TMP_CONF" > "$SSH_CONFIG"
-        rm "$TMP_CONF"
-      fi
+      # Merge required includes into the writable config once. Local entries come
+      # first so tools can override generated host blocks when they need to.
+      TMP_CONF=$(mktemp)
+      {
+        echo "Include ~/.ssh/config.local"
+        echo "Include ~/.ssh/config_nix"
+        grep -v -E '^[[:space:]]*Include[[:space:]]+~/.ssh/config[.]local[[:space:]]*$|^[[:space:]]*Include[[:space:]]+~/.ssh/config_nix[[:space:]]*$' "$SSH_CONFIG" 2>/dev/null || true
+      } > "$TMP_CONF"
+      cat "$TMP_CONF" > "$SSH_CONFIG"
+      rm "$TMP_CONF"
+      chmod 600 "$SSH_CONFIG"
+    fi
+
+    if [ ! -f "$LOCAL_SSH_CONFIG" ]; then
+      touch "$LOCAL_SSH_CONFIG"
+      chmod 600 "$LOCAL_SSH_CONFIG"
+      echo "# Local SSH configuration file" > "$LOCAL_SSH_CONFIG"
+      echo "# Programs can write host entries here without touching the Nix-managed config." >> "$LOCAL_SSH_CONFIG"
+      echo "" >> "$LOCAL_SSH_CONFIG"
     fi
   '';
 

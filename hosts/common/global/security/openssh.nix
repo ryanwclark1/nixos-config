@@ -35,8 +35,13 @@ in
         StreamLocalBindUnlink = "yes";
         # Allow forwarding ports to everywhere
         GatewayPorts = "clientspecified";
-        # Let WAYLAND_DISPLAY be forwarded
-        AcceptEnv = [ "WAYLAND_DISPLAY" ];
+        # Let Wayland and Ghostty terminal metadata be forwarded
+        AcceptEnv = [
+          "WAYLAND_DISPLAY"
+          "COLORTERM"
+          "TERM_PROGRAM"
+          "TERM_PROGRAM_VERSION"
+        ];
         X11Forwarding = true;
         # Additional security
         ClientAliveInterval = 300;
@@ -55,29 +60,30 @@ in
 
   programs.ssh = {
     # Each hosts public key
-    knownHosts = lib.foldl' (acc: hostname:
+    knownHosts = lib.foldl' (
+      acc: hostname:
       let
         keyPath = "${hostsDir}/${hostname}/ssh_host_ed25519_key.pub";
       in
       if builtins.pathExists keyPath then
-        acc // {
+        acc
+        // {
           ${hostname} = {
             publicKey = builtins.readFile keyPath;
-            extraHostNames =
-              [
-                "${hostname}.${domain}"
-              ]
-              ++
-                # Alias for localhost if it's the same host
-                (lib.optional (hostname == config.networking.hostName) "localhost")
-              ++ (lib.optionals (hostname == "woody") [
-                "${domain}"
-                "local.${domain}"
-              ])
-              ++ (lib.optionals (hostname == "frametop") [
-                "${domain}"
-                "local.${domain}"
-              ]);
+            extraHostNames = [
+              "${hostname}.${domain}"
+            ]
+            ++
+              # Alias for localhost if it's the same host
+              (lib.optional (hostname == config.networking.hostName) "localhost")
+            ++ (lib.optionals (hostname == "woody") [
+              "${domain}"
+              "local.${domain}"
+            ])
+            ++ (lib.optionals (hostname == "frametop") [
+              "${domain}"
+              "local.${domain}"
+            ]);
           };
         }
       else
