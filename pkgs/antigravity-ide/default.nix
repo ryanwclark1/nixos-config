@@ -84,7 +84,7 @@ in
 
   src = fetchurl { inherit (source) url sha256; };
 
-  sourceRoot = if hostPlatform.isDarwin then "Antigravity.app" else "Antigravity IDE";
+  sourceRoot = if hostPlatform.isDarwin then "Antigravity IDE.app" else "Antigravity IDE";
 
   # When running inside an FHS environment, ensure browsers are available for Playwright
   # This coordinates with home-manager playwright settings (PLAYWRIGHT_BROWSERS_PATH)

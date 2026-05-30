@@ -173,16 +173,16 @@ switch:
 	sudo nixos-rebuild switch --flake .#$(i) --show-trace --verbose
 
 darwin-switch:
-	darwin-rebuild switch --flake .#$(i) --show-trace
+	sudo darwin-rebuild switch --flake .#$(i) --show-trace
 
 woody:
 	sudo nixos-rebuild switch --flake .#woody --show-trace --verbose
 
 neo:
-	darwin-rebuild switch --flake .#neo --show-trace
+	sudo darwin-rebuild switch --flake .#neo --show-trace
 
 mini:
-	darwin-rebuild switch --flake .#mini --show-trace
+	sudo darwin-rebuild switch --flake .#mini --show-trace
 
 frametop-dryrun:
 	sudo nixos-rebuild dry-run --flake .#frametop
