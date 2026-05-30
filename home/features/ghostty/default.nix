@@ -20,7 +20,7 @@
       theme = "theme";
 
       # Font
-      font-family = "JetBrainsMono Nerd Font";
+      font-family = config.theme.fonts.monospace;
       font-style = "Regular";
       font-size = 12;
 

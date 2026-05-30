@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -53,7 +54,7 @@
       };
       ui_font_family = "FiraCode Nerd Font";
       terminal = {
-        font_family = "JetBrainsMono Nerd Font";
+        font_family = config.theme.fonts.monospace;
         font_size = 14;
         copy_on_select = true;
       };
@@ -107,7 +108,10 @@
           formatter = {
             external = {
               command = "ruff";
-              arguments = [ "format" "-" ];
+              arguments = [
+                "format"
+                "-"
+              ];
             };
           };
         };
@@ -115,7 +119,11 @@
           formatter = {
             external = {
               command = "biome";
-              arguments = [ "format" "--stdin-file-path" "{buffer_path}" ];
+              arguments = [
+                "format"
+                "--stdin-file-path"
+                "{buffer_path}"
+              ];
             };
           };
         };
@@ -123,7 +131,11 @@
           formatter = {
             external = {
               command = "biome";
-              arguments = [ "format" "--stdin-file-path" "{buffer_path}" ];
+              arguments = [
+                "format"
+                "--stdin-file-path"
+                "{buffer_path}"
+              ];
             };
           };
         };

@@ -323,7 +323,7 @@ in
           "terminal.integrated.defaultProfile.linux" = "bash";
           "terminal.integrated.enableImages" = true;
           "terminal.integrated.environmentChangesIndicator" = "off";
-          "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
+          "terminal.integrated.fontFamily" = config.theme.fonts.monospace;
           "terminal.integrated.minimumContrastRatio" = 1;
           "terminal.integrated.mouseWheelZoom" = true;
           "terminal.integrated.scrollback" = 10000;

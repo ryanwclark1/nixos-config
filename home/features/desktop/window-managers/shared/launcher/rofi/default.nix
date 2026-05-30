@@ -6,6 +6,25 @@
 }:
 let
   inherit (config.lib.formats.rasi) mkLiteral;
+  inherit (config.theme.colors)
+    base00
+    base01
+    base02
+    base03
+    base04
+    base05
+    base06
+    base07
+    base08
+    base09
+    base0A
+    base0B
+    base0C
+    base0D
+    base0E
+    base0F
+    ;
+  font = config.theme.fonts.monospace;
 in
 # with lib;
 # TODO: Fix ssh functionality
@@ -129,29 +148,29 @@ in
     terminal = "kitty";
     theme = {
       "*" = {
-        font ="JetBrainsMono Nerd Font 14";
-        background = mkLiteral "#303446";
-        background-alt = mkLiteral "#30344699";
-        foreground = mkLiteral "#c6d0f5";
-        selected = mkLiteral "#8caaee";
-        active = mkLiteral "#a6d189";
-        urgent = mkLiteral "#e78284";
-        base00 = mkLiteral "#303446";
-        base01 = mkLiteral "#292c3c";
-        base02 = mkLiteral "#414559";
-        base03 = mkLiteral "#51576d";
-        base04 = mkLiteral "#626880";
-        base05 = mkLiteral "#c6d0f5";
-        base06 = mkLiteral "#f2d5cf";
-        base07 = mkLiteral "#babbf1";
-        base08 = mkLiteral "#e78284";
-        base09 = mkLiteral "#ef9f76";
-        base0A = mkLiteral "#e5c890";
-        base0B = mkLiteral "#a6d189";
-        base0C = mkLiteral "#81c8be";
-        base0D = mkLiteral "#8caaee";
-        base0E = mkLiteral "#ca9ee6";
-        base0F = mkLiteral "#eebebe";
+        font = "${font} 14";
+        background = mkLiteral "#${base00}";
+        background-alt = mkLiteral "#${base00}99";
+        foreground = mkLiteral "#${base05}";
+        selected = mkLiteral "#${base0D}";
+        active = mkLiteral "#${base0B}";
+        urgent = mkLiteral "#${base08}";
+        base00 = mkLiteral "#${base00}";
+        base01 = mkLiteral "#${base01}";
+        base02 = mkLiteral "#${base02}";
+        base03 = mkLiteral "#${base03}";
+        base04 = mkLiteral "#${base04}";
+        base05 = mkLiteral "#${base05}";
+        base06 = mkLiteral "#${base06}";
+        base07 = mkLiteral "#${base07}";
+        base08 = mkLiteral "#${base08}";
+        base09 = mkLiteral "#${base09}";
+        base0A = mkLiteral "#${base0A}";
+        base0B = mkLiteral "#${base0B}";
+        base0C = mkLiteral "#${base0C}";
+        base0D = mkLiteral "#${base0D}";
+        base0E = mkLiteral "#${base0E}";
+        base0F = mkLiteral "#${base0F}";
         border-color = mkLiteral "var(selected)";
         handle-color = mkLiteral "var(selected)";
         background-color = mkLiteral "var(background)";
@@ -200,7 +219,12 @@ in
         border = mkLiteral "0px solid";
         border-color = mkLiteral "@border-color";
         border-radius = mkLiteral "0px 0px 0px 0px";
-        children = map mkLiteral [ "inputbar" "message" "mode-switcher" "listview" ];
+        children = map mkLiteral [
+          "inputbar"
+          "message"
+          "mode-switcher"
+          "listview"
+        ];
         enabled = mkLiteral "true";
         margin = mkLiteral "0px";
         padding = mkLiteral "20px";
@@ -212,7 +236,10 @@ in
         border = mkLiteral "0px solid";
         border-color = mkLiteral "@border-color";
         border-radius = mkLiteral "10px";
-        children = map mkLiteral [ "textbox-prompt-colon" "entry" ];
+        children = map mkLiteral [
+          "textbox-prompt-colon"
+          "entry"
+        ];
         enabled = mkLiteral "true";
         margin = mkLiteral "0px 0px 10px 0px";
         padding = mkLiteral "5px 10px";

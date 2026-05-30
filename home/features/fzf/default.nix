@@ -6,22 +6,24 @@
   ...
 }:
 let
-  base00 = "303446"; # base
-  base01 = "292c3c"; # mantle
-  base02 = "414559"; # surface0
-  base03 = "51576d"; # surface1
-  base04 = "626880"; # surface2
-  base05 = "c6d0f5"; # text
-  base06 = "f2d5cf"; # rosewater
-  base07 = "babbf1"; # lavender
-  base08 = "e78284"; # red
-  base09 = "ef9f76"; # peach
-  base0A = "e5c890"; # yellow
-  base0B = "a6d189"; # green
-  base0C = "81c8be"; # teal
-  base0D = "8caaee"; # blue
-  base0E = "ca9ee6"; # mauve
-  base0F = "eebebe"; # flamingo
+  inherit (config.theme.colors)
+    base00
+    base01
+    base02
+    base03
+    base04
+    base05
+    base06
+    base07
+    base08
+    base09
+    base0A
+    base0B
+    base0C
+    base0D
+    base0E
+    base0F
+    ;
 
   # Import fzf scripts module
   fzfScripts = import ../desktop/common/scripts/fzf/default.nix {

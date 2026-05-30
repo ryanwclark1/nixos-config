@@ -7,6 +7,10 @@
 }:
 
 {
+  imports = [
+    ../theme
+  ];
+
   # Nix configuration handled by system-level config in hosts/common/global/nix.nix
 
   # systemd.user.startServices = "sd-switch";
@@ -31,7 +35,6 @@
       MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
       BAT_THEME = lib.mkDefault "theme";
     };
-
 
     # persistence = {};
     # persistence = {

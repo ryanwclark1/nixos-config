@@ -6,6 +6,7 @@
 
 {
   imports = [
+    ./theme
     ./features/shell
     ./features/atuin
     ./features/bat
