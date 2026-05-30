@@ -13,7 +13,7 @@ AGE_PUBLIC_KEY_FILE = $(AGE_DIR)/keys.txt
 RSA_BITS = 4096
 
 # Define the makefile targets and rules
-.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key update-packages update-package-status niri-vm-build niri-vm niri-vm-reset niri-vm-fresh niri-vm-ssh niri-vm-fresh-ssh niri-vm-smoke hyprland-vm-build hyprland-vm hyprland-vm-reset hyprland-vm-ssh hyprland-vm-panel-qa hyprland-vm-settings-qa
+.PHONY: keygen rsa_key ed25519_key age_key get_age_public_key switch darwin-switch woody neo mini update-packages update-package-status niri-vm-build niri-vm niri-vm-reset niri-vm-fresh niri-vm-ssh niri-vm-fresh-ssh niri-vm-smoke hyprland-vm-build hyprland-vm hyprland-vm-reset hyprland-vm-ssh hyprland-vm-panel-qa hyprland-vm-settings-qa
 
 keygen: rsa_key ed25519_key age_key get_age_public_key
 
@@ -172,8 +172,17 @@ secrets:
 switch:
 	sudo nixos-rebuild switch --flake .#$(i) --show-trace --verbose
 
+darwin-switch:
+	darwin-rebuild switch --flake .#$(i) --show-trace
+
 woody:
 	sudo nixos-rebuild switch --flake .#woody --show-trace --verbose
+
+neo:
+	darwin-rebuild switch --flake .#neo --show-trace
+
+mini:
+	darwin-rebuild switch --flake .#mini --show-trace
 
 frametop-dryrun:
 	sudo nixos-rebuild dry-run --flake .#frametop
