@@ -174,7 +174,10 @@ show_status() {
   local updates_available=()
   local up_to_date=()
 
-  for pkg in "${!PACKAGES[@]}"; do
+  local sorted_pkgs
+  sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+
+  for pkg in "${sorted_pkgs[@]}"; do
     if check_updates "$pkg"; then
       updates_available+=("$pkg")
       echo -e "  ${YELLOW}●${NC} $pkg - Update available"
@@ -207,7 +210,9 @@ case "${1:-}" in
       error "Please specify a package name or use 'update-all'"
       echo ""
       echo "Available packages:"
-      for pkg in "${!PACKAGES[@]}"; do
+      local sorted_pkgs
+      sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+      for pkg in "${sorted_pkgs[@]}"; do
         echo "  - $pkg"
       done
       exit 1
@@ -217,7 +222,9 @@ case "${1:-}" in
     for pkg in "$@"; do
       if [[ "$pkg" == "all" ]]; then
         # Update all packages
-        for pkg_name in "${!PACKAGES[@]}"; do
+        local sorted_pkgs
+        sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+        for pkg_name in "${sorted_pkgs[@]}"; do
           update_package "$pkg_name" || true
         done
       else
@@ -228,7 +235,9 @@ case "${1:-}" in
   update-all|upgrade-all)
     info "Updating all packages..."
     echo ""
-    for pkg in "${!PACKAGES[@]}"; do
+    local sorted_pkgs
+    sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+    for pkg in "${sorted_pkgs[@]}"; do
       update_package "$pkg" || true
       echo "---"
     done
@@ -236,7 +245,9 @@ case "${1:-}" in
     ;;
   list)
     echo "Available packages:"
-    for pkg in "${!PACKAGES[@]}"; do
+    local sorted_pkgs
+    sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+    for pkg in "${sorted_pkgs[@]}"; do
       pkg_dir="${PACKAGES[$pkg]}"
       version_file="$REPO_ROOT/$pkg_dir/default.nix"
       version="unknown"
@@ -260,7 +271,7 @@ case "${1:-}" in
       else
         echo "  - $pkg"
       fi
-    done | sort
+    done
     ;;
   *)
     echo "Usage: $0 [command] [package-name...]"
