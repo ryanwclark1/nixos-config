@@ -113,7 +113,8 @@ in
   # Set Tailscale operator for this user
   systemd.services.tailscale-set-operator = {
     description = "Set Tailscale operator user";
-    after = [ "tailscale.service" ];
+    after = [ "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
