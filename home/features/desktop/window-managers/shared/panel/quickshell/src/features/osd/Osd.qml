@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import "."
 import "../../shared"
@@ -10,10 +9,6 @@ import "../../services"
 Scope {
   id: root
   readonly property int _startupSuppressMs: 2000
-
-  PwObjectTracker {
-    objects: [ Pipewire.defaultAudioSink, Pipewire.defaultAudioSource ]
-  }
 
   // --- State ---
   property bool shouldShowOsd: false
@@ -38,17 +33,12 @@ Scope {
     if (root.osdType === "kbdbrightness") BrightnessService.subscriberCount--;
   }
 
-  // Pipewire reactive bindings
-  property real sinkVolume: {
-    var v = Pipewire.defaultAudioSink?.audio?.volume;
-    return (v !== undefined && !isNaN(v)) ? (Config.osdOverdrive ? Math.min(v, 1.5) : Colors.clamp01(v)) : 0;
-  }
-  property bool sinkMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
-  property real sourceVolume: {
-    var v = Pipewire.defaultAudioSource?.audio?.volume;
-    return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
-  }
-  property bool sourceMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
+  // AudioService uses wpctl polling instead of PwObjectTracker to avoid a
+  // QuickShell 0.3.0 PipeWire tracker crash when default nodes are removed.
+  property real sinkVolume: Config.osdOverdrive ? Math.min(AudioService.outputVolume, 1.5) : Colors.clamp01(AudioService.outputVolume)
+  property bool sinkMuted: AudioService.outputMuted
+  property real sourceVolume: Colors.clamp01(AudioService.inputVolume)
+  property bool sourceMuted: AudioService.inputMuted
 
   // --- OSD helpers ---
   readonly property real maxValue: {

@@ -141,11 +141,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780119894,
-        "narHash": "sha256-UHNy0DfU+GlFsiVj7hM8emTsFocNPhCPxKLptK5d398=",
+        "lastModified": 1780188999,
+        "narHash": "sha256-DQI/o9NPTWQ5npnWHKQrquQJkuYjoMu4tNj5zmVsK9Y=",
         "owner": "steveyegge",
         "repo": "beads",
-        "rev": "8de88e15b7d09b1dbfc9043298aff1cd3de87a29",
+        "rev": "848d0d7b6c933a00bd3d06a9a7c2de4368a2a8db",
         "type": "github"
       },
       "original": {
@@ -375,11 +375,11 @@
         "zon2nix": "zon2nix"
       },
       "locked": {
-        "lastModified": 1780112670,
-        "narHash": "sha256-lsqmuNcudXnAvlciQPFtT3oLG4oV2L5M/XSeyow5L80=",
+        "lastModified": 1780246812,
+        "narHash": "sha256-2AFB/g7GI/nFsVVqTabMXr1X3Afwuf2w0EDnwSwEHLs=",
         "owner": "ghostty-org",
         "repo": "ghostty",
-        "rev": "2c62d182cec246764ff725096a70b9ef44996f7f",
+        "rev": "16f2fdc90c2ca59ed870c7b3355a337b1fd650b2",
         "type": "github"
       },
       "original": {
@@ -678,11 +678,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1780142732,
-        "narHash": "sha256-yUO7rPGOdqVKJUluDhcQgJ8PZO7FvxsC2wTmR/9Sp0M=",
+        "lastModified": 1780258655,
+        "narHash": "sha256-cSJ57CSWK3VbQulmREfJ1lcbnAcn+GGuWU8o0nMprpU=",
         "ref": "refs/heads/main",
-        "rev": "34fddc949042e45d22bed6cbe72f9a9c838914fa",
-        "revCount": 7391,
+        "rev": "515b883da63583bb2582b40deea005e2f3638038",
+        "revCount": 7392,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/hyprwm/Hyprland"
@@ -1890,11 +1890,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779116225,
-        "narHash": "sha256-o5jyK9JA8qru3Cn4drCo/JN2lizTE9x7jRymwSL6jRk=",
+        "lastModified": 1780180566,
+        "narHash": "sha256-tfXlfIFWY+E/izmRb9Qd3to3guxhyIh9HyZAoTKqa9k=",
         "owner": "uiriansan",
         "repo": "SilentSDDM",
-        "rev": "d7c812cbcb3206c0ea780a84463a7e9a625d1d67",
+        "rev": "0828621769acaa26ef131ed96255c7bd06038111",
         "type": "github"
       },
       "original": {
@@ -1943,11 +1943,11 @@
         "tinted-zed": "tinted-zed"
       },
       "locked": {
-        "lastModified": 1780079634,
-        "narHash": "sha256-VVyCrzwLitvxZGx48FgzvlbLYGQU99GsaQnZmwqZoUo=",
+        "lastModified": 1780256506,
+        "narHash": "sha256-wEXN/OoZt9HfsKBL6694p2Y9xRlwfUbdn/M107U8fVU=",
         "owner": "danth",
         "repo": "stylix",
-        "rev": "ca07e0644716a7c13e91c6d92d169fc81889c589",
+        "rev": "8ed48a41087feeb66372ff718021a9512fc552b3",
         "type": "github"
       },
       "original": {
@@ -2182,11 +2182,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780158425,
-        "narHash": "sha256-a9wtFzIyzIZhnkX18NtpRs8AkuYVpf5KxV9G2Z+Bb+U=",
+        "lastModified": 1780177149,
+        "narHash": "sha256-ZRTlpx7np+TKs+C7JWpU8W2/QYYIrCUTkfsUsbCO42k=",
         "owner": "peteonrails",
         "repo": "voxtype",
-        "rev": "e7f48777a0070cff66125a9e92562ac31cba7954",
+        "rev": "c9500eacb0ec5368f6973120818cb8da907314dd",
         "type": "github"
       },
       "original": {
