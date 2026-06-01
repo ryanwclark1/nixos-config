@@ -20,7 +20,7 @@ in
       logLevel = "INFO";
       wifi = {
         powersave = false;
-        backend = "wpa_supplicant";
+        backend = "iwd";
       };
       ethernet = {
         # 'preserve' ensures the hardware MAC is used, preventing the machine
@@ -89,6 +89,16 @@ in
       "${domain}"
     ];
     resolvconf.enable = false;
+
+    # Use modern and faster Intel Wireless Daemon (iwd) instead of wpa_supplicant
+    wireless.iwd = {
+      enable = true;
+      settings = {
+        Settings = {
+          AutoConnect = true;
+        };
+      };
+    };
 
     # Network security settings
     enableIPv6 = true;
