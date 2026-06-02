@@ -14,7 +14,7 @@
   # Override systemd service to prevent the notify/activation timeout loop
   systemd.services.seatd = {
     serviceConfig = {
-      Type = "simple";
+      Type = lib.mkForce "simple";
       ExecStart = lib.mkForce "${pkgs.seatd}/bin/seatd -u root -g seat -l info";
     };
   };

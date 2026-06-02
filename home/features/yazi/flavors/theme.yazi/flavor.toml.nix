@@ -56,7 +56,6 @@ in
       # Tab
       tab_active = { fg = "#${base00}", bg = "#${base05}" }
       tab_inactive = { fg = "#${base05}", bg = "#${base03}" }
-      tab_width = 1
 
       # Count
       count_copied = { fg = "#${base00}", bg = "#${base0B}" }
