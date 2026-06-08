@@ -152,6 +152,9 @@
           inherit system;
           overlays = myOverlays; # apply overlays globally
           config.allowUnfree = true;
+          config.permittedInsecurePackages = [
+            "electron-39.8.10"
+          ];
         }
       );
     in
