@@ -505,6 +505,9 @@ in
           "git.confirmSync" = false;
           "git.enableSmartCommit" = true;
 
+          ##### Swift #####
+          "swift.path" = "/etc/profiles/per-user/${config.home.username}/bin";
+
         };
       };
     };

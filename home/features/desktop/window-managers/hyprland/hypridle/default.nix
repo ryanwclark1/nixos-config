@@ -22,7 +22,10 @@ let
 in
 {
   # Install hypridle package
-  home.packages = [ pkgs.hypridle ];
+  home.packages = [
+    pkgs.brightnessctl
+    pkgs.hypridle
+  ];
 
   # Copy hypridle configuration file
   home.file.".config/hypr/hypridle.conf".source = ./hypridle.conf;

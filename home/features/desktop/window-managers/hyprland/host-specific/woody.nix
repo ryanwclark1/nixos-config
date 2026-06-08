@@ -25,11 +25,9 @@
       source = ~/.config/hypr/conf/environments/amd.conf
 
       # AORUS FO48U 4K OLED Monitor Configuration
-      monitor = DP-1, 3840x2160@120, 0x0, 1
-
-      # Second monitor rotated 90 degrees (common for vertical monitors)
-      monitor = HDMI-A-1, 3840x2160@60, 3840x0, 1
-      monitor = HDMI-A-1, transform, 1
+      # Keep this on the display's preferred mode so DPMS/hotplug recovery
+      # does not repeatedly force a modeset that can crash Hyprland.
+      monitor = DP-1, preferred, 0x0, 1
 
       # Performance decoration preset for powerful desktop
       # source = ~/.config/hypr/conf/decorations/default.conf
