@@ -78,15 +78,21 @@ for platform in "${!platformFileUrls[@]}"; do
   fileUrl="${platformFileUrls[$platform]}"
   echo "  Prefetching $platform..."
 
-  sourcePath=$(nix-prefetch-url "$fileUrl" --name "kiro-${maxVersion}-${platform}" 2>&1 | tail -1)
-  hash=$(nix-hash --to-sri --type sha256 "$sourcePath")
+  # nix store prefetch-file returns the SRI hash directly in JSON. This avoids the
+  # fragile `nix-prefetch-url ... 2>&1 | tail -1` parsing (which can capture a
+  # progress line) and fails loudly on HTTP errors instead of hashing an error page.
+  hash=$(nix store prefetch-file --json --name "kiro-${maxVersion}-${platform}" "$fileUrl" | jq -r '.hash')
+  if [[ -z "$hash" || "$hash" != sha256-* ]]; then
+    echo "Error: failed to compute sha256 for $platform from $fileUrl (got: '$hash')" >&2
+    exit 1
+  fi
 
   platformHashes[$platform]="$hash"
 done
 
 # Extract vscode version from the Linux tar.gz archive
 echo "Extracting VSCode version..."
-linuxArchivePath=$(nix-prefetch-url --print-path "${platformFileUrls[x86_64-linux]}" 2>&1 | tail -1)
+linuxArchivePath=$(nix store prefetch-file --json --name "kiro-${maxVersion}-x86_64-linux" "${platformFileUrls[x86_64-linux]}" | jq -r '.storePath')
 vscodeVersion=$(tar -Oxzf "$linuxArchivePath" "Kiro/resources/app/product.json" 2>/dev/null | jq -r '.vsCodeVersion' || echo "")
 
 if [[ -z "$vscodeVersion" ]] || [[ "$vscodeVersion" == "null" ]]; then

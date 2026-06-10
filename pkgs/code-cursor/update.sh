@@ -83,8 +83,14 @@ echo "Prefetching hashes..."
 for platform in "${!platforms[@]}"; do
   url="${urls[$platform]}"
   echo "  Prefetching $platform..."
-  source=$(nix-prefetch-url "$url" --name "cursor-$new_version-$platform" 2>&1 | tail -1)
-  hash=$(nix-hash --to-sri --type sha256 "$source")
+  # nix store prefetch-file returns the SRI hash directly in JSON. This avoids the
+  # fragile `nix-prefetch-url ... 2>&1 | tail -1` parsing (which can capture a
+  # progress line) and fails loudly on HTTP errors instead of hashing an error page.
+  hash=$(nix store prefetch-file --json --name "cursor-$new_version-$platform" "$url" | jq -r '.hash')
+  if [[ -z "$hash" || "$hash" != sha256-* ]]; then
+    echo "Error: failed to compute sha256 for $platform from $url (got: '$hash')" >&2
+    exit 1
+  fi
   hashes[$platform]="$hash"
 done
 
