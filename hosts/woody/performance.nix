@@ -14,6 +14,12 @@
     # Desktop-specific scheduler tweaks
     "kernel.sched_autogroup" = 1;
     "kernel.sched_rr_timeslice_ms" = 1;
+
+    # Kitty config watchers and desktop file monitors can exceed the default
+    # watch budget on this workstation.
+    "fs.inotify.max_user_watches" = 4194304;
+    "fs.inotify.max_user_instances" = 2048;
+    "fs.inotify.max_queued_events" = 65536;
   };
 
   boot = {
