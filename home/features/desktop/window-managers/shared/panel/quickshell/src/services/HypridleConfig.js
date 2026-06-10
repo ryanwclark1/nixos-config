@@ -35,10 +35,15 @@ function render(profile) {
         "    ignore_dbus_inhibit = false",
         "}",
         "",
+        // NOTE: deliberately NOT `hyprctl dispatch dpms off`. On AMD GPUs that makes
+        // the monitor drop its DisplayPort link; Hyprland 0.55 then enters an unsafe
+        // headless state and crashes (SIGABRT in getViewsForWorkspace). Dim the
+        // backlight instead so the screen-off timeout stays meaningful and OLED-safe.
+        // See: https://github.com/hyprwm/Hyprland/discussions/11356
         "listener {",
         "    timeout = " + (monitorMinutes * 60),
-        "    on-timeout = hyprctl dispatch dpms off",
-        "    on-resume = hyprctl dispatch dpms on && brightnessctl -r",
+        "    on-timeout = brightnessctl -s set 10",
+        "    on-resume = brightnessctl -r",
         "}",
         "",
         "listener {",

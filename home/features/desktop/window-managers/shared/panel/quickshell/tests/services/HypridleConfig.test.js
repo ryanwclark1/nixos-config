@@ -26,7 +26,10 @@ describe("HypridleConfig", () => {
     expect(rendered).toContain("timeout = 300");
     expect(rendered).toContain("timeout = 420");
     expect(rendered).toContain("timeout = 600");
-    expect(rendered).toContain("on-timeout = hyprctl dispatch dpms off");
+    // No `dpms off`: it crashes Hyprland 0.55 on AMD via DP-link disconnect.
+    // The screen-off timeout dims the backlight instead.
+    expect(rendered).not.toContain("dpms off");
+    expect(rendered).toContain("on-timeout = brightnessctl -s set 10");
     expect(rendered).toContain("on-timeout = loginctl lock-session");
     expect(rendered).toContain("on-timeout = systemctl suspend");
   });
