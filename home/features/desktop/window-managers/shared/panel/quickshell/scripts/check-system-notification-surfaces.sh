@@ -379,8 +379,10 @@ runtime_checks() {
 }
 
 main() {
-  require_cmd quickshell
   require_cmd rg
+  if (( ci_mode == 0 )); then
+    require_cmd quickshell
+  fi
 
   if (( repo_shell_mode == 1 )); then
     trap handle_termination EXIT TERM INT

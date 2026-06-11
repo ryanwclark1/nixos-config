@@ -378,10 +378,12 @@ create_fixtures() {
 }
 
 main() {
-  require_cmd quickshell
   require_cmd node
   require_cmd rg
   require_cmd tail
+  if (( ci_mode == 0 )); then
+    require_cmd quickshell
+  fi
 
   trap cleanup EXIT
   trap handle_termination TERM INT
