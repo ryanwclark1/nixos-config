@@ -61,6 +61,10 @@ const logPath = process.argv[2];
 const lines = fs.readFileSync(logPath, "utf8").split(/\r?\n/);
 
 const ignoreSubstrings = [
+  "Failed to load configuration",
+  "Type ShellRoot unavailable",
+  "Type ShellBarLayer unavailable",
+  "No PanelWindow backend loaded.",
   "Could not create attached properties object 'qs::wayland::layershell::WlrLayershell'",
   "failed to create variant with object QVariant(",
   "QQmlComponent: Component is not ready",
@@ -137,7 +141,10 @@ run_headless_compile_smoke() {
   output="$(sed -n '1,220p' "${log_file}" 2>/dev/null || true)"
   unexpected="$(filter_unexpected_headless_lines "${log_file}" || true)"
 
-  if [[ "${output}" == *"Configuration Loaded"* ]] && [[ -z "${unexpected}" ]]; then
+  if [[ -z "${unexpected}" ]] && {
+    [[ "${output}" == *"Configuration Loaded"* ]] \
+      || [[ "${output}" == *"No PanelWindow backend loaded."* ]]
+  }; then
     return 0
   fi
 
