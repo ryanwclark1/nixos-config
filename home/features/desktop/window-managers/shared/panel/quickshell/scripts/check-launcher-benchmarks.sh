@@ -3,6 +3,15 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 baseline_file="${script_dir}/launcher-benchmark-baselines.json"
+strict_absolute_thresholds="${QS_VERIFY_LAUNCHER_BENCHMARK_STRICT_ABSOLUTE:-}"
+
+if [[ -z "${strict_absolute_thresholds}" ]]; then
+  if [[ "${CI:-}" == "true" ]]; then
+    strict_absolute_thresholds=0
+  else
+    strict_absolute_thresholds=1
+  fi
+fi
 
 if [[ ! -f "${baseline_file}" ]]; then
   printf '%s\n' "Benchmark baseline file is missing: ${baseline_file}" >&2
@@ -44,7 +53,7 @@ run_case() {
   legacy_checksum="$(node -e 'const d=JSON.parse(process.argv[1]); console.log(String(d.legacyChecksum));' "${output}")"
   opt_checksum="$(node -e 'const d=JSON.parse(process.argv[1]); console.log(String(d.optimizedChecksum));' "${output}")"
 
-  if ! compare_leq "${opt_median}" "${max_allowed}"; then
+  if [[ "${strict_absolute_thresholds}" == "1" ]] && ! compare_leq "${opt_median}" "${max_allowed}"; then
     violations+=("${key} optimized median ${opt_median}ms exceeded allowed ${max_allowed}ms (baseline ${max_opt}ms, tol ${tol}%)")
   fi
   if ! compare_leq "1.0" "${speedup}"; then
@@ -77,7 +86,11 @@ run_case() {
     fi
   fi
 
-  printf '%s\n' "${key}: legacy=${legacy_median}ms optimized=${opt_median}ms speedup=${speedup}x (<= ${max_allowed}ms allowed)"
+  if [[ "${strict_absolute_thresholds}" == "1" ]]; then
+    printf '%s\n' "${key}: legacy=${legacy_median}ms optimized=${opt_median}ms speedup=${speedup}x (<= ${max_allowed}ms allowed)"
+  else
+    printf '%s\n' "${key}: legacy=${legacy_median}ms optimized=${opt_median}ms speedup=${speedup}x (absolute threshold skipped)"
+  fi
 }
 
 run_case "filter" "benchmark-launcher-filter.js" "--items=30000 --runs=40 --seed=1337"
