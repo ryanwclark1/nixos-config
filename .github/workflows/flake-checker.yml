@@ -34,6 +34,9 @@ jobs:
             bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-verify.sh --ci
       - name: QuickShell plugin verification checks
         run: |
+          qt5compat_qml="$(nix build --no-link --print-out-paths nixpkgs#qt6.qt5compat)/lib/qt-6/qml"
+          QML2_IMPORT_PATH="${qt5compat_qml}${QML2_IMPORT_PATH:+:${QML2_IMPORT_PATH}}" \
+          QML_IMPORT_PATH="${qt5compat_qml}${QML_IMPORT_PATH:+:${QML_IMPORT_PATH}}" \
           nix shell nixpkgs#bash nixpkgs#jq nixpkgs#findutils nixpkgs#coreutils nixpkgs#ripgrep nixpkgs#nodejs nixpkgs#quickshell nixpkgs#qt6.qt5compat -c \
             bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/plugin-verify.sh
       - name: QuickShell launcher smoke checks (CI mode)
