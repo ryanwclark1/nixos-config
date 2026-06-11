@@ -7,7 +7,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MCP_CONFIG_FILE="${HOME}/.config/open-webui/mcp-servers.json"
+MCP_CONFIG_FILE="${MCP_CONFIG_FILE:-${HOME}/.config/open-webui/mcp-servers.json}"
 MCP_PROCESSED_CONFIG="/tmp/mcp-servers-processed.json"
 
 # Check dependencies
@@ -209,14 +209,55 @@ launch_qwen_code() {
 
 launch_antigravity_cli() {
     local servers="$1"
+    shift
     if command -v agy >/dev/null 2>&1; then
-        # Antigravity CLI MCP integration
-        agy --mcp "$MCP_PROCESSED_CONFIG" "$@"
+        # Antigravity CLI MCP integration via temporary HOME directory redirection
+        local temp_home
+        temp_home=$(mktemp -d -t agy-home.XXXXXX)
+
+        mkdir -p "$temp_home/.gemini/config"
+
+        # Symlink all entries from actual ~/.gemini except config
+        if [[ -d "${HOME}/.gemini" ]]; then
+            for item in "${HOME}/.gemini"/* "${HOME}/.gemini"/.*; do
+                local base_item
+                base_item=$(basename "$item")
+                if [[ "$base_item" == "." || "$base_item" == ".." || "$base_item" == "config" ]]; then
+                    continue
+                fi
+                if [[ -e "$item" ]]; then
+                    ln -sf "$item" "$temp_home/.gemini/$base_item"
+                fi
+            done
+        fi
+
+        # Symlink other files/directories from the actual HOME to temp_home
+        # to ensure local config/git config/etc are inherited
+        for item in "${HOME}"/* "${HOME}"/.*; do
+            local base_item
+            base_item=$(basename "$item")
+            if [[ "$base_item" == "." || "$base_item" == ".." || "$base_item" == ".gemini" ]]; then
+                continue
+            fi
+            if [[ -e "$item" ]]; then
+                ln -sf "$item" "$temp_home/$base_item"
+            fi
+        done
+
+        # Link the processed MCP configuration to the expected path
+        ln -sf "$MCP_PROCESSED_CONFIG" "$temp_home/.gemini/config/mcp_config.json"
+
+        # Run agy with the temporary HOME and restore afterward
+        HOME="$temp_home" agy "$@"
+        local exit_code=$?
+        rm -rf "$temp_home"
+        return $exit_code
     else
         echo "Error: agy not found in PATH" >&2
         return 1
     fi
 }
+
 
 # Usage function
 usage() {
