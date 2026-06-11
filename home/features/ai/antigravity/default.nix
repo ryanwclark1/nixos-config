@@ -7,8 +7,8 @@
 
 {
   home.packages = [
-    pkgs.antigravity
+    pkgs.antigravity.fhs
     pkgs.antigravity-cli
-    pkgs.antigravity-ide
+    pkgs.antigravity-ide.fhs
   ];
 }

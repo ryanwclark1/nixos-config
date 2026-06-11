@@ -61,6 +61,8 @@ let
   # Import the generic function
   genericFunction = import ../vscode-generic/generic.nix;
 
+  finalCommandLineArgs = "--disable-gpu-sandbox " + commandLineArgs;
+
   # Call the function directly with explicit arguments to avoid callPackage auto-filling meta
   # First argument set: build dependencies
   # Second argument set: package-specific arguments
@@ -72,7 +74,8 @@ in
   inherit libx11 libxkbfile libxcb systemdLibs fontconfig imagemagick libdbusmenu;
   inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep which asar bash;
 } {
-  inherit commandLineArgs useVSCodeRipgrep;
+  commandLineArgs = finalCommandLineArgs;
+  inherit useVSCodeRipgrep;
   inherit (information) version vscodeVersion;
   pname = "antigravity";
 
@@ -91,9 +94,8 @@ in
   # by making playwright.browsers available in the FHS environment PATH
   customizeFHSEnv =
     args:
-    buildFHSEnv (
-      args
-      // {
+    args
+    // {
         # Add playwright.browsers to targetPkgs so browsers are available in FHS PATH
         # This ensures Playwright can find browsers even if PLAYWRIGHT_BROWSERS_PATH
         # isn't passed through the FHS environment
@@ -117,8 +119,7 @@ in
           done
           exec ${args.runScript} "$@"
         '';
-      }
-    );
+      };
 
   postInstall = ''
     rm -f "$out/bin/antigravity"

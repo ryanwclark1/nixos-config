@@ -15,110 +15,161 @@
 ![Static Badge](https://img.shields.io/badge/%20-a3be8c?style=for-the-badge&labelColor=a3be8c&color=a3be8c)
 ![Static Badge](https://img.shields.io/badge/%20-b48ead?style=for-the-badge&labelColor=b48ead&color=b48ead)
 
-# ❄️ NixOS & Home Manager Configurations
+# NixOS and Home Manager Configurations
 
 [![GitHub stars](https://img.shields.io/github/stars/ryanwclark1/nixos-config?color=8fbcbb&labelColor=3b4252&style=for-the-badge&logo=starship&logoColor=8fbcbb)](https://github.com/ryanwclark1/nixos-config/stargazers)
 [![NixOS](https://img.shields.io/badge/NixOS-unstable-blue.svg?style=for-the-badge&labelColor=3b4252&logo=NixOS&logoColor=81a1c1&color=81a1c1)](https://nixos.org)
 [![License](https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=MIT&colorA=3b4252&colorB=5e81ac&logo=unlicense&logoColor=5e81ac)](https://github.com/ryanwclark1/nixos-config/blob/main/LICENSE)
 
-A comprehensive, modular [Nix Flake](https://zero-to-nix.com/concepts/flakes) for managing a multi-host fleet across Linux (NixOS) and macOS (nix-darwin).
+A personal Nix flake for declarative NixOS, nix-darwin, and Home Manager configurations across desktops, laptops, servers, and test VMs. The repository is organized around reusable system modules, host-specific composition, feature-based Home Manager modules, custom packages, and operational scripts.
 
-## 🖥️ Fleet Overview
+## Fleet
 
-| Hostname | Platform | Role | CPU | RAM | Primary GPU | Status |
-| :--- | :---: | :---: | :--- | :---: | :--- | :---: |
-| `woody` | ❄️ | 🖥️ | [AMD Ryzen 9 7900X] | 64GB | [AMD Radeon RX 7800 XT] | ✅ |
-| `neo` | 🍎 | 💻️ | [Apple M4] | 16GB | [Apple Integrated GPU] | ✅ |
-| `mini` | 🍎 | 🖥️ | [Apple M4] | 16GB | [Apple Integrated GPU] | ✅ |
-| `frametop` | ❄️ | 💻️ | [Intel i7-1260P] | 64GB | [Intel Iris XE Graphics] | ✅ |
-| `accent` | ❄️ | ☁️ | Remote Server | 8GB | N/A | ✅ |
-| `vlad` | ❄️ | ☁️ | Remote Server | 4GB | N/A | ✅ |
-| `lighthouse`| ❄️ | ☁️ | Remote Server | 8GB | N/A | ✅ |
+| Host | Platform | Role | Main hardware | Flake output |
+| :--- | :---: | :--- | :--- | :--- |
+| `woody` | NixOS | Desktop / monitoring host | Ryzen 9 7900X, 64 GB RAM, Radeon RX 7800 XT | `nixosConfigurations.woody`, `homeConfigurations.administrator@woody` |
+| `frametop` | NixOS | Framework laptop | Intel i7-1260P, 64 GB RAM, Intel Iris Xe | `nixosConfigurations.frametop`, `homeConfigurations.administrator@frametop` |
+| `mini` | macOS | Mac mini | Apple M4, 16 GB RAM | `darwinConfigurations.mini`, `homeConfigurations.administrator@mini` |
+| `neo` | macOS | MacBook | Apple M4, 16 GB RAM | `darwinConfigurations.neo`, `homeConfigurations.ryanclark@neo` |
+| `accent` | Linux | Remote server | 8 GB RAM | `homeConfigurations.administrator@accent` |
+| `vlad` | Linux | Remote server | 4 GB RAM | `homeConfigurations.root@vlad` |
+| `lighthouse` | Linux | Remote server | 8 GB RAM | `homeConfigurations.ryanc@lighthouse` |
+| `ansible` | Linux | Automation host | Remote / VM profile | `homeConfigurations.ryanc@ansible` |
+| `niriTestVm` | NixOS VM | Niri desktop test target | VM variant of `woody` | `nixosConfigurations.niriTestVm` |
+| `hyprlandTestVm` | NixOS VM | Hyprland desktop test target | VM variant of `woody` | `nixosConfigurations.hyprlandTestVm` |
 
-**Key:** 🖥️ Desktop • 💻️ Laptop • ☁️ Server • 🍎 macOS • ❄️ NixOS
+## Highlights
 
----
+- **Modular NixOS hosts**: shared global modules, optional services, per-host hardware, and host-specific service composition under `hosts/`.
+- **Feature-based Home Manager**: reusable modules for shells, editors, AI tools, desktop environments, terminals, browsers, media tools, and development stacks under `home/features/`.
+- **Wayland desktop coverage**: Hyprland and Niri configurations with shared desktop services, QuickShell panel work, Stylix theming, Omarchy utilities, screenshots, clipboard helpers, and VM validation paths.
+- **Development tooling**: Rust, Go, Python via `uv`, Node.js, Lua, SQL, Protobuf/gRPC, JSONnet, Nix tooling, editor integrations, and custom packages.
+- **Observability**: Prometheus, Grafana, Loki, Grafana Alloy, and Alertmanager configuration primarily centered on `woody`.
+- **Secrets**: SOPS and age-based secret handling through `sops-nix`.
+- **Custom package overlay**: packaged AI and editor tooling including Antigravity, Claude Code, Codex, Cursor, Kiro, and supporting helpers.
 
-## 🚀 Key Features
+## Repository Layout
 
-### 🤖 SuperClaude Framework
-An elite AI development ecosystem integrated directly into the workspace.
-- **20 Specialized Agents**: Tailored personas for everything from Nix systems to Security engineering.
-- **Knowledge Management**: Structured `PLANNING.md`, `TASK.md`, and `KNOWLEDGE.md` for continuous learning.
-- **MCP Integration**: Model Context Protocol servers for Context7, Playwright, and Sequential Thinking.
-- **Multi-Assistant Support**: Deeply configured setups for Claude, Gemini, Codex, and local Ollama models.
+| Path | Purpose |
+| :--- | :--- |
+| `flake.nix` | Main flake inputs, overlays, packages, dev shells, formatters, NixOS hosts, Darwin hosts, and Home Manager outputs. |
+| `hosts/` | System-level NixOS and nix-darwin configuration. |
+| `hosts/common/global/` | Baseline modules shared by NixOS systems. |
+| `hosts/common/optional/` | Opt-in system modules for desktops, services, tools, monitoring, and virtualization. |
+| `home/` | Host/user-specific Home Manager entry points. |
+| `home/features/` | Reusable Home Manager feature modules. |
+| `home/theme/` | Shared colors, fonts, and theme wiring. |
+| `pkgs/` | Custom package definitions exposed through the flake. |
+| `overlays/` | Package overlays applied to flake package sets. |
+| `omarchy/` | Local Omarchy-inspired utilities, configs, themes, and install assets. |
+| `scripts/` | Maintenance, package update, VM, Cursor, VS Code, and helper scripts. |
+| `secrets/` | Encrypted secrets managed with SOPS. |
+| `templates/` | Flake templates for C, Node.js, and Rust projects. |
+| `docs/` | Focused documentation and diagrams. |
 
-### 📊 Observability Stack
-Production-grade monitoring primarily hosted on `woody`:
-- **Metrics**: Prometheus & Grafana for system-wide performance tracking.
-- **Logging**: Loki for centralized log aggregation.
-- **Agents**: Grafana Alloy for telemetry collection.
-- **Alerting**: Alertmanager for proactive system health notifications.
+## Common Commands
 
-### 🎨 The Desktop Experience
-Modern, high-performance Wayland environments:
-- **Hyprland & Niri**: Fully declarative Wayland compositors.
-- **Omarchy Integration**: DHH-inspired system utilities (`os-battery-show`, `os-time-show`).
-- **Stylix**: Unified theming across applications using the Nord color palette.
-- **Custom Scripts**: Unified `screenshot.sh` and clipboard management.
+Enter the development shell:
 
-### 🛠️ Development Environments
-Isolated, reproducible toolchains for modern engineering:
-- **Languages**: Rust, Go, Python (via `uv`), Node.js, Lua, SQL.
-- **Tooling**: Protobuf/gRPC suite, JSONnet, and advanced system debuggers.
-- **IDEs**: Declarative configurations for Cursor, VS Code, and Ghostty.
-
----
-
-## 🏗️ Repository Structure
-
-- `home/`: Home Manager modules and host-specific user configs.
-  - `features/`: Modular features (AI, Shell, Development, Desktop, etc.)
-  - `global/`: Shared user settings.
-- `hosts/`: System-level configurations (NixOS and nix-darwin).
-  - `common/`: Shared system traits and optional service modules.
-- `pkgs/`: Custom packages and builders (antigravity, antigravity-cli, antigravity-ide, claude-code, etc.).
-- `omarchy/`: Custom bin utilities and distribution logic.
-- `scripts/`: Maintenance and update scripts.
-- `secrets/`: Encrypted secrets managed via `sops-nix`.
-
----
-
-## 🛠️ Usage
-
-### Quick Start
 ```bash
-# Enter the development shell
-nix develop # or nix-shell
-
-# Apply NixOS configuration
-sudo nixos-rebuild switch --flake .#<hostname>
-
-# Apply Home Manager configuration
-home-manager switch --flake .#<user>@<host>
-
-# Apply Darwin configuration
-darwin-rebuild switch --flake .#<hostname>
+nix develop
 ```
 
-### Management via Makefile
-- `make switch i=<host>`: Rebuild specific host.
-- `make woody`: Rebuild the primary desktop.
-- `make up`: Update all flake inputs.
-- `make gc`: Perform system cleanup and garbage collection.
-- `make fmt`: Format all Nix files in the repository.
+Build or switch NixOS hosts:
 
----
+```bash
+sudo nixos-rebuild switch --flake .#woody
+sudo nixos-rebuild switch --flake .#frametop
+make switch i=woody
+make woody
+```
 
-## 📜 Documentation
+Build or switch nix-darwin hosts:
+
+```bash
+sudo darwin-rebuild switch --flake .#mini
+sudo darwin-rebuild switch --flake .#neo
+make darwin-switch i=mini
+make mini
+make neo
+```
+
+Apply a Home Manager configuration:
+
+```bash
+home-manager switch --flake .#administrator@woody
+home-manager switch --flake .#administrator@mini
+home-manager switch --flake .#ryanclark@neo
+```
+
+Maintain the flake:
+
+```bash
+make up                  # Update all flake inputs
+make upp i=<input>       # Update one flake input
+make fmt                 # Format Nix files
+make gc                  # Clean old generations and rebuild current host for boot
+make update-packages     # Run custom package updaters
+make update-package-status
+```
+
+## Desktop and VM Validation
+
+The repository includes dedicated VM workflows for compositor and panel testing.
+
+```bash
+make niri-vm
+make niri-vm-smoke
+make hyprland-vm
+make quickshell-checks
+make quickshell-test
+make panel-vm-qa
+make vm-disk-cleanup
+```
+
+Host-side QuickShell checks can be run without a VM:
+
+```bash
+make quickshell-guard
+make quickshell-test-host
+make quickshell-checks-host
+```
+
+## Secrets
+
+Secrets are managed with SOPS and age. The helper targets can generate local SSH and age material:
+
+```bash
+make keygen
+```
+
+See [docs/secrets.md](docs/secrets.md) for the repository-specific workflow.
+
+## Templates
+
+Project templates are exposed from `templates/`:
+
+```bash
+nix flake init -t github:ryanwclark1/nixos-config#c
+nix flake init -t github:ryanwclark1/nixos-config#node
+nix flake init -t github:ryanwclark1/nixos-config#rust
+```
+
+## Documentation
+
 - [Home Manager Guide](docs/home-manager.md)
 - [Secrets Management](docs/secrets.md)
 - [Hyprland Keybindings](docs/hyprland.md)
-- [Screenshot Consolidation](docs/screenshot-scripts-consolidation.md)
+- [Package Updates](docs/package-updates.md)
+- [Playwright on NixOS](docs/playwright-nixos-setup.md)
+- [Screenshot Script Consolidation](docs/screenshot-scripts-consolidation.md)
+- [Mini Darwin Migration](docs/mini-darwin-migration.md)
+- [Configuration Diagram](docs/diagrams/nix-config.drawio)
 
----
+## CI
 
-## 🧑‍🏫 Inspirations
-Heavily influenced by [Omarchy](https://omarchy.org), [Misterio77's starter configs](https://github.com/Misterio77/nix-starter-configs), and the Nix community's best practices.
+GitHub Actions run flake health checks and QuickShell verification. Dependabot tracks GitHub Actions updates, and the lock file updater opens scheduled input refresh PRs.
 
-*Generated with ❤️ by Gemini CLI*
+## Inspirations
+
+This configuration is influenced by [Omarchy](https://omarchy.org), [Misterio77's starter configs](https://github.com/Misterio77/nix-starter-configs), and the broader Nix community.
