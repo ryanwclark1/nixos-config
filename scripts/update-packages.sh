@@ -210,7 +210,6 @@ case "${1:-}" in
       error "Please specify a package name or use 'update-all'"
       echo ""
       echo "Available packages:"
-      local sorted_pkgs
       sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
       for pkg in "${sorted_pkgs[@]}"; do
         echo "  - $pkg"
@@ -222,7 +221,6 @@ case "${1:-}" in
     for pkg in "$@"; do
       if [[ "$pkg" == "all" ]]; then
         # Update all packages
-        local sorted_pkgs
         sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
         for pkg_name in "${sorted_pkgs[@]}"; do
           update_package "$pkg_name" || true
@@ -235,7 +233,6 @@ case "${1:-}" in
   update-all|upgrade-all)
     info "Updating all packages..."
     echo ""
-    local sorted_pkgs
     sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
     for pkg in "${sorted_pkgs[@]}"; do
       update_package "$pkg" || true
@@ -245,7 +242,6 @@ case "${1:-}" in
     ;;
   list)
     echo "Available packages:"
-    local sorted_pkgs
     sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
     for pkg in "${sorted_pkgs[@]}"; do
       pkg_dir="${PACKAGES[$pkg]}"
