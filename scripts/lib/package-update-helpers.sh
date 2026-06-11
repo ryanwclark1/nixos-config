@@ -14,9 +14,6 @@ resolve_upstream_package_name() {
     claude-code)
       printf 'claude-code-bin\n'
       ;;
-    claude-code-npm)
-      printf 'claude-code\n'
-      ;;
     *)
       printf '%s\n' "$1"
       ;;
@@ -42,6 +39,14 @@ run_package_update_script() {
   local system json script_type
   system=${NIX_SYSTEM:-$(get_nix_system)}
 
+  # Prefer the working-tree script when it exists. Resolving passthru.updateScript
+  # via `nix eval path:...` copies the repo into the (read-only) Nix store, so a
+  # script that writes its results next to itself (e.g. sources.json) would fail.
+  if [[ -f "$fallback_script" ]]; then
+    "$fallback_script" "$@"
+    return $?
+  fi
+
   if json=$(resolve_package_update_script_json "$repo_root" "$pkg_name" "$system"); then
     script_type=$(printf '%s' "$json" | jq -r 'type')
 
@@ -50,20 +55,15 @@ run_package_update_script() {
         local script_path
         script_path=$(printf '%s' "$json" | jq -r '.')
         "$script_path" "$@"
-        return 0
+        return $?
         ;;
       array)
         local -a script_cmd=()
         mapfile -t script_cmd < <(printf '%s' "$json" | jq -r '.[]')
         "${script_cmd[@]}" "$@"
-        return 0
+        return $?
         ;;
     esac
-  fi
-
-  if [[ -f "$fallback_script" ]]; then
-    "$fallback_script" "$@"
-    return 0
   fi
 
   echo "Error: update script not found for ${pkg_name}" >&2

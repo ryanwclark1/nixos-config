@@ -2,7 +2,11 @@
   stdenv,
   lib,
   coreutils,
+  gawk,
+  getconf,
   gnugrep,
+  gnused,
+  jq,
   copyDesktopItems,
   makeDesktopItem,
   unzip,
@@ -33,6 +37,7 @@
   openssl,
   webkitgtk_4_1,
   ripgrep,
+  which,
 
   # needed to fix "Save as Root"
   asar,
@@ -70,6 +75,8 @@
   # Customize FHS environment
   # Function that takes default buildFHSEnv arguments and returns modified arguments
   customizeFHSEnv ? args: args,
+
+  postInstall ? null,
 }:
 
 stdenv.mkDerivation (
@@ -178,6 +185,7 @@ stdenv.mkDerivation (
       src
       sourceRoot
       dontFixup
+      postInstall
       ;
 
     passthru = {
@@ -269,9 +277,21 @@ stdenv.mkDerivation (
       autoPatchelfHook
       asar
       copyDesktopItems
+      jq
       # override doesn't preserve splicing https://github.com/NixOS/nixpkgs/issues/132651
       # Has to use `makeShellWrapper` from `buildPackages` even though `makeShellWrapper` from the inputs is spliced because `propagatedBuildInputs` would pick the wrong one because of a different offset.
       (buildPackages.wrapGAppsHook3.override { makeWrapper = buildPackages.makeShellWrapper; })
+    ];
+
+    # autoPatchelfHook cannot index libwebkit2gtk-4.1.so because pyelftools
+    # fails to parse it (ELFError: String Table not found).  Ignore the
+    # missing dep and add the library path via appendRunpaths so it is still
+    # available at runtime for libmsalruntime.so (Microsoft Authentication).
+    autoPatchelfIgnoreMissingDeps = lib.optionals stdenv.hostPlatform.isLinux [
+      "libwebkit2gtk-4.1.so.0"
+    ];
+    appendRunpaths = lib.optionals stdenv.hostPlatform.isLinux [
+      "${webkitgtk_4_1}/lib"
     ];
 
     dontBuild = true;
@@ -299,30 +319,44 @@ stdenv.mkDerivation (
             mkdir -p "$out/lib/${libraryName}" "$out/bin"
             cp -r ./* "$out/lib/${libraryName}"
 
-            ln -s "$out/lib/${libraryName}/bin/${sourceExecutableName}" "$out/bin/${executableName}"
+            if [ -f "$out/lib/${libraryName}/bin/${sourceExecutableName}" ]; then
+              ln -s "$out/lib/${libraryName}/bin/${sourceExecutableName}" "$out/bin/${executableName}"
+            else
+              ln -s "$out/lib/${libraryName}/${sourceExecutableName}" "$out/bin/${executableName}"
+            fi
           ''
           # These are named vscode.png, vscode-insiders.png, etc to match the name in upstream *.deb packages.
           + ''
             mkdir -p "$out/share/pixmaps"
             icon_file="$out/lib/${libraryName}/resources/app/resources/linux/code.png"
-            cp "$icon_file" "$out/share/pixmaps/${iconName}.png"
+            if [ -f "$icon_file" ]; then
+              cp "$icon_file" "$out/share/pixmaps/${iconName}.png"
 
-            # Dynamically determine size of icon and place in appropriate directory
-            size=$(identify -format "%wx%h" "$icon_file")
-            mkdir -p "$out/share/icons/hicolor/$size/apps"
-            cp "$icon_file" "$out/share/icons/hicolor/$size/apps/${iconName}.png"
+              # Dynamically determine size of icon and place in appropriate directory
+              size=$(identify -format "%wx%h" "$icon_file")
+              mkdir -p "$out/share/icons/hicolor/$size/apps"
+              cp "$icon_file" "$out/share/icons/hicolor/$size/apps/${iconName}.png"
+            else
+              echo "Warning: $icon_file not found, skipping icon installation"
+            fi
           ''
         )
         # Override the previously determined VSCODE_PATH with the one we know to be correct
         + (lib.optionalString patchVSCodePath ''
-          sed -i "/ELECTRON=/iVSCODE_PATH='$out/lib/${libraryName}'" "$out/bin/${executableName}"
-          grep -q "VSCODE_PATH='$out/lib/${libraryName}'" "$out/bin/${executableName}" # check if sed succeeded
+          if [ -f "$out/bin/${executableName}" ] && grep -q "ELECTRON=" "$out/bin/${executableName}"; then
+            sed -i "/ELECTRON=/iVSCODE_PATH='$out/lib/${libraryName}'" "$out/bin/${executableName}"
+            grep -q "VSCODE_PATH='$out/lib/${libraryName}'" "$out/bin/${executableName}" # check if sed succeeded
+          else
+            echo "Warning: $out/bin/${executableName} not found or not a script, skipping VSCODE_PATH patch"
+          fi
         '')
         # Remove native encryption code, as it derives the key from the executable path which does not work for us.
         # The credentials should be stored in a secure keychain already, so the benefit of this is questionable
         # in the first place.
+        # Also remove prebuilt Copilot binaries that seemingly have been added by accident.
         + ''
           rm -rf $out/lib/${libraryName}/resources/app/node_modules/vscode-encrypt
+          rm -rf $out/lib/${libraryName}/resources/app/node_modules/@github/copilot-linuxmusl*
         ''
     )
     + ''
@@ -337,14 +371,23 @@ stdenv.mkDerivation (
               "--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ libdbusmenu ]}"
           }
         --prefix PATH : ${
-          lib.makeBinPath [
-            # for moving files to trash
-            glib
+          lib.makeBinPath (
+            [
+              # for moving files to trash
+              glib
 
-            # for launcher script
-            gnugrep
-            coreutils
-          ]
+              # for launcher and bundled helper scripts
+              gawk
+              gnugrep
+              gnused
+              coreutils
+              which
+            ]
+            # provides `getconf` for ps-fallback script that only runs on Linux
+            # https://github.com/microsoft/vscode/blob/97c807618b413805fde466739ba14f77a1f12307/src/vs/base/node/ps.sh#L2
+            # https://github.com/microsoft/vscode/blob/97c807618b413805fde466739ba14f77a1f12307/src/vs/base/node/ps.ts#L203-L217
+            ++ lib.optional stdenv.hostPlatform.isLinux getconf
+          )
         }
         --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true --wayland-text-input-version=3}}"
         --add-flags ${lib.escapeShellArg commandLineArgs}
@@ -354,44 +397,88 @@ stdenv.mkDerivation (
     # See https://github.com/NixOS/nixpkgs/issues/49643#issuecomment-873853897
     # linux only because of https://github.com/NixOS/nixpkgs/issues/138729
     postPatch =
-      # this is a fix for "save as root" functionality
-      lib.optionalString stdenv.hostPlatform.isLinux (
+      ''
+        productJson="${
+          if stdenv.hostPlatform.isDarwin then "Contents/Resources" else "resources"
+        }/app/product.json"
+        if [ -f "$productJson" ]; then
+          tmpProductJson="$(mktemp)"
+          jq 'del(.updateUrl, .backupUpdateUrl)' "$productJson" > "$tmpProductJson"
+          mv "$tmpProductJson" "$productJson"
+        else
+          echo "Warning: $productJson not found, skipping updateUrl removal"
+        fi
+      ''
+      + lib.optionalString stdenv.hostPlatform.isLinux (
+        # this is a fix for "save as root" functionality
         ''
           packed="resources/app/node_modules.asar"
           unpacked="resources/app/node_modules"
-          asar extract "$packed" "$unpacked"
-          substituteInPlace $unpacked/@vscode/sudo-prompt/index.js \
-            --replace-fail "/usr/bin/pkexec" "/run/wrappers/bin/pkexec" \
-            --replace-fail "/bin/bash" "${bash}/bin/bash"
-          rm -rf "$packed"
-        ''
-        # without this symlink loading JsChardet, the library that is used for auto encoding detection when files.autoGuessEncoding is true,
-        # fails to load with: electron/js2c/renderer_init: Error: Cannot find module 'jschardet'
-        # and the window immediately closes which renders VSCode unusable
-        # see https://github.com/NixOS/nixpkgs/issues/152939 for full log
-        + ''
-          ln -rs "$unpacked" "$packed"
+          if [ -f "$packed" ]; then
+            asar extract "$packed" "$unpacked"
+            substituteInPlace $unpacked/@vscode/sudo-prompt/index.js \
+              --replace-fail "/usr/bin/pkexec" "/run/wrappers/bin/pkexec" \
+              --replace-fail "/bin/bash" "${bash}/bin/bash"
+            rm -rf "$packed"
+            # without this symlink loading JsChardet, the library that is used for auto encoding detection when files.autoGuessEncoding is true,
+            # fails to load with: electron/js2c/renderer_init: Error: Cannot find module 'jschardet'
+            # and the window immediately closes which renders VSCode unusable
+            # see https://github.com/NixOS/nixpkgs/issues/152939 for full log
+            ln -rs "$unpacked" "$packed"
+          else
+            echo "Warning: $packed not found, skipping 'save as root' patch"
+          fi
         ''
       )
       + (
         let
-          vscodeRipgrep =
+          nodeModulesPath =
             if stdenv.hostPlatform.isDarwin then
               if lib.versionAtLeast vscodeVersion "1.94.0" then
-                "Contents/Resources/app/node_modules/@vscode/ripgrep/bin/rg"
+                "Contents/Resources/app/node_modules"
               else
-                "Contents/Resources/app/node_modules.asar.unpacked/@vscode/ripgrep/bin/rg"
+                "Contents/Resources/app/node_modules.asar.unpacked"
             else
-              "resources/app/node_modules/@vscode/ripgrep/bin/rg";
+              "resources/app/node_modules";
+
+          # see https://www.npmjs.com/package/@vscode/ripgrep-universal?activeTab=code
+          ripgrepSystem =
+            {
+              x86_64-darwin = "darwin-x64";
+              aarch64-darwin = "darwin-arm64";
+              armv7l-linux = "linux-arm";
+              aarch64-linux = "linux-arm64";
+              i686-linux = "linux-ia32";
+              powerpc64-linux = "linux-ppc64";
+              riscv64-linux = "linux-riscv64";
+              s390x-linux = "linux-s390x";
+              x86_64-linux = "linux-x64";
+            }
+            .${stdenv.hostPlatform.system}
+              or (throw "Unknown system for ripgrep-universal: ${stdenv.hostPlatform.system}");
+
+          ripgrepPath =
+            if lib.versionAtLeast vscodeVersion "1.122.0" then
+              "@vscode/ripgrep-universal/bin/${ripgrepSystem}/rg"
+            else
+              "@vscode/ripgrep/bin/rg";
+
+          vscodeRipgrep = "${nodeModulesPath}/${ripgrepPath}";
         in
         if !useVSCodeRipgrep then
           ''
-            rm ${vscodeRipgrep}
-            ln -s ${ripgrep}/bin/rg ${vscodeRipgrep}
+            if [ -e "${vscodeRipgrep}" ]; then
+              rm -f "${vscodeRipgrep}"
+              ln -s "${ripgrep}/bin/rg" "${vscodeRipgrep}"
+            else
+              echo "Warning: ${vscodeRipgrep} not found, skipping ripgrep replacement"
+            fi
           ''
         else
           ''
-            chmod +x ${vscodeRipgrep}
+            if [ -e "${vscodeRipgrep}" ]; then
+              chmod +x "${vscodeRipgrep}"
+            fi
           ''
       );
 

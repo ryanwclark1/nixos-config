@@ -51,28 +51,10 @@ QtObject {
     // ── Subscriber-based (kept for Ref.qml compat, now a no-op) ──
     property int subscriberCount: 0
 
-    // ── PipeWire object tracking ─────────────────
-    // Track default sink/source AND their .audio sub-objects for reactive volume/muted bindings.
-    property PwObjectTracker _defaultTracker: PwObjectTracker {
-        objects: {
-            if (root.debugDisableAudioService)
-                return [];
-            var out = [];
-            if (Pipewire.defaultAudioSink) {
-                out.push(Pipewire.defaultAudioSink);
-                if (Pipewire.defaultAudioSink.audio) out.push(Pipewire.defaultAudioSink.audio);
-            }
-            if (Pipewire.defaultAudioSource) {
-                out.push(Pipewire.defaultAudioSource);
-                if (Pipewire.defaultAudioSource.audio) out.push(Pipewire.defaultAudioSource.audio);
-            }
-            return out;
-        }
-    }
-
-    property PwObjectTracker _nodeTracker: PwObjectTracker {
-        objects: root.debugDisableAudioService ? [] : _allAudioNodes()
-    }
+    // Avoid PwObjectTracker for now. QuickShell 0.3.0 can segfault in
+    // PwObjectTracker::clearList() when PipeWire removes the current default
+    // node during startup/device churn. The wpctl polls below keep the visible
+    // default volume/mute state fresh without holding those transient objects.
 
     property CommandPoll _outputPoll: CommandPoll {
         interval: root._wpctlPollIntervalMs

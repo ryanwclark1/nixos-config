@@ -10,8 +10,10 @@
   programs.opencode = {
     enable = true;
     package = pkgs.opencode;
-    settings = {
+    tui = {
       theme = "catppuccin";
+    };
+    settings = {
       provider = {
         ollama = {
           npm = "@ai-sdk/openai-compatible";

@@ -92,11 +92,9 @@ in
   # Extend the auto-generated service without replacing it
   systemd.services.wireguard-wg0 = {
     after = lib.mkAfter [
-      "network-online.target"
       "sops-nix.service"
     ];
     wants = lib.mkAfter [
-      "network-online.target"
       "sops-nix.service"
     ];
     serviceConfig.Restart = "on-failure";

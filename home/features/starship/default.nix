@@ -6,35 +6,41 @@
 }:
 
 let
-  base00 = "303446"; # base
-  base01 = "292c3c"; # mantle
-  base02 = "414559"; # surface0
-  base03 = "51576d"; # surface1
-  base04 = "626880"; # surface2
-  base05 = "c6d0f5"; # text
-  base06 = "f2d5cf"; # rosewater
-  base07 = "babbf1"; # lavender
-  base08 = "e78284"; # red
-  base09 = "ef9f76"; # peach
-  base0A = "e5c890"; # yellow
-  base0B = "a6d189"; # green
-  base0C = "81c8be"; # teal
-  base0D = "8caaee"; # blue
-  base0E = "ca9ee6"; # mauve
-  base0F = "eebebe"; # flamingo
-  base10 = "292c3c"; # mantle - darker background
-  base11 = "232634"; # crust - darkest background
-  base12 = "ea999c"; # maroon - bright red
-  base13 = "f2d5cf"; # rosewater - bright yellow
-  base14 = "a6d189"; # green - bright green
-  base15 = "99d1db"; # sky - bright cyan
-  base16 = "85c1dc"; # sapphire - bright blue
-  base17 = "f4b8e4"; # pink - bright purple
+  inherit (config.theme.colors)
+    base00
+    base01
+    base02
+    base03
+    base04
+    base05
+    base06
+    base07
+    base08
+    base09
+    base0A
+    base0B
+    base0C
+    base0D
+    base0E
+    base0F
+    base10
+    base11
+    base12
+    base13
+    base14
+    base15
+    base16
+    base17
+    ;
 in
 {
+  home.file.".local/bin/starship" = {
+    source = "${config.programs.starship.package}/bin/starship";
+    force = true;
+  };
+
   programs.starship = {
     enable = true;
-    package = pkgs.starship;
     enableBashIntegration = lib.mkIf config.programs.bash.enable true;
     enableFishIntegration = lib.mkIf config.programs.fish.enable true;
     enableZshIntegration = lib.mkIf config.programs.zsh.enable true;
@@ -71,13 +77,16 @@ in
         "$kubernetes"
         "$lua"
         "$nodejs"
+        "$package"
         "$php"
         "$rust"
         "$swift"
+        "$terraform"
         "$zig"
         "[](fg:#${base0F} bg:#${base06})"
         "$docker_context"
         "$nix_shell"
+        "$conda"
         "[](fg:#${base06})"
         "$fill"
         "[](fg:#${base0E})"
@@ -278,11 +287,11 @@ in
         disabled = true;
       };
       package = {
-        symbol = "󰏗 ";
+        symbol = "󰏗";
         style = "bg:#${base0F}";
         version_format = "v$raw";
         format = "[[ $symbol( $version) ](fg:#${base00} bg:#${base0F})]($style)";
-        disabled = false;
+        disabled = true;
       };
       bun = {
         symbol = " ";
@@ -465,7 +474,7 @@ in
         description = "Show when in a Nix flake directory";
         symbol = "󱄅 ";
         style = "bg:#${base0E} fg:#${base00}";
-        when = ''test -f flake.nix || test -f flake.lock'';
+        when = "test -f flake.nix || test -f flake.lock";
         format = "[$symbol]($style)";
         disabled = true;
       };
@@ -475,7 +484,7 @@ in
         description = "Show when in a git worktree";
         symbol = "󰧨 ";
         style = "bg:#${base05} fg:#${base00}";
-        when = ''git rev-parse --git-dir 2>/dev/null | grep -q worktrees'';
+        when = "git rev-parse --git-dir 2>/dev/null | grep -q worktrees";
         format = "[$symbol]($style)";
         disabled = true;
       };

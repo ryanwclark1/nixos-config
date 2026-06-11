@@ -153,6 +153,7 @@ Item {
         // =====================================================================
         ColumnLayout {
             Layout.fillWidth: true
+            Layout.topMargin: Appearance.spacingL
             spacing: Appearance.spacingS
 
             Text {
@@ -173,6 +174,7 @@ Item {
             Column {
                 id: quickLinkOrderList
                 Layout.fillWidth: true
+                Layout.bottomMargin: Appearance.spacingS
                 spacing: Appearance.spacingXS
 
                 Repeater {
@@ -262,6 +264,7 @@ Item {
         // =====================================================================
         ColumnLayout {
             Layout.fillWidth: true
+            Layout.topMargin: Appearance.spacingL
             spacing: Appearance.spacingS
 
             Text {
@@ -282,6 +285,7 @@ Item {
             Column {
                 id: toggleOrderList
                 Layout.fillWidth: true
+                Layout.bottomMargin: Appearance.spacingS
                 spacing: Appearance.spacingXS
 
                 Repeater {
@@ -371,6 +375,7 @@ Item {
         // =====================================================================
         ColumnLayout {
             Layout.fillWidth: true
+            Layout.topMargin: Appearance.spacingL
             spacing: Appearance.spacingS
 
             Text {
@@ -391,6 +396,7 @@ Item {
             Column {
                 id: widgetOrderList
                 Layout.fillWidth: true
+                Layout.bottomMargin: Appearance.spacingS
                 spacing: Appearance.spacingXS
 
                 Repeater {
@@ -480,6 +486,7 @@ Item {
         // =====================================================================
         ColumnLayout {
             Layout.fillWidth: true
+            Layout.topMargin: Appearance.spacingL
             spacing: Appearance.spacingS
             visible: PluginService.controlCenterPlugins.length > 0
 
@@ -501,6 +508,7 @@ Item {
             Column {
                 id: pluginOrderList
                 Layout.fillWidth: true
+                Layout.bottomMargin: Appearance.spacingS
                 spacing: Appearance.spacingXS
 
                 Repeater {

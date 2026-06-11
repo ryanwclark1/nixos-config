@@ -7,15 +7,7 @@ launcher_key_handler_qml="${script_dir}/../src/launcher/LauncherKeyHandler.qml"
 launcher_content_panel_qml="${script_dir}/../src/launcher/LauncherContentPanel.qml"
 
 violations=()
-
-require_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
-  fi
-}
+source "${script_dir}/check-helpers.sh"
 
 # Config normalization and matrix hinting.
 require_literal "$launcher_qml" 'readonly property string launcherTabBehavior: {' "launcherTabBehavior property"
@@ -75,10 +67,4 @@ require_literal "$launcher_qml" 'return "Shift+Tab: Next Mode";' "legend tertiar
 require_literal "$launcher_qml" 'var nextIndex = (currentIndex + step + availableModes.length) % availableModes.length;' "mode cycle wrap-around"
 require_literal "$launcher_qml" 'var next = (selectedIndex + step + filteredItems.length) % filteredItems.length;' "selection cycle wrap-around"
 
-if (( ${#violations[@]} > 0 )); then
-  printf '%s\n' "Launcher tab matrix check failed:" >&2
-  printf '  - %s\n' "${violations[@]}" >&2
-  exit 1
-fi
-
-printf '%s\n' "Launcher tab matrix check passed."
+report_violations "Launcher tab matrix check"

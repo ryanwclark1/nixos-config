@@ -9,8 +9,8 @@ QtObject {
     // --- COLORS (Dynamic) ---
     property color background: "#0a0a0c"
     property color surface: "#1e1e24"
-    property color primary: "#7289da"
-    property color secondary: "#99aab5"
+    property color primary: "#ffffff"
+    property color secondary: "#b9bbbe"
     property color accent: "#f39c12"
     property color error: "#f04747"
     property color warning: "#f1c40f"
@@ -20,8 +20,8 @@ QtObject {
     property bool _isLight: false
 
     property color text: "#ffffff"
-    property color textSecondary: "#b9bbbe"
-    property color textDisabled: "#72767d"
+    property color textSecondary: "#cfd1d4"
+    property color textDisabled: "#9ea2a8"
 
     // ── Color transition control ───────────────
     property bool skipTransition: true

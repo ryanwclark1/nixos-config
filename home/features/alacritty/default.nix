@@ -1,33 +1,36 @@
 {
+  config,
   pkgs,
   ...
 }:
 let
-  base00 = "303446"; # base
-  base01 = "292c3c"; # mantle
-  base02 = "414559"; # surface0
-  base03 = "51576d"; # surface1
-  base04 = "626880"; # surface2
-  base05 = "c6d0f5"; # text
-  base06 = "f2d5cf"; # rosewater
-  base07 = "babbf1"; # lavender
-  base08 = "e78284"; # red
-  base09 = "ef9f76"; # peach
-  base0A = "e5c890"; # yellow
-  base0B = "a6d189"; # green
-  base0C = "81c8be"; # teal
-  base0D = "8caaee"; # blue
-  base0E = "ca9ee6"; # mauve
-  base0F = "eebebe"; # flamingo
-  base10 = "292c3c"; # mantle - darker background
-  base11 = "232634"; # crust - darkest background
-  base12 = "ea999c"; # maroon - bright red
-  base13 = "f2d5cf"; # rosewater - bright yellow
-  base14 = "a6d189"; # green - bright green
-  base15 = "99d1db"; # sky - bright cyan
-  base16 = "85c1dc"; # sapphire - bright blue
-  base17 = "f4b8e4"; # pink - bright purple
-  font = "JetBrainsMono Nerd Font";
+  inherit (config.theme.colors)
+    base00
+    base01
+    base02
+    base03
+    base04
+    base05
+    base06
+    base07
+    base08
+    base09
+    base0A
+    base0B
+    base0C
+    base0D
+    base0E
+    base0F
+    base10
+    base11
+    base12
+    base13
+    base14
+    base15
+    base16
+    base17
+    ;
+  font = config.theme.fonts.monospace;
 
 in
 {
@@ -70,7 +73,7 @@ in
         multiplier = 5;
       };
       colors = {
-         # Default colors
+        # Default colors
         primary = {
           background = "#${base00}"; # base
           foreground = "#${base05}"; # text
@@ -82,11 +85,11 @@ in
         # Cursor colors
         cursor = {
           text = "#${base00}"; # base
-          cursor = "#${base06}"; # rosewater
+          cursor = "#${base06}";
         };
         vi_mode_cursor = {
           text = "#${base00}"; # base
-          cursor = "#${base07}"; # lavender
+          cursor = "#${base07}";
         };
         # Search colors
         search.matches = {
@@ -98,8 +101,8 @@ in
           background = "#${base0B}"; # green
         };
         footer_bar = {
-            foreground = "#${base00}"; # base
-            background = "#${base05}"; # subtext0/text
+          foreground = "#${base00}"; # base
+          background = "#${base05}"; # subtext0/text
         };
         # Keyboard regex hints
         hints.start = {
@@ -113,7 +116,7 @@ in
         # Selection colors
         selection = {
           text = "#${base00}"; # base
-          background = "#${base06}"; # rosewater
+          background = "#${base06}";
         };
         # Normal colors
         normal = {

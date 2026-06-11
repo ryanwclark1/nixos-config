@@ -55,8 +55,11 @@ in
 {
   imports = [
     ./claude
+    # Codex is packaged from source and currently pulls in a heavy Rust/V8 build.
+    # Keep it out of the default HM path so switch/rebuild stays reliable.
+    # Re-enable once the package path is replaced or stabilized.
     ./codex
-    ./gemini
+    ./antigravity
     ./opencode
   ];
   home.packages = with pkgs; [
@@ -76,10 +79,6 @@ in
     (writeShellScriptBin "mcp-cli" (builtins.readFile ./scripts/mcp-cli-launcher.sh))
     (writeShellScriptBin "mcp-process-config" (
       builtins.readFile ./scripts/mcp-process-config.sh
-    ))
-    (writeShellScriptBin "update-gemini-cli" (builtins.readFile ./scripts/update-gemini-cli.sh))
-    (writeShellScriptBin "gemini-cli-version" (
-      builtins.readFile ./scripts/gemini-cli-version.sh
     ))
   ];
 

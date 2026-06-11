@@ -7,6 +7,7 @@
 
 {
   imports = [
+    ../../../home/theme
     ./core
     ./networking
     ./security

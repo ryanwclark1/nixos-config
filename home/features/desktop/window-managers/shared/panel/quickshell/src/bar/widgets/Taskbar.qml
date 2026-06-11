@@ -8,8 +8,10 @@ Item {
   property int spacing: Appearance.spacingS
   property bool vertical: false
   property var anchorWindow: null
-  property int buttonSize: 32
-  property int iconSize: 20
+  property real iconScale: 1.0
+  property real fontScale: 1.0
+  property int buttonSize: 32 * iconScale
+  property int iconSize: 20 * iconScale
   property bool showRunningIndicator: true
   property bool showSeparator: true
   property int maxUnpinned: 0
@@ -249,7 +251,7 @@ Item {
   Component {
     id: horizontalLayoutComponent
     Row {
-      spacing: root.spacing
+      spacing: root.spacing * root.iconScale
 
       Repeater {
         model: taskModel
@@ -264,7 +266,7 @@ Item {
   Component {
     id: verticalLayoutComponent
     Column {
-      spacing: root.spacing
+      spacing: root.spacing * root.iconScale
 
       Repeater {
         model: taskModel
@@ -279,8 +281,8 @@ Item {
   Component {
     id: separatorComponent
     Rectangle {
-      width: root.vertical ? 16 : 1
-      height: root.vertical ? 1 : 16
+      width: root.vertical ? (16 * root.iconScale) : 1
+      height: root.vertical ? 1 : (16 * root.iconScale)
       color: Colors.border
     }
   }
@@ -299,6 +301,7 @@ Item {
       anchorWindow: root.anchorWindow
       buttonSize: root.buttonSize
       iconSize: root.iconSize
+      iconScale: root.iconScale
       showRunningIndicator: root.showRunningIndicator
       onPinToggled: (app) => root.togglePin(app)
     }

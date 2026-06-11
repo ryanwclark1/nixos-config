@@ -7,7 +7,7 @@
 {
   home.packages = with pkgs; [
     file
-    wl-clipboard  # For clipboard integration in fzf
+    (lib.mkIf pkgs.stdenv.isLinux wl-clipboard) # For clipboard integration in fzf
     (writeScriptBin "bluetoothz" (builtins.readFile ./bluetoothz.sh))
     (writeScriptBin "dkr" (builtins.readFile ./dkr.sh))
     (writeScriptBin "fv" (builtins.readFile ./fv.sh))

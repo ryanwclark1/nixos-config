@@ -19,7 +19,10 @@ in
       enable = lib.mkDefault true;
       allowSFTP = lib.mkDefault true;
       openFirewall = lib.mkDefault true;
-      startWhenNeeded = lib.mkDefault true;
+      # Keep sshd running: socket activation (true) has been associated with failed
+      # inbound SSH after suspend/idle (e.g. nixpkgs#91351). A screen lock alone does
+      # not block SSH; loss of reachability usually means sleep or network drop.
+      startWhenNeeded = lib.mkDefault false;
       ports = [ 22 ];
       settings = {
         PasswordAuthentication = true;
@@ -32,8 +35,13 @@ in
         StreamLocalBindUnlink = "yes";
         # Allow forwarding ports to everywhere
         GatewayPorts = "clientspecified";
-        # Let WAYLAND_DISPLAY be forwarded
-        AcceptEnv = [ "WAYLAND_DISPLAY" ];
+        # Let Wayland and Ghostty terminal metadata be forwarded
+        AcceptEnv = [
+          "WAYLAND_DISPLAY"
+          "COLORTERM"
+          "TERM_PROGRAM"
+          "TERM_PROGRAM_VERSION"
+        ];
         X11Forwarding = true;
         # Additional security
         ClientAliveInterval = 300;
@@ -52,29 +60,30 @@ in
 
   programs.ssh = {
     # Each hosts public key
-    knownHosts = lib.foldl' (acc: hostname:
+    knownHosts = lib.foldl' (
+      acc: hostname:
       let
         keyPath = "${hostsDir}/${hostname}/ssh_host_ed25519_key.pub";
       in
       if builtins.pathExists keyPath then
-        acc // {
+        acc
+        // {
           ${hostname} = {
             publicKey = builtins.readFile keyPath;
-            extraHostNames =
-              [
-                "${hostname}.${domain}"
-              ]
-              ++
-                # Alias for localhost if it's the same host
-                (lib.optional (hostname == config.networking.hostName) "localhost")
-              ++ (lib.optionals (hostname == "woody") [
-                "${domain}"
-                "local.${domain}"
-              ])
-              ++ (lib.optionals (hostname == "frametop") [
-                "${domain}"
-                "local.${domain}"
-              ]);
+            extraHostNames = [
+              "${hostname}.${domain}"
+            ]
+            ++
+              # Alias for localhost if it's the same host
+              (lib.optional (hostname == config.networking.hostName) "localhost")
+            ++ (lib.optionals (hostname == "woody") [
+              "${domain}"
+              "local.${domain}"
+            ])
+            ++ (lib.optionals (hostname == "frametop") [
+              "${domain}"
+              "local.${domain}"
+            ]);
           };
         }
       else

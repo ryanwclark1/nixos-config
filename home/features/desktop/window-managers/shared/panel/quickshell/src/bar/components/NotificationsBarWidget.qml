@@ -47,18 +47,18 @@ SharedWidgets.BarPill {
     ]
 
     Row {
-        spacing: Appearance.spacingXS
+        spacing: Appearance.spacingXS * root.iconScale
 
         SharedWidgets.SvgIcon {
             source: root.hasDnd ? "alert-off.svg" : "alert.svg"
             color: Colors.text
-            size: Appearance.fontSizeXL
+            size: Appearance.fontSizeXL * root.iconScale
         }
 
         Text {
             visible: !root.iconOnly && root.hasDnd
             color: Colors.textSecondary
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             text: "DND"
             anchors.verticalCenter: parent.verticalCenter
@@ -67,7 +67,7 @@ SharedWidgets.BarPill {
         Text {
             visible: !root.iconOnly && !root.hasDnd && root.hasUnread && root.badgeStyle === "count"
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             text: String(root.unreadCount)
             anchors.verticalCenter: parent.verticalCenter
@@ -76,14 +76,14 @@ SharedWidgets.BarPill {
 
     Rectangle {
         parent: root
-        width: root.badgeStyle === "count" ? Math.max(14, unreadBadgeText.implicitWidth + 8) : 8
-        height: 8
+        width: root.badgeStyle === "count" ? Math.max(14 * root.iconScale, unreadBadgeText.implicitWidth + 8 * root.iconScale) : 8 * root.iconScale
+        height: 8 * root.iconScale
         radius: width / 2
         color: Colors.error
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: 2
-        anchors.rightMargin: 2
+        anchors.topMargin: 2 * root.iconScale
+        anchors.rightMargin: 2 * root.iconScale
         visible: root.hasUnread && !root.hasDnd && root.badgeStyle !== "off" && root.iconOnly
         z: 10
 
@@ -93,7 +93,7 @@ SharedWidgets.BarPill {
             visible: root.badgeStyle === "count"
             text: String(root.unreadCount)
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeXS
+            font.pixelSize: Appearance.fontSizeXS * root.fontScale
             font.weight: Font.Bold
         }
     }

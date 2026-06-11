@@ -9,11 +9,17 @@ Item {
   property color color: Colors.primary
   property int thickness: 2
   property string icon: ""
-  readonly property real safeThickness: Math.max(1, Math.min(root.thickness, Math.min(root.width, root.height) / 2))
+  property real iconScale: 1.0
+  property int iconSize: 0 // If 0, auto-calculated from diameter
+
+  readonly property real _iconSize: root.iconSize > 0 ? root.iconSize : Math.max(Appearance.fontSizeSmall, innerContent.width * 0.42)
+  readonly property real safeThickness: Math.max(1, Math.min(root.thickness * root.iconScale, Math.min(root.width, root.height) / 2))
   readonly property real innerDiameter: Math.max(0, Math.min(root.width, root.height) - (safeThickness * 2))
 
-  width: 24
-  height: 24
+  width: 24 * iconScale
+  height: 24 * iconScale
+  implicitWidth: width
+  implicitHeight: height
 
   Item {
     id: innerContent
@@ -25,14 +31,13 @@ Item {
       anchors.centerIn: parent
       sourceComponent: String(root.icon).endsWith(".svg") ? _cgSvg : _cgNerd
     }
-    Component { id: _cgSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.color; size: Math.max(Appearance.fontSizeSmall, innerContent.width * 0.42) } }
-    Component { id: _cgNerd; Text { text: root.icon; font.family: Appearance.fontMono; font.pixelSize: Math.max(Appearance.fontSizeSmall, innerContent.width * 0.42); color: root.color; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
+    Component { id: _cgSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.color; size: root._iconSize } }
+    Component { id: _cgNerd; Text { text: root.icon; font.family: Appearance.fontMono; font.pixelSize: root._iconSize; color: root.color; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
   }
 
   Shape {
     id: shape
     anchors.fill: parent
-    layer.enabled: false
 
     ShapePath {
       fillColor: "transparent"

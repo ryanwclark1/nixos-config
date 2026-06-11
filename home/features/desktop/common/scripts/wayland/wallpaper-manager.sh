@@ -48,16 +48,16 @@ is_cache_enabled() {
     [[ -f "$CACHE_ENABLED" ]]
 }
 
-# Ensure swww daemon is running
-ensure_swww_daemon() {
-    if command -v swww >/dev/null; then
-        if ! pgrep -x "swww-daemon" > /dev/null; then
-            log "INFO" "Starting swww daemon"
-            swww-daemon &
+# Ensure awww daemon is running
+ensure_awww_daemon() {
+    if command -v awww >/dev/null; then
+        if ! pgrep -x "awww-daemon" > /dev/null; then
+            log "INFO" "Starting awww daemon"
+            awww-daemon &
             sleep 1
             # Wait for daemon to be ready
             local attempts=0
-            while ! swww query >/dev/null 2>&1 && [ $attempts -lt 10 ]; do
+            while ! awww query >/dev/null 2>&1 && [ $attempts -lt 10 ]; do
                 sleep 0.5
                 attempts=$((attempts + 1))
             done
@@ -79,14 +79,14 @@ set_current_wallpaper() {
     # Store current wallpaper
     echo "$wallpaper" > "$CURRENT_WALLPAPER"
     
-    # Set wallpaper using available tools (prioritize swww)
-    if ensure_swww_daemon; then
+    # Set wallpaper using available tools (prioritize awww)
+    if ensure_awww_daemon; then
         # Add buffer management flags to reduce errors
-        swww img "$wallpaper" --transition-fps 30 --transition-type fade --transition-duration 1 --no-resize 2>/dev/null || {
-            log "WARNING" "swww failed, retrying with fallback settings"
+        awww img "$wallpaper" --transition-fps 30 --transition-type fade --transition-duration 1 --no-resize 2>/dev/null || {
+            log "WARNING" "awww failed, retrying with fallback settings"
             sleep 0.5
-            swww img "$wallpaper" --no-resize 2>/dev/null || {
-                log "ERROR" "swww completely failed, falling back to swaybg"
+            awww img "$wallpaper" --no-resize 2>/dev/null || {
+                log "ERROR" "awww completely failed, falling back to swaybg"
                 pkill swaybg 2>/dev/null || true
                 swaybg -i "$wallpaper" &
             }
@@ -97,7 +97,7 @@ set_current_wallpaper() {
         pkill swaybg 2>/dev/null || true
         swaybg -i "$wallpaper" &
     else
-        log "ERROR" "No wallpaper tool found (swww, waypaper, swaybg)"
+        log "ERROR" "No wallpaper tool found (awww, waypaper, swaybg)"
         return 1
     fi
     
@@ -337,14 +337,14 @@ toggle_cache() {
     fi
 }
 
-# Set swww transition options
-set_swww_transition() {
+# Set awww transition options
+set_awww_transition() {
     local transition_type="${1:-wipe}"
     local duration="${2:-2}"
     local fps="${3:-60}"
     
-    if ! ensure_swww_daemon; then
-        log "ERROR" "swww not available"
+    if ! ensure_awww_daemon; then
+        log "ERROR" "awww not available"
         return 1
     fi
     
@@ -353,7 +353,7 @@ set_swww_transition() {
         wallpaper="${wallpaper/#\~/$HOME}"
         
         log "INFO" "Applying transition: $transition_type (${duration}s, ${fps}fps)"
-        swww img "$wallpaper" --transition-type "$transition_type" --transition-duration "$duration" --transition-fps "$fps"
+        awww img "$wallpaper" --transition-type "$transition_type" --transition-duration "$duration" --transition-fps "$fps"
         notify "Transition Applied" "$transition_type transition"
     else
         log "ERROR" "No current wallpaper set"
@@ -381,7 +381,7 @@ Commands:
     effect select           Select effect interactively
     effect off              Disable effects
     
-    transition <type> [dur] [fps]  Set swww transition (types: wipe, fade, center, etc.)
+    transition <type> [dur] [fps]  Set awww transition (types: wipe, fade, center, etc.)
     
     cache clear             Clear wallpaper cache
     cache toggle            Toggle cache generation
@@ -456,7 +456,7 @@ main() {
                 echo "Error: transition requires type" >&2
                 exit 1
             fi
-            set_swww_transition "$2" "${3:-2}" "${4:-60}"
+            set_awww_transition "$2" "${3:-2}" "${4:-60}"
             ;;
         "cache")
             case "${2:-}" in

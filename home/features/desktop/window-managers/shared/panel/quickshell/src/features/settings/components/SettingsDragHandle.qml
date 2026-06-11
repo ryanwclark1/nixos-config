@@ -6,7 +6,6 @@ import "../../../widgets" as SharedWidgets
 Rectangle {
     id: root
 
-    property bool enabled: true
     property int handleSize: 28
     property int hitSize: 40
     property int dragAxis: Drag.YAxis

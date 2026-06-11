@@ -6,6 +6,6 @@
     "test:watch": "vitest --config tests/vitest.config.js"
   },
   "devDependencies": {
-    "vitest": "^3.1.0"
+    "vitest": "^3.2.6"
   }
 }

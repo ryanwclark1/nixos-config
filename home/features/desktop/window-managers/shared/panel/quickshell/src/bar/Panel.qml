@@ -42,10 +42,17 @@ Item {
     readonly property int runtimeSpacing: Appearance.spacingM
     readonly property int verticalItemWidthCap: vertical ? Math.max(24, thickness) : 0
     readonly property int verticalBarWidthCap: vertical ? (verticalItemWidthCap + outerPadding * 2) : 0
-    readonly property real centerTargetOffset: 0
-    readonly property real centerMinOffset: outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0) - width / 2 + centerSection.width / 2
-    readonly property real centerMaxOffset: width / 2 - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width / 2
-    readonly property real centerClampedOffset: centerMinOffset > centerMaxOffset ? 0 : Math.max(centerMinOffset, Math.min(centerTargetOffset, centerMaxOffset))
+    readonly property real centerClampedOffset: {
+        if (root.vertical) {
+            var minV = outerPadding + leftSection.height + (leftSection.height > 0 ? runtimeSpacing : 0) - height / 2 + centerSection.height / 2;
+            var maxV = height / 2 - outerPadding - rightSection.height - (rightSection.height > 0 ? runtimeSpacing : 0) - centerSection.height / 2;
+            return minV > maxV ? 0 : Math.max(minV, Math.min(0, maxV));
+        } else {
+            var minH = outerPadding + leftSection.width + (leftSection.width > 0 ? runtimeSpacing : 0) - width / 2 + centerSection.width / 2;
+            var maxH = width / 2 - outerPadding - rightSection.width - (rightSection.width > 0 ? runtimeSpacing : 0) - centerSection.width / 2;
+            return minH > maxH ? 0 : Math.max(minH, Math.min(0, maxH));
+        }
+    }
     readonly property real computedOpacity: (barConfig && barConfig.opacity !== undefined) ? barConfig.opacity : Config.barOpacity
     readonly property bool floatingBar: barConfig && barConfig.floating !== undefined ? !!barConfig.floating : Config.barFloating
     readonly property bool autoHide: !!(barConfig && barConfig.autoHide)
@@ -269,6 +276,7 @@ Item {
         "notifications": notificationsComponent,
         "personality": personalityComponent,
         "pomodoro": pomodoroComponent,
+        "power": powerComponent,
         "todo": todoComponent,
         "gameMode": gameModeComponent,
         "nightLight": nightLightComponent,
@@ -455,6 +463,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: root.vertical ? 0 : root.centerClampedOffset
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: root.vertical ? root.centerClampedOffset : 0
     }
 
     BarSectionRepeater {
@@ -615,6 +624,11 @@ Item {
                 onLoaded: {
                     if (item && item.widgetInstance !== undefined)
                         item.widgetInstance = parent.widgetInstance;
+                    if (item) {
+                        if ("fontScale" in item) item.fontScale = root.barFontScale;
+                        if ("iconScale" in item) item.iconScale = root.barIconScale;
+                        if ("panelRef" in item) item.panelRef = root;
+                    }
                     diagnosticWrapper.refreshDiagnosticState();
                 }
             }
@@ -680,6 +694,8 @@ Item {
             property var widgetInstance: null
             tooltipText: "Application launcher"
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             iconOnly: root.triggerWidgetIconOnly(widgetInstance)
             labelText: root.triggerWidgetLabel(widgetInstance, "Apps")
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -727,6 +743,8 @@ Item {
             property var widgetInstance: null
             vertical: root.vertical
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             settings: root.widgetSettings(widgetInstance)
             showAddButton: root.widgetSettings(widgetInstance).showAddButton !== false
             showMiniMap: root.widgetSettings(widgetInstance).showMiniMap !== false
@@ -739,6 +757,8 @@ Item {
             property var widgetInstance: null
             vertical: root.vertical
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
         }
     }
 
@@ -748,8 +768,8 @@ Item {
             property var widgetInstance: null
             vertical: root.vertical
             anchorWindow: root.anchorWindow
-            buttonSize: root.widgetIntegerSetting(widgetInstance, "buttonSize", 32, 24, 56)
-            iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 20, 14, 36)
+            buttonSize: root.widgetIntegerSetting(widgetInstance, "buttonSize", 32, 24, 56) * root.barIconScale
+            iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 20, 14, 36) * root.barIconScale
             showRunningIndicator: root.widgetSettings(widgetInstance).showRunningIndicator !== false
             showSeparator: root.widgetSettings(widgetInstance).showSeparator !== false
             maxUnpinned: root.widgetIntegerSetting(widgetInstance, "maxUnpinned", 0, 0, 20)
@@ -770,6 +790,8 @@ Item {
             property var widgetInstance: null
             vertical: root.vertical
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
         }
     }
 
@@ -782,6 +804,8 @@ Item {
             iconColor: Colors.primary
             label: "CPU"
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             compact: root.isCompactStatWidget(widgetInstance)
             iconOnly: root.isIconOnlyStatWidget(widgetInstance)
             valueText: root.statDisplayText("cpuStatus", widgetInstance)
@@ -801,6 +825,8 @@ Item {
             iconColor: Colors.accent
             label: "RAM"
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             compact: root.isCompactStatWidget(widgetInstance)
             iconOnly: root.isIconOnlyStatWidget(widgetInstance)
             valueText: root.statDisplayText("ramStatus", widgetInstance)
@@ -820,6 +846,8 @@ Item {
             iconColor: Colors.secondary
             label: "GPU"
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             compact: root.isCompactStatWidget(widgetInstance)
             iconOnly: root.isIconOnlyStatWidget(widgetInstance)
             valueText: root.statDisplayText("gpuStatus", widgetInstance)
@@ -839,6 +867,8 @@ Item {
             iconColor: Colors.secondary
             label: "Disk"
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             compact: root.isCompactStatWidget(widgetInstance)
             iconOnly: root.isIconOnlyStatWidget(widgetInstance)
             valueText: root.statDisplayText("diskStatus", widgetInstance)
@@ -858,6 +888,8 @@ Item {
             iconColor: Colors.primary
             label: "Net"
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             compact: root.isCompactStatWidget(widgetInstance)
             iconOnly: root.isIconOnlyStatWidget(widgetInstance)
             valueText: root.statDisplayText("networkStatus", widgetInstance)
@@ -884,6 +916,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("dateTimeMenu")
             onClicked: triggerItem => root.requestSurface("dateTimeMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -900,6 +934,8 @@ Item {
             showVisualizer: root.widgetBooleanSetting(widgetInstance, "showVisualizer", true)
             visualizerBars: root.widgetIntegerSetting(widgetInstance, "visualizerBars", 8, 4, 20)
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
         }
     }
 
@@ -909,6 +945,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
         }
     }
 
@@ -918,6 +956,7 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
             isActive: root.isSurfaceActive("cavaPopup")
             onClicked: triggerItem => root.requestSurface("cavaPopup", triggerItem)
         }
@@ -928,6 +967,8 @@ Item {
         IdleInhibitorBarWidget {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -938,6 +979,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("modelUsageMenu")
             onTriggerRequested: triggerItem => root.requestSurface("modelUsageMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -950,6 +993,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("weatherMenu")
             onTriggerRequested: triggerItem => root.requestSurface("weatherMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -962,6 +1007,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("marketMenu")
             onTriggerRequested: triggerItem => root.requestSurface("marketMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -975,6 +1022,8 @@ Item {
             property var widgetInstance: null
             isActive: root.isSurfaceActive("sshMenu")
             anchorWindow: root.anchorWindow
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Connections {
@@ -992,6 +1041,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("vpnMenu")
             onTriggerRequested: triggerItem => root.requestSurface("vpnMenu", triggerItem)
             onNetworkClicked: triggerItem => root.requestSurface("networkMenu", triggerItem)
@@ -1002,6 +1053,7 @@ Item {
     Component {
         id: networkComponent
         SharedWidgets.BarPill {
+            id: networkPill
             property var widgetInstance: null
             isActive: root.isSurfaceActive("networkMenu")
             anchorWindow: root.anchorWindow
@@ -1017,10 +1069,12 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Appearance.spacingS
+                spacing: Appearance.spacingS * networkPill.iconScale
                 SharedWidgets.NetworkWidget {
                     id: networkWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+                    iconScale: networkPill.iconScale
+                    fontScale: networkPill.fontScale
                 }
             }
         }
@@ -1032,6 +1086,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("bluetoothMenu")
             onTriggerRequested: triggerItem => root.requestSurface("bluetoothMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -1041,6 +1097,7 @@ Item {
     Component {
         id: audioComponent
         SharedWidgets.BarPill {
+            id: audioPill
             property var widgetInstance: null
             isActive: root.isSurfaceActive("audioMenu")
             anchorWindow: root.anchorWindow
@@ -1064,10 +1121,12 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Appearance.spacingS
+                spacing: Appearance.spacingS * audioPill.iconScale
                 SharedWidgets.AudioWidget {
                     id: audioWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+                    iconScale: audioPill.iconScale
+                    fontScale: audioPill.fontScale
                 }
             }
         }
@@ -1079,6 +1138,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("musicMenu")
             onTriggerRequested: triggerItem => root.requestSurface("musicMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -1091,6 +1152,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("privacyMenu")
             onTriggerRequested: triggerItem => root.requestSurface("privacyMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -1103,6 +1166,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -1113,6 +1178,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("recordingMenu")
             onTriggerRequested: triggerItem => root.requestSurface("recordingMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -1122,6 +1189,7 @@ Item {
     Component {
         id: batteryComponent
         SharedWidgets.BarPill {
+            id: batteryPill
             property var widgetInstance: null
             visible: batteryWidget.showBattery
             isActive: root.isSurfaceActive("batteryMenu")
@@ -1156,10 +1224,12 @@ Item {
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
 
             Row {
-                spacing: Appearance.spacingXS
+                spacing: Appearance.spacingXS * batteryPill.iconScale
                 SharedWidgets.BatteryWidget {
                     id: batteryWidget
                     iconOnly: root.isSummaryWidgetIconOnly(widgetInstance)
+                    iconScale: batteryPill.iconScale
+                    fontScale: batteryPill.fontScale
                 }
             }
         }
@@ -1171,6 +1241,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("printerMenu")
             onTriggerRequested: triggerItem => root.requestSurface("printerMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -1219,9 +1291,9 @@ Item {
             property var widgetInstance: null
             vertical: root.vertical
             anchorWindow: root.anchorWindow
-            itemSize: root.widgetIntegerSetting(widgetInstance, "itemSize", 24, 18, 40)
-            iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 18, 12, 32)
-            itemSpacing: root.widgetIntegerSetting(widgetInstance, "spacing", Appearance.spacingS, 2, 16)
+            itemSize: root.widgetIntegerSetting(widgetInstance, "itemSize", 24, 18, 40) * root.barIconScale
+            iconSize: root.widgetIntegerSetting(widgetInstance, "iconSize", 18, 12, 32) * root.barIconScale
+            itemSpacing: root.widgetIntegerSetting(widgetInstance, "spacing", Appearance.spacingS, 2, 16) * root.barIconScale
         }
     }
 
@@ -1261,6 +1333,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             manager: root.manager
             isActive: root.isSurfaceActive("notifCenter")
             onTriggerRequested: triggerItem => root.requestSurface("notifCenter", triggerItem)
@@ -1274,7 +1348,7 @@ Item {
             property var widgetInstance: null
             readonly property int spacerSize: {
                 var settings = root.widgetSettings(widgetInstance);
-                return Math.max(8, parseInt(settings.size !== undefined ? settings.size : 24, 10) || 24);
+                return Math.round(Math.max(8, parseInt(settings.size !== undefined ? settings.size : 24, 10) || 24) * root.barIconScale);
             }
             width: root.vertical ? 1 : spacerSize
             height: root.vertical ? spacerSize : 1
@@ -1287,9 +1361,9 @@ Item {
         id: separatorComponent
         Rectangle {
             property var widgetInstance: null
-            readonly property int separatorThickness: root.widgetIntegerSetting(widgetInstance, "thickness", 1, 1, 8)
-            readonly property int separatorLength: root.widgetIntegerSetting(widgetInstance, "length", 20, 8, 64)
-            implicitWidth: root.vertical ? Math.max(24, root.thickness - 8) : separatorThickness
+            readonly property int separatorThickness: Math.max(1, Math.round(root.widgetIntegerSetting(widgetInstance, "thickness", 1, 1, 8) * root.barIconScale))
+            readonly property int separatorLength: Math.round(root.widgetIntegerSetting(widgetInstance, "length", 20, 8, 64) * root.barIconScale)
+            implicitWidth: root.vertical ? Math.max(24 * root.barIconScale, root.thickness - 8 * root.barIconScale) : separatorThickness
             implicitHeight: root.vertical ? separatorThickness : separatorLength
             width: implicitWidth
             height: implicitHeight
@@ -1331,6 +1405,8 @@ Item {
         id: personalityComponent
         SharedWidgets.PersonalityGif {
             property var widgetInstance: null
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
         }
     }
 
@@ -1340,6 +1416,21 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
+            onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
+        }
+    }
+
+    Component {
+        id: powerComponent
+        PowerBarWidget {
+            property var widgetInstance: null
+            anchorWindow: root.anchorWindow
+            vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
+            onTriggerRequested: triggerItem => root.requestSurface("powerMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -1350,6 +1441,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -1360,6 +1453,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -1370,6 +1465,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
         }
     }
@@ -1380,6 +1477,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("unifiNetworkMenu")
             onTriggerRequested: triggerItem => root.requestSurface("unifiNetworkMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)
@@ -1392,6 +1491,8 @@ Item {
             property var widgetInstance: null
             anchorWindow: root.anchorWindow
             vertical: root.vertical
+            iconScale: root.barIconScale
+            fontScale: root.barFontScale
             isActive: root.isSurfaceActive("unifiProtectMenu")
             onTriggerRequested: triggerItem => root.requestSurface("unifiProtectMenu", triggerItem)
             onContextMenuRequested: (actions, rect) => root.contextMenuRequested(actions, rect)

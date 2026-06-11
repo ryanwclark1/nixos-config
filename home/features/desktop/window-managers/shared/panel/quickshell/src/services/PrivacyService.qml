@@ -63,22 +63,8 @@ QtObject {
     return count;
   }
 
-  // Track all stream nodes so the _micStreamCount binding re-evaluates reactively
-  // whenever streams are added, removed, or change state.
-  property PwObjectTracker _streamTracker: PwObjectTracker {
-    objects: _allStreamNodes()
-  }
-
-  function _allStreamNodes() {
-    if (!Pipewire.ready) return [];
-    var nodes = Pipewire.nodes?.values ?? [];
-    var streams = [];
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i] && nodes[i].audio && nodes[i].isStream)
-        streams.push(nodes[i]);
-    }
-    return streams;
-  }
+  // Do not use PwObjectTracker here. QuickShell 0.3.0 can crash while clearing
+  // tracked PipeWire object lists when nodes disappear during device churn.
 
   // ── Camera + screenshare — reduced-frequency polling ─
   // No reactive alternative for /dev/video* without inotify; screenshare

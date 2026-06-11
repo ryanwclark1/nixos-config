@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd)"
 HELPERS="$SCRIPT_DIR/lib/package-update-helpers.sh"
 
 # shellcheck source=./lib/package-update-helpers.sh
@@ -26,9 +26,9 @@ NC='\033[0m' # No Color
 declare -A PACKAGES=(
   [code-cursor]="pkgs/code-cursor"
   [cursor-cli]="pkgs/cursor-cli"
-  [gemini-cli]="pkgs/gemini-cli"
+  [antigravity-cli]="pkgs/antigravity-cli"
+  [antigravity-ide]="pkgs/antigravity-ide"
   [claude-code]="pkgs/claude-code-bin"
-  [claude-code-npm]="pkgs/claude-code"
   [codex]="pkgs/codex"
   [antigravity]="pkgs/antigravity"
   [kiro]="pkgs/kiro"
@@ -141,7 +141,7 @@ check_updates() {
     return 1
   fi
 
-  if [[ "$pkg_name" == "claude-code" || "$pkg_name" == "claude-code-npm" ]]; then
+  if [[ "$pkg_name" == "claude-code" ]]; then
     cd "$REPO_ROOT"
     if output=$(PACKAGE_UPDATE_ORCHESTRATED=true run_package_update_script "$REPO_ROOT" "$pkg_name" "$update_script" --check-only 2>&1); then
       if echo "$output" | grep -q "Already up to date"; then
@@ -174,7 +174,10 @@ show_status() {
   local updates_available=()
   local up_to_date=()
 
-  for pkg in "${!PACKAGES[@]}"; do
+  local sorted_pkgs
+  sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+
+  for pkg in "${sorted_pkgs[@]}"; do
     if check_updates "$pkg"; then
       updates_available+=("$pkg")
       echo -e "  ${YELLOW}●${NC} $pkg - Update available"
@@ -207,7 +210,8 @@ case "${1:-}" in
       error "Please specify a package name or use 'update-all'"
       echo ""
       echo "Available packages:"
-      for pkg in "${!PACKAGES[@]}"; do
+      sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+      for pkg in "${sorted_pkgs[@]}"; do
         echo "  - $pkg"
       done
       exit 1
@@ -217,7 +221,8 @@ case "${1:-}" in
     for pkg in "$@"; do
       if [[ "$pkg" == "all" ]]; then
         # Update all packages
-        for pkg_name in "${!PACKAGES[@]}"; do
+        sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+        for pkg_name in "${sorted_pkgs[@]}"; do
           update_package "$pkg_name" || true
         done
       else
@@ -228,7 +233,8 @@ case "${1:-}" in
   update-all|upgrade-all)
     info "Updating all packages..."
     echo ""
-    for pkg in "${!PACKAGES[@]}"; do
+    sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+    for pkg in "${sorted_pkgs[@]}"; do
       update_package "$pkg" || true
       echo "---"
     done
@@ -236,7 +242,8 @@ case "${1:-}" in
     ;;
   list)
     echo "Available packages:"
-    for pkg in "${!PACKAGES[@]}"; do
+    sorted_pkgs=($(for k in "${!PACKAGES[@]}"; do echo "$k"; done | sort))
+    for pkg in "${sorted_pkgs[@]}"; do
       pkg_dir="${PACKAGES[$pkg]}"
       version_file="$REPO_ROOT/$pkg_dir/default.nix"
       version="unknown"
@@ -247,26 +254,20 @@ case "${1:-}" in
       fi
 
       if [[ -z "$version" || "$version" == "unknown" ]]; then
-        manifest_file="$REPO_ROOT/$pkg_dir/manifest.json"
-        if [[ -f "$manifest_file" ]]; then
-          version=$(jq -r '.version' "$manifest_file" 2>/dev/null || echo "unknown")
+        sources_file="$REPO_ROOT/$pkg_dir/sources.json"
+        if [[ -f "$sources_file" ]]; then
+          version=$(jq -r '.version' "$sources_file" 2>/dev/null || echo "unknown")
         fi
       fi
 
-      # Special case for antigravity which uses information.json
-      if [[ "$pkg" == "antigravity" ]] && [[ -z "$version" || "$version" == "unknown" ]]; then
-        info_file="$REPO_ROOT/$pkg_dir/information.json"
-        if [[ -f "$info_file" ]]; then
-          version=$(jq -r '.version' "$info_file" 2>/dev/null || echo "unknown")
-        fi
-      fi
+
 
       if [[ -n "$version" && "$version" != "unknown" ]]; then
         echo "  - $pkg (v$version)"
       else
         echo "  - $pkg"
       fi
-    done | sort
+    done
     ;;
   *)
     echo "Usage: $0 [command] [package-name...]"

@@ -1,7 +1,6 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import "."
 
 // Cloud-based UniFi Site Manager API service.

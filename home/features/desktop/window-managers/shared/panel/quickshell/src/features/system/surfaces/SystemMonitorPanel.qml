@@ -33,16 +33,16 @@ PanelWindow {
     WlrLayershell.namespace: "quickshell"
 
     property bool showContent: false
-    readonly property int telemetryColumnMinWidth: 360
-    readonly property int detailColumnMinWidth: 760
+    readonly property int telemetryColumnMinWidth: 400
+    readonly property int detailColumnMinWidth: 1100
     property int panelWidth: _persist.panelWidth
     readonly property int panelMinWidth: telemetryColumnMinWidth + detailColumnMinWidth + Appearance.spacingM + (Appearance.paddingLarge * 2)
-    readonly property int panelMaxWidth: 1760
+    readonly property int panelMaxWidth: 2560
 
     PersistentProperties {
         id: _persist
         reloadableId: "systemMonitorPanelState"
-        property int panelWidth: 1360
+        property int panelWidth: 1700
     }
     property real _dragStartX: 0
     property real _dragStartWidth: 0

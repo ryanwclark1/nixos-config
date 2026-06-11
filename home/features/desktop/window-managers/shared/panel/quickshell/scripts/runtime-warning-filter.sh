@@ -21,6 +21,9 @@ qt\.multimedia\.pipewire\.devicemonitor: Ignoring dummy output: .*
 \[W\]\[AiService\] Ollama unreachable
 \[W\]\[Workspaces\] \[hyprland\] no workspaces from compositor
 Failed to open VDPAU backend libvdpau_nvidia\.so
+qt\.qml\.propertyCache\.append: Member .* overrides a member of the base object\.
+Could not find the videoconvert GStreamer element
+quickshell\.qmlscanner: Module path contains invalid characters
 quickshell\.service\.pam\.subprocess:
 Read of .*niri/config\.kdl failed: File does not exist
 EOF

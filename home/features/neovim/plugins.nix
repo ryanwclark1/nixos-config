@@ -462,128 +462,73 @@
           },
           priority = 999,
           config = function()
+            local servers = {
+              "lua_ls",        -- Lua
+              "nixd",          -- Nix
+              "yamlls",        -- YAML
+              "jsonls",        -- JSON
+              "html",          -- HTML
+              "cssls",         -- CSS
+              "tailwindcss",   -- Tailwind CSS
+              "emmet_ls",      -- Emmet
+              "pyright",       -- Python
+              "ruff",          -- Python linting/formatting
+              "rust_analyzer", -- Rust
+              "gopls",         -- Go
+              "marksman",      -- Markdown
+              "templ",         -- Templ
+              "sqls",          -- SQL
+            }
+
+            local cmp_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
             local mason_lspconfig = require("mason-lspconfig")
-            mason_lspconfig.setup({
-              -- Automatically install these LSP servers
-              ensure_installed = {
-                "lua_ls",          -- Lua
-                "nixd",            -- Nix  
-                "yamlls",          -- YAML
-                "jsonls",          -- JSON
-                "html",            -- HTML
-                "cssls",           -- CSS
-                "tailwindcss",     -- Tailwind CSS
-                "emmet_ls",        -- Emmet
-                "pyright",         -- Python
-                "ruff",            -- Python linting/formatting
-                "rust_analyzer",   -- Rust
-                "gopls",           -- Go
-                "marksman",        -- Markdown
-                "templ",           -- Templ
-                "sqls",            -- SQL
+            local capabilities = cmp_ok and cmp_nvim_lsp.default_capabilities() or vim.lsp.protocol.make_client_capabilities()
+
+            local function on_attach(_, bufnr)
+              local opts = { noremap = true, silent = true, buffer = bufnr }
+              vim.keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
+              vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+              vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
+              vim.keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
+              vim.keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
+              vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
+              vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+              vim.keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
+              vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
+              vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+              vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+              vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+              vim.keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
+            end
+
+            local default_config = {
+              capabilities = capabilities,
+              on_attach = on_attach,
+            }
+
+            for _, server_name in ipairs(servers) do
+              vim.lsp.config(server_name, default_config)
+            end
+
+            vim.lsp.config("lua_ls", {
+              capabilities = capabilities,
+              on_attach = on_attach,
+              settings = {
+                Lua = {
+                  runtime = { version = "LuaJIT" },
+                  diagnostics = { globals = { "vim" } },
+                  workspace = {
+                    library = vim.api.nvim_get_runtime_file("", true),
+                    checkThirdParty = false,
+                  },
+                  telemetry = { enable = false },
+                },
               },
-              -- Automatically install LSP servers when opening supported files
-              automatic_installation = true,
             })
-            
-            -- Set up LSP configuration after VimEnter to ensure everything is loaded
-            vim.api.nvim_create_autocmd("VimEnter", {
-              callback = function()
-                -- Add a small delay to ensure all plugins are fully loaded
-                vim.defer_fn(function()
-                  local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
-                  local cmp_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-                  
-                  if not lspconfig_ok or not cmp_ok then
-                    vim.notify("LSP dependencies not available", vim.log.levels.WARN)
-                    return
-                  end
-                  
-                  local capabilities = cmp_nvim_lsp.default_capabilities()
-                  
-                  -- Common on_attach function
-                  local function on_attach(client, bufnr)
-                    local opts = { noremap = true, silent = true, buffer = bufnr }
-                    vim.keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
-                    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-                    vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
-                    vim.keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
-                    vim.keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
-                    vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-                    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-                    vim.keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
-                    vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
-                    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-                    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-                    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-                    vim.keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
-                  end
-                  
-                  -- Check if setup_handlers function exists before calling it
-                  if mason_lspconfig.setup_handlers then
-                    -- Set up handlers for automatic LSP configuration
-                    mason_lspconfig.setup_handlers({
-                      -- Default handler for all servers
-                      function(server_name)
-                        lspconfig[server_name].setup({
-                          capabilities = capabilities,
-                          on_attach = on_attach,
-                        })
-                      end,
 
-                      -- Custom configurations for specific servers
-                      ["lua_ls"] = function()
-                        lspconfig.lua_ls.setup({
-                          capabilities = capabilities,
-                          on_attach = on_attach,
-                          settings = {
-                            Lua = {
-                              runtime = { version = 'LuaJIT' },
-                              diagnostics = { globals = {'vim'} },
-                              workspace = {
-                                library = vim.api.nvim_get_runtime_file("", true),
-                                checkThirdParty = false,
-                              },
-                              telemetry = { enable = false },
-                            },
-                          },
-                        })
-                      end,
-                    })
-                  else
-                    -- Fallback: manually configure common LSP servers
-                    vim.notify("setup_handlers not available, using manual LSP setup", vim.log.levels.WARN)
-
-                    -- Get list of installed servers
-                    local installed_servers = mason_lspconfig.get_installed_servers()
-
-                    for _, server_name in ipairs(installed_servers) do
-                      if server_name == "lua_ls" then
-                        lspconfig.lua_ls.setup({
-                          capabilities = capabilities,
-                          on_attach = on_attach,
-                          settings = {
-                            Lua = {
-                              runtime = { version = 'LuaJIT' },
-                              diagnostics = { globals = {'vim'} },
-                              workspace = {
-                                library = vim.api.nvim_get_runtime_file("", true),
-                                checkThirdParty = false,
-                              },
-                              telemetry = { enable = false },
-                            },
-                          },
-                        })
-                      else
-                        lspconfig[server_name].setup({
-                          capabilities = capabilities,
-                          on_attach = on_attach,
-                        })
-                      end
-                    end
-                  end
-                end, 100)
-              end,
+            mason_lspconfig.setup({
+              ensure_installed = servers,
+              automatic_enable = true,
             })
           end,
         },

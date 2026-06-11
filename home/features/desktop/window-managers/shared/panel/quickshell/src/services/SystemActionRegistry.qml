@@ -110,11 +110,25 @@ QtObject {
                 ipcTarget: "Shell",
                 ipcAction: "toggleSurface",
                 clickCommand: SU.ipcCall("Shell", "toggleSurface", "controlCenter", "")
+            },
+            powerMenu: {
+                id: "powerMenu",
+                category: "Controls",
+                name: "Open Power Menu",
+                title: "Open system session controls",
+                label: "Power Menu",
+                icon: "power.svg",
+                subtitle: "Shutdown, reboot, lock, and logout",
+                danger: false,
+                requiresConfirmation: false,
+                ipcTarget: "Shell",
+                ipcAction: "toggleSurface",
+                clickCommand: SU.ipcCall("Shell", "toggleSurface", "powerMenu", "")
             }
         })
 
     readonly property var sessionActionIds: ["shutdown", "reboot", "lock", "logout"]
-    readonly property var shellEntryActionIds: ["audioControls", "networkControls", "vpnControls", "commandCenter"]
+    readonly property var shellEntryActionIds: ["audioControls", "networkControls", "vpnControls", "commandCenter", "powerMenu"]
 
     readonly property var sessionActions: actionsByIds(sessionActionIds)
     readonly property var shellEntryActions: actionsByIds(shellEntryActionIds)

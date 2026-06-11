@@ -15,10 +15,10 @@ describe("System monitor panel contract", () => {
   it("opens wider by default and reserves more width for detail tables", () => {
     const panel = source("src/features/system/surfaces/SystemMonitorPanel.qml");
 
-    expect(panel).toContain("readonly property int telemetryColumnMinWidth: 360");
-    expect(panel).toContain("readonly property int detailColumnMinWidth: 760");
-    expect(panel).toContain("readonly property int panelMaxWidth: 1760");
-    expect(panel).toContain("property int panelWidth: 1360");
+    expect(panel).toContain("readonly property int telemetryColumnMinWidth: 400");
+    expect(panel).toContain("readonly property int detailColumnMinWidth: 1100");
+    expect(panel).toContain("readonly property int panelMaxWidth: 2560");
+    expect(panel).toContain("property int panelWidth: 1700");
     expect(panel).toContain("Math.round(root.panelWidth * 0.32)");
   });
 
@@ -53,5 +53,22 @@ describe("System monitor panel contract", () => {
     expect(serviceTable).toContain("property bool jumpHighlighted: false");
     expect(serviceTable).toContain("function pulseJumpHighlight()");
     expect(serviceTable).toContain("opacity: root.jumpHighlighted ? 1.0 : 0.0");
+  });
+
+  it("separates process state filters from list and tree view mode controls", () => {
+    const processWidget = source("src/features/system/sections/ProcessWidget.qml");
+
+    expect(processWidget).toContain("id: stateFilterFlow");
+    expect(processWidget).toContain("id: processViewModeRow");
+    expect(processWidget).toContain('label: "List"');
+    expect(processWidget).toContain('label: "Tree"');
+    expect(processWidget).toContain('selected: root.displayMode === "flat"');
+    expect(processWidget).toContain('selected: root.displayMode === "tree"');
+  });
+
+  it("keeps the process table subscribed when embedded outside system monitor surfaces", () => {
+    const processWidget = source("src/features/system/sections/ProcessWidget.qml");
+
+    expect(processWidget).toContain("SharedWidgets.Ref { service: ProcessService }");
   });
 });

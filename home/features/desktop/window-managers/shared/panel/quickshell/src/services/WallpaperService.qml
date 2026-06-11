@@ -7,12 +7,12 @@ import "."
 import "ShellUtils.js" as ShellUtils
 import "../shared/WallpaperThumbnailCache.js" as WTC
 
-// WallpaperService — per-monitor wallpaper management with swww/hyprpaper support.
+// WallpaperService — per-monitor wallpaper management with awww/hyprpaper support.
 // Scans multiple well-known wallpaper directories and exposes the list of available
 // wallpapers as `availableWallpapers`.  Tracks the currently-active wallpaper for each
 // monitor in `wallpapers` (a monitorName → path map), persisted through Config.
 //
-// Wall-setter is tool-agnostic: tries swww first, then compositor-specific fallback
+// Wall-setter is tool-agnostic: tries awww first, then compositor-specific fallback
 // provided by CompositorAdapter, then swaybg. Optionally runs pywal to regenerate colours.
 
 QtObject {
@@ -250,7 +250,7 @@ QtObject {
     setWallpaper(availableWallpapers[idx].path, monitorName);
   }
 
-  // Apply a solid color background via swww.
+  // Apply a solid color background via awww.
   function setSolidColor(colorHex, monitorName, persistSetting, notifyUser) {
     var request = {
       colorHex: (colorHex || "000000ff").replace(/^#/, ""),
@@ -679,13 +679,13 @@ QtObject {
   function _buildSetterCommand(imagePath, monitorName) {
     var script = "set -u; ok=0; img=\"$1\"; mon=\"$2\"; "
          + "output_flag=''; [ -n \"$mon\" ] && output_flag=\"--outputs $mon \"; "
-         + "if command -v swww >/dev/null 2>&1; then "
-         + "  if ! swww query >/dev/null 2>&1; then "
-         + "    swww-daemon >/dev/null 2>&1 & "
-         + "    tries=0; while ! swww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
+         + "if command -v awww >/dev/null 2>&1; then "
+         + "  if ! awww query >/dev/null 2>&1; then "
+         + "    awww-daemon >/dev/null 2>&1 & "
+         + "    tries=0; while ! awww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
          + "  fi; "
-         + "  if eval swww img $output_flag '\"$img\"' --transition-type fade --transition-duration 2; then "
-         + "    echo BACKEND:swww; ok=1; "
+         + "  if eval awww img $output_flag '\"$img\"' --transition-type fade --transition-duration 2; then "
+         + "    echo BACKEND:awww; ok=1; "
          + "  fi; "
          + "fi; ";
 
@@ -704,12 +704,12 @@ QtObject {
   // Returns command array. $1 = colorHex, $2 = monitorName (may be empty)
   function _buildSolidColorCommand(colorHex, monitorName) {
     var script = "set -u; color=\"$1\"; mon=\"$2\"; "
-         + "command -v swww >/dev/null 2>&1 || { echo 'swww not installed' >&2; exit 1; }; "
-         + "if ! swww query >/dev/null 2>&1; then "
-         + "  swww-daemon >/dev/null 2>&1 & "
-         + "  tries=0; while ! swww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
+         + "command -v awww >/dev/null 2>&1 || { echo 'awww not installed' >&2; exit 1; }; "
+         + "if ! awww query >/dev/null 2>&1; then "
+         + "  awww-daemon >/dev/null 2>&1 & "
+         + "  tries=0; while ! awww query >/dev/null 2>&1 && [ \"$tries\" -lt 10 ]; do sleep 0.2; tries=$((tries + 1)); done; "
          + "fi; "
-         + "if [ -n \"$mon\" ]; then swww clear --outputs \"$mon\" \"$color\"; else swww clear \"$color\"; fi";
+         + "if [ -n \"$mon\" ]; then awww clear --outputs \"$mon\" \"$color\"; else awww clear \"$color\"; fi";
     return ["sh", "-c", script, "sh", colorHex, monitorName || ""];
   }
 }

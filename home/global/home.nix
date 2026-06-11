@@ -7,6 +7,10 @@
 }:
 
 {
+  imports = [
+    ../theme
+  ];
+
   # Nix configuration handled by system-level config in hosts/common/global/nix.nix
 
   # systemd.user.startServices = "sd-switch";
@@ -20,7 +24,8 @@
   home = {
     username = lib.mkDefault "administrator";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
-    stateVersion = lib.mkDefault "24.11";
+    stateVersion = lib.mkDefault "26.11";
+    enableNixpkgsReleaseCheck = false;
 
     sessionVariables = {
       FLAKE = lib.mkDefault "${config.home.homeDirectory}/nixos-config";
@@ -30,7 +35,6 @@
       MANPAGER = lib.mkDefault "sh -c 'col -bx | bat -l man -p'";
       BAT_THEME = lib.mkDefault "theme";
     };
-
 
     # persistence = {};
     # persistence = {
@@ -54,6 +58,9 @@
     config = {
       allowUnfree = true;
       allowUnfreePredicate = _: true;
+      permittedInsecurePackages = [
+        "electron-39.8.10"
+      ];
     };
   };
 }

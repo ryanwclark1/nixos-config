@@ -43,7 +43,8 @@ var VERTICAL_ICON_WIDGETS = [
     "pomodoro",
     "todo",
     "gameMode",
-    "nightLight"
+    "nightLight",
+    "personality"
 ];
 
 var VERTICAL_NATIVE_WIDGETS = [

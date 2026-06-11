@@ -8,7 +8,7 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMinWidth: 340; popupMaxWidth: 380; compactThreshold: 360
-  implicitHeight: compactMode ? 620 : 560
+  implicitHeight: compactMode ? 820 : 760
   title: "Audio"
 
   SharedWidgets.Ref { service: AudioService }

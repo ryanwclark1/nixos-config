@@ -24,6 +24,8 @@ Item {
   property string compactValueText: ""
   property string tooltipText: ""
   property bool isActive: false
+  property real fontScale: 1.0
+  property real iconScale: 1.0
 
   signal clicked()
 
@@ -43,7 +45,56 @@ Item {
     anchorWindow: root.anchorWindow
     isActive: root.isActive || reaperPopup.isOpen
     tooltipText: root.tooltipText
-    horizontalPadding: (root.compact || root.iconOnly) ? 5 : 8
+    horizontalPadding: (root.compact || root.iconOnly) ? 5 * root.iconScale : 8 * root.iconScale
+    fontScale: root.fontScale
+    iconScale: root.iconScale
+
+    readonly property bool showSparkline: (root.statKey === "cpuStatus" || root.statKey === "ramStatus" || root.statKey === "gpuStatus") && !root.iconOnly
+    readonly property var historyData: {
+      if (root.statKey === "cpuStatus") return SystemStatus.cpuHistory;
+      if (root.statKey === "ramStatus") return SystemStatus.ramHistory;
+      if (root.statKey === "gpuStatus") return SystemStatus.gpuHistory;
+      return [];
+    }
+
+    Canvas {
+      id: sparklineCanvas
+      anchors.fill: parent
+      anchors.topMargin: parent.height * 0.4
+      anchors.bottomMargin: 4
+      anchors.leftMargin: 12
+      anchors.rightMargin: 12
+      visible: pill.showSparkline
+      opacity: 0.4
+      renderTarget: Canvas.FramebufferObject
+
+      onPaint: {
+        var ctx = getContext("2d");
+        ctx.reset();
+        if (pill.historyData.length < 2) return;
+        
+        var w = width / (pill.historyData.length - 1);
+        var h = height;
+
+        ctx.beginPath();
+        for (var i = 0; i < pill.historyData.length; i++) {
+          var x = i * w;
+          var y = h - (pill.historyData[i] * h * 0.8);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = root.iconColor;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      Connections {
+        target: SystemStatus
+        function onCpuHistoryChanged() { if (root.statKey === "cpuStatus") sparklineCanvas.requestPaint(); }
+        function onRamHistoryChanged() { if (root.statKey === "ramStatus") sparklineCanvas.requestPaint(); }
+        function onGpuHistoryChanged() { if (root.statKey === "gpuStatus") sparklineCanvas.requestPaint(); }
+      }
+    }
 
     onClicked: root.clicked()
     onSecondaryClicked: {
@@ -126,7 +177,7 @@ Item {
 
       SharedWidgets.NumericText {
         text: root.compactValueText
-        font.pixelSize: Appearance.fontSizeXS
+        font.pixelSize: Appearance.fontSizeXXS * root.fontScale
         anchors.horizontalCenter: parent.horizontalCenter
       }
     }
@@ -135,7 +186,7 @@ Item {
   Component {
     id: wideContent
     Row {
-      spacing: Appearance.spacingS
+      spacing: Appearance.spacingS * root.iconScale
 
       Loader {
         anchors.verticalCenter: parent.verticalCenter
@@ -144,16 +195,16 @@ Item {
 
       SharedWidgets.NumericText {
         text: root.label + " " + root.valueText
-        font.pixelSize: Appearance.fontSizeMedium
+        font.pixelSize: Appearance.fontSizeSmall * root.fontScale
         anchors.verticalCenter: parent.verticalCenter
       }
     }
   }
 
-  Component { id: _iconSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeMedium } }
-  Component { id: _iconNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
-  Component { id: _compactSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeMedium } }
-  Component { id: _compactNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeMedium; font.family: Appearance.fontMono } }
-  Component { id: _wideSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeLarge } }
-  Component { id: _wideNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeLarge; font.family: Appearance.fontMono } }
+  Component { id: _iconSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeLarge * root.iconScale } }
+  Component { id: _iconNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeLarge * root.iconScale; font.family: Appearance.fontMono } }
+  Component { id: _compactSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeLarge * root.iconScale } }
+  Component { id: _compactNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeLarge * root.iconScale; font.family: Appearance.fontMono } }
+  Component { id: _wideSvg; SharedWidgets.SvgIcon { source: root.icon; color: root.iconColor; size: Appearance.fontSizeIcon * root.iconScale } }
+  Component { id: _wideNerd; Text { text: root.icon; color: root.iconColor; font.pixelSize: Appearance.fontSizeIcon * root.iconScale; font.family: Appearance.fontMono } }
 }

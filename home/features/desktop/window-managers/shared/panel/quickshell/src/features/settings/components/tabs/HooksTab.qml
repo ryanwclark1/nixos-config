@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import "../../../../services"
+import "../../../../services/ShellUtils.js" as SU
 import "../../../../services/IconHelpers.js" as IconHelpers
 import "../../../../widgets" as SharedWidgets
 import ".."
@@ -141,18 +142,35 @@ Item {
 
                         Text {
                             Layout.fillWidth: true
-                            text: "Open ~/.config/quickshell/hooks in the default file manager."
+                            text: "Open ~/.config/quickshell/hooks in your file manager or terminal."
                             color: Colors.textSecondary
                             font.pixelSize: Appearance.fontSizeSmall
                             wrapMode: Text.WordWrap
                         }
                     }
 
-                    SettingsActionButton {
-                        label: "Open"
-                        iconName: "folder.svg"
-                        compact: true
-                        onClicked: Quickshell.execDetached(["xdg-open", HookService.hookDir])
+                    RowLayout {
+                        spacing: Appearance.spacingS
+
+                        SettingsActionButton {
+                            label: "Open"
+                            iconName: "folder.svg"
+                            compact: true
+                            onClicked: {
+                                Quickshell.execDetached(["xdg-open", HookService.hookDir]);
+                                ToastService.showSuccess("Opening Directory", "Hooks folder opening in file manager");
+                            }
+                        }
+
+                        SettingsActionButton {
+                            label: "Terminal"
+                            iconName: "terminal.svg"
+                            compact: true
+                            onClicked: {
+                                Quickshell.execDetached(SU.terminalCommand("cd " + SU.shellQuote(HookService.hookDir) + " && exec bash"));
+                                ToastService.showSuccess("Opening Terminal", "Hooks folder opening in terminal");
+                            }
+                        }
                     }
                 }
             }

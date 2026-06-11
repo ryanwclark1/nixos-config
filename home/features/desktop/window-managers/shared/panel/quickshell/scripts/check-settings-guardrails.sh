@@ -79,9 +79,9 @@ main() {
   require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'dragReorderEnabled:\s*true' "bar widget drag enablement"
   require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'SettingsReorderRow' "bar widget shared reorder row"
   require_pattern "${config_root}/features/settings/components/tabs/BarWidgetsTab.qml" 'SettingsReorderButtons' "bar widget reorder fallback buttons"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'SettingsReorderRow' "launcher web shared reorder row"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'SettingsReorderButtons' "launcher web reorder fallback buttons"
-  require_pattern "${config_root}/features/settings/components/tabs/ShellLauncherSection.qml" 'currentWebProviderDropIndex' "shell-core tab reorder math helper usage"
+  require_pattern "${config_root}/features/settings/components/tabs/LauncherWebSection.qml" 'SettingsReorderRow' "launcher web shared reorder row"
+  require_pattern "${config_root}/features/settings/components/tabs/LauncherWebSection.qml" 'SettingsReorderButtons' "launcher web reorder fallback buttons"
+  require_pattern "${config_root}/features/settings/components/tabs/LauncherWebSection.qml" 'currentWebProviderDropIndex' "shell-core tab reorder math helper usage"
   require_pattern "${script_dir}/check-bar-widgets-first-open.sh" 'check-settings-responsive\.sh"\s+--id "\$\{instance_id\}"\s+--skip-reload' "bar widgets first-open settings smoke instance-id binding"
 
   if (( skip_responsive == 0 )); then

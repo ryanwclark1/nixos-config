@@ -3,9 +3,29 @@
   ...
 }:
 
+let
+  hypridleLauncher = pkgs.writeShellScript "hypridle-launcher" ''
+    set -eu
+
+    state_dir="''${XDG_STATE_HOME:-$HOME/.local/state}/quickshell"
+    runtime_conf="$state_dir/hypridle.conf"
+    template_conf="$HOME/.config/hypr/hypridle.conf"
+
+    mkdir -p "$state_dir"
+
+    if [ ! -s "$runtime_conf" ]; then
+      cp "$template_conf" "$runtime_conf"
+    fi
+
+    exec ${pkgs.hypridle}/bin/hypridle -c "$runtime_conf"
+  '';
+in
 {
   # Install hypridle package
-  home.packages = [ pkgs.hypridle ];
+  home.packages = [
+    pkgs.brightnessctl
+    pkgs.hypridle
+  ];
 
   # Copy hypridle configuration file
   home.file.".config/hypr/hypridle.conf".source = ./hypridle.conf;
@@ -19,7 +39,7 @@
     };
 
     Service = {
-      ExecStart = "${pkgs.hypridle}/bin/hypridle";
+      ExecStart = "${hypridleLauncher}";
       Restart = "on-failure";
       RestartSec = 1;
     };

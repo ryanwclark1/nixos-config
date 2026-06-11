@@ -45,12 +45,12 @@ SharedWidgets.BarPill {
     }
 
     Row {
-        spacing: Appearance.spacingXS
+        spacing: Appearance.spacingXS * root.iconScale
 
         SharedWidgets.SvgIcon {
             source: "print.svg"
-            color: PrinterService.activeJobs > 0 ? Colors.warning : Colors.text
-            size: Appearance.fontSizeLarge
+            color: PrinterService.activeJobs > 0 ? Colors.warning : Colors.primary
+            size: Appearance.fontSizeIcon * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
             Behavior on color {
                 enabled: !Colors.isTransitioning
@@ -62,9 +62,9 @@ SharedWidgets.BarPill {
 
         Rectangle {
             visible: PrinterService.activeJobs > 0 && !root.iconOnly && root.badgeStyle !== "off"
-            width: root.badgeStyle === "count" ? printerJobsBadge.contentWidth + 8 : 8
-            height: 16
-            radius: root.badgeStyle === "count" ? Appearance.radiusXS : 4
+            width: root.badgeStyle === "count" ? (printerJobsBadge.contentWidth + 8 * root.iconScale) : 8 * root.iconScale
+            height: 16 * root.iconScale
+            radius: root.badgeStyle === "count" ? Appearance.radiusXS * root.iconScale : 4 * root.iconScale
             color: Colors.withAlpha(Colors.warning, 0.20)
             anchors.verticalCenter: parent.verticalCenter
 
@@ -73,7 +73,7 @@ SharedWidgets.BarPill {
                 anchors.centerIn: parent
                 text: PrinterService.activeJobs
                 color: Colors.warning
-                font.pixelSize: Appearance.fontSizeXS
+                font.pixelSize: Appearance.fontSizeXS * root.fontScale
                 font.weight: Font.Bold
                 visible: root.badgeStyle === "count"
             }

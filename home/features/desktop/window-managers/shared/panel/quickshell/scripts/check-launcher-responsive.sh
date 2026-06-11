@@ -12,6 +12,7 @@ launcher_home_qml="${script_dir}/../src/launcher/LauncherHome.qml"
 launcher_diag_js="${script_dir}/../src/launcher/LauncherDiagnostics.js"
 launcher_metrics_box_qml="${script_dir}/../src/launcher/LauncherMetricsBox.qml"
 launcher_settings_qml="${script_dir}/../src/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_web_settings_qml="${script_dir}/../src/features/settings/components/tabs/LauncherWebSection.qml"
 expected_config="$(realpath "${script_dir}/../src/shell.qml" 2>/dev/null || printf '%s' "${script_dir}/../src/shell.qml")"
 repo_shell_log="/tmp/quickshell-repo-launcher-responsive.log"
 
@@ -89,8 +90,12 @@ require_literal() {
   local file="$1"
   local needle="$2"
   local label="$3"
+  local alt_file="${4:-}"
   if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
+    if [[ -n "${alt_file}" ]] && rg -n -F -- "$needle" "${alt_file}" >/dev/null 2>&1; then
+        return 0
+    fi
+    violations+=("${label} missing in ${file}${alt_file:+ or ${alt_file}}")
   fi
 }
 
@@ -470,9 +475,9 @@ static_checks() {
   require_literal "$launcher_qml" 'function escapeActionStateObject() {' "escape action payload helper"
   require_literal "$launcher_qml" 'diagnosticSetViewport(0, 0);' "diagnostic viewport reset"
   require_literal "$launcher_home_qml" 'readonly property bool showCategoryFilters: root.showCategoryFiltersSection && root.launcher.showLauncherHome && root.launcher.drunCategoryFiltersEnabled && root.launcher.mode === "drun" && root.launcher.drunCategoryOptions.length > 1' "drun category chip visibility guard"
-  require_literal "$launcher_settings_qml" 'minimumHeight: root.compactMode ? 76 : 44' "settings compact row height"
-  require_literal "$launcher_settings_qml" 'elide: root.compactMode ? Text.ElideNone : Text.ElideRight' "settings compact label wrapping"
-  require_literal "$launcher_settings_qml" 'wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap' "settings compact wrap mode"
+  require_literal "$launcher_settings_qml" 'minimumHeight: root.compactMode ? 76 : 44' "settings compact row height" "$launcher_web_settings_qml"
+  require_literal "$launcher_settings_qml" 'elide: root.compactMode ? Text.ElideNone : Text.ElideRight' "settings compact label wrapping" "$launcher_web_settings_qml"
+  require_literal "$launcher_settings_qml" 'wrapMode: root.compactMode ? Text.WordWrap : Text.NoWrap' "settings compact wrap mode" "$launcher_web_settings_qml"
 
   if (( ${#violations[@]} > 0 )); then
     local violation

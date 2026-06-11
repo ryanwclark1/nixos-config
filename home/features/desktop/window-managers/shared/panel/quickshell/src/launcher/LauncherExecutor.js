@@ -199,7 +199,7 @@ function executeSelection(mode, item, actions) {
         if (actions.setWallpaper) {
             actions.setWallpaper(item.path, "");
         } else {
-            actions.execDetached(["swww", "img", item.path, "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "1.5"]);
+            actions.execDetached(["awww", "img", item.path, "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "1.5"]);
         }
         actions.execDetached(["wallust", "run", item.path]);
         actions.close();

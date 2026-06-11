@@ -7,7 +7,7 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMinWidth: 300; popupMaxWidth: 320; compactThreshold: 310
-  implicitHeight: compactMode ? 290 : 260
+  implicitHeight: compactMode ? 490 : 460
   title: "Privacy"
 
   SharedWidgets.Ref { service: PrivacyService }

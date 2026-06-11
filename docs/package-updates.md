@@ -25,7 +25,7 @@ make update-packages
 ### Update a Specific Package
 ```bash
 ./scripts/update-packages.sh update code-cursor
-./scripts/update-packages.sh update cursor-cli gemini-cli
+./scripts/update-packages.sh update cursor-cli antigravity-cli
 ```
 
 ## Available Packages
@@ -34,7 +34,7 @@ The following packages are managed with custom versions:
 
 1. **code-cursor** - AI-powered code editor (Cursor IDE)
 2. **cursor-cli** - Cursor CLI tool
-3. **gemini-cli** - Google Gemini CLI
+3. **antigravity-cli** - Google Antigravity CLI (successor to Gemini CLI)
 4. **claude-code** - Anthropic Claude Code CLI (native binary default)
 5. **claude-code-npm** - Anthropic Claude Code CLI (npm fallback)
 6. **codex** - OpenAI Codex CLI
@@ -93,7 +93,7 @@ After updating packages, you may need to:
    git diff pkgs/<package-name>/
    ```
 
-2. **For npm packages** (gemini-cli, claude-code-npm): Update `npmDepsHash`
+2. **For binary packages** (antigravity-cli, claude-code-bin): Update hashes in `default.nix`
    ```bash
    nix build .#<package-name>
    # Copy the hash from the error message and update default.nix
@@ -170,9 +170,10 @@ If a package fails to build after updating:
 - Fetches from Cursor's install page
 - Version format: `0-unstable-YYYY-MM-DD`
 
-### gemini-cli
-- Requires manual `npmDepsHash` update after version bump
-- Fetches from GitHub releases
+### antigravity-cli
+- Successor to Gemini CLI
+- Fetches from Google's release manifest
+- Native Go binary (no longer npm-based)
 
 ### claude-code
 - Default package uses Anthropic's native binary release manifest

@@ -9,7 +9,11 @@
   useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
   # Get all build dependencies needed by generic.nix
   coreutils,
+  gawk,
+  getconf,
   gnugrep,
+  gnused,
+  jq,
   copyDesktopItems,
   makeDesktopItem,
   unzip,
@@ -40,6 +44,7 @@
   openssl,
   webkitgtk_4_1,
   ripgrep,
+  which,
   asar,
   bash,
 }:
@@ -68,11 +73,11 @@ let
   # Second argument set: package-specific arguments
 in
 (genericFunction {
-  inherit stdenv lib coreutils gnugrep copyDesktopItems makeDesktopItem unzip libsecret;
+  inherit stdenv lib coreutils gawk getconf gnugrep gnused jq copyDesktopItems makeDesktopItem unzip libsecret;
   inherit buildPackages at-spi2-atk autoPatchelfHook buildFHSEnv;
   inherit alsa-lib libgbm nss nspr libxrandr libxfixes libxext libxdamage libxcomposite;
   inherit libx11 libxkbfile libxcb systemdLibs fontconfig imagemagick libdbusmenu;
-  inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep asar bash;
+  inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep which asar bash;
 } {
   inherit useVSCodeRipgrep version vscodeVersion;
   commandLineArgs = finalCommandLineArgs;
@@ -129,6 +134,15 @@ in
   (oldAttrs: {
     nativeBuildInputs =
       (oldAttrs.nativeBuildInputs or [ ]) ++ lib.optionals hostPlatform.isDarwin [ undmg ];
+
+    # Cursor bundles both glibc and musl variants of some native addons.
+    # The musl binaries are optional on glibc systems, so don't make
+    # autoPatchelf fail the build trying to resolve musl libc for them.
+    autoPatchelfIgnoreMissingDeps =
+      (oldAttrs.autoPatchelfIgnoreMissingDeps or [ ])
+      ++ lib.optionals (hostPlatform.isLinux && hostPlatform.system == "x86_64-linux") [
+        "libc.musl-x86_64.so.1"
+      ];
 
     passthru = (oldAttrs.passthru or { }) // {
       inherit sources;

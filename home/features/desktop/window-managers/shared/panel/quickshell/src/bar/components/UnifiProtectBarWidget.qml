@@ -9,7 +9,7 @@ SharedWidgets.BarPill {
     property bool vertical: false
     signal triggerRequested(var triggerItem)
 
-    visible: UnifiProtectService.configured
+    visible: true
     tooltipText: {
         if (UnifiProtectService.status === "unconfigured") return "UniFi Protect — not configured";
         if (UnifiProtectService.status === "error") return "UniFi Protect — " + UnifiProtectService.errorMessage;
@@ -24,18 +24,18 @@ SharedWidgets.BarPill {
         },
         {
             label: "Open UniFi Protect Menu",
-            icon: "unifi-protect-symbolic.svg",
+            icon: "brands/unifi-protect-symbolic.svg",
             action: () => root.triggerRequested(root)
         }
     ]
 
     Row {
-        spacing: Appearance.spacingS
+        spacing: Appearance.spacingS * root.iconScale
 
         SharedWidgets.SvgIcon {
-            source: "unifi-protect-symbolic.svg"
-            color: UnifiProtectService.status === "ready" ? Colors.text : Colors.textDisabled
-            size: Appearance.fontSizeLarge
+            source: "brands/unifi-protect-symbolic.svg"
+            color: UnifiProtectService.status === "ready" ? Colors.primary : Colors.textDisabled
+            size: Appearance.fontSizeIcon * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -43,7 +43,7 @@ SharedWidgets.BarPill {
             visible: PanelHelpers.isSummaryWidgetFull(widgetInstance, vertical) && UnifiProtectService.status === "ready"
             text: UnifiProtectService.onlineCameras + "/" + UnifiProtectService.totalCameras
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

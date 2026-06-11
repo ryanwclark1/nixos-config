@@ -21,11 +21,31 @@ if [[ -z "$LATEST_GENERIC" ]] || echo "$LATEST_GENERIC" | grep -q "404: Not Foun
 fi
 
 # Calculate hashes
-CURRENT_HASH=$(sha256sum "$GENERIC_NIX" 2>/dev/null | cut -d' ' -f1 || echo "")
+CHECK_ONLY=false
+for arg in "$@"; do
+  case "$arg" in
+    --check-only)
+      CHECK_ONLY=true
+      ;;
+  esac
+done
+
+UPSTREAM_HASH_FILE="$SCRIPT_DIR/.upstream-hash"
+SAVED_UPSTREAM_HASH=$(cat "$UPSTREAM_HASH_FILE" 2>/dev/null || echo "")
 NEW_HASH=$(echo "$LATEST_GENERIC" | sha256sum | cut -d' ' -f1)
 
-if [[ "$CURRENT_HASH" == "$NEW_HASH" ]]; then
-  echo "Already up to date: vscode-generic/generic.nix (hash: $CURRENT_HASH)"
+if [[ "$CHECK_ONLY" == "true" ]]; then
+  if [[ "$SAVED_UPSTREAM_HASH" == "$NEW_HASH" ]]; then
+    echo "Already up to date: vscode-generic/generic.nix is based on upstream hash $NEW_HASH"
+    exit 0
+  else
+    echo "Update available: vscode-generic/generic.nix (upstream hash changed from $SAVED_UPSTREAM_HASH to $NEW_HASH)"
+    exit 0
+  fi
+fi
+
+if [[ "$SAVED_UPSTREAM_HASH" == "$NEW_HASH" ]]; then
+  echo "Already up to date: vscode-generic/generic.nix (upstream hash: $NEW_HASH)"
   exit 0
 fi
 
@@ -37,6 +57,7 @@ if [[ -f "$GENERIC_NIX" ]]; then
 fi
 
 echo "$LATEST_GENERIC" > "$GENERIC_NIX"
+echo "$NEW_HASH" > "$UPSTREAM_HASH_FILE"
 
 # Ensure default.nix exists and is correct
 if [[ ! -f "$DEFAULT_NIX" ]] || ! grep -q "callPackage ./generic.nix" "$DEFAULT_NIX"; then
@@ -58,7 +79,7 @@ fi
 echo "✅ Updated vscode-generic/generic.nix"
 echo ""
 echo "Changes:"
-echo "  Hash: $CURRENT_HASH -> $NEW_HASH"
+echo "  Hash: $SAVED_UPSTREAM_HASH -> $NEW_HASH"
 echo ""
 echo "Please review the changes:"
 echo "  git diff $GENERIC_NIX"

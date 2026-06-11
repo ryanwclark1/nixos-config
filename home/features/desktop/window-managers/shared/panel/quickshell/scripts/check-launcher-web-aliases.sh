@@ -10,18 +10,11 @@ config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 mode_data_js="${config_dir}/launcher/LauncherModeData.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_web_settings_qml="${config_dir}/features/settings/components/tabs/LauncherWebSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 
 violations=()
-
-require_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
-  fi
-}
+source "${script_dir}/check-helpers.sh"
 
 # Config: schema and persistence.
 require_literal "$config_qml" 'property var launcherWebAliases: ({' "launcherWebAliases property"
@@ -41,17 +34,11 @@ require_literal "$launcher_qml" 'function parseWebQuery(text) {' "parseWebQuery 
 require_literal "$launcher_content_panel_qml" 'aliasHint: launcher.webAliasHint' "web alias hint shown in UI"
 
 # Settings: editable alias tokens and reset/default behavior.
-require_literal "$launcher_settings_qml" 'readonly property var webAliasDefaults: ({' "settings alias defaults"
+require_literal "$launcher_settings_qml" 'readonly property var webAliasDefaults: ({' "settings alias defaults" "$launcher_web_settings_qml"
 require_literal "$launcher_helpers_js" 'function parseAliasTokens(text, providerKey) {' "alias token parser"
 require_literal "$launcher_helpers_js" 'if (!/^[a-z0-9][a-z0-9_-]{0,15}$/.test(token))' "settings alias token validation"
 require_literal "$launcher_helpers_js" 'Config.launcherWebAliases = next;' "settings alias update binding"
 require_literal "$launcher_helpers_js" 'Config.launcherWebAliases = defaultWebAliasesCopy(webAliasDefaults);' "settings alias reset binding"
-require_literal "$launcher_settings_qml" 'title: "Web Aliases"' "settings alias section label"
+require_literal "$launcher_settings_qml" 'title: "Web Aliases"' "settings alias section label" "$launcher_web_settings_qml"
 
-if (( ${#violations[@]} > 0 )); then
-  printf '%s\n' "Launcher web alias check failed:" >&2
-  printf '  - %s\n' "${violations[@]}" >&2
-  exit 1
-fi
-
-printf '%s\n' "Launcher web alias check passed."
+report_violations "Launcher web alias check"

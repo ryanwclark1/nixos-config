@@ -12,7 +12,7 @@ BasePopupMenu {
   id: root
   popupMaxWidth: 440
   compactThreshold: 360
-  implicitHeight: compactMode ? 560 : 600
+  implicitHeight: compactMode ? 760 : 800
   title: "Docker"
   subtitle: ServiceUnitService.dockerBusy ? "Refreshing containers..." : "Manage containers and images"
   contentSpacing: Appearance.spacingM

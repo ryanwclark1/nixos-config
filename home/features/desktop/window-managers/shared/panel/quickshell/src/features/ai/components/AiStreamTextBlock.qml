@@ -8,6 +8,7 @@ Rectangle {
     id: root
     readonly property var blockData: parent ? parent.modelData : null
     readonly property int blockIndex: parent ? parent.index : 0
+    readonly property int _cursorBlinkMs: 530
     width: parent ? parent.width : 0
     height: streamTextBlockEdit.implicitHeight + Appearance.spacingM * 2
     radius: Appearance.radiusMedium
@@ -60,11 +61,9 @@ Rectangle {
             }
         }
 
-        readonly property int _cursorBlinkMs: 530
-
         Timer {
             id: cursorBlink
-            interval: _cursorBlinkMs
+            interval: root._cursorBlinkMs
             repeat: true
             running: AiService.isStreaming
             property bool cursorVisible: true

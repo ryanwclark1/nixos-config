@@ -16,7 +16,7 @@ describe("ClipboardHistoryService contracts", () => {
     expect(source).toContain("ClipboardDisplay.imagePreviewExtension");
     expect(source).toContain('mt=$(file -Lb --mime-type');
     expect(source).toContain("image/png|image/jpeg|image/webp|image/gif|image/bmp");
-    expect(source).toContain("property var _parsedMap: ({})");
-    expect(source).toContain("root._decodedImages = Object.assign({}, _parsedMap);");
+    expect(source).toContain("var next = {};");
+    expect(source).toContain("root._decodedImages = Object.assign({}, next);");
   });
 });

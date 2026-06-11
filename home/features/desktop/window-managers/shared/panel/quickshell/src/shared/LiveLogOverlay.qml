@@ -50,6 +50,15 @@ Rectangle {
             }
             Item { Layout.fillWidth: true }
             IconButton {
+                icon: "copy.svg"
+                size: 28; iconSize: 16
+                tooltipText: "Copy All"
+                onClicked: {
+                    Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | wl-copy", "sh", logText.text]);
+                    ToastService.showSuccess("Copied", "Log content copied to clipboard");
+                }
+            }
+            IconButton {
                 icon: "dismiss.svg"
                 size: 28; iconSize: 16
                 tooltipText: "Close"
@@ -58,11 +67,12 @@ Rectangle {
         }
 
         Rectangle {
+            id: textContainer
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: Colors.withAlpha(Colors.background, 0.4)
             radius: Appearance.radiusSmall
-            border.color: Colors.border
+            border.color: logText.activeFocus ? Colors.accent : Colors.border
             border.width: 1
             clip: true
 
@@ -74,14 +84,23 @@ Rectangle {
                 contentWidth: width
                 flickableDirection: Flickable.VerticalFlick
                 
-                Text {
+                TextEdit {
                     id: logText
                     width: parent.width
                     color: Colors.textSecondary
                     font.family: Appearance.fontMono
                     font.pixelSize: Appearance.fontSizeXS
-                    wrapMode: Text.WrapAnywhere
+                    wrapMode: TextEdit.WrapAnywhere
                     text: ""
+                    readOnly: true
+                    selectByMouse: true
+                    selectionColor: Colors.accent
+                    selectedTextColor: Colors.background
+                    activeFocusOnTab: true
+                    
+                    Accessible.role: Accessible.EditableText
+                    Accessible.name: root.title
+                    Accessible.readOnly: true
                     
                     onTextChanged: {
                         // Auto-scroll to bottom

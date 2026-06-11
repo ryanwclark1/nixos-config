@@ -11,7 +11,7 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMaxWidth: 420; compactThreshold: 390
-  implicitHeight: compactMode ? 600 : 560
+  implicitHeight: compactMode ? 840 : 800
   title: "Clipboard"
   contentSpacing: Appearance.spacingM
   focusOnOpen: true
@@ -55,6 +55,12 @@ BasePopupMenu {
     if (!item)
       return;
     ClipboardHistoryService.deleteEntry(item.id);
+  }
+
+  function openClipboardImage(path) {
+    if (!path)
+      return;
+    Quickshell.execDetached(["xdg-open", path]);
   }
 
   readonly property var filteredItemsResult: {
@@ -146,7 +152,7 @@ BasePopupMenu {
           required property var modelData
           Layout.fillWidth: true
           readonly property bool isSelected: clipMouse.containsMouse || root.selectedIndex === index
-          implicitHeight: (clipCard.isImage && clipCard.imageSrc !== "") ? 140 : clipContentCol.implicitHeight + Appearance.spacingM * 2
+          implicitHeight: clipContentCol.implicitHeight + Appearance.spacingM * 2
           radius: Appearance.radiusMedium
           color: isSelected ? Colors.primarySubtle : Colors.cardSurface
           border.color: isSelected ? Colors.withAlpha(Colors.primary, 0.4) : Colors.border
@@ -180,7 +186,7 @@ BasePopupMenu {
             // Image preview
             Rectangle {
               Layout.fillWidth: true
-              Layout.preferredHeight: 100
+              Layout.preferredHeight: 120
               radius: Appearance.radiusXS
               color: Colors.withAlpha(Colors.text, 0.04)
               visible: clipCard.isImage && clipCard.imageSrc !== ""
@@ -236,16 +242,32 @@ BasePopupMenu {
                 color: Colors.textSecondary
                 font.pixelSize: Appearance.fontSizeXXS
                 Layout.fillWidth: true
+                verticalAlignment: Text.AlignVCenter
               }
 
               SharedWidgets.IconButton {
+                id: openBtn
+                icon: "open.svg"
+                size: 24
+                visible: clipCard.isImage && clipCard.imageSrc !== ""
+                iconSize: Appearance.fontSizeSmall
+                iconColor: Colors.textDisabled
+                stateColor: Colors.primary
+                tooltipText: "Open in viewer"
+                onClicked: root.openClipboardImage(clipCard.imageSrc)
+                z: 10
+              }
+
+              SharedWidgets.IconButton {
+                id: deleteBtn
                 icon: "delete.svg"
-                size: 22
+                size: 24
                 iconSize: Appearance.fontSizeSmall
                 iconColor: Colors.textDisabled
                 stateColor: Colors.error
                 tooltipText: "Delete"
                 onClicked: root.deleteClipboardItem(modelData)
+                z: 10
               }
             }
           }
@@ -253,11 +275,15 @@ BasePopupMenu {
           MouseArea {
             id: clipMouse
             anchors.fill: parent
-            anchors.rightMargin: 32
             hoverEnabled: true
+            propagateComposedEvents: true
             cursorShape: Qt.PointingHandCursor
             onEntered: root.selectedIndex = index
             onClicked: (mouse) => {
+              if (deleteBtn.containsMouse || (openBtn && openBtn.containsMouse)) {
+                mouse.accepted = false;
+                return;
+              }
               clipStateLayer.burst(mouse.x, mouse.y);
               root.selectedIndex = index;
               root.activateClipboardItem(modelData);

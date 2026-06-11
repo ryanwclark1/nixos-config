@@ -143,7 +143,7 @@ let
           foreground: base0B   # green
 
     media:
-      foreground: base0F       # flamingo
+      foreground: base0F
 
     office:
       foreground: base08       # red

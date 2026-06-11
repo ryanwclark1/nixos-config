@@ -1,5 +1,6 @@
 # Docs: https://stylix.danth.me/
 {
+  config,
   lib,
   pkgs,
   ...
@@ -30,21 +31,21 @@ in
     fonts = {
       serif = {
         package = lib.mkDefault pkgs.dejavu_fonts;
-        name = lib.mkDefault "DejaVu Serif";
+        name = lib.mkDefault config.theme.fonts.serif;
       };
       sansSerif = {
         package = lib.mkDefault pkgs.dejavu_fonts;
-        name = lib.mkDefault "DejaVu Sans";
+        name = lib.mkDefault config.theme.fonts.sansSerif;
       };
       monospace = {
         # Package provided by system-level fonts
         package = lib.mkDefault pkgs.nerd-fonts.jetbrains-mono;
-        name = lib.mkDefault "JetBrainsMono Nerd Font";
+        name = lib.mkDefault config.theme.fonts.monospace;
       };
       emoji = {
         # Package provided by fonts/default.nix
         package = lib.mkDefault pkgs.noto-fonts-color-emoji;
-        name = lib.mkDefault "Noto Color Emoji";
+        name = lib.mkDefault config.theme.fonts.emoji;
       };
       sizes = {
         applications = lib.mkDefault 12;
@@ -91,7 +92,7 @@ in
       neovim = {
         enable = lib.mkDefault false;
         transparentBackground = {
-          main =lib.mkDefault  false;
+          main = lib.mkDefault false;
           signColumn = lib.mkDefault false;
         };
       };

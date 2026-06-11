@@ -4,7 +4,6 @@
   rustPlatform,
   fetchFromGitHub,
   fetchurl,
-  installShellFiles,
   clang,
   cmake,
   gitMinimal,
@@ -14,30 +13,28 @@
   nix-update-script,
   pkg-config,
   openssl,
+  playwright,
   ripgrep,
-  versionCheckHook,
-  installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "codex";
-  version = "0.117.0";
+  version = "0.139.0";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
     tag = "rust-v${finalAttrs.version}";
-    hash = "sha256-Ezd8KaEMVeJPKC74CSPhecPLZghm0v6JkQTCPhr/2nY=";
+    hash = "sha256-XjzlkBUkBey+P3tFLDYB3ae5oseUfW5tmzhLzqlqj2E=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
 
-  cargoHash = "sha256-YbE6SQn8zWQUfSpEO2IynXzJhLl+AHc6sfh7E6PxYJk=";
+  cargoHash = "sha256-8mN4OTRJvt2mBYHQXZS55PSOChLqEIiXwPu2y+2MZ9o=";
 
   nativeBuildInputs = [
     clang
     cmake
     gitMinimal
-    installShellFiles
     makeBinaryWrapper
     pkg-config
   ];
@@ -82,21 +79,17 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # the future once this software stabilizes.
   doCheck = false;
 
-  postInstall = lib.optionalString installShellCompletions ''
-    installShellCompletion --cmd codex \
-      --bash <($out/bin/codex completion bash) \
-      --fish <($out/bin/codex completion fish) \
-      --zsh <($out/bin/codex completion zsh)
-  '';
-
   postFixup = ''
     wrapProgram $out/bin/codex \
-      --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          ripgrep
+          playwright
+        ]
+      } \
+      --set PLAYWRIGHT_BROWSERS_PATH ${lib.getLib playwright.browsers} \
       --set DISABLE_AUTOUPDATER 1
   '';
-
-  doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru = {
     updateScript = nix-update-script {

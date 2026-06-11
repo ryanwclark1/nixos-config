@@ -171,9 +171,9 @@ QtObject {
     }
 
     function _updateInternalBrightness() {
-        if (!_hasInternalSysfs || !_intBrightFile.text || !_intMaxFile.text) return;
-        var curr = parseFloat(_intBrightFile.text) || 0;
-        var max = parseFloat(_intMaxFile.text) || 100;
+        if (!_hasInternalSysfs || !_intBrightFile.text() || !_intMaxFile.text()) return;
+        var curr = parseFloat(_intBrightFile.text()) || 0;
+        var max = parseFloat(_intMaxFile.text()) || 100;
         var brightness = max > 0 ? Colors.clamp01(curr / max) : 0;
         var updated = [];
         for (var i = 0; i < monitors.length; i++) {
@@ -197,9 +197,9 @@ QtObject {
     }
 
     function _updateKbdBrightness() {
-        if (!kbdDevice.available || !_kbdBrightFile.text || !_kbdMaxFile.text) return;
-        var curr = parseFloat(_kbdBrightFile.text) || 0;
-        var max = parseFloat(_kbdMaxFile.text) || 0;
+        if (!kbdDevice.available || !_kbdBrightFile.text() || !_kbdMaxFile.text()) return;
+        var curr = parseFloat(_kbdBrightFile.text()) || 0;
+        var max = parseFloat(_kbdMaxFile.text()) || 0;
         if (max > 0)
             kbdDevice = { name: kbdDevice.name, brightness: Colors.clamp01(curr / max), maxSteps: max, available: true };
     }

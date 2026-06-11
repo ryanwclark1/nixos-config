@@ -122,7 +122,7 @@ function sourceForTab(tabId, componentsByTab) {
 
 describe("SettingsSearchIndex", () => {
   it("references supported entry types without duplicates", () => {
-    const allowedTypes = new Set(["toggle", "slider", "mode", "select", "text", "color"]);
+    const allowedTypes = new Set(["toggle", "slider", "mode", "select", "text", "color", "password"]);
     const unsupportedTypes = [...new Set(entries.map((entry) => entry.type).filter((type) => !allowedTypes.has(type)))];
     const duplicates = [];
     const seen = new Set();

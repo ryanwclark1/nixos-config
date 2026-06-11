@@ -706,13 +706,8 @@ QtObject {
     if (section === destinationSection) {
       if (toIndex < 0 || toIndex > sourceWidgets.length) return false;
 
-      var originalLength = sourceWidgets.length;
       var sameSectionItem = sourceWidgets.splice(fromIndex, 1)[0];
       var insertionIndex = Math.min(toIndex, sourceWidgets.length);
-      if (fromIndex < toIndex && toIndex < originalLength)
-        insertionIndex -= 1;
-      if (insertionIndex < 0)
-        insertionIndex = 0;
 
       if (fromIndex === insertionIndex) return true;
       sourceWidgets.splice(insertionIndex, 0, sameSectionItem);

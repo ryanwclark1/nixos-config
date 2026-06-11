@@ -9,7 +9,7 @@ SharedWidgets.BarPill {
     property bool vertical: false
     signal triggerRequested(var triggerItem)
 
-    visible: UnifiNetworkService.configured
+    visible: true
     tooltipText: {
         if (UnifiNetworkService.status === "unconfigured") return "UniFi Network — not configured";
         if (UnifiNetworkService.status === "error") return "UniFi Network — " + UnifiNetworkService.errorMessage;
@@ -24,18 +24,18 @@ SharedWidgets.BarPill {
         },
         {
             label: "Open UniFi Network Menu",
-            icon: "ubiquiti-symbolic.svg",
+            icon: "brands/ubiquiti-symbolic.svg",
             action: () => root.triggerRequested(root)
         }
     ]
 
     Row {
-        spacing: Appearance.spacingS
+        spacing: Appearance.spacingS * root.iconScale
 
         SharedWidgets.SvgIcon {
-            source: "ubiquiti-symbolic.svg"
-            color: UnifiNetworkService.status === "ready" ? Colors.text : Colors.textDisabled
-            size: Appearance.fontSizeLarge
+            source: "brands/ubiquiti-symbolic.svg"
+            color: UnifiNetworkService.status === "ready" ? Colors.primary : Colors.textDisabled
+            size: Appearance.fontSizeIcon * root.iconScale
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -43,7 +43,7 @@ SharedWidgets.BarPill {
             visible: PanelHelpers.isSummaryWidgetFull(widgetInstance, vertical) && UnifiNetworkService.status === "ready"
             text: UnifiNetworkService.onlineDevices + "/" + UnifiNetworkService.totalDevices
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             anchors.verticalCenter: parent.verticalCenter
         }

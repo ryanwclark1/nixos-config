@@ -10,6 +10,7 @@ QtObject {
     // ── Public state ─────────────────────────────
     property string lastScreenshotPath: ""
     property string lastRegionPath: ""
+    property string lastAnalyzePath: ""
     property bool capturing: false
     property string _captureMode: ""
     property string _captureMonitor: ""
@@ -19,6 +20,7 @@ QtObject {
     property bool _captureExitObserved: false
     property bool _captureStdoutFinished: false
     property bool _captureStderrFinished: false
+    property bool isAnalyzeFlow: false
 
     // ── Delay state ──────────────────────────────
     property int delayRemaining: 0
@@ -36,13 +38,15 @@ QtObject {
     signal delayTick(int remaining)
 
     // ── Actions ──────────────────────────────────
-    function captureRegion() { root.regionSelectionRequested(); }
-    function captureWindow() { _startOrDelay("window", ""); }
-    function captureScreen(monitorName) { _startOrDelay("screen", monitorName || ""); }
-    function captureFullscreen() { _startOrDelay("fullscreen", ""); }
-    function analyzeRegion() { root.analyzeSelectionRequested(); }
+    function captureRegion() { root.isAnalyzeFlow = false; root.regionSelectionRequested(); }
+    function captureWindow() { root.isAnalyzeFlow = false; _startOrDelay("window", ""); }
+    function captureScreen(monitorName) { root.isAnalyzeFlow = false; _startOrDelay("screen", monitorName || ""); }
+    function captureFullscreen() { root.isAnalyzeFlow = false; _startOrDelay("fullscreen", ""); }
+    function analyzeRegion() { root.isAnalyzeFlow = true; root.analyzeSelectionRequested(); }
 
     function captureArea(x, y, w, h) {
+        // Note: isAnalyzeFlow should be set by the caller before calling captureArea
+        // or it's already set by analyzeRegion -> RegionSelector -> captureArea flow.
         var geometry = Math.round(x) + "," + Math.round(y) + " " + Math.round(w) + "x" + Math.round(h);
         _startOrDelay("area", geometry);
     }
@@ -88,6 +92,7 @@ QtObject {
     function _capture(mode, monitor) {
         if (root.capturing) return;
         root.capturing = true;
+        root.lastAnalyzePath = "";
         root._captureMode = mode;
         root._captureMonitor = monitor || "";
         root._captureStdout = "";
@@ -126,6 +131,9 @@ QtObject {
             root.lastScreenshotPath = path;
             if (root._captureMode === "region" || root._captureMode === "area") {
                 root.lastRegionPath = path;
+                if (root.isAnalyzeFlow) {
+                    root.lastAnalyzePath = path;
+                }
                 root.regionCaptured(path);
             }
             // Push to history
@@ -181,5 +189,10 @@ QtObject {
 
     function openScreenshotsFolder() {
         Quickshell.execDetached(["xdg-open", (Quickshell.env("HOME") || "/home") + "/Pictures/Screenshots"]);
+        ToastService.showSuccess("Opening Folder", "Screenshots folder opening in file manager");
+    }
+
+    function clearLastAnalyze() {
+        root.lastAnalyzePath = "";
     }
 }

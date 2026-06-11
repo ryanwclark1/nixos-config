@@ -96,8 +96,8 @@
 
       # File system performance
       "fs.file-max" = 2097152;
-      "fs.inotify.max_user_watches" = 1048576;
-      "fs.inotify.max_user_instances" = 1024;
+      "fs.inotify.max_user_watches" = lib.mkDefault 1048576;
+      "fs.inotify.max_user_instances" = lib.mkDefault 1024;
 
       # Real-time scheduling (can be overridden per host)
       "kernel.sched_rt_runtime_us" = 950000;

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import "../../shared"
 import "../../services"
 import "../../services/IconHelpers.js" as IconHelpers
@@ -25,6 +26,7 @@ BasePopupMenu {
         variant: "card"
         Layout.fillWidth: true
         implicitHeight: 70
+        hovered: marketMouse.containsMouse
 
         RowLayout {
           anchors.fill: parent
@@ -35,13 +37,13 @@ BasePopupMenu {
             Layout.fillWidth: true
             spacing: Appearance.spacingXXS
             Text {
-              text: modelData.symbol
+              text: modelData.symbol || ""
               color: Colors.text
               font.pixelSize: Appearance.fontSizeLarge
               font.weight: Font.Bold
             }
             Text {
-              text: "Last update: " + modelData.time
+              text: "Last update: " + (modelData.time || "N/A")
               color: Colors.textDisabled
               font.pixelSize: Appearance.fontSizeXS
             }
@@ -51,7 +53,7 @@ BasePopupMenu {
             Layout.alignment: Qt.AlignRight
             spacing: Appearance.spacingXXS
             Text {
-              text: modelData.close
+              text: modelData.close || "0.00"
               color: Colors.text
               font.pixelSize: Appearance.fontSizeLarge
               font.weight: Font.Bold
@@ -60,7 +62,7 @@ BasePopupMenu {
             RowLayout {
               Layout.alignment: Qt.AlignRight
               spacing: 4
-              property real change: modelData.close - modelData.open
+              property real change: (modelData.close || 0) - (modelData.open || 0)
               property bool up: change >= 0
               SharedWidgets.SvgIcon {
                 source: IconHelpers.trendIndicatorIcon(parent.up)
@@ -75,6 +77,24 @@ BasePopupMenu {
               }
             }
           }
+        }
+
+        MouseArea {
+          id: marketMouse
+          anchors.fill: parent
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: {
+            var url = "https://stooq.com/q/?s=" + encodeURIComponent(modelData.symbol || "");
+            Quickshell.execDetached(["xdg-open", url]);
+          }
+        }
+
+        SharedWidgets.BarTooltip {
+          text: "Click to view " + (modelData.symbol || "market") + " chart"
+          hovered: marketMouse.containsMouse
+          anchorItem: parent
+          anchorWindow: root.anchorWindow
         }
       }
     }

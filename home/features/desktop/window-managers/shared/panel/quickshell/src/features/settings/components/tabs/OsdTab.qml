@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import "../../../../services"
+import "../../../../services/ShellUtils.js" as SU
 import ".."
 
 Item {
@@ -222,6 +224,13 @@ Item {
                     max: 260
                     value: Config.osdSize
                     onMoved: v => Config.osdSize = v
+                }
+
+                SettingsActionButton {
+                    label: "Test OSD Overlay"
+                    iconName: "speaker.svg"
+                    description: "Preview the current OSD position, style, and duration."
+                    onClicked: Quickshell.execDetached(SU.ipcCall("Osd", "showVolume", "65", "false"))
                 }
             }
         }

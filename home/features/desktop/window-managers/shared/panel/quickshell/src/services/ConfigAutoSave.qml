@@ -200,6 +200,15 @@ QtObject {
         function onControlCenterHiddenPluginsChanged() {
             root.config.scheduleSave();
         }
+        function onControlCenterQuickLinkOrderChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterHiddenQuickLinksChanged() {
+            root.config.scheduleSave();
+        }
+        function onControlCenterWidgetOrderChanged() {
+            root.config.scheduleSave();
+        }
         function onControlCenterShowPomodoroChanged() {
             root.config.scheduleSave();
         }
@@ -429,6 +438,30 @@ QtObject {
             root.config.scheduleSave();
         }
         function onDebugChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiApiKeyChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiPollIntervalChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiProtectHostChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiProtectApiKeyChanged() {
+            root.config.scheduleSave();
+        }
+        function onUnifiProtectPollIntervalChanged() {
+            root.config.scheduleSave();
+        }
+        function onGithubTokenChanged() {
+            root.config.scheduleSave();
+        }
+        function onGitlabTokenChanged() {
+            root.config.scheduleSave();
+        }
+        function onGitlabHostChanged() {
             root.config.scheduleSave();
         }
         function onBarWidgetLoadLoggingChanged() {

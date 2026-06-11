@@ -21,7 +21,9 @@ MouseArea {
   property color activeBorderColor: Colors.primary
   property color normalBorderColor: Colors.border
   property real hoverScale: 1.04
-  property real horizontalPadding: 8
+  property real horizontalPadding: 8 * iconScale
+  property real fontScale: 1.0
+  property real iconScale: 1.0
 
   default property alias content: contentContainer.data
   signal secondaryClicked()
@@ -62,7 +64,7 @@ MouseArea {
     return maxHeight;
   }
 
-  height: 28
+  height: 28 * iconScale
   // Keep width >= height so radius-based pills never become a vertical capsule when content width is under-measured.
   width: Math.max(height, measuredContentWidth() + horizontalPadding * 2)
   implicitWidth: width

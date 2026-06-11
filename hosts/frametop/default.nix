@@ -46,6 +46,7 @@
     ../common/optional/tools/fonts.nix
     ../common/optional/tools/wireshark.nix
     ../common/optional/tools/zsh.nix
+    ../common/optional/tools/android-tools.nix
   ];
 
   # Frametop-specific monitoring additions

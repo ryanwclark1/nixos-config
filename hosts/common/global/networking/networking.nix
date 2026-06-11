@@ -20,10 +20,12 @@ in
       logLevel = "INFO";
       wifi = {
         powersave = false;
-        backend = "wpa_supplicant";
+        backend = "iwd";
       };
       ethernet = {
-        macAddress = "random";
+        # 'preserve' ensures the hardware MAC is used, preventing the machine
+        # from being assigned a new IP address by DHCP on reboot/update (which happens with 'random')
+        macAddress = "preserve";
       };
       # Configure IPv6 privacy extensions through connection profiles
       ensureProfiles.profiles = {
@@ -87,6 +89,16 @@ in
       "${domain}"
     ];
     resolvconf.enable = false;
+
+    # Use modern and faster Intel Wireless Daemon (iwd) instead of wpa_supplicant
+    wireless.iwd = {
+      enable = true;
+      settings = {
+        Settings = {
+          AutoConnect = true;
+        };
+      };
+    };
 
     # Network security settings
     enableIPv6 = true;

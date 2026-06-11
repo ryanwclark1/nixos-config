@@ -109,7 +109,8 @@ Item {
                             mods: modStr,
                             key: b["key"] || "",
                         dispatcher: catName,
-                        arg: b.comment || ""
+                        arg: b.comment || "",
+                        action: b.action || ""
                     });
                 }
             }
@@ -191,63 +192,99 @@ Item {
                 }
 
                 delegate: SettingsListRow {
-                    ColumnLayout {
+                    id: row
+                    active: mouseArea.containsMouse
+
+                    Item {
                         Layout.fillWidth: true
-                        spacing: root.tightSpacing ? 4 : 6
+                        implicitHeight: contentColumn.implicitHeight
 
-                        Flow {
-                            Layout.fillWidth: true
-                            width: parent.width
-                            spacing: Appearance.spacingS
+                        MouseArea {
+                            id: mouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (CompositorAdapter.isHyprland) {
+                                    CompositorAdapter.dispatchAction(modelData.dispatcher, modelData.arg);
+                                } else if (CompositorAdapter.isNiri) {
+                                    if (modelData.action) {
+                                        // Split action into words for spawn or just pass as is for builtins
+                                        var action = String(modelData.action).trim();
+                                        if (action.indexOf("spawn") === 0) {
+                                            // Simple spawn handling: remove 'spawn' and quotes
+                                            var cmd = action.substring(5).trim();
+                                            if (cmd.indexOf("\"") === 0 && cmd.lastIndexOf("\"") === cmd.length - 1) {
+                                                cmd = cmd.substring(1, cmd.length - 1);
+                                            }
+                                            NiriService.spawn(cmd.split(/\s+/));
+                                        } else {
+                                            // Built-in action
+                                            Quickshell.execDetached(["niri", "msg", "action", action]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
-                            Rectangle {
-                                id: chordBadge
-                                implicitWidth: Math.min(parent.width, chordText.implicitWidth + 16)
-                                height: 26
-                                radius: Appearance.radiusXXS
-                                color: Colors.highlight
-                                border.color: Colors.primary
-                                border.width: 1
+                        ColumnLayout {
+                            id: contentColumn
+                            anchors.fill: parent
+                            spacing: root.tightSpacing ? 4 : 6
+
+                            Flow {
+                                Layout.fillWidth: true
+                                spacing: Appearance.spacingS
+
+                                Rectangle {
+                                    id: chordBadge
+                                    implicitWidth: Math.min(parent.width, chordText.implicitWidth + 16)
+                                    height: 26
+                                    radius: Appearance.radiusXXS
+                                    color: Colors.highlight
+                                    border.color: Colors.primary
+                                    border.width: 1
+
+                                    Text {
+                                        id: chordText
+                                        anchors.centerIn: parent
+                                        text: {
+                                            var parts = [];
+                                            if (modelData.mods)
+                                                parts.push(modelData.mods);
+                                            if (modelData["key"])
+                                                parts.push(modelData["key"]);
+                                            return parts.join(" + ");
+                                        }
+                                        width: Math.max(0, parent.width - 12)
+                                        color: Colors.primary
+                                        font.family: Appearance.fontMono
+                                        font.pixelSize: Appearance.fontSizeSmall
+                                        font.weight: Font.DemiBold
+                                        elide: Text.ElideRight
+                                    }
+                                }
 
                                 Text {
-                                    id: chordText
-                                    anchors.centerIn: parent
-                                    text: {
-                                        var parts = [];
-                                        if (modelData.mods)
-                                            parts.push(modelData.mods);
-                                        if (modelData["key"])
-                                            parts.push(modelData["key"]);
-                                        return parts.join(" + ");
-                                    }
-                                    width: Math.max(0, parent.width - 12)
-                                    color: Colors.primary
-                                    font.family: Appearance.fontMono
-                                    font.pixelSize: Appearance.fontSizeSmall
+                                    text: modelData.dispatcher
+                                    color: Colors.text
+                                    font.pixelSize: Appearance.fontSizeMedium
                                     font.weight: Font.DemiBold
+                                    width: (root.compactMode || chordBadge.width > parent.width * 0.45)
+                                        ? parent.width
+                                        : Math.max(0, parent.width - chordBadge.width - Appearance.spacingS)
                                     elide: Text.ElideRight
                                 }
                             }
 
                             Text {
-                                text: modelData.dispatcher
-                                color: Colors.text
-                                font.pixelSize: Appearance.fontSizeMedium
-                                font.weight: Font.DemiBold
-                                width: (root.compactMode || chordBadge.width > parent.width * 0.45)
-                                    ? parent.width
-                                    : Math.max(0, parent.width - chordBadge.width - Appearance.spacingS)
-                                elide: Text.ElideRight
+                                text: modelData.arg || "—"
+                                color: Colors.textSecondary
+                                font.pixelSize: Appearance.fontSizeSmall
+                                font.family: modelData.arg ? Appearance.fontMono : ""
+                                Layout.fillWidth: true
+                                wrapMode: Text.WrapAnywhere
                             }
-                        }
-
-                        Text {
-                            text: modelData.arg || "—"
-                            color: Colors.textSecondary
-                            font.pixelSize: Appearance.fontSizeSmall
-                            font.family: modelData.arg ? Appearance.fontMono : ""
-                            Layout.fillWidth: true
-                            wrapMode: Text.WrapAnywhere
                         }
                     }
                 }

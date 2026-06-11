@@ -6,6 +6,7 @@
 
 {
   imports = [
+    ./theme
     ./features/shell
     ./features/atuin
     ./features/bat
@@ -33,7 +34,7 @@
   };
 
   home.username = lib.mkDefault "administrator";
-  home.stateVersion = lib.mkDefault "24.11";
+  home.stateVersion = lib.mkDefault "26.11";
   home.homeDirectory = lib.mkForce "/Users/${config.home.username}";
   # home.username = lib.mkForce "administrator";
   # Disable impermanence

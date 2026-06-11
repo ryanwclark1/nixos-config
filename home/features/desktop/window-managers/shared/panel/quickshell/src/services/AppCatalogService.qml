@@ -19,13 +19,34 @@ QtObject {
   property var _paths: []
   readonly property string cachePath: (Quickshell.env("HOME") || "/home") + "/.local/state/quickshell/app_catalog.json"
 
-  readonly property var desktopRoots: [
-    "/usr/share/applications",
-    "/usr/local/share/applications",
-    (Quickshell.env("HOME") || "/home") + "/.local/share/applications",
-    (Quickshell.env("HOME") || "/home") + "/.nix-profile/share/applications",
-    "/run/current-system/sw/share/applications"
-  ]
+  readonly property var desktopRoots: {
+    var paths = [];
+    var xdgDataDirs = String(Quickshell.env("XDG_DATA_DIRS") || "").split(":");
+    for (var i = 0; i < xdgDataDirs.length; i++) {
+      var d = xdgDataDirs[i].trim();
+      if (d === "") continue;
+      var target = d;
+      if (!d.endsWith("/applications") && !d.endsWith("/applications/")) {
+        target = d + (d.endsWith("/") ? "" : "/") + "applications";
+      }
+      if (paths.indexOf(target) === -1) {
+        paths.push(target);
+      }
+    }
+    // Fallbacks
+    var fallbacks = [
+      "/usr/share/applications",
+      "/usr/local/share/applications",
+      (Quickshell.env("HOME") || "/home") + "/.local/share/applications"
+    ];
+    for (var j = 0; j < fallbacks.length; j++) {
+      if (paths.indexOf(fallbacks[j]) === -1) {
+        paths.push(fallbacks[j]);
+      }
+    }
+    Logger.d("AppCatalogService", "Desktop roots:", paths.join(", "));
+    return paths;
+  }
 
   function _desktopIdForPath(path) {
     var value = String(path || "");

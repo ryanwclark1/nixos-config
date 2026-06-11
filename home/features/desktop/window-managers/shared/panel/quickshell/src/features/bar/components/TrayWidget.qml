@@ -9,12 +9,14 @@ import "../../../widgets"
 
 Flow {
   id: root
-  spacing: Math.max(2, itemSpacing)
+  spacing: Math.max(2, itemSpacing * iconScale)
   property bool vertical: false
   flow: vertical ? Flow.TopToBottom : Flow.LeftToRight
   property var anchorWindow: null
-  property int itemSize: 24
-  property int iconSize: 18
+  property real iconScale: 1.0
+  property real fontScale: 1.0
+  property int itemSize: 24 * iconScale
+  property int iconSize: 18 * iconScale
   property int itemSpacing: Appearance.spacingS
   visible: SystemTray.items.length > 0
 
@@ -44,7 +46,7 @@ Flow {
           anchors.centerIn: parent
           source: "apps.svg"
           color: Colors.textSecondary
-          size: Appearance.fontSizeMedium
+          size: Appearance.fontSizeMedium * root.iconScale
           visible: parent.status !== Image.Ready
         }
       }

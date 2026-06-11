@@ -12,7 +12,6 @@
     ./features/ai
     ./features/alacritty
     ./features/ansible
-    ./features/antigravity
     ./features/atuin
     ./features/audio
     ./features/bat
@@ -63,6 +62,7 @@
     ./features/vivid
     ./features/voxtype
     ./features/vscode
+    ./features/zed
     ./features/webapps
     ./features/wireless
     ./features/yazi

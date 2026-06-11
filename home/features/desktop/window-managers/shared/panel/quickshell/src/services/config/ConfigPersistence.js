@@ -19,6 +19,7 @@
 .import "domains/misc.js" as Misc
 .import "domains/launcher.js" as Launcher
 .import "domains/unifi.js" as Unifi
+.import "domains/forge.js" as Forge
 
 // ── Assemble _MAPS from domain modules ──────────────────────────
 // Primary sections come from each module's top-level sectionKey/maps.
@@ -41,7 +42,8 @@ var _allDomains = [
     Features,
     Misc,
     Launcher,
-    Unifi
+    Unifi,
+    Forge
 ];
 
 // Collect sub-sections from domain modules.

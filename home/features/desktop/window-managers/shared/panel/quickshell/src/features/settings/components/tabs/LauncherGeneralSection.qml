@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../../services"
-import ".."
+import ".." as Components
 
 ColumnLayout {
     id: root
@@ -12,19 +12,19 @@ ColumnLayout {
 
     spacing: Appearance.spacingL
 
-    SettingsCard {
+    Components.SettingsCard {
         Layout.fillWidth: true
         title: "Launcher Behavior"
         iconName: "search-visual.svg"
         description: "Choose the default launcher behavior and opening mode."
 
-        SettingsInfoCallout {
+        Components.SettingsInfoCallout {
             iconName: "globe-search.svg"
             title: "Dedicated launcher settings"
             body: "Launcher controls now live under their own settings section so search, modes, home layout, and diagnostics are easier to tune without digging through Shell settings."
         }
 
-        SettingsModeRow {
+        Components.SettingsModeRow {
             label: "Default Mode"
             icon: "info.svg"
             currentValue: Config.launcherDefaultMode
@@ -32,29 +32,29 @@ ColumnLayout {
             onModeSelected: modeValue => Config.launcherDefaultMode = modeValue
         }
 
-        SettingsFieldGrid {
+        Components.SettingsFieldGrid {
             maximumColumns: root.compactMode ? 1 : 2
             minimumColumnWidth: root.launcherWideFieldMinimumWidth
 
-            SettingsToggleRow {
+            Components.SettingsToggleRow {
                 label: "Show Mode Hints"
                 icon: "keyboard.svg"
                 configKey: "launcherShowModeHints"
             }
 
-            SettingsToggleRow {
+            Components.SettingsToggleRow {
                 label: "Keep Query on Mode Switch"
                 icon: "timer.svg"
                 configKey: "launcherKeepSearchOnModeSwitch"
             }
 
-            SettingsToggleRow {
+            Components.SettingsToggleRow {
                 label: "Paste Characters on Select"
                 icon: "paste.svg"
                 configKey: "launcherCharacterPasteOnSelect"
             }
 
-            SettingsModeRow {
+            Components.SettingsModeRow {
                 label: "Tab Behavior"
                 icon: "keyboard.svg"
                 currentValue: Config.launcherTabBehavior
@@ -78,7 +78,7 @@ ColumnLayout {
                 onModeSelected: modeValue => Config.launcherTabBehavior = modeValue
             }
 
-            SettingsTextInputRow {
+            Components.SettingsTextInputRow {
                 label: "Character Trigger"
                 leadingIcon: "add.svg"
                 placeholderText: ":"
@@ -89,30 +89,30 @@ ColumnLayout {
         }
     }
 
-    SettingsCard {
+    Components.SettingsCard {
         Layout.fillWidth: true
         title: "Home Layout"
         iconName: "terminal.svg"
         description: "Control what the launcher home view shows before a search is entered."
 
-        SettingsFieldGrid {
+        Components.SettingsFieldGrid {
             maximumColumns: root.compactMode ? 1 : 2
             minimumColumnWidth: root.launcherWideFieldMinimumWidth
 
-            SettingsToggleRow {
+            Components.SettingsToggleRow {
                 label: "Show Home Sections"
                 icon: "terminal.svg"
                 configKey: "launcherShowHomeSections"
             }
 
-            SettingsToggleRow {
+            Components.SettingsToggleRow {
                 label: "App Category Filters"
                 icon: "info.svg"
                 configKey: "launcherDrunCategoryFiltersEnabled"
             }
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Recents History Limit"
             icon: "arrow-counterclockwise.svg"
             min: 4
@@ -123,7 +123,7 @@ ColumnLayout {
             onMoved: v => Config.launcherRecentsLimit = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Recent Apps on Home"
             icon: "arrow-counterclockwise.svg"
             min: 1
@@ -134,7 +134,7 @@ ColumnLayout {
             onMoved: v => Config.launcherRecentAppsLimit = v
         }
 
-        SettingsSliderRow {
+        Components.SettingsSliderRow {
             label: "Suggestions on Home"
             icon: "copy.svg"
             min: 0

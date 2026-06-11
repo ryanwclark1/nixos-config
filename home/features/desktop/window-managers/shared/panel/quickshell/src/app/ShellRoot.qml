@@ -102,6 +102,13 @@ Scope {
         return surfaceService.toggleSurface(surfaceId, context);
     }
 
+    function openSettingsHub(tabId) {
+        settingsHub.clearSettingHighlight();
+        if (tabId)
+            settingsHub.setCurrentTab(tabId);
+        settingsHub.open();
+    }
+
     function popupAnchorX(context, popupWidth, screenWidth) {
         return surfaceService.popupAnchorX(context, popupWidth, screenWidth);
     }
@@ -159,6 +166,7 @@ Scope {
         var done = Logger.perf("ShellRoot", "startup");
         void ThemeService.activeThemeId;
         void HookService;
+        void HypridleSyncService;
         void ColorExportService;
         done();
     }
@@ -340,6 +348,7 @@ Scope {
         interactionBlocked: root.fileBrowserVisible
         onBrowseWallpaper: monitorName => fileFlow.browseWallpaper(monitorName)
         onPickWallpaperFolder: fileFlow.pickWallpaperFolder()
+        onPickFolder: callerId => fileFlow.pickFolder(callerId)
         onBrowseManifest: fileFlow.browseManifest()
     }
 
@@ -393,10 +402,11 @@ Scope {
     RegionSelector {
         id: regionSelector
         onAnalyzeRegionCaptured: path => {
+            // Start a fresh conversation for the analysis task
+            if (AiService.activeMessages.length > 0 || AiService.activeDraftText.length > 0) {
+                AiService.newConversation();
+            }
             root.openSurface("aiChat");
-            // AiChat's existing Connections on ScreenshotService.onRegionCaptured
-            // already sets includeVisualContext = true. If AiChat was just created
-            // by LazyLoader, it checks lastRegionPath in Component.onCompleted.
         }
     }
 

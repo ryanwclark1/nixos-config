@@ -13,13 +13,13 @@ in
     ./custom.theme/themes/theme.json.nix
   ];
 
-  home.file.".config/vscode/plugins/custom.theme/package.json" = {
+  home.file.".config/VSCodium/plugins/custom.theme/package.json" = {
     force = true;
     source = ./custom.theme/package.json;
   };
 
   # MCP Configuration
-  home.file.".config/Code/User/mcp.json" = {
+  home.file.".config/VSCodium/User/mcp.json" = {
     force = true;
     text = builtins.toJSON {
       servers = {
@@ -194,9 +194,12 @@ in
     tailwindcss_4
   ];
 
-  programs.vscode = {
+  programs.vscodium = {
     enable = true;
-    package = pkgs.vscode-fhs;
+    # The Microsoft VS Code derivation fetches its upstream tarball during
+    # builds, which makes home-manager switch depend on Microsoft's redirect
+    # hosts resolving. VSCodium is available from the NixOS binary cache.
+    package = pkgs.vscodium-fhs;
     mutableExtensionsDir = true;
     profiles = {
       default = {
@@ -213,8 +216,8 @@ in
                 }
                 ''
                   mkdir -p "$out/share/vscode/extensions/$vscodeExtUniqueId/themes"
-                  ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
-                  ln -s ${config.home.homeDirectory}/.config/vscode/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
+                  ln -s ${config.home.homeDirectory}/.config/VSCodium/plugins/custom.theme/package.json "$out/share/vscode/extensions/$vscodeExtUniqueId/package.json"
+                  ln -s ${config.home.homeDirectory}/.config/VSCodium/plugins/custom.theme/themes/theme.json "$out/share/vscode/extensions/$vscodeExtUniqueId/themes/theme.json"
                 '';
           in
           [
@@ -320,7 +323,7 @@ in
           "terminal.integrated.defaultProfile.linux" = "bash";
           "terminal.integrated.enableImages" = true;
           "terminal.integrated.environmentChangesIndicator" = "off";
-          "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
+          "terminal.integrated.fontFamily" = config.theme.fonts.monospace;
           "terminal.integrated.minimumContrastRatio" = 1;
           "terminal.integrated.mouseWheelZoom" = true;
           "terminal.integrated.scrollback" = 10000;
@@ -501,6 +504,9 @@ in
           "git.autofetchPeriod" = 30;
           "git.confirmSync" = false;
           "git.enableSmartCommit" = true;
+
+          ##### Swift #####
+          "swift.path" = "/etc/profiles/per-user/${config.home.username}/bin";
 
         };
       };

@@ -14,19 +14,12 @@ launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 config_qml="${config_dir}/services/Config.qml"
 launcher_qml="${config_dir}/launcher/Launcher.qml"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_web_settings_qml="${config_dir}/features/settings/components/tabs/LauncherWebSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 default_nix="${script_dir}/../default.nix"
 
 violations=()
-
-require_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
-  fi
-}
+source "${script_dir}/check-helpers.sh"
 
 # ── Phase 1: Expanded catalog (26 built-in providers) ──────────────────
 
@@ -56,9 +49,9 @@ require_literal "$config_qml" '"wikipedia": ["w", "wiki"]' "wikipedia default al
 require_literal "$config_qml" '"maps": ["map"]' "maps default alias"
 
 # Settings UI has all new providers
-require_literal "$launcher_settings_qml" '{ key: "brave"' "brave in settings UI"
-require_literal "$launcher_settings_qml" '{ key: "stackoverflow"' "stackoverflow in settings UI"
-require_literal "$launcher_settings_qml" '{ key: "wikipedia"' "wikipedia in settings UI"
+require_literal "$launcher_settings_qml" '{ key: "brave"' "brave in settings UI" "$launcher_web_settings_qml"
+require_literal "$launcher_settings_qml" '{ key: "stackoverflow"' "stackoverflow in settings UI" "$launcher_web_settings_qml"
+require_literal "$launcher_settings_qml" '{ key: "wikipedia"' "wikipedia in settings UI" "$launcher_web_settings_qml"
 
 # ── Phase 2: Custom user-defined search engines ────────────────────────
 
@@ -87,8 +80,8 @@ require_literal "$web_providers_js" 'exec.indexOf("%s")' "percent-s detection in
 require_literal "$web_providers_js" 'exec.replace(/%s/g, encodeURIComponent(query))' "percent-s replacement"
 
 # Settings UI: custom engine editor
-require_literal "$launcher_settings_qml" 'title: "Custom Search Engines"' "custom engine settings card"
-require_literal "$launcher_settings_qml" 'label: "Add Custom Engine"' "add custom engine button"
+require_literal "$launcher_settings_qml" 'title: "Custom Search Engines"' "custom engine settings card" "$launcher_web_settings_qml"
+require_literal "$launcher_settings_qml" 'label: "Add Custom Engine"' "add custom engine button" "$launcher_web_settings_qml"
 
 # Reset includes custom engines
 require_literal "$launcher_helpers_js" 'Config.launcherWebCustomEngines = [];' "custom engines reset"
@@ -115,8 +108,8 @@ require_literal "$default_nix" '"qs-bang-sync"' "qs-bang-sync wrapper"
 require_literal "$default_nix" '"qs-bang-search"' "qs-bang-search wrapper"
 
 # Settings UI
-require_literal "$launcher_settings_qml" 'title: "DuckDuckGo Bangs"' "bangs settings card"
-require_literal "$launcher_settings_qml" '"qs-bang-sync"' "sync invocation in settings"
+require_literal "$launcher_settings_qml" 'title: "DuckDuckGo Bangs"' "bangs settings card" "$launcher_web_settings_qml"
+require_literal "$launcher_settings_qml" '"qs-bang-sync"' "sync invocation in settings" "$launcher_web_settings_qml"
 
 # Reset
 require_literal "$launcher_helpers_js" 'Config.launcherWebBangsEnabled = false;' "bangs enabled reset"
@@ -124,10 +117,4 @@ require_literal "$launcher_helpers_js" 'Config.launcherWebBangsLastSync = "";' "
 
 # ── Report ─────────────────────────────────────────────────────────────
 
-if (( ${#violations[@]} > 0 )); then
-  printf '%s\n' "Web provider expansion check failed (${#violations[@]} violations):" >&2
-  printf '  - %s\n' "${violations[@]}" >&2
-  exit 1
-fi
-
-printf '%s\n' "Web provider expansion check passed (Phase 1+2+3)."
+report_violations "Web provider expansion check (Phase 1+2+3)"

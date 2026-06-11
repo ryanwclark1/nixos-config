@@ -23,11 +23,6 @@ src.vsmarketplace = "vitest.explorer"
 fetch.vsmarketplace = "vitest.explorer"
 passthru = { publisher = "vitest", name = "explorer" }
 
-[gemini-cli-vscode-ide-companion]
-src.vsmarketplace = "Google.gemini-cli-vscode-ide-companion"
-fetch.vsmarketplace = "Google.gemini-cli-vscode-ide-companion"
-passthru = { publisher = "Google", name = "gemini-cli-vscode-ide-companion" }
-
 [gopls]
 src.github_tag = "golang/tools"
 src.include_regex = "gopls/v[0-9]+\\.[0-9]+\\.[0-9]+"

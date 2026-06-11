@@ -44,6 +44,7 @@ in
           "adm"
         ]
         ++ ifTheyExist [
+          "adbusers"
           "deluge"
           "docker"
           "git"
@@ -112,11 +113,24 @@ in
   # Set Tailscale operator for this user
   systemd.services.tailscale-set-operator = {
     description = "Set Tailscale operator user";
-    after = [ "tailscale.service" ];
+    after = [ "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.tailscale}/bin/tailscale set --operator=${user}";
+      ExecStart = "${pkgs.writeShellScript "tailscale-set-operator" ''
+        # Wait for tailscaled socket to exist
+        for i in {1..30}; do
+          if [ -S /var/run/tailscale/tailscaled.sock ]; then
+            echo "tailscaled socket is ready."
+            sleep 1
+            break
+          fi
+          echo "Waiting for tailscaled socket..."
+          sleep 1
+        done
+        ${pkgs.tailscale}/bin/tailscale set --operator=${user}
+      ''}";
       RemainAfterExit = true;
     };
   };

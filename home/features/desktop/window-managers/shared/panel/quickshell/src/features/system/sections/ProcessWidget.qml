@@ -47,6 +47,8 @@ SharedWidgets.CardBase {
     Layout.fillWidth: true
     Layout.preferredHeight: tableFocus.implicitHeight + root.pad * 2
 
+    SharedWidgets.Ref { service: ProcessService }
+
     onStatContextChanged: applyContextDefaultSort()
 
     function applyContextDefaultSort() {
@@ -568,49 +570,67 @@ SharedWidgets.CardBase {
                 onTextChanged: root.searchQuery = text
             }
 
-            Flow {
+            RowLayout {
                 Layout.fillWidth: true
-                width: parent.width
+                spacing: Appearance.spacingS
+
+                Flow {
+                    id: stateFilterFlow
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: implicitHeight
+                    spacing: Appearance.spacingS
+
+                    SharedWidgets.FilterChip {
+                        label: "All"
+                        selected: root.stateFilter === "all"
+                        onClicked: root.stateFilter = "all"
+                    }
+
+                    SharedWidgets.FilterChip {
+                        label: "Running"
+                        selected: root.stateFilter === "running"
+                        onClicked: root.stateFilter = "running"
+                    }
+
+                    SharedWidgets.FilterChip {
+                        label: "Stopped"
+                        selected: root.stateFilter === "stopped"
+                        onClicked: root.stateFilter = "stopped"
+                    }
+
+                    SharedWidgets.FilterChip {
+                        label: "High Load"
+                        selected: root.stateFilter === "high"
+                        onClicked: root.stateFilter = "high"
+                    }
+                }
+
+                RowLayout {
+                    id: processViewModeRow
+                    Layout.alignment: Qt.AlignRight | Qt.AlignTop
+                    spacing: Appearance.spacingXS
+
+                    SharedWidgets.FilterChip {
+                        label: "List"
+                        selected: root.displayMode === "flat"
+                        onClicked: root.displayMode = "flat"
+                    }
+
+                    SharedWidgets.FilterChip {
+                        label: "Tree"
+                        selected: root.displayMode === "tree"
+                        onClicked: root.displayMode = "tree"
+                    }
+                }
+            }
+
+            Flow {
+                visible: root.displayMode === "tree"
+                Layout.fillWidth: true
+                Layout.preferredHeight: visible ? implicitHeight : 0
                 spacing: Appearance.spacingS
 
                 SharedWidgets.FilterChip {
-                    label: "All"
-                    selected: root.stateFilter === "all"
-                    onClicked: root.stateFilter = "all"
-                }
-
-                SharedWidgets.FilterChip {
-                    label: "Running"
-                    selected: root.stateFilter === "running"
-                    onClicked: root.stateFilter = "running"
-                }
-
-                SharedWidgets.FilterChip {
-                    label: "Stopped"
-                    selected: root.stateFilter === "stopped"
-                    onClicked: root.stateFilter = "stopped"
-                }
-
-                SharedWidgets.FilterChip {
-                    label: "High Load"
-                    selected: root.stateFilter === "high"
-                    onClicked: root.stateFilter = "high"
-                }
-
-                SharedWidgets.FilterChip {
-                    label: "Flat"
-                    selected: root.displayMode === "flat"
-                    onClicked: root.displayMode = "flat"
-                }
-
-                SharedWidgets.FilterChip {
-                    label: "Tree"
-                    selected: root.displayMode === "tree"
-                    onClicked: root.displayMode = "tree"
-                }
-
-                SharedWidgets.FilterChip {
-                    visible: root.displayMode === "tree"
                     label: "Expand All"
                     enabled: Object.keys(root.collapsedPids || {}).length > 0
                     selected: false
@@ -618,7 +638,6 @@ SharedWidgets.CardBase {
                 }
 
                 SharedWidgets.FilterChip {
-                    visible: root.displayMode === "tree"
                     label: "Collapse Sel"
                     enabled: !!root.selectedProcess && !!root.selectedProcess._hasChildren && !root.selectedProcess._collapsed
                     selected: false

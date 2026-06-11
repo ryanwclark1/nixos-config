@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   ...
 }:
@@ -25,6 +26,7 @@
       HIP_VISIBLE_DEVICES = "0";
       ROCR_VISIBLE_DEVICES = "0";
       HSA_OVERRIDE_GFX_VERSION = "11.0.1"; # Match gfx1101 target
+      LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.libdrm ];
     };
     loadModels = [
       "qwen3:30b-thinking" # PRIMARY: Latest gen + tools + thinking + 256K context (19GB)

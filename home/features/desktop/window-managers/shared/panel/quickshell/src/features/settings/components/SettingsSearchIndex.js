@@ -53,8 +53,7 @@ var entries = [
     { tabId: "system", cardTitle: "Panel Enablement", label: "System Monitor", keywords: "panel enable disable memory", type: "toggle" },
 
     // ── Control Center ───────────────────────────────
-    { tabId: "control-center", cardTitle: "Control Center", label: "Quick Links", keywords: "links shortcuts", type: "toggle" },
-    { tabId: "control-center", cardTitle: "Control Center", label: "Media Widget", keywords: "media player music", type: "toggle" },
+    { tabId: "control-center", cardTitle: "Pinned Footer", label: "Power Actions", keywords: "links shortcuts", type: "toggle" },
     { tabId: "control-center", cardTitle: "Control Center", label: "Control Center Width", keywords: "width size", type: "slider" },
 
     // ── OSD ──────────────────────────────────────────
@@ -279,6 +278,11 @@ var entries = [
     { tabId: "launcher-search", cardTitle: "Result Scoring", label: "Exec/Class Weight", keywords: "search score exec class weight", type: "slider" },
     { tabId: "launcher-search", cardTitle: "Result Scoring", label: "Body Weight", keywords: "search score body weight", type: "slider" },
     { tabId: "launcher-search", cardTitle: "Result Scoring", label: "Category/Keywords Weight", keywords: "search score category keywords weight", type: "slider" },
+
+    // ── Forge ────────────────────────────────────────
+    { tabId: "forge", cardTitle: "GitHub", label: "Access Token", keywords: "github gh token api notification", type: "password" },
+    { tabId: "forge", cardTitle: "GitLab", label: "GitLab Host", keywords: "gitlab host url server", type: "text" },
+    { tabId: "forge", cardTitle: "GitLab", label: "Access Token", keywords: "gitlab token api notification todo", type: "password" },
 
     // ── Launcher (Web) ───────────────────────────────
     { tabId: "launcher-web", cardTitle: "Web Search Behavior", label: "Web Enter Uses Primary", keywords: "web search enter primary provider", type: "toggle" },

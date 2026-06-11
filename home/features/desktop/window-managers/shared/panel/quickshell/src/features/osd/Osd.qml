@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import "."
 import "../../shared"
@@ -10,10 +9,6 @@ import "../../services"
 Scope {
   id: root
   readonly property int _startupSuppressMs: 2000
-
-  PwObjectTracker {
-    objects: [ Pipewire.defaultAudioSink, Pipewire.defaultAudioSource ]
-  }
 
   // --- State ---
   property bool shouldShowOsd: false
@@ -38,17 +33,12 @@ Scope {
     if (root.osdType === "kbdbrightness") BrightnessService.subscriberCount--;
   }
 
-  // Pipewire reactive bindings
-  property real sinkVolume: {
-    var v = Pipewire.defaultAudioSink?.audio?.volume;
-    return (v !== undefined && !isNaN(v)) ? (Config.osdOverdrive ? Math.min(v, 1.5) : Colors.clamp01(v)) : 0;
-  }
-  property bool sinkMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
-  property real sourceVolume: {
-    var v = Pipewire.defaultAudioSource?.audio?.volume;
-    return (v !== undefined && !isNaN(v)) ? Colors.clamp01(v) : 0;
-  }
-  property bool sourceMuted: Pipewire.defaultAudioSource?.audio?.muted ?? false
+  // AudioService uses wpctl polling instead of PwObjectTracker to avoid a
+  // QuickShell 0.3.0 PipeWire tracker crash when default nodes are removed.
+  property real sinkVolume: Config.osdOverdrive ? Math.min(AudioService.outputVolume, 1.5) : Colors.clamp01(AudioService.outputVolume)
+  property bool sinkMuted: AudioService.outputMuted
+  property real sourceVolume: Colors.clamp01(AudioService.inputVolume)
+  property bool sourceMuted: AudioService.inputMuted
 
   // --- OSD helpers ---
   readonly property real maxValue: {
@@ -304,12 +294,10 @@ Scope {
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "quickshell-osd"
 
-        // Size depends on style
-        implicitWidth: Math.max(1, root.isCriticalAlert ? criticalWidth : (Config.osdStyle === "pill" ? pillWidth : Config.osdSize))
-        implicitHeight: Math.max(1, root.isCriticalAlert ? criticalHeight : (Config.osdStyle === "pill" ? pillHeight : Config.osdSize))
+        // Size depends on style. Scaling factors derived from baseline 180px circular OSD.
+        implicitWidth: Math.max(1, root.isCriticalAlert ? criticalWidth : (Config.osdStyle === "pill" ? Math.round(Config.osdSize * 1.55) : Config.osdSize))
+        implicitHeight: Math.max(1, root.isCriticalAlert ? criticalHeight : (Config.osdStyle === "pill" ? Math.round(Config.osdSize * 0.31) : Config.osdSize))
 
-        readonly property int pillWidth: 280
-        readonly property int pillHeight: 56
         readonly property int criticalWidth: 320
         readonly property int criticalHeight: 148
 
@@ -320,8 +308,8 @@ Scope {
         Rectangle {
           id: content
           anchors.fill: parent
-          radius: root.isCriticalAlert ? Appearance.radiusLarge : (Config.osdStyle === "pill" ? height / 2 : 28)
-          color: Colors.cardSurface
+          radius: root.isCriticalAlert ? Appearance.radiusLarge : (Config.osdStyle === "pill" ? height / 2 : Math.round(Config.osdSize * 0.15))
+          color: Colors.surfaceContainerHighest
           border.color: root.osdColor
           border.width: 2
 

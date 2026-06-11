@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   inputs,
   lib,
@@ -6,7 +7,19 @@
 }:
 
 let
-  epkgs = if lib.hasAttr pkgs.stdenv.hostPlatform.system inputs.elephant.packages then inputs.elephant.packages.${pkgs.stdenv.hostPlatform.system} else {};
+  inherit (config.theme.colors)
+    base00
+    base01
+    base02
+    base05
+    base08
+    ;
+
+  epkgs =
+    if lib.hasAttr pkgs.stdenv.hostPlatform.system inputs.elephant.packages then
+      inputs.elephant.packages.${pkgs.stdenv.hostPlatform.system}
+    else
+      { };
   elephantPkgNames = [
     "elephant"
     "elephant-calc"
@@ -22,8 +35,11 @@ let
     "elephant-websearch"
     "elephant-todo"
   ];
-  elephantPkgs = builtins.concatLists (map (name: lib.optional (lib.hasAttr name epkgs) epkgs.${name}) elephantPkgNames);
-in {
+  elephantPkgs = builtins.concatLists (
+    map (name: lib.optional (lib.hasAttr name epkgs) epkgs.${name}) elephantPkgNames
+  );
+in
+{
   # programs.walker = {
   #   enable = true;
   #   package = pkgs.walker;
@@ -49,94 +65,94 @@ in {
   home.file.".config.walker/config.toml" = {
     force = true;
     text = ''
-    close_when_open = true
-    theme = "catppuccin"
-    hotreload_theme = true
-    force_keyboard_focus = true
-    timeout = 60
+      close_when_open = true
+      theme = "catppuccin"
+      hotreload_theme = true
+      force_keyboard_focus = true
+      timeout = 60
 
-    [keys.ai]
-    run_last_response = ["ctrl e"]
+      [keys.ai]
+      run_last_response = ["ctrl e"]
 
-    [list]
-    max_entries = 200
-    cycle = true
+      [list]
+      max_entries = 200
+      cycle = true
 
-    [search]
-    placeholder = " Search..."
+      [search]
+      placeholder = " Search..."
 
-    [builtins.hyprland_keybinds]
-    path = "~/.config/hypr/hyprland.conf"
-    hidden = true
+      [builtins.hyprland_keybinds]
+      path = "~/.config/hypr/hyprland.conf"
+      hidden = true
 
-    [builtins.applications]
-    launch_prefix = "uwsm app -- "
-    placeholder = " Search..."
-    prioritize_new = false
-    context_aware = false
-    show_sub_when_single = false
-    history = false
-    icon = ""
-    hidden = true
+      [builtins.applications]
+      launch_prefix = "uwsm app -- "
+      placeholder = " Search..."
+      prioritize_new = false
+      context_aware = false
+      show_sub_when_single = false
+      history = false
+      icon = ""
+      hidden = true
 
-    [builtins.applications.actions]
-    enabled = false
-    hide_category = true
+      [builtins.applications.actions]
+      enabled = false
+      hide_category = true
 
-    [builtins.bookmarks]
-    hidden = true
+      [builtins.bookmarks]
+      hidden = true
 
-    [builtins.calc]
-    name = "Calculator"
-    icon = ""
-    min_chars = 3
-    prefix = "="
+      [builtins.calc]
+      name = "Calculator"
+      icon = ""
+      min_chars = 3
+      prefix = "="
 
-    [builtins.windows]
-    switcher_only = true
-    hidden = true
+      [builtins.windows]
+      switcher_only = true
+      hidden = true
 
-    [builtins.clipboard]
-    hidden = true
+      [builtins.clipboard]
+      hidden = true
 
-    [builtins.commands]
-    hidden = true
+      [builtins.commands]
+      hidden = true
 
-    [builtins.custom_commands]
-    hidden = true
+      [builtins.custom_commands]
+      hidden = true
 
-    [builtins.emojis]
-    name = "Emojis"
-    icon = ""
-    prefix = ":"
+      [builtins.emojis]
+      name = "Emojis"
+      icon = ""
+      prefix = ":"
 
-    [builtins.symbols]
-    after_copy = ""
-    hidden = true
+      [builtins.symbols]
+      after_copy = ""
+      hidden = true
 
-    [builtins.finder]
-    use_fd = true
-    cmd_alt = "xdg-open $(dirname ~/%RESULT%)"
-    icon = "file"
-    name = "Finder"
-    preview_images = true
-    hidden = false
-    prefix = "."
+      [builtins.finder]
+      use_fd = true
+      cmd_alt = "xdg-open $(dirname ~/%RESULT%)"
+      icon = "file"
+      name = "Finder"
+      preview_images = true
+      hidden = false
+      prefix = "."
 
-    [builtins.runner]
-    shell_config = ""
-    switcher_only = true
-    hidden = true
+      [builtins.runner]
+      shell_config = ""
+      switcher_only = true
+      hidden = true
 
-    [builtins.ssh]
-    hidden = true
+      [builtins.ssh]
+      hidden = true
 
-    [builtins.websearch]
-    switcher_only = true
-    hidden = true
+      [builtins.websearch]
+      switcher_only = true
+      hidden = true
 
-    [builtins.translation]
-    hidden = true
+      [builtins.translation]
+      hidden = true
     '';
   };
 
@@ -144,32 +160,11 @@ in {
   home.file.".config.walker/themes/catppuccin.css" = {
     force = true;
     text = ''
-      @define-color rosewater #f2d5cf;
-      @define-color flamingo #eebebe;
-      @define-color pink #f4b8e4;
-      @define-color mauve #ca9ee6;
-      @define-color red #e78284;
-      @define-color maroon #ea999c;
-      @define-color peach #ef9f76;
-      @define-color yellow #e5c890;
-      @define-color green #a6d189;
-      @define-color teal #81c8be;
-      @define-color sky #99d1db;
-      @define-color sapphire #85c1dc;
-      @define-color blue #8caaee;
-      @define-color lavender #babbf1;
-      @define-color text #c6d0f5;
-      @define-color subtext1 #b5bfe2;
-      @define-color subtext0 #a5adce;
-      @define-color overlay2 #949cbb;
-      @define-color overlay1 #838ba7;
-      @define-color overlay0 #737994;
-      @define-color surface2 #626880;
-      @define-color surface1 #51576d;
-      @define-color surface0 #414559;
-      @define-color base #303446;
-      @define-color mantle #292c3c;
-      @define-color crust #232634;
+      @define-color base00 #${base00};
+      @define-color base01 #${base01};
+      @define-color base02 #${base02};
+      @define-color base05 #${base05};
+      @define-color base08 #${base08};
 
       #window,
       #box,
@@ -195,37 +190,37 @@ in {
       }
 
       #cfgerr {
-        background: @red;
+        background: @base08;
         margin-top: 20px;
         padding: 8px;
         font-size: 1.2em;
       }
 
       #window {
-        color: @text;
+        color: @base05;
       }
 
       #box {
         border-radius: 2px;
-        background: @base;
+        background: @base00;
         padding: 32px;
-        border: 1px solid @crust;
+        border: 1px solid @base01;
       }
 
       #search {
-        background: @mantle;
+        background: @base01;
         padding: 8px;
       }
 
       #prompt {
         margin-left: 4px;
         margin-right: 12px;
-        color: @text;
+        color: @base05;
         opacity: 0.2;
       }
 
       #clear {
-        color: @text;
+        color: @base05;
         opacity: 0.8;
       }
 
@@ -247,7 +242,7 @@ in {
       }
 
       #typeahead {
-        color: @text;
+        color: @base05;
         opacity: 0.8;
       }
 
@@ -265,7 +260,7 @@ in {
 
       child:selected,
       child:hover {
-        background: alpha(@surface0, 0.4);
+        background: alpha(@base02, 0.4);
       }
 
       #item {
@@ -276,7 +271,7 @@ in {
       }
 
       #text {
-        color: @text;
+        color: @base05;
       }
 
       #label {
@@ -309,8 +304,8 @@ in {
       .aiItem {
         padding: 10px;
         border-radius: 2px;
-        color: @text;
-        background: @base;
+        color: @base05;
+        background: @base00;
       }
 
       .aiItem.user {
@@ -319,116 +314,115 @@ in {
       }
 
       .aiItem.assistant {
-        background: @mantle;
+        background: @base01;
       }
     '';
   };
 
-  home.file.".config.walker/themes/catppuccin.toml" =
-  {
+  home.file.".config.walker/themes/catppuccin.toml" = {
     force = true;
     text = ''
-    [ui.anchors]
-    bottom = true
-    left = true
-    right = true
-    top = true
+      [ui.anchors]
+      bottom = true
+      left = true
+      right = true
+      top = true
 
-    [ui.window]
-    h_align = "fill"
-    v_align = "fill"
+      [ui.window]
+      h_align = "fill"
+      v_align = "fill"
 
-    [ui.window.box]
-    h_align = "center"
-    width = 450
+      [ui.window.box]
+      h_align = "center"
+      width = 450
 
-    [ui.window.box.bar]
-    orientation = "horizontal"
-    position = "end"
+      [ui.window.box.bar]
+      orientation = "horizontal"
+      position = "end"
 
-    [ui.window.box.bar.entry]
-    h_align = "fill"
-    h_expand = true
+      [ui.window.box.bar.entry]
+      h_align = "fill"
+      h_expand = true
 
-    [ui.window.box.bar.entry.icon]
-    h_align = "center"
-    h_expand = true
-    pixel_size = 24
-    theme = ""
+      [ui.window.box.bar.entry.icon]
+      h_align = "center"
+      h_expand = true
+      pixel_size = 24
+      theme = ""
 
-    [ui.window.box.margins]
-    top = 200
+      [ui.window.box.margins]
+      top = 200
 
-    [ui.window.box.ai_scroll]
-    name = "aiScroll"
-    h_align = "fill"
-    v_align = "fill"
-    max_height = 300
-    min_width = 400
-    height = 300
-    width = 400
+      [ui.window.box.ai_scroll]
+      name = "aiScroll"
+      h_align = "fill"
+      v_align = "fill"
+      max_height = 300
+      min_width = 400
+      height = 300
+      width = 400
 
-    [ui.window.box.ai_scroll.margins]
-    top = 8
+      [ui.window.box.ai_scroll.margins]
+      top = 8
 
-    [ui.window.box.ai_scroll.list]
-    name = "aiList"
-    orientation = "vertical"
-    width = 400
-    spacing = 10
+      [ui.window.box.ai_scroll.list]
+      name = "aiList"
+      orientation = "vertical"
+      width = 400
+      spacing = 10
 
-    [ui.window.box.ai_scroll.list.item]
-    name = "aiItem"
-    h_align = "fill"
-    v_align = "fill"
-    x_align = 0
-    y_align = 0
-    wrap = true
+      [ui.window.box.ai_scroll.list.item]
+      name = "aiItem"
+      h_align = "fill"
+      v_align = "fill"
+      x_align = 0
+      y_align = 0
+      wrap = true
 
-    [ui.window.box.scroll.list]
-    marker_color = "#1BFFE1"
-    max_height = 300
-    max_width = 400
-    min_width = 400
-    width = 400
+      [ui.window.box.scroll.list]
+      marker_color = "#1BFFE1"
+      max_height = 300
+      max_width = 400
+      min_width = 400
+      width = 400
 
-    [ui.window.box.scroll.list.item.activation_label]
-    h_align = "fill"
-    v_align = "fill"
-    width = 20
-    x_align = 0.5
-    y_align = 0.5
+      [ui.window.box.scroll.list.item.activation_label]
+      h_align = "fill"
+      v_align = "fill"
+      width = 20
+      x_align = 0.5
+      y_align = 0.5
 
-    [ui.window.box.scroll.list.item.icon]
-    pixel_size = 26
-    theme = ""
+      [ui.window.box.scroll.list.item.icon]
+      pixel_size = 26
+      theme = ""
 
-    [ui.window.box.scroll.list.margins]
-    top = 8
+      [ui.window.box.scroll.list.margins]
+      top = 8
 
-    [ui.window.box.search.prompt]
-    name = "prompt"
-    icon = "edit-find"
-    theme = ""
-    pixel_size = 18
-    h_align = "center"
-    v_align = "center"
+      [ui.window.box.search.prompt]
+      name = "prompt"
+      icon = "edit-find"
+      theme = ""
+      pixel_size = 18
+      h_align = "center"
+      v_align = "center"
 
-    [ui.window.box.search.clear]
-    name = "clear"
-    icon = "edit-clear"
-    theme = ""
-    pixel_size = 18
-    h_align = "center"
-    v_align = "center"
+      [ui.window.box.search.clear]
+      name = "clear"
+      icon = "edit-clear"
+      theme = ""
+      pixel_size = 18
+      h_align = "center"
+      v_align = "center"
 
-    [ui.window.box.search.input]
-    h_align = "fill"
-    h_expand = true
-    icons = true
+      [ui.window.box.search.input]
+      h_align = "fill"
+      h_expand = true
+      icons = true
 
-    [ui.window.box.search.spinner]
-    hide = true
+      [ui.window.box.search.spinner]
+      hide = true
     '';
   };
 }

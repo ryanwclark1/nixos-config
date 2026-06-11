@@ -13,13 +13,13 @@ BasePopupMenu {
     popupMaxWidth: root.statKey === "cpuStatus" || root.statKey === "ramStatus" ? 540 : 460
     compactThreshold: root.statKey === "cpuStatus" || root.statKey === "ramStatus" ? 500 : 420
     readonly property int _desiredHeight: {
-        if (statKey === "gpuStatus") return compactMode ? 400 : 380;
-        if (statKey === "diskStatus") return compactMode ? 420 : 400;
-        if (statKey === "networkStatus") return compactMode ? 440 : 420;
-        if (statKey === "cpuStatus" || statKey === "ramStatus") return compactMode ? 580 : 540;
-        return compactMode ? 620 : 580;
+        if (statKey === "gpuStatus") return compactMode ? 600 : 580;
+        if (statKey === "diskStatus") return compactMode ? 620 : 600;
+        if (statKey === "networkStatus") return compactMode ? 640 : 620;
+        if (statKey === "cpuStatus" || statKey === "ramStatus") return compactMode ? 780 : 740;
+        return compactMode ? 820 : 780;
     }
-    readonly property int _screenMaxHeight: screen ? Math.max(320, screen.height - 32) : 560
+    readonly property int _screenMaxHeight: screen ? Math.max(320, screen.height - 32) : 800
     implicitHeight: Math.min(_desiredHeight, _screenMaxHeight)
     focusOnOpen: true
 

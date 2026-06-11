@@ -7,7 +7,7 @@ import "../../widgets" as SharedWidgets
 BasePopupMenu {
   id: root
   popupMinWidth: 320; popupMaxWidth: 360; compactThreshold: 340
-  implicitHeight: compactMode ? 430 : 390
+  implicitHeight: compactMode ? 630 : 590
   title: "Screen Recording"
   subtitle: RecordingService.isRecording
     ? ("Active · " + RecordingService.elapsedText)

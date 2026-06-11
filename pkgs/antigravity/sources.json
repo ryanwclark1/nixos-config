@@ -1,0 +1,22 @@
+{
+  "version": "2.0.11",
+  "vscodeVersion": "2.0.11",
+  "sources": {
+    "x86_64-linux": {
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.11-6560309696135168/linux-x64/Antigravity.tar.gz",
+      "sha256": "a1b2b5bf0de5f4304c29897f81aa69cb8c56e8a29570a962b95387ebc72bd951"
+    },
+    "aarch64-linux": {
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.11-6560309696135168/linux-arm/Antigravity.tar.gz",
+      "sha256": "595d7e0fba5c68a480b0124c31bb0d503ebd49d0edaf139459ffc1d1f4a6f3cc"
+    },
+    "x86_64-darwin": {
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.11-6560309696135168/darwin-x64/Antigravity.zip",
+      "sha256": "7697d4134a0edf171691f4c0e6c9d1bdc383b36bfbc6a64a486286806dd2c9e7"
+    },
+    "aarch64-darwin": {
+      "url": "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.11-6560309696135168/darwin-arm/Antigravity.zip",
+      "sha256": "f2385f3afa5a878df25465a712af8a2365bed9d45b5a689745b66f8d896e433b"
+    }
+  }
+}

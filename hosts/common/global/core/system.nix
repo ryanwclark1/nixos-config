@@ -18,7 +18,9 @@
   systemd.oomd = {
     enable = lib.mkDefault true;
     enableRootSlice = lib.mkDefault true;
-    enableUserSlices = lib.mkDefault true;
+    # User-slice memory-pressure killing can terminate the active compositor
+    # during transient reclaim pressure even when the machine has plenty of RAM.
+    enableUserSlices = lib.mkDefault false;
   };
 
   # Work around invalid pre-sleep/pre-shutdown oneshot units when powerDownCommands is empty.

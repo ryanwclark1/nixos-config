@@ -90,10 +90,13 @@ PanelWindow {
 
     Component.onCompleted: {
         root._syncInputFromService();
-        // If AiChat was lazy-loaded after a region capture (e.g. "Analyze with AI"),
-        // auto-enable visual context since the regionCaptured signal fired before creation.
-        if (ScreenshotService.lastRegionPath !== "" && !root.includeVisualContext)
-            root.includeVisualContext = true;
+        // If AiChat was lazy-loaded after a region capture for analysis,
+        // auto-enable visual context and consume the path.
+        if (ScreenshotService.lastAnalyzePath !== "") {
+            if (!root.includeVisualContext)
+                root.includeVisualContext = true;
+            ScreenshotService.clearLastAnalyze();
+        }
     }
 
     // --- Drag-resize state ---

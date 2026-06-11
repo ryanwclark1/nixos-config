@@ -11,7 +11,7 @@ import "../../services/ShellUtils.js" as ShellUtils
 BasePopupMenu {
   id: root
   popupMinWidth: 340; popupMaxWidth: 380; compactThreshold: 360
-  implicitHeight: compactMode ? 560 : 520
+  implicitHeight: compactMode ? 760 : 720
   title: "Bluetooth"
 
   readonly property bool hasAdapter: !!Bluetooth.defaultAdapter

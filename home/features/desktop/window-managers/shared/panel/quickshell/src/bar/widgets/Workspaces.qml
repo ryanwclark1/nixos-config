@@ -12,15 +12,17 @@ Rectangle {
   property bool _allowEmptyWorkspaceWarning: false
   property bool _hyprctlFallbackPending: false
   readonly property bool hasWorkspaceContent: workspaceApiAvailable && !!state && (state.workspaces || []).length > 0
-  readonly property real contentWidth: vertical ? 28 : (strip.implicitWidth + 12)
-  readonly property real contentHeight: vertical ? (strip.implicitHeight + 12) : 24
+  readonly property real contentWidth: vertical ? (28 * iconScale) : (strip.implicitWidth + 12 * iconScale)
+  readonly property real contentHeight: vertical ? (strip.implicitHeight + 12 * iconScale) : (24 * iconScale)
   height: hasWorkspaceContent ? contentHeight : 0
-  radius: vertical ? 12 : (height > 0 ? height / 2 : 0)
+  radius: vertical ? (12 * iconScale) : (height > 0 ? height / 2 : 0)
   color: Colors.bgWidget
 
   property bool vertical: false
   property var settings: ({})
   property var anchorWindow: null
+  property real iconScale: 1.0
+  property real fontScale: 1.0
   property bool showAddButton: true
   property bool showMiniMap: true
   property var state: ({ workspaces: [], activeWorkspace: -1 })
@@ -292,6 +294,8 @@ Rectangle {
     vertical: root.vertical
     state: root.state
     settings: root.settings
+    iconScale: root.iconScale
+    fontScale: root.fontScale
     showAddButton: root.showAddButton
     showMiniMap: root.showMiniMap
   }

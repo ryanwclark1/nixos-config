@@ -205,7 +205,10 @@ PanelWindow {
                 id: openSettingsTimer
                 interval: root.settingsOpenDelayMs
                 repeat: false
-                onTriggered: Quickshell.execDetached(SU.ipcCall("SettingsHub", "open"))
+                onTriggered: {
+                    if (root.shellRoot)
+                        root.shellRoot.openSettingsHub();
+                }
             }
 
             Timer {

@@ -9,7 +9,6 @@
     ./features/ai
     ./features/alacritty
     ./features/ansible
-    ./features/antigravity
     ./features/atuin
     ./features/audio
     ./features/bat
@@ -55,6 +54,7 @@
     ./features/tmux
     ./features/vivid
     ./features/vscode
+    ./features/zed
     ./features/webapps
     ./features/wireless
     ./features/yazi
@@ -62,7 +62,6 @@
 
     # Desktop environment configuration
     ./features/desktop/common # Core desktop components
-    ./features/battery/battery-monitor.nix # Laptop-specific battery monitoring
     ./features/desktop/window-managers # Window managers and shared WM tools
     ./features/desktop/window-managers/hyprland/host-specific/frametop.nix
     # ./features/desktop/window-managers/niri/host-specific/frametop.nix

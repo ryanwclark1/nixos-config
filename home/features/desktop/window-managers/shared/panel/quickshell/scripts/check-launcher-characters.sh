@@ -14,18 +14,11 @@ config_persistence_js="${config_dir}/services/config/ConfigPersistence.js"
 launcher_domain_js="${config_dir}/services/config/domains/launcher.js"
 config_launcher_js="${config_dir}/services/config/ConfigLauncher.js"
 launcher_settings_qml="${config_dir}/features/settings/components/tabs/ShellLauncherSection.qml"
+launcher_general_settings_qml="${config_dir}/features/settings/components/tabs/LauncherGeneralSection.qml"
 launcher_helpers_js="${config_dir}/features/settings/components/tabs/ShellCoreHelpers.js"
 
 violations=()
-
-require_literal() {
-  local file="$1"
-  local needle="$2"
-  local label="$3"
-  if ! rg -n -F -- "$needle" "$file" >/dev/null 2>&1; then
-    violations+=("${label} missing in ${file}")
-  fi
-}
+source "${script_dir}/check-helpers.sh"
 
 require_literal "$config_qml" 'property string launcherCharacterTrigger: ":"' "launcher character trigger config"
 require_literal "$config_qml" 'property bool launcherCharacterPasteOnSelect: false' "launcher character paste toggle config"
@@ -47,8 +40,8 @@ require_literal "$launcher_search_js" 'function stripCharacterTrigger(searchText
 require_literal "$launcher_search_js" 'function rankCharacterItem(item, clean, cleanLower)' "launcher character ranking helper"
 require_literal "$launcher_executor_js" 'actions.selectCharacter(item.name, actions.shouldPasteCharacter(actions.modifiers));' "launcher executor character action"
 require_literal "$launcher_result_delegate_qml" 'if (root.mode === "emoji")' "launcher character provider badge"
-require_literal "$launcher_settings_qml" 'label: "Character Trigger"' "launcher settings character trigger row"
-require_literal "$launcher_settings_qml" 'configKey: "launcherCharacterPasteOnSelect"' "launcher settings paste toggle row"
+require_literal "$launcher_settings_qml" 'label: "Character Trigger"' "launcher settings character trigger row" "$launcher_general_settings_qml"
+require_literal "$launcher_settings_qml" 'configKey: "launcherCharacterPasteOnSelect"' "launcher settings paste toggle row" "$launcher_general_settings_qml"
 require_literal "$launcher_helpers_js" 'Config.launcherCharacterTrigger = ":";' "launcher character trigger reset"
 require_literal "$launcher_helpers_js" 'Config.launcherCharacterPasteOnSelect = false;' "launcher character paste reset"
 
@@ -84,10 +77,4 @@ then
   violations+=("character catalog content validation failed")
 fi
 
-if (( ${#violations[@]} > 0 )); then
-  printf '%s\n' "Launcher character check failed:" >&2
-  printf '  - %s\n' "${violations[@]}" >&2
-  exit 1
-fi
-
-printf '%s\n' "Launcher character check passed."
+report_violations "Launcher character check"

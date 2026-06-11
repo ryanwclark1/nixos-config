@@ -7,8 +7,10 @@ import "../../widgets" as SharedWidgets
 Item {
     id: root
     property var widgetInstance: null
-    required property var anchorWindow
-    property bool inhibitorActive: _pidFile.text !== ""
+    property var anchorWindow
+    property bool inhibitorActive: _pidFile.text() !== ""
+    property real iconScale: 1.0
+    property real fontScale: 1.0
     signal contextMenuRequested(var actions, rect triggerRect)
 
     implicitWidth: inhibitorPill.width
@@ -28,6 +30,8 @@ Item {
         normalColor: root.inhibitorActive ? Colors.primaryTint : Colors.bgWidget
         hoverColor: root.inhibitorActive ? Colors.withAlpha(Colors.primary, 0.35) : Colors.highlightLight
         tooltipText: root.inhibitorActive ? "Idle inhibitor enabled" : "Idle inhibitor"
+        iconScale: root.iconScale
+        fontScale: root.fontScale
         contextActions: [
             {
                 label: root.inhibitorActive ? "Disable Inhibitor" : "Enable Inhibitor",
@@ -45,7 +49,7 @@ Item {
         SharedWidgets.SvgIcon {
             source: "power-sleep.svg"
             color: root.inhibitorActive ? Colors.primary : Colors.text
-            size: Appearance.fontSizeXL
+            size: Appearance.fontSizeXL * root.iconScale
         }
 
     }

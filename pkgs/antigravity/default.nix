@@ -7,10 +7,13 @@
   buildFHSEnv,
   writeShellScript,
   coreutils,
+  gawk,
+  getconf,
   commandLineArgs ? "",
   useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
   # Get all build dependencies needed by generic.nix
   gnugrep,
+  gnused,
   copyDesktopItems,
   makeDesktopItem,
   unzip,
@@ -40,6 +43,7 @@
   openssl,
   webkitgtk_4_1,
   ripgrep,
+  which,
   asar,
   bash,
   # Playwright browsers for browser automation support
@@ -49,7 +53,7 @@
 
 let
   inherit (stdenv) hostPlatform;
-  information = (lib.importJSON ./information.json);
+  information = (lib.importJSON ./sources.json);
   source =
     information.sources."${hostPlatform.system}"
       or (throw "antigravity: unsupported system ${hostPlatform.system}");
@@ -62,11 +66,11 @@ let
   # Second argument set: package-specific arguments
 in
 (genericFunction {
-  inherit stdenv lib coreutils gnugrep copyDesktopItems makeDesktopItem unzip libsecret;
+  inherit stdenv lib coreutils gawk getconf gnugrep gnused jq copyDesktopItems makeDesktopItem unzip libsecret;
   inherit buildPackages at-spi2-atk autoPatchelfHook buildFHSEnv;
   inherit alsa-lib libgbm nss nspr libxrandr libxfixes libxext libxdamage libxcomposite;
   inherit libx11 libxkbfile libxcb systemdLibs fontconfig imagemagick libdbusmenu;
-  inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep asar bash;
+  inherit glib wayland libglvnd openssl webkitgtk_4_1 ripgrep which asar bash;
 } {
   inherit commandLineArgs useVSCodeRipgrep;
   inherit (information) version vscodeVersion;
@@ -80,7 +84,7 @@ in
 
   src = fetchurl { inherit (source) url sha256; };
 
-  sourceRoot = if hostPlatform.isDarwin then "Antigravity.app" else "Antigravity";
+  sourceRoot = if hostPlatform.isDarwin then "Antigravity.app" else "Antigravity-${if hostPlatform.isAarch64 then "arm64" else "x64"}";
 
   # When running inside an FHS environment, ensure browsers are available for Playwright
   # This coordinates with home-manager playwright settings (PLAYWRIGHT_BROWSERS_PATH)
@@ -116,6 +120,15 @@ in
       }
     );
 
+  postInstall = ''
+    rm -f "$out/bin/antigravity"
+    cat > "$out/bin/antigravity" <<EOF
+#!/bin/sh
+exec "$out/lib/antigravity/antigravity" "\$@"
+EOF
+    chmod +x "$out/bin/antigravity"
+  '';
+
   tests = { };
   updateScript = ./update.sh;
 
@@ -138,15 +151,4 @@ in
       Zaczero
     ];
   };
-}).overrideAttrs
-  (oldAttrs: {
-    # Disable update checks
-    nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ jq ];
-    postPatch = (oldAttrs.postPatch or "") + ''
-      productJson="${
-        if stdenv.hostPlatform.isDarwin then "Contents/Resources" else "resources"
-      }/app/product.json"
-      data=$(jq 'del(.updateUrl)' "$productJson")
-      echo "$data" > "$productJson"
-    '';
-  })
+})

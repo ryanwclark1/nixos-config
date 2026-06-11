@@ -15,10 +15,19 @@ Rectangle {
     property string tooltipShortcut: ""
     signal clicked(real mouseX, real mouseY)
 
+    activeFocusOnTab: true
     Accessible.role: Accessible.Button
     Accessible.name: root.label
     Accessible.description: root.tooltipText || root.label
     Accessible.onPressAction: root.clicked(width / 2, height / 2)
+
+    Keys.onPressed: event => {
+        if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+            actionSL.burst(width / 2, height / 2);
+            root.clicked(width / 2, height / 2);
+            event.accepted = true;
+        }
+    }
 
     readonly property color effectiveColor: danger ? Colors.error : accentColor
 
@@ -26,8 +35,8 @@ Rectangle {
     height: compact ? 28 : 36
     radius: Appearance.radiusSmall
     color: Colors.withAlpha(effectiveColor, actionMouse.containsMouse ? 0.18 : 0.10)
-    border.color: effectiveColor
-    border.width: 1
+    border.color: root.activeFocus ? Colors.primary : effectiveColor
+    border.width: root.activeFocus ? 2 : 1
 
     RowLayout {
         id: actionRow

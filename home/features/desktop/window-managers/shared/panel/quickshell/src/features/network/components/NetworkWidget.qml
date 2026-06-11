@@ -5,9 +5,11 @@ import "../../../widgets"
 
 Row {
     id: root
-    spacing: Appearance.spacingS
+    spacing: Appearance.spacingS * iconScale
 
     property bool iconOnly: false
+    property real iconScale: 1.0
+    property real fontScale: 1.0
     readonly property bool wifiActive: NetworkService.activePrimaryType === "wifi" || NetworkService.activePrimaryType === "802-11-wireless"
     readonly property bool ethernetActive: NetworkService.activePrimaryType === "ethernet" || NetworkService.activePrimaryType === "802-3-ethernet"
     readonly property bool tailscaleActive: NetworkService.tailscaleConnected
@@ -62,22 +64,22 @@ Row {
     SvgIcon {
         source: NetworkService.networkIcon()
         color: Colors.primary
-        size: Appearance.fontSizeLarge
+        size: Appearance.fontSizeLarge * root.iconScale
         anchors.verticalCenter: parent.verticalCenter
     }
 
     Row {
         visible: !root.iconOnly
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Appearance.spacingSM
+        spacing: Appearance.spacingSM * root.iconScale
 
         Text {
             text: root.networkName
             color: Colors.text
-            font.pixelSize: Appearance.fontSizeSmall
+            font.pixelSize: Appearance.fontSizeSmall * root.fontScale
             font.weight: Font.DemiBold
             elide: Text.ElideRight
-            width: Math.min(contentWidth, 120)
+            width: Math.min(contentWidth, 120 * root.iconScale)
             anchors.verticalCenter: parent.verticalCenter
         }
 
@@ -89,6 +91,8 @@ Row {
             borderColor: Colors.border
             textColor: Colors.textSecondary
             fontWeight: Font.Medium
+            iconScale: root.iconScale
+            fontScale: root.fontScale
         }
 
         NetworkBadge {
@@ -96,6 +100,8 @@ Row {
             text: NetworkService.vpnOtherCount > 1 ? NetworkService.vpnOtherCount + " VPN" : "VPN"
             badgeColor: Colors.accent
             textColor: Colors.accent
+            iconScale: root.iconScale
+            fontScale: root.fontScale
         }
 
         NetworkBadge {
@@ -103,6 +109,8 @@ Row {
             text: "TS"
             badgeColor: Colors.primary
             textColor: Colors.primary
+            iconScale: root.iconScale
+            fontScale: root.fontScale
         }
     }
 }

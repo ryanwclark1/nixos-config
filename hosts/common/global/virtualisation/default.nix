@@ -29,6 +29,12 @@
     };
   };
 
+  # Ensure containerd-shim processes don't delay shutdown
+  systemd.services.docker.serviceConfig = {
+    TimeoutStopSec = 15;
+    KillMode = "mixed";
+  };
+
   # Add Docker Buildx and Compose for advanced build features
   environment.systemPackages = with pkgs; [
     docker-buildx

@@ -57,7 +57,7 @@ require_literal "$adapter_qml" 'function workspaceNameById(wsId) {' "compositor-
 
 require_literal "$title_qml" 'readonly property string activeTitle: CompositorAdapter.activeWindowTitle || ""' "window title widget uses normalized title"
 require_literal "$title_qml" 'readonly property string activeAppId: CompositorAdapter.activeWindowAppId || ""' "window title widget uses normalized app id"
-require_literal "$title_qml" 'implicitWidth: visible ? contentRow.implicitWidth : 0' "window title widget collapses width when hidden"
+require_literal "$title_qml" 'visible: activeTitle !== ""' "window title widget hides when no active window"
 
 require_literal "$panel_qml" 'function reportWidgetDiagnostic(widgetId, state, details) {' "panel widget diagnostic reporter"
 require_literal "$panel_qml" 'readonly property string diagnosticState: {' "panel widget diagnostic state"
