@@ -83,7 +83,9 @@ require_absent_literal "$clipboard_service_qml" 'content.indexOf("[[ binary data
 require_literal "$panel_qml" 'action: () => Quickshell.execDetached(["cliphist", "wipe"])' "Clipboard bar widget clears history with direct exec"
 
 if command -v cliphist >/dev/null 2>&1; then
-  if cliphist list | node -e '
+  cliphist_out="$(mktemp)"
+  cliphist_err="$(mktemp)"
+  if cliphist list >"$cliphist_out" 2>"$cliphist_err" && node -e '
 const fs = require("fs");
 const raw = fs.readFileSync(0, "utf8");
 const lines = raw.trim() === "" ? [] : raw.trim().split("\n");
@@ -91,11 +93,14 @@ for (const line of lines.slice(0, 10)) {
   const idx = line.indexOf("\t");
   if (idx <= 0) process.exit(1);
 }
-'; then
+' <"$cliphist_out"; then
     pass "cliphist list emits tab-delimited rows that ClipboardHistoryService can parse"
+  elif rg -Fq "please store something first" "$cliphist_err"; then
+    pass "cliphist list has no stored rows in a fresh environment"
   else
     fail "cliphist list emits tab-delimited rows that ClipboardHistoryService can parse"
   fi
+  rm -f "$cliphist_out" "$cliphist_err"
 else
   fail "cliphist must be installed for clipboard contracts"
 fi
