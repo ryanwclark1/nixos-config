@@ -22,7 +22,7 @@ jobs:
       - uses: DeterminateSystems/flake-checker-action@v10
       - name: QuickShell structure verify (CI deterministic)
         run: |
-          nix shell nixpkgs#bash nixpkgs#python3 nixpkgs#ripgrep nixpkgs#coreutils -c \
+          nix shell nixpkgs#bash nixpkgs#python3 nixpkgs#ripgrep nixpkgs#coreutils nixpkgs#cliphist nixpkgs#wl-clipboard nixpkgs#nodejs -c \
             bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/quickshell-structure-verify.sh --ci --quiet
       - name: QuickShell Vitest suite
         run: |
