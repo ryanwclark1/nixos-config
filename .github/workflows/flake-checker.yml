@@ -34,7 +34,7 @@ jobs:
             bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/compositor-verify.sh --ci
       - name: QuickShell plugin verification checks
         run: |
-          nix shell nixpkgs#bash nixpkgs#jq nixpkgs#findutils nixpkgs#coreutils nixpkgs#ripgrep nixpkgs#nodejs nixpkgs#quickshell -c \
+          nix shell nixpkgs#bash nixpkgs#jq nixpkgs#findutils nixpkgs#coreutils nixpkgs#ripgrep nixpkgs#nodejs nixpkgs#quickshell nixpkgs#qt6.qt5compat -c \
             bash ./home/features/desktop/window-managers/shared/panel/quickshell/scripts/plugin-verify.sh
       - name: QuickShell launcher smoke checks (CI mode)
         run: |
