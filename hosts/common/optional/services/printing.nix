@@ -4,17 +4,9 @@
 }:
 
 {
-  services.avahi = {
-    enable = true;
-    openFirewall = true;
-    nssmdns4 = true; # Allows software to use Avahi to resolve.
-    publish = {
-      enable = true;
-      addresses = true;
-      workstation = true;
-      userServices = true;
-    };
-  };
+  imports = [
+    ./avahi.nix
+  ];
 
   # Cupsd configuration for printing
   services.printing = {
