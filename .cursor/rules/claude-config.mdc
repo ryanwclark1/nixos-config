@@ -3,9 +3,12 @@ description: Claude Code configuration reference system - when and how to use co
 alwaysApply: true
 ---
 
-# Claude Code Configuration System
+# Agent Desk and Claude Code Configuration System
 
-This project keeps a small set of Claude Code reference files in `home/features/ai/claude/config/`. These files are deployed to `~/.claude/` and should be referenced only when relevant.
+This project keeps reusable procedures in the shared Agent Desk skills library
+and Claude-specific compatibility files under `home/features/ai/claude/config/`.
+Shared skills are deployed to `$AGENT_DESK_SKILLS_DIR` and should be preferred
+over copying prompt libraries between agents.
 
 ## Behavioral Rules
 
@@ -17,18 +20,25 @@ This project keeps a small set of Claude Code reference files in `home/features/
 - **[PLANNING.md](mdc:home/features/ai/claude/config/PLANNING.md)**: NixOS config architecture principles and design decisions.
 - **[KNOWLEDGE.md](mdc:home/features/ai/claude/config/KNOWLEDGE.md)**: NixOS and Home Manager troubleshooting notes and learned patterns.
 
+## Shared Agent Desk Skills
+
+- **improve**: Canonical code-improvement workflow deployed to `$AGENT_DESK_SKILLS_DIR/improve/SKILL.md`.
+- Claude keeps `/sc:improve` as a thin compatibility shortcut to the shared skill.
+- Other legacy `/sc:*` command docs remain in the repo for reference but are not deployed to `~/.claude/commands/sc/` by default.
+
 ## Business Panel Documentation
 
-- **[MODE_Business_Panel.md](mdc:home/features/ai/claude/config/MODE_Business_Panel.md)**: When `/sc:business-panel` is used or business analysis is needed
+- **[MODE_Business_Panel.md](mdc:home/features/ai/claude/config/MODE_Business_Panel.md)**: When business analysis is needed
 - **[BUSINESS_SYMBOLS.md](mdc:home/features/ai/claude/config/BUSINESS_SYMBOLS.md)**: Business panel symbol system (used with MODE_Business_Panel)
 
 ## Usage Guidelines
 
 1. **Always Apply**: Cursor rule files guide behavior by default.
-2. **Project Context**: Reference PLANNING.md and KNOWLEDGE.md when making architectural decisions.
-3. **Business Panel**: Reference MODE_Business_Panel.md and BUSINESS_SYMBOLS.md only for `/sc:business-panel` workflows.
-4. **MCP Usage**: MCP servers are declared in Nix and exposed through generated client config.
+2. **Shared Skills**: Prefer `$AGENT_DESK_SKILLS_DIR` procedures for reusable workflows.
+3. **Project Context**: Reference PLANNING.md and KNOWLEDGE.md when making architectural decisions.
+4. **Business Panel**: Reference MODE_Business_Panel.md and BUSINESS_SYMBOLS.md only for business-panel workflows.
+5. **MCP Usage**: MCP servers are declared in Nix and exposed through generated client config.
 
 ## File Locations
 
-The reference files listed above are deployed to `~/.claude/` via [default.nix](mdc:home/features/ai/claude/default.nix). They can be read directly from that location or from the source in `home/features/ai/claude/config/`.
+The reference files listed above are deployed to `~/.claude/` via [default.nix](mdc:home/features/ai/claude/default.nix). Shared skills are deployed by [skills/default.nix](mdc:home/features/ai/skills/default.nix).
