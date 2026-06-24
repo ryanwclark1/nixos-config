@@ -12,7 +12,7 @@ if [ -z "$FILE_PATH" ] || [ "$FILE_PATH" = "null" ]; then
 fi
 
 # Resolve relative paths
-if [ ! "$FILE_PATH" = /* ]; then
+if [[ "$FILE_PATH" != /* ]]; then
   FILE_PATH="$CWD/$FILE_PATH"
 fi
 
@@ -32,9 +32,20 @@ fi
 
 # Type check Python files
 if [[ "$FILE_PATH" == *.py ]]; then
-  if command -v mypy >/dev/null 2>&1; then
-    # Check if pyproject.toml or mypy.ini exists
-    if [ -f "$CWD/pyproject.toml" ] || [ -f "$CWD/mypy.ini" ] || [ -f "$CWD/.mypy.ini" ]; then
+  # Check if a Python project/type-checker config exists before running tools.
+  if [ -f "$CWD/pyproject.toml" ] || [ -f "$CWD/pyrefly.toml" ] || \
+     [ -f "$CWD/ty.toml" ] || [ -f "$CWD/mypy.ini" ] || \
+     [ -f "$CWD/.mypy.ini" ] || [ -f "$CWD/pyrightconfig.json" ] || \
+     [ -f "$CWD/setup.py" ]; then
+    if command -v pyrefly >/dev/null 2>&1; then
+      (cd "$CWD" && pyrefly check "$FILE_PATH") 2>&1 || true
+    fi
+
+    if command -v ty >/dev/null 2>&1; then
+      (cd "$CWD" && ty check "$FILE_PATH") 2>&1 || true
+    fi
+
+    if command -v mypy >/dev/null 2>&1; then
       mypy "$FILE_PATH" 2>&1 || true
     fi
   fi
