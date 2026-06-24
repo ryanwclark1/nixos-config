@@ -16,6 +16,7 @@
     ./features/fd
     ./features/fzf
     ./features/git
+    ./features/kubernetes/helm.nix
     ./features/kitty
     ./features/lazygit
     ./features/ripgrep

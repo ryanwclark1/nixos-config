@@ -7,6 +7,7 @@
 
 {
   imports = [
+    ./helm.nix
     ./k9s.nix
   ];
 
@@ -15,7 +16,6 @@
 
   home.packages = with pkgs; [
     kubectl
-    kubernetes-helm
     minikube
     talosctl
     kubeshark # Kubernetes packet capture tool
@@ -48,11 +48,6 @@
       if command -v minikube &> /dev/null; then
         source <(minikube completion bash 2>/dev/null | grep -v "shopt.*progcomp" || true)
       fi
-
-      # Helm completion
-      if command -v helm &> /dev/null; then
-        source <(helm completion bash 2>/dev/null | grep -v "shopt.*progcomp" || true)
-      fi
     fi
   '';
 
@@ -66,11 +61,6 @@
     if command -v minikube &> /dev/null
       minikube completion fish | source
     end
-
-    # Helm completion
-    if command -v helm &> /dev/null
-      helm completion fish | source
-    end
   '';
 
   programs.zsh.initContent = lib.mkIf config.programs.zsh.enable ''
@@ -83,11 +73,6 @@
     # Minikube completion
     if command -v minikube &> /dev/null; then
       source <(minikube completion zsh)
-    fi
-
-    # Helm completion
-    if command -v helm &> /dev/null; then
-      source <(helm completion zsh)
     fi
   '';
 }

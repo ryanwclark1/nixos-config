@@ -18,6 +18,7 @@
     ./features/fd
     ./features/fzf
     ./features/git
+    ./features/kubernetes/helm.nix
     ./features/lazygit
     ./features/ripgrep
     ./features/starship
