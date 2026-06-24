@@ -7,8 +7,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MCP_CONFIG_FILE="${MCP_CONFIG_FILE:-${HOME}/.config/open-webui/mcp-servers.json}"
-MCP_PROCESSED_CONFIG="/tmp/mcp-servers-processed.json"
+MCP_CONFIG_FILE="${MCP_CONFIG_FILE:-${XDG_CONFIG_HOME:-${HOME}/.config}/open-webui/mcp-servers.json}"
+MCP_PROCESSED_CONFIG="${MCP_PROCESSED_CONFIG:-${XDG_RUNTIME_DIR:-/tmp}/mcp-servers-processed.json}"
 
 # Check dependencies
 check_dependencies() {
@@ -43,6 +43,8 @@ process_mcp_config() {
         return 1
     fi
 
+    mkdir -p "$(dirname "$output_file")"
+
     # Read the JSON and replace template variables
     local processed_json
     processed_json=$(cat "$input_file" 2>/dev/null) || {
@@ -51,7 +53,7 @@ process_mcp_config() {
     }
 
     # Replace {{HOME}} with actual home directory
-    processed_json=$(echo "$processed_json" | sed "s|{{HOME}}|${HOME}|g")
+    processed_json=$(printf '%s' "$processed_json" | sed "s|{{HOME}}|${HOME}|g")
 
     # Process SOPS secrets
     while IFS= read -r line; do
@@ -79,11 +81,23 @@ process_mcp_config() {
                 secret_value="MISSING_SECRET_${secret_key}"
             fi
 
-            processed_json=$(echo "$processed_json" | sed "s|{{SOPS:${secret_key}}}|${secret_value}|g")
+            processed_json=$(printf '%s' "$processed_json" | jq --arg needle "{{SOPS:${secret_key}}}" --arg value "$secret_value" \
+                'walk(if type == "string" then split($needle) | join($value) else . end)')
         fi
-    done < <(echo "$processed_json" | grep -o '{{SOPS:[^}]*}}' || true)
+    done < <(printf '%s' "$processed_json" | grep -o '{{SOPS:[^}]*}}' || true)
 
-    echo "$processed_json" > "$output_file" || {
+    # Resolve ${ENV_VAR} placeholders when the variable is present. Unknown
+    # placeholders are left intact so missing secrets are visible.
+    while IFS= read -r placeholder; do
+        local env_key="${placeholder#\$\{}"
+        env_key="${env_key%\}}"
+        if [[ -v "$env_key" ]]; then
+            processed_json=$(printf '%s' "$processed_json" | jq --arg needle "$placeholder" --arg value "${!env_key}" \
+                'walk(if type == "string" then split($needle) | join($value) else . end)')
+        fi
+    done < <(printf '%s' "$processed_json" | grep -o '\${[A-Za-z_][A-Za-z0-9_]*}' | sort -u || true)
+
+    printf '%s\n' "$processed_json" > "$output_file" || {
         echo "Error: Failed to write processed configuration" >&2
         return 1
     }
@@ -120,9 +134,10 @@ launch_mcp_server() {
         return 1
     fi
 
-    local command args env_vars
+    local command
+    local -a args_array
     command=$(echo "$server_config" | jq -r '.command')
-    args=$(echo "$server_config" | jq -r '.args[]?' | tr '\n' ' ')
+    mapfile -t args_array < <(echo "$server_config" | jq -r '.args[]?')
 
     # Set environment variables if specified
     if echo "$server_config" | jq -e '.env' > /dev/null 2>&1; then
@@ -132,7 +147,7 @@ launch_mcp_server() {
     fi
 
     # Launch the server
-    exec $command $args
+    exec "$command" "${args_array[@]}"
 }
 
 # CLI tool integration functions
@@ -319,7 +334,7 @@ main() {
             get_mcp_servers | while read -r server; do
                 if [ -n "$server" ]; then
                     local desc
-                    desc=$(jq -r ".\"$server\".description" "$MCP_CONFIG_FILE" 2>/dev/null || echo "No description")
+                    desc=$(jq -r ".\"$server\".description" "$MCP_PROCESSED_CONFIG" 2>/dev/null || echo "No description")
                     echo "  $server: $desc"
                 fi
             done

@@ -162,6 +162,5 @@ mcp-server-playwright-nixos --browser=chrome
 - `home/features/chrome/default.nix` - Chrome configuration with Playwright support
 - `home/features/ai/default.nix` - AI features with Playwright MCP wrapper
 - `home/features/vscode/default.nix` - VSCode MCP configuration
-- `home/features/ai/mcp-servers.json` - JSON-based MCP server configs
-
-
+- `home/features/ai/shared/mcp-config.nix` - declarative MCP configuration for `mcp-servers-nix`
+- `home/features/ai/shared/playwright-mcp-wrapper.nix` - NixOS-compatible Playwright MCP wrapper

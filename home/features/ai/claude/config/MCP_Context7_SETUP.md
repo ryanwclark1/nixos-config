@@ -4,18 +4,9 @@
 
 ## Configuration Overview
 
-Context7 is configured in `home/features/ai/claude/mcp-servers.json` with:
-```json
-{
-  "context7": {
-    "command": "npx",
-    "args": ["-y", "@upstash/context7-mcp"],
-    "env": {
-      "CONTEXT7_TOKEN": "${CONTEXT7_TOKEN}"
-    }
-  }
-}
-```
+Context7 is configured in `home/features/ai/shared/mcp-config.nix` through `mcp-servers-nix` and generated to `~/.claude/mcp-servers.json` as a wrapped command.
+
+The wrapper reads the SOPS secret at runtime, so the token is not written into Nix store files or generated MCP JSON.
 
 ## Token Source
 
@@ -26,11 +17,7 @@ The `CONTEXT7_TOKEN` is loaded from SOPS secrets:
 
 ## Runtime Processing
 
-A systemd service (`generate-claude-config`) processes the MCP configuration at runtime:
-
-1. **Reads token** from SOPS secret file
-2. **Generates processed config** at `~/.claude/mcp-servers-processed.json` with actual token values
-3. **Creates .env file** at `~/.claude/.env` with environment variables
+`mcp-servers-nix` wraps the Context7 command with `passwordCommand`. When the MCP server starts, the wrapper reads `${config.sops.secrets.context7-token.path}` and exports `CONTEXT7_TOKEN` for that process only.
 
 ## Verification Steps
 
@@ -44,40 +31,26 @@ ls -la ~/.config/sops/context7-token
 ls -la /run/user/$(id -u)/secrets/context7-token
 ```
 
-### 2. Check Systemd Service Status
+### 2. Check Generated MCP Config
 ```bash
-systemctl --user status generate-claude-config
+jq '.context7.command' ~/.claude/mcp-servers.json
 ```
 
-### 3. Verify Processed Config Generated
+### 3. Verify Token Is Not Materialized
 ```bash
-# Check if processed config exists
-ls -la ~/.claude/mcp-servers-processed.json
-
-# Verify token is injected (should show actual token, not ${CONTEXT7_TOKEN})
-jq '.context7.env.CONTEXT7_TOKEN' ~/.claude/mcp-servers-processed.json
+! grep -R "CONTEXT7_TOKEN=" ~/.claude/mcp-servers.json
 ```
 
-### 4. Check .env File
+### 4. Test Context7 MCP Server Directly
 ```bash
-# Verify .env file exists and has token
-cat ~/.claude/.env | grep CONTEXT7_TOKEN
+jq -r '.context7.command' ~/.claude/mcp-servers.json | xargs -r -I{} {} --help
 ```
 
-### 5. Test Context7 MCP Server Directly
-```bash
-# Set environment variable
-export CONTEXT7_TOKEN=$(cat ~/.config/sops/context7-token 2>/dev/null || cat /run/user/$(id -u)/secrets/context7-token)
-
-# Test Context7 MCP server
-npx -y @upstash/context7-mcp
-```
-
-### 6. Verify in Claude Code
+### 5. Verify in Claude Code
 
 When Claude Code starts, it should:
-1. Load environment variables from `~/.claude/.env`
-2. Use processed MCP config if available
+1. Read `~/.claude/mcp-servers.json`
+2. Launch the generated Context7 wrapper command
 3. Make Context7 available via `--c7` flag or auto-selection
 
 ## Troubleshooting
@@ -93,55 +66,21 @@ When Claude Code starts, it should:
    sops secrets/secrets.yaml | grep context7-token
    ```
 
-### Processed Config Not Generated
-**Error**: `mcp-servers-processed.json` doesn't exist
+### Context7 Wrapper Missing
+**Error**: `context7.command` does not point to a Nix store wrapper
 
 **Solution**:
-1. Manually trigger systemd service:
-   ```bash
-   systemctl --user start generate-claude-config
-   ```
-2. Check service logs:
-   ```bash
-   journalctl --user -u generate-claude-config
-   ```
+1. Rebuild Home Manager: `home-manager switch`
+2. Check `home/features/ai/shared/mcp-config.nix`
+3. Verify `mcp-servers-nix` is present in `flake.lock`
 
-### Environment Variable Not Set
+### Authentication Error
 **Error**: Context7 MCP server fails with authentication error
 
 **Solution**:
-1. Use wrapper script: `~/.claude/claude-code-wrapper.sh`
-2. Or manually export before starting:
-   ```bash
-   export CONTEXT7_TOKEN=$(cat ~/.config/sops/context7-token)
-   claude-code
-   ```
-
-### Claude Code Not Using Processed Config
-**Solution**:
-1. Set environment variable:
-   ```bash
-   export MCP_SERVERS_CONFIG=~/.claude/mcp-servers-processed.json
-   ```
-2. Or use wrapper script which sets this automatically
-
-## Manual Token Injection
-
-If automatic processing fails, manually inject token:
-
-```bash
-# Read token
-CONTEXT7_TOKEN=$(cat ~/.config/sops/context7-token)
-
-# Process config manually
-jq --arg token "$CONTEXT7_TOKEN" \
-   '.context7.env.CONTEXT7_TOKEN = $token' \
-   ~/.claude/mcp-servers.json > ~/.claude/mcp-servers-processed.json
-
-# Export for Claude Code
-export MCP_SERVERS_CONFIG=~/.claude/mcp-servers-processed.json
-export CONTEXT7_TOKEN
-```
+1. Ensure the SOPS secret file exists and is readable.
+2. Rebuild Home Manager so the wrapper command is regenerated.
+3. Run the generated command directly to inspect the failure.
 
 ## Testing Context7
 

@@ -183,19 +183,12 @@ sops updatekeys secrets/secrets.yaml
 
 **Solution**:
 ```nix
-# Ensure MCP server package is installed
-home.packages = with pkgs; [
-  # ... other packages
-  nodejs  # Required for some MCP servers
-];
+# MCP servers are declared in home/features/ai/shared/mcp-config.nix
+# through mcp-servers-nix. Verify generated commands point at /nix/store.
+cat ~/.claude/mcp-servers.json | jq .
 
-# Check .env file has required API keys
-home.file."${claudeHome}/.env".text = ''
-  CONTEXT7_TOKEN=$(cat ${config.sops.secrets.context7-token.path})
-'';
-
-# Verify mcp-servers.json configuration
-# Path should match installed binary location
+# Secret-backed MCP servers use wrapper commands that read SOPS secrets at
+# runtime; tokens should not be materialized in generated JSON.
 ```
 
 ### Issue: Slow Rebuild Times

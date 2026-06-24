@@ -5,8 +5,8 @@
 
 set -euo pipefail
 
-SOURCE_CONFIG="${HOME}/.config/open-webui/mcp-servers.json"
-OUTPUT_CONFIG="${HOME}/.config/open-webui/mcp-servers-processed.json"
+SOURCE_CONFIG="${MCP_CONFIG_FILE:-${XDG_CONFIG_HOME:-${HOME}/.config}/open-webui/mcp-servers.json}"
+OUTPUT_CONFIG="${MCP_PROCESSED_CONFIG:-${XDG_RUNTIME_DIR:-${HOME}/.cache}/mcp-servers-processed.json}"
 
 # Check dependencies
 check_dependencies() {
@@ -47,7 +47,7 @@ process_config() {
     # Replace {{HOME}} with actual home directory
     echo "  Resolving HOME directory..."
     local processed_json
-    processed_json=$(echo "$template_json" | sed "s|{{HOME}}|${HOME}|g")
+    processed_json=$(printf '%s' "$template_json" | sed "s|{{HOME}}|${HOME}|g")
 
     # Process SOPS secrets
     echo "  Resolving SOPS secrets..."
@@ -84,12 +84,27 @@ process_config() {
                 secret_value="MISSING_SECRET_${secret_key}"
             fi
 
-            processed_json=$(echo "$processed_json" | sed "s|{{SOPS:${secret_key}}}|${secret_value}|g")
+            processed_json=$(printf '%s' "$processed_json" | jq --arg needle "{{SOPS:${secret_key}}}" --arg value "$secret_value" \
+                'walk(if type == "string" then split($needle) | join($value) else . end)')
         fi
-    done < <(echo "$processed_json" | grep -o '{{SOPS:[^}]*}}' || true)
+    done < <(printf '%s' "$processed_json" | grep -o '{{SOPS:[^}]*}}' || true)
+
+    # Resolve ${ENV_VAR} placeholders when the variable is present. Unknown
+    # placeholders remain visible in the output for easier debugging.
+    echo "  Resolving environment placeholders..."
+    while IFS= read -r placeholder; do
+        local env_key="${placeholder#\$\{}"
+        env_key="${env_key%\}}"
+        if [[ -v "$env_key" ]]; then
+            processed_json=$(printf '%s' "$processed_json" | jq --arg needle "$placeholder" --arg value "${!env_key}" \
+                'walk(if type == "string" then split($needle) | join($value) else . end)')
+        else
+            echo "    Leaving unresolved: $placeholder"
+        fi
+    done < <(printf '%s' "$processed_json" | grep -o '\${[A-Za-z_][A-Za-z0-9_]*}' | sort -u || true)
 
     # Write the processed configuration
-    echo "$processed_json" > "$OUTPUT_CONFIG" || {
+    printf '%s\n' "$processed_json" > "$OUTPUT_CONFIG" || {
         echo "Error: Failed to write processed configuration" >&2
         return 1
     }

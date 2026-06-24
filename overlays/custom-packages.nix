@@ -1,8 +1,90 @@
-# Overlay to override packages with custom/newer versions
-# This uses the custom package definitions in pkgs/
-# Includes: code-cursor, cursor-cli, antigravity-cli, antigravity-ide, claude-code, claude-code-bin, codex, antigravity, kiro, and vscode-generic
+{
+  inputs ? { },
+}:
+
+# Overlay to override packages with custom/newer versions.
+# This uses the custom package definitions in pkgs/ and Qumulo's llm-agents
+# flake for fast-moving AI agent ecosystem packages.
+# Includes: code-cursor, cursor-cli, antigravity-cli, antigravity-ide,
+# claude-code, claude-code-bin, codex, antigravity, kiro, vscode-generic,
+# plus Beads/Gastown/WorkMux/GitButler/skills/proxy tooling from llm-agents.
 # Note: github-mcp-server is now available in nixpkgs and no longer needs a custom package
-final: prev: {
+final: prev:
+let
+  system = final.stdenv.hostPlatform.system;
+  llmAgents =
+    if
+      inputs ? llm-agents
+      && inputs.llm-agents ? packages
+      && builtins.hasAttr system inputs.llm-agents.packages
+    then
+      inputs.llm-agents.packages.${system}
+    else
+      { };
+  mcpServersNix =
+    if
+      inputs ? mcp-servers-nix
+      && inputs.mcp-servers-nix ? packages
+      && builtins.hasAttr system inputs.mcp-servers-nix.packages
+    then
+      inputs.mcp-servers-nix.packages.${system}
+    else
+      { };
+
+  fromLlmAgents =
+    name: fallback:
+    if builtins.hasAttr name llmAgents then builtins.getAttr name llmAgents else fallback;
+  fromMcpServersNix =
+    name: fallback:
+    if builtins.hasAttr name mcpServersNix then builtins.getAttr name mcpServersNix else fallback;
+in
+{
+  llm-agents = llmAgents;
+  mcp-servers-nix = mcpServersNix;
+
+  # Accent AI platform layers from Qumulo/llm-agents.
+  beads = fromLlmAgents "beads" prev.beads;
+  beads-rust = fromLlmAgents "beads-rust" null;
+  beads-viewer = fromLlmAgents "beads-viewer" null;
+  mardi-gras = fromLlmAgents "mardi-gras" null;
+  gastown = fromLlmAgents "gastown" null;
+  gascity = fromLlmAgents "gascity" null;
+  bernstein = fromLlmAgents "bernstein" null;
+  workmux = fromLlmAgents "workmux" null;
+  gitbutler = fromLlmAgents "gitbutler" prev.gitbutler;
+  but = fromLlmAgents "but" null;
+  cli-proxy-api = fromLlmAgents "cli-proxy-api" null;
+  claude-code-router = fromLlmAgents "claude-code-router" null;
+  rtk = fromLlmAgents "rtk" null;
+  skills = fromLlmAgents "skills" null;
+  skills-installer = fromLlmAgents "skills-installer" null;
+  openskills = fromLlmAgents "openskills" null;
+  apm = fromLlmAgents "apm" null;
+  context-hub = fromLlmAgents "context-hub" null;
+  mcporter = fromLlmAgents "mcporter" null;
+  opencode = fromLlmAgents "opencode" prev.opencode;
+  amp-cli = fromLlmAgents "amp" (prev.amp-cli or null);
+  gemini-cli = fromLlmAgents "gemini-cli" (prev.gemini-cli or null);
+  goose-cli = fromLlmAgents "goose-cli" (prev.goose-cli or null);
+  qwen-code = fromLlmAgents "qwen-code" null;
+  crush = fromLlmAgents "crush" null;
+  git-surgeon = fromLlmAgents "git-surgeon" null;
+  hunk = fromLlmAgents "hunk" null;
+  tuicr = fromLlmAgents "tuicr" null;
+  codex-acp = fromLlmAgents "codex-acp" null;
+  claude-agent-acp = fromLlmAgents "claude-agent-acp" null;
+  codex-auth = fromLlmAgents "codex-auth" null;
+
+  # Packaged MCP servers from natsukium/mcp-servers-nix.
+  context7-mcp = fromMcpServersNix "context7-mcp" null;
+  mcp-server-fetch = fromMcpServersNix "mcp-server-fetch" null;
+  mcp-server-filesystem = fromMcpServersNix "mcp-server-filesystem" null;
+  mcp-server-git = fromMcpServersNix "mcp-server-git" null;
+  mcp-server-memory = fromMcpServersNix "mcp-server-memory" null;
+  mcp-server-sequential-thinking = fromMcpServersNix "mcp-server-sequential-thinking" null;
+  mcp-server-time = fromMcpServersNix "mcp-server-time" null;
+  serena = fromMcpServersNix "serena" null;
+
   # Override code-cursor with our custom version
   # Workaround: callPackage incorrectly auto-fills 'meta' from package set
   # Solution: use lib.callPackageWith to exclude meta from auto-args
@@ -44,9 +126,7 @@ final: prev: {
       callPackageWithoutMeta = final.lib.callPackageWith pkgsWithoutMeta;
       # Safely get playwright.browsers if available
       playwrightBrowsers =
-        if final ? playwright && final.playwright ? browsers
-        then final.playwright.browsers
-        else null;
+        if final ? playwright && final.playwright ? browsers then final.playwright.browsers else null;
     in
     callPackageWithoutMeta (import ../pkgs/antigravity) {
       callPackage = callPackageWithoutMeta;
@@ -63,9 +143,7 @@ final: prev: {
       pkgsWithoutMeta = builtins.removeAttrs final [ "meta" ];
       callPackageWithoutMeta = final.lib.callPackageWith pkgsWithoutMeta;
       playwrightBrowsers =
-        if final ? playwright && final.playwright ? browsers
-        then final.playwright.browsers
-        else null;
+        if final ? playwright && final.playwright ? browsers then final.playwright.browsers else null;
     in
     callPackageWithoutMeta (import ../pkgs/antigravity-ide) {
       callPackage = callPackageWithoutMeta;
@@ -106,7 +184,7 @@ final: prev: {
     (python-final: python-prev: {
       pipx = python-prev.pipx.overrideAttrs (oldAttrs: {
         doCheck = false;
-        pytestFlagsArray = [];
+        pytestFlagsArray = [ ];
         checkPhase = "";
       });
     })

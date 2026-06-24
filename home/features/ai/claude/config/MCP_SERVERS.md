@@ -1,7 +1,7 @@
 # Available MCP Servers
 
 > **Purpose**: Reference guide for configured MCP servers in this NixOS configuration
-> **Location**: Configured in `home/features/ai/claude/mcp-servers.json`
+> **Location**: Generated from `home/features/ai/shared/mcp-config.nix` through `mcp-servers-nix`
 
 ## Currently Configured Servers
 
@@ -12,7 +12,6 @@
 | **context7** | Official library documentation | `--c7`, `--context7` | [MCP_Context7.md](mdc:home/features/ai/claude/config/MCP_Context7.md) |
 | **sequential-thinking** | Multi-step reasoning | `--seq`, `--sequential` | [MCP_Sequential.md](mdc:home/features/ai/claude/config/MCP_Sequential.md) |
 | **playwright** | Browser automation & E2E testing | `--play`, `--playwright` | [MCP_Playwright.md](mdc:home/features/ai/claude/config/MCP_Playwright.md) |
-| **serena** | Symbol operations & project memory | `--serena` | [MCP_Serena.md](mdc:home/features/ai/claude/config/MCP_Serena.md) |
 | **github** | GitHub repository operations | N/A | (No dedicated docs) |
 | **git** | Git operations | N/A | (No dedicated docs) |
 | **fetch** | Web content fetching | N/A | (No dedicated docs) |
@@ -45,12 +44,6 @@
 → Use Playwright MCP server
 ```
 
-### For Symbol Operations
-```
---serena
-→ Use Serena MCP server
-```
-
 ### For Bulk Edits (No MCP Available)
 ```
 Use MultiEdit tool or grep + search_replace
@@ -79,17 +72,11 @@ Use --c7 for patterns, then manual coding
 → Sequential plans strategy → Playwright executes tests
 ```
 
-**Refactoring + Memory**:
-```
-/sc:refactor --serena "Rename function across codebase"
-→ Serena handles symbol operations with project memory
-```
-
 ## Adding New MCP Servers
 
 To add a new MCP server:
 
-1. Add configuration to `home/features/ai/claude/mcp-servers.json`
+1. Add configuration to `home/features/ai/shared/mcp-config.nix`
 2. Create documentation file: `MCP_[ServerName].md`
 3. Add flag to `FLAGS.md` if applicable
 4. Update this file with the new server
@@ -99,7 +86,7 @@ To add a new MCP server:
 
 To verify which MCP servers are available:
 ```bash
-cat home/features/ai/claude/mcp-servers.json
+cat ~/.claude/mcp-servers.json
 ```
 
 For complete flag documentation, see [FLAGS.md](mdc:home/features/ai/claude/config/FLAGS.md).

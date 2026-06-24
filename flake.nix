@@ -111,9 +111,17 @@
     elephant = {
       url = "github:abenz1267/elephant";
     };
-    # Beads - issue tracker for AI-supervised coding workflows
-    beads = {
-      url = "github:steveyegge/beads";
+    # AI coding agents and orchestration tools: Beads, Gastown, WorkMux,
+    # GitButler, OpenCode, skills, proxy tooling, and related CLIs.
+    llm-agents = {
+      url = "github:Qumulo/llm-agents";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.systems.follows = "systems";
+    };
+    # Declarative MCP server packages/configuration for Claude Code, Codex,
+    # OpenCode, VS Code, and other MCP clients.
+    mcp-servers-nix = {
+      url = "github:natsukium/mcp-servers-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Voxtype - push-to-talk voice-to-text for Linux
@@ -139,7 +147,7 @@
 
       # 1) overlays as an ATTRSET (convention)
       overlaysSet = {
-        custom-packages = import ./overlays/custom-packages.nix;
+        custom-packages = import ./overlays/custom-packages.nix { inherit inputs; };
       };
 
       # 2) Convert to LIST when importing nixpkgs

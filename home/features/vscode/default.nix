@@ -7,6 +7,17 @@
 
 let
   marketplaceExtensions = builtins.fromJSON (builtins.readFile ./marketplace-extensions.json);
+  sharedMcpServers = lib.mapAttrs (
+    _: lib.filterAttrs (_: value: value != null && value != [ ] && value != { })
+  ) config.programs.mcp.servers;
+  vscodeMcpServers = sharedMcpServers // {
+    filesystem = {
+      command = "${pkgs.mcp-server-filesystem}/bin/mcp-server-filesystem";
+      args = [
+        config.home.homeDirectory
+      ];
+    };
+  };
 in
 {
   imports = [
@@ -22,165 +33,7 @@ in
   home.file.".config/VSCodium/User/mcp.json" = {
     force = true;
     text = builtins.toJSON {
-      servers = {
-        filesystem = {
-          command = "npx";
-          args = [
-            "@modelcontextprotocol/server-filesystem"
-            config.home.homeDirectory
-          ];
-          description = "Provides filesystem access to home directory";
-        };
-        git = {
-          command = "docker";
-          args = [
-            "run"
-            "-i"
-            "--rm"
-            "--name"
-            "mcp-git"
-            "-v"
-            "${config.home.homeDirectory}:${config.home.homeDirectory}:rw"
-            "-v"
-            "${config.home.homeDirectory}/.gitconfig:/root/.gitconfig:ro"
-            "mcp/git"
-          ];
-          description = "Provides git repository information and operations";
-        };
-        memory = {
-          command = "docker";
-          args = [
-            "run"
-            "-i"
-            "--rm"
-            "--name"
-            "mcp-memory"
-            "-v"
-            "mcp-memory-data:/data"
-            "mcp/memory"
-          ];
-          env = {
-            DATABASE_URL = "sqlite:///data/memory.db";
-          };
-          description = "Maintains context and memory across sessions";
-        };
-        time = {
-          command = "docker";
-          args = [
-            "run"
-            "-i"
-            "--rm"
-            "--name"
-            "mcp-time"
-            "mcp/time"
-            "--local-timezone=America/Chicago"
-          ];
-          env = {
-            TZ = "America/Chicago";
-          };
-          description = "Provides date and time information and operations";
-        };
-        fetch = {
-          command = "docker";
-          args = [
-            "run"
-            "-i"
-            "--rm"
-            "--name"
-            "mcp-fetch"
-            "--network"
-            "bridge"
-            "mcp/fetch"
-          ];
-          description = "Fetches and analyzes web content";
-        };
-        sequential-thinking = {
-          command = "npx";
-          args = [ "@modelcontextprotocol/server-sequential-thinking@latest" ];
-          env = {
-            NODE_ENV = "production";
-          };
-          description = "Helps break down complex problems into sequential steps";
-        };
-        context7 = {
-          command = "docker";
-          args = [
-            "run"
-            "-i"
-            "--rm"
-            "--name"
-            "mcp-context7"
-            "mcp/context7"
-          ];
-          env = {
-            CONTEXT7_TOKEN = "$(cat ${config.sops.secrets.context7-token.path})";
-            MCP_TRANSPORT = "stdio";
-          };
-          description = "Provides up-to-date code documentation for AI code editors";
-        };
-        github = {
-          command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
-          args = [ "stdio" ];
-          env = {
-            GITHUB_PERSONAL_ACCESS_TOKEN = "$(cat ${config.sops.secrets.github-pat.path})";
-            GITHUB_TOOLSETS = "repos,issues,pull_requests,actions,code_security,discussions";
-            MCP_TRANSPORT = "stdio";
-          };
-          description = "GitHub repository and workflow management via MCP";
-        };
-        playwright = {
-          command = "${pkgs.writeShellScriptBin "mcp-server-playwright-nixos" ''
-            #!/usr/bin/env bash
-            set -euo pipefail
-
-            # Playwright MCP wrapper for NixOS
-            # Ensure Playwright can find browsers in NixOS environments
-
-            # Use Playwright's bundled browsers (most reliable)
-            export PLAYWRIGHT_BROWSERS_PATH="${lib.getLib pkgs.playwright.browsers}"
-
-            # Try to find system Chrome/Chromium as fallback
-            if [ -z "''${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH:-}" ]; then
-              for candidate in google-chrome-stable google-chrome chromium-browser chromium; do
-                if target=$(command -v "$candidate" 2>/dev/null); then
-                  export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="$target"
-                  break
-                fi
-              done
-            fi
-
-            exec ${pkgs.playwright-mcp}/bin/mcp-server-playwright "$@"
-          ''}/bin/mcp-server-playwright-nixos";
-          args = [ "--headless" ];
-          env = {
-            PLAYWRIGHT_BROWSERS_PATH = "${lib.getLib pkgs.playwright.browsers}";
-          };
-          description = "Browser automation and web scraping via Playwright (NixOS-compatible)";
-        };
-        serena = {
-          command = "docker";
-          args = [
-            "run"
-            "-i"
-            "--rm"
-            "--name"
-            "mcp-serena"
-            "-v"
-            "/home/administrator/Code:/workspace/Code:rw"
-            "--network"
-            "host"
-            "ghcr.io/oraios/serena:latest"
-            "serena"
-            "start-mcp-server"
-            "--transport"
-            "stdio"
-          ];
-          env = {
-            SERENA_DOCKER = "1";
-          };
-          description = "AI-powered development assistant with Code directory access";
-        };
-      };
+      servers = vscodeMcpServers;
     };
   };
 
