@@ -1,14 +1,12 @@
 { pkgs, lib, ... }:
 
-let
-  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
-in
 {
-  home.packages = llmAgents.available [
-    (llmAgents.from "jules" (pkgs.jules or null))
-    (llmAgents.from "codex-acp" (pkgs.codex-acp or null))
-    (llmAgents.from "claude-agent-acp" (pkgs.claude-agent-acp or null))
-    (llmAgents.from "codex-auth" (pkgs.codex-auth or null))
+  home.packages = lib.filter (p: p != null) [
+    pkgs.antigravity-cli
+    pkgs.jules
+    pkgs.codex-acp
+    pkgs.claude-agent-acp
+    pkgs.codex-auth
   ];
 
   xdg.configFile."agent-desk/agent-roles.md".text = ''
@@ -38,6 +36,7 @@ in
     Primary execution agents:
     - Claude Code for senior implementation and refactoring
     - Codex for validation, review, and alternate implementations
+    - Antigravity CLI (`agy`) for Google agent workflows from the terminal
     - OpenCode for open-source, local-model, and experimental workflows
     - Jules for asynchronous Google coding-agent workflows
   '';

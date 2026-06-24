@@ -6,16 +6,15 @@
 }:
 
 let
-  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
   skillsDir = "${config.home.homeDirectory}/.local/share/agent-desk/skills";
 in
 {
-  home.packages = llmAgents.available [
-    (llmAgents.from "skills" (pkgs.skills or null))
-    (llmAgents.from "skills-installer" (pkgs.skills-installer or null))
-    (llmAgents.from "openskills" (pkgs.openskills or null))
-    (llmAgents.from "apm" (pkgs.apm or null))
-    (llmAgents.from "context-hub" (pkgs.context-hub or null))
+  home.packages = lib.filter (p: p != null) [
+    pkgs.skills
+    pkgs.skills-installer
+    pkgs.openskills
+    pkgs.apm
+    pkgs.context-hub
   ];
 
   home.sessionVariables = {

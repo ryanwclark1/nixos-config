@@ -7,13 +7,12 @@
 
 let
   agentDeskContext = builtins.readFile ../shared/agent-desk-context.md;
-  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
 in
 
 {
   programs.opencode = {
     enable = true;
-    package = llmAgents.from "opencode" pkgs.opencode;
+    package = pkgs.opencode;
     enableMcpIntegration = true;
     context = ''
       ${agentDeskContext}

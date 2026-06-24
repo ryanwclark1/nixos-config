@@ -1,13 +1,10 @@
 { pkgs, lib, ... }:
 
-let
-  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
-in
 {
-  home.packages = llmAgents.available [
-    (llmAgents.from "gastown" (pkgs.gastown or null))
-    (llmAgents.from "gascity" (pkgs.gascity or null))
-    (llmAgents.from "bernstein" (pkgs.bernstein or null))
+  home.packages = lib.filter (p: p != null) [
+    pkgs.gastown
+    pkgs.gascity
+    pkgs.bernstein
   ];
 
   xdg.configFile."agent-desk/architecture/gastown.md".text = ''

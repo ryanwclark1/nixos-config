@@ -63,17 +63,13 @@ in
   context-hub = fromLlmAgents "context-hub" null;
   mcporter = fromLlmAgents "mcporter" null;
   opencode = fromLlmAgents "opencode" prev.opencode;
-  amp-cli = fromLlmAgents "amp" (prev.amp-cli or null);
-  gemini-cli = fromLlmAgents "gemini-cli" (prev.gemini-cli or null);
-  goose-cli = fromLlmAgents "goose-cli" (prev.goose-cli or null);
-  qwen-code = fromLlmAgents "qwen-code" null;
-  crush = fromLlmAgents "crush" null;
   git-surgeon = fromLlmAgents "git-surgeon" null;
   hunk = fromLlmAgents "hunk" null;
   tuicr = fromLlmAgents "tuicr" null;
   codex-acp = fromLlmAgents "codex-acp" null;
   claude-agent-acp = fromLlmAgents "claude-agent-acp" null;
   codex-auth = fromLlmAgents "codex-auth" null;
+  jules = fromLlmAgents "jules" null;
 
   # Packaged MCP servers from natsukium/mcp-servers-nix.
   context7-mcp = fromMcpServersNix "context7-mcp" null;

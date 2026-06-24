@@ -6,7 +6,6 @@
 }:
 
 let
-  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
   cfg = config.features.agent-desk.beads.doltSqlServer;
 in
 {
@@ -33,10 +32,10 @@ in
   };
 
   config = {
-    home.packages = llmAgents.available [
-      (llmAgents.from "beads" (pkgs.beads or null))
-      (llmAgents.from "beads-viewer" (pkgs.beads-viewer or null))
-      (llmAgents.from "mardi-gras" (pkgs.mardi-gras or null))
+    home.packages = lib.filter (p: p != null) [
+      pkgs.beads
+      pkgs.beads-viewer
+      pkgs.mardi-gras
       pkgs.dolt
       pkgs.mariadb.client
     ];

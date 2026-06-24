@@ -10,7 +10,6 @@ let
   claudeHome = "${config.home.homeDirectory}/.claude";
   skillsDir = "${config.home.homeDirectory}/.local/share/agent-desk/skills";
   agentDeskContext = builtins.readFile ../shared/agent-desk-context.md;
-  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
   mcpConfig = import ../shared/mcp-config.nix { inherit config pkgs lib; };
   mcpServersNix = import inputs.mcp-servers-nix { inherit pkgs; };
   claudeMcpConfig = mcpServersNix.lib.mkConfig pkgs (
@@ -99,7 +98,7 @@ in
 
   programs.claude-code = {
     enable = true;
-    package = llmAgents.from "claude-code" pkgs.claude-code;
+    package = pkgs.claude-code;
     enableMcpIntegration = true;
     context = ''
       ${agentDeskContext}

@@ -1,11 +1,8 @@
 { pkgs, lib, ... }:
 
-let
-  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
-in
 {
-  home.packages = llmAgents.available [
-    (llmAgents.from "workmux" (pkgs.workmux or null))
+  home.packages = lib.filter (p: p != null) [
+    pkgs.workmux
     pkgs.tmux
     pkgs.zellij
   ];
