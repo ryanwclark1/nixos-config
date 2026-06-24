@@ -13,11 +13,14 @@ Both system and home configs are set to import SSH host keys and auto-generate a
 
 ## Initial setup
 
-1. Ensure a host SSH key exists (usually already present on NixOS installs):
+1. Ensure a host SSH key exists. On standard NixOS installs this is usually
+   `/etc/ssh/ssh_host_ed25519_key`; on hosts with a custom
+   `services.openssh.hostKeys` path, use that configured key instead.
    ```sh
    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
    ```
-2. Convert the host SSH public key to an age recipient and add it to `.sops.yaml`:
+2. Convert the host SSH public key to an age recipient and add it to `.sops.yaml`.
+   Match the path to the key used by the host.
    ```sh
    nix shell nixpkgs#ssh-to-age -c ssh-to-age -i /etc/ssh/ssh_host_ed25519_key.pub
    ```
@@ -28,7 +31,8 @@ Both system and home configs are set to import SSH host keys and auto-generate a
 
 ## Adding a new host
 
-1. Convert the host SSH public key to an age recipient (same as above).
+1. Convert the host SSH public key to an age recipient (same as above), using
+   the public key for the host's configured `services.openssh.hostKeys` entry.
 2. Add the new recipient to `.sops.yaml`.
 3. Re-encrypt secrets so the new host can decrypt:
    ```sh
