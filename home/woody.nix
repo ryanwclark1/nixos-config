@@ -5,11 +5,6 @@
 
 {
   features.quickshell.enable = true;
-  features.agent-desk.beads.doltSqlServer = {
-    enable = true;
-    port = 13306;
-    workdir = "/home/administrator/nixos-config";
-  };
 
   imports = [
     ./global

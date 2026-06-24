@@ -1,107 +1,76 @@
 {
-  config,
   pkgs,
   lib,
   ...
 }:
 
-let
-  cfg = config.features.agent-desk.beads.doltSqlServer;
-in
 {
-  options.features.agent-desk.beads.doltSqlServer = {
-    enable = lib.mkEnableOption "Dolt SQL server for the Agent Desk Beads repository";
+  # Dolt is owned and managed by Gas Town (gt), not by a standalone systemd
+  # unit. Gas Town runs a single Dolt SQL server (default port 3307) over
+  # ~/gt/.dolt-data/, with one database per rig plus the town "hq" database,
+  # and keeps it alive via `gt up` / `gt dolt`. Running a second dolt server
+  # here would collide with that ownership (see `gt dolt kill-imposters`).
+  #
+  # This module only provides the Beads CLI and Dolt inspection tooling.
 
-    workdir = lib.mkOption {
-      type = lib.types.str;
-      default = "/home/administrator/nixos-config";
-      description = "Repository directory containing the Beads Dolt database.";
-    };
+  home.packages = lib.filter (p: p != null) [
+    pkgs.beads
+    pkgs.beads-viewer
+    pkgs.mardi-gras
+    pkgs.dolt
+    pkgs.mariadb.client
+  ];
 
-    host = lib.mkOption {
-      type = lib.types.str;
-      default = "127.0.0.1";
-      description = "Host address for the Dolt MySQL-compatible SQL server.";
-    };
-
-    port = lib.mkOption {
-      type = lib.types.port;
-      default = 13306;
-      description = "TCP port for the Dolt MySQL-compatible SQL server.";
-    };
+  home.shellAliases = {
+    bd-ready = "bd ready";
+    bd-open = "bd show";
+    bd-sync = "bd dolt pull && bd dolt push";
+    # Lifecycle and inspection go through Gas Town's managed Dolt server.
+    # Delegate to `gt dolt` so the port/data dir stay owned by Gas Town
+    # rather than hardcoded here.
+    bd-dolt-server = "gt dolt start";
+    bd-dolt-status = "gt dolt status";
+    bd-sql = "gt dolt sql";
   };
 
-  config = {
-    home.packages = lib.filter (p: p != null) [
-      pkgs.beads
-      pkgs.beads-viewer
-      pkgs.mardi-gras
-      pkgs.dolt
-      pkgs.mariadb.client
-    ];
+  xdg.configFile."agent-desk/architecture/beads.md".text = ''
+    # Beads
 
-    home.shellAliases = {
-      bd-ready = "bd ready";
-      bd-open = "bd show";
-      bd-sync = "bd dolt pull && bd dolt push";
-      bd-sql = "mysql --protocol=tcp --host=${cfg.host} --port=${toString cfg.port} --user=root";
-      bd-dolt-server = "cd ${cfg.workdir} && dolt sql-server --host ${cfg.host} --port ${toString cfg.port}";
-    };
+    Beads is the persistent work ledger for the Agent Desk workstation.
 
-    systemd.user.services.agent-desk-dolt-sql = lib.mkIf cfg.enable {
-      Unit = {
-        Description = "Agent Desk Beads Dolt SQL server";
-        After = [ "network.target" ];
-      };
+    It owns:
 
-      Service = {
-        Type = "simple";
-        WorkingDirectory = toString cfg.workdir;
-        ExecStart = "${pkgs.dolt}/bin/dolt sql-server --host ${cfg.host} --port ${toString cfg.port}";
-        Restart = "on-failure";
-        RestartSec = 5;
-      };
+    - Tasks and work items
+    - Dependencies and ready queues
+    - Agent notes and workflow state
+    - Historical decisions and project memory
 
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
+    Beads is Dolt-backed. Dolt provides the versioned SQL database under
+    Beads and exposes it through a MySQL-compatible SQL server for
+    inspection and multi-writer access.
 
-    xdg.configFile."agent-desk/architecture/beads.md".text = ''
-      # Beads
+    ## Dolt is owned by Gas Town
 
-      Beads is the persistent work ledger for the Agent Desk workstation.
+    Gas Town (`gt`) manages the single Dolt SQL server, including its port
+    and data directory. Do not run a second Dolt server against the same
+    data; `gt dolt kill-imposters` exists precisely to evict rival servers
+    from the workspace port. In particular, do not run a separate Dolt
+    server (Docker compose, systemd unit, etc.) on the Gas Town port.
 
-      It owns:
+    - Lifecycle: `gt up` / `gt dolt start` / `gt dolt stop`
+    - Status: `gt dolt status`
+    - SQL shell: `gt dolt sql`
+    - Data: ~/gt/.dolt-data/ (one database per rig + town "hq")
 
-      - Tasks and work items
-      - Dependencies and ready queues
-      - Agent notes and workflow state
-      - Historical decisions and project memory
+    Useful commands:
 
-      Beads is Dolt-backed. Dolt provides the versioned SQL database under
-      Beads and can expose it through a MySQL-compatible SQL server for
-      inspection and multi-writer access.
+    - bd ready
+    - bd dolt status
+    - gt dolt status
+    - gt dolt sync          # push rig databases to DoltHub remotes
+    - mysql --protocol=tcp --host=127.0.0.1 --port=3307 --user=root
 
-      Local Dolt SQL server:
-
-      - Service: agent-desk-dolt-sql
-      - Host: ${cfg.host}
-      - Port: ${toString cfg.port}
-      - Workdir: ${cfg.workdir}
-
-      Useful commands:
-
-      - bd ready
-      - bd dolt status
-      - bd dolt pull
-      - bd dolt push
-      - dolt sql-server --host ${cfg.host} --port ${toString cfg.port}
-      - mysql --protocol=tcp --host=${cfg.host} --port=${toString cfg.port} --user=root
-
-      Gastown and the execution agents should treat Beads as the durable data
-      plane for coordinated work. Gastown should coordinate through Beads,
-      while Dolt/MySQL access remains the persistence and inspection layer.
-    '';
-  };
+    Gas Town and the execution agents treat Beads as the durable data plane
+    for coordinated work, with Dolt as the persistence and inspection layer.
+  '';
 }
