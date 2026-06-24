@@ -1,32 +1,88 @@
-{ pkgs, lib, ... }:
-
 {
-  home.packages = lib.filter (p: p != null) [
-    pkgs.gastown
-    pkgs.gascity
-    pkgs.bernstein
-  ];
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
-  xdg.configFile."agent-desk/architecture/gastown.md".text = ''
-    # Gastown
+let
+  cfg = config.features.agent-desk.gastown;
+in
+{
+  options.features.agent-desk.gastown = {
+    hqRoot = lib.mkOption {
+      type = lib.types.str;
+      default = "${config.home.homeDirectory}/gt";
+      description = "Path to the Gas Town HQ workspace.";
+    };
 
-    Gastown is the orchestration layer for the Agent Desk workstation.
+    autoStartDolt = lib.mkEnableOption "starting Gas Town's Dolt SQL server on login";
+  };
 
-    It coordinates:
+  config = {
+    home.packages = lib.filter (p: p != null) [
+      pkgs.gastown
+      pkgs.gascity
+      pkgs.bernstein
+    ];
 
-    - Agent roles
-    - Workflows
-    - Workspaces
-    - Messaging
-    - Reviews
+    # Persist Gas Town's Dolt SQL server (the Beads data plane) across
+    # reboots. This runs `gt dolt start` from the HQ, so it picks up the
+    # HQ's configured port and data directory automatically. Only the Dolt
+    # server is started here; the daemon/mayor/witnesses (which spawn agent
+    # sessions) are left to an explicit `gt up`.
+    systemd.user.services.gastown-dolt = lib.mkIf cfg.autoStartDolt {
+      Unit = {
+        Description = "Gas Town Dolt SQL server (Beads data plane)";
+        After = [ "default.target" ];
+      };
 
-    Target flow:
+      Service = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = cfg.hqRoot;
+        Environment = [
+          "PATH=${
+            lib.makeBinPath [
+              pkgs.gastown
+              pkgs.dolt
+              pkgs.beads
+              pkgs.git
+              pkgs.bash
+              pkgs.coreutils
+            ]
+          }"
+        ];
+        ExecStart = "${pkgs.gastown}/bin/gt dolt start";
+        ExecStop = "${pkgs.gastown}/bin/gt dolt stop";
+      };
 
-    Human -> Gastown -> Specialized Agents -> Beads -> Dolt -> Git
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+    };
 
-    Beads is the task ledger. Its Dolt-backed store may be served locally
-    through the Agent Desk Dolt SQL service for MySQL-compatible inspection,
-    but Gastown should continue to coordinate work through Beads commands and
-    workflow state.
-  '';
+    xdg.configFile."agent-desk/architecture/gastown.md".text = ''
+      # Gastown
+
+      Gastown is the orchestration layer for the Agent Desk workstation.
+
+      It coordinates:
+
+      - Agent roles
+      - Workflows
+      - Workspaces
+      - Messaging
+      - Reviews
+
+      Target flow:
+
+      Human -> Gastown -> Specialized Agents -> Beads -> Dolt -> Git
+
+      Beads is the task ledger. Gas Town owns the Dolt SQL server that backs
+      it (`gt dolt`); the `gastown-dolt` user service keeps that server
+      running across reboots. Gastown coordinates work through Beads commands
+      and workflow state on top of it.
+    '';
+  };
 }

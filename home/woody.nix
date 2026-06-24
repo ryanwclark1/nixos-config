@@ -5,6 +5,7 @@
 
 {
   features.quickshell.enable = true;
+  features.agent-desk.gastown.autoStartDolt = true;
 
   imports = [
     ./global
