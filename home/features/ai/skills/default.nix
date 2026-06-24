@@ -40,4 +40,6 @@ in
     Prefer portable `SKILL.md` skills so multiple agents can load the same
     procedure instead of maintaining separate prompt libraries.
   '';
+
+  home.file.".local/share/agent-desk/skills/improve/SKILL.md".source = ./improve/SKILL.md;
 }

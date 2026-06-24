@@ -5,11 +5,7 @@ let
 in
 {
   home.packages = llmAgents.available [
-    (llmAgents.from "amp" (pkgs.amp-cli or null))
-    (llmAgents.from "gemini-cli" (pkgs.gemini-cli or null))
-    (llmAgents.from "goose-cli" (pkgs.goose-cli or null))
-    (llmAgents.from "qwen-code" (pkgs.qwen-code or null))
-    (llmAgents.from "crush" (pkgs.crush or null))
+    (llmAgents.from "jules" (pkgs.jules or null))
     (llmAgents.from "codex-acp" (pkgs.codex-acp or null))
     (llmAgents.from "claude-agent-acp" (pkgs.claude-agent-acp or null))
     (llmAgents.from "codex-auth" (pkgs.codex-auth or null))
@@ -43,5 +39,6 @@ in
     - Claude Code for senior implementation and refactoring
     - Codex for validation, review, and alternate implementations
     - OpenCode for open-source, local-model, and experimental workflows
+    - Jules for asynchronous Google coding-agent workflows
   '';
 }

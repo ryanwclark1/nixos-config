@@ -2,11 +2,12 @@
 
 ## Platform Shape
 
-This workstation is a Nix-based multi-agent development environment for software agent work.
+This workstation is a multi-agent development environment for software engineering across repositories and languages.
 
 Primary goals:
 
-- Reproducible NixOS/Home Manager workstations
+- Reliable project work in Python, TypeScript, Go, Rust, Nix, and other stacks
+- Reproducible workstation and tool configuration
 - Git-native task memory and workflow state
 - Multi-agent software engineering workflows
 - Local-first operation with cloud model support
@@ -21,6 +22,7 @@ Primary goals:
 - Claude Code, Codex, OpenCode, and Antigravity are execution agents.
 - Shared skills live under `AGENT_DESK_SKILLS_DIR`.
 - Model proxy tooling should use OpenAI-compatible APIs where practical.
+- NixOS and Home Manager provide the workstation/tooling substrate, but individual project conventions take precedence inside application repositories.
 
 ## Workflow
 
@@ -44,6 +46,7 @@ Architect:
 Implementer:
 - Make scoped, testable changes.
 - Preserve existing repo conventions and minimize unrelated churn.
+- Choose verification commands from the project stack: for example `pytest`, `ruff`, `mypy`, `npm test`, `pnpm test`, `tsc`, `go test`, `cargo test`, `cargo clippy`, or Nix evaluations as appropriate.
 
 Reviewer:
 - Look first for bugs, regressions, missing tests, and maintainability risks.
@@ -55,8 +58,10 @@ Documentation:
 ## Operating Rules
 
 - Prefer the repo's existing module boundaries and helpers.
-- Keep secrets out of Nix-managed plaintext.
+- Detect the project stack before acting; do not assume a Nix project unless the files or request indicate it.
+- Keep secrets out of plaintext configuration and generated artifacts.
 - Use Beads/Gastown/WorkMux/GitButler as complementary layers, not replacements for each other.
 - Use shared skills before copying prompts between agents.
 - Prefer explicit verification commands and record failures honestly.
-- For Nix changes, evaluate the affected Home Manager or NixOS targets before calling the work done.
+- For Nix workstation changes, evaluate the affected Home Manager or NixOS targets before calling the work done.
+- For application changes, run the repository's own tests, type checks, linters, formatters, or build commands before calling the work done.

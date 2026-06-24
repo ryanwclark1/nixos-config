@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   ...
 }:
 
@@ -21,7 +22,7 @@
     # eog # Gnome Image viewer
     ffmpeg # Multimedia framework
     # gimp # Image editor
-    graphviz # Graph visualization
+    (lib.lowPrio graphviz) # Graph visualization; yields conflicting binaries such as gc
     # handbrake # Video transcoder
     imagemagick # Image manipulation
     # inkscape # Vector graphics editor
@@ -33,5 +34,4 @@
     fragments # BitTorrent client
   ];
 }
-
 
