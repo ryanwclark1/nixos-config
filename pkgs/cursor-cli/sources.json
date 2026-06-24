@@ -1,22 +1,22 @@
 {
-  "version": "2026.06.15-18-00-12-6f5a2cf",
-  "release": "2026.06.15-18-00-12-6f5a2cf",
+  "version": "2026.06.16-20-30-07-a07d3ac",
+  "release": "2026.06.16-20-30-07-a07d3ac",
   "sources": {
     "x86_64-linux": {
-      "url": "https://downloads.cursor.com/lab/2026.06.15-18-00-12-6f5a2cf/linux/x64/agent-cli-package.tar.gz",
-      "hash": "sha256-M7IrDE/QOXqJ/BuQjkU2uwqPsJ2v+XrPUZ++x2VpzLM="
+      "url": "https://downloads.cursor.com/lab/2026.06.16-20-30-07-a07d3ac/linux/x64/agent-cli-package.tar.gz",
+      "hash": "sha256-UjmQEErAgMFeSjEtwSVN1hxmVdH4bPMUqYgvn6u57ko="
     },
     "aarch64-linux": {
-      "url": "https://downloads.cursor.com/lab/2026.06.15-18-00-12-6f5a2cf/linux/arm64/agent-cli-package.tar.gz",
-      "hash": "sha256-cD46R6R7uq5NVLSPhgp4Ctrla/2/uM/M9Xjd29VyE4I="
+      "url": "https://downloads.cursor.com/lab/2026.06.16-20-30-07-a07d3ac/linux/arm64/agent-cli-package.tar.gz",
+      "hash": "sha256-31uBFmpnmBEqiWMCIAfhpJ6TxCxStW5y3S94RBB26uQ="
     },
     "x86_64-darwin": {
-      "url": "https://downloads.cursor.com/lab/2026.06.15-18-00-12-6f5a2cf/darwin/x64/agent-cli-package.tar.gz",
-      "hash": "sha256-brifvXk3SqyBReovGXk8+j9hONdK8dRdT+KZxkRkKnQ="
+      "url": "https://downloads.cursor.com/lab/2026.06.16-20-30-07-a07d3ac/darwin/x64/agent-cli-package.tar.gz",
+      "hash": "sha256-XFiGYigZrnXOvPQrGCm2bmdlAmfjWraZSVxL+Fsghk0="
     },
     "aarch64-darwin": {
-      "url": "https://downloads.cursor.com/lab/2026.06.15-18-00-12-6f5a2cf/darwin/arm64/agent-cli-package.tar.gz",
-      "hash": "sha256-Se2EDjq0ahKZaJB9v+8G5Fnu+y/KHE/sU461YOG1m6w="
+      "url": "https://downloads.cursor.com/lab/2026.06.16-20-30-07-a07d3ac/darwin/arm64/agent-cli-package.tar.gz",
+      "hash": "sha256-FkWfDcmyILV2RLXYsXJEbMt2EOoDGPLxcFcoi6bwY5U="
     }
   }
 }
