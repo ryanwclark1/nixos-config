@@ -21,7 +21,6 @@ let
     }
   );
   hookScripts = [
-    "statusline.sh"
     "format-hook.sh"
     "security-hook.sh"
     "lint-hook.sh"
