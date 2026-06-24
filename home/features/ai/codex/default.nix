@@ -9,6 +9,7 @@
 let
   codexHome = "${config.home.homeDirectory}/.codex";
   agentDeskContext = builtins.readFile ../shared/agent-desk-context.md;
+  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
   mcpConfig = import ../shared/mcp-config.nix { inherit config pkgs lib; };
   mcpServersNix = import inputs.mcp-servers-nix { inherit pkgs; };
   codexMcpConfig = mcpServersNix.lib.mkConfig pkgs (
@@ -21,8 +22,8 @@ let
   );
 in
 {
-  home.packages = with pkgs; [
-    codex
+  home.packages = [
+    (llmAgents.from "codex" pkgs.codex)
   ];
 
   home.file."${codexHome}/AGENT_DESK.md".text = agentDeskContext;

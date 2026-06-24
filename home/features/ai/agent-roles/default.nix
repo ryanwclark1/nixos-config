@@ -1,18 +1,18 @@
 { pkgs, lib, ... }:
 
 let
-  available = lib.filter (pkg: pkg != null);
+  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
 in
 {
-  home.packages = available [
-    (pkgs.amp-cli or null)
-    (pkgs.gemini-cli or null)
-    (pkgs.goose-cli or null)
-    (pkgs.qwen-code or null)
-    (pkgs.crush or null)
-    (pkgs.codex-acp or null)
-    (pkgs.claude-agent-acp or null)
-    (pkgs.codex-auth or null)
+  home.packages = llmAgents.available [
+    (llmAgents.from "amp" (pkgs.amp-cli or null))
+    (llmAgents.from "gemini-cli" (pkgs.gemini-cli or null))
+    (llmAgents.from "goose-cli" (pkgs.goose-cli or null))
+    (llmAgents.from "qwen-code" (pkgs.qwen-code or null))
+    (llmAgents.from "crush" (pkgs.crush or null))
+    (llmAgents.from "codex-acp" (pkgs.codex-acp or null))
+    (llmAgents.from "claude-agent-acp" (pkgs.claude-agent-acp or null))
+    (llmAgents.from "codex-auth" (pkgs.codex-auth or null))
   ];
 
   xdg.configFile."agent-desk/agent-roles.md".text = ''

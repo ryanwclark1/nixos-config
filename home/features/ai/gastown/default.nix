@@ -1,13 +1,14 @@
 { pkgs, lib, ... }:
 
 let
-  available = lib.filter (pkg: pkg != null);
+  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
+  gascity = llmAgents.from "gascity" (pkgs.gascity or null);
 in
 {
-  home.packages = available [
-    (pkgs.gastown or null)
-    (pkgs.gascity or null)
-    (pkgs.bernstein or null)
+  home.packages = llmAgents.available [
+    (llmAgents.from "gastown" (pkgs.gastown or null))
+    (if gascity != null then pkgs.lowPrio gascity else null)
+    (llmAgents.from "bernstein" (pkgs.bernstein or null))
   ];
 
   xdg.configFile."agent-desk/architecture/gastown.md".text = ''

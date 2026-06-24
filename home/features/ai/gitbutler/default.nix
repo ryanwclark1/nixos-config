@@ -1,15 +1,15 @@
 { pkgs, lib, ... }:
 
 let
-  available = lib.filter (pkg: pkg != null);
+  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
 in
 {
-  home.packages = available [
-    (pkgs.gitbutler or null)
-    (pkgs.but or null)
-    (pkgs.git-surgeon or null)
-    (pkgs.hunk or null)
-    (pkgs.tuicr or null)
+  home.packages = llmAgents.available [
+    (llmAgents.from "gitbutler" (pkgs.gitbutler or null))
+    (llmAgents.from "but" (pkgs.but or null))
+    (llmAgents.from "git-surgeon" (pkgs.git-surgeon or null))
+    (llmAgents.from "hunk" (pkgs.hunk or null))
+    (llmAgents.from "tuicr" (pkgs.tuicr or null))
   ];
 
   xdg.configFile."agent-desk/architecture/gitbutler.md".text = ''

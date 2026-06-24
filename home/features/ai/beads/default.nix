@@ -1,13 +1,13 @@
 { pkgs, lib, ... }:
 
 let
-  available = lib.filter (pkg: pkg != null);
+  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
 in
 {
-  home.packages = available [
-    pkgs.beads
-    (pkgs.beads-viewer or null)
-    (pkgs.mardi-gras or null)
+  home.packages = llmAgents.available [
+    (llmAgents.from "beads" (pkgs.beads or null))
+    (llmAgents.from "beads-viewer" (pkgs.beads-viewer or null))
+    (llmAgents.from "mardi-gras" (pkgs.mardi-gras or null))
   ];
 
   home.shellAliases = {

@@ -1,14 +1,14 @@
 { pkgs, lib, ... }:
 
 let
-  available = lib.filter (pkg: pkg != null);
+  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
 in
 {
-  home.packages = available [
-    (pkgs.cli-proxy-api or null)
-    (pkgs.mcporter or null)
-    (pkgs.claude-code-router or null)
-    (pkgs.rtk or null)
+  home.packages = llmAgents.available [
+    (llmAgents.from "cli-proxy-api" (pkgs.cli-proxy-api or null))
+    (llmAgents.from "mcporter" (pkgs.mcporter or null))
+    (llmAgents.from "claude-code-router" (pkgs.claude-code-router or null))
+    (llmAgents.from "rtk" (pkgs.rtk or null))
   ];
 
   xdg.configFile."agent-desk/architecture/model-proxy.md".text = ''

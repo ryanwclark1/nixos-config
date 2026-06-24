@@ -8,16 +8,21 @@
 let
   antigravityConfig = "${config.home.homeDirectory}/.config/antigravity";
   agentDeskContext = builtins.readFile ../shared/agent-desk-context.md;
+  llmAgents = import ../shared/llm-agents-packages.nix { inherit pkgs lib; };
   mcpServers = lib.mapAttrs (
     _: lib.filterAttrs (_: value: value != null && value != [ ] && value != { })
   ) config.programs.mcp.servers;
 in
 {
-  home.packages = [
-    pkgs.antigravity.fhs
-    pkgs.antigravity-cli
-    pkgs.antigravity-ide.fhs
-  ];
+  home.packages =
+    (lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+      pkgs.antigravity.fhs
+      (llmAgents.from "antigravity-cli" pkgs.antigravity-cli)
+      pkgs.antigravity-ide.fhs
+    ])
+    ++ (lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+      pkgs.antigravity-cli
+    ]);
 
   home.file."${antigravityConfig}/AGENT_DESK.md".text = agentDeskContext;
   home.file."${antigravityConfig}/AGENTS.md".text = ''
