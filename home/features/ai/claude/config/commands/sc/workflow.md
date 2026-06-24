@@ -3,7 +3,7 @@ name: workflow
 description: "Generate structured implementation workflows from PRDs and feature requirements"
 category: orchestration
 complexity: advanced
-mcp-servers: [sequential, context7, playwright, serena]
+mcp-servers: [sequential, context7, playwright]
 personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
 ---
 
@@ -13,7 +13,7 @@ personas: [architect, analyzer, frontend, backend, security, devops, project-man
 - PRD and feature specification analysis for implementation planning
 - Structured workflow generation for development projects
 - Multi-persona coordination for complex implementation strategies
-- Cross-session workflow management and dependency mapping
+- Workflow documentation and dependency mapping
 
 **Note:** For requirements discovery and specification development, consider using `/sc:brainstorm` first to explore and refine requirements before generating workflows.
 
@@ -31,17 +31,14 @@ personas: [architect, analyzer, frontend, backend, security, devops, project-man
 
 Key behaviors:
 - Multi-persona orchestration across architecture, frontend, backend, security, and devops domains
-- Advanced MCP coordination with intelligent routing for specialized workflow analysis
+- MCP coordination with intelligent routing for specialized workflow analysis
 - Systematic execution with progressive workflow enhancement and parallel processing
-- Cross-session workflow management with comprehensive dependency tracking
+- Workflow documentation with comprehensive dependency tracking
 
 ## MCP Integration
 - **Sequential MCP**: Complex multi-step workflow analysis and systematic implementation planning
 - **Context7 MCP**: Framework-specific workflow patterns and implementation best practices
-- **Magic MCP**: UI/UX workflow generation and design system integration strategies
 - **Playwright MCP**: Testing workflow integration and quality assurance automation
-- **Morphllm MCP**: Large-scale workflow transformation and pattern-based optimization
-- **Serena MCP**: Cross-session workflow persistence, memory management, and project context
 
 ## Tool Coordination
 - **Read/Write/Edit**: PRD analysis and workflow documentation generation
@@ -69,7 +66,7 @@ Key behaviors:
 ```
 /sc:workflow "user authentication system" --strategy agile --parallel
 # Agile workflow generation with parallel task coordination
-# Context7 and Magic MCP for framework and UI workflow patterns
+# Context7 and Playwright MCP for framework and UI workflow validation
 ```
 
 ### Enterprise Implementation Planning
@@ -79,19 +76,18 @@ Key behaviors:
 # Security, devops, and architect personas for compliance and scalability
 ```
 
-### Cross-Session Workflow Management
+### Workflow Documentation
 ```
 /sc:workflow project-brief.md --depth normal
-# Serena MCP manages cross-session workflow context and persistence
-# Progressive workflow enhancement with memory-driven insights
+# Progressive workflow enhancement with durable notes and dependency mapping
 ```
 
 ## Boundaries
 
 **Will:**
 - Generate comprehensive implementation workflows from PRD and feature specifications
-- Coordinate multiple personas and MCP servers for complete implementation strategies
-- Provide cross-session workflow management and progressive enhancement capabilities
+- Coordinate multiple personas and declared MCP servers for complete implementation strategies
+- Provide workflow documentation and progressive enhancement capabilities
 
 **Will Not:**
 - Execute actual implementation tasks beyond workflow planning and strategy

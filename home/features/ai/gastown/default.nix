@@ -10,10 +10,10 @@ in
     (pkgs.bernstein or null)
   ];
 
-  xdg.configFile."accent-ai/architecture/gastown.md".text = ''
+  xdg.configFile."agent-desk/architecture/gastown.md".text = ''
     # Gastown
 
-    Gastown is the orchestration layer for the Accent AI workstation.
+    Gastown is the orchestration layer for the Agent Desk workstation.
 
     It coordinates:
 

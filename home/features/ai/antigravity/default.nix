@@ -7,7 +7,7 @@
 
 let
   antigravityConfig = "${config.home.homeDirectory}/.config/antigravity";
-  accentAiContext = builtins.readFile ../shared/accent-ai-context.md;
+  agentDeskContext = builtins.readFile ../shared/agent-desk-context.md;
   mcpServers = lib.mapAttrs (
     _: lib.filterAttrs (_: value: value != null && value != [ ] && value != { })
   ) config.programs.mcp.servers;
@@ -19,9 +19,9 @@ in
     pkgs.antigravity-ide.fhs
   ];
 
-  home.file."${antigravityConfig}/ACCENT_AI.md".text = accentAiContext;
+  home.file."${antigravityConfig}/AGENT_DESK.md".text = agentDeskContext;
   home.file."${antigravityConfig}/AGENTS.md".text = ''
-    ${accentAiContext}
+    ${agentDeskContext}
 
     ## Antigravity Role
 

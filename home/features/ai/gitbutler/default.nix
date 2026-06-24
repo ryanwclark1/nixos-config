@@ -12,7 +12,7 @@ in
     (pkgs.tuicr or null)
   ];
 
-  xdg.configFile."accent-ai/architecture/gitbutler.md".text = ''
+  xdg.configFile."agent-desk/architecture/gitbutler.md".text = ''
     # GitButler
 
     GitButler is the change-management layer for agent-heavy work.

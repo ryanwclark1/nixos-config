@@ -9,9 +9,6 @@
 let
   playwrightMcpWrapper = import ./shared/playwright-mcp-wrapper.nix { inherit pkgs lib; };
   mcpConfig = import ./shared/mcp-config.nix { inherit config pkgs lib; };
-  cleanMcpServers = lib.mapAttrs (
-    _: lib.filterAttrs (_: value: value != null && value != [ ] && value != { })
-  ) config.programs.mcp.servers;
 in
 {
   imports = [
@@ -44,13 +41,7 @@ in
 
     # Wrapper script for NixOS compatibility
     playwrightMcpWrapper
-
-    # MCP and AI CLI utility scripts
-    (writeShellScriptBin "mcp-cli" (builtins.readFile ./scripts/mcp-cli-launcher.sh))
-    (writeShellScriptBin "mcp-process-config" (builtins.readFile ./scripts/mcp-process-config.sh))
   ];
-
-  xdg.configFile."open-webui/mcp-servers.json".text = builtins.toJSON cleanMcpServers;
 
   # Environment variables for Playwright
   # These help Playwright find browsers in NixOS

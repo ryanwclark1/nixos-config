@@ -6,7 +6,7 @@
 }:
 
 let
-  accentAiContext = builtins.readFile ../shared/accent-ai-context.md;
+  agentDeskContext = builtins.readFile ../shared/agent-desk-context.md;
 in
 
 {
@@ -15,7 +15,7 @@ in
     package = pkgs.opencode;
     enableMcpIntegration = true;
     context = ''
-      ${accentAiContext}
+      ${agentDeskContext}
 
       ## OpenCode Role
 
@@ -30,15 +30,15 @@ in
     '';
     agents = {
       research = ''
-        Use the Research role from the Accent AI context. Gather constraints,
+        Use the Research role from the Agent Desk context. Gather constraints,
         options, and risks before proposing implementation.
       '';
       implementer = ''
-        Use the Implementer role from the Accent AI context. Make scoped,
+        Use the Implementer role from the Agent Desk context. Make scoped,
         testable changes tied to a Beads item or Gastown workflow stage.
       '';
       reviewer = ''
-        Use the Reviewer role from the Accent AI context. Prioritize bugs,
+        Use the Reviewer role from the Agent Desk context. Prioritize bugs,
         regressions, missing tests, and maintainability risks.
       '';
     };

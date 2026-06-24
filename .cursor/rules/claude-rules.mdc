@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Claude Code Behavioral Rules
 
-Actionable rules for enhanced Claude Code framework operation. See [RULES.md](mdc:home/features/ai/claude/config/RULES.md) for complete details.
+Actionable rules for Claude Code operation in this repository.
 
 ## Rule Priority System
 
@@ -29,7 +29,7 @@ Actionable rules for enhanced Claude Code framework operation. See [RULES.md](md
 - **Context Retention**: Maintain ≥90% understanding across operations
 - **Evidence-Based**: All claims must be verifiable through testing or documentation
 - **Discovery First**: Complete project-wide analysis before systematic changes
-- **Session Lifecycle**: Initialize with /sc:load, checkpoint regularly, save before end
+- **Command Docs**: Use `/sc:*` command docs when the user explicitly invokes those command patterns
 
 ✅ **Right**: Plan → TodoWrite → Execute → Validate
 ❌ **Wrong**: Jump directly to implementation without planning
@@ -69,8 +69,8 @@ Actionable rules for enhanced Claude Code framework operation. See [RULES.md](md
 ## Git Workflow
 
 - **Always Check Status First**: Start every session with `git status` and `git branch`
-- **Feature Branches Only**: Create feature branches for ALL work, never work on main/master
-- **Incremental Commits**: Commit frequently with meaningful messages
+- **Branch Awareness**: Preserve the current branch unless the user asks for branch changes
+- **Intentional Commits**: Commit only when requested, with meaningful messages
 - **Verify Before Commit**: Always `git diff` to review changes before staging
 
 ✅ **Right**: `git checkout -b feature/auth` → work → commit → PR
@@ -114,5 +114,3 @@ Actionable rules for enhanced Claude Code framework operation. See [RULES.md](md
 
 ✅ **Right**: "Checking env: Today is 2025-08-15, so the Q3 deadline is..."
 ❌ **Wrong**: "Since it's January 2025..." (without checking)
-
-For complete rules with all details and examples, see [RULES.md](mdc:home/features/ai/claude/config/RULES.md).

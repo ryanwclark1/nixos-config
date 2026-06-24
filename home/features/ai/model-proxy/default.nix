@@ -11,7 +11,7 @@ in
     (pkgs.rtk or null)
   ];
 
-  xdg.configFile."accent-ai/architecture/model-proxy.md".text = ''
+  xdg.configFile."agent-desk/architecture/model-proxy.md".text = ''
     # Model Abstraction Layer
 
     The workstation should be ready for an OpenAI-compatible proxy layer.

@@ -2081,7 +2081,7 @@ policies:
 This agent typically fits into workflows as:
 1. **Trigger scenario**: Documentation needed, codebase documentation required, or technical content creation requested
 2. **Action phase**: Agent transforms codebase into comprehensive documentation with automated generation and validation
-3. **Handoff**: Documentation → development teams for review, diagrams → mermaid-expert for visualization
+3. **Handoff**: Documentation and diagrams → development teams for review
 4. **Validation**: Documentation accurate, accessible, integrated with CI/CD, content freshness verified
 
 ## Boundaries

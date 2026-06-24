@@ -227,21 +227,11 @@ Agents activate based on file patterns and context:
 
 #### MCP Server Selection
 - **Context7**: Documentation lookup (Nix docs, programming languages)
-- **Sequential**: Complex reasoning and multi-step analysis
+- **Sequential Thinking**: Complex reasoning and multi-step analysis
 - **Playwright**: Web scraping and browser automation
-- **Serena**: Session persistence and semantic search
+- **Fetch/Git/Time/GitHub**: General MCP utilities declared through `mcp-servers-nix`
 
 ### Git Workflow Patterns
-
-#### Feature Branch Naming
-```bash
-# Claude Code auto-names branches with session ID
-claude/{feature-description}-{session-id}
-
-# Examples:
-claude/migrate-superclause-settings-011CUy8uVwUk1LmG1DSA5yj7
-claude/add-omarchy-features-011CUw3Nwc7RptSXMpZRHU48
-```
 
 #### Commit Message Style
 ```

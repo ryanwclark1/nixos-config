@@ -3,7 +3,7 @@ name: task
 description: "Execute complex tasks with intelligent workflow management and delegation"
 category: special
 complexity: advanced
-mcp-servers: [sequential, context7, playwright, serena]
+mcp-servers: [sequential, context7, playwright]
 personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
 ---
 
@@ -11,7 +11,7 @@ personas: [architect, analyzer, frontend, backend, security, devops, project-man
 
 ## Triggers
 - Complex tasks requiring multi-agent coordination and delegation
-- Projects needing structured workflow management and cross-session persistence
+- Projects needing structured workflow management and durable task artifacts
 - Operations requiring intelligent MCP server routing and domain expertise
 - Tasks benefiting from systematic execution and progressive enhancement
 
@@ -29,17 +29,14 @@ personas: [architect, analyzer, frontend, backend, security, devops, project-man
 
 Key behaviors:
 - Multi-persona coordination across architect, frontend, backend, security, devops domains
-- Intelligent MCP server routing (Sequential, Context7, Playwright, Serena)
-- Systematic execution with progressive task enhancement and cross-session persistence
+- Intelligent MCP server routing (Sequential, Context7, Playwright)
+- Systematic execution with progressive task enhancement and explicit task artifacts
 - Advanced task delegation with hierarchical breakdown and dependency management
 
 ## MCP Integration
 - **Sequential MCP**: Complex multi-step task analysis and systematic execution planning
 - **Context7 MCP**: Framework-specific patterns and implementation best practices
-- **Magic MCP**: UI/UX task coordination and design system integration
 - **Playwright MCP**: Testing workflow integration and validation automation
-- **Morphllm MCP**: Large-scale task transformation and pattern-based optimization
-- **Serena MCP**: Cross-session task persistence and project memory management
 
 ## Tool Coordination
 - **TodoWrite**: Hierarchical task breakdown and progress tracking across Epic → Story → Task levels
@@ -51,7 +48,7 @@ Key behaviors:
 - **Task Hierarchy**: Epic-level objectives → Story coordination → Task execution → Subtask granularity
 - **Strategy Selection**: Systematic (comprehensive) → Agile (iterative) → Enterprise (governance)
 - **Multi-Agent Coordination**: Persona activation → MCP routing → parallel execution → result integration
-- **Cross-Session Management**: Task persistence → context continuity → progressive enhancement
+- **Artifact Management**: Task notes → context continuity → progressive enhancement
 
 ## Examples
 
@@ -66,7 +63,7 @@ Key behaviors:
 ```
 /sc:task execute "feature backlog" --strategy agile --delegate
 # Iterative task execution with intelligent delegation
-# Cross-session persistence for sprint continuity
+# Task artifacts preserve sprint continuity
 ```
 
 ### Multi-Domain Integration
@@ -80,7 +77,7 @@ Key behaviors:
 
 **Will:**
 - Execute complex tasks with multi-agent coordination and intelligent delegation
-- Provide hierarchical task breakdown with cross-session persistence
+- Provide hierarchical task breakdown with durable task artifacts
 - Coordinate multiple MCP servers and personas for optimal task outcomes
 
 **Will Not:**

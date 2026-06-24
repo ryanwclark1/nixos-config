@@ -42,7 +42,7 @@ in
   llm-agents = llmAgents;
   mcp-servers-nix = mcpServersNix;
 
-  # Accent AI platform layers from Qumulo/llm-agents.
+  # Agent Desk platform layers from Qumulo/llm-agents.
   beads = fromLlmAgents "beads" prev.beads;
   beads-rust = fromLlmAgents "beads-rust" null;
   beads-viewer = fromLlmAgents "beads-viewer" null;

@@ -34,13 +34,12 @@ personas: [architect, frontend, backend, security, qa-specialist]
 
 Key behaviors:
 - Context-based persona activation (architect, frontend, backend, security, qa)
-- Framework-specific implementation via Context7 and Magic MCP integration
+- Framework-specific implementation via Context7 and project-local patterns
 - Systematic multi-component coordination via Sequential MCP
 - Comprehensive testing integration with Playwright for validation
 
 ## MCP Integration
 - **Context7 MCP**: Framework patterns and official documentation for React, Vue, Angular, Express
-- **Magic MCP**: Auto-activated for UI component generation and design system integration
 - **Sequential MCP**: Complex multi-step analysis and implementation planning
 - **Playwright MCP**: Testing validation and quality assurance integration
 
@@ -61,8 +60,7 @@ Key behaviors:
 ### React Component Implementation
 ```
 /sc:implement user profile component --type component --framework react
-# Magic MCP generates UI component with design system integration
-# Frontend persona ensures best practices and accessibility
+# Context7 provides framework patterns; frontend persona ensures accessibility
 ```
 
 ### API Service Implementation

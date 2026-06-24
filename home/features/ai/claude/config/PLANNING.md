@@ -101,20 +101,19 @@ in
 
 ### AI/Development Tools
 - **Claude Code**: Primary AI coding assistant
-- **MCP Servers**: Context7, Playwright, Sequential, Serena
-- **Agents**: 17 specialized agents for different domains
-- **Commands**: 24 /sc: commands for workflows
+- **MCP Servers**: Declared in `home/features/ai/shared/mcp-config.nix`
+- **Agents**: Specialized agents declared in `home/features/ai/claude/default.nix`
+- **Commands**: `/sc:` command docs under `home/features/ai/claude/config/commands/sc/`
 
 ## Migration Strategy
 
 When adding new features:
 1. **Research existing patterns** in the codebase
-2. **Create feature branch** (`claude/feature-name-{session-id}`)
-3. **Implement in modular fashion** (new module in appropriate location)
-4. **Test locally** (`nixos-rebuild test` or `home-manager switch`)
-5. **Commit incrementally** with clear messages
-6. **Document significant changes** in commit messages
-7. **Clean up** (remove debug/temporary configs)
+2. **Implement in modular fashion** (new module in appropriate location)
+3. **Test locally** (`nixos-rebuild test` or `home-manager switch`)
+4. **Commit intentionally when requested** with clear messages
+5. **Document significant changes** in commit messages
+6. **Clean up** (remove debug/temporary configs)
 
 ## Risk Management
 
@@ -147,7 +146,7 @@ When adding new features:
 
 ### Code Quality
 - Follow Nix style guide (2-space indentation, proper formatting)
-- Use `nixpkgs-fmt` for consistent formatting
+- Use `nixfmt` for consistent formatting
 - Proper error handling and validation
 - Clear variable naming
 

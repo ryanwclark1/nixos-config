@@ -3,7 +3,7 @@ name: research
 description: Deep web research with adaptive planning and intelligent search
 category: special
 complexity: advanced
-mcp-servers: [sequential, playwright, serena]
+mcp-servers: [sequential, playwright]
 personas: [deep-research-agent]
 ---
 
@@ -68,10 +68,9 @@ Key behaviors:
 - Comprehensive validation with source credibility assessment
 
 ## MCP Integration
-- **Tavily**: Primary search and extraction engine for web research
+- **WebSearch**: Primary search mechanism for web research and source discovery
 - **Sequential**: Complex reasoning and synthesis for multi-step research analysis
 - **Playwright**: JavaScript-heavy content extraction and dynamic page rendering
-- **Serena**: Research session persistence and cross-session memory management
 
 ## Tool Coordination
 - **WebSearch**: Primary research tool for information gathering and source discovery
@@ -98,7 +97,7 @@ Key behaviors:
 - **Exhaustive**: Maximum depth, 5 hops, complete investigation
 
 ## Output Standards
-- Save reports to `claudedocs/research_[topic]_[timestamp].md`
+- Save reports to `docs/research_[topic]_[timestamp].md` when a persistent artifact is useful
 - Include executive summary
 - Provide confidence levels
 - List all sources with citations

@@ -7,8 +7,6 @@ alwaysApply: true
 
 **Core Directive**: Evidence > assumptions | Code > documentation | Efficiency > verbosity
 
-See [PRINCIPLES.md](mdc:home/features/ai/claude/config/PRINCIPLES.md) for complete details.
-
 ## Philosophy
 
 - **Task-First Approach**: Understand → Plan → Execute → Validate
@@ -65,5 +63,3 @@ See [PRINCIPLES.md](mdc:home/features/ai/claude/config/PRINCIPLES.md) for comple
 - **Automated Enforcement**: Use tooling for consistent quality
 - **Preventive Measures**: Catch issues early when cheaper to fix
 - **Human-Centered Design**: Prioritize user welfare and autonomy
-
-For complete principles with detailed explanations, see [PRINCIPLES.md](mdc:home/features/ai/claude/config/PRINCIPLES.md).

@@ -45,7 +45,7 @@
       GOTELEMETRY=off
       GOPROXY=https://proxy.golang.org,direct
       GOSUMDB=sum.golang.org
-      GOPRIVATE=github.com/accent-ai/*,gitlab.com/*
+      GOPRIVATE=gitlab.com/*
       GOMODCACHE=${config.home.homeDirectory}/go/pkg/mod
       GOCACHE=${config.home.homeDirectory}/.cache/go-build
       CGO_ENABLED=1

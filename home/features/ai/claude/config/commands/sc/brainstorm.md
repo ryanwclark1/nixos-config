@@ -3,7 +3,7 @@ name: brainstorm
 description: "Interactive requirements discovery through Socratic dialogue and systematic exploration"
 category: orchestration
 complexity: advanced
-mcp-servers: [sequential, context7, playwright, serena]
+mcp-servers: [sequential, context7, playwright]
 personas: [architect, analyzer, frontend, backend, security, devops, project-manager]
 ---
 
@@ -15,7 +15,7 @@ personas: [architect, analyzer, frontend, backend, security, devops, project-man
 - Ambiguous project ideas requiring structured exploration
 - Requirements discovery and specification development needs
 - Concept validation and feasibility assessment requests
-- Cross-session brainstorming and iterative refinement scenarios
+- Iterative brainstorming and requirements refinement scenarios
 
 ## Context Trigger Pattern
 ```
@@ -27,22 +27,19 @@ personas: [architect, analyzer, frontend, backend, security, devops, project-man
 1. **Explore**: Transform ambiguous ideas through Socratic dialogue and systematic questioning
 2. **Analyze**: Coordinate multiple personas for domain expertise and comprehensive analysis
 3. **Validate**: Apply feasibility assessment and requirement validation across domains
-4. **Specify**: Generate concrete specifications with cross-session persistence capabilities
+4. **Specify**: Generate concrete specifications with clear follow-up artifacts
 5. **Handoff**: Create actionable briefs ready for implementation or further development
 
 Key behaviors:
 - Multi-persona orchestration across architecture, analysis, frontend, backend, security domains
-- Advanced MCP coordination with intelligent routing for specialized analysis
+- MCP coordination with intelligent routing for specialized analysis
 - Systematic execution with progressive dialogue enhancement and parallel exploration
-- Cross-session persistence with comprehensive requirements discovery documentation
+- Comprehensive requirements discovery documentation for future handoff
 
 ## MCP Integration
 - **Sequential MCP**: Complex multi-step reasoning for systematic exploration and validation
 - **Context7 MCP**: Framework-specific feasibility assessment and pattern analysis
-- **Magic MCP**: UI/UX feasibility and design system integration analysis
 - **Playwright MCP**: User experience validation and interaction pattern testing
-- **Morphllm MCP**: Large-scale content analysis and pattern-based transformation
-- **Serena MCP**: Cross-session persistence, memory management, and project context enhancement
 
 ## Tool Coordination
 - **Read/Write/Edit**: Requirements documentation and specification generation
@@ -70,29 +67,28 @@ Key behaviors:
 ```
 /sc:brainstorm "real-time collaboration features" --strategy agile --parallel
 # Parallel exploration paths with frontend, backend, and security personas
-# Context7 and Magic MCP for framework and UI pattern analysis
+# Context7 and Playwright MCP for framework and interaction pattern analysis
 ```
 
 ### Enterprise Solution Validation
 ```
 /sc:brainstorm "enterprise data analytics platform" --strategy enterprise --validate
 # Comprehensive validation with security, devops, and architect personas
-# Serena MCP for cross-session persistence and enterprise requirements tracking
+# Sequential MCP for enterprise requirements tracking and validation
 ```
 
-### Cross-Session Refinement
+### Iterative Refinement
 ```
 /sc:brainstorm "mobile app monetization strategy" --depth normal
-# Serena MCP manages cross-session context and iterative refinement
-# Progressive dialogue enhancement with memory-driven insights
+# Progressive dialogue enhancement with structured follow-up notes
 ```
 
 ## Boundaries
 
 **Will:**
 - Transform ambiguous ideas into concrete specifications through systematic exploration
-- Coordinate multiple personas and MCP servers for comprehensive analysis
-- Provide cross-session persistence and progressive dialogue enhancement
+- Coordinate multiple personas and declared MCP servers for comprehensive analysis
+- Provide structured requirements artifacts and progressive dialogue enhancement
 
 **Will Not:**
 - Make implementation decisions without proper requirements discovery

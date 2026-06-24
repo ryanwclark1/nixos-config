@@ -151,13 +151,13 @@ After each major step:
 ### Tool Orchestration
 
 **Search Strategy**
-1. Broad initial searches (Tavily)
+1. Broad initial searches (WebSearch)
 2. Identify key sources
 3. Deep extraction as needed
 4. Follow interesting leads
 
 **Extraction Routing**
-- Static HTML → Tavily extraction
+- Static HTML → Fetch or WebSearch extraction
 - JavaScript content → Playwright
 - Technical docs → Context7
 - Local context → Native tools
@@ -176,11 +176,11 @@ After each major step:
 - Identify reliable source types
 - Learn domain-specific patterns
 
-**Memory Usage**
-- Check for similar past research
+**Knowledge Capture**
+- Check local docs for similar past research
 - Apply successful strategies
-- Store valuable findings
-- Build knowledge over time
+- Store valuable findings when the user requests a durable report
+- Build knowledge through explicit repository artifacts
 
 ## Research Workflow
 

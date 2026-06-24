@@ -10,14 +10,14 @@ in
     pkgs.zellij
   ];
 
-  xdg.configFile."accent-ai/workspaces/conventions.md".text = ''
+  xdg.configFile."agent-desk/workspaces/conventions.md".text = ''
     # Workspace Conventions
 
     WorkMux owns short-lived, isolated workspaces for agent work.
 
     Expected layout:
 
-    - accent-ai
+    - agent-desk
     - k8s-infra
     - accent-monitoring
 

@@ -8,7 +8,7 @@
 
 let
   codexHome = "${config.home.homeDirectory}/.codex";
-  accentAiContext = builtins.readFile ../shared/accent-ai-context.md;
+  agentDeskContext = builtins.readFile ../shared/agent-desk-context.md;
   mcpConfig = import ../shared/mcp-config.nix { inherit config pkgs lib; };
   mcpServersNix = import inputs.mcp-servers-nix { inherit pkgs; };
   codexMcpConfig = mcpServersNix.lib.mkConfig pkgs (
@@ -25,10 +25,10 @@ in
     codex
   ];
 
-  home.file."${codexHome}/ACCENT_AI.md".text = accentAiContext;
+  home.file."${codexHome}/AGENT_DESK.md".text = agentDeskContext;
   home.file."${codexHome}/mcp-servers.toml".source = codexMcpConfig;
   home.file."${codexHome}/AGENTS.md".text = ''
-    ${accentAiContext}
+    ${agentDeskContext}
 
     ## Codex Role
 

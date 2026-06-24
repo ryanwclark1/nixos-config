@@ -7,7 +7,7 @@
 
 let
   available = lib.filter (pkg: pkg != null);
-  skillsDir = "${config.home.homeDirectory}/.local/share/accent-ai/skills";
+  skillsDir = "${config.home.homeDirectory}/.local/share/agent-desk/skills";
 in
 {
   home.packages = available [
@@ -19,11 +19,11 @@ in
   ];
 
   home.sessionVariables = {
-    ACCENT_AI_SKILLS_DIR = skillsDir;
+    AGENT_DESK_SKILLS_DIR = skillsDir;
   };
 
-  home.file.".local/share/accent-ai/skills/README.md".text = ''
-    # Accent AI Shared Skills
+  home.file.".local/share/agent-desk/skills/README.md".text = ''
+    # Agent Desk Shared Skills
 
     This directory is the shared skill library for Claude Code, Codex, OpenCode,
     Gastown workflows, and future agents.

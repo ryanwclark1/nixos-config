@@ -15,8 +15,8 @@ in
     (pkgs.codex-auth or null)
   ];
 
-  xdg.configFile."accent-ai/agent-roles.md".text = ''
-    # Accent AI Agent Roles
+  xdg.configFile."agent-desk/agent-roles.md".text = ''
+    # Agent Desk Agent Roles
 
     Research:
     - Investigate options

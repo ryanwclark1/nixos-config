@@ -15,10 +15,10 @@ in
     bd-open = "bd show";
   };
 
-  xdg.configFile."accent-ai/architecture/beads.md".text = ''
+  xdg.configFile."agent-desk/architecture/beads.md".text = ''
     # Beads
 
-    Beads is the persistent work ledger for the Accent AI workstation.
+    Beads is the persistent work ledger for the Agent Desk workstation.
 
     It owns:
 

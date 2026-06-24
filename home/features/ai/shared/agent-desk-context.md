@@ -1,8 +1,8 @@
-# Accent AI Development Platform
+# Agent Desk Development Platform
 
 ## Platform Shape
 
-This workstation is a Nix-based multi-agent development environment for Accent AI work.
+This workstation is a Nix-based multi-agent development environment for software agent work.
 
 Primary goals:
 
@@ -19,7 +19,7 @@ Primary goals:
 - WorkMux creates isolated workspaces using git worktrees and terminal sessions.
 - GitButler manages virtual branches, stacked branches, and agent-friendly changesets.
 - Claude Code, Codex, OpenCode, and Antigravity are execution agents.
-- Shared skills live under `ACCENT_AI_SKILLS_DIR`.
+- Shared skills live under `AGENT_DESK_SKILLS_DIR`.
 - Model proxy tooling should use OpenAI-compatible APIs where practical.
 
 ## Workflow
