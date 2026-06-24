@@ -3,17 +3,15 @@
 
 set -euo pipefail
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=./hook-common.sh
+. "$SCRIPT_DIR/hook-common.sh"
+
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.path // .tool_input.file_path // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 
-if [ -z "$FILE_PATH" ] || [ "$FILE_PATH" = "null" ]; then
+if ! FILE_PATH=$(resolve_hook_file_path "$INPUT" "$CWD"); then
   exit 0
-fi
-
-# Resolve relative paths
-if [ ! "$FILE_PATH" = /* ]; then
-  FILE_PATH="$CWD/$FILE_PATH"
 fi
 
 if [ ! -f "$FILE_PATH" ]; then
@@ -22,20 +20,22 @@ fi
 
 # Lint Python files
 if [[ "$FILE_PATH" == *.py ]]; then
-  if command -v ruff >/dev/null 2>&1; then
-    ruff check "$FILE_PATH" 2>&1 || true
-  elif command -v pylint >/dev/null 2>&1; then
-    pylint "$FILE_PATH" 2>&1 || true
+  if has_python_project "$CWD"; then
+    if command -v uv >/dev/null 2>&1 || command -v ruff >/dev/null 2>&1; then
+      run_python_tool "$CWD" ruff check "$FILE_PATH"
+    elif command -v pylint >/dev/null 2>&1; then
+      run_python_tool "$CWD" pylint "$FILE_PATH"
+    fi
   fi
 fi
 
 # Lint TypeScript/JavaScript files
 if [[ "$FILE_PATH" == *.ts ]] || [[ "$FILE_PATH" == *.tsx ]] || \
    [[ "$FILE_PATH" == *.js ]] || [[ "$FILE_PATH" == *.jsx ]]; then
-  if command -v biome >/dev/null 2>&1; then
-    biome lint "$FILE_PATH" 2>&1 || true
-  elif command -v eslint >/dev/null 2>&1; then
-    eslint "$FILE_PATH" 2>&1 || true
+  if node_tool_available "$CWD" biome; then
+    run_node_tool "$CWD" biome lint "$FILE_PATH"
+  elif node_tool_available "$CWD" eslint; then
+    run_node_tool "$CWD" eslint "$FILE_PATH"
   fi
 fi
 

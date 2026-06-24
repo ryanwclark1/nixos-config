@@ -4,38 +4,18 @@
 
 set -euo pipefail
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=./hook-common.sh
+. "$SCRIPT_DIR/hook-common.sh"
+
 # Read JSON input from stdin
 INPUT=$(cat)
-
-# Extract file path from tool input
-# Try multiple possible field names for file path
-FILE_PATH=$(echo "$INPUT" | jq -r '
-  .tool_input.path //
-  .tool_input.file_path //
-  .tool_input.file //
-  .tool_input.target //
-  empty
-')
-
-# Exit if no file path found
-if [ -z "$FILE_PATH" ] || [ "$FILE_PATH" = "null" ] || [ "$FILE_PATH" = "" ]; then
-  exit 0
-fi
 
 # Get current working directory from hook input
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 
-# Resolve file path relative to CWD if needed
-if [ ! "$FILE_PATH" = /* ]; then
-  FILE_PATH="$CWD/$FILE_PATH"
-fi
-
-# Normalize path (remove .. and .) - use realpath if available, otherwise use cd
-if command -v realpath >/dev/null 2>&1; then
-  FILE_PATH=$(realpath -m "$FILE_PATH" 2>/dev/null || echo "$FILE_PATH")
-else
-  # Fallback: use cd to resolve relative paths
-  FILE_PATH=$(cd "$(dirname "$FILE_PATH")" 2>/dev/null && pwd)/$(basename "$FILE_PATH") 2>/dev/null || echo "$FILE_PATH")
+if ! FILE_PATH=$(resolve_hook_file_path "$INPUT" "$CWD"); then
+  exit 0
 fi
 
 # Check if file exists
@@ -45,31 +25,23 @@ fi
 
 # Format Python files
 if [[ "$FILE_PATH" == *.py ]]; then
-  if command -v ruff >/dev/null 2>&1; then
-    ruff format "$FILE_PATH" 2>&1 || true
-  elif command -v black >/dev/null 2>&1; then
-    black "$FILE_PATH" 2>&1 || true
+  if has_python_project "$CWD"; then
+    if command -v uv >/dev/null 2>&1 || command -v ruff >/dev/null 2>&1; then
+      run_python_tool "$CWD" ruff format "$FILE_PATH"
+    elif command -v black >/dev/null 2>&1; then
+      run_python_tool "$CWD" black "$FILE_PATH"
+    fi
   fi
 fi
 
 # Format TypeScript/JavaScript files
 if [[ "$FILE_PATH" == *.ts ]] || [[ "$FILE_PATH" == *.tsx ]] || \
    [[ "$FILE_PATH" == *.js ]] || [[ "$FILE_PATH" == *.jsx ]]; then
-  # Prefer Biome for formatting (faster and includes linting)
-  if command -v biome >/dev/null 2>&1; then
-    biome format --write "$FILE_PATH" 2>&1 || true
-  # Fall back to Prettier if Biome isn't available
-  elif command -v prettier >/dev/null 2>&1; then
-    prettier --write "$FILE_PATH" 2>&1 || true
+  if node_tool_available "$CWD" biome; then
+    run_node_tool "$CWD" biome format --write "$FILE_PATH"
+  elif node_tool_available "$CWD" prettier; then
+    run_node_tool "$CWD" prettier --write "$FILE_PATH"
   fi
-
-  # Optional: Run TypeScript compiler type checking (doesn't format, but validates types)
-  # Uncomment if you want type checking after formatting
-  # if [[ "$FILE_PATH" == *.ts ]] || [[ "$FILE_PATH" == *.tsx ]]; then
-  #   if command -v tsc >/dev/null 2>&1; then
-  #     tsc --noEmit "$FILE_PATH" 2>&1 || true
-  #   fi
-  # fi
 fi
 
 exit 0

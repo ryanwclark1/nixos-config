@@ -21,6 +21,7 @@ let
     }
   );
   hookScripts = [
+    "hook-common.sh"
     "format-hook.sh"
     "security-hook.sh"
     "lint-hook.sh"

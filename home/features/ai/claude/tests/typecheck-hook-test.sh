@@ -36,6 +36,18 @@ SH
 make_fake_checker pyrefly
 make_fake_checker ty
 make_fake_checker mypy
+cat >"$BIN/uv" <<'SH'
+#!/usr/bin/env bash
+printf 'uv %s\n' "$*" >>"$TYPECHECK_HOOK_LOG"
+if [ "$1" = "run" ]; then
+  shift
+  if [ "${1:-}" = "--no-sync" ]; then
+    shift
+  fi
+fi
+"$@"
+SH
+chmod +x "$BIN/uv"
 
 TYPECHECK_HOOK_LOG="$LOG" \
 PATH="$BIN:$PATH" \
@@ -43,6 +55,9 @@ PATH="$BIN:$PATH" \
 {"cwd":"$PROJECT","tool_input":{"path":"example.py"}}
 JSON
 
+grep -Fx "uv run --no-sync pyrefly check $PROJECT/example.py" "$LOG"
 grep -Fx "pyrefly check $PROJECT/example.py" "$LOG"
+grep -Fx "uv run --no-sync ty check $PROJECT/example.py" "$LOG"
 grep -Fx "ty check $PROJECT/example.py" "$LOG"
+grep -Fx "uv run --no-sync mypy $PROJECT/example.py" "$LOG"
 grep -Fx "mypy $PROJECT/example.py" "$LOG"
