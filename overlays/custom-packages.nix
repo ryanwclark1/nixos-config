@@ -47,7 +47,28 @@ in
   beads-rust = fromLlmAgents "beads-rust" null;
   beads-viewer = fromLlmAgents "beads-viewer" null;
   mardi-gras = fromLlmAgents "mardi-gras" null;
-  gastown = fromLlmAgents "gastown" null;
+  # gastown: deploy a local reaper/compact fix (real wisp_dependencies depends-on
+  # columns) on top of the llm-agents v1.2.1 build. The fix is a single commit on
+  # the v1.2.1 base with NO go.mod/go.sum change, so we reuse the upstream
+  # buildGoModule vendor derivation and only swap in the patched source.
+  # Source: local fork branch fix/wisp-depends-col @ a2699f79 (ryanwclark1/gastown).
+  # TODO(reproducibility): once the fix lands upstream in llm-agents, drop this
+  # override. To make it portable beyond this machine, push the branch and switch
+  # src to fetchFromGitHub.
+  gastown =
+    let
+      base = fromLlmAgents "gastown" null;
+    in
+    if base == null then
+      null
+    else
+      base.overrideAttrs (_old: {
+        src = builtins.fetchGit {
+          url = "/home/administrator/Code/gastown-wisp-fix";
+          ref = "fix/wisp-depends-col";
+          rev = "a2699f79874fa69e03cbd8d1a19bb3f1f564b148";
+        };
+      });
   gascity = fromLlmAgents "gascity" null;
   bernstein = fromLlmAgents "bernstein" null;
   workmux = fromLlmAgents "workmux" null;
