@@ -96,6 +96,11 @@
     # Desktop GPU tuning
     corectrl
     gamemode
+
+    # Provides `chattr`/`lsattr` so Dolt's append-only data dir can be marked
+    # NoCOW (FS_NOCOW_FL) on btrfs, avoiding kworker thrashing from transparent
+    # compression. Surfaced by `bd doctor` (Btrfs NoCOW check).
+    e2fsprogs
   ];
 
   # GPU device access for non-root users (compute uses /dev/dri/renderD*)
