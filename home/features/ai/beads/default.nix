@@ -68,7 +68,7 @@
     - bd dolt status
     - gt dolt status
     - gt dolt sync          # push rig databases to DoltHub remotes
-    - mysql --protocol=tcp --host=127.0.0.1 --port=3317 --user=root
+    - mysql --protocol=tcp --host=127.0.0.1 --port=3307 --user=root
 
     Gas Town and the execution agents treat Beads as the durable data plane
     for coordinated work, with Dolt as the persistence and inspection layer.

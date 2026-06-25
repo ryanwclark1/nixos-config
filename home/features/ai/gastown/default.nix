@@ -20,7 +20,7 @@ in
 
     doltPort = lib.mkOption {
       type = lib.types.port;
-      default = 3317;
+      default = 3307;
       description = "Port for Gas Town's Dolt SQL server.";
     };
   };
