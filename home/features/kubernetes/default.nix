@@ -73,6 +73,10 @@
     # Minikube completion
     if command -v minikube &> /dev/null; then
       source <(minikube completion zsh)
+      # Minikube's generated zsh completion currently loads bashcompinit, which
+      # aliases native zsh completers and breaks fzf-tab/systemctl completion.
+      unalias _complete _expand shopt 2>/dev/null || true
+      autoload -Uz _complete _expand
     fi
   '';
 }

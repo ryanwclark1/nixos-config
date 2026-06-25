@@ -37,6 +37,29 @@ in
     # shell or a project checkout fails with "not in a Gas Town workspace".
     home.sessionVariables.GT_TOWN_ROOT = cfg.hqRoot;
 
+    programs.bash.bashrcExtra = lib.mkAfter ''
+      # Fallback GT_TOWN_ROOT to HQ root if not in a Gas Town rig
+      _gastown_fallback_hook() {
+        if [ -z "$GT_TOWN_ROOT" ]; then
+          export GT_TOWN_ROOT="${cfg.hqRoot}"
+        fi
+      }
+      if [[ ";''${PROMPT_COMMAND[*]:-};" != *";_gastown_fallback_hook;"* ]]; then
+        PROMPT_COMMAND="''${PROMPT_COMMAND:+$PROMPT_COMMAND;}_gastown_fallback_hook"
+      fi
+    '';
+
+    programs.zsh.initContent = lib.mkAfter ''
+      # Fallback GT_TOWN_ROOT to HQ root if not in a Gas Town rig
+      _gastown_fallback_hook() {
+        if [ -z "$GT_TOWN_ROOT" ]; then
+          export GT_TOWN_ROOT="${cfg.hqRoot}"
+        fi
+      }
+      autoload -Uz add-zsh-hook
+      add-zsh-hook precmd _gastown_fallback_hook
+    '';
+
     # Persist Gas Town's Dolt SQL server (the Beads data plane) across
     # reboots. This runs `gt dolt start` from the HQ, so it picks up the
     # HQ's configured port and data directory automatically. Only the Dolt
