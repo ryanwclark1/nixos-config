@@ -1654,11 +1654,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1782222689,
-        "narHash": "sha256-35JqmXCC8zzpHgQ6jzBWNg5tRvRM5ESO2abz0YIqj5o=",
+        "lastModified": 1782308533,
+        "narHash": "sha256-Qgh/7Bz9GPOoFdTmKMmujeOvMvqD2SSfoEGTrKlt21Y=",
         "owner": "Qumulo",
         "repo": "llm-agents",
-        "rev": "d085c627bf1864c20e01e2f9df534b0d0c6b55e2",
+        "rev": "e593d384fa85a68779e3a1795e65dfa33a035e81",
         "type": "github"
       },
       "original": {

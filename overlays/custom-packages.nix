@@ -124,15 +124,18 @@ in
   # Override cursor-cli with our custom version
   cursor-cli = final.callPackage ../pkgs/cursor-cli { };
 
-  # Override antigravity-cli with our custom version
-  antigravity-cli = final.callPackage ../pkgs/antigravity-cli { };
+  # Prefer fast-moving agent CLIs from Qumulo/llm-agents; keep local
+  # derivations as fallbacks for input failures or package shape changes.
+  antigravity-cli = fromLlmAgents "antigravity-cli" (final.callPackage ../pkgs/antigravity-cli { });
 
-  # Override Claude Code with our custom native binary package by default.
+  # Keep the local native binary package available, but expose Claude Code
+  # from llm-agents by default so /ai follows the shared agent flake.
   claude-code-bin = final.callPackage ../pkgs/claude-code-bin { };
-  claude-code = final.claude-code-bin;
+  claude-code = fromLlmAgents "claude-code" final.claude-code-bin;
 
-  # Override codex with our custom version
-  codex = final.callPackage ../pkgs/codex { };
+  # Prefer Codex from llm-agents so the AI feature tracks the shared agent
+  # flake; keep the local derivation as a fallback for input failures.
+  codex = fromLlmAgents "codex" (final.callPackage ../pkgs/codex { });
 
   # Override antigravity with our custom version
   # Same workaround as code-cursor: exclude meta from auto-filling

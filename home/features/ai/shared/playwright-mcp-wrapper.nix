@@ -28,5 +28,5 @@ pkgs.writeShellScriptBin "mcp-server-playwright-nixos" ''
     )
   }:$PATH"
 
-  exec ${pkgs.playwright-mcp}/bin/mcp-server-playwright "$@"
+  exec ${lib.getExe pkgs.playwright-mcp} "$@"
 ''

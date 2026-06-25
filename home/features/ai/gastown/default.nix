@@ -17,6 +17,12 @@ in
     };
 
     autoStartDolt = lib.mkEnableOption "starting Gas Town's Dolt SQL server on login";
+
+    doltPort = lib.mkOption {
+      type = lib.types.port;
+      default = 3317;
+      description = "Port for Gas Town's Dolt SQL server.";
+    };
   };
 
   config = {
@@ -25,6 +31,11 @@ in
       pkgs.gascity
       pkgs.bernstein
     ];
+
+    # Let `gt` locate the HQ workspace from any shell (not just tmux panes,
+    # where the daemon injects it). Without this, `gt` invoked from a plain
+    # shell or a project checkout fails with "not in a Gas Town workspace".
+    home.sessionVariables.GT_TOWN_ROOT = cfg.hqRoot;
 
     # Persist Gas Town's Dolt SQL server (the Beads data plane) across
     # reboots. This runs `gt dolt start` from the HQ, so it picks up the
@@ -42,6 +53,7 @@ in
         RemainAfterExit = true;
         WorkingDirectory = cfg.hqRoot;
         Environment = [
+          "GT_DOLT_PORT=${toString cfg.doltPort}"
           "PATH=${
             lib.makeBinPath [
               pkgs.gastown
@@ -81,8 +93,8 @@ in
 
       Beads is the task ledger. Gas Town owns the Dolt SQL server that backs
       it (`gt dolt`); the `gastown-dolt` user service keeps that server
-      running across reboots. Gastown coordinates work through Beads commands
-      and workflow state on top of it.
+      running across reboots on port ${toString cfg.doltPort}. Gastown
+      coordinates work through Beads commands and workflow state on top of it.
     '';
   };
 }

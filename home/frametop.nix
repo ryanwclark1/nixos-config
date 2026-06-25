@@ -69,6 +69,7 @@
 
   # Frametop-specific configuration
   features.quickshell.enable = true;
+  features.agent-desk.gastown.autoStartDolt = true;
 
   features.battery-monitor = {
     enable = true;

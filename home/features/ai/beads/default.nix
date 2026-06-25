@@ -6,7 +6,7 @@
 
 {
   # Dolt is owned and managed by Gas Town (gt), not by a standalone systemd
-  # unit. Gas Town runs a single Dolt SQL server (default port 3307) over
+  # unit. Gas Town runs a single Dolt SQL server (port 3317) over
   # ~/gt/.dolt-data/, with one database per rig plus the town "hq" database,
   # and keeps it alive via `gt up` / `gt dolt`. Running a second dolt server
   # here would collide with that ownership (see `gt dolt kill-imposters`).
@@ -68,7 +68,7 @@
     - bd dolt status
     - gt dolt status
     - gt dolt sync          # push rig databases to DoltHub remotes
-    - mysql --protocol=tcp --host=127.0.0.1 --port=3307 --user=root
+    - mysql --protocol=tcp --host=127.0.0.1 --port=3317 --user=root
 
     Gas Town and the execution agents treat Beads as the durable data plane
     for coordinated work, with Dolt as the persistence and inspection layer.

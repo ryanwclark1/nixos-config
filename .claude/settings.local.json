@@ -5,7 +5,6 @@
       "Bash(head:*)",
       "WebFetch(domain:mynixos.com)",
       "Bash(ls -la /home/administrator/nixos-config/home/*.nix)",
-      "*",
       "Bash(grep -r \"features\\\\.\" /home/administrator/nixos-config/home/*.nix)",
       "Bash(*)",
       "mcp__context7__resolve-library-id",
