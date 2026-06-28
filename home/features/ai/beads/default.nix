@@ -6,7 +6,7 @@
 
 {
   # Dolt is owned and managed by Gas Town (gt), not by a standalone systemd
-  # unit. Gas Town runs a single Dolt SQL server (port 3317) over
+  # unit. Gas Town runs a single Dolt SQL server (port 3307) over
   # ~/gt/.dolt-data/, with one database per rig plus the town "hq" database,
   # and keeps it alive via `gt up` / `gt dolt`. Running a second dolt server
   # here would collide with that ownership (see `gt dolt kill-imposters`).

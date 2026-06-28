@@ -12,7 +12,7 @@
       "--disable-ctrl-r"
     ];
     settings = {
-      auto_sync = false;
+      auto_sync = true;
       dialect = "us";
       enter_accept = false;
       exit_mode = "return-original";
@@ -22,24 +22,35 @@
       keymap_mode = "vim-normal";
       local_timeout = 5;
       max_preview_height = 4;
-      network_connection_timeout = 5;
+      network_connect_timeout = 5;
       network_timeout = 30;
-      search_mode = "fuzzy";
+      sync_address = "https://atuin-1.tail5825d.ts.net";
+      sync_frequency = "10m";
+      search_mode = "daemon-fuzzy";
       search_mode_shell_up_key_binding = "fuzzy";
-      secrets_filter = false;
+      secrets_filter = true;
       show_help = true;
       show_preview = true;
       show_tabs = true;
       store_failed = true;
       style = "auto";
       update_check = false;
-      workspace = false;
+      workspaces = false;
       prefers_reduced_motion = false;
+
+      daemon = {
+        enabled = true;
+        autostart = true;
+      };
 
       keymap_cursor = {
         emacs = "blink-block";
         vim_insert = "blink-block";
         vim_normal = "steady-block";
+      };
+
+      sync = {
+        records = true;
       };
 
       stats = {

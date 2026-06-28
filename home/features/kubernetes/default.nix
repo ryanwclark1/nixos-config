@@ -16,8 +16,11 @@
 
   home.packages = with pkgs; [
     kubectl
+    opentofu # Terraform-compatible IaC for Proxmox VM provisioning
     minikube
     talosctl
+    skopeo # Inspect OCI images and digests without pulling them into Docker
+    cilium-cli # Cilium install/status/debug CLI
     kubeshark # Kubernetes packet capture tool
     seabird # Kubernetes native desktop app that simplifies working with Kubernetes.
     weave-gitops # GitOps for Kubernetes
