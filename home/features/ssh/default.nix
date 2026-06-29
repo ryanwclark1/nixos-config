@@ -104,6 +104,10 @@ in
         HostName = "frametop";
       };
 
+      "testbox" = commonHostConfig // {
+        HostName = "10.10.100.108";
+      };
+
       # Direct IP connections
       "10.10.100.56" = commonHostConfig // {
         HostName = "10.10.100.56";

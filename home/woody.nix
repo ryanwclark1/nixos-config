@@ -5,7 +5,10 @@
 
 {
   features.quickshell.enable = true;
-  features.agent-desk.gastown.autoStartDolt = true;
+  features.agent-desk.gastown.enable = false;
+  features.agent-desk.gastown.autoStartDolt = false;
+  features.agent-desk.beads.remoteDoltTunnel.enable = true;
+  features.productivity.logseq.enable = false;
 
   imports = [
     ./global

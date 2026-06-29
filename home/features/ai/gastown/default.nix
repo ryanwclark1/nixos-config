@@ -10,6 +10,10 @@ let
 in
 {
   options.features.agent-desk.gastown = {
+    enable = lib.mkEnableOption "local Gas Town tooling and shell integration" // {
+      default = true;
+    };
+
     hqRoot = lib.mkOption {
       type = lib.types.str;
       default = "${config.home.homeDirectory}/gt";
@@ -25,7 +29,7 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf cfg.enable {
     home.packages = lib.filter (p: p != null) [
       pkgs.gastown
       pkgs.gascity

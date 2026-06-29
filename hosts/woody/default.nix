@@ -146,6 +146,11 @@
     loader.systemd-boot.configurationLimit = lib.mkForce 20;
   };
 
+  # The current linux_zen build in this flake exposes vmlinuz rather than the
+  # x86 default bzImage path. Keep the Zen kernel and point the boot toplevel at
+  # the image the package actually provides.
+  system.boot.loader.kernelFile = lib.mkForce "vmlinuz";
+
   # Desktop-specific power management
   powerManagement = {
     cpuFreqGovernor = "performance";
