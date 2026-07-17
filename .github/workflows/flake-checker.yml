@@ -18,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: DeterminateSystems/nix-installer-action@v22
-      - uses: DeterminateSystems/flake-checker-action@v10
+      - uses: DeterminateSystems/flake-checker-action@v13
       - name: QuickShell structure verify (CI deterministic)
         run: |
           nix shell nixpkgs#bash nixpkgs#python3 nixpkgs#ripgrep nixpkgs#coreutils nixpkgs#cliphist nixpkgs#wl-clipboard nixpkgs#nodejs -c \
